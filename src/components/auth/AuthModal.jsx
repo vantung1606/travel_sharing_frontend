@@ -75,8 +75,9 @@ export const AuthModal = () => {
           </div>
 
           {/* Center Mascot & Quote */}
-          <div className="relative z-10 my-auto py-6 flex flex-col items-center text-center">
-            <div className="relative w-36 h-36 mb-4 filter drop-shadow-[0_15px_25px_rgba(0,0,0,0.5)] animate-float-3d">
+          <div className="relative z-10 my-auto py-4 flex flex-col items-center text-center">
+            {/* ENLARGED 3D MASCOT CHARACTER */}
+            <div className="relative w-52 h-52 sm:w-64 sm:h-64 mb-2 filter drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)] animate-float-3d transition-all">
               <img
                 src={mascotImg}
                 alt="Wayfare Mascot"
@@ -84,8 +85,8 @@ export const AuthModal = () => {
               />
             </div>
 
-            <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-xs text-slate-200 space-y-2">
-              <p className="italic font-medium">
+            <div className="p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 text-xs text-slate-200 space-y-1.5 w-full">
+              <p className="italic font-medium text-[11px] leading-relaxed">
                 "Du lịch không chỉ là đến một địa điểm mới, mà là thay đổi góc nhìn về cuộc sống."
               </p>
               <div className="flex items-center justify-center gap-1.5 text-amber-400 font-bold text-[11px]">
@@ -96,7 +97,7 @@ export const AuthModal = () => {
           </div>
 
           {/* Bottom Bullet Points */}
-          <div className="relative z-10 space-y-2 text-xs text-slate-300">
+          <div className="relative z-10 space-y-1.5 text-xs text-slate-300">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>Lập tour AI tự động theo gu cá nhân</span>
@@ -108,6 +109,11 @@ export const AuthModal = () => {
           </div>
 
         </div>
+
+        {/* ========================================================= */}
+        {/* ELEGANT VERTICAL MIDDLE DIVIDER LINE (DESKTOP)            */}
+        {/* ========================================================= */}
+        <div className="hidden lg:block w-[1px] bg-gradient-to-b from-slate-200/20 via-slate-300 to-slate-200/20 relative z-20 shrink-0"></div>
 
         {/* ========================================================= */}
         {/* RIGHT COLUMN: AUTH01 FORM (STITCH AUTH01 SPECIFICATION)  */}
@@ -258,10 +264,10 @@ export const AuthModal = () => {
             {/* ========================================================= */}
             <div className="relative my-6 flex items-center justify-center">
               <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                <div className="w-full border-t border-slate-200/90"></div>
+                <div className="w-full border-t border-slate-300"></div>
               </div>
               <div className="relative px-3 bg-white text-center">
-                <span className="px-3 py-1 rounded-full bg-slate-100 border border-slate-200/80 text-[11px] font-extrabold text-slate-500 uppercase tracking-wider shadow-2xs">
+                <span className="px-3.5 py-1 rounded-full bg-slate-100/90 border border-slate-200 text-[11px] font-extrabold text-slate-500 uppercase tracking-widest shadow-2xs">
                   Hoặc đăng nhập với
                 </span>
               </div>
