@@ -17,8 +17,10 @@ export const AppProvider = ({ children }) => {
   const [userTab, setUserTab] = useState('home'); // 'home'|'explore'|'community'|'itineraries'|'ai-planner'|'messages'|'profile'
   const [adminTab, setAdminTab] = useState('dashboard'); // 'dashboard'|'places'|'users'
 
-  // AI Modal State
+  // AI & Auth Modal State
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
 
   // Data States
   const [destinations, setDestinations] = useState(INITIAL_DESTINATIONS);
@@ -138,6 +140,10 @@ export const AppProvider = ({ children }) => {
         setAdminTab,
         isAIGeneratorOpen,
         setIsAIGeneratorOpen,
+        isAuthModalOpen,
+        setIsAuthModalOpen,
+        authMode,
+        setAuthMode,
         destinations,
         posts,
         itineraries,

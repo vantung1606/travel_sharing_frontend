@@ -24,6 +24,8 @@ export const Navbar = () => {
     userTab,
     setUserTab,
     setIsAIGeneratorOpen,
+    setIsAuthModalOpen,
+    setAuthMode,
     currentUser,
     stats
   } = useApp();
@@ -151,6 +153,15 @@ export const Navbar = () => {
                 </>
               )}
 
+              {/* Auth Login Button */}
+              <button
+                onClick={() => { setAuthMode('login'); setIsAuthModalOpen(true); }}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer shrink-0"
+              >
+                <User className="w-3.5 h-3.5 text-sky-600" />
+                <span>Đăng nhập</span>
+              </button>
+
               {/* User Profile Avatar */}
               <div
                 onClick={() => { setPortalMode('user'); setUserTab('profile'); }}
@@ -256,16 +267,23 @@ export const Navbar = () => {
 
               {/* Primary AI Generator CTA Button */}
               {portalMode === 'user' && (
-                <button
-                  onClick={() => {
-                    setIsAIGeneratorOpen(true);
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full sparkle-btn text-white py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-orange-500/25"
-                >
-                  <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
-                  <span>Tạo Lịch Trình AI Mới</span>
-                </button>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => { setAuthMode('login'); setIsAuthModalOpen(true); setIsMobileMenuOpen(false); }}
+                    className="w-full py-2.5 rounded-2xl bg-slate-900 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                  >
+                    <User className="w-4 h-4 text-sky-400" />
+                    <span>Đăng nhập / Đăng ký</span>
+                  </button>
+
+                  <button
+                    onClick={() => { setIsAIGeneratorOpen(true); setIsMobileMenuOpen(false); }}
+                    className="w-full sparkle-btn text-white py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 cursor-pointer"
+                  >
+                    <Sparkles className="w-4 h-4 text-amber-200" />
+                    <span>Tạo Lịch Trình AI Ngay</span>
+                  </button>
+                </div>
               )}
 
               {/* Main Navigation Links List */}

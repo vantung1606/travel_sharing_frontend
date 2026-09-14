@@ -6,6 +6,7 @@ import { AdminSidebar } from './components/common/AdminSidebar';
 import { AdminHeader } from './components/common/AdminHeader';
 import { Footer } from './components/common/Footer';
 import { AITripGeneratorModal } from './components/ai/AITripGeneratorModal';
+import { AuthModal } from './components/auth/AuthModal';
 
 // User Pages
 import { HomePage } from './pages/user/Home/HomePage';
@@ -86,6 +87,9 @@ const AppContent = () => {
 
       {/* Global AI Generator Wizard Modal */}
       <AITripGeneratorModal />
+
+      {/* Global Stitch Auth01 Login & Register Modal */}
+      <AuthModal />
     </div>
   );
 };
