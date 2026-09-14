@@ -12,18 +12,18 @@ export const Footer = () => {
                 <Compass className="w-5 h-5" />
               </div>
               <span className="font-display font-bold text-lg text-white tracking-tight">
-                Wander<span className="text-sky-400">AI</span>
+                Roam<span className="text-sky-400">ly</span>
               </span>
             </div>
             <p className="text-slate-400 leading-relaxed mb-4">
-              Nền tảng lập lịch trình du lịch thông minh & chia sẻ trải nghiệm hàng đầu với công nghệ AI thế hệ mới.
+              Nền tảng du lịch thông minh & chia sẻ trải nghiệm hành trình hàng đầu Việt Nam.
             </p>
           </div>
 
           <div>
             <h4 className="font-bold text-white mb-3">Khám Phá</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-sky-400">Lịch trình gợi ý AI</a></li>
+              <li><a href="#" className="hover:text-sky-400">Lịch trình gợi ý</a></li>
               <li><a href="#" className="hover:text-sky-400">Top 100 Điểm Đến HOT</a></li>
               <li><a href="#" className="hover:text-sky-400">Cộng đồng du lịch</a></li>
               <li><a href="#" className="hover:text-sky-400">Review điểm Check-in</a></li>
@@ -31,9 +31,9 @@ export const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-3">Tính Năng AI</h4>
+            <h4 className="font-bold text-white mb-3">Tính Năng Nổi Bật</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-sky-400">AI Itinerary Generator</a></li>
+              <li><a href="#" className="hover:text-sky-400">Tạo tour tự động</a></li>
               <li><a href="#" className="hover:text-sky-400">Tối ưu hoá ngân sách</a></li>
               <li><a href="#" className="hover:text-sky-400">Dự báo thời tiết & thời gian</a></li>
               <li><a href="#" className="hover:text-sky-400">Bản đồ tương tác nhóm</a></li>
@@ -42,18 +42,18 @@ export const Footer = () => {
 
           <div>
             <h4 className="font-bold text-white mb-3">Liên Hệ & Hỗ Trợ</h4>
-            <p className="mb-2">Email: contact@wanderai.com</p>
-            <p className="mb-4">Hotline: 1900 6868 AI</p>
+            <p className="mb-2">Email: contact@roamly.vn</p>
+            <p className="mb-4">Hotline: 1900 6868</p>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[11px] font-semibold flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-amber-400" /> Powered by Stitch & Gemini AI
+                <Sparkles className="w-3 h-3 text-amber-400" /> Roamly Smart Platform
               </span>
             </div>
           </div>
         </div>
 
         <div className="pt-8 border-t border-slate-800 text-center flex flex-col sm:flex-row items-center justify-between text-slate-500">
-          <p>© 2026 WanderAI Platform. Tất cả quyền được bảo lưu.</p>
+          <p>© 2026 Roamly Platform. Tất cả quyền được bảo lưu.</p>
           <p className="flex items-center justify-center gap-1 mt-2 sm:mt-0">
             Thiết kế với <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> cho cộng đồng yêu du lịch Việt Nam
           </p>

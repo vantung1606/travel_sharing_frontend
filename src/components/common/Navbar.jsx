@@ -60,11 +60,11 @@ export const Navbar = () => {
                   <Compass className="w-5 h-5 md:w-6 md:h-6 animate-spin-slow" />
                 </div>
                 <div className="block">
-                  <span className="font-display font-bold text-base sm:text-lg md:text-xl tracking-tight text-slate-900 group-hover:text-sky-600 transition-colors">
-                    Wander<span className="text-sky-600">AI</span>
+                  <span className="font-display font-extrabold text-base sm:text-lg md:text-xl tracking-tight text-slate-900 group-hover:text-sky-600 transition-colors">
+                    Roam<span className="text-sky-600">ly</span>
                   </span>
-                  <span className="hidden sm:block text-[10px] uppercase tracking-wider font-semibold text-slate-400">
-                    Smart Travel Platform
+                  <span className="hidden sm:block text-[9px] uppercase tracking-widest font-extrabold text-slate-400">
+                    Smart Travel Companion
                   </span>
                 </div>
               </div>
