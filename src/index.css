@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: #0284c7;
+    --secondary: #0d5c75;
+    --tertiary: #f97316;
+    --surface: #faf8ff;
+    --on-surface: #131b2e;
+  }
+
+  /* Responsive Font Sizing: Standard 15px on mobile, enlarged to 17px & 18px on PC/Desktop */
+  html {
+    font-size: 15px;
+  }
+  @media (min-width: 1024px) {
+    html {
+      font-size: 16.5px;
+    }
+  }
+  @media (min-width: 1440px) {
+    html {
+      font-size: 18px;
+    }
+  }
+}
+
+/* Glassmorphism & Custom Effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.glass-panel-dark {
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sparkle-btn {
+  background: linear-gradient(135deg, #f97316 0%, #fb923c 100%);
+  box-shadow: 0 4px 20px -2px rgba(249, 115, 22, 0.35);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sparkle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -2px rgba(249, 115, 22, 0.5);
+}
+
+.ocean-gradient {
+  background: linear-gradient(135deg, #0284c7 0%, #0d5c75 100%);
+}
+
+.hero-gradient {
+  background: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.15) 0%, rgba(249, 115, 22, 0.05) 50%, rgba(255, 255, 255, 0) 100%);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 3D Mascot Animations & Perspective Effects */
+@keyframes float3d {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(1.2deg);
+  }
+}
+
+.animate-float-3d {
+  animation: float3d 4.5s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.1);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+.mascot-3d-shadow {
+  filter: drop-shadow(0 25px 35px rgba(2, 132, 199, 0.45)) drop-shadow(0 10px 15px rgba(15, 23, 42, 0.4));
+}
+
