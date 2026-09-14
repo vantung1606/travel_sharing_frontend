@@ -78,14 +78,14 @@ export const HomePage = () => {
               {/* Smart Badge Pill */}
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-sm text-xs font-bold text-sky-300">
                 <Sparkles className="w-4 h-4 text-amber-400 animate-spin-slow" />
-                <span>Trợ Lý Du Lịch Roamly • Lập lịch trình thông minh</span>
+                <span>Trợ Lý Lữ Hành Wayfare • Hành trình cá nhân hóa</span>
               </div>
 
               {/* Hero Headline */}
               <h1 className="font-display font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight leading-tight">
-                Kết nối & Lập lịch trình Du lịch Thông minh cùng{' '}
+                Kết nối & Lập lịch trình Du lịch Cực chất cùng{' '}
                 <span className="bg-gradient-to-r from-sky-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
-                  Roamly
+                  Wayfare
                 </span>
               </h1>
 

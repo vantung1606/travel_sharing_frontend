@@ -12,11 +12,11 @@ export const Footer = () => {
                 <Compass className="w-5 h-5" />
               </div>
               <span className="font-display font-bold text-lg text-white tracking-tight">
-                Roam<span className="text-sky-400">ly</span>
+                Way<span className="text-sky-400">fare</span>
               </span>
             </div>
             <p className="text-slate-400 leading-relaxed mb-4">
-              Nền tảng du lịch thông minh & chia sẻ trải nghiệm hành trình hàng đầu Việt Nam.
+              Nền tảng du lịch cá tính & chia sẻ trải nghiệm lữ hành hàng đầu Việt Nam.
             </p>
           </div>
 
@@ -42,18 +42,18 @@ export const Footer = () => {
 
           <div>
             <h4 className="font-bold text-white mb-3">Liên Hệ & Hỗ Trợ</h4>
-            <p className="mb-2">Email: contact@roamly.vn</p>
+            <p className="mb-2">Email: contact@wayfare.vn</p>
             <p className="mb-4">Hotline: 1900 6868</p>
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[11px] font-semibold flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-amber-400" /> Roamly Smart Platform
+                <Sparkles className="w-3 h-3 text-amber-400" /> Wayfare Authentic Platform
               </span>
             </div>
           </div>
         </div>
 
         <div className="pt-8 border-t border-slate-800 text-center flex flex-col sm:flex-row items-center justify-between text-slate-500">
-          <p>© 2026 Roamly Platform. Tất cả quyền được bảo lưu.</p>
+          <p>© 2026 Wayfare Platform. Tất cả quyền được bảo lưu.</p>
           <p className="flex items-center justify-center gap-1 mt-2 sm:mt-0">
             Thiết kế với <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> cho cộng đồng yêu du lịch Việt Nam
           </p>

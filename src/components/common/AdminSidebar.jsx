@@ -34,7 +34,7 @@ export const AdminSidebar = () => {
           </div>
           <div className="flex flex-col">
             <span className="font-display font-extrabold text-base text-white tracking-tight leading-tight">
-              Roam<span className="text-sky-400">ly</span>
+              Way<span className="text-sky-400">fare</span>
             </span>
             <span className="text-[10px] font-extrabold text-sky-300 uppercase tracking-widest">
               Admin Portal
