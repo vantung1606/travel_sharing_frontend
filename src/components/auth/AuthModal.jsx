@@ -47,9 +47,10 @@ export const AuthModal = () => {
         </button>
 
         {/* ========================================================= */}
-        {/* LEFT COLUMN: VISUAL BRAND HERO BANNER (Desktop Only)      */}
         {/* ========================================================= */}
-        <div className="hidden lg:flex lg:w-5/12 bg-slate-950 relative flex-col justify-between p-8 text-white overflow-hidden">
+        {/* LEFT COLUMN: VISUAL BRAND HERO BANNER WITH DIAGONAL CUT   */}
+        {/* ========================================================= */}
+        <div className="hidden lg:flex lg:w-[45%] bg-slate-950 relative flex-col justify-between p-8 pr-12 text-white overflow-hidden z-10 [clip-path:polygon(0_0,100%_0,82%_100%,0_100%)]">
           
           {/* Background Image Scrim */}
           <div
@@ -107,14 +108,14 @@ export const AuthModal = () => {
         </div>
 
         {/* ========================================================= */}
-        {/* ELEGANT VERTICAL MIDDLE DIVIDER LINE (DESKTOP)            */}
+        {/* DIAGONAL ANGLED SLANT NEON GLOW LINE (DESKTOP)            */}
         {/* ========================================================= */}
-        <div className="hidden lg:block w-[1px] bg-gradient-to-b from-slate-200/20 via-slate-300 to-slate-200/20 relative z-20 shrink-0"></div>
+        <div className="hidden lg:block absolute top-0 bottom-0 left-[45%] -ml-1 w-2 border-r-2 border-sky-400/80 shadow-[0_0_15px_rgba(56,189,248,0.7)] z-20 origin-top [clip-path:polygon(100%_0,100%_0,82%_100%,82%_100%)] pointer-events-none"></div>
 
         {/* ========================================================= */}
         {/* RIGHT COLUMN: AUTH01 FORM (STITCH AUTH01 SPECIFICATION)  */}
         {/* ========================================================= */}
-        <div className="w-full lg:w-7/12 p-6 sm:p-8 md:p-10 flex flex-col justify-between overflow-y-auto">
+        <div className="w-full lg:w-[55%] p-6 sm:p-8 md:p-10 flex flex-col justify-between overflow-y-auto pl-6 lg:pl-12">
           
           <div>
             {/* Header Title & Mode Switcher Tabs */}
