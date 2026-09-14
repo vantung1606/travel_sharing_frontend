@@ -64,20 +64,16 @@ export const AuthModal = () => {
           <div className="absolute -bottom-10 -left-10 w-64 h-64 rounded-full bg-sky-500/25 blur-3xl pointer-events-none"></div>
 
           {/* Top Brand Branding */}
-          <div className="relative z-10 space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-sky-300">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>Wayfare Auth Portal</span>
-            </div>
-            <h2 className="font-display font-extrabold text-2xl tracking-tight text-white">
+          <div className="relative z-10">
+            <h2 className="font-display font-extrabold text-2xl lg:text-3xl tracking-tight text-white leading-tight">
               Bắt đầu hành trình lữ hành cá tính
             </h2>
           </div>
 
           {/* Center Mascot & Quote */}
-          <div className="relative z-10 my-auto py-4 flex flex-col items-center text-center">
-            {/* ENLARGED 3D MASCOT CHARACTER */}
-            <div className="relative w-52 h-52 sm:w-64 sm:h-64 mb-2 filter drop-shadow-[0_20px_30px_rgba(0,0,0,0.6)] animate-float-3d transition-all">
+          <div className="relative z-10 my-auto py-2 flex flex-col items-center text-center">
+            {/* EVEN LARGER 3D MASCOT CHARACTER */}
+            <div className="relative w-60 h-60 sm:w-72 sm:h-72 lg:w-80 lg:h-80 my-1 filter drop-shadow-[0_25px_35px_rgba(0,0,0,0.7)] animate-float-3d transition-all">
               <img
                 src={mascotImg}
                 alt="Wayfare Mascot"
