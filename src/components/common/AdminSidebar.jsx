@@ -9,10 +9,11 @@ import {
   Cpu,
   LogOut,
   Compass,
-  MessageSquare
+  MessageSquare,
+  DollarSign
 } from 'lucide-react';
 
-export const AdminSidebar = () => {
+export const AdminSidebar = ({ onNavigate }) => {
   const { adminTab, setAdminTab, setPortalMode, stats } = useApp();
 
   const menuItems = [
@@ -20,7 +21,8 @@ export const AdminSidebar = () => {
     { id: 'places', label: 'Địa điểm & Check-in', icon: MapPin, badge: stats.pendingCheckins },
     { id: 'users', label: 'Người dùng & Phân quyền', icon: Users, badge: stats.reportedContent },
     { id: 'reports', label: 'Bài viết & Báo cáo', icon: MessageSquare },
-    { id: 'analytics', label: 'Thống kê & Doanh thu', icon: BarChart3 },
+    { id: 'analytics', label: 'Thống kê hệ thống', icon: BarChart3 },
+    { id: 'revenue', label: 'Mô hình Doanh thu', icon: DollarSign, isDev: true },
     { id: 'ai-config', label: 'Cấu hình Hệ thống AI', icon: Cpu }
   ];
 
@@ -61,7 +63,8 @@ export const AdminSidebar = () => {
             return (
               <button
                 key={item.id}
-                onClick={() => setAdminTab(item.id)}
+                onClick={() => { setAdminTab(item.id); onNavigate?.(); }}
+                aria-current={active ? 'page' : undefined}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   active
                     ? 'bg-sky-600 text-white shadow-md'
@@ -75,6 +78,11 @@ export const AdminSidebar = () => {
                 {item.badge > 0 && (
                   <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-amber-500 text-slate-950">
                     {item.badge}
+                  </span>
+                )}
+                {item.isDev && (
+                  <span className="px-2 py-0.5 text-[9px] font-extrabold rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                    Đang phát triển
                   </span>
                 )}
               </button>

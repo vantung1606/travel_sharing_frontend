@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Search, Plus, Bell, Menu, X, Compass, Shield } from 'lucide-react';
 import { AdminSidebar } from './AdminSidebar';
@@ -6,23 +6,36 @@ import { AdminSidebar } from './AdminSidebar';
 export const AdminHeader = () => {
   const { setPortalMode, setAdminTab } = useApp();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileDialog = useRef(null);
+  useEffect(() => {
+    if (!isMobileMenuOpen) return undefined;
+    const dialog = mobileDialog.current;
+    const overflow = document.body.style.overflow;
+    dialog.showModal();
+    document.body.style.overflow = 'hidden';
+    const closeOnDesktop = () => { if (window.innerWidth >= 768) setIsMobileMenuOpen(false); };
+    window.addEventListener('resize', closeOnDesktop);
+    return () => { dialog.close(); document.body.style.overflow = overflow; window.removeEventListener('resize', closeOnDesktop); };
+  }, [isMobileMenuOpen]);
 
   return (
     <>
       <header className="fixed top-0 left-0 md:left-[260px] right-0 h-16 bg-white/90 backdrop-blur-xl border-b border-slate-200/80 z-40 flex items-center justify-between px-4 sm:px-6 shadow-sm">
         
         {/* Mobile Hamburger & Search Bar */}
-        <div className="flex items-center gap-3 flex-1 max-w-xl">
+        <div className="flex min-w-0 items-center gap-3 flex-1 max-w-xl">
           {/* Mobile Hamburger Drawer Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
             title="Mở menu Admin"
+            aria-label="Mở menu Admin"
+            aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
 
-          <div className="relative w-full">
+          <div className="relative min-w-0 w-full">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
@@ -74,15 +87,11 @@ export const AdminHeader = () => {
 
       {/* Mobile Slide-Over Drawer for Admin Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex">
-          <div
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm"
-          ></div>
-          <div className="relative w-[260px] max-w-full z-50">
-            <AdminSidebar />
-          </div>
-        </div>
+        <dialog ref={mobileDialog} aria-label="Điều hướng quản trị" onCancel={() => setIsMobileMenuOpen(false)} className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none border-0 bg-transparent p-0 backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm">
+          <button type="button" tabIndex={-1} aria-label="Đóng menu" className="absolute inset-0 h-full w-full" onClick={() => setIsMobileMenuOpen(false)} />
+          <AdminSidebar onNavigate={() => setIsMobileMenuOpen(false)} />
+          <button autoFocus type="button" aria-label="Đóng menu Admin" className="fixed right-2 top-3 z-[60] flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-700 shadow-lg" onClick={() => setIsMobileMenuOpen(false)}><X className="h-5 w-5" /></button>
+        </dialog>
       )}
     </>
   );

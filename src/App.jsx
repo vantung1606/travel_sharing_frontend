@@ -24,6 +24,8 @@ import { AdminPlacesPage } from './pages/admin/Places/AdminPlacesPage';
 import { AdminUsersPage } from './pages/admin/Users/AdminUsersPage';
 import { AdminReportsPage } from './pages/admin/Reports/AdminReportsPage';
 import { AdminRevenuePage } from './pages/admin/Revenue/AdminRevenuePage';
+import { AdminStatisticsPage } from './pages/admin/Statistics/AdminStatisticsPage';
+import { AdminAIConfigPage } from './pages/admin/AIConfig/AdminAIConfigPage';
 
 const AppContent = () => {
   const { portalMode, userTab, adminTab } = useApp();
@@ -47,8 +49,9 @@ const AppContent = () => {
       case 'places': return <AdminPlacesPage />;
       case 'users': return <AdminUsersPage />;
       case 'reports': return <AdminReportsPage />;
-      case 'analytics': return <AdminRevenuePage />;
-      case 'ai-config': return <AdminDashboardPage />;
+      case 'analytics': return <AdminStatisticsPage />;
+      case 'revenue': return <AdminRevenuePage />;
+      case 'ai-config': return <AdminAIConfigPage />;
       default: return <AdminDashboardPage />;
     }
   };
@@ -74,14 +77,14 @@ const AppContent = () => {
       ) : (
         <div className="min-h-screen bg-[#faf8ff]">
           {/* Admin Fixed Sidebar (260px) */}
-          <AdminSidebar />
+          <div className="hidden md:block"><AdminSidebar /></div>
 
           {/* Admin Fixed Top Header */}
           <AdminHeader />
 
           {/* Admin Main Workspace Container */}
-          <div className="pl-[260px] pt-16 min-h-screen">
-            <main className="p-6 sm:p-8 bg-[#faf8ff] min-h-[calc(100vh-64px)]">
+          <div className="min-w-0 md:pl-[260px] pt-16 min-h-screen">
+            <main className="min-w-0 p-4 sm:p-6 lg:p-8 bg-[#faf8ff] min-h-[calc(100vh-64px)]">
               {renderAdminPage()}
             </main>
           </div>
