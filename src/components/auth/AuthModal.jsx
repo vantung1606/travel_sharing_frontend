@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
+import { useToast } from '../common/Toast';
+import { authApi } from '../../services/api';
 import mascotImg from '../../assets/design/bannerlogo.png';
 import {
   X,
@@ -16,19 +18,37 @@ import {
 
 export const AuthModal = () => {
   const { isAuthModalOpen, setIsAuthModalOpen, authMode, setAuthMode, login } = useApp();
+  const toast = useToast();
   
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!isAuthModalOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    login({ name: fullName || (email ? email.split('@')[0] : 'Nguyễn Thanh Tùng') });
-    setIsAuthModalOpen(false);
+    setIsLoading(true);
+
+    try {
+      if (authMode === 'login') {
+        const res = await authApi.login(email, password);
+        login(res.data?.user || { name: email.split('@')[0] });
+        toast.success(res.message || 'Đăng nhập thành công! 🎉');
+      } else {
+        const res = await authApi.register(fullName, email, password);
+        login(res.data?.user || { name: fullName || email.split('@')[0] });
+        toast.success(res.message || 'Đăng ký tài khoản thành công! 🎉');
+      }
+      setIsAuthModalOpen(false);
+    } catch (err) {
+      toast.error(err.message || 'Đã xảy ra lỗi, vui lòng thử lại!');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -248,10 +268,17 @@ export const AuthModal = () => {
               {/* Submit CTA Button */}
               <button
                 type="submit"
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 transition-all transform active:scale-95 cursor-pointer mt-2"
+                disabled={isLoading}
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 disabled:opacity-60 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 transition-all transform active:scale-95 cursor-pointer mt-2"
               >
-                <span>{authMode === 'login' ? 'Đăng nhập ngay' : 'Tạo tài khoản ngay'}</span>
-                <ArrowRight className="w-4 h-4" />
+                {isLoading ? (
+                  <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                ) : (
+                  <>
+                    <span>{authMode === 'login' ? 'Đăng nhập ngay' : 'Tạo tài khoản ngay'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
               </button>
 
             </form>

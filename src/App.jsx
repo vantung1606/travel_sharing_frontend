@@ -1,5 +1,6 @@
 import React from 'react';
 import { AppProvider, useApp } from './context/AppContext';
+import { ToastProvider } from './components/common/Toast';
 import { Navbar } from './components/common/Navbar';
 import { BottomNav } from './components/common/BottomNav';
 import { AdminSidebar } from './components/common/AdminSidebar';
@@ -96,8 +97,10 @@ const AppContent = () => {
 
 export default function App() {
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <ToastProvider>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </ToastProvider>
   );
 }
