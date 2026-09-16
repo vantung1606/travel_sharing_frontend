@@ -22,6 +22,7 @@ import { ProfilePage } from './pages/user/Profile/ProfilePage';
 import { AdminDashboardPage } from './pages/admin/Dashboard/AdminDashboardPage';
 import { AdminPlacesPage } from './pages/admin/Places/AdminPlacesPage';
 import { AdminUsersPage } from './pages/admin/Users/AdminUsersPage';
+import { AdminReportsPage } from './pages/admin/Reports/AdminReportsPage';
 
 const AppContent = () => {
   const { portalMode, userTab, adminTab } = useApp();
@@ -44,7 +45,7 @@ const AppContent = () => {
       case 'dashboard': return <AdminDashboardPage />;
       case 'places': return <AdminPlacesPage />;
       case 'users': return <AdminUsersPage />;
-      case 'reports': return <AdminUsersPage />;
+      case 'reports': return <AdminReportsPage />;
       case 'analytics': return <AdminDashboardPage />;
       case 'ai-config': return <AdminDashboardPage />;
       default: return <AdminDashboardPage />;
