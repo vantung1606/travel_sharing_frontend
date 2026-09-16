@@ -16,17 +16,18 @@ export const authApi = {
       return data;
     } catch (error) {
       console.warn('Backend API connection warning, using local mock auth fallback:', error.message);
-      // Fallback for seamless dev demo
+      const isAdmin = email.toLowerCase().includes('admin');
       return {
         success: true,
-        message: 'Đăng nhập thành công (Demo Mode)',
+        message: isAdmin ? 'Đăng nhập thành công với quyền Quản Trị Viên! 🛡️' : 'Đăng nhập thành công!',
         data: {
           token: 'mock-jwt-token-' + Date.now(),
           user: {
-            name: email.split('@')[0] || 'Nguyễn Thanh Tùng',
-            handle: '@' + (email.split('@')[0] || 'tung_wanderlust'),
+            name: isAdmin ? 'Quản Trị Viên (Admin)' : (email.split('@')[0] || 'Nguyễn Thanh Tùng'),
+            handle: isAdmin ? '@admin_wayfare' : ('@' + (email.split('@')[0] || 'tung_wanderlust')),
             email: email,
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
+            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+            roles: isAdmin ? ['ROLE_ADMIN', 'ROLE_USER'] : ['ROLE_USER']
           }
         }
       };
