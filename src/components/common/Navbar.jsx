@@ -82,7 +82,7 @@ export const Navbar = () => {
 
             {/* 2. Sleek Rounded Navigation Bar (Stitch M05 Style) */}
             {portalMode === 'user' && (
-              <nav className="hidden lg:flex items-center gap-1 p-1 bg-slate-100/70 rounded-full border border-slate-200/50 shadow-2xs">
+              <nav className="hidden md:flex items-center gap-0.5 lg:gap-1 p-1 bg-slate-100/70 rounded-full border border-slate-200/50 shadow-2xs max-w-full overflow-x-auto no-scrollbar">
                 {navItems.map(tab => {
                   const active = userTab === tab.id;
                   const Icon = tab.icon;
@@ -90,7 +90,7 @@ export const Navbar = () => {
                     <button
                       key={tab.id}
                       onClick={() => handleNavClick(tab.id)}
-                      className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap ${
+                      className={`flex items-center gap-1 lg:gap-1.5 px-2.5 py-1 md:px-2.5 md:py-1 lg:px-3.5 lg:py-1.5 text-[11px] lg:text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap ${
                         active
                           ? 'bg-sky-600 text-white font-bold shadow-xs'
                           : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
@@ -105,7 +105,7 @@ export const Navbar = () => {
 
                       {/* Smart Tag for AI Planner */}
                       {tab.isAi && (
-                        <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-0.5 ${
+                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] lg:text-[10px] font-bold flex items-center gap-0.5 ${
                           active
                             ? 'bg-sky-700/80 text-amber-200'
                             : 'bg-amber-100 text-amber-800'
@@ -116,7 +116,7 @@ export const Navbar = () => {
 
                       {/* Notification badge */}
                       {tab.badge && !active && (
-                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
+                        <span className={`px-1.5 py-0.5 rounded-full text-[8px] lg:text-[9px] font-bold ${
                           tab.badge === 'HOT' ? 'bg-amber-100 text-amber-800' : 'bg-rose-500 text-white'
                         }`}>
                           {tab.badge}
@@ -171,7 +171,7 @@ export const Navbar = () => {
                   <button
                     type="button"
                     onClick={() => setIsAIGeneratorOpen(true)}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0"
+                    className="hidden lg:inline-flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-200" />
                     <span>Tạo lịch trình</span>
@@ -279,10 +279,10 @@ export const Navbar = () => {
                 </div>
               )}
 
-              {/* Hamburger Button (< lg) */}
+              {/* Hamburger Button (< md) */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 lg:hidden transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 md:hidden transition-colors cursor-pointer shrink-0"
                 aria-label="Toggle navigation menu"
               >
                 {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -294,10 +294,10 @@ export const Navbar = () => {
       </header>
 
       {/* ========================================================= */}
-      {/* MOBILE / TABLET DRAWER                                    */}
+      {/* MOBILE DRAWER (< md)                                      */}
       {/* ========================================================= */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex justify-end">
+        <div className="fixed inset-0 z-50 md:hidden flex justify-end">
           <div
             onClick={() => setIsMobileMenuOpen(false)}
             className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
