@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 export const AuthModal = () => {
-  const { isAuthModalOpen, setIsAuthModalOpen, authMode, setAuthMode } = useApp();
+  const { isAuthModalOpen, setIsAuthModalOpen, authMode, setAuthMode, login } = useApp();
   
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
@@ -27,7 +27,7 @@ export const AuthModal = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert(`Đăng nhập thành công với tài khoản: ${email}`);
+    login({ name: fullName || (email ? email.split('@')[0] : 'Nguyễn Thanh Tùng') });
     setIsAuthModalOpen(false);
   };
 

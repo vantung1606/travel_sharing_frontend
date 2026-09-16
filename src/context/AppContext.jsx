@@ -31,6 +31,9 @@ export const AppProvider = ({ children }) => {
   const [reports, setReports] = useState(INITIAL_REPORTS);
   const [stats, setStats] = useState(ADMIN_STATS);
 
+  // Auth State
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   // User Profile
   const [currentUser, setCurrentUser] = useState({
     name: 'Nguyễn Thanh Tùng',
@@ -41,6 +44,19 @@ export const AppProvider = ({ children }) => {
     tripsCount: 6,
     savedItinerariesCount: 4
   });
+
+  const login = (userData) => {
+    setIsLoggedIn(true);
+    if (userData) {
+      setCurrentUser(prev => ({ ...prev, ...userData }));
+    }
+  };
+
+  const logout = () => {
+    setIsLoggedIn(false);
+    setPortalMode('user');
+    setUserTab('home');
+  };
 
   // Actions
   const toggleLikePost = (postId) => {
@@ -152,6 +168,10 @@ export const AppProvider = ({ children }) => {
         reports,
         stats,
         currentUser,
+        isLoggedIn,
+        setIsLoggedIn,
+        login,
+        logout,
         toggleLikePost,
         addCommunityPost,
         generateAITrip,

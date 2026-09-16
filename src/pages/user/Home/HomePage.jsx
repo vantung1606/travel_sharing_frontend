@@ -75,15 +75,11 @@ export const HomePage = () => {
             {/* LEFT COLUMN: Headline & CTA Actions (7 Cols) */}
             <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
               
-              {/* Smart Badge Pill */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 shadow-sm text-xs font-bold text-sky-300">
-                <Sparkles className="w-4 h-4 text-amber-400 animate-spin-slow" />
-                <span>Trợ Lý Lữ Hành Wayfare • Hành trình cá nhân hóa</span>
-              </div>
+             
 
               {/* Hero Headline */}
               <h1 className="font-display font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight leading-tight">
-                Kết nối & Lập lịch trình Du lịch Cực chất cùng{' '}
+                Hành trình du lịch trọn vẹn cùng{' '}
                 <span className="bg-gradient-to-r from-sky-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
                   Wayfare
                 </span>
@@ -91,7 +87,7 @@ export const HomePage = () => {
 
               {/* Subtitle */}
               <p className="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed">
-                Trải nghiệm du lịch dễ dàng hơn với trợ lý AI phân bổ lịch trình từng ngày, ước tính chi phí thực tế và kết nối cộng đồng xê dịch hàng đầu Việt Nam.
+                Trợ lý thông minh hỗ trợ thiết kế lịch trình cá nhân, dự tính chi phí thực tế và kết nối những người yêu du lịch.
               </p>
 
               {/* CTA Action Group */}
@@ -164,11 +160,11 @@ export const HomePage = () => {
                   <div className="flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                     <span className="font-bold text-sky-300 flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Trợ Lý AI Nam
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Trợ Lý AI Tùng
                     </span>
                   </div>
                   <p className="text-[11px] font-medium text-slate-100 leading-snug">
-                    "Xin chào! Tôi là Nam ✌️ Bạn muốn lập tour đi biển hay săn mây hôm nay?"
+                    "Xin chào! Tôi là Tùng ✌️ Bạn muốn lập tour đi đâu hôm nay?"
                   </p>
                   {/* Speech bubble pointer tip */}
                   <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-white/20"></div>
