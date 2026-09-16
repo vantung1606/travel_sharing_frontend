@@ -18,6 +18,7 @@ import {
   LogOut,
   UserCheck
 } from 'lucide-react';
+import { NotificationDropdown } from './NotificationDropdown';
 
 export const Navbar = () => {
   const {
@@ -31,11 +32,13 @@ export const Navbar = () => {
     currentUser,
     isLoggedIn,
     logout,
-    stats
+    stats,
+    unreadNotificationsCount
   } = useApp();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   const navItems = [
     { id: 'home', label: 'Trang Chủ', icon: Compass },
@@ -123,10 +126,28 @@ export const Navbar = () => {
                     <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
                   </button>
 
-                  <button className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full relative cursor-pointer shrink-0">
-                    <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full"></span>
-                  </button>
+                  <div className="relative shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsNotificationOpen(!isNotificationOpen);
+                        setIsProfileDropdownOpen(false);
+                      }}
+                      className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full relative cursor-pointer transition-colors"
+                      title="Thông báo (M08)"
+                    >
+                      <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
+                      {unreadNotificationsCount > 0 && (
+                        <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white font-extrabold text-[10px] rounded-full flex items-center justify-center ring-2 ring-white shadow-xs animate-pulse">
+                          {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                        </span>
+                      )}
+                    </button>
+                    <NotificationDropdown
+                      isOpen={isNotificationOpen}
+                      onClose={() => setIsNotificationOpen(false)}
+                    />
+                  </div>
                 </>
               )}
 
@@ -172,6 +193,21 @@ export const Navbar = () => {
                         <p className="text-xs font-bold text-slate-900">{currentUser.name}</p>
                         <p className="text-[10px] text-slate-400">{currentUser.handle}</p>
                       </div>
+
+                      <button
+                        onClick={() => { setPortalMode('user'); setUserTab('notifications'); setIsProfileDropdownOpen(false); }}
+                        className="w-full flex items-center justify-between px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Bell className="w-4 h-4 text-sky-600" />
+                          <span>Thông báo (M08)</span>
+                        </div>
+                        {unreadNotificationsCount > 0 && (
+                          <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white font-extrabold text-[9px]">
+                            {unreadNotificationsCount}
+                          </span>
+                        )}
+                      </button>
 
                       <button
                         onClick={() => { setPortalMode('user'); setUserTab('profile'); setIsProfileDropdownOpen(false); }}

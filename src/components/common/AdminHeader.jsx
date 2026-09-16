@@ -2,10 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import { Search, Plus, Bell, Menu, X, Compass, Shield } from 'lucide-react';
 import { AdminSidebar } from './AdminSidebar';
+import { NotificationDropdown } from './NotificationDropdown';
 
 export const AdminHeader = () => {
-  const { setPortalMode, setAdminTab } = useApp();
+  const { setPortalMode, setAdminTab, unreadNotificationsCount } = useApp();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const mobileDialog = useRef(null);
   useEffect(() => {
     if (!isMobileMenuOpen) return undefined;
@@ -60,15 +62,25 @@ export const AdminHeader = () => {
             <span>Server 1: OK</span>
           </div>
 
-          <button
-            className="relative p-2 rounded-full text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
-            title="Thông báo báo cáo"
-          >
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white text-[10px] rounded-full flex items-center justify-center font-extrabold shadow-sm">
-              5
-            </span>
-          </button>
+          <div className="relative shrink-0">
+            <button
+              type="button"
+              onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+              className="relative p-2 rounded-full text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              title="Thông báo hệ thống (M08)"
+            >
+              <Bell className="w-5 h-5" />
+              {unreadNotificationsCount > 0 && (
+                <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white text-[10px] rounded-full flex items-center justify-center font-extrabold shadow-sm ring-2 ring-white">
+                  {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                </span>
+              )}
+            </button>
+            <NotificationDropdown
+              isOpen={isNotificationOpen}
+              onClose={() => setIsNotificationOpen(false)}
+            />
+          </div>
 
           {/* Switch Portal Button */}
           <div

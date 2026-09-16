@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   INITIAL_DESTINATIONS,
   INITIAL_POSTS,
@@ -8,13 +8,14 @@ import {
   INITIAL_USER_LIST,
   INITIAL_REPORTS
 } from '../mock/data';
+import { notificationApi, INITIAL_MOCK_NOTIFICATIONS } from '../services/api';
 
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   // Navigation & Role State
   const [portalMode, setPortalMode] = useState('user'); // 'user' | 'admin'
-  const [userTab, setUserTab] = useState('home'); // 'home'|'explore'|'community'|'itineraries'|'ai-planner'|'messages'|'profile'
+  const [userTab, setUserTab] = useState('home'); // 'home'|'explore'|'community'|'itineraries'|'ai-planner'|'messages'|'profile'|'notifications'
   const [adminTab, setAdminTab] = useState('dashboard'); // 'dashboard'|'places'|'users'
 
   // AI & Auth Modal State
@@ -30,6 +31,44 @@ export const AppProvider = ({ children }) => {
   const [users, setUsers] = useState(INITIAL_USER_LIST);
   const [reports, setReports] = useState(INITIAL_REPORTS);
   const [stats, setStats] = useState(ADMIN_STATS);
+
+  // Notification State (M08)
+  const [notifications, setNotifications] = useState(INITIAL_MOCK_NOTIFICATIONS);
+  const [isNotificationLiveBackend, setIsNotificationLiveBackend] = useState(false);
+
+  // Fetch notifications on mount
+  useEffect(() => {
+    notificationApi.getNotifications().then(res => {
+      if (res && res.data) {
+        setNotifications(res.data);
+        setIsNotificationLiveBackend(res.isBackend);
+      }
+    });
+  }, []);
+
+  const unreadNotificationsCount = notifications.filter(n => !n.isRead).length;
+
+  const markNotificationAsRead = async (id) => {
+    setNotifications(prev => prev.map(n => (n.id === id ? { ...n, isRead: true } : n)));
+    await notificationApi.markAsRead(id);
+  };
+
+  const markAllNotificationsAsRead = async () => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    await notificationApi.markAllAsRead();
+  };
+
+  const deleteNotification = async (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+    await notificationApi.deleteNotification(id);
+  };
+
+  const addTestNotification = async (payload) => {
+    const res = await notificationApi.createTestNotification(payload);
+    if (res && res.data) {
+      setNotifications(prev => [res.data, ...prev]);
+    }
+  };
 
   // Auth State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -178,7 +217,14 @@ export const AppProvider = ({ children }) => {
         approvePlace,
         rejectPlace,
         resolveReport,
-        toggleUserStatus
+        toggleUserStatus,
+        notifications,
+        unreadNotificationsCount,
+        isNotificationLiveBackend,
+        markNotificationAsRead,
+        markAllNotificationsAsRead,
+        deleteNotification,
+        addTestNotification
       }}
     >
       {children}

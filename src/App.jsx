@@ -17,6 +17,7 @@ import { ItineraryManagerPage } from './pages/user/Itineraries/ItineraryManagerP
 import { AIPlannerPage } from './pages/user/AIPlanner/AIPlannerPage';
 import { MessagesPage } from './pages/user/Messages/MessagesPage';
 import { ProfilePage } from './pages/user/Profile/ProfilePage';
+import { NotificationsPage } from './pages/user/Notifications/NotificationsPage';
 
 // Admin Pages
 import { AdminDashboardPage } from './pages/admin/Dashboard/AdminDashboardPage';
@@ -39,6 +40,7 @@ const AppContent = () => {
       case 'ai-planner': return <AIPlannerPage />;
       case 'messages': return <MessagesPage />;
       case 'profile': return <ProfilePage />;
+      case 'notifications': return <NotificationsPage />;
       default: return <HomePage />;
     }
   };
@@ -91,21 +93,21 @@ const AppContent = () => {
         </div>
       )}
 
-      {/* Global AI Generator Wizard Modal */}
+      {/* Global Overlays & Modals */}
       <AITripGeneratorModal />
-
-      {/* Global Stitch Auth01 Login & Register Modal */}
       <AuthModal />
     </div>
   );
 };
 
-export default function App() {
+export function App() {
   return (
-    <ToastProvider>
-      <AppProvider>
+    <AppProvider>
+      <ToastProvider>
         <AppContent />
-      </AppProvider>
-    </ToastProvider>
+      </ToastProvider>
+    </AppProvider>
   );
 }
+
+export default App;
