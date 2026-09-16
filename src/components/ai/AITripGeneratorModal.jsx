@@ -1,18 +1,50 @@
 import React, { useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Sparkles, X, MapPin, Calendar, DollarSign, Activity, Compass, Loader2 } from 'lucide-react';
+import { useToast } from '../common/Toast';
+import {
+  Sparkles,
+  X,
+  MapPin,
+  Calendar,
+  DollarSign,
+  Bike,
+  Car,
+  Bus,
+  Loader2,
+  Check,
+  ShieldCheck
+} from 'lucide-react';
 
 export const AITripGeneratorModal = () => {
   const { isAIGeneratorOpen, setIsAIGeneratorOpen, generateAITrip } = useApp();
+  const toast = useToast();
 
-  const [destination, setDestination] = useState('Đà Nẵng & Hội An');
+  const [destination, setDestination] = useState('Đà Nẵng & Hội An, Miền Trung');
   const [daysCount, setDaysCount] = useState('3');
-  const [budget, setBudget] = useState('3.500.000đ - 5.000.000đ');
-  const [pace, setPace] = useState('Cân bằng');
-  const [style, setStyle] = useState('Biển & Ẩm thực');
+  const [budgetVal, setBudgetVal] = useState(4500000);
+  const [budgetTier, setBudgetTier] = useState('Tiêu chuẩn');
+  const [selectedStyles, setSelectedStyles] = useState([
+    '🏖️ Nghỉ dưỡng & Biển',
+    '🍜 Ẩm thực địa phương'
+  ]);
+  const [transport, setTransport] = useState('Taxi / Công nghệ');
+  const [notes, setNotes] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
   if (!isAIGeneratorOpen) return null;
+
+  const toggleStyle = (st) => {
+    setSelectedStyles(prev =>
+      prev.includes(st) ? prev.filter(s => s !== st) : [...prev, st]
+    );
+  };
+
+  const handleSelectTier = (tier) => {
+    setBudgetTier(tier);
+    if (tier === 'Tiết kiệm') setBudgetVal(2500000);
+    else if (tier === 'Tiêu chuẩn') setBudgetVal(4500000);
+    else if (tier === 'Cao cấp') setBudgetVal(8500000);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,157 +53,241 @@ export const AITripGeneratorModal = () => {
     setTimeout(() => {
       generateAITrip({
         destination,
-        daysCount,
-        budget,
-        pace,
-        style
+        daysCount: Number(daysCount),
+        budget: `${budgetVal.toLocaleString('vi-VN')}đ`,
+        style: selectedStyles.join(', '),
+        transport,
+        notes
       });
       setIsGenerating(false);
       setIsAIGeneratorOpen(false);
-    }, 1500);
+      toast.success(`WanderAI đã tạo thành công lịch trình ${daysCount} ngày cho chuyến đi ${destination}!`);
+    }, 1300);
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-100 relative overflow-hidden">
+      <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-100 relative overflow-hidden max-h-[92vh] overflow-y-auto">
         
-        {/* Glow Header Accent */}
-        <div className="absolute -top-24 -left-24 w-48 h-48 bg-sky-400/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-orange-400/20 rounded-full blur-3xl pointer-events-none"></div>
+        {/* Glow Header Accents */}
+        <div className="absolute -top-24 -left-24 w-48 h-48 bg-sky-400/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-amber-400/20 rounded-full blur-3xl pointer-events-none" />
 
         <button
+          type="button"
           onClick={() => setIsAIGeneratorOpen(false)}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors"
+          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-12 h-12 rounded-2xl sparkle-btn flex items-center justify-center text-white shadow-lg">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-amber-600 via-orange-500 to-amber-600 flex items-center justify-center text-white shadow-md flex-shrink-0">
             <Sparkles className="w-6 h-6 text-amber-200 animate-pulse" />
           </div>
           <div>
-            <h3 className="text-xl font-display font-bold text-slate-900">Trợ Lý Lập Lịch Trình AI</h3>
-            <p className="text-xs text-slate-500">Thiết kế tour cá nhân hóa trọn gói chỉ trong 3 giây</p>
+            <div className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full mb-1">
+              WanderAI v3.5
+            </div>
+            <h3 className="text-lg font-bold text-slate-900">Trợ Lý Lập Lịch Trình AI</h3>
+            <p className="text-xs text-slate-500">Tối ưu cung đường, dự trù ngân sách & thời gian thực</p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-xs">
           
           {/* Destination */}
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-sky-600" />
-              Điểm Đến Mong Muốn
+          <div className="space-y-1">
+            <label className="font-bold text-slate-700 flex items-center justify-between">
+              <span className="flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-sky-600" />
+                Điểm đến mong muốn
+              </span>
+              <span className="text-[10px] text-sky-600 font-semibold">Đã nhận diện vị trí</span>
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                placeholder="Ví dụ: Đà Nẵng, Đà Lạt, Phú Quốc..."
+                className="w-full pl-3 pr-8 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20"
+                required
+              />
+              {destination && (
+                <button
+                  type="button"
+                  onClick={() => setDestination('')}
+                  className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-700"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Duration */}
+          <div className="space-y-1">
+            <label className="font-bold text-slate-700 flex items-center gap-1">
+              <Calendar className="w-3.5 h-3.5 text-sky-600" />
+              Thời gian chuyến đi
             </label>
             <select
-              value={destination}
-              onChange={(e) => setDestination(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all"
+              value={daysCount}
+              onChange={(e) => setDaysCount(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20"
             >
-              <option value="Đà Nẵng & Hội An">Đà Nẵng & Phố Cổ Hội An</option>
-              <option value="Đảo Ngọc Phú Quốc">Đảo Ngọc Phú Quốc</option>
-              <option value="Hà Giang Phượt Loop">Hà Giang Phượt Loop</option>
-              <option value="Sapa Sương Mờ">Sapa Sương Mờ & Fansipan</option>
-              <option value="Đà Lạt Ngàn Hoa">Đà Lạt Ngàn Hoa</option>
-              <option value="Nha Trang Biển Xanh">Nha Trang Biển Xanh</option>
+              <option value="2">2 Ngày 1 Đêm</option>
+              <option value="3">3 Ngày 2 Đêm</option>
+              <option value="4">4 Ngày 3 Đêm</option>
+              <option value="5">5 Ngày 4 Đêm</option>
             </select>
           </div>
 
-          {/* Days Count & Budget */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-sky-600" />
-                Số Ngày Đi
-              </label>
-              <select
-                value={daysCount}
-                onChange={(e) => setDaysCount(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all"
-              >
-                <option value="2">2 Ngày 1 Đêm</option>
-                <option value="3">3 Ngày 2 Đêm</option>
-                <option value="4">4 Ngày 3 Đêm</option>
-                <option value="5">5 Ngày 4 Đêm</option>
-              </select>
+          {/* Budget Range & Tiers */}
+          <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-slate-800 flex items-center gap-1">
+                <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                Ngân sách dự kiến
+              </span>
+              <span className="font-bold text-sky-700 text-xs">
+                {budgetVal.toLocaleString('vi-VN')}đ <span className="text-[10px] text-slate-400 font-normal">/ người</span>
+              </span>
             </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                <DollarSign className="w-4 h-4 text-emerald-600" />
-                Ngân Sách Dự Kiến
-              </label>
-              <select
-                value={budget}
-                onChange={(e) => setBudget(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all"
-              >
-                <option value="2.000.000đ - 3.500.000đ">Tiết kiệm (2M - 3.5M)</option>
-                <option value="3.500.000đ - 5.000.000đ">Tiêu chuẩn (3.5M - 5M)</option>
-                <option value="5.000.000đ - 10.000.000đ">Cao cấp (5M - 10M)</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Pace & Style */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                <Activity className="w-4 h-4 text-orange-500" />
-                Nhịp Độ Chuyến Đi
-              </label>
-              <select
-                value={pace}
-                onChange={(e) => setPace(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all"
-              >
-                <option value="Nghỉ dưỡng thư thái">Nghỉ dưỡng thư thái</option>
-                <option value="Cân bằng">Cân bằng hài hoà</option>
-                <option value="Khám phá năng động">Khám phá tối đa điểm</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center gap-1.5">
-                <Compass className="w-4 h-4 text-purple-600" />
-                Phong Cách Du Lịch
-              </label>
-              <select
-                value={style}
-                onChange={(e) => setStyle(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-slate-50/50 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none transition-all"
-              >
-                <option value="Biển & Ẩm thực">Biển & Ẩm thực</option>
-                <option value="Văn hoá & Di tích">Văn hoá & Di tích</option>
-                <option value="Phượt & Sinh thái">Phượt & Sinh thái</option>
-                <option value="Sống ảo & Check-in">Sống ảo & Check-in</option>
-              </select>
+            <input
+              type="range"
+              min={1500000}
+              max={15000000}
+              step={250000}
+              value={budgetVal}
+              onChange={(e) => setBudgetVal(Number(e.target.value))}
+              className="w-full accent-sky-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+            />
+            <div className="flex items-center gap-1.5 pt-0.5">
+              {['Tiết kiệm', 'Tiêu chuẩn', 'Cao cấp'].map((tier) => (
+                <button
+                  key={tier}
+                  type="button"
+                  onClick={() => handleSelectTier(tier)}
+                  className={`flex-1 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer ${
+                    budgetTier === tier
+                      ? 'bg-sky-700 text-white shadow-xs'
+                      : 'bg-white hover:bg-slate-200 text-slate-600 border border-slate-200'
+                  }`}
+                >
+                  {tier}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="pt-4">
+          {/* Travel Style Chips */}
+          <div className="space-y-1.5">
+            <label className="font-bold text-slate-700 block">Phong cách chuyến đi</label>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                '🏖️ Nghỉ dưỡng & Biển',
+                '🍜 Ẩm thực địa phương',
+                '📸 Check-in sống ảo',
+                '🏛️ Văn hóa & Lịch sử',
+                '⛺ Khám phá mạo hiểm'
+              ].map((st) => {
+                const active = selectedStyles.includes(st);
+                return (
+                  <button
+                    key={st}
+                    type="button"
+                    onClick={() => toggleStyle(st)}
+                    className={`px-2.5 py-1.5 rounded-full text-[11px] font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                      active
+                        ? 'bg-sky-100 text-sky-900 border border-sky-300'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200/60'
+                    }`}
+                  >
+                    <span>{st}</span>
+                    {active && <Check className="w-3 h-3 text-sky-700" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Transport */}
+          <div className="space-y-1.5">
+            <label className="font-bold text-slate-700 block">Phương tiện ưu tiên</label>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { name: 'Xe máy', icon: Bike },
+                { name: 'Taxi / Công nghệ', icon: Car },
+                { name: 'Xe tự lái', icon: Bus }
+              ].map((item) => {
+                const Icon = item.icon;
+                const active = transport === item.name;
+                return (
+                  <button
+                    key={item.name}
+                    type="button"
+                    onClick={() => setTransport(item.name)}
+                    className={`p-2 rounded-xl flex flex-col items-center justify-center gap-1 text-center transition-all cursor-pointer ${
+                      active
+                        ? 'bg-sky-700 text-white font-bold shadow-xs'
+                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200 font-medium'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-[10px]">{item.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Notes */}
+          <div className="space-y-1">
+            <label className="font-bold text-slate-700 block">Ghi chú cho AI</label>
+            <textarea
+              rows={2}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Yêu cầu cụ thể (VD: Thích ngắm hoàng hôn, ăn hải sản tươi ngon, v.v.)..."
+              className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 resize-none"
+            />
+          </div>
+
+          {/* Meta badge */}
+          <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-100/70 text-[10px] text-slate-500 font-medium">
+            <ShieldCheck className="w-3.5 h-3.5 text-sky-600 flex-shrink-0" />
+            <span>Tự động tối ưu theo dữ liệu Google Places & thời tiết 2026.</span>
+          </div>
+
+          {/* Submit CTA */}
+          <div className="pt-2">
             <button
               type="submit"
               disabled={isGenerating}
-              className="w-full sparkle-btn py-3 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+              className="w-full py-3 px-4 rounded-full bg-gradient-to-r from-amber-600 via-orange-500 to-amber-600 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-md hover:shadow-lg transition-all disabled:opacity-75"
             >
               {isGenerating ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin text-white" />
-                  <span>AI Đang Tính Toán Lịch Trình Tối Ưu...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>AI Đang Tính Toán Lộ Trình Tối Ưu...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-5 h-5 text-amber-200" />
+                  <Sparkles className="w-4 h-4 text-amber-200" />
                   <span>Tạo Lịch Trình Ngay Với AI</span>
                 </>
               )}
             </button>
           </div>
+
         </form>
 
       </div>
     </div>
   );
 };
+
+export default AITripGeneratorModal;
