@@ -15,8 +15,7 @@ import {
   X,
   ChevronRight,
   ChevronDown,
-  LogOut,
-  UserCheck
+  LogOut
 } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
 
@@ -32,7 +31,6 @@ export const Navbar = () => {
     currentUser,
     isLoggedIn,
     logout,
-    stats,
     unreadNotificationsCount
   } = useApp();
 
@@ -40,12 +38,14 @@ export const Navbar = () => {
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
+  // Modern navigation aligned with Stitch M01 / M05
   const navItems = [
-    { id: 'home', label: 'Trang Chủ', icon: Compass },
-    { id: 'explore', label: 'Khám Phá', icon: MapPin },
-    { id: 'community', label: 'Cộng Đồng', icon: Users, badge: 'HOT' },
-    { id: 'itineraries', label: 'Lịch Trình AI', icon: Calendar },
-    { id: 'messages', label: 'Trò Chuyện', icon: MessageSquare, badge: '2' }
+    { id: 'home', label: 'Trang chủ', icon: Compass },
+    { id: 'explore', label: 'Khám phá', icon: MapPin },
+    { id: 'community', label: 'Cộng đồng', icon: Users, badge: 'HOT' },
+    { id: 'itineraries', label: 'Lịch trình của tôi', icon: Calendar },
+    { id: 'ai-planner', label: 'AI Travel Planner', icon: Sparkles, isAi: true },
+    { id: 'messages', label: 'Trò chuyện', icon: MessageSquare, badge: '2' }
   ];
 
   const handleNavClick = (tabId) => {
@@ -56,76 +56,94 @@ export const Navbar = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-xl border-b border-slate-200/80 shadow-sm select-none">
-        <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="flex items-center justify-between h-14 md:h-16 gap-2 sm:gap-4">
+      <header className="sticky top-0 z-40 w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/70 shadow-xs select-none">
+        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 sm:h-18 gap-3">
             
-            {/* Brand Logo */}
-            <div className="flex items-center gap-3 lg:gap-5 shrink-0 min-w-0">
+            {/* 1. Brand Logo */}
+            <div className="flex items-center gap-3 shrink-0">
               <div
                 onClick={() => { setPortalMode('user'); setUserTab('home'); }}
-                className="flex items-center gap-2 cursor-pointer group shrink-0"
+                className="flex items-center gap-2.5 cursor-pointer group"
               >
-                <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-tr from-sky-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
-                  <Compass className="w-5 h-5 md:w-6 md:h-6 animate-spin-slow" />
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
+                  <Compass className="w-5 h-5 animate-spin-slow" />
                 </div>
-                <div className="block">
-                  <span className="font-display font-extrabold text-base sm:text-lg md:text-xl tracking-tight text-slate-900 group-hover:text-sky-600 transition-colors">
+                <div className="block leading-tight">
+                  <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 group-hover:text-sky-600 transition-colors">
                     Way<span className="text-sky-600">fare</span>
                   </span>
                   <span className="hidden sm:block text-[9px] uppercase tracking-widest font-extrabold text-slate-400">
-                    Authentic Travel Stories
+                    Smart Travel AI
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Navigation Links: Visible on md+ screens */}
+            {/* 2. Sleek Rounded Navigation Bar (Stitch M05 Style) */}
             {portalMode === 'user' && (
-              <nav className="hidden md:flex items-center gap-1 overflow-x-auto no-scrollbar min-w-0 flex-1 justify-center px-2">
+              <nav className="hidden lg:flex items-center gap-1 p-1 bg-slate-100/70 rounded-full border border-slate-200/50 shadow-2xs">
                 {navItems.map(tab => {
-                  const Icon = tab.icon;
                   const active = userTab === tab.id;
+                  const Icon = tab.icon;
                   return (
                     <button
                       key={tab.id}
                       onClick={() => handleNavClick(tab.id)}
-                      className={`flex items-center gap-1.5 px-3 py-2 text-xs lg:text-sm font-bold rounded-xl transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                      className={`flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap ${
                         active
-                          ? 'bg-sky-50 text-sky-700 font-extrabold shadow-xs'
-                          : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                          ? 'bg-sky-600 text-white font-bold shadow-xs'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 ${active ? 'text-sky-600' : 'text-slate-400'}`} />
+                      {tab.isAi ? (
+                        <Sparkles className={`w-3.5 h-3.5 ${active ? 'text-amber-200' : 'text-amber-500'}`} />
+                      ) : (
+                        <Icon className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-slate-400'}`} />
+                      )}
                       <span>{tab.label}</span>
+
+                      {/* Smart Tag for AI Planner */}
+                      {tab.isAi && (
+                        <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-bold flex items-center gap-0.5 ${
+                          active
+                            ? 'bg-sky-700/80 text-amber-200'
+                            : 'bg-amber-100 text-amber-800'
+                        }`}>
+                          Smart
+                        </span>
+                      )}
+
+                      {/* Notification badge */}
+                      {tab.badge && !active && (
+                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold ${
+                          tab.badge === 'HOT' ? 'bg-amber-100 text-amber-800' : 'bg-rose-500 text-white'
+                        }`}>
+                          {tab.badge}
+                        </span>
+                      )}
                     </button>
                   );
                 })}
               </nav>
             )}
 
-            {/* Right Action Bar */}
+            {/* 3. Right Action Bar */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              
+              {/* Search Pill Input (Desktop) */}
+              <div className="hidden xl:flex items-center bg-slate-100/80 hover:bg-slate-100 focus-within:bg-white rounded-full px-3.5 py-1.5 border border-slate-200/60 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20 transition-all text-xs">
+                <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Tìm điểm đến, ẩm thực..."
+                  className="bg-transparent border-0 outline-none text-xs text-slate-800 placeholder:text-slate-400 w-32 2xl:w-44"
+                />
+              </div>
+
               {portalMode === 'user' && (
                 <>
-                  {/* Create AI Itinerary CTA */}
-                  <button
-                    onClick={() => setIsAIGeneratorOpen(true)}
-                    className="hidden xl:flex sparkle-btn text-white px-4 py-2 rounded-full text-xs font-bold items-center gap-2 shadow-lg shadow-orange-500/25 cursor-pointer shrink-0"
-                  >
-                    <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
-                    <span className="whitespace-nowrap">Tạo Lịch Trình AI</span>
-                  </button>
-
-                  {/* Compact Sparkles Icon Button */}
-                  <button
-                    onClick={() => setIsAIGeneratorOpen(true)}
-                    className="hidden sm:flex xl:hidden p-2 text-amber-600 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-full cursor-pointer shrink-0"
-                    title="Tạo Lịch Trình AI"
-                  >
-                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
-                  </button>
-
+                  {/* Notification Bell */}
                   <div className="relative shrink-0">
                     <button
                       type="button"
@@ -133,12 +151,12 @@ export const Navbar = () => {
                         setIsNotificationOpen(!isNotificationOpen);
                         setIsProfileDropdownOpen(false);
                       }}
-                      className="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full relative cursor-pointer transition-colors"
-                      title="Thông báo (M08)"
+                      className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 hover:text-slate-900 transition-colors relative cursor-pointer shadow-2xs"
+                      title="Thông báo"
                     >
-                      <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <Bell className="w-4 h-4" />
                       {unreadNotificationsCount > 0 && (
-                        <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white font-extrabold text-[10px] rounded-full flex items-center justify-center ring-2 ring-white shadow-xs animate-pulse">
+                        <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 bg-amber-600 text-white font-bold text-[10px] rounded-full flex items-center justify-center ring-2 ring-white shadow-2xs">
                           {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
                         </span>
                       )}
@@ -148,42 +166,48 @@ export const Navbar = () => {
                       onClose={() => setIsNotificationOpen(false)}
                     />
                   </div>
+
+                  {/* Refined "Tạo lịch trình" Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsAIGeneratorOpen(true)}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                    <span>Tạo lịch trình</span>
+                  </button>
                 </>
               )}
 
-              {/* ========================================================= */}
-              {/* AUTH & USER PROFILE TOGGLE                                */}
-              {/* ========================================================= */}
+              {/* User Profile / Auth Toggle */}
               {!isLoggedIn ? (
-                /* CHƯA ĐĂNG NHẬP: Hiển thị duy nhất nút Đăng nhập */
                 <button
                   onClick={() => { setAuthMode('login'); setIsAuthModalOpen(true); }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-sm hover:shadow-md transition-all cursor-pointer shrink-0"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0"
                 >
                   <User className="w-3.5 h-3.5 text-white" />
                   <span>Đăng nhập</span>
                 </button>
               ) : (
-                /* ĐÃ ĐĂNG NHẬP: Hiển thị Profile Pill kèm Dropdown Menu */
                 <div className="relative">
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                    className="flex items-center gap-2.5 p-1 sm:pr-3 rounded-full hover:bg-slate-100 border border-slate-200/80 transition-all cursor-pointer group shrink-0"
+                    className="flex items-center gap-2 p-1 sm:pr-2.5 rounded-full hover:bg-slate-100/80 border border-slate-200/80 transition-all cursor-pointer group shrink-0"
                   >
                     <img
                       src={currentUser.avatar}
                       alt={currentUser.name}
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover ring-2 ring-sky-500/30 group-hover:ring-sky-500 transition-all"
+                      className="w-8 h-8 rounded-full object-cover ring-2 ring-sky-500/20"
                     />
-                    <div className="hidden xl:block text-left">
-                      <span className="block text-xs font-bold text-slate-800 leading-tight">
+                    <div className="hidden xl:block text-left leading-tight">
+                      <span className="block text-xs font-bold text-slate-800">
                         {currentUser.name}
                       </span>
                       <span className="block text-[10px] text-slate-400">
                         {portalMode === 'admin' ? 'Quyền Admin' : currentUser.handle}
                       </span>
                     </div>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block group-hover:text-slate-700 transition-colors" />
                   </button>
 
                   {/* Profile Dropdown Menu */}
@@ -196,14 +220,14 @@ export const Navbar = () => {
 
                       <button
                         onClick={() => { setPortalMode('user'); setUserTab('notifications'); setIsProfileDropdownOpen(false); }}
-                        className="w-full flex items-center justify-between px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                        className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <div className="flex items-center gap-2">
                           <Bell className="w-4 h-4 text-sky-600" />
-                          <span>Thông báo (M08)</span>
+                          <span>Thông báo</span>
                         </div>
                         {unreadNotificationsCount > 0 && (
-                          <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white font-extrabold text-[9px]">
+                          <span className="px-1.5 py-0.5 rounded-full bg-amber-600 text-white font-bold text-[9px]">
                             {unreadNotificationsCount}
                           </span>
                         )}
@@ -211,7 +235,7 @@ export const Navbar = () => {
 
                       <button
                         onClick={() => { setPortalMode('user'); setUserTab('profile'); setIsProfileDropdownOpen(false); }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <User className="w-4 h-4 text-sky-600" />
                         <span>Trang cá nhân</span>
@@ -219,15 +243,23 @@ export const Navbar = () => {
 
                       <button
                         onClick={() => { setPortalMode('user'); setUserTab('itineraries'); setIsProfileDropdownOpen(false); }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
-                        <Calendar className="w-4 h-4 text-amber-500" />
+                        <Calendar className="w-4 h-4 text-sky-600" />
                         <span>Lịch trình của tôi</span>
                       </button>
 
                       <button
+                        onClick={() => { setPortalMode('user'); setUserTab('ai-planner'); setIsProfileDropdownOpen(false); }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                      >
+                        <Sparkles className="w-4 h-4 text-amber-500" />
+                        <span>AI Travel Planner</span>
+                      </button>
+
+                      <button
                         onClick={() => { setPortalMode(portalMode === 'admin' ? 'user' : 'admin'); setIsProfileDropdownOpen(false); }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <Shield className="w-4 h-4 text-emerald-600" />
                         <span>{portalMode === 'admin' ? 'Về giao diện Người dùng' : 'Giao diện Admin'}</span>
@@ -237,7 +269,7 @@ export const Navbar = () => {
 
                       <button
                         onClick={() => { logout(); setIsProfileDropdownOpen(false); }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                       >
                         <LogOut className="w-4 h-4" />
                         <span>Đăng xuất</span>
@@ -247,10 +279,10 @@ export const Navbar = () => {
                 </div>
               )}
 
-              {/* HAMBURGER BUTTON (Visible on < lg screens) */}
+              {/* Hamburger Button (< lg) */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 lg:hidden transition-colors cursor-pointer shrink-0"
+                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 lg:hidden transition-colors cursor-pointer shrink-0"
                 aria-label="Toggle navigation menu"
               >
                 {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -262,21 +294,18 @@ export const Navbar = () => {
       </header>
 
       {/* ========================================================= */}
-      {/* MOBILE / TABLET SLIDE-OVER NAVIGATION DRAWER              */}
+      {/* MOBILE / TABLET DRAWER                                    */}
       {/* ========================================================= */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex justify-end">
-          {/* Backdrop */}
           <div
             onClick={() => setIsMobileMenuOpen(false)}
             className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
-          ></div>
+          />
 
-          {/* Right Drawer */}
           <div className="relative z-10 w-[310px] max-w-[85vw] bg-white h-full shadow-2xl flex flex-col justify-between p-6 overflow-y-auto animate-in slide-in-from-right duration-300">
             <div className="space-y-6">
               
-              {/* Drawer Top Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <div className="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white font-bold shadow-md">
@@ -300,7 +329,7 @@ export const Navbar = () => {
                 </button>
               </div>
 
-              {/* Primary Action Button */}
+              {/* Mobile CTA */}
               <div className="space-y-2">
                 {!isLoggedIn ? (
                   <button
@@ -313,17 +342,17 @@ export const Navbar = () => {
                 ) : (
                   <button
                     onClick={() => { setIsAIGeneratorOpen(true); setIsMobileMenuOpen(false); }}
-                    className="w-full sparkle-btn text-white py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 cursor-pointer"
+                    className="w-full bg-sky-600 hover:bg-sky-700 text-white py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer"
                   >
                     <Sparkles className="w-4 h-4 text-amber-200" />
-                    <span>Tạo Lịch Trình AI Ngay</span>
+                    <span>Tạo Lịch Trình AI</span>
                   </button>
                 )}
               </div>
 
-              {/* Main Navigation Links List */}
+              {/* Mobile Navigation List */}
               <div className="space-y-1">
-                <span className="text-[10px] uppercase font-extrabold text-slate-400 tracking-wider block px-2 mb-2">
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block px-2 mb-2">
                   Danh mục trang
                 </span>
                 {navItems.map(tab => {
@@ -348,13 +377,17 @@ export const Navbar = () => {
                         <span>{tab.label}</span>
                       </div>
 
-                      {tab.badge && (
+                      {tab.isAi ? (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                          Smart
+                        </span>
+                      ) : tab.badge ? (
                         <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold ${
                           tab.badge === 'HOT' ? 'bg-amber-100 text-amber-800' : 'bg-rose-500 text-white'
                         }`}>
                           {tab.badge}
                         </span>
-                      )}
+                      ) : null}
                     </button>
                   );
                 })}
@@ -362,7 +395,7 @@ export const Navbar = () => {
 
             </div>
 
-            {/* Footer Profile Box / Logout */}
+            {/* Drawer Footer Profile */}
             {isLoggedIn && (
               <div className="pt-4 border-t border-slate-100 space-y-3">
                 <div
@@ -399,3 +432,5 @@ export const Navbar = () => {
     </>
   );
 };
+
+export default Navbar;
