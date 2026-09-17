@@ -3,12 +3,20 @@ export const DRAFT_KEY = 'wayfare_a06_ai_config_v2';
 
 export const MODELS = [
   {
+    id: 'gemini-3.6-flash',
+    name: 'Google Gemini 3.6 Flash (Khuyên dùng)',
+    shortName: 'Gemini 3.6 Flash',
+    provider: 'Google AI',
+    description: 'Thế hệ mới nhất từ Google AI, tốc độ siêu tốc (< 0.5s), thông minh và tối ưu hoá cho toàn bộ tác vụ du lịch.',
+    isDefault: true
+  },
+  {
     id: 'gemini-1.5-pro',
     name: 'Google Gemini 1.5 Pro',
     shortName: 'Gemini 1.5 Pro',
     provider: 'Google AI',
     description: 'Khuyên dùng cho Itinerary dài, context window 1M tokens, đa phương thức đọc ảnh & phân tích tài liệu hành trình.',
-    isDefault: true
+    isDefault: false
   },
   {
     id: 'gemini-1.5-flash',
@@ -34,7 +42,7 @@ export const MODELS = [
 ];
 
 export const DEFAULT_CONFIG = {
-  model: 'gemini-1.5-pro',
+  model: 'gemini-3.6-flash',
   temperature: 0.40,
   maxTokens: 4096,
   topP: 0.95,
@@ -43,7 +51,7 @@ export const DEFAULT_CONFIG = {
   fallbackModel: 'gpt-4o-mini',
   timeout: 3.5,
   grounding: true,
-  apiKey: 'AIzaSyDk9941_SecretKey_WanderAI_Production',
+  apiKey: import.meta.env?.VITE_GEMINI_API_KEY || '',
   systemPrompt: `Bạn là WanderAI - Chuyên gia cố vấn du lịch thông minh bản địa Việt Nam.
 Nguyên tắc hoạt động cốt lõi:
 1. Luôn gợi ý lộ trình thực tế theo cung đường địa lý thuận tiện nhất, tránh đi vòng gây lãng phí thời gian di chuyển.
@@ -142,6 +150,10 @@ export function readDraft() {
     const config = Object.fromEntries(
       Object.keys(DEFAULT_CONFIG).map(key => [key, stored.config[key] ?? DEFAULT_CONFIG[key]])
     );
+    // Auto-upgrade from old dummy placeholder to configured real Gemini key
+    if (!config.apiKey || config.apiKey === 'AIzaSyDk9941_SecretKey_WanderAI_Production') {
+      config.apiKey = DEFAULT_CONFIG.apiKey;
+    }
     if (Object.keys(validateConfig(config)).length || ['cache', 'fallback', 'grounding'].some(k => typeof config[k] !== 'boolean')) {
       return { config: { ...DEFAULT_CONFIG }, savedAt: null };
     }
@@ -149,6 +161,88 @@ export function readDraft() {
   } catch {
     return { config: { ...DEFAULT_CONFIG }, savedAt: null };
   }
+}
+
+/**
+ * Real API connection test against Google Gemini API Gateway
+ */
+export async function testGeminiConnection(apiKey) {
+  const keyToUse = (apiKey || DEFAULT_CONFIG.apiKey || '').trim();
+  const startTime = performance.now();
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keyToUse}`);
+    const latency = Math.round(performance.now() - startTime);
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      return {
+        ok: false,
+        latency,
+        error: errJson.error?.message || `HTTP ${res.status}: Không thể xác thực với Google Gemini.`
+      };
+    }
+    const data = await res.json();
+    return {
+      ok: true,
+      latency,
+      modelsCount: data.models?.length || 0,
+      activeModel: 'Gemini 3.6 Flash'
+    };
+  } catch (err) {
+    return {
+      ok: false,
+      latency: Math.round(performance.now() - startTime),
+      error: err.message || 'Lỗi mạng khi kết nối Google Gemini API.'
+    };
+  }
+}
+
+/**
+ * Call Gemini Generate Content
+ */
+export async function callGeminiGenerate({ apiKey, prompt, systemPrompt, model = 'gemini-3.6-flash', temperature = 0.4, maxTokens = 2048 }) {
+  const keyToUse = (apiKey || DEFAULT_CONFIG.apiKey || '').trim();
+  const targetModel = model.includes('gemini') ? model : 'gemini-3.6-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${keyToUse}`;
+
+  const payload = {
+    contents: [
+      {
+        parts: [{ text: prompt }]
+      }
+    ],
+    generationConfig: {
+      temperature: Number(temperature) || 0.4,
+      maxOutputTokens: Number(maxTokens) || 2048
+    }
+  };
+
+  if (systemPrompt) {
+    payload.systemInstruction = {
+      parts: [{ text: systemPrompt }]
+    };
+  }
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Lỗi Gemini API (HTTP ${res.status})`);
+  }
+
+  const result = await res.json();
+  const text = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  const usage = result.usageMetadata || {};
+
+  return {
+    text,
+    promptTokens: usage.promptTokenCount || 0,
+    completionTokens: usage.candidatesTokenCount || 0,
+    totalTokens: usage.totalTokenCount || 0
+  };
 }
 
 export const SAMPLE_PROMPT = 'Lên lịch trình 2N1Đ đi Ninh Bình cho 2 người, thích chụp ảnh sống ảo và ẩm thực dê núi';
