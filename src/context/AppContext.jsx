@@ -132,27 +132,48 @@ export const AppProvider = ({ children }) => {
   };
 
   const generateAITrip = (tripParams) => {
-    const newItinerary = {
-      id: `itin-${Date.now()}`,
-      title: `${tripParams.destination}: Hành Trình AI Thiết Kế (${tripParams.daysCount} ngày)`,
-      destination: tripParams.destination,
-      budgetTotal: tripParams.budget || '4.500.000đ',
-      daysCount: Number(tripParams.daysCount) || 3,
-      pace: tripParams.pace || 'Cân bằng',
-      style: tripParams.style || 'Trải nghiệm tổng hợp',
-      days: Array.from({ length: Number(tripParams.daysCount) || 3 }).map((_, i) => ({
-        dayNumber: i + 1,
-        title: `Ngày ${i + 1}: Khám phá điểm nhấn ${tripParams.destination}`,
-        activities: [
-          { time: '08:00', title: `Đón bình minh & Thưởng thức đặc sản địa phương`, note: 'AI gợi ý quán truyền thống 4.9*' },
-          { time: '10:30', title: `Check-in danh thắng nổi tiếng tại ${tripParams.destination}`, note: 'Tránh khung giờ đông khách' },
-          { time: '14:00', title: `Trải nghiệm văn hóa & hoạt động outdoor`, note: 'Tích hợp bản đồ trực tuyến' },
-          { time: '19:00', title: `Thưởng thức tiệc tối & Chill đêm`, note: 'Gợi ý điểm ngắm hoàng hôn/đêm đẹp nhất' }
-        ]
-      }))
-    };
+    let newItinerary;
+    if (tripParams.fullItinerary) {
+      newItinerary = tripParams.fullItinerary;
+    } else if (tripParams.id && tripParams.days) {
+      newItinerary = tripParams;
+    } else {
+      newItinerary = {
+        id: `itin-${Date.now()}`,
+        title: `${tripParams.destination}: Hành Trình AI Thiết Kế (${tripParams.daysCount || 3} ngày)`,
+        destination: tripParams.destination,
+        region: tripParams.region || 'Điểm đến du lịch',
+        coverImage: tripParams.coverImage || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
+        duration: `${tripParams.daysCount || 3}N${Math.max(1, (tripParams.daysCount || 3) - 1)}Đ`,
+        daysCount: Number(tripParams.daysCount) || 3,
+        status: tripParams.status || 'upcoming',
+        isAiGenerated: true,
+        countdown: 'Sắp khởi hành • Mới tạo',
+        departureDate: tripParams.departureDate || 'Khởi hành trong tháng tới',
+        groupType: tripParams.groupType || 'Nhóm bạn / Cặp đôi',
+        placesCount: (Number(tripParams.daysCount) || 3) * 3,
+        placesList: [tripParams.destination + ' City Center', 'Điểm Check-in Đặc Sắc', 'Khu Ẩm Thực Đêm'],
+        budgetPerPerson: tripParams.budgetPerPerson || 3500000,
+        totalBudget: tripParams.totalBudget || 7000000,
+        budgetProgress: 40,
+        budgetNote: 'Được tạo bởi WanderAI Gemini • Hạn mức tối ưu',
+        pace: tripParams.pace || 'Cân bằng',
+        style: tripParams.style || 'Trải nghiệm tổng hợp',
+        aiTipNote: tripParams.aiTipNote || 'Gợi ý từ WanderAI: Nên khởi hành sớm để tránh nắng gắt và săn ảnh bình minh đẹp.',
+        days: Array.from({ length: Number(tripParams.daysCount) || 3 }).map((_, i) => ({
+          dayNumber: i + 1,
+          title: `Ngày ${i + 1}: Khám phá điểm nhấn ${tripParams.destination}`,
+          activities: [
+            { time: '08:00', title: `Đón bình minh & Thưởng thức đặc sản địa phương`, note: 'AI gợi ý quán truyền thống 4.9*' },
+            { time: '10:30', title: `Check-in danh thắng nổi tiếng tại ${tripParams.destination}`, note: 'Tránh khung giờ đông khách' },
+            { time: '14:00', title: `Trải nghiệm văn hóa & hoạt động outdoor`, note: 'Tích hợp bản đồ trực tuyến' },
+            { time: '19:00', title: `Thưởng thức tiệc tối & Chill đêm`, note: 'Gợi ý điểm ngắm hoàng hôn/đêm đẹp nhất' }
+          ]
+        }))
+      };
+    }
 
-    setItineraries([newItinerary, ...itineraries]);
+    setItineraries(prev => [newItinerary, ...prev]);
     setStats(prev => ({ ...prev, aiGenerationsToday: prev.aiGenerationsToday + 1 }));
     setUserTab('itineraries');
   };

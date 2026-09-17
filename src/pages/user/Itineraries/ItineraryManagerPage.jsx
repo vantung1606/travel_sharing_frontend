@@ -55,14 +55,6 @@ export const ItineraryManagerPage = () => {
   const [detailDayIndex, setDetailDayIndex] = useState(0);
   const [detailViewTab, setDetailViewTab] = useState('timeline'); // 'timeline' | 'budget' | 'tips'
 
-  // Fast AI Quick Planner Modal
-  const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false);
-  const [quickDest, setQuickDest] = useState('');
-  const [quickDays, setQuickDays] = useState(3);
-  const [quickBudget, setQuickBudget] = useState('4.500.000đ');
-  const [quickStyle, setQuickStyle] = useState('🏖️ Nghỉ dưỡng biển & Ẩm thực');
-  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-
   // Filter and Sort Logic
   const filteredItineraries = useMemo(() => {
     return itineraries.filter(itin => {
@@ -119,72 +111,8 @@ export const ItineraryManagerPage = () => {
     }
   };
 
-  // Fast AI Quick Generate
-  const handleRunQuickAI = async (e) => {
-    if (e) e.preventDefault();
-    if (!quickDest.trim()) {
-      toast.warn('Vui lòng nhập điểm đến du lịch mong muốn!');
-      return;
-    }
-
-    setIsGeneratingAI(true);
-    toast.info(`WanderAI đang kết nối Google Gemini để phân tích lộ trình ${quickDest}...`);
-
-    try {
-      // Call Gemini for real AI trip advice
-      const prompt = `Lên kế hoạch du lịch chi tiết ${quickDays} ngày tại ${quickDest}, phong cách ${quickStyle}, ngân sách ${quickBudget}. Hãy đưa ra 3 điểm check-in tiêu biểu và 1 mẹo ẩm thực bản địa. Trả lời ngắn gọn súc tích tiếng Việt.`;
-      const aiAdvice = await aiService.generateText({ prompt });
-
-      const newTrip = {
-        id: `itin-${Date.now()}`,
-        title: `Hành Trình ${quickDest} (${quickDays}N${quickDays - 1}Đ): AI Tối Ưu`,
-        destination: quickDest,
-        region: 'Hành trình mới tạo',
-        coverImage: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
-        duration: `${quickDays}N${quickDays - 1}Đ`,
-        daysCount: Number(quickDays),
-        status: 'upcoming',
-        isAiGenerated: true,
-        countdown: 'Sắp khởi hành • Mới tạo',
-        departureDate: 'Khởi hành trong tháng tới',
-        groupType: 'Nhóm bạn / Cặp đôi',
-        placesCount: quickDays * 3,
-        placesList: [quickDest + ' City Tour', 'Điểm Check-in Đặc Sắc', 'Khu Ẩm Thực Đêm'],
-        budgetPerPerson: 3500000,
-        totalBudget: 7000000,
-        budgetProgress: 40,
-        budgetNote: 'Được tạo bởi Google Gemini AI • Hạn mức linh hoạt',
-        pace: 'Cân bằng',
-        style: quickStyle,
-        aiTipNote: aiAdvice || 'Gợi ý từ WanderAI: Nên khởi hành sớm để tránh nắng gắt và săn ảnh bình minh đẹp.',
-        days: Array.from({ length: Number(quickDays) }).map((_, i) => ({
-          dayNumber: i + 1,
-          title: `Ngày ${i + 1}: Khám phá điểm nhấn ${quickDest}`,
-          activities: [
-            { time: '08:00', title: `Đón bình minh & Thưởng thức đặc sản ${quickDest}`, note: 'Quán ăn bản địa đánh giá 4.9*', cost: '60.000đ' },
-            { time: '10:30', title: `Check-in danh thắng tiêu biểu tại ${quickDest}`, note: 'Tận dụng khung giờ vàng ánh sáng đẹp', cost: '150.000đ' },
-            { time: '14:30', title: `Trải nghiệm văn hóa & Cafe sống ảo`, note: 'Góc ngắm toàn cảnh thành phố', cost: '80.000đ' },
-            { time: '19:00', title: `Thưởng thức ẩm thực đêm & Chill phố cổ`, note: 'Thưởng thức món ngon địa phương', cost: '250.000đ' }
-          ]
-        }))
-      };
-
-      setItineraries([newTrip, ...itineraries]);
-      setIsGeneratingAI(false);
-      setIsQuickCreateOpen(false);
-      setSelectedItinerary(newTrip);
-      toast.success(`WanderAI đã tạo thành công lịch trình ${quickDays} ngày tại ${quickDest}! ✨`);
-    } catch (err) {
-      console.warn('AI generator fallback:', err.message);
-      setIsGeneratingAI(false);
-      setIsQuickCreateOpen(false);
-      toast.success(`Đã khởi tạo lịch trình ${quickDest} thành công!`);
-    }
-  };
-
   return (
     <div className="min-w-0 space-y-8 pb-20">
-      
       {/* ─── 1. TOP AMBIENT GLOW & HEADER (M04 STITCH CANVAS) ──────────────────── */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-600/10 via-cyan-500/10 to-amber-500/10 p-6 sm:p-8 border border-sky-100 shadow-sm">
         <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1000px] h-[300px] bg-gradient-to-r from-sky-400/20 via-cyan-300/20 to-amber-300/15 blur-3xl pointer-events-none -z-10"></div>
@@ -220,7 +148,7 @@ export const ItineraryManagerPage = () => {
             {/* AI Generator Button with Glowing Badge */}
             <button
               type="button"
-              onClick={() => setIsQuickCreateOpen(true)}
+              onClick={() => setIsAIGeneratorOpen(true)}
               className="group relative inline-flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
             >
               <Sparkles className="w-4 h-4 text-amber-200 group-hover:rotate-12 transition-transform" />
@@ -1004,129 +932,6 @@ export const ItineraryManagerPage = () => {
                 </button>
               </div>
             </div>
-
-          </div>
-        </div>
-      )}
-
-      {/* ─── 7. FAST AI QUICK CREATOR MODAL ─────────────────────────────────────── */}
-      {isQuickCreateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-slate-200 space-y-5">
-            
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-xs">
-                  <Sparkles className="w-5 h-5 animate-pulse" />
-                </div>
-                <div>
-                  <h3 className="font-display font-extrabold text-base text-slate-900">
-                    Trợ Lý AI Lập Lịch Trình Nhanh
-                  </h3>
-                  <p className="text-xs text-slate-400">Kết nối trực tiếp trí tuệ nhân tạo Google Gemini Live</p>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setIsQuickCreateOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleRunQuickAI} className="space-y-4 text-xs">
-              <div className="space-y-1.5">
-                <label className="font-bold text-slate-700">Điểm đến mong muốn <span className="text-rose-500">*</span></label>
-                <input
-                  type="text"
-                  required
-                  value={quickDest}
-                  onChange={(e) => setQuickDest(e.target.value)}
-                  placeholder="Ví dụ: Quy Nhơn & Phú Yên, Đà Lạt, Sa Pa..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 outline-none focus:border-sky-500 focus:bg-white text-xs"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="font-bold text-slate-700">Thời lượng (Số ngày)</label>
-                  <select
-                    value={quickDays}
-                    onChange={(e) => setQuickDays(Number(e.target.value))}
-                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 outline-none text-xs"
-                  >
-                    <option value={2}>2 Ngày 1 Đêm</option>
-                    <option value={3}>3 Ngày 2 Đêm (Chuẩn)</option>
-                    <option value={4}>4 Ngày 3 Đêm</option>
-                    <option value={5}>5 Ngày 4 Đêm</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="font-bold text-slate-700">Dự trù ngân sách</label>
-                  <select
-                    value={quickBudget}
-                    onChange={(e) => setQuickBudget(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 outline-none text-xs"
-                  >
-                    <option value="2.500.000đ">Tiết kiệm (2.5 triệu)</option>
-                    <option value="4.500.000đ">Tiêu chuẩn (4.5 triệu)</option>
-                    <option value="8.000.000đ">Cao cấp (8 triệu+)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="font-bold text-slate-700">Gu du lịch & Phong cách</label>
-                <input
-                  type="text"
-                  value={quickStyle}
-                  onChange={(e) => setQuickStyle(e.target.value)}
-                  placeholder="Ví dụ: Sống ảo, ẩm thực truyền thống, phượt xe máy..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 outline-none focus:border-sky-500 focus:bg-white text-xs"
-                />
-              </div>
-
-              <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-[11px] text-amber-800 space-y-1">
-                <p className="font-bold flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                  Định tuyến thông minh WanderAI
-                </p>
-                <p className="text-amber-700">
-                  AI sẽ tự động tính toán lộ trình không đi vòng, tối ưu thời gian di chuyển và dự trù chi phí chính xác từng bữa ăn.
-                </p>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsQuickCreateOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
-                >
-                  Hủy bỏ
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={isGeneratingAI}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold hover:shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
-                >
-                  {isGeneratingAI ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Đang tạo lịch trình...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4" />
-                      <span>Khởi tạo ngay</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
 
           </div>
         </div>
