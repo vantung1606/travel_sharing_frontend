@@ -55,6 +55,29 @@ export const ItineraryManagerPage = () => {
   const [detailDayIndex, setDetailDayIndex] = useState(0);
   const [detailViewTab, setDetailViewTab] = useState('timeline'); // 'timeline' | 'budget' | 'tips'
 
+  // Manual Trip Creator Modal State
+  const [isManualCreateOpen, setIsManualCreateOpen] = useState(false);
+  const [manualTitle, setManualTitle] = useState('');
+  const [manualDest, setManualDest] = useState('');
+  const [manualRegion, setManualRegion] = useState('Tây Nguyên');
+  const [manualStartDate, setManualStartDate] = useState('');
+  const [manualEndDate, setManualEndDate] = useState('');
+  const [manualDays, setManualDays] = useState(3);
+  const [manualGroup, setManualGroup] = useState('Nhóm bạn (3-5 người)');
+  const [manualBudget, setManualBudget] = useState(5000000);
+  const [manualCover, setManualCover] = useState('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80');
+  const [manualPlaces, setManualPlaces] = useState('');
+  const [manualNote, setManualNote] = useState('');
+
+  const COVER_PRESETS = [
+    { label: 'Đà Lạt Săn Mây', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80' },
+    { label: 'Đà Nẵng Biển Xanh', url: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80' },
+    { label: 'Phú Quốc Hoàng Hôn', url: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80' },
+    { label: 'Hà Giang Hùng Vĩ', url: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80' },
+    { label: 'Ninh Bình Non Nước', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80' },
+    { label: 'Sa Pa Ruộng Bậc Thang', url: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=1200&q=80' }
+  ];
+
   // Filter and Sort Logic
   const filteredItineraries = useMemo(() => {
     return itineraries.filter(itin => {
@@ -111,6 +134,64 @@ export const ItineraryManagerPage = () => {
     }
   };
 
+  // Handle Manual Trip Creation
+  const handleCreateManualTrip = (e) => {
+    e.preventDefault();
+    if (!manualTitle.trim() || !manualDest.trim()) {
+      toast.warn('Vui lòng nhập tên chuyến đi và điểm đến chính!');
+      return;
+    }
+
+    const calculatedDays = Number(manualDays) || 3;
+    const places = manualPlaces.trim()
+      ? manualPlaces.split(',').map(p => p.trim()).filter(Boolean)
+      : [manualDest + ' City Tour', 'Điểm Check-in Đặc Sắc', 'Khu Ẩm Thực Bản Địa'];
+
+    const newTrip = {
+      id: `itin-${Date.now()}`,
+      title: manualTitle.trim(),
+      destination: manualDest.trim(),
+      region: manualRegion,
+      coverImage: manualCover,
+      duration: `${calculatedDays}N${Math.max(1, calculatedDays - 1)}Đ`,
+      daysCount: calculatedDays,
+      status: 'upcoming',
+      isAiGenerated: false,
+      countdown: manualStartDate ? `Khởi hành ${manualStartDate.split('-').reverse().join('/')}` : 'Sắp khởi hành',
+      departureDate: manualStartDate && manualEndDate
+        ? `${manualStartDate.split('-').reverse().join('/')} – ${manualEndDate.split('-').reverse().join('/')}`
+        : 'Khởi hành trong tháng tới',
+      groupType: manualGroup,
+      placesCount: places.length,
+      placesList: places,
+      budgetPerPerson: Math.round(Number(manualBudget) / (manualGroup.includes('Nhóm') ? 4 : manualGroup.includes('Cặp đôi') ? 2 : 1)),
+      totalBudget: Number(manualBudget),
+      budgetProgress: 20,
+      budgetNote: `Ngân sách tự lập: ${Number(manualBudget).toLocaleString('vi-VN')}đ`,
+      pace: 'Tự do',
+      style: 'Lịch trình tự thiết kế',
+      aiTipNote: manualNote || 'Lịch trình thủ công do bạn tự tạo và quản lý trên WanderAI.',
+      days: Array.from({ length: calculatedDays }).map((_, i) => ({
+        dayNumber: i + 1,
+        title: `Ngày ${i + 1}: Kế hoạch khám phá ${manualDest}`,
+        activities: [
+          { time: '08:30', title: `Bắt đầu hoạt động ngày ${i + 1}`, note: 'Điểm dừng chân tự do', cost: 'Tùy chi tiêu' },
+          { time: '14:00', title: `Khám phá & tham quan tự do`, note: 'Tự do trải nghiệm và chụp ảnh', cost: 'Tùy chi tiêu' }
+        ]
+      }))
+    };
+
+    setItineraries(prev => [newTrip, ...prev]);
+    setIsManualCreateOpen(false);
+    setSelectedItinerary(newTrip);
+    toast.success(`Đã tạo thành công chuyến đi mới: ${newTrip.title}! 🎉`);
+
+    setManualTitle('');
+    setManualDest('');
+    setManualPlaces('');
+    setManualNote('');
+  };
+
   return (
     <div className="min-w-0 space-y-8 pb-20">
       {/* ─── 1. TOP AMBIENT GLOW & HEADER (M04 STITCH CANVAS) ──────────────────── */}
@@ -162,7 +243,7 @@ export const ItineraryManagerPage = () => {
             {/* Manual New Trip */}
             <button
               type="button"
-              onClick={() => setIsAIGeneratorOpen(true)}
+              onClick={() => setIsManualCreateOpen(true)}
               className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
@@ -932,6 +1013,262 @@ export const ItineraryManagerPage = () => {
                 </button>
               </div>
             </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* ─── 7. MODAL TẠO CHUYẾN ĐI THỦ CÔNG (MANUAL TRIP CREATOR) ────────────────── */}
+      {isManualCreateOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-auto max-h-[92vh] flex flex-col">
+            
+            {/* Header */}
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-sky-600 text-white flex items-center justify-center shadow-sm">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-display font-extrabold text-base sm:text-lg text-slate-900">
+                    Tạo Chuyến Đi Mới (Thủ Công)
+                  </h3>
+                  <p className="text-xs text-slate-500">Tự do lên kế hoạch, điểm đến và quản lý ngân sách theo ý bạn</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsManualCreateOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center cursor-pointer transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Form Body */}
+            <form onSubmit={handleCreateManualTrip} className="p-6 overflow-y-auto flex-1 space-y-4 text-xs">
+              
+              {/* Trip Title */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700 flex items-center gap-1">
+                  <span>Tên chuyến đi / Tiêu đề hành trình</span>
+                  <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={manualTitle}
+                  onChange={(e) => setManualTitle(e.target.value)}
+                  placeholder="Ví dụ: Phượt săn mây Đà Lạt cùng hội bạn, Nghỉ dưỡng Phú Quốc 4N3Đ..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-sky-500"
+                />
+              </div>
+
+              {/* Destination & Region */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-sky-600" />
+                    <span>Điểm đến chính</span>
+                    <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={manualDest}
+                    onChange={(e) => setManualDest(e.target.value)}
+                    placeholder="Ví dụ: Đà Lạt, Phú Quốc, Ninh Bình..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-sky-500"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 flex items-center gap-1">
+                    <Compass className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Khu vực / Vùng miền</span>
+                  </label>
+                  <select
+                    value={manualRegion}
+                    onChange={(e) => setManualRegion(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-sky-500"
+                  >
+                    <option value="Tây Nguyên">Tây Nguyên</option>
+                    <option value="Miền Trung">Miền Trung di sản</option>
+                    <option value="Miền Bắc">Miền Bắc</option>
+                    <option value="Miền Nam">Miền Nam</option>
+                    <option value="Hải Đảo">Hải Đảo</option>
+                    <option value="Quốc tế">Quốc tế</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Duration & Dates */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-teal-600" />
+                    <span>Ngày bắt đầu</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={manualStartDate}
+                    onChange={(e) => {
+                      setManualStartDate(e.target.value);
+                      if (e.target.value && manualEndDate) {
+                        const diffTime = Math.abs(new Date(manualEndDate) - new Date(e.target.value));
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                        if (diffDays > 0) setManualDays(diffDays);
+                      }
+                    }}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-teal-600" />
+                    <span>Ngày kết thúc</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={manualEndDate}
+                    onChange={(e) => {
+                      setManualEndDate(e.target.value);
+                      if (manualStartDate && e.target.value) {
+                        const diffTime = Math.abs(new Date(e.target.value) - new Date(manualStartDate));
+                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                        if (diffDays > 0) setManualDays(diffDays);
+                      }
+                    }}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Số ngày ({manualDays}N{Math.max(1, manualDays - 1)}Đ)</span>
+                  </label>
+                  <select
+                    value={manualDays}
+                    onChange={(e) => setManualDays(Number(e.target.value))}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(d => (
+                      <option key={d} value={d}>{d} Ngày {Math.max(1, d - 1)} Đêm</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Group & Budget */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 flex items-center gap-1">
+                    <Users className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>Đối tượng tham gia</span>
+                  </label>
+                  <select
+                    value={manualGroup}
+                    onChange={(e) => setManualGroup(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
+                  >
+                    <option value="Đi một mình (Solo)">Đi một mình (Solo)</option>
+                    <option value="Cặp đôi (2 người)">Cặp đôi (2 người)</option>
+                    <option value="Nhóm bạn (3-5 người)">Nhóm bạn (3-5 người)</option>
+                    <option value="Gia đình nhiều thế hệ">Gia đình nhiều thế hệ</option>
+                    <option value="Đoàn đông người (>10 người)">Đoàn đông người (&gt;10 người)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-slate-700 flex items-center gap-1">
+                    <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Dự trù tổng ngân sách (VNĐ)</span>
+                  </label>
+                  <input
+                    type="number"
+                    step={500000}
+                    value={manualBudget}
+                    onChange={(e) => setManualBudget(Number(e.target.value))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-bold outline-none focus:bg-white focus:border-sky-500"
+                  />
+                </div>
+              </div>
+
+              {/* Preset Cover Selection */}
+              <div className="space-y-2">
+                <label className="font-bold text-slate-700 flex items-center justify-between">
+                  <span>Chọn ảnh bìa chuyến đi</span>
+                  <span className="text-[10px] text-slate-400 font-normal">Nhấp để chọn ảnh mẫu</span>
+                </label>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {COVER_PRESETS.map((p, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => setManualCover(p.url)}
+                      className={`relative rounded-xl overflow-hidden aspect-video border-2 transition-all cursor-pointer group ${
+                        manualCover === p.url ? 'border-sky-600 ring-2 ring-sky-500/20 shadow-xs' : 'border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <img src={p.url} alt={p.label} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-1">
+                        <span className="text-[9px] font-bold text-white truncate">{p.label}</span>
+                      </div>
+                      {manualCover === p.url && (
+                        <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-sky-600 text-white flex items-center justify-center">
+                          <Check className="w-2.5 h-2.5" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Places list */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700">Các điểm dừng dự kiến (ngăn cách bằng dấu phẩy)</label>
+                <input
+                  type="text"
+                  value={manualPlaces}
+                  onChange={(e) => setManualPlaces(e.target.value)}
+                  placeholder="Ví dụ: Cầu Rồng, Bán đảo Sơn Trà, Biển Mỹ Khê, Chùa Cầu Hội An..."
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
+                />
+              </div>
+
+              {/* Note */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700">Ghi chú chuyến đi</label>
+                <textarea
+                  rows={2}
+                  value={manualNote}
+                  onChange={(e) => setManualNote(e.target.value)}
+                  placeholder="Ghi chú đồ dùng cần chuẩn bị, liên hệ thuê xe, danh sách địa điểm cần đặt vé trước..."
+                  className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500 resize-none"
+                />
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsManualCreateOpen(false)}
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm hover:shadow-md"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tạo chuyến đi ngay</span>
+                </button>
+              </div>
+
+            </form>
 
           </div>
         </div>
