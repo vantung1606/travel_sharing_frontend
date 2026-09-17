@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { aiService } from '../../../services/aiService';
+import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import {
   Sparkles,
   MapPin,
@@ -52,8 +53,6 @@ export const ItineraryManagerPage = () => {
 
   // Selected Itinerary for Detail Modal
   const [selectedItinerary, setSelectedItinerary] = useState(null);
-  const [detailDayIndex, setDetailDayIndex] = useState(0);
-  const [detailViewTab, setDetailViewTab] = useState('timeline'); // 'timeline' | 'budget' | 'tips'
 
   // Manual Trip Creator Modal State
   const [isManualCreateOpen, setIsManualCreateOpen] = useState(false);
@@ -644,13 +643,7 @@ export const ItineraryManagerPage = () => {
               <div className="space-y-2 pt-1">
                 <button
                   type="button"
-                  onClick={() => {
-                    setQuickDest('Nha Trang & Đảo Điệp Sơn');
-                    setQuickDays(3);
-                    setQuickBudget('3.800.000đ');
-                    setQuickStyle('🏖️ Nghỉ dưỡng biển & Lặn ngắm san hô');
-                    setIsQuickCreateOpen(true);
-                  }}
+                  onClick={() => setIsAIGeneratorOpen(true)}
                   className="w-full text-left px-3.5 py-2.5 rounded-xl bg-white hover:bg-sky-50 border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors shadow-xs cursor-pointer"
                 >
                   <span>🏖️ Nghỉ dưỡng biển 3N2Đ &lt; 4 triệu</span>
@@ -659,13 +652,7 @@ export const ItineraryManagerPage = () => {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setQuickDest('Đà Lạt Mộng Mơ');
-                    setQuickDays(2);
-                    setQuickBudget('2.500.000đ');
-                    setQuickStyle('☕ Săn mây & Cafe sống ảo');
-                    setIsQuickCreateOpen(true);
-                  }}
+                  onClick={() => setIsAIGeneratorOpen(true)}
                   className="w-full text-left px-3.5 py-2.5 rounded-xl bg-white hover:bg-sky-50 border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors shadow-xs cursor-pointer"
                 >
                   <span>☕ Săn mây Cafe Đà Lạt 2N1Đ</span>
@@ -676,11 +663,11 @@ export const ItineraryManagerPage = () => {
 
             <button
               type="button"
-              onClick={() => setIsQuickCreateOpen(true)}
+              onClick={() => setIsAIGeneratorOpen(true)}
               className="mt-5 w-full py-2.5 px-4 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
-              <span>Khởi tạo chuyến đi mới</span>
+              <Sparkles className="w-4 h-4" />
+              <span>Khởi tạo chuyến đi cùng WanderAI</span>
             </button>
           </div>
         </div>
@@ -716,306 +703,12 @@ export const ItineraryManagerPage = () => {
         </div>
       </div>
 
-      {/* ─── 6. INTERACTIVE ITINERARY DETAIL DRAWER / MODAL ─────────────────────── */}
+      {/* ─── 6. INTERACTIVE ITINERARY DETAIL MODAL (STITCH M10) ─────────────────── */}
       {selectedItinerary && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
-            
-            {/* Modal Header Banner */}
-            <div className="relative h-44 sm:h-52 w-full bg-slate-900 shrink-0 overflow-hidden">
-              <img
-                src={selectedItinerary.coverImage}
-                alt={selectedItinerary.title}
-                className="w-full h-full object-cover opacity-60"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
-
-              {/* Close Button */}
-              <button
-                type="button"
-                onClick={() => setSelectedItinerary(null)}
-                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-md transition-colors cursor-pointer"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              {/* Trip Header Info */}
-              <div className="absolute bottom-4 left-5 right-5 text-white space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-sky-500 text-[10px] font-extrabold uppercase tracking-wider">
-                    {selectedItinerary.duration}
-                  </span>
-                  {selectedItinerary.isAiGenerated && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500 text-[10px] font-extrabold uppercase tracking-wider flex items-center gap-1">
-                      <Sparkles className="w-2.5 h-2.5" /> WanderAI Optimized
-                    </span>
-                  )}
-                </div>
-
-                <h2 className="font-display text-lg sm:text-2xl font-extrabold leading-tight">
-                  {selectedItinerary.title}
-                </h2>
-
-                <div className="flex flex-wrap items-center gap-4 text-xs text-slate-300 pt-1">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                    {selectedItinerary.destination}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-sky-400" />
-                    {selectedItinerary.departureDate}
-                  </span>
-                  <span className="flex items-center gap-1 font-semibold text-emerald-400">
-                    <DollarSign className="w-3.5 h-3.5" />
-                    {selectedItinerary.budgetPerPerson ? `${selectedItinerary.budgetPerPerson.toLocaleString('vi-VN')}đ/người` : selectedItinerary.budgetTotal}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Navigation Tabs */}
-            <div className="px-6 border-b border-slate-100 flex items-center justify-between gap-4 bg-slate-50/80">
-              <div className="flex items-center gap-2 overflow-x-auto py-3">
-                {[
-                  { id: 'timeline', label: 'Lộ trình chi tiết từng giờ' },
-                  { id: 'budget', label: 'Phân bổ chi phí & Dự toán' },
-                  { id: 'tips', label: 'Lời khuyên từ WanderAI' }
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setDetailViewTab(tab.id)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      detailViewTab === tab.id
-                        ? 'bg-white text-sky-600 shadow-xs border border-slate-200'
-                        : 'text-slate-500 hover:text-slate-800'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Action Buttons in Header */}
-              <div className="hidden sm:flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={(e) => handleShareItinerary(selectedItinerary, e)}
-                  className="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
-                >
-                  <Share2 className="w-3.5 h-3.5 text-slate-500" />
-                  <span>Mời bạn bè</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => toast.success('Đã tải lịch trình ngoại tuyến thành công!')}
-                  className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Tải PDF</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Modal Body Scroll Area */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              
-              {/* TAB 1: TIMELINE DETAIL */}
-              {detailViewTab === 'timeline' && (
-                <div className="space-y-6">
-                  {/* Days Selector Tabs */}
-                  {selectedItinerary.days && selectedItinerary.days.length > 0 ? (
-                    <>
-                      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                        {selectedItinerary.days.map((d, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => setDetailDayIndex(idx)}
-                            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
-                              detailDayIndex === idx
-                                ? 'bg-slate-900 text-white shadow-xs'
-                                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                            }`}
-                          >
-                            Ngày {d.dayNumber || idx + 1}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Selected Day Activities List */}
-                      {selectedItinerary.days[detailDayIndex] && (
-                        <div className="space-y-4">
-                          <div className="p-4 rounded-2xl bg-sky-50/70 border border-sky-100 flex items-center justify-between">
-                            <h4 className="font-display font-extrabold text-xs sm:text-sm text-sky-900">
-                              {selectedItinerary.days[detailDayIndex].title}
-                            </h4>
-                            <span className="text-[11px] font-bold text-sky-700 bg-white px-2.5 py-1 rounded-full shadow-xs">
-                              {selectedItinerary.days[detailDayIndex].activities?.length || 0} Hoạt động
-                            </span>
-                          </div>
-
-                          {/* Chronological Timeline Spine */}
-                          <div className="relative pl-6 space-y-4 before:absolute before:left-2.5 before:top-3 before:bottom-3 before:w-0.5 before:bg-slate-200">
-                            {selectedItinerary.days[detailDayIndex].activities?.map((act, i) => (
-                              <div key={i} className="relative group">
-                                <div className="absolute -left-6 top-3 w-4 h-4 rounded-full bg-white border-2 border-sky-500 group-hover:bg-sky-500 transition-colors"></div>
-
-                                <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/80 border border-slate-200/70 transition-all space-y-1.5">
-                                  <div className="flex items-center justify-between">
-                                    <span className="font-mono font-bold text-sky-600 text-xs flex items-center gap-1.5">
-                                      <Clock className="w-3.5 h-3.5" />
-                                      {act.time}
-                                    </span>
-                                    {act.cost && (
-                                      <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                                        {act.cost}
-                                      </span>
-                                    )}
-                                  </div>
-
-                                  <h5 className="font-display font-bold text-xs sm:text-sm text-slate-900">
-                                    {act.title}
-                                  </h5>
-
-                                  <p className="text-xs text-slate-500 leading-relaxed">
-                                    {act.note}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <p className="text-xs text-slate-400">Không có dữ liệu ngày chi tiết.</p>
-                  )}
-                </div>
-              )}
-
-              {/* TAB 2: BUDGET BREAKDOWN */}
-              {detailViewTab === 'budget' && (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200/60 space-y-1">
-                      <span className="text-[11px] font-bold text-slate-500">Dự toán mỗi người</span>
-                      <p className="font-display text-xl font-extrabold text-sky-700">
-                        {selectedItinerary.budgetPerPerson ? `${selectedItinerary.budgetPerPerson.toLocaleString('vi-VN')}đ` : selectedItinerary.budgetTotal}
-                      </p>
-                      <p className="text-[10px] text-slate-400">Đã bao gồm lưu trú & ăn uống</p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/60 space-y-1">
-                      <span className="text-[11px] font-bold text-slate-500">Tổng ngân sách nhóm</span>
-                      <p className="font-display text-xl font-extrabold text-emerald-700">
-                        {selectedItinerary.totalBudget ? `${selectedItinerary.totalBudget.toLocaleString('vi-VN')}đ` : 'Chưa tính'}
-                      </p>
-                      <p className="text-[10px] text-slate-400">Ước tính theo phương tiện thực tế</p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200/60 space-y-1">
-                      <span className="text-[11px] font-bold text-slate-500">Tiết kiệm nhờ AI</span>
-                      <p className="font-display text-xl font-extrabold text-amber-700">-15% ~ -20%</p>
-                      <p className="text-[10px] text-slate-400">Nhờ tối ưu cung đường & đặt sớm</p>
-                    </div>
-                  </div>
-
-                  {/* Budget Categories Progress */}
-                  <div className="space-y-3 p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
-                      Phân Bổ Hạng Mục Chi Tiêu Khuyên Dùng
-                    </h4>
-
-                    {[
-                      { label: 'Ăn uống & Đặc sản địa phương', pct: 35, color: 'bg-amber-500' },
-                      { label: 'Lưu trú (Khách sạn / Homestay)', pct: 30, color: 'bg-sky-600' },
-                      { label: 'Di chuyển (Xe máy / Taxi / Đưa đón)', pct: 20, color: 'bg-cyan-500' },
-                      { label: 'Vé tham quan & Trải nghiệm vui chơi', pct: 15, color: 'bg-emerald-500' }
-                    ].map((cat, idx) => (
-                      <div key={idx} className="space-y-1">
-                        <div className="flex items-center justify-between text-xs text-slate-600">
-                          <span>{cat.label}</span>
-                          <span className="font-bold">{cat.pct}%</span>
-                        </div>
-                        <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
-                          <div className={`h-full ${cat.color} rounded-full`} style={{ width: `${cat.pct}%` }}></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* TAB 3: WANDERAI INSIGHTS & TIPS */}
-              {detailViewTab === 'tips' && (
-                <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 space-y-2">
-                    <div className="flex items-center gap-2 font-bold text-xs">
-                      <Sparkles className="w-4 h-4 text-amber-600" />
-                      <span>Lời khuyên thông minh từ Trợ lý WanderAI</span>
-                    </div>
-                    <p className="text-xs leading-relaxed text-amber-800">
-                      {selectedItinerary.aiTipNote ||
-                        'Thời điểm lý tưởng nhất để tham quan là buổi sáng trước 09:00 hoặc sau 15:30 chiều. Hãy chuẩn bị sạc dự phòng, trang phục màu sáng để có những bức ảnh check-in rực rỡ nhất!'}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50 space-y-2">
-                      <h5 className="font-bold text-xs text-slate-800 flex items-center gap-1.5">
-                        <Camera className="w-4 h-4 text-sky-600" />
-                        <span>Góc chụp ảnh (Photo Spots) đẹp</span>
-                      </h5>
-                      <p className="text-xs text-slate-500 leading-relaxed">
-                        Chụp ngược sáng hoàng hôn, tận dụng góc nhìn từ trên cao tại các điểm dừng check-in để bắt trọn cảnh quan rộng lớn.
-                      </p>
-                    </div>
-
-                    <div className="p-4 rounded-2xl border border-slate-200/80 bg-slate-50 space-y-2">
-                      <h5 className="font-bold text-xs text-slate-800 flex items-center gap-1.5">
-                        <Car className="w-4 h-4 text-cyan-600" />
-                        <span>Kinh nghiệm di chuyển thuận tiện</span>
-                      </h5>
-                      <p className="text-xs text-slate-500 leading-relaxed">
-                        Thuê xe tự lái hoặc xe máy công nghệ theo chặng ngắn để tiết kiệm tối đa thời gian di chuyển giữa các điểm đến.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50">
-              <span className="text-xs text-slate-400">
-                Mã hành trình: <span className="font-mono text-slate-600 font-bold">{selectedItinerary.id}</span>
-              </span>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedItinerary(null)}
-                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-100 transition-colors cursor-pointer"
-                >
-                  Đóng lại
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    toast.success('Đã lưu các thay đổi cho lịch trình này!');
-                    setSelectedItinerary(null);
-                  }}
-                  className="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer"
-                >
-                  Lưu & Áp dụng
-                </button>
-              </div>
-            </div>
-
-          </div>
-        </div>
+        <ItineraryDetailModal
+          itinerary={selectedItinerary}
+          onClose={() => setSelectedItinerary(null)}
+        />
       )}
 
       {/* ─── 7. MODAL TẠO CHUYẾN ĐI THỦ CÔNG (MANUAL TRIP CREATOR) ────────────────── */}

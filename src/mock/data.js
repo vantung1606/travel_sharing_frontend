@@ -130,32 +130,174 @@ export const INITIAL_ITINERARIES = [
         dayNumber: 1,
         title: 'Ngày 1: Biển Mỹ Khê - Bán đảo Sơn Trà & Check-in Cầu Rồng',
         activities: [
-          { time: '08:30', title: 'Đáp sân bay Đà Nẵng & Nhận phòng khách sạn', note: 'Xe đưa đón riêng về khách sạn Monarque Biển Mỹ Khê', cost: '350.000đ' },
-          { time: '11:30', title: 'Thưởng thức Mì Quảng Bà Mua & Bánh tráng thịt heo', note: 'Quán ăn bản địa đánh giá 4.8*, không gian sạch sẽ', cost: '120.000đ' },
-          { time: '14:30', title: 'Bán đảo Sơn Trà & Chùa Linh Ứng', note: 'Chiêm bái tượng Phật Bà 67m, góc chụp toàn cảnh vịnh Đà Nẵng', cost: 'Miễn phí' },
-          { time: '17:00', title: 'Tắm biển Mỹ Khê & Thưởng thức dừa tươi', note: 'Khung giờ vàng hoàng hôn biển tuyệt đẹp', cost: '60.000đ' },
-          { time: '19:30', title: 'Ăn tối Hải Sản Phố & Xem Cầu Rồng phun lửa', note: 'AI Tip: Đặt bàn view cầu trước 18:00 để có chỗ đẹp nhất', cost: '450.000đ' }
+          {
+            time: '08:30 – 10:30',
+            category: 'Văn hóa & Tâm linh',
+            title: 'Check-in & Viếng Chùa Linh Ứng – Bán đảo Sơn Trà',
+            location: 'Chùa Linh Ứng Sơn Trà',
+            address: 'Bán đảo Sơn Trà, P. Thọ Quang, Q. Sơn Trà, TP. Đà Nẵng',
+            note: 'Chiêm bái tượng Phật Bà Quan Âm cao 67m hướng nhìn trọn vẹn vịnh biển Đà Nẵng tuyệt đẹp.',
+            aiTip: 'Nên đến trước 09:30 để ngắm trọn vẹn biển biếc và tránh nắng gắt trưa.',
+            cost: 'Miễn phí vé',
+            image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80',
+            transit: 'Đón xe từ sân bay Đà Nẵng: 14.5 km ~ 25 phút qua Cầu Rồng'
+          },
+          {
+            time: '11:30 – 13:00',
+            category: 'Ẩm thực bản địa',
+            title: 'Ăn trưa Đặc sản Bánh tráng cuốn thịt heo Quán Trần',
+            location: 'Đặc sản Quán Trần',
+            address: '04 Lê Duẩn, P. Hải Châu 1, Q. Hải Châu, TP. Đà Nẵng',
+            note: 'Món bánh tráng cuốn thịt heo 2 đầu da nổi tiếng kèm mắm nêm đậm đà thơm lừng xứ Quảng.',
+            aiTip: 'Nên gọi thêm đĩa Mì Quảng tôm thịt ăn kèm để thưởng thức trọn vị miền Trung.',
+            cost: '140.000đ/người',
+            image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80',
+            transit: 'Di chuyển theo Cung đường Hoàng Sa: 8.5 km ~ 18 phút ngắm biển'
+          },
+          {
+            time: '14:30 – 16:30',
+            category: 'Nghỉ ngơi & Lưu trú',
+            title: 'Nhận phòng & Nghỉ ngơi tại Resort Biển Mỹ Khê',
+            location: 'Monarque Hotel / Resort Mỹ Khê',
+            address: '238 Võ Nguyên Giáp, P. Phước Mỹ, Q. Sơn Trà, TP. Đà Nẵng',
+            note: 'Nghỉ ngơi nạp năng lượng, phòng hướng biển ngắm trọn cảnh bình minh và sóng vỗ.',
+            aiTip: 'Khách sạn có hồ bơi vô cực tầng thượng view 360 độ toàn thành phố Đà Nẵng.',
+            cost: 'Đã thanh toán',
+            image: 'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?auto=format&fit=crop&w=600&q=80',
+            transit: 'Di chuyển từ trung tâm qua Cầu Sông Hàn: 4.2 km ~ 10 phút'
+          },
+          {
+            time: '17:00 – 18:30',
+            category: 'Check-in & Sống ảo',
+            title: 'Thư giãn tắm biển Mỹ Khê & Chill cafe ngắm hoàng hôn',
+            location: 'Sơn Trà Marina Cafe',
+            address: 'Đường Hồ Xanh, Bán đảo Sơn Trà, P. Thọ Quang, TP. Đà Nẵng',
+            note: 'Check-in quán cafe ven bờ biển Sơn Trà Marina phong cách Santorini ngắm chiều tà lãng mạn.',
+            aiTip: 'Khung giờ vàng từ 17:00 – 17:45 ánh sáng hoàng hôn tím hồng đẹp nhất để chụp ảnh.',
+            cost: '75.000đ/người',
+            image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+            transit: 'Đi dọc bãi tắm Võ Nguyên Giáp: 6 km ~ 12 phút'
+          },
+          {
+            time: '19:30 – 21:30',
+            category: 'Ẩm thực & Đêm',
+            title: 'Ăn tối Hải sản Bé Mặn ven biển & Xem Cầu Rồng phun lửa',
+            location: 'Hải Sản Bé Mặn & Cầu Rồng',
+            address: 'Lô 11 Võ Nguyên Giáp, P. Mạn Thái, Q. Sơn Trà, TP. Đà Nẵng',
+            note: 'Thưởng thức tôm hùm baby, cua rang me tươi sống và ngắm Cầu Rồng phun lửa lúc 21:00 cuối tuần.',
+            aiTip: 'Nên đặt bàn trước 18:30 và có mặt tại Cầu Rồng lúc 20:45 để chọn góc ngắm đẹp nhất.',
+            cost: '350.000đ/người',
+            image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80',
+            transit: 'Di chuyển từ bãi biển về Cầu Rồng: 3.5 km ~ 8 phút'
+          }
         ]
       },
       {
         dayNumber: 2,
         title: 'Ngày 2: Chinh phục Sun World Bà Nà Hills & Cầu Vàng',
         activities: [
-          { time: '07:30', title: 'Lên cáp treo Bà Nà Hills đón bình minh mây', note: 'Quét mã QR vé điện tử WanderAI tiết kiệm 30 phút xếp hàng', cost: '900.000đ' },
-          { time: '09:00', title: 'Check-in Cầu Vàng Bàn Tay Khổng Lồ', note: 'Khung giờ vắng khách nhất trong ngày, ánh sáng lý tưởng săn ảnh', cost: 'Bao gồm vé' },
-          { time: '12:00', title: 'Buffet trưa bốn mùa tại Beer Plaza', note: 'Hơn 100 món Á - Âu đặc sắc kèm bia tươi', cost: '350.000đ' },
-          { time: '15:00', title: 'Khám phá Làng Pháp & Hầm rượu Debay', note: 'Không gian kiến trúc Gothic cổ kính lãng mạn', cost: 'Miễn phí' },
-          { time: '18:30', title: 'Xuống núi về trung tâm & Trải nghiệm chợ đêm Helio', note: 'Thưởng thức ẩm thực đường phố và nghe nhạc acoustic', cost: '200.000đ' }
+          {
+            time: '07:30 – 09:00',
+            category: 'Trải nghiệm cáp treo',
+            title: 'Lên cáp treo Bà Nà Hills đón bình minh mây bồng bềnh',
+            location: 'Ga Cáp Treo Suối Mơ - Bà Nà Hills',
+            address: 'Thôn An Sơn, Xã Hòa Ninh, Huyện Hòa Vang, TP. Đà Nẵng',
+            note: 'Tuyến cáp treo đạt nhiều kỷ lục thế giới băng qua cánh rừng nguyên sinh đại ngàn.',
+            aiTip: 'Quét mã QR vé điện tử WanderAI để đi thẳng qua cổng soát vé, tiết kiệm 30 phút.',
+            cost: '900.000đ/vé',
+            image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80',
+            transit: 'Xe đưa đón từ khách sạn lên Bà Nà: 28 km ~ 45 phút'
+          },
+          {
+            time: '09:00 – 11:30',
+            category: 'Danh thắng biểu tượng',
+            title: 'Check-in Cầu Vàng Bàn Tay Khổng Lồ & Vườn hoa Le Jardin',
+            location: 'Cầu Vàng (Golden Bridge)',
+            address: 'Đỉnh Bà Nà Hills, Xã Hòa Ninh, Huyện Hòa Vang, TP. Đà Nẵng',
+            note: 'Kiến trúc kỳ quan được truyền thông quốc tế ca ngợi, ngắm trọn mây trời bao la.',
+            aiTip: 'Đến đây lúc 09:00 là thời điểm sương vừa tan, nắng nhẹ chưa bị sương mù che khuất.',
+            cost: 'Bao gồm vé cáp',
+            image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80',
+            transit: 'Đi bộ từ Ga Marseille qua Cầu Vàng: 200m ~ 5 phút'
+          },
+          {
+            time: '12:00 – 14:00',
+            category: 'Ẩm thực quốc tế',
+            title: 'Buffet trưa bốn mùa tại Beer Plaza Làng Pháp',
+            location: 'Nhà hàng Beer Plaza',
+            address: 'Quảng trường Làng Pháp, Đỉnh Núi Chúa, Bà Nà Hills, TP. Đà Nẵng',
+            note: 'Thưởng thức đại tiệc buffet hơn 100 món Á - Âu cùng chương trình vũ hội bia Đức náo nhiệt.',
+            aiTip: 'Khu vực tầng 2 có tầm nhìn bao quát sân khấu biểu diễn nghệ thuật rất đẹp.',
+            cost: '350.000đ/người',
+            image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80',
+            transit: 'Tàu hỏa leo núi lên Làng Pháp: 1.2 km ~ 5 phút'
+          },
+          {
+            time: '18:30 – 21:00',
+            category: 'Chợ đêm & Giải trí',
+            title: 'Xuống núi về trung tâm & Trải nghiệm Chợ đêm Helio',
+            location: 'Chợ đêm Helio Center',
+            address: 'Đường 2 Tháng 9, P. Hòa Cường Bắc, Q. Hải Châu, TP. Đà Nẵng',
+            note: 'Thiên đường ẩm thực đêm lớn nhất Đà Nẵng với hàng trăm gian hàng đặc sản và âm nhạc live.',
+            aiTip: 'Đừng bỏ qua món ốc hút cay nồng và bánh tráng nướng Đà Nẵng tại đây.',
+            cost: '180.000đ/người',
+            image: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&q=80',
+            transit: 'Xe đưa đón về trung tâm: 29 km ~ 45 phút'
+          }
         ]
       },
       {
         dayNumber: 3,
         title: 'Ngày 3: Phố Cổ Hội An lung linh đèn lồng & Thuyền thúng',
         activities: [
-          { time: '08:30', title: 'Di chuyển Hội An & Ghé Lò Gạch Cũ chụp ảnh', note: 'Cung đường ven biển thoáng đãng, cafe view đồng lúa bao la', cost: '80.000đ' },
-          { time: '10:30', title: 'Chèo thuyền thúng Rừng Dừa Bảy Mẫu', note: 'Trải nghiệm múa thúng cảm giác mạnh và giăng lưới bắt cá', cost: '150.000đ' },
-          { time: '13:00', title: 'Cơm gà Bà Buội & Nước Mót Hội An', note: 'Hương vị thảo mộc thanh mát đặc trưng phố Hội', cost: '95.000đ' },
-          { time: '16:00', title: 'Dạo bộ Chùa Cầu, Nhà cổ Tấn Ký & Thả hoa đăng sông Hoài', note: 'Khoảnh khắc phố cổ lên đèn rực rỡ lãng mạn nhất Việt Nam', cost: '100.000đ' }
+          {
+            time: '08:30 – 10:00',
+            category: 'Check-in cảnh quan',
+            title: 'Ghé check-in Lò Gạch Cũ Duy Xuyên trên đường đi Hội An',
+            location: 'Lò Gạch Cũ Farmstay',
+            address: 'Thôn Vĩnh Nam, Xã Duy Vinh, Huyện Duy Xuyên, Tỉnh Quảng Nam',
+            note: 'Cây cầu tre uốn lượn giữa đồng lúa bát ngát dẫn vào lò gạch cổ kính rêu phong.',
+            aiTip: 'Thưởng thức cà phê sữa đá nông sản hữu cơ nguyên chất tại quán cafe view lúa.',
+            cost: '65.000đ/người',
+            image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+            transit: 'Di chuyển theo đường Lạc Long Quân ven biển: 24 km ~ 35 phút'
+          },
+          {
+            time: '10:30 – 12:30',
+            category: 'Trải nghiệm sông nước',
+            title: 'Chèo thuyền thúng Rừng Dừa Bảy Mẫu Cẩm Thanh',
+            location: 'Khu du lịch sinh thái Rừng Dừa Bảy Mẫu',
+            address: 'Thôn Vạn Lăng, Xã Cẩm Thanh, TP. Hội An, Tỉnh Quảng Nam',
+            note: 'Trải nghiệm ngồi thuyền thúng len lỏi qua rặng dừa nước ngập mặn và xem màn múa thúng xoay tít.',
+            aiTip: 'Nên mang mũ rộng vành và chuẩn bị tiền boa nhỏ cho bác lái thúng nhiệt tình.',
+            cost: '150.000đ/người',
+            image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80',
+            transit: 'Di chuyển từ Duy Xuyên qua Cẩm Thanh: 7 km ~ 15 phút'
+          },
+          {
+            time: '13:00 – 14:30',
+            category: 'Ẩm thực phố cổ',
+            title: 'Ăn trưa Cơm gà Bà Buội & Thưởng thức Nước Mót Hội An',
+            location: 'Cơm gà Bà Buội & Trà Mót',
+            address: '22 Phan Chu Trinh & 150 Trần Phú, P. Minh An, TP. Hội An, Quảng Nam',
+            note: 'Thịt gà ta thả vườn vàng ươm, cơm dẻo nấu nước luộc gà thơm lừng, tráng miệng nước mót hoa sen.',
+            aiTip: 'Quán rất đông vào giờ trưa, nên ghé sau 13:00 để có chỗ ngồi mát mẻ.',
+            cost: '95.000đ/người',
+            image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80',
+            transit: 'Di chuyển vào phố cổ Hội An: 4 km ~ 10 phút'
+          },
+          {
+            time: '16:00 – 21:00',
+            category: 'Di sản văn hóa',
+            title: 'Dạo bộ Chùa Cầu, Nhà cổ Tấn Ký & Thả hoa đăng Sông Hoài',
+            location: 'Chùa Cầu & Sông Hoài Phố Cổ',
+            address: 'Đường Nguyễn Thị Minh Khai & Bạch Đằng, P. Minh An, TP. Hội An',
+            note: 'Ngắm phố cổ lung linh hàng vạn đèn lồng khi hoàng hôn buông xuống, thả hoa đăng nguyện ước may mắn.',
+            aiTip: 'Thuê thuyền gỗ ngắm phố cổ từ lòng sông Hoài lúc 18:30 khi các dãy nhà cổ đồng loạt thắp đèn lồng.',
+            cost: '120.000đ/người',
+            image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=600&q=80',
+            transit: 'Dạo bộ trong khu phố cổ đi bộ: 1.5 km'
+          }
         ]
       }
     ]
@@ -186,18 +328,84 @@ export const INITIAL_ITINERARIES = [
         dayNumber: 1,
         title: 'Ngày 1: Check-in Homestay view thung lũng & Lẩu gà lá é',
         activities: [
-          { time: '11:00', title: 'Nhận phòng Homestay Hoàng Hôn Dasar', note: 'Căn phòng kính ngắm trọn thung lũng thông reo', cost: '600.000đ' },
-          { time: '14:30', title: 'Cafe Tiệm Cà Phê Túi Mơ To', note: 'Vườn cúc họa mi nở rộ, view nhà lồng lên đèn thơ mộng', cost: '85.000đ' },
-          { time: '18:30', title: 'Lẩu gà lá é Tao Ngộ đường 3/4', note: 'Nước dùng chua thanh the cay ấm lòng đêm đông', cost: '150.000đ' }
+          {
+            time: '11:00 – 13:00',
+            category: 'Nghỉ dưỡng & Homestay',
+            title: 'Nhận phòng Homestay Hoàng Hôn Dasar view đồi thông',
+            location: 'Dasar Hill Homestay',
+            address: 'Thôn 1, Xã Đạ Sar, Huyện Lạc Dương, Tỉnh Lâm Đồng',
+            note: 'Căn phòng kính ngắm trọn thung lũng thông reo, không khí se lạnh 16°C trong lành.',
+            aiTip: 'Nên đặt trước phòng áp mái hướng đông để đón trọn bình minh thung lũng.',
+            cost: '600.000đ/đêm',
+            image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+            transit: 'Từ bến xe liên tỉnh về Homestay: 12 km ~ 20 phút'
+          },
+          {
+            time: '14:30 – 17:00',
+            category: 'Check-in cafe chill',
+            title: 'Thưởng thức cafe & ngắm cúc họa mi tại Tiệm Cà Phê Túi Mơ To',
+            location: 'Tiệm Cà Phê Túi Mơ To',
+            address: 'Hẻm 31 Sào Nam, Phường 11, TP. Đà Lạt, Tỉnh Lâm Đồng',
+            note: 'Vườn cúc họa mi trắng muốt nở rộ, view nhìn xuống thung lũng nhà lồng trồng hoa thơ mộng.',
+            aiTip: 'Đến lúc 16:00 để chụp cả ban ngày và đón khoảnh khắc nhà lồng bật đèn vàng rực rỡ.',
+            cost: '85.000đ/người',
+            image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+            transit: 'Đi theo QL20 vào Hẻm Sào Nam: 6.8 km ~ 15 phút'
+          },
+          {
+            time: '18:30 – 20:30',
+            category: 'Ẩm thực ấm nóng',
+            title: 'Ăn tối Lẩu gà lá é Tao Ngộ đường 3 Tháng 4 chuẩn vị',
+            location: 'Lẩu gà lá é Tao Ngộ',
+            address: 'Số 05 Đường 3 Tháng 4, Phường 3, TP. Đà Lạt, Tỉnh Lâm Đồng',
+            note: 'Nồi lẩu gà nóng hổi bốc khói, thịt gà ta chắc ngọt và vị the the chua thanh ấm nồng đêm lạnh.',
+            aiTip: 'Quán rất đông vào mùa đông, nên đến lúc 18:00 để không phải xếp hàng chờ bàn.',
+            cost: '150.000đ/người',
+            image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80',
+            transit: 'Từ Sào Nam về trung tâm đường 3/4: 5.5 km ~ 12 phút'
+          }
         ]
       },
       {
         dayNumber: 2,
         title: 'Ngày 2: Săn mây Đồi chè Cầu Đất & Vườn hồng treo gió',
         activities: [
-          { time: '04:45', title: 'Khởi hành săn mây thảm gỗ Cầu Đất', note: 'Nhiệt độ 12°C, mang áo ấm dày và găng tay', cost: '120.000đ' },
-          { time: '08:30', title: 'Ăn sáng Bánh mì xíu mại Hoàng Diệu', note: 'Chén xíu mại nóng hổi thơm nồng ớt cay', cost: '40.000đ' },
-          { time: '14:00', title: 'Tham quan cơ sở sản xuất hồng treo gió công nghệ Nhật', note: 'Thử hồng mật dẻo ngọt và mua quà lưu niệm', cost: '200.000đ' }
+          {
+            time: '04:45 – 07:30',
+            category: 'Thiên nhiên & Săn mây',
+            title: 'Khởi hành săn biển mây thảm gỗ Đồi chè Cầu Đất Farm',
+            location: 'Thiên Đường Săn Mây Cầu Đất',
+            address: 'Thôn Trường Thọ, Xã Trạm Hành, TP. Đà Lạt, Tỉnh Lâm Đồng',
+            note: 'Biển mây bồng bềnh cuồn cuộn dưới ánh bình minh xuyên qua đồi chè xanh mướt ngút ngàn.',
+            aiTip: 'Nhiệt độ sáng sớm chỉ 12°C - 14°C, hãy mặc áo phao dày, găng tay và khăn quàng cổ.',
+            cost: '120.000đ/người',
+            image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+            transit: 'Cung đường QL20 uốn lượn sương mù: 24 km ~ 40 phút'
+          },
+          {
+            time: '08:30 – 09:30',
+            category: 'Điểm tâm sáng',
+            title: 'Ăn sáng Bánh mì xíu mại chén Hoàng Diệu thơm cay',
+            location: 'Bánh mì xíu mại Hoàng Diệu',
+            address: '26 Hoàng Diệu, Phường 5, TP. Đà Lạt, Tỉnh Lâm Đồng',
+            note: 'Chén xíu mại nóng hổi thơm nồng ớt sa tế, chấm kèm bánh mì giòn tan sưởi ấm sáng sớm.',
+            aiTip: 'Nên gọi thêm ly sữa đậu nành nóng hổi ăn kèm bánh mì xíu mại chuẩn gu người Đà Lạt.',
+            cost: '40.000đ/người',
+            image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80',
+            transit: 'Từ Cầu Đất quay về trung tâm Hoàng Diệu: 22 km ~ 35 phút'
+          },
+          {
+            time: '14:00 – 16:30',
+            category: 'Nông nghiệp trải nghiệm',
+            title: 'Tham quan cơ sở sản xuất Hồng treo gió công nghệ Nhật',
+            location: 'Vườn hồng Lễ Vân',
+            address: '45 Khe Sanh, Phường 10, TP. Đà Lạt, Tỉnh Lâm Đồng',
+            note: 'Chiêm ngưỡng giàn hồng treo gió vàng ươm mật dẻo tự nhiên, thử hồng và trà atiso miễn phí.',
+            aiTip: 'Mua hồng treo gió làm quà nên chọn gói hút chân không để giữ được độ dẻo thơm lâu nhất.',
+            cost: '200.000đ',
+            image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80',
+            transit: 'Di chuyển theo cung đường Khe Sanh: 4.5 km ~ 10 phút'
+          }
         ]
       }
     ]
@@ -228,9 +436,42 @@ export const INITIAL_ITINERARIES = [
         dayNumber: 1,
         title: 'Ngày 1: Hà Giang City - Cổng Trời Quản Bạ - Rừng Thông Yên Minh',
         activities: [
-          { time: '07:30', title: 'Thuê xe máy cào cào và trang bị giáp bảo hộ', note: 'Kiểm tra lốp, phanh và đèn sương mù cẩn thận', cost: '200.000đ' },
-          { time: '11:00', title: 'Check-in Dốc Bắc Sum & Cổng Trời Quản Bạ', note: 'Chiêm ngưỡng Núi Đôi Cô Tiên giữa trập trùng thung lũng', cost: 'Miễn phí' },
-          { time: '17:30', title: 'Đến Phố Cáo & Nghỉ đêm tại Homestay nhà trình tường', note: 'Ăn tối Thắng Dền và rượu ngô men lá cùng đồng bào Mông', cost: '250.000đ' }
+          {
+            time: '07:30 – 09:00',
+            category: 'Chuẩn bị phượt',
+            title: 'Thuê xe máy cào cào và trang bị giáp bảo hộ phượt',
+            location: 'Dịch vụ thuê xe Giang Sơn',
+            address: 'Km3 Cầu Mè, Xã Phương Thiện, TP. Hà Giang, Tỉnh Hà Giang',
+            note: 'Kiểm tra kỹ lưỡng phanh, lốp gai, đèn sương mù và nhận áo mưa bộ phản quang.',
+            aiTip: 'Kiểm tra kỹ giấy tờ xe và đổ đầy bình xăng trước khi bắt đầu leo dốc núi.',
+            cost: '200.000đ/xe',
+            image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80',
+            transit: 'Khởi hành từ trung tâm TP. Hà Giang'
+          },
+          {
+            time: '11:00 – 12:30',
+            category: 'Kỳ quan đèo dốc',
+            title: 'Chinh phục Dốc Bắc Sum & Check-in Cổng Trời Quản Bạ',
+            location: 'Cổng Trời Quản Bạ & Núi Đôi Cô Tiên',
+            address: 'Quốc lộ 4C, Xã Quyết Tiến, Huyện Quản Bạ, Tỉnh Hà Giang',
+            note: 'Cung đường đèo uốn lượn ngoạn mục, ngắm Núi Đôi Cô Tiên trù phú giữa lòng thung lũng Tam Sơn.',
+            aiTip: 'Ghé quán cafe đỉnh đèo Quản Bạ để có góc máy chụp bao quát toàn bộ Dốc Bắc Sum từ trên cao.',
+            cost: 'Miễn phí vé',
+            image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+            transit: 'Vượt Dốc Bắc Sum trên QL4C: 46 km ~ 1.5 giờ lái xe máy'
+          },
+          {
+            time: '17:30 – 21:00',
+            category: 'Văn hóa bản địa',
+            title: 'Đến Phố Cáo & Nghỉ đêm tại Homestay nhà trình tường',
+            location: 'A Páo Homestay Phố Cáo',
+            address: 'Thôn Sảng Pả, Xã Phố Cáo, Huyện Đồng Văn, Tỉnh Hà Giang',
+            note: 'Trải nghiệm ngủ nhà đất trình tường ấm áp của người Mông, quây quần bên bếp lửa thưởng thức Thắng Cố.',
+            aiTip: 'Thử một chén rượu ngô men lá thơm nồng của gia chủ để xua tan cái lạnh vùng cao.',
+            cost: '250.000đ/người',
+            image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80',
+            transit: 'Đi qua rừng thông Yên Minh: 75 km ~ 2.5 giờ lái xe'
+          }
         ]
       }
     ]
