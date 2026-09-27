@@ -36,11 +36,29 @@ export const AuthModal = () => {
     try {
       if (authMode === 'login') {
         const res = await authApi.login(email, password);
-        login(res.data?.user || { name: email.split('@')[0] });
+        const userData = res.data?.user || {
+          name: res.data?.fullName || email.split('@')[0],
+          fullName: res.data?.fullName,
+          email: res.data?.email || email,
+          handle: res.data?.handle || ('@' + email.split('@')[0]),
+          avatar: res.data?.avatar,
+          roles: res.data?.roles,
+          token: res.data?.token
+        };
+        login(userData);
         toast.success(res.message || 'Đăng nhập thành công! 🎉');
       } else {
         const res = await authApi.register(fullName, email, password);
-        login(res.data?.user || { name: fullName || email.split('@')[0] });
+        const userData = res.data?.user || {
+          name: res.data?.fullName || fullName || email.split('@')[0],
+          fullName: res.data?.fullName || fullName,
+          email: res.data?.email || email,
+          handle: res.data?.handle || ('@' + (fullName ? fullName.toLowerCase().replace(/\s+/g, '_') : email.split('@')[0])),
+          avatar: res.data?.avatar,
+          roles: res.data?.roles,
+          token: res.data?.token
+        };
+        login(userData);
         toast.success(res.message || 'Đăng ký tài khoản thành công! 🎉');
       }
       setIsAuthModalOpen(false);

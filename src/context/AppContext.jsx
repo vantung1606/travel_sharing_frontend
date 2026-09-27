@@ -14,7 +14,23 @@ const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
   // Navigation & Role State
-  const [portalMode, setPortalMode] = useState('user'); // 'user' | 'admin'
+  const [portalMode, setPortalModeState] = useState(() => {
+    try {
+      return localStorage.getItem('wayfare_portal_mode') || 'user';
+    } catch {
+      return 'user';
+    }
+  });
+
+  const setPortalMode = (mode) => {
+    setPortalModeState(mode);
+    try {
+      localStorage.setItem('wayfare_portal_mode', mode);
+    } catch {
+      // ignore
+    }
+  };
+
   const [userTab, setUserTab] = useState('home'); // 'home'|'explore'|'community'|'itineraries'|'ai-planner'|'messages'|'profile'|'notifications'
   const [adminTab, setAdminTab] = useState('dashboard'); // 'dashboard'|'places'|'users'
 
@@ -70,31 +86,79 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Auth State
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  // User Profile
-  const [currentUser, setCurrentUser] = useState({
+  const DEFAULT_USER = {
     name: 'Nguyễn Thanh Tùng',
     handle: '@tung_wanderlust',
+    email: 'tung@gmail.com',
     avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
     bio: 'Đam mê khám phá thiên nhiên & trải nghiệm ẩm thực du lịch độc lạ cùng AI 🌍✈️',
     destinationsCount: 18,
     tripsCount: 6,
-    savedItinerariesCount: 4
+    savedItinerariesCount: 4,
+    roles: ['ROLE_USER']
+  };
+
+  // Auth State (Restores from localStorage on page reload)
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    try {
+      return localStorage.getItem('wayfare_auth') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  // User Profile (Restores from localStorage on page reload)
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const stored = localStorage.getItem('wayfare_user');
+      if (stored) {
+        return { ...DEFAULT_USER, ...JSON.parse(stored) };
+      }
+    } catch {
+      // fallback
+    }
+    return DEFAULT_USER;
   });
 
   const login = (userData) => {
     setIsLoggedIn(true);
+    let updatedUser = { ...DEFAULT_USER, ...currentUser };
     if (userData) {
-      setCurrentUser(prev => ({ ...prev, ...userData }));
+      const normalized = {
+        ...userData,
+        name: userData.fullName || userData.name || currentUser.name,
+        handle: userData.handle || currentUser.handle,
+        email: userData.email || currentUser.email,
+        avatar: userData.avatar || currentUser.avatar,
+        roles: userData.roles || (userData.email?.toLowerCase().includes('admin') ? ['ROLE_ADMIN', 'ROLE_USER'] : ['ROLE_USER'])
+      };
+      updatedUser = { ...updatedUser, ...normalized };
+      setCurrentUser(updatedUser);
+      try {
+        localStorage.setItem('wayfare_user', JSON.stringify(updatedUser));
+      } catch (e) {
+        console.error('Failed to save wayfare_user to localStorage', e);
+      }
+    }
+    try {
+      localStorage.setItem('wayfare_auth', 'true');
+    } catch (e) {
+      console.error('Failed to save wayfare_auth to localStorage', e);
     }
   };
 
   const logout = () => {
     setIsLoggedIn(false);
+    setCurrentUser(DEFAULT_USER);
     setPortalMode('user');
     setUserTab('home');
+    try {
+      localStorage.removeItem('wayfare_auth');
+      localStorage.removeItem('wayfare_user');
+      localStorage.removeItem('wayfare_portal_mode');
+    } catch (e) {
+      console.error('Failed to clear auth from localStorage', e);
+    }
   };
 
   // Actions
