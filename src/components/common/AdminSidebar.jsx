@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 
 export const AdminSidebar = ({ onNavigate }) => {
-  const { adminTab, setAdminTab, setPortalMode, stats } = useApp();
+  const { adminTab, setAdminTab, setPortalMode, stats, currentUser } = useApp();
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard tổng quan', icon: LayoutDashboard },
@@ -30,7 +30,10 @@ export const AdminSidebar = ({ onNavigate }) => {
     <aside className="fixed left-0 top-0 h-full w-[260px] bg-[#283044] text-[#eef0ff] z-50 flex flex-col justify-between shadow-xl border-r border-slate-700/50 select-none">
       <div className="flex flex-col">
         {/* Brand Header */}
-        <div className="h-16 px-5 flex items-center gap-3 bg-[#283044] border-b border-slate-700/40">
+        <div 
+          onClick={() => setAdminTab('dashboard')}
+          className="h-16 px-5 flex items-center gap-3 bg-[#283044] border-b border-slate-700/40 cursor-pointer hover:bg-slate-800/50 transition-colors"
+        >
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-cyan-400 flex items-center justify-center text-white shadow-md">
             <Compass className="w-5 h-5 animate-spin-slow" />
           </div>
@@ -95,18 +98,26 @@ export const AdminSidebar = ({ onNavigate }) => {
       <div className="p-4 bg-black/10 border-t border-slate-700/40">
         <div className="flex items-center justify-between gap-3 p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/60">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-full bg-sky-600 text-white flex items-center justify-center shrink-0 font-extrabold text-xs shadow-sm">
-              MQ
-            </div>
+            {currentUser?.avatar ? (
+              <img 
+                src={currentUser.avatar} 
+                alt={currentUser.name} 
+                className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-sky-500/30"
+              />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-sky-600 text-white flex items-center justify-center shrink-0 font-extrabold text-xs shadow-sm">
+                {currentUser?.name?.charAt(0) || 'A'}
+              </div>
+            )}
             <div className="truncate">
-              <p className="font-bold text-xs text-white truncate">Minh Quân</p>
+              <p className="font-bold text-xs text-white truncate">{currentUser?.name || 'Quản Trị Viên'}</p>
               <p className="text-[10px] text-sky-300 font-semibold truncate">Super Admin</p>
             </div>
           </div>
 
           <button
             onClick={() => setPortalMode('user')}
-            title="Thoát giao diện Admin"
+            title="Thoát về giao diện Người dùng"
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors shrink-0 cursor-pointer"
           >
             <LogOut className="w-4 h-4" />

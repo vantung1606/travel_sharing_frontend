@@ -5,10 +5,20 @@ import { AdminSidebar } from './AdminSidebar';
 import { NotificationDropdown } from './NotificationDropdown';
 
 export const AdminHeader = () => {
-  const { setPortalMode, setAdminTab, unreadNotificationsCount } = useApp();
+  const { setPortalMode, setAdminTab, adminTab, unreadNotificationsCount } = useApp();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const mobileDialog = useRef(null);
+
+  const ADMIN_TAB_NAMES = {
+    dashboard: 'Dashboard Tổng quan',
+    places: 'Địa điểm & Check-in',
+    users: 'Người dùng & Phân quyền',
+    reports: 'Bài viết & Báo cáo',
+    analytics: 'Thống kê Hệ thống',
+    revenue: 'Mô hình Doanh thu',
+    'ai-config': 'Cấu hình AI Engine'
+  };
   useEffect(() => {
     if (!isMobileMenuOpen) return undefined;
     const dialog = mobileDialog.current;
@@ -45,6 +55,12 @@ export const AdminHeader = () => {
               className="w-full pl-10 pr-4 py-2 bg-slate-100/80 text-slate-800 rounded-full text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition-all"
             />
           </div>
+        </div>
+
+        {/* Active Page Breadcrumb Indicator */}
+        <div className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 shadow-2xs">
+          <Shield className="w-3.5 h-3.5 text-sky-600" />
+          <span>{ADMIN_TAB_NAMES[adminTab] || 'Quản trị hệ thống'}</span>
         </div>
 
         {/* Right Controls */}

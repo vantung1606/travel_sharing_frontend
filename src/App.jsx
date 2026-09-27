@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { ToastProvider } from './components/common/Toast';
 import { Navbar } from './components/common/Navbar';
@@ -8,6 +9,7 @@ import { AdminHeader } from './components/common/AdminHeader';
 import { Footer } from './components/common/Footer';
 import { AITripGeneratorModal } from './components/ai/AITripGeneratorModal';
 import { AuthModal } from './components/auth/AuthModal';
+import { PageTitleManager, AdminRouteGuard, UserAuthGuard } from './components/common/RouteGuards';
 
 // User Pages
 import { HomePage } from './pages/user/Home/HomePage';
@@ -29,68 +31,92 @@ import { AdminStatisticsPage } from './pages/admin/Statistics/AdminStatisticsPag
 import { AdminAIConfigPage } from './pages/admin/AIConfig/AdminAIConfigPage';
 
 const AppContent = () => {
-  const { portalMode, userTab, adminTab } = useApp();
-
-  const renderUserPage = () => {
-    switch (userTab) {
-      case 'home': return <HomePage />;
-      case 'explore': return <ExplorePage />;
-      case 'community': return <CommunityPage />;
-      case 'itineraries': return <ItineraryManagerPage />;
-      case 'ai-planner': return <AIPlannerPage />;
-      case 'messages': return <MessagesPage />;
-      case 'profile': return <ProfilePage />;
-      case 'notifications': return <NotificationsPage />;
-      default: return <HomePage />;
-    }
-  };
-
-  const renderAdminPage = () => {
-    switch (adminTab) {
-      case 'dashboard': return <AdminDashboardPage />;
-      case 'places': return <AdminPlacesPage />;
-      case 'users': return <AdminUsersPage />;
-      case 'reports': return <AdminReportsPage />;
-      case 'analytics': return <AdminStatisticsPage />;
-      case 'revenue': return <AdminRevenuePage />;
-      case 'ai-config': return <AdminAIConfigPage />;
-      default: return <AdminDashboardPage />;
-    }
-  };
+  const location = useLocation();
+  const isAdminPath = location.pathname.startsWith('/admin');
 
   return (
     <div className="min-h-screen bg-[#faf8ff] font-sans text-slate-900 selection:bg-sky-500 selection:text-white">
-      {portalMode === 'user' ? (
+      {/* Dynamic Title Manager for Browser Tab */}
+      <PageTitleManager />
+
+      {!isAdminPath ? (
+        /* USER PORTAL LAYOUT */
         <div className="min-h-screen flex flex-col pb-20 md:pb-0">
-          {/* User Navbar */}
           <Navbar />
 
-          {/* User Main View */}
           <main className="flex-1">
-            {renderUserPage()}
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/home" element={<Navigate to="/" replace />} />
+              <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/community" element={<CommunityPage />} />
+              <Route path="/itineraries" element={<ItineraryManagerPage />} />
+              <Route path="/ai-planner" element={<AIPlannerPage />} />
+              
+              {/* Protected User Routes */}
+              <Route 
+                path="/messages" 
+                element={
+                  <UserAuthGuard title="Hộp thư & Trò chuyện chuyến đi">
+                    <MessagesPage />
+                  </UserAuthGuard>
+                } 
+              />
+              <Route 
+                path="/profile" 
+                element={
+                  <UserAuthGuard title="Trang Hồ sơ cá nhân">
+                    <ProfilePage />
+                  </UserAuthGuard>
+                } 
+              />
+              <Route 
+                path="/notifications" 
+                element={
+                  <UserAuthGuard title="Trung tâm Thông báo">
+                    <NotificationsPage />
+                  </UserAuthGuard>
+                } 
+              />
+
+              {/* Catch-all redirect */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
           </main>
 
-          {/* Mobile Bottom Navigation */}
           <BottomNav />
-
-          {/* User Footer */}
           <Footer />
         </div>
       ) : (
-        <div className="min-h-screen bg-[#faf8ff]">
-          {/* Admin Fixed Sidebar (260px) */}
-          <div className="hidden md:block"><AdminSidebar /></div>
+        /* ADMIN PORTAL SECURED LAYOUT */
+        <AdminRouteGuard>
+          <div className="min-h-screen bg-[#faf8ff]">
+            {/* Fixed Sidebar */}
+            <div className="hidden md:block">
+              <AdminSidebar />
+            </div>
 
-          {/* Admin Fixed Top Header */}
-          <AdminHeader />
+            {/* Fixed Top Header */}
+            <AdminHeader />
 
-          {/* Admin Main Workspace Container */}
-          <div className="min-w-0 md:pl-[260px] pt-16 min-h-screen">
-            <main className="min-w-0 p-4 sm:p-6 lg:p-8 bg-[#faf8ff] min-h-[calc(100vh-64px)]">
-              {renderAdminPage()}
-            </main>
+            {/* Admin Workspace Content */}
+            <div className="min-w-0 md:pl-[260px] pt-16 min-h-screen">
+              <main className="min-w-0 p-4 sm:p-6 lg:p-8 bg-[#faf8ff] min-h-[calc(100vh-64px)]">
+                <Routes>
+                  <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+                  <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+                  <Route path="/admin/places" element={<AdminPlacesPage />} />
+                  <Route path="/admin/users" element={<AdminUsersPage />} />
+                  <Route path="/admin/reports" element={<AdminReportsPage />} />
+                  <Route path="/admin/analytics" element={<AdminStatisticsPage />} />
+                  <Route path="/admin/revenue" element={<AdminRevenuePage />} />
+                  <Route path="/admin/ai-config" element={<AdminAIConfigPage />} />
+                  <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
+                </Routes>
+              </main>
+            </div>
           </div>
-        </div>
+        </AdminRouteGuard>
       )}
 
       {/* Global Overlays & Modals */}

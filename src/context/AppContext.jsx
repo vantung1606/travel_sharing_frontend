@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   INITIAL_DESTINATIONS,
   INITIAL_POSTS,
@@ -13,26 +14,73 @@ import { notificationApi, INITIAL_MOCK_NOTIFICATIONS } from '../services/api';
 const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  // Navigation & Role State
-  const [portalMode, setPortalModeState] = useState(() => {
-    try {
-      return localStorage.getItem('wayfare_portal_mode') || 'user';
-    } catch {
-      return 'user';
-    }
-  });
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Navigation & Role State linked directly to Browser URL
+  const portalMode = location.pathname.startsWith('/admin') ? 'admin' : 'user';
 
   const setPortalMode = (mode) => {
-    setPortalModeState(mode);
-    try {
-      localStorage.setItem('wayfare_portal_mode', mode);
-    } catch {
-      // ignore
+    if (mode === 'admin') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/');
     }
   };
 
-  const [userTab, setUserTab] = useState('home'); // 'home'|'explore'|'community'|'itineraries'|'ai-planner'|'messages'|'profile'|'notifications'
-  const [adminTab, setAdminTab] = useState('dashboard'); // 'dashboard'|'places'|'users'
+  // User Tab dynamically derived from URL pathname
+  const userTab = useMemo(() => {
+    const p = location.pathname;
+    if (p === '/' || p === '/home') return 'home';
+    if (p.startsWith('/explore')) return 'explore';
+    if (p.startsWith('/community')) return 'community';
+    if (p.startsWith('/itineraries')) return 'itineraries';
+    if (p.startsWith('/ai-planner')) return 'ai-planner';
+    if (p.startsWith('/messages')) return 'messages';
+    if (p.startsWith('/profile')) return 'profile';
+    if (p.startsWith('/notifications')) return 'notifications';
+    return 'home';
+  }, [location.pathname]);
+
+  const setUserTab = (tabId) => {
+    const pathMap = {
+      home: '/',
+      explore: '/explore',
+      community: '/community',
+      itineraries: '/itineraries',
+      'ai-planner': '/ai-planner',
+      messages: '/messages',
+      profile: '/profile',
+      notifications: '/notifications'
+    };
+    navigate(pathMap[tabId] || '/');
+  };
+
+  // Admin Tab dynamically derived from URL pathname
+  const adminTab = useMemo(() => {
+    const p = location.pathname;
+    if (p === '/admin' || p === '/admin/' || p.startsWith('/admin/dashboard')) return 'dashboard';
+    if (p.startsWith('/admin/places')) return 'places';
+    if (p.startsWith('/admin/users')) return 'users';
+    if (p.startsWith('/admin/reports')) return 'reports';
+    if (p.startsWith('/admin/analytics')) return 'analytics';
+    if (p.startsWith('/admin/revenue')) return 'revenue';
+    if (p.startsWith('/admin/ai-config')) return 'ai-config';
+    return 'dashboard';
+  }, [location.pathname]);
+
+  const setAdminTab = (tabId) => {
+    const pathMap = {
+      dashboard: '/admin/dashboard',
+      places: '/admin/places',
+      users: '/admin/users',
+      reports: '/admin/reports',
+      analytics: '/admin/analytics',
+      revenue: '/admin/revenue',
+      'ai-config': '/admin/ai-config'
+    };
+    navigate(pathMap[tabId] || '/admin/dashboard');
+  };
 
   // AI & Auth Modal State
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);

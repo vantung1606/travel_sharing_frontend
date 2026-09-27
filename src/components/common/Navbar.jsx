@@ -257,13 +257,16 @@ export const Navbar = () => {
                         <span>AI Travel Planner</span>
                       </button>
 
-                      <button
-                        onClick={() => { setPortalMode(portalMode === 'admin' ? 'user' : 'admin'); setIsProfileDropdownOpen(false); }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
-                      >
-                        <Shield className="w-4 h-4 text-emerald-600" />
-                        <span>{portalMode === 'admin' ? 'Về giao diện Người dùng' : 'Giao diện Admin'}</span>
-                      </button>
+                      {/* Admin Portal Toggle - Protected: Only visible for ROLE_ADMIN */}
+                      {isLoggedIn && ((currentUser?.roles && currentUser.roles.includes('ROLE_ADMIN')) || (currentUser?.email && currentUser.email.toLowerCase().includes('admin'))) && (
+                        <button
+                          onClick={() => { setPortalMode(portalMode === 'admin' ? 'user' : 'admin'); setIsProfileDropdownOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
+                        >
+                          <Shield className="w-4 h-4 text-emerald-600" />
+                          <span>{portalMode === 'admin' ? 'Về giao diện Người dùng' : 'Giao diện Quản Trị (Admin)'}</span>
+                        </button>
+                      )}
 
                       <div className="my-1 border-t border-slate-100"></div>
 
