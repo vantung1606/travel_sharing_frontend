@@ -52,6 +52,7 @@ export const DEFAULT_CONFIG = {
   timeout: 3.5,
   grounding: true,
   apiKey: import.meta.env?.VITE_GEMINI_API_KEY || '',
+  apiEndpoint: import.meta.env?.VITE_GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta',
   systemPrompt: `Bạn là WanderAI - Chuyên gia cố vấn du lịch thông minh bản địa Việt Nam.
 Nguyên tắc hoạt động cốt lõi:
 1. Luôn gợi ý lộ trình thực tế theo cung đường địa lý thuận tiện nhất, tránh đi vòng gây lãng phí thời gian di chuyển.
@@ -166,11 +167,12 @@ export function readDraft() {
 /**
  * Real API connection test against Google Gemini API Gateway
  */
-export async function testGeminiConnection(apiKey) {
+export async function testGeminiConnection(apiKey, apiEndpoint) {
   const keyToUse = (apiKey || DEFAULT_CONFIG.apiKey || '').trim();
+  const endpoint = (apiEndpoint || DEFAULT_CONFIG.apiEndpoint || 'https://generativelanguage.googleapis.com/v1beta').replace(/\/+$/, '');
   const startTime = performance.now();
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${keyToUse}`);
+    const res = await fetch(`${endpoint}/models?key=${keyToUse}`);
     const latency = Math.round(performance.now() - startTime);
     if (!res.ok) {
       const errJson = await res.json().catch(() => ({}));
@@ -199,10 +201,11 @@ export async function testGeminiConnection(apiKey) {
 /**
  * Call Gemini Generate Content
  */
-export async function callGeminiGenerate({ apiKey, prompt, systemPrompt, model = 'gemini-3.6-flash', temperature = 0.4, maxTokens = 2048 }) {
+export async function callGeminiGenerate({ apiKey, apiEndpoint, prompt, systemPrompt, model = 'gemini-3.6-flash', temperature = 0.4, maxTokens = 2048 }) {
   const keyToUse = (apiKey || DEFAULT_CONFIG.apiKey || '').trim();
+  const endpoint = (apiEndpoint || DEFAULT_CONFIG.apiEndpoint || 'https://generativelanguage.googleapis.com/v1beta').replace(/\/+$/, '');
   const targetModel = model.includes('gemini') ? model : 'gemini-3.6-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${keyToUse}`;
+  const url = `${endpoint}/models/${targetModel}:generateContent?key=${keyToUse}`;
 
   const payload = {
     contents: [

@@ -15,6 +15,8 @@ import {
   KeyRound,
   Eye,
   EyeOff,
+  Globe,
+  Link2,
   History,
   TrendingUp,
   Smile,
@@ -158,6 +160,7 @@ export function AdminAIConfigPage() {
     try {
       const geminiRes = await callGeminiGenerate({
         apiKey: config.apiKey,
+        apiEndpoint: config.apiEndpoint,
         prompt: sandboxPrompt,
         systemPrompt: config.systemPrompt,
         model: config.model,
@@ -208,7 +211,7 @@ export function AdminAIConfigPage() {
 
     setTimeout(() => setTestStep(2), 400);
 
-    const res = await testGeminiConnection(config.apiKey);
+    const res = await testGeminiConnection(config.apiKey, config.apiEndpoint);
     setTestResult(res);
 
     setTimeout(() => {
@@ -626,63 +629,108 @@ export function AdminAIConfigPage() {
             </div>
           </div>
 
-          {/* Gemini API Key Vault Card */}
-          <div className="p-4 rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50/70 to-white space-y-3">
+          {/* Gemini API Key Vault & Endpoint Gateway Card */}
+          <div className="p-4 rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50/70 to-white space-y-3.5">
+            {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <KeyRound className="w-4 h-4 text-sky-600" />
-                <span className="text-xs font-bold text-slate-800">Gemini API Key Vault</span>
+                <span className="text-xs font-bold text-slate-800">Gemini API Key & Endpoint Gateway</span>
               </div>
               <span className="px-2 py-0.5 rounded-md bg-sky-100 text-sky-700 font-bold text-[10px]">
-                Tier 3 (Pay-as-you-go)
+                Google AI Studio / Live
               </span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <div className="flex-1 relative">
-                <input
-                  type={showApiKey ? 'text' : 'password'}
-                  readOnly
-                  value={config.apiKey || import.meta.env?.VITE_GEMINI_API_KEY || ''}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-mono text-slate-700 outline-none"
-                />
+            {/* API Key Row */}
+            <div className="space-y-1">
+              <label className="text-[11px] font-bold text-slate-600 flex items-center justify-between">
+                <span>Khóa API (API Key)</span>
+                <span className="text-[10px] text-slate-400 font-normal">Được bảo vệ bằng Vault</span>
+              </label>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 relative">
+                  <input
+                    type={showApiKey ? 'text' : 'password'}
+                    readOnly
+                    value={config.apiKey || import.meta.env?.VITE_GEMINI_API_KEY || ''}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-mono text-slate-700 outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  >
+                    {showApiKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
+
                 <button
                   type="button"
-                  onClick={() => setShowApiKey(!showApiKey)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                  onClick={() => setActiveModal('api-key')}
+                  className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-all shadow-xs cursor-pointer shrink-0"
                 >
-                  {showApiKey ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  Đổi Key
                 </button>
               </div>
-
-              <button
-                type="button"
-                onClick={() => setActiveModal('api-key')}
-                className="px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-all shadow-xs cursor-pointer"
-              >
-                Đổi Key
-              </button>
-
-              <button
-                type="button"
-                onClick={async () => {
-                  toast.info('Đang kiểm tra trực tiếp Google Gemini API Key...');
-                  const res = await testGeminiConnection(config.apiKey);
-                  if (res.ok) {
-                    toast.success(`Google Gemini API Key hợp lệ! (${res.latency}ms • ${res.modelsCount} models)`);
-                  } else {
-                    toast.error(`Kiểm tra API Key thất bại: ${res.error}`);
-                  }
-                }}
-                className="px-3.5 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold hover:bg-sky-700 transition-all shadow-xs cursor-pointer"
-              >
-                Kiểm tra Key
-              </button>
             </div>
 
-            <p className="text-[11px] text-slate-500 flex items-center justify-between">
-              <span>Hạn mức tháng còn lại: $640.20 / $1,000.00 Credit limit</span>
-              <span className="text-emerald-600 font-bold">Khả dụng</span>
+            {/* API Endpoint Gateway URL Row */}
+            <div className="space-y-1 pt-1 border-t border-sky-100">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
+                  <Globe className="w-3 h-3 text-sky-600" />
+                  <span>Link API Endpoint Gemini (Base URL)</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    updateConfig('apiEndpoint', 'https://generativelanguage.googleapis.com/v1beta');
+                    toast.info('Đã khôi phục Link API Gemini mặc định!');
+                  }}
+                  className="text-[10px] text-sky-600 hover:underline font-semibold cursor-pointer"
+                  title="Khôi phục link chính thức của Google"
+                >
+                  Khôi phục mặc định
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={config.apiEndpoint || 'https://generativelanguage.googleapis.com/v1beta'}
+                    onChange={(e) => updateConfig('apiEndpoint', e.target.value)}
+                    placeholder="https://generativelanguage.googleapis.com/v1beta"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-mono text-slate-700 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    toast.info('Đang kiểm tra kết nối API Gemini...');
+                    const res = await testGeminiConnection(config.apiKey, config.apiEndpoint);
+                    if (res.ok) {
+                      toast.success(`Kết nối thành công! (${res.latency}ms • ${res.modelsCount} models)`);
+                    } else {
+                      toast.error(`Kết nối thất bại: ${res.error}`);
+                    }
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold hover:bg-sky-700 transition-all shadow-xs cursor-pointer shrink-0"
+                >
+                  Kiểm tra
+                </button>
+              </div>
+              <p className="text-[10px] text-slate-400">
+                Mặc định: <code className="text-slate-600 bg-white px-1 py-0.5 rounded border border-slate-200">https://generativelanguage.googleapis.com/v1beta</code> (hoặc tùy biến qua Proxy / Cloudflare AI Gateway).
+              </p>
+            </div>
+
+            <p className="text-[11px] text-slate-500 flex items-center justify-between pt-1 border-t border-sky-100">
+              <span>Hạn mức tháng: $640.20 / $1,000.00 Credit limit</span>
+              <span className="text-emerald-600 font-bold flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Khả dụng
+              </span>
             </p>
           </div>
         </div>
@@ -1281,18 +1329,49 @@ export function AdminAIConfigPage() {
               </button>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-700">Khóa API Google Gemini mới</label>
-              <input
-                type="text"
-                defaultValue={config.apiKey}
-                id="new-api-key-input"
-                placeholder="AIzaSy... hoặc AQ.Ab8..."
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-mono text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
-              />
-              <p className="text-[11px] text-slate-400">
-                Khóa được mã hóa và lưu an toàn. Dùng cho việc sinh lịch trình AI.
-              </p>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700">Khóa API Google Gemini (API Key)</label>
+                <input
+                  type="text"
+                  defaultValue={config.apiKey}
+                  id="new-api-key-input"
+                  placeholder="AIzaSy... hoặc AQ.Ab8..."
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-mono text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+                />
+                <p className="text-[11px] text-slate-400">
+                  Khóa được bảo vệ trong Vault an toàn dùng cho toàn bộ hệ thống WanderAI.
+                </p>
+              </div>
+
+              <div className="space-y-1.5 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <Globe className="w-3.5 h-3.5 text-sky-600" />
+                    <span>Link API Gemini (Base URL Endpoint)</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const input = document.getElementById('new-api-endpoint-input');
+                      if (input) input.value = 'https://generativelanguage.googleapis.com/v1beta';
+                    }}
+                    className="text-[10px] text-sky-600 hover:underline font-semibold cursor-pointer"
+                  >
+                    Điền link gốc
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  defaultValue={config.apiEndpoint || 'https://generativelanguage.googleapis.com/v1beta'}
+                  id="new-api-endpoint-input"
+                  placeholder="https://generativelanguage.googleapis.com/v1beta"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-mono text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+                />
+                <p className="text-[11px] text-slate-400">
+                  Hỗ trợ link API chính thức hoặc link Reverse Proxy / AI Gateway trung gian.
+                </p>
+              </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-2">
@@ -1306,16 +1385,20 @@ export function AdminAIConfigPage() {
               <button
                 type="button"
                 onClick={() => {
-                  const inputVal = document.getElementById('new-api-key-input')?.value;
-                  if (inputVal) {
-                    updateConfig('apiKey', inputVal);
-                    toast.success('Đã cập nhật khóa API Key Vault thành công!');
+                  const inputKey = document.getElementById('new-api-key-input')?.value;
+                  const inputEndpoint = document.getElementById('new-api-endpoint-input')?.value;
+                  if (inputKey !== undefined) {
+                    updateConfig('apiKey', inputKey);
                   }
+                  if (inputEndpoint !== undefined) {
+                    updateConfig('apiEndpoint', inputEndpoint);
+                  }
+                  toast.success('Đã cập nhật cấu hình API Key & Link Endpoint thành công!');
                   setActiveModal(null);
                 }}
                 className="px-5 py-2 rounded-xl bg-sky-600 text-white font-bold text-xs hover:bg-sky-700 shadow-sm"
               >
-                Xác nhận đổi khóa
+                Xác nhận lưu
               </button>
             </div>
           </div>
