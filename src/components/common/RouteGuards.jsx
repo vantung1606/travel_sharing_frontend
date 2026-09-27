@@ -20,6 +20,7 @@ export const PAGE_TITLES = {
   '/admin/users': 'Wayfare Admin - Quản lý Người dùng & Phân quyền RBAC',
   '/admin/reports': 'Wayfare Admin - Kiểm duyệt Vi phạm & Báo cáo Spam',
   '/admin/analytics': 'Wayfare Admin - Thống kê & Phân tích Tăng trưởng',
+  '/admin/audit-logs': 'Wayfare Admin - Nhật ký Hệ thống & Hoạt động (Audit Logs)',
   '/admin/revenue': 'Wayfare Admin - Quản lý Doanh thu, Hoa hồng & Đặt cọc',
   '/admin/ai-config': 'Wayfare Admin - Cấu hình Hệ thống AI & Gemini Gateway'
 };

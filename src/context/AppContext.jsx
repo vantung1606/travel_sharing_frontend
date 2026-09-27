@@ -64,6 +64,7 @@ export const AppProvider = ({ children }) => {
     if (p.startsWith('/admin/users')) return 'users';
     if (p.startsWith('/admin/reports')) return 'reports';
     if (p.startsWith('/admin/analytics')) return 'analytics';
+    if (p.startsWith('/admin/audit-logs')) return 'audit-logs';
     if (p.startsWith('/admin/revenue')) return 'revenue';
     if (p.startsWith('/admin/ai-config')) return 'ai-config';
     return 'dashboard';
@@ -76,6 +77,7 @@ export const AppProvider = ({ children }) => {
       users: '/admin/users',
       reports: '/admin/reports',
       analytics: '/admin/analytics',
+      'audit-logs': '/admin/audit-logs',
       revenue: '/admin/revenue',
       'ai-config': '/admin/ai-config'
     };

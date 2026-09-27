@@ -10,7 +10,8 @@ import {
   LogOut,
   Compass,
   MessageSquare,
-  DollarSign
+  DollarSign,
+  History
 } from 'lucide-react';
 
 export const AdminSidebar = ({ onNavigate }) => {
@@ -22,6 +23,7 @@ export const AdminSidebar = ({ onNavigate }) => {
     { id: 'users', label: 'Người dùng & Phân quyền', icon: Users, badge: stats.reportedContent },
     { id: 'reports', label: 'Bài viết & Báo cáo', icon: MessageSquare },
     { id: 'analytics', label: 'Thống kê hệ thống', icon: BarChart3 },
+    { id: 'audit-logs', label: 'Nhật ký hệ thống', icon: History },
     { id: 'revenue', label: 'Mô hình Doanh thu', icon: DollarSign, isDev: true },
     { id: 'ai-config', label: 'Cấu hình Hệ thống AI', icon: Cpu }
   ];

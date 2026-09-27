@@ -16,6 +16,7 @@ export const AdminHeader = () => {
     users: 'Người dùng & Phân quyền',
     reports: 'Bài viết & Báo cáo',
     analytics: 'Thống kê Hệ thống',
+    'audit-logs': 'Nhật ký Hệ thống & Hoạt động',
     revenue: 'Mô hình Doanh thu',
     'ai-config': 'Cấu hình AI Engine'
   };

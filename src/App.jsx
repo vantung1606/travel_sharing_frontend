@@ -28,6 +28,7 @@ import { AdminUsersPage } from './pages/admin/Users/AdminUsersPage';
 import { AdminReportsPage } from './pages/admin/Reports/AdminReportsPage';
 import { AdminRevenuePage } from './pages/admin/Revenue/AdminRevenuePage';
 import { AdminStatisticsPage } from './pages/admin/Statistics/AdminStatisticsPage';
+import { AdminAuditLogsPage } from './pages/admin/AuditLogs/AdminAuditLogsPage';
 import { AdminAIConfigPage } from './pages/admin/AIConfig/AdminAIConfigPage';
 
 const AppContent = () => {
@@ -109,6 +110,7 @@ const AppContent = () => {
                   <Route path="/admin/users" element={<AdminUsersPage />} />
                   <Route path="/admin/reports" element={<AdminReportsPage />} />
                   <Route path="/admin/analytics" element={<AdminStatisticsPage />} />
+                  <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
                   <Route path="/admin/revenue" element={<AdminRevenuePage />} />
                   <Route path="/admin/ai-config" element={<AdminAIConfigPage />} />
                   <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />

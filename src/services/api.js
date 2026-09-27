@@ -606,3 +606,65 @@ export const notificationApi = {
     }
   }
 };
+
+// ─── AUDIT LOGS API ─────────────────────────────────────────────────────────
+export const auditLogApi = {
+  async getLogs({ keyword = '', userId = '', action = '', page = 0, size = 15 } = {}) {
+    const params = new URLSearchParams();
+    if (keyword) params.append('keyword', keyword);
+    if (userId) params.append('userId', userId);
+    if (action && action !== 'ALL') params.append('action', action);
+    params.append('page', page);
+    params.append('size', size);
+
+    try {
+      const res = await fetch(`${BASE_URL}/admin/audit-logs?${params.toString()}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.warn('API error fetching audit logs:', err.message);
+      return { content: [], totalElements: 0, totalPages: 0, number: 0 };
+    }
+  },
+
+  async getActions() {
+    try {
+      const res = await fetch(`${BASE_URL}/admin/audit-logs/actions`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching audit actions:', err.message);
+      return [];
+    }
+  },
+
+  async getStats() {
+    try {
+      const res = await fetch(`${BASE_URL}/admin/audit-logs/stats`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || {};
+    } catch (err) {
+      console.warn('API error fetching audit stats:', err.message);
+      return {};
+    }
+  }
+};
+
