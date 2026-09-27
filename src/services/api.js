@@ -121,6 +121,126 @@ export const adminApi = {
   }
 };
 
+// ─── Admin Users & RBAC API (A03) ─────────────────────────────────────────────
+export const adminUserApi = {
+  async getUsers({ keyword = '', role = '', status = '' } = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (keyword) params.append('keyword', keyword);
+      if (role && role !== 'all') params.append('role', role);
+      if (status && status !== 'all') params.append('status', status);
+
+      const response = await fetch(`${BASE_URL}/admin/users?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const result = await response.json();
+      return result.data || [];
+    } catch (error) {
+      console.warn('Admin users API unavailable:', error.message);
+      return [];
+    }
+  },
+
+  async getUserMetrics() {
+    try {
+      const response = await fetch(`${BASE_URL}/admin/users/metrics`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const result = await response.json();
+      return result.data || {
+        totalUsers: 0,
+        activeUsers: 0,
+        lockedUsers: 0,
+        adminCount: 0,
+        newUsersToday: 0
+      };
+    } catch (error) {
+      console.warn('Admin user metrics API unavailable:', error.message);
+      return {
+        totalUsers: 0,
+        activeUsers: 0,
+        lockedUsers: 0,
+        adminCount: 0,
+        newUsersToday: 0
+      };
+    }
+  },
+
+  async getUserById(id) {
+    const response = await fetch(`${BASE_URL}/admin/users/${id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const result = await response.json();
+    return result.data;
+  },
+
+  async toggleUserStatus(id) {
+    const response = await fetch(`${BASE_URL}/admin/users/${id}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return await response.json();
+  },
+
+  async updateUserRole(id, role) {
+    const response = await fetch(`${BASE_URL}/admin/users/${id}/role`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ role })
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    return await response.json();
+  },
+
+  async createUser(payload) {
+    const response = await fetch(`${BASE_URL}/admin/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error(errData.message || `HTTP ${response.status}`);
+    }
+    return await response.json();
+  }
+};
+
 // ─── Notification API (M08) ──────────────────────────────────────────────────
 export const INITIAL_MOCK_NOTIFICATIONS = [
   {
