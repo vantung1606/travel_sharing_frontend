@@ -241,6 +241,130 @@ export const adminUserApi = {
   }
 };
 
+// ─── Admin Content & Reports Moderation API (A04) ─────────────────────────────
+export const adminReportApi = {
+  async getMetrics() {
+    try {
+      const response = await fetch(`${BASE_URL}/admin/reports/metrics`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const res = await response.json();
+      return res.data || {
+        totalPostsToday: 0,
+        pendingReportsCount: 0,
+        hiddenPostsCount: 0,
+        safeRate: 98.4,
+        growthPercent: 12,
+        totalArticlesCount: 0
+      };
+    } catch (err) {
+      console.warn('Admin report metrics API warning:', err.message);
+      return {
+        totalPostsToday: 0,
+        pendingReportsCount: 0,
+        hiddenPostsCount: 0,
+        safeRate: 98.4,
+        growthPercent: 12,
+        totalArticlesCount: 0
+      };
+    }
+  },
+
+  async getPendingReports(keyword = '') {
+    try {
+      const params = new URLSearchParams();
+      if (keyword) params.append('keyword', keyword);
+      const response = await fetch(`${BASE_URL}/admin/reports/pending?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const res = await response.json();
+      return res.data || [];
+    } catch (err) {
+      console.warn('Pending reports API warning:', err.message);
+      return [];
+    }
+  },
+
+  async getAllArticles({ keyword = '', status = 'all' } = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (keyword) params.append('keyword', keyword);
+      if (status && status !== 'all') params.append('status', status);
+      const response = await fetch(`${BASE_URL}/admin/reports/all?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const res = await response.json();
+      return res.data || [];
+    } catch (err) {
+      console.warn('All articles API warning:', err.message);
+      return [];
+    }
+  },
+
+  async dismissReport(postId) {
+    const response = await fetch(`${BASE_URL}/admin/reports/${postId}/dismiss`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  },
+
+  async hidePost(postId) {
+    const response = await fetch(`${BASE_URL}/admin/reports/${postId}/hide`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  },
+
+  async removePostAndBanAuthor(postId) {
+    const response = await fetch(`${BASE_URL}/admin/reports/${postId}/remove-and-ban`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  },
+
+  async deletePost(postId) {
+    const response = await fetch(`${BASE_URL}/admin/reports/${postId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  }
+};
+
 // ─── Notification API (M08) ──────────────────────────────────────────────────
 export const INITIAL_MOCK_NOTIFICATIONS = [
   {
