@@ -118,6 +118,24 @@ export const adminApi = {
         topPlaces: []
       };
     }
+  },
+
+  async getAllItineraries() {
+    try {
+      const response = await fetch(`${BASE_URL}/itineraries/all`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const res = await response.json();
+      return res.data || [];
+    } catch (err) {
+      console.warn('Admin getAllItineraries API warning:', err.message);
+      return [];
+    }
   }
 };
 

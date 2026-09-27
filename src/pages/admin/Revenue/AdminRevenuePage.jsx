@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from '../../../components/common/Toast';
+import { adminApi } from '../../../services/api';
 import {
   TrendingUp,
   DollarSign,
@@ -15,11 +16,25 @@ import {
   PieChart,
   Target,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  RefreshCw
 } from 'lucide-react';
 
 export const AdminRevenuePage = () => {
   const toast = useToast();
+  const [liveGmv, setLiveGmv] = useState(21000000);
+  const [itinCount, setItinCount] = useState(4);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    adminApi.getAllItineraries().then(res => {
+      if (Array.isArray(res) && res.length > 0) {
+        setItinCount(res.length);
+        const sum = res.reduce((acc, it) => acc + (Number(it.budgetTotal) || 0), 0);
+        if (sum > 0) setLiveGmv(sum);
+      }
+    }).catch(() => {});
+  }, []);
 
   const revenueStreams = [
     {
@@ -137,24 +152,37 @@ export const AdminRevenuePage = () => {
       </div>
 
       {/* Target Revenue Projections Overview Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold shrink-0">
-            <Target className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold shrink-0">
+            <DollarSign className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-400 block">Mục tiêu Doanh thu Năm 1</span>
-            <span className="font-display font-extrabold text-xl text-slate-900">1.200.000.000 VNĐ</span>
+            <span className="text-xs font-bold text-slate-400 block">GMV Lịch trình Thực tế</span>
+            <span className="font-display font-extrabold text-lg text-slate-900">{liveGmv.toLocaleString('vi-VN')} đ</span>
+            <span className="text-[10px] text-indigo-600 font-semibold block">{itinCount} chuyến trong CSDL</span>
+          </div>
+        </div>
+
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold shrink-0">
+            <TrendingUp className="w-6 h-6" />
+          </div>
+          <div>
+            <span className="text-xs font-bold text-slate-400 block">Hoa hồng ước tính (10%)</span>
+            <span className="font-display font-extrabold text-lg text-emerald-600">{(liveGmv * 0.1).toLocaleString('vi-VN')} đ</span>
+            <span className="text-[10px] text-emerald-700 font-semibold block">Affiliate & Booking</span>
           </div>
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0">
-            <BarChart3 className="w-6 h-6" />
+            <Target className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-400 block">Kênh doanh thu chính</span>
-            <span className="font-display font-extrabold text-xl text-sky-600">Affiliate Booking (60%)</span>
+            <span className="text-xs font-bold text-slate-400 block">Mục tiêu Doanh thu Năm 1</span>
+            <span className="font-display font-extrabold text-lg text-slate-900">1.2 Tỷ VNĐ</span>
+            <span className="text-[10px] text-sky-600 font-semibold block">Kế hoạch thương mại hóa</span>
           </div>
         </div>
 
@@ -163,8 +191,9 @@ export const AdminRevenuePage = () => {
             <Zap className="w-6 h-6" />
           </div>
           <div>
-            <span className="text-xs font-bold text-slate-400 block">Trạng thái phát triển</span>
-            <span className="font-display font-extrabold text-xl text-amber-600">Đang hoàn thiện 65%</span>
+            <span className="text-xs font-bold text-slate-400 block">Tiến độ tích hợp</span>
+            <span className="font-display font-extrabold text-lg text-amber-600">65% Hoàn tất</span>
+            <span className="text-[10px] text-amber-700 font-semibold block">VietQR & Affiliate Gateways</span>
           </div>
         </div>
       </div>

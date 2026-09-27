@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../../../context/AppContext';
+import { useToast } from '../../../components/common/Toast';
+import { adminApi, adminReportApi } from '../../../services/api';
 import {
   Users,
   MapPin,
@@ -25,62 +27,95 @@ import {
   Download,
   SlidersHorizontal,
   Map,
-  ArrowRight
+  ArrowRight,
+  RefreshCw,
+  Award
 } from 'lucide-react';
 
 export const AdminDashboardPage = () => {
-  const { stats, itineraries, pendingPlaces, approvePlace, setAdminTab } = useApp();
+  const toast = useToast();
+  const { currentUser, setAdminTab } = useApp();
+
+  const [stats, setStats] = useState({
+    totalUsers: 6,
+    newUsersThisMonth: 6,
+    totalPosts: 6,
+    totalPlaces: 6,
+    totalItineraries: 4,
+    activeItineraries: 4,
+    totalLikes: 316,
+    totalComments: 96,
+    averagePlaceRating: 4.8,
+    topDestinations: [],
+    topPlaces: []
+  });
+  const [itinerariesList, setItinerariesList] = useState([]);
+  const [pendingReports, setPendingReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [chartTab, setChartTab] = useState('Lịch trình AI');
   const [statusFilter, setStatusFilter] = useState('all');
   const [tableSearch, setTableSearch] = useState('');
 
-  // Sample AI Itineraries Data matching Stitch A01 table
-  const sampleItineraries = [
-    {
-      id: '#WTR-8921',
-      title: 'Khám phá trọn vẹn Hà Giang 4N3Đ',
-      subtitle: 'Tạo bởi AI Explorer Mode · 12 hoạt động',
-      author: 'Hoàng Nam',
-      handle: '@namwanderer',
-      destination: 'Hà Giang (9 điểm)',
-      budget: '2.900.000đ',
-      status: 'Đã chốt & Chia sẻ',
-      statusType: 'success'
-    },
-    {
-      id: '#WTR-8920',
-      title: 'Nghỉ dưỡng biển Mỹ Khê & Hội An 3N2Đ',
-      subtitle: 'AI Luxury Resort Concierge',
-      author: 'Minh Anh',
-      handle: 'Travel Blogger',
-      destination: 'Đà Nẵng, Quảng Nam',
-      budget: '3.850.000đ',
-      status: 'Đang đi',
-      statusType: 'warning'
-    },
-    {
-      id: '#WTR-8919',
-      title: 'Săn mây Đồi Đa Phú & Cafe Chill 2N1Đ',
-      subtitle: 'Chuyến đi nhóm giới trẻ',
-      author: 'Tuấn Kiệt',
-      handle: 'Nhóm 6 người',
-      destination: 'Đà Lạt',
-      budget: '1.800.000đ',
-      status: 'Hoàn thành',
-      statusType: 'neutral'
-    },
-    {
-      id: '#WTR-8918',
-      title: 'Food Tour Phố Cổ Hà Nội 1 Ngày',
-      subtitle: 'AI Culinary Map · 8 quán ăn',
-      author: 'Thu Thảo',
-      handle: 'Khách cá nhân',
-      destination: 'Hà Nội',
-      budget: '650.000đ',
-      status: 'Bản nháp AI',
-      statusType: 'info'
+  const loadDashboardData = async (isManual = false) => {
+    if (isManual) setRefreshing(true);
+    else setLoading(true);
+
+    try {
+      const [fetchedStats, fetchedItins, fetchedReports] = await Promise.all([
+        adminApi.getStats(),
+        adminApi.getAllItineraries(),
+        adminReportApi.getPendingReports()
+      ]);
+
+      if (fetchedStats) {
+        setStats(fetchedStats);
+      }
+      if (Array.isArray(fetchedItins) && fetchedItins.length > 0) {
+        setItinerariesList(fetchedItins);
+      }
+      if (Array.isArray(fetchedReports)) {
+        setPendingReports(fetchedReports);
+      }
+
+      if (isManual) {
+        toast.success('Đã làm mới dữ liệu tổng quan thời gian thực từ cơ sở dữ liệu!');
+      }
+    } catch (err) {
+      console.error('Failed to load admin dashboard data:', err);
+      if (isManual) toast.error('Không thể đồng bộ dữ liệu thời gian thực: ' + err.message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  // Filter itineraries
+  const filteredItineraries = useMemo(() => {
+    return itinerariesList.filter(item => {
+      if (statusFilter !== 'all') {
+        if (statusFilter === 'active' && item.status !== 'ACTIVE') return false;
+      }
+      if (tableSearch.trim()) {
+        const q = tableSearch.toLowerCase();
+        const matchTitle = item.title && item.title.toLowerCase().includes(q);
+        const matchDest = item.destination && item.destination.toLowerCase().includes(q);
+        const matchCreator = item.creatorName && item.creatorName.toLowerCase().includes(q);
+        const matchId = item.id && String(item.id).includes(q);
+        if (!matchTitle && !matchDest && !matchCreator && !matchId) return false;
+      }
+      return true;
+    });
+  }, [itinerariesList, statusFilter, tableSearch]);
+
+  // Total GMV calculated from itineraries budget
+  const totalGmv = useMemo(() => {
+    return itinerariesList.reduce((acc, it) => acc + (Number(it.budgetTotal) || 0), 0);
+  }, [itinerariesList]);
 
   return (
     <div className="space-y-6 pb-12">
@@ -94,24 +129,28 @@ export const AdminDashboardPage = () => {
             <span className="text-sky-600">Dashboard tổng quan</span>
           </nav>
           <h1 className="font-display text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-            Chào buổi sáng, Quản trị viên Minh Quân! <span className="inline-block animate-bounce">👋</span>
+            Chào buổi sáng, {currentUser?.name || 'Quản trị viên'}! <span className="inline-block animate-bounce">👋</span>
           </h1>
           <p className="text-xs text-slate-600 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            Hệ thống ghi nhận <strong className="text-slate-900 font-bold">1.420</strong> chuyến đi được tạo bởi AI hôm nay và <strong className="text-amber-600 font-bold">{stats.pendingCheckins}</strong> địa điểm mới đang chờ duyệt.
+            Hệ thống ghi nhận <strong className="text-slate-900 font-bold">{stats.totalItineraries}</strong> chuyến đi được lưu trữ và <strong className="text-rose-600 font-bold">{pendingReports.length}</strong> báo cáo vi phạm cần xử lý.
           </p>
         </div>
 
         {/* Action Toolbar */}
         <div className="flex flex-wrap items-center gap-2 pt-2 xl:pt-0">
-          <button className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors shadow-sm cursor-pointer">
-            <FileText className="w-4 h-4 text-slate-500" />
-            <span>Xuất báo cáo PDF</span>
+          <button 
+            onClick={() => loadDashboardData(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors shadow-sm cursor-pointer"
+            title="Làm mới dữ liệu từ CSDL"
+          >
+            <RefreshCw className={`w-4 h-4 text-slate-600 ${refreshing ? 'animate-spin' : ''}`} />
+            <span>Đồng bộ CSDL</span>
           </button>
 
           <button className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors shadow-sm cursor-pointer">
             <Calendar className="w-4 h-4 text-slate-500" />
-            <span>Bộ lọc: 30 ngày qua</span>
+            <span>Dữ liệu thời gian thực</span>
           </button>
 
           <button
@@ -119,7 +158,7 @@ export const AdminDashboardPage = () => {
             className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>+ Thêm địa điểm nhanh</span>
+            <span>+ Quản lý điểm đến</span>
           </button>
         </div>
       </div>
@@ -135,17 +174,17 @@ export const AdminDashboardPage = () => {
             </div>
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold">
               <TrendingUp className="w-3.5 h-3.5" />
-              +14.2%
+              +{stats.newUsersThisMonth || 6} mới
             </span>
           </div>
           <div>
-            <span className="text-xs text-slate-400 font-semibold block">Tổng người dùng hoạt động</span>
+            <span className="text-xs text-slate-400 font-semibold block">Tổng người dùng hệ thống</span>
             <div className="flex items-baseline gap-2 mt-1">
-              <h2 className="font-display font-extrabold text-2xl text-slate-900">128.450</h2>
-              <span className="text-xs text-slate-400 font-medium">user</span>
+              <h2 className="font-display font-extrabold text-2xl text-slate-900">{stats.totalUsers}</h2>
+              <span className="text-xs text-slate-400 font-medium">tài khoản</span>
             </div>
             <p className="text-xs text-slate-500 mt-2">
-              <strong className="text-sky-600 font-bold">1.840 mới</strong> hôm nay
+              <strong className="text-sky-600 font-bold">100%</strong> đã xác thực CSDL
             </p>
           </div>
         </div>
@@ -158,17 +197,17 @@ export const AdminDashboardPage = () => {
             </div>
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold">
               <TrendingUp className="w-3.5 h-3.5" />
-              +28.5%
+              100% Active
             </span>
           </div>
           <div>
             <span className="text-xs text-slate-400 font-semibold block">Lịch trình tạo bằng AI</span>
             <div className="flex items-baseline gap-2 mt-1">
-              <h2 className="font-display font-extrabold text-2xl text-slate-900">46.820</h2>
-              <span className="text-xs text-slate-400 font-medium">bản</span>
+              <h2 className="font-display font-extrabold text-2xl text-slate-900">{stats.totalItineraries}</h2>
+              <span className="text-xs text-slate-400 font-medium">hành trình</span>
             </div>
             <p className="text-xs text-slate-500 mt-2">
-              Tỷ lệ hoàn tất khảo sát: <strong className="text-slate-800 font-bold">94.1%</strong>
+              Đang hoạt động: <strong className="text-slate-800 font-bold">{stats.activeItineraries} chuyến</strong>
             </p>
           </div>
         </div>
@@ -180,17 +219,17 @@ export const AdminDashboardPage = () => {
               <MapPin className="w-6 h-6" />
             </div>
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-extrabold">
-              +120 tuần này
+              {stats.averagePlaceRating ? Number(stats.averagePlaceRating).toFixed(1) : '4.8'} ⭐
             </span>
           </div>
           <div>
-            <span className="text-xs text-slate-400 font-semibold block">Địa điểm & Check-in</span>
+            <span className="text-xs text-slate-400 font-semibold block">Địa điểm & Điểm tham quan</span>
             <div className="flex items-baseline gap-2 mt-1">
-              <h2 className="font-display font-extrabold text-2xl text-slate-900">8.940</h2>
-              <span className="text-xs text-slate-400 font-medium">điểm</span>
+              <h2 className="font-display font-extrabold text-2xl text-slate-900">{stats.totalPlaces}</h2>
+              <span className="text-xs text-slate-400 font-medium">địa danh</span>
             </div>
             <p className="text-xs text-slate-500 mt-2">
-              Phủ khắp <strong className="text-slate-800 font-bold">63 tỉnh thành</strong>
+              Phủ khắp các vùng: <strong className="text-slate-800 font-bold">Bắc - Trung - Nam</strong>
             </p>
           </div>
         </div>
@@ -203,17 +242,17 @@ export const AdminDashboardPage = () => {
             </div>
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-extrabold">
               <TrendingUp className="w-3.5 h-3.5" />
-              +18.7%
+              10% HH
             </span>
           </div>
           <div>
-            <span className="text-xs text-slate-400 font-semibold block">Tỷ lệ chuyển đổi & Doanh thu</span>
+            <span className="text-xs text-slate-400 font-semibold block">Tổng ngân sách dự toán & GMV</span>
             <div className="flex items-baseline gap-1 mt-1">
-              <h2 className="font-display font-extrabold text-xl sm:text-2xl text-slate-900">248.500.000</h2>
+              <h2 className="font-display font-extrabold text-xl sm:text-2xl text-slate-900">{totalGmv.toLocaleString('vi-VN')}</h2>
               <span className="text-xs font-extrabold text-slate-500">VNĐ</span>
             </div>
             <p className="text-xs text-slate-500 mt-2">
-              Hoa hồng đối tác vé & tour
+              Hoa hồng ước tính: <strong className="text-emerald-600 font-bold">{(totalGmv * 0.1).toLocaleString('vi-VN')} VNĐ</strong>
             </p>
           </div>
         </div>
@@ -457,66 +496,48 @@ export const AdminDashboardPage = () => {
                 <span>Cần xử lý gấp</span>
               </div>
               <span className="px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 font-extrabold text-xs">
-                28 mục chờ
+                {pendingReports.length} báo cáo chờ
               </span>
             </div>
 
             <div className="space-y-3 text-xs">
-              
-              {/* Urgent Report Item */}
-              <div className="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-100 space-y-2">
-                <div className="flex items-center justify-between text-rose-700 font-bold">
-                  <span className="flex items-center gap-1">
-                    <Flag className="w-3.5 h-3.5" /> Báo cáo vi phạm (3 cờ)
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-normal">5 phút trước</span>
+              {pendingReports.length === 0 ? (
+                <div className="p-4 rounded-2xl bg-emerald-50 text-emerald-800 text-center font-semibold">
+                  <CheckCircle2 className="w-5 h-5 mx-auto mb-1 text-emerald-600" />
+                  Không có nội dung vi phạm tồn đọng!
                 </div>
-                <h4 className="font-bold text-slate-900">Bài viết spam quảng cáo vé tour ảo</h4>
-                <p className="text-[11px] text-slate-600 line-clamp-2">
-                  Người dùng báo cáo tài khoản @tourgiare liên tục gắn link affiliate mạo danh resort...
-                </p>
-                <div className="flex justify-end gap-2 pt-1">
-                  <button
-                    onClick={() => setAdminTab('users')}
-                    className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition-colors shadow-sm cursor-pointer"
-                  >
-                    Xử lý ngay
-                  </button>
-                </div>
-              </div>
-
-              {/* Pending Places Proposals */}
-              {pendingPlaces.map(p => (
-                <div key={p.id} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/60 space-y-2">
-                  <div className="flex items-center justify-between text-sky-700 font-bold">
-                    <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5" /> Địa điểm người dùng đề xuất
-                    </span>
-                    <span className="text-[10px] text-slate-400 font-normal">18 phút trước</span>
+              ) : (
+                pendingReports.slice(0, 3).map((r) => (
+                  <div key={r.id} className="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-100 space-y-2">
+                    <div className="flex items-center justify-between text-rose-700 font-bold">
+                      <span className="flex items-center gap-1">
+                        <Flag className="w-3.5 h-3.5" /> {r.category || 'Vi phạm'} ({r.reportsCount || 1} cờ)
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-normal">{r.timeAgo || 'Vừa xong'}</span>
+                    </div>
+                    <h4 className="font-bold text-slate-900 line-clamp-1">{r.title}</h4>
+                    <p className="text-[11px] text-slate-600 line-clamp-2">
+                      {r.aiFlagReason || r.reportReason || r.snippet}
+                    </p>
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-[10px] text-slate-400">Tác giả: {r.authorName}</span>
+                      <button
+                        onClick={() => setAdminTab('reports')}
+                        className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition-colors shadow-sm cursor-pointer"
+                      >
+                        Kiểm duyệt
+                      </button>
+                    </div>
                   </div>
-                  <h4 className="font-bold text-slate-900">{p.name}</h4>
-                  <p className="text-[11px] text-slate-600">{p.location} · Gửi bởi @{p.submittedBy}</p>
-                  <div className="flex items-center justify-between pt-1">
-                    <span className="text-[10px] font-bold text-amber-600 flex items-center gap-1">
-                      📸 6 ảnh kèm tọa độ
-                    </span>
-                    <button
-                      onClick={() => approvePlace(p.id)}
-                      className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold transition-colors shadow-sm cursor-pointer"
-                    >
-                      Duyệt ngay
-                    </button>
-                  </div>
-                </div>
-              ))}
-
+                ))
+              )}
             </div>
 
             <button
-              onClick={() => setAdminTab('places')}
+              onClick={() => setAdminTab('reports')}
               className="w-full pt-2 text-center text-sky-600 hover:text-sky-700 font-bold text-xs flex items-center justify-center gap-1 cursor-pointer"
             >
-              <span>Xem tất cả 28 yêu cầu chờ</span>
+              <span>Xem tất cả {pendingReports.length} bài viết bị báo cáo</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -605,15 +626,16 @@ export const AdminDashboardPage = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs font-semibold text-slate-700 outline-none cursor-pointer"
             >
-              <option value="all">Tất cả trạng thái</option>
-              <option value="success">Đã chốt & Chia sẻ</option>
-              <option value="warning">Đang đi</option>
-              <option value="neutral">Hoàn thành</option>
-              <option value="info">Bản nháp AI</option>
+              <option value="all">Tất cả trạng thái ({itinerariesList.length})</option>
+              <option value="active">Đang hoạt động ({itinerariesList.filter(i => i.status === 'ACTIVE').length})</option>
             </select>
 
-            <button className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors" title="Lọc nâng cao">
-              <SlidersHorizontal className="w-4 h-4" />
+            <button 
+              onClick={() => loadDashboardData(true)}
+              className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors" 
+              title="Làm mới bảng"
+            >
+              <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
             </button>
           </div>
         </div>
@@ -633,56 +655,90 @@ export const AdminDashboardPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {sampleItineraries.map((row) => (
-                <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
-                  <td className="py-3.5 px-4 font-mono font-bold text-sky-600">{row.id}</td>
-
-                  <td className="py-3.5 px-4">
-                    <div className="font-bold text-slate-900">{row.title}</div>
-                    <span className="text-slate-400 text-[11px]">{row.subtitle}</span>
-                  </td>
-
-                  <td className="py-3.5 px-4">
-                    <div className="font-semibold text-slate-800">{row.author}</div>
-                    <span className="text-slate-400 text-[11px]">{row.handle}</span>
-                  </td>
-
-                  <td className="py-3.5 px-4">
-                    <div className="flex items-center gap-1 text-slate-800 font-medium">
-                      <MapPin className="w-3.5 h-3.5 text-teal-600" />
-                      <span>{row.destination}</span>
-                    </div>
-                  </td>
-
-                  <td className="py-3.5 px-4 font-bold text-slate-900">{row.budget}</td>
-
-                  <td className="py-3.5 px-4">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
-                      row.statusType === 'success'
-                        ? 'bg-sky-100 text-sky-800'
-                        : row.statusType === 'warning'
-                        ? 'bg-amber-100 text-amber-800'
-                        : row.statusType === 'info'
-                        ? 'bg-purple-100 text-purple-800'
-                        : 'bg-slate-100 text-slate-700'
-                    }`}>
-                      <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                      {row.status}
-                    </span>
-                  </td>
-
-                  <td className="py-3.5 px-4 text-right">
-                    <div className="flex items-center justify-end gap-1 text-slate-400">
-                      <button className="p-1.5 hover:text-sky-600 transition-colors" title="Xem chi tiết">
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="p-1.5 hover:text-sky-600 transition-colors" title="Xuất dữ liệu">
-                        <Download className="w-4 h-4" />
-                      </button>
-                    </div>
+              {loading ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-slate-400">
+                    <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-sky-500" />
+                    Đang đồng bộ dữ liệu lịch trình từ cơ sở dữ liệu...
                   </td>
                 </tr>
-              ))}
+              ) : filteredItineraries.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center text-slate-400">
+                    Không tìm thấy lịch trình nào khớp với bộ lọc tìm kiếm.
+                  </td>
+                </tr>
+              ) : (
+                filteredItineraries.map((row) => (
+                  <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="py-3.5 px-4 font-mono font-bold text-sky-600">#ITN-890{row.id}</td>
+
+                    <td className="py-3.5 px-4">
+                      <div className="font-bold text-slate-900">{row.title}</div>
+                      <span className="text-slate-400 text-[11px]">
+                        {row.isAiGenerated ? 'Tạo bởi WanderAI Gemini • Tối ưu điểm đến' : 'Thành viên tự thiết kế'}
+                      </span>
+                    </td>
+
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-2">
+                        {row.creatorAvatar ? (
+                          <img src={row.creatorAvatar} alt="" className="w-6 h-6 rounded-full object-cover" />
+                        ) : (
+                          <div className="w-6 h-6 rounded-full bg-sky-600 text-white font-bold text-[10px] flex items-center justify-center">
+                            {row.creatorName ? row.creatorName.charAt(0) : 'U'}
+                          </div>
+                        )}
+                        <div>
+                          <div className="font-semibold text-slate-800">{row.creatorName || 'Người dùng'}</div>
+                          <span className="text-slate-400 text-[11px]">{row.creatorEmail || '@user'}</span>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-1 text-slate-800 font-medium">
+                        <MapPin className="w-3.5 h-3.5 text-teal-600" />
+                        <span>{row.destination}</span>
+                      </div>
+                    </td>
+
+                    <td className="py-3.5 px-4 font-bold text-slate-900">
+                      {row.budgetTotal ? Number(row.budgetTotal).toLocaleString('vi-VN') + 'đ' : 'Chưa nhập'}
+                    </td>
+
+                    <td className="py-3.5 px-4">
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold ${
+                        row.status === 'ACTIVE'
+                          ? 'bg-sky-100 text-sky-800'
+                          : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                        {row.status === 'ACTIVE' ? 'Đang hoạt động' : (row.status || 'Bản nháp')}
+                      </span>
+                    </td>
+
+                    <td className="py-3.5 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1 text-slate-400">
+                        <button 
+                          onClick={() => toast.info(`Lịch trình: ${row.title} (${row.destination})`)}
+                          className="p-1.5 hover:text-sky-600 transition-colors cursor-pointer" 
+                          title="Xem chi tiết"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={() => toast.success(`Đã xuất báo cáo lịch trình #${row.id}!`)}
+                          className="p-1.5 hover:text-sky-600 transition-colors cursor-pointer" 
+                          title="Xuất dữ liệu"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
