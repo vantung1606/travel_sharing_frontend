@@ -57,8 +57,8 @@ export const Navbar = () => {
   return (
     <>
       <header className="sticky top-0 z-40 w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/70 shadow-xs select-none">
-        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-10">
-          <div className="flex items-center justify-between h-16 sm:h-18 gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 gap-3">
             
             {/* 1. Brand Logo */}
             <div className="flex items-center gap-3 shrink-0">
@@ -82,7 +82,7 @@ export const Navbar = () => {
 
             {/* 2. Sleek Rounded Navigation Bar (Stitch M05 Style) */}
             {portalMode === 'user' && (
-              <nav className="hidden md:flex items-center gap-0.5 lg:gap-1 p-1 bg-slate-100/70 rounded-full border border-slate-200/50 shadow-2xs max-w-full overflow-x-auto no-scrollbar">
+              <nav className="hidden md:flex items-center gap-0.5 lg:gap-1 p-1 bg-slate-100/70 rounded-full border border-slate-200/50 shadow-2xs no-scrollbar overflow-hidden">
                 {navItems.map(tab => {
                   const active = userTab === tab.id;
                   const Icon = tab.icon;

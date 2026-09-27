@@ -51,14 +51,13 @@ export const HomePage = () => {
   };
 
   return (
-    <div className="space-y-12 pb-16">
-      
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
       {/* 1. ATMOSPHERIC HERO SECTION WITH 3D MASCOT SPOTLIGHT */}
-      <section className="relative w-full overflow-hidden -mt-6 pt-16 pb-28 md:pb-36 bg-slate-950 text-white">
+      <section className="relative w-full overflow-hidden -mt-6 pt-10 pb-16 md:pb-20 bg-slate-950 text-white">
         
         {/* Background Image with Dark Gradient Scrim */}
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-35 mix-blend-luminosity"
+          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity"
           style={{
             backgroundImage: `url('https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1800&q=80')`
           }}
@@ -66,19 +65,17 @@ export const HomePage = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/70 to-slate-900"></div>
 
         {/* Ambient Glowing AI Light Effect */}
-        <div className="absolute top-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-sky-500/20 blur-3xl pointer-events-none animate-pulse-glow"></div>
-        <div className="absolute top-1/3 left-1/4 w-[380px] h-[380px] rounded-full bg-orange-500/15 blur-3xl pointer-events-none"></div>
+        <div className="absolute top-1/4 right-1/4 w-[350px] h-[350px] rounded-full bg-sky-500/20 blur-3xl pointer-events-none animate-pulse-glow"></div>
+        <div className="absolute top-1/3 left-1/4 w-[300px] h-[300px] rounded-full bg-orange-500/15 blur-3xl pointer-events-none"></div>
 
-        <div className="relative w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10 z-10">
+        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             {/* LEFT COLUMN: Headline & CTA Actions (7 Cols) */}
-            <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6">
+            <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-5">
               
-             
-
               {/* Hero Headline */}
-              <h1 className="font-display font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight leading-tight">
+              <h1 className="font-display font-extrabold text-2xl sm:text-4xl lg:text-5xl tracking-tight leading-tight">
                 Hành trình du lịch trọn vẹn cùng{' '}
                 <span className="bg-gradient-to-r from-sky-400 via-teal-300 to-amber-300 bg-clip-text text-transparent">
                   Wayfare
@@ -86,57 +83,57 @@ export const HomePage = () => {
               </h1>
 
               {/* Subtitle */}
-              <p className="text-slate-300 text-sm sm:text-base max-w-2xl leading-relaxed">
+              <p className="text-slate-300 text-xs sm:text-sm max-w-xl leading-relaxed">
                 Trợ lý thông minh hỗ trợ thiết kế lịch trình cá nhân, dự tính chi phí thực tế và kết nối những người yêu du lịch.
               </p>
 
               {/* CTA Action Group */}
-              <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto pt-2">
+              <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto pt-1">
                 <button
                   onClick={() => setIsAIGeneratorOpen(true)}
-                  className="w-full sm:w-auto sparkle-btn text-white px-8 py-4 rounded-full text-sm font-bold flex items-center justify-center gap-2.5 shadow-2xl cursor-pointer"
+                  className="w-full sm:w-auto sparkle-btn text-white px-6 py-3 rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-xl cursor-pointer"
                 >
-                  <Sparkles className="w-5 h-5 text-amber-200" />
+                  <Sparkles className="w-4 h-4 text-amber-200" />
                   <span>Tạo lịch trình AI ngay</span>
                 </button>
                 <button
                   onClick={() => setUserTab('explore')}
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white text-sm font-bold flex items-center justify-center gap-2 transition-all"
+                  className="w-full sm:w-auto px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
-                  <PlayCircle className="w-5 h-5 text-sky-400" />
+                  <PlayCircle className="w-4 h-4 text-sky-400" />
                   <span>Khám phá địa điểm nổi bật</span>
                 </button>
               </div>
 
               {/* Trust Metrics & Social Proof Pill */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 px-6 py-4 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-slate-800 shadow-2xl text-left w-full max-w-2xl pt-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400 shrink-0">
-                    <Compass className="w-5 h-5" />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 px-5 py-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-slate-800 shadow-xl text-left w-full max-w-xl">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400 shrink-0">
+                    <Compass className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="font-bold text-base text-white leading-none">50,000+</p>
-                    <p className="text-xs text-slate-400 mt-1">Lịch trình đã tạo</p>
+                    <p className="font-bold text-sm text-white leading-none">50,000+</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">Lịch trình đã tạo</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 sm:border-l sm:border-slate-800 sm:pl-6">
-                  <div className="w-10 h-10 rounded-full bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-400 shrink-0">
-                    <MapPin className="w-5 h-5" />
+                <div className="flex items-center gap-2.5 sm:border-l sm:border-slate-800 sm:pl-4">
+                  <div className="w-8 h-8 rounded-full bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-teal-400 shrink-0">
+                    <MapPin className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="font-bold text-base text-white leading-none">12,000+</p>
-                    <p className="text-xs text-slate-400 mt-1">Điểm đến Việt Nam</p>
+                    <p className="font-bold text-sm text-white leading-none">12,000+</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">Điểm đến Việt Nam</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 sm:border-l sm:border-slate-800 sm:pl-6">
-                  <div className="w-10 h-10 rounded-full bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
-                    <Star className="w-5 h-5 fill-amber-400" />
+                <div className="flex items-center gap-2.5 sm:border-l sm:border-slate-800 sm:pl-4">
+                  <div className="w-8 h-8 rounded-full bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 shrink-0">
+                    <Star className="w-4 h-4 fill-amber-400" />
                   </div>
                   <div>
-                    <p className="font-bold text-base text-white leading-none">4.9 / 5.0</p>
-                    <p className="text-xs text-slate-400 mt-1">Đánh giá hài lòng</p>
+                    <p className="font-bold text-sm text-white leading-none">4.9 / 5.0</p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">Đánh giá hài lòng</p>
                   </div>
                 </div>
               </div>
@@ -144,30 +141,30 @@ export const HomePage = () => {
             </div>
 
             {/* RIGHT COLUMN: 3D MASCOT ARTWORK SPOTLIGHT (5 Cols) */}
-            <div className="lg:col-span-5 relative flex items-center justify-center mt-6 lg:mt-0">
+            <div className="lg:col-span-5 relative flex items-center justify-center mt-4 lg:mt-0">
               
               {/* Glowing Aura Backlight Disk */}
-              <div className="absolute w-[320px] h-[320px] sm:w-[420px] sm:h-[420px] rounded-full bg-gradient-to-tr from-sky-500/30 via-teal-400/20 to-orange-500/30 blur-2xl animate-pulse-glow pointer-events-none"></div>
+              <div className="absolute w-[240px] h-[240px] sm:w-[300px] sm:h-[300px] rounded-full bg-gradient-to-tr from-sky-500/30 via-teal-400/20 to-orange-500/30 blur-2xl animate-pulse-glow pointer-events-none"></div>
 
               {/* Decorative 3D Ring Circle */}
-              <div className="absolute w-[360px] h-[360px] sm:w-[460px] sm:h-[460px] rounded-full border border-sky-500/20 border-dashed animate-spin-slow pointer-events-none"></div>
+              <div className="absolute w-[280px] h-[280px] sm:w-[340px] sm:h-[340px] rounded-full border border-sky-500/20 border-dashed animate-spin-slow pointer-events-none"></div>
 
               {/* Main 3D Mascot Character Container */}
               <div className="relative z-10 flex flex-col items-center">
                 
                 {/* 3D Glassmorphic AI Chat Speech Bubble */}
-                <div className="mb-2 px-4 py-2.5 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/25 shadow-2xl text-xs text-white max-w-xs animate-bounce space-y-1 relative">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                    <span className="font-bold text-sky-300 flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Trợ Lý AI Tùng
+                <div className="mb-2 px-3.5 py-2 rounded-2xl bg-white/15 backdrop-blur-xl border border-white/25 shadow-xl text-xs text-white max-w-[240px] animate-bounce space-y-0.5 relative">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span className="font-bold text-sky-300 text-[11px] flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-amber-400" /> Trợ Lý AI Tùng
                     </span>
                   </div>
-                  <p className="text-[11px] font-medium text-slate-100 leading-snug">
+                  <p className="text-[10px] font-medium text-slate-100 leading-snug">
                     "Xin chào! Tôi là Tùng ✌️ Bạn muốn lập tour đi đâu hôm nay?"
                   </p>
                   {/* Speech bubble pointer tip */}
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-white/20"></div>
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-6 border-l-transparent border-r-6 border-r-transparent border-t-6 border-t-white/20"></div>
                 </div>
 
                 {/* 3D Mascot Image with Drop Shadow & Smooth Float */}
@@ -175,28 +172,28 @@ export const HomePage = () => {
                   <img
                     src={mascotImg}
                     alt="AI Wander 3D Mascot Guide Nam"
-                    className="h-[360px] sm:h-[440px] lg:h-[480px] w-auto object-contain animate-float-3d mascot-3d-shadow group-hover:scale-105 transition-transform duration-500"
+                    className="h-[240px] sm:h-[300px] lg:h-[340px] w-auto object-contain animate-float-3d mascot-3d-shadow group-hover:scale-105 transition-transform duration-500"
                   />
                   
                   {/* Floating Bento Badge 1: AI Assistant Status */}
-                  <div className="absolute top-12 -left-6 sm:-left-10 px-3.5 py-2 rounded-2xl bg-slate-900/85 backdrop-blur-md border border-slate-700/80 shadow-2xl text-xs text-white flex items-center gap-2 animate-pulse">
-                    <div className="w-7 h-7 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
-                      <Bot className="w-4 h-4" />
+                  <div className="absolute top-8 -left-4 sm:-left-8 px-3 py-1.5 rounded-xl bg-slate-900/85 backdrop-blur-md border border-slate-700/80 shadow-xl text-xs text-white flex items-center gap-1.5 animate-pulse">
+                    <div className="w-6 h-6 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center font-bold">
+                      <Bot className="w-3.5 h-3.5" />
                     </div>
                     <div>
-                      <span className="font-extrabold block text-[11px] text-sky-300">WanderAI v3.5</span>
-                      <span className="text-[9px] text-slate-400">Trí tuệ nhân tạo 2026</span>
+                      <span className="font-extrabold block text-[10px] text-sky-300">WanderAI v3.5</span>
+                      <span className="text-[8px] text-slate-400">Trí tuệ nhân tạo</span>
                     </div>
                   </div>
 
                   {/* Floating Bento Badge 2: Quick Check-in Stats */}
-                  <div className="absolute bottom-8 -right-4 sm:-right-8 px-4 py-2.5 rounded-2xl bg-slate-900/85 backdrop-blur-md border border-slate-700/80 shadow-2xl text-xs text-white flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
-                      <Sparkles className="w-4.5 h-4.5 text-amber-400" />
+                  <div className="absolute bottom-6 -right-3 sm:-right-6 px-3.5 py-2 rounded-xl bg-slate-900/85 backdrop-blur-md border border-slate-700/80 shadow-xl text-xs text-white flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                     </div>
                     <div>
-                      <span className="font-extrabold block text-xs text-amber-300">100% Tối ưu tour</span>
-                      <span className="text-[10px] text-slate-400">Tiết kiệm 20% chi phí</span>
+                      <span className="font-extrabold block text-[11px] text-amber-300">100% Tối ưu tour</span>
+                      <span className="text-[9px] text-slate-400">Tiết kiệm 20% chi phí</span>
                     </div>
                   </div>
 
@@ -210,12 +207,12 @@ export const HomePage = () => {
         </div>
 
         {/* Subtle Bottom Vignette Gradient */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-24 bg-gradient-to-b from-transparent via-slate-950/40 to-slate-950/90 pointer-events-none z-[2]"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-12 sm:h-16 bg-gradient-to-b from-transparent via-slate-950/40 to-slate-950/90 pointer-events-none z-[2]"></div>
       </section>
 
       {/* 2. FLOATING QUICK SEARCH & FILTER CARD (MATCHING STITCH M01) */}
-      <section className="relative z-20 w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10 -mt-12 md:-mt-16">
-        <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-2xl border border-slate-200/80 space-y-6">
+      <section className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 md:-mt-10">
+        <div className="bg-white p-5 sm:p-6 rounded-3xl shadow-xl border border-slate-200/80 space-y-4">
           
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -324,7 +321,7 @@ export const HomePage = () => {
       </section>
 
       {/* 3. TRENDING TRAVEL DESTINATIONS */}
-      <section className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10 space-y-6 pt-6">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 pt-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-1.5 text-xs font-bold text-orange-600 uppercase tracking-wider mb-1">

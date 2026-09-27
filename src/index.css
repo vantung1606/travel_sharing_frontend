@@ -11,20 +11,30 @@
     --on-surface: #131b2e;
   }
 
-  /* Responsive Font Sizing: Standard 15px on mobile, enlarged to 17px & 18px on PC/Desktop */
+  /* Clean, crisp & modern base font sizing (proportional and balanced across all screens) */
   html {
-    font-size: 15px;
+    font-size: 14px;
+    scroll-behavior: smooth;
   }
   @media (min-width: 1024px) {
     html {
-      font-size: 16.5px;
+      font-size: 14.5px;
     }
   }
   @media (min-width: 1440px) {
     html {
-      font-size: 18px;
+      font-size: 15px;
     }
   }
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 /* Glassmorphism & Custom Effects */
