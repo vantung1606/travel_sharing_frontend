@@ -68,7 +68,7 @@ export const HomePage = () => {
         <div className="absolute top-1/4 right-1/4 w-[350px] h-[350px] rounded-full bg-sky-500/20 blur-3xl pointer-events-none animate-pulse-glow"></div>
         <div className="absolute top-1/3 left-1/4 w-[300px] h-[300px] rounded-full bg-orange-500/15 blur-3xl pointer-events-none"></div>
 
-        <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+        <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             {/* LEFT COLUMN: Headline & CTA Actions (7 Cols) */}
@@ -83,7 +83,7 @@ export const HomePage = () => {
               </h1>
 
               {/* Subtitle */}
-              <p className="text-slate-300 text-xs sm:text-sm max-w-xl leading-relaxed">
+              <p className="text-slate-300 text-xs sm:text-sm max-w-2xl leading-relaxed">
                 Trợ lý thông minh hỗ trợ thiết kế lịch trình cá nhân, dự tính chi phí thực tế và kết nối những người yêu du lịch.
               </p>
 
@@ -106,7 +106,7 @@ export const HomePage = () => {
               </div>
 
               {/* Trust Metrics & Social Proof Pill */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 px-5 py-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-slate-800 shadow-xl text-left w-full max-w-xl">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 px-5 py-3 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-slate-800 shadow-xl text-left w-full max-w-2xl">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-full bg-sky-500/20 border border-sky-400/30 flex items-center justify-center text-sky-400 shrink-0">
                     <Compass className="w-4 h-4" />
@@ -211,7 +211,7 @@ export const HomePage = () => {
       </section>
 
       {/* 2. FLOATING QUICK SEARCH & FILTER CARD (MATCHING STITCH M01) */}
-      <section className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 md:-mt-10">
+      <section className="relative z-20 w-full px-4 sm:px-6 lg:px-8 xl:px-12 -mt-8 md:-mt-10">
         <div className="bg-white p-5 sm:p-6 rounded-3xl shadow-xl border border-slate-200/80 space-y-4">
           
           <div className="flex items-center justify-between">
@@ -321,7 +321,7 @@ export const HomePage = () => {
       </section>
 
       {/* 3. TRENDING TRAVEL DESTINATIONS */}
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 pt-6">
+      <section className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 space-y-6 pt-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-1.5 text-xs font-bold text-orange-600 uppercase tracking-wider mb-1">
@@ -467,7 +467,7 @@ export const HomePage = () => {
 
       {/* 4. KHỐI AI FEATURE HIGHLIGHT SHOWCASE (EXACT STITCH AI M01 SECTION) */}
       <section className="w-full bg-slate-100/70 py-16 my-8 border-y border-slate-200/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             {/* Left Column: Interactive AI Generator Simulation Card */}
@@ -633,7 +633,7 @@ export const HomePage = () => {
       </section>
 
       {/* 5. COMMUNITY TRAVEL FEED PREVIEW (MATCHING STITCH M01) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+      <section className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 space-y-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-1.5 text-xs font-bold text-sky-600 uppercase tracking-wider mb-1">
