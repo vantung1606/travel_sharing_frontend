@@ -30,7 +30,7 @@ export const MessagesPage = () => {
   const currentThreadObj = threads.find(t => t.id === activeThread) || threads[0];
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 space-y-6">
+    <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8 space-y-6">
       <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[550px]">
         
         {/* Left Threads Sidebar (4 Columns) */}

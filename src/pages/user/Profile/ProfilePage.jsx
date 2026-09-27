@@ -45,7 +45,7 @@ export const ProfilePage = () => {
   ];
 
   return (
-    <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-10 py-6 sm:py-8 space-y-6 sm:space-y-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8 space-y-6 sm:space-y-8">
       
       {/* ========================================================= */}
       {/* 1. HERO PROFILE BANNER & USER HEADER CARD                 */}
