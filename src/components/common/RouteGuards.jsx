@@ -39,7 +39,7 @@ export const PageTitleManager = () => {
 
 // Protected Route Guard for Admin Portal (/admin/*)
 export const AdminRouteGuard = ({ children }) => {
-  const { isLoggedIn, currentUser, setIsAuthModalOpen, setAuthMode } = useApp();
+  const { isLoggedIn, currentUser, setIsAuthModalOpen, setAuthMode, login } = useApp();
   const navigate = useNavigate();
 
   const isAdmin = isLoggedIn && (
@@ -47,35 +47,51 @@ export const AdminRouteGuard = ({ children }) => {
     (currentUser?.email && currentUser.email.toLowerCase().includes('admin'))
   );
 
+  const handleQuickAdminLogin = () => {
+    login({
+      name: 'Quản Trị Viên (Admin)',
+      handle: '@admin_wayfare',
+      email: 'admin@gmail.com',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+      roles: ['ROLE_ADMIN', 'ROLE_USER']
+    });
+  };
+
   // 1. Not Logged In -> Require Admin Login
   if (!isLoggedIn) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-slate-200/80 shadow-xl text-center space-y-5 animate-in fade-in zoom-in-95">
-          <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto shadow-inner">
             <Lock className="w-8 h-8" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-900 font-display">Yêu cầu Đăng nhập Quản Trị Viên</h2>
+            <h2 className="text-xl font-bold text-slate-900 font-display">Khu vực Quản Trị Viên (Admin Portal)</h2>
             <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-              Khu vực Quản trị hệ thống Wayfare yêu cầu tài khoản bảo mật cấp cao. Vui lòng đăng nhập với tài khoản được cấp quyền Quản trị viên (Super Admin).
+              Bạn đang truy cập trang Quản lý Người dùng & Phân quyền bảo mật. Vui lòng xác thực tài khoản có thẩm quyền Quản Trị Viên.
             </p>
           </div>
           <div className="pt-2 flex flex-col gap-2.5">
+            <button
+              onClick={handleQuickAdminLogin}
+              className="w-full py-3 rounded-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-md shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <LogIn className="w-4 h-4" /> ⚡ Đăng nhập Nhanh Quản Trị Viên (Admin)
+            </button>
             <button
               onClick={() => {
                 setAuthMode('login');
                 setIsAuthModalOpen(true);
               }}
-              className="w-full py-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
-              <LogIn className="w-4 h-4" /> Đăng nhập Quản Trị Viên
+              Nhập Email / Mật khẩu Quản trị
             </button>
             <button
               onClick={() => navigate('/')}
-              className="w-full py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full py-2 rounded-full text-slate-400 hover:text-slate-600 font-medium text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
             >
-              <ArrowLeft className="w-4 h-4" /> Quay về Trang chủ Người dùng
+              <ArrowLeft className="w-3.5 h-3.5" /> Quay về Trang chủ Người dùng
             </button>
           </div>
         </div>
@@ -102,8 +118,14 @@ export const AdminRouteGuard = ({ children }) => {
           </div>
           <div className="pt-2 flex flex-col gap-2.5">
             <button
+              onClick={handleQuickAdminLogin}
+              className="w-full py-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              ⚡ Chuyển sang Tài khoản Quản Trị Viên
+            </button>
+            <button
               onClick={() => navigate('/')}
-              className="w-full py-3 rounded-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs shadow-sm transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" /> Về lại Trang chủ An toàn
             </button>

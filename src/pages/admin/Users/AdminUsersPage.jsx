@@ -90,16 +90,19 @@ export const AdminUsersPage = () => {
         adminUserApi.getUserMetrics()
       ]);
 
-      setUsersList(fetchedUsers);
-      setMetrics(fetchedMetrics);
+      const usersArr = Array.isArray(fetchedUsers) ? fetchedUsers : [];
+      setUsersList(usersArr);
+      if (fetchedMetrics) {
+        setMetrics(fetchedMetrics);
+      }
 
       // Default selected audit user to first locked or high risk user, or first user in list
-      if (!selectedAuditUser && fetchedUsers.length > 0) {
-        const priorityUser = fetchedUsers.find(u => u.status === 'LOCKED' || (u.riskScore && u.riskScore > 50)) || fetchedUsers[0];
+      if (!selectedAuditUser && usersArr.length > 0) {
+        const priorityUser = usersArr.find(u => u.status === 'LOCKED' || (u.riskScore && u.riskScore > 50)) || usersArr[0];
         setSelectedAuditUser(priorityUser);
-      } else if (selectedAuditUser) {
+      } else if (selectedAuditUser && usersArr.length > 0) {
         // Keep updated state for current audit user
-        const updatedSelected = fetchedUsers.find(u => u.id === selectedAuditUser.id);
+        const updatedSelected = usersArr.find(u => u.id === selectedAuditUser.id);
         if (updatedSelected) setSelectedAuditUser(updatedSelected);
       }
 
@@ -159,7 +162,7 @@ export const AdminUsersPage = () => {
 
   // Average Trust Score
   const avgTrustScore = useMemo(() => {
-    if (usersList.length === 0) return 95;
+    if (usersList.length === 0) return '95.0';
     const sum = usersList.reduce((acc, u) => acc + (u.trustScore || 85), 0);
     return (sum / usersList.length).toFixed(1);
   }, [usersList]);
@@ -198,7 +201,7 @@ export const AdminUsersPage = () => {
 
   const openRoleModal = (user) => {
     setUserToChangeRole(user);
-    const currentPrimary = user.roles && user.roles.find(r => r === 'ROLE_ADMIN') 
+    const currentPrimary = (user.roles && user.roles.find(r => r === 'ROLE_ADMIN')) 
       || (user.roles && user.roles.find(r => r === 'ROLE_MODERATOR')) 
       || (user.roles && user.roles.find(r => r === 'ROLE_GUIDE')) 
       || 'ROLE_USER';
@@ -240,7 +243,7 @@ export const AdminUsersPage = () => {
 
     setIsSubmittingUser(true);
     try {
-      const response = await adminUserApi.createUser(newUserForm);
+      await adminUserApi.createUser(newUserForm);
       toast.success('Đã khởi tạo tài khoản & phân quyền thành công! 🎉');
       setShowAddUserModal(false);
       setNewUserForm({
