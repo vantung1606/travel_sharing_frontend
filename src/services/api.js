@@ -737,3 +737,115 @@ export const auditLogApi = {
   }
 };
 
+// ─── Community Posts & Social Interaction API ────────────────────────────────
+export const postApi = {
+  async getPosts({ category = '', keyword = '' } = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (category && category !== 'Tất cả') params.append('category', category);
+      if (keyword) params.append('keyword', keyword);
+
+      const res = await fetch(`${BASE_URL}/posts?${params.toString()}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching community posts:', err.message);
+      return [];
+    }
+  },
+
+  async getPostById(id) {
+    try {
+      const res = await fetch(`${BASE_URL}/posts/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.warn('API error fetching post detail:', err.message);
+      return null;
+    }
+  },
+
+  async createPost(payload) {
+    const res = await fetch(`${BASE_URL}/posts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  },
+
+  async toggleLike(postId) {
+    const res = await fetch(`${BASE_URL}/posts/${postId}/like`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  },
+
+  async getComments(postId) {
+    try {
+      const res = await fetch(`${BASE_URL}/posts/${postId}/comments`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching post comments:', err.message);
+      return [];
+    }
+  },
+
+  async addComment(postId, content) {
+    const res = await fetch(`${BASE_URL}/posts/${postId}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ content })
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  },
+
+  async cloneItinerary(postId) {
+    const res = await fetch(`${BASE_URL}/posts/${postId}/clone-itinerary`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  }
+};
+
