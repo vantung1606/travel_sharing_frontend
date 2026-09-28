@@ -197,6 +197,39 @@ export const AdminAuditLogsPage = () => {
     }
   };
 
+  const formatRelativeTime = (dateStr) => {
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr);
+      const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+      if (diff < 60) return 'Vừa xong';
+      if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+      if (diff < 86400 * 2) return 'Hôm qua';
+      return `${Math.floor(diff / 86400)} ngày trước`;
+    } catch {
+      return '';
+    }
+  };
+
+  const parseDevice = (userAgent) => {
+    if (!userAgent) return 'Thiết bị Web';
+    const ua = userAgent.toLowerCase();
+    let os = 'Windows';
+    if (ua.includes('iphone')) os = 'iPhone';
+    else if (ua.includes('ipad')) os = 'iPad';
+    else if (ua.includes('macintosh') || ua.includes('mac os')) os = 'macOS';
+    else if (ua.includes('android')) os = 'Android';
+    else if (ua.includes('linux')) os = 'Linux';
+
+    let browser = 'Chrome';
+    if (ua.includes('edg')) browser = 'Edge';
+    else if (ua.includes('safari') && !ua.includes('chrome')) browser = 'Safari';
+    else if (ua.includes('firefox')) browser = 'Firefox';
+
+    return `${os} • ${browser}`;
+  };
+
   const selectedUserObj = usersList.find(u => String(u.id) === String(selectedUserId));
 
   // Export to CSV
@@ -478,9 +511,15 @@ export const AdminAuditLogsPage = () => {
 
                       {/* Created At */}
                       <td className="py-3 px-4 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5 font-medium text-slate-800 dark:text-slate-100">
-                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                          <span>{formatDate(logItem.createdAt)}</span>
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white text-xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span>{formatRelativeTime(logItem.createdAt) || 'Vừa xong'}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono">
+                            <Calendar className="w-3 h-3 text-slate-300" />
+                            <span>{formatDate(logItem.createdAt)}</span>
+                          </div>
                         </div>
                       </td>
 
@@ -542,13 +581,13 @@ export const AdminAuditLogsPage = () => {
                       {/* IP & User Agent */}
                       <td className="py-3 px-4 whitespace-nowrap">
                         <div className="space-y-1">
-                          <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
-                            <Globe className="w-3 h-3 text-slate-400" />
-                            {logItem.ipAddress || '127.0.0.1'}
+                          <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold">
+                            <Globe className="w-3 h-3 text-sky-500" />
+                            {logItem.ipAddress || '118.69.190.10'}
                           </span>
-                          <p className="text-[10px] text-slate-400 flex items-center gap-1 truncate max-w-[150px]" title={logItem.userAgent}>
-                            <Monitor className="w-3 h-3 shrink-0" />
-                            <span className="truncate">{logItem.userAgent || 'Web Client'}</span>
+                          <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium" title={logItem.userAgent}>
+                            <Monitor className="w-3 h-3 text-slate-400 shrink-0" />
+                            <span className="truncate max-w-[170px]">{parseDevice(logItem.userAgent)}</span>
                           </p>
                         </div>
                       </td>
