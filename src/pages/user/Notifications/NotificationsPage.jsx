@@ -22,6 +22,8 @@ import {
   CheckCircle2,
   AlertCircle,
   SlidersHorizontal,
+  Megaphone,
+  Radio,
   X
 } from 'lucide-react';
 
@@ -34,6 +36,9 @@ export const NotificationsPage = () => {
     markAllNotificationsAsRead,
     deleteNotification,
     addTestNotification,
+    broadcastNotification,
+    fetchNotifications,
+    currentUser,
     setUserTab,
     setPortalMode,
     isNotificationLiveBackend
@@ -43,6 +48,8 @@ export const NotificationsPage = () => {
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'unread' | 'ai' | 'social' | 'trips' | 'system'
   const [searchQuery, setSearchQuery] = useState('');
   const [isTestDispatcherOpen, setIsTestDispatcherOpen] = useState(false);
+  const [dispatchMode, setDispatchMode] = useState('test'); // 'test' | 'broadcast'
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Test Notification Form States
   const [testType, setTestType] = useState('AI_READY');
@@ -177,22 +184,42 @@ export const NotificationsPage = () => {
     e.preventDefault();
     setIsSubmittingTest(true);
 
-    const payload = {
-      type: testType,
-      actorName: testActorName,
-      actorHandle: testActorHandle,
-      message: testMessage,
-      targetUrl: testTargetUrl
-    };
-
     try {
-      await addTestNotification(payload);
-      toast.success('Đã gửi thông báo mới thành công! 🔔');
+      if (dispatchMode === 'broadcast') {
+        await broadcastNotification({
+          type: testType,
+          message: testMessage,
+          targetUrl: testTargetUrl
+        });
+        toast.success('Đã phát thông báo toàn hệ thống thành công! 📢');
+      } else {
+        const payload = {
+          type: testType,
+          actorName: testActorName,
+          actorHandle: testActorHandle,
+          message: testMessage,
+          targetUrl: testTargetUrl
+        };
+        await addTestNotification(payload);
+        toast.success('Đã gửi thông báo mới thành công! 🔔');
+      }
       setIsTestDispatcherOpen(false);
     } catch {
       toast.error('Gửi thông báo thất bại.');
     } finally {
       setIsSubmittingTest(false);
+    }
+  };
+
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await fetchNotifications();
+      toast.info('Đã đồng bộ thông báo mới nhất! 🔄');
+    } catch {
+      toast.error('Không thể đồng bộ thông báo.');
+    } finally {
+      setIsRefreshing(false);
     }
   };
 
@@ -242,11 +269,21 @@ export const NotificationsPage = () => {
         <div className="flex flex-wrap items-center gap-2.5 self-start md:self-center">
           <button
             type="button"
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-sky-600 transition-colors shadow-xs"
+            title="Đồng bộ lại thông báo từ CSDL"
+          >
+            <RotateCcw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-sky-600' : ''}`} />
+          </button>
+
+          <button
+            type="button"
             onClick={() => setIsTestDispatcherOpen(!isTestDispatcherOpen)}
             className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition-all shadow-xs"
           >
             <PlusCircle className="w-4 h-4 text-sky-600" />
-            <span>Gửi thông báo thật / Test</span>
+            <span>Gửi thông báo / Phát tin</span>
           </button>
 
           {unreadNotificationsCount > 0 && (
@@ -297,6 +334,33 @@ export const NotificationsPage = () => {
             </button>
           </div>
 
+          <div className="flex flex-wrap items-center gap-2 border-b border-sky-100 pb-3">
+            <button
+              type="button"
+              onClick={() => setDispatchMode('test')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ${
+                dispatchMode === 'test'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Thông báo thử nghiệm (Cá nhân)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setDispatchMode('broadcast')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ${
+                dispatchMode === 'broadcast'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              <Megaphone className="w-3.5 h-3.5" />
+              <span>Phát thông báo toàn hệ thống (Broadcast All)</span>
+            </button>
+          </div>
+
           <form onSubmit={handleCreateTestPush} className="grid grid-cols-1 md:grid-cols-12 gap-4">
             <div className="md:col-span-4 space-y-1.5">
               <label className="text-xs font-bold text-slate-700">Loại thông báo (Type)</label>
@@ -332,18 +396,20 @@ export const NotificationsPage = () => {
               </select>
             </div>
 
-            <div className="md:col-span-4 space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Tên người gửi (Actor Name)</label>
-              <input
-                type="text"
-                value={testActorName}
-                onChange={(e) => setTestActorName(e.target.value)}
-                required
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none focus:border-sky-500"
-              />
-            </div>
+            {dispatchMode === 'test' && (
+              <div className="md:col-span-4 space-y-1.5">
+                <label className="text-xs font-bold text-slate-700">Tên người gửi (Actor Name)</label>
+                <input
+                  type="text"
+                  value={testActorName}
+                  onChange={(e) => setTestActorName(e.target.value)}
+                  required
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none focus:border-sky-500"
+                />
+              </div>
+            )}
 
-            <div className="md:col-span-4 space-y-1.5">
+            <div className={`${dispatchMode === 'test' ? 'md:col-span-4' : 'md:col-span-8'} space-y-1.5`}>
               <label className="text-xs font-bold text-slate-700">Đường dẫn điều hướng (Target URL)</label>
               <input
                 type="text"
@@ -361,6 +427,7 @@ export const NotificationsPage = () => {
                 value={testMessage}
                 onChange={(e) => setTestMessage(e.target.value)}
                 required
+                placeholder={dispatchMode === 'broadcast' ? 'Nhập thông báo gửi đến toàn thể cộng đồng du khách Wayfare...' : 'Nhập nội dung thông báo...'}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-sky-500"
               />
             </div>
@@ -376,10 +443,20 @@ export const NotificationsPage = () => {
               <button
                 type="submit"
                 disabled={isSubmittingTest}
-                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-sm transition-all disabled:opacity-50"
+                className={`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-white font-bold text-xs shadow-sm transition-all disabled:opacity-50 ${
+                  dispatchMode === 'broadcast'
+                    ? 'bg-amber-600 hover:bg-amber-700'
+                    : 'bg-sky-600 hover:bg-sky-700'
+                }`}
               >
-                <Send className="w-3.5 h-3.5" />
-                <span>{isSubmittingTest ? 'Đang gửi...' : 'Bắn thông báo ngay'}</span>
+                {dispatchMode === 'broadcast' ? <Megaphone className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
+                <span>
+                  {isSubmittingTest
+                    ? 'Đang gửi...'
+                    : dispatchMode === 'broadcast'
+                    ? 'Phát thông báo toàn hệ thống'
+                    : 'Bắn thông báo ngay'}
+                </span>
               </button>
             </div>
           </form>

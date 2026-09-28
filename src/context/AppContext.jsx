@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   INITIAL_DESTINATIONS,
@@ -98,44 +98,6 @@ export const AppProvider = ({ children }) => {
   const [reports, setReports] = useState(INITIAL_REPORTS);
   const [stats, setStats] = useState(ADMIN_STATS);
 
-  // Notification State (M08)
-  const [notifications, setNotifications] = useState(INITIAL_MOCK_NOTIFICATIONS);
-  const [isNotificationLiveBackend, setIsNotificationLiveBackend] = useState(false);
-
-  // Fetch notifications on mount
-  useEffect(() => {
-    notificationApi.getNotifications().then(res => {
-      if (res && res.data) {
-        setNotifications(res.data);
-        setIsNotificationLiveBackend(res.isBackend);
-      }
-    });
-  }, []);
-
-  const unreadNotificationsCount = notifications.filter(n => !n.isRead).length;
-
-  const markNotificationAsRead = async (id) => {
-    setNotifications(prev => prev.map(n => (n.id === id ? { ...n, isRead: true } : n)));
-    await notificationApi.markAsRead(id);
-  };
-
-  const markAllNotificationsAsRead = async () => {
-    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
-    await notificationApi.markAllAsRead();
-  };
-
-  const deleteNotification = async (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
-    await notificationApi.deleteNotification(id);
-  };
-
-  const addTestNotification = async (payload) => {
-    const res = await notificationApi.createTestNotification(payload);
-    if (res && res.data) {
-      setNotifications(prev => [res.data, ...prev]);
-    }
-  };
-
   const DEFAULT_USER = {
     name: 'Nguyễn Thanh Tùng',
     handle: '@tung_wanderlust',
@@ -209,6 +171,70 @@ export const AppProvider = ({ children }) => {
     } catch (e) {
       console.error('Failed to clear auth from localStorage', e);
     }
+  };
+
+  // Notification State (M08) - Synced with currentUser
+  const [notifications, setNotifications] = useState(INITIAL_MOCK_NOTIFICATIONS);
+  const [isNotificationLiveBackend, setIsNotificationLiveBackend] = useState(false);
+
+  const fetchNotifications = useCallback(async (targetEmail) => {
+    const emailToUse = targetEmail || currentUser?.email || 'admin@gmail.com';
+    try {
+      const res = await notificationApi.getNotifications(emailToUse);
+      if (res && res.data) {
+        setNotifications(res.data);
+        setIsNotificationLiveBackend(res.isBackend);
+      }
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+    }
+  }, [currentUser?.email]);
+
+  // Sync notifications on mount and whenever user email changes
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
+  // Polling every 30 seconds for live notification updates & badge counts
+  useEffect(() => {
+    const timer = setInterval(() => {
+      fetchNotifications();
+    }, 30000);
+    return () => clearInterval(timer);
+  }, [fetchNotifications]);
+
+  const unreadNotificationsCount = notifications.filter(n => !n.isRead).length;
+
+  const markNotificationAsRead = async (id) => {
+    setNotifications(prev => prev.map(n => (n.id === id ? { ...n, isRead: true } : n)));
+    await notificationApi.markAsRead(id, currentUser?.email);
+  };
+
+  const markAllNotificationsAsRead = async () => {
+    setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+    await notificationApi.markAllAsRead(currentUser?.email);
+  };
+
+  const deleteNotification = async (id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+    await notificationApi.deleteNotification(id, currentUser?.email);
+  };
+
+  const addTestNotification = async (payload) => {
+    const res = await notificationApi.createTestNotification(payload, currentUser?.email);
+    if (res && res.data) {
+      setNotifications(prev => [res.data, ...prev]);
+    }
+    return res;
+  };
+
+  const broadcastNotification = async (payload) => {
+    const res = await notificationApi.broadcastNotification({
+      ...payload,
+      senderEmail: currentUser?.email
+    });
+    fetchNotifications();
+    return res;
   };
 
   // Actions
@@ -359,7 +385,9 @@ export const AppProvider = ({ children }) => {
         markNotificationAsRead,
         markAllNotificationsAsRead,
         deleteNotification,
-        addTestNotification
+        addTestNotification,
+        broadcastNotification,
+        fetchNotifications
       }}
     >
       {children}

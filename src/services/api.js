@@ -467,6 +467,15 @@ export const INITIAL_MOCK_NOTIFICATIONS = [
 
 const LOCAL_NOTIF_KEY = 'wayfare_notifications_store_v1';
 
+const getCurrentUserEmail = () => {
+  try {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    return user.email || 'admin@gmail.com';
+  } catch {
+    return 'admin@gmail.com';
+  }
+};
+
 const getStoredLocalNotifications = () => {
   try {
     const raw = localStorage.getItem(LOCAL_NOTIF_KEY);
@@ -490,7 +499,7 @@ const saveStoredLocalNotifications = (list) => {
 
 export const notificationApi = {
   // Fetch list of notifications
-  async getNotifications(email = 'admin@gmail.com') {
+  async getNotifications(email = getCurrentUserEmail()) {
     try {
       const response = await fetch(`${BASE_URL}/notifications?email=${encodeURIComponent(email)}`, {
         method: 'GET',
@@ -514,8 +523,28 @@ export const notificationApi = {
     }
   },
 
+  // Get unread notification count
+  async getUnreadCount(email = getCurrentUserEmail()) {
+    try {
+      const response = await fetch(`${BASE_URL}/notifications/unread-count?email=${encodeURIComponent(email)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+      const data = await response.json();
+      const count = typeof data.unreadCount === 'number' ? data.unreadCount : (typeof data.count === 'number' ? data.count : 0);
+      return { isBackend: true, count };
+    } catch (err) {
+      const list = getStoredLocalNotifications();
+      return { isBackend: false, count: list.filter(n => !n.isRead).length };
+    }
+  },
+
   // Mark a single notification as read
-  async markAsRead(id, email = 'admin@gmail.com') {
+  async markAsRead(id, email = getCurrentUserEmail()) {
     try {
       const response = await fetch(`${BASE_URL}/notifications/${id}/read?email=${encodeURIComponent(email)}`, {
         method: 'PUT',
@@ -535,7 +564,7 @@ export const notificationApi = {
   },
 
   // Mark all notifications as read
-  async markAllAsRead(email = 'admin@gmail.com') {
+  async markAllAsRead(email = getCurrentUserEmail()) {
     try {
       const response = await fetch(`${BASE_URL}/notifications/read-all?email=${encodeURIComponent(email)}`, {
         method: 'PUT',
@@ -554,7 +583,7 @@ export const notificationApi = {
   },
 
   // Delete a notification
-  async deleteNotification(id, email = 'admin@gmail.com') {
+  async deleteNotification(id, email = getCurrentUserEmail()) {
     try {
       const response = await fetch(`${BASE_URL}/notifications/${id}?email=${encodeURIComponent(email)}`, {
         method: 'DELETE',
@@ -573,7 +602,7 @@ export const notificationApi = {
   },
 
   // Create test / real push notification
-  async createTestNotification(payload, email = 'admin@gmail.com') {
+  async createTestNotification(payload, email = getCurrentUserEmail()) {
     try {
       const response = await fetch(`${BASE_URL}/notifications/test?email=${encodeURIComponent(email)}`, {
         method: 'POST',
@@ -597,6 +626,46 @@ export const notificationApi = {
         type: payload.type || 'SYSTEM',
         message: payload.message || 'Thông báo thử nghiệm mới.',
         targetUrl: payload.targetUrl || '/community',
+        isRead: false,
+        createdAt: new Date().toISOString()
+      };
+      const list = [newNotif, ...getStoredLocalNotifications()];
+      saveStoredLocalNotifications(list);
+      return { isBackend: false, data: newNotif };
+    }
+  },
+
+  // Broadcast a notification to all users (Admin only)
+  async broadcastNotification(payload) {
+    const senderEmail = payload.senderEmail || getCurrentUserEmail();
+    try {
+      const response = await fetch(`${BASE_URL}/notifications/broadcast?email=${encodeURIComponent(senderEmail)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        },
+        body: JSON.stringify({
+          type: payload.type || 'SYSTEM',
+          message: payload.message,
+          targetUrl: payload.targetUrl || '/'
+        })
+      });
+      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+      const data = await response.json();
+      return { isBackend: true, data };
+    } catch (err) {
+      console.warn('Backend broadcast failed, broadcasting to local storage:', err.message);
+      const newNotif = {
+        id: Date.now(),
+        recipientId: null,
+        actorId: null,
+        actorName: 'Wayfare Ban Quản Trị',
+        actorHandle: '@wayfare_system',
+        actorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+        type: payload.type || 'SYSTEM',
+        message: payload.message,
+        targetUrl: payload.targetUrl || '/',
         isRead: false,
         createdAt: new Date().toISOString()
       };
