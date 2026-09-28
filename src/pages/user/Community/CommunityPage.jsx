@@ -39,7 +39,9 @@ import {
   Check,
   UserCheck,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  AlertTriangle,
+  ShieldAlert
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -51,7 +53,7 @@ const CATEGORIES = [
 ];
 
 export const CommunityPage = () => {
-  const { currentUser, itineraries, setItineraries, setIsAIGeneratorOpen } = useApp();
+  const { currentUser, itineraries, setItineraries, setIsAIGeneratorOpen, fetchNotifications } = useApp();
   const toast = useToast();
 
   // Feed State
@@ -71,6 +73,10 @@ export const CommunityPage = () => {
   const [postImagesInput, setPostImagesInput] = useState('');
   const [attachedItineraryId, setAttachedItineraryId] = useState('');
   const [submittingPost, setSubmittingPost] = useState(false);
+
+  // AI Moderation Scanning Step & Feedback State
+  const [moderationStep, setModerationStep] = useState(0); // 0: idle, 1: text scan, 2: safety rules, 3: AI scoring
+  const [moderationFeedback, setModerationFeedback] = useState(null); // { type, title, score, reason, message }
 
   // Itinerary Detail Modal State
   const [selectedItineraryForModal, setSelectedItineraryForModal] = useState(null);
@@ -327,6 +333,16 @@ export const CommunityPage = () => {
 
     try {
       setSubmittingPost(true);
+      setModerationStep(1);
+
+      // AI Inspection Simulation Step 1: Text & context scan
+      await new Promise(r => setTimeout(r, 650));
+      setModerationStep(2);
+
+      // AI Inspection Simulation Step 2: Environmental & safety regulations
+      await new Promise(r => setTimeout(r, 650));
+      setModerationStep(3);
+
       const images = postImagesInput
         .split('\n')
         .map(url => url.trim())
@@ -343,25 +359,47 @@ export const CommunityPage = () => {
         itineraryId: attachedItineraryId ? Number(attachedItineraryId) : null
       };
 
-      await postApi.createPost(payload);
+      const result = await postApi.createPost(payload);
 
-      toast.showSuccess('Đã đăng bài viết thành công lên Cộng đồng Wayfare! 🚀');
-
-      // Reset form
+      // Close create modal and reset form
+      setIsCreateModalOpen(false);
       setPostTitle('');
       setPostContent('');
       setPostLocation('');
       setPostCategory('Ẩm thực & Check-in');
       setPostImagesInput('');
       setAttachedItineraryId('');
-      setIsCreateModalOpen(false);
 
-      // Refresh posts
+      // Evaluate Moderation Result for Feedback Display
+      if (result && result.status === 'PENDING_REVIEW') {
+        setModerationFeedback({
+          type: 'PENDING_REVIEW',
+          title: 'Bài viết đang chờ Quản trị viên duyệt 🛡️',
+          score: result.aiSafetyScore || 45,
+          reason: result.aiFlagReason || 'Nội dung chứa cảnh báo an toàn du lịch / cần xác thực thêm.',
+          message: 'Hệ thống WanderAI Safety Shield đã phát hiện một số cảnh báo an toàn hoặc quy định bảo tồn rừng đặc dụng. Bài viết của bạn đã được chuyển vào hàng đợi kiểm duyệt thủ công của Quản trị viên. Bạn sẽ nhận được thông báo ngay khi bài được duyệt!'
+        });
+        toast.showWarning('Bài viết đã chuyển vào hàng đợi CHỜ ADMIN DUYỆT THỦ CÔNG do AI phát hiện cảnh báo an toàn. ⚠️');
+      } else {
+        setModerationFeedback({
+          type: 'APPROVED',
+          title: 'Thẩm định AI thành công! Xuất bản công khai 🎉',
+          score: result?.aiSafetyScore || 98,
+          message: 'Bài viết của bạn đã vượt qua toàn bộ quy chuẩn an toàn của Trợ lý AI và đã được đăng công khai trên Cộng đồng Wayfare!'
+        });
+        toast.showSuccess('Đã đăng bài viết thành công lên Cộng đồng Wayfare! 🚀');
+      }
+
+      // Refresh posts and notifications
       fetchPosts();
+      if (typeof fetchNotifications === 'function') {
+        fetchNotifications();
+      }
     } catch (err) {
       toast.showError('Không thể tạo bài viết: ' + err.message);
     } finally {
       setSubmittingPost(false);
+      setModerationStep(0);
     }
   };
 
@@ -688,8 +726,26 @@ export const CommunityPage = () => {
               return (
                 <article
                   key={post.id}
-                  className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4 hover:shadow-md transition-shadow"
+                  className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4 hover:shadow-md transition-shadow relative"
                 >
+                  {/* Status Banner for Posts Pending Review */}
+                  {post.status === 'PENDING_REVIEW' && (
+                    <div className="bg-amber-50/90 border border-amber-200 p-3.5 rounded-2xl flex items-start gap-3 text-xs text-amber-900 shadow-2xs">
+                      <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-slate-900">Đang chờ Quản trị viên duyệt thủ công</span>
+                          <span className="px-2 py-0.5 rounded-md bg-amber-200/80 text-amber-900 text-[10px] font-bold">
+                            Điểm AI: {post.aiSafetyScore || 45}/100
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-amber-800 mt-1 leading-relaxed">
+                          <strong>Lý do AI gắn cờ:</strong> {post.aiFlagReason || 'Nội dung chứa yếu tố cần xác thực thêm trước khi công khai.'} <span className="text-slate-500 italic">(Hiện tại chỉ hiển thị trong feed của bạn)</span>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Post Header: Author, Verification Badge, Time, Location */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
@@ -1084,7 +1140,38 @@ export const CommunityPage = () => {
       {/* ========================================================= */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto space-y-4 animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto space-y-4 animate-in fade-in zoom-in-95 duration-200 relative">
+            
+            {/* AI Moderation & Shield Scanning Overlay */}
+            {submittingPost && (
+              <div className="absolute inset-0 bg-white/95 backdrop-blur-xs rounded-3xl z-30 flex flex-col items-center justify-center p-6 text-center space-y-5 animate-in fade-in">
+                <div className="relative">
+                  <div className="w-16 h-16 rounded-2xl ocean-gradient text-white flex items-center justify-center shadow-lg shadow-sky-500/25 animate-pulse">
+                    <ShieldCheck className="w-8 h-8" />
+                  </div>
+                  <Sparkles className="w-6 h-6 text-amber-500 absolute -top-1 -right-1 animate-spin" />
+                </div>
+                <div className="space-y-1.5 max-w-sm">
+                  <h4 className="font-extrabold text-sm text-slate-900">
+                    {moderationStep === 1
+                      ? 'Đang quét từ khóa & ngữ cảnh an toàn du lịch...'
+                      : moderationStep === 2
+                      ? 'Đang thẩm định an toàn bảo tồn rừng & PCCC...'
+                      : 'Đang chấm điểm WanderAI Safety Score...'}
+                  </h4>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    Hệ thống AI Safety Shield đang thẩm định tự động để bảo vệ cộng đồng và thẩm định nội dung trước khi xuất bản.
+                  </p>
+                </div>
+                <div className="w-48 h-2 bg-slate-100 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-sky-500 via-teal-500 to-amber-500 transition-all duration-300 rounded-full"
+                    style={{ width: `${(moderationStep / 3) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
@@ -1266,6 +1353,70 @@ export const CommunityPage = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL: AI MODERATION & SAFETY REVIEW FEEDBACK             */}
+      {/* ========================================================= */}
+      {moderationFeedback && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200 text-center">
+            <div
+              className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center shadow-lg transition-transform duration-300 scale-105"
+              style={{
+                background:
+                  moderationFeedback.type === 'APPROVED'
+                    ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
+                    : 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)'
+              }}
+            >
+              {moderationFeedback.type === 'APPROVED' ? (
+                <CheckCircle2 className="w-8 h-8 text-white" />
+              ) : (
+                <ShieldAlert className="w-8 h-8 text-white" />
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="font-extrabold text-base text-slate-900">
+                {moderationFeedback.title}
+              </h3>
+              <div
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mt-1"
+                style={{
+                  backgroundColor: moderationFeedback.type === 'APPROVED' ? '#ecfdf5' : '#fffbeb',
+                  color: moderationFeedback.type === 'APPROVED' ? '#047857' : '#b45309'
+                }}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Điểm an toàn WanderAI: {moderationFeedback.score}/100</span>
+              </div>
+            </div>
+
+            {moderationFeedback.reason && (
+              <div className="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-3.5 text-left text-xs space-y-1">
+                <span className="font-bold text-amber-900 flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                  Cảnh báo AI phát hiện:
+                </span>
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  {moderationFeedback.reason}
+                </p>
+              </div>
+            )}
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              {moderationFeedback.message}
+            </p>
+
+            <button
+              onClick={() => setModerationFeedback(null)}
+              className="w-full ocean-gradient text-white py-2.5 rounded-xl text-xs font-bold shadow-md shadow-sky-500/20 hover:shadow-lg transition-all cursor-pointer"
+            >
+              {moderationFeedback.type === 'APPROVED' ? 'Xem bài viết ngay' : 'Đã hiểu & Tiếp tục theo dõi'}
+            </button>
           </div>
         </div>
       )}

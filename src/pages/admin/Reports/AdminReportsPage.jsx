@@ -95,6 +95,34 @@ export const AdminReportsPage = () => {
   }, [activeTab]);
 
   // Actions on Reported Posts
+  const handleApprovePost = async (id) => {
+    try {
+      await adminReportApi.approvePost(id);
+      setReports(prev => prev.filter(r => r.id !== id));
+      setMetrics(prev => ({
+        ...prev,
+        pendingReportsCount: Math.max(0, prev.pendingReportsCount - 1)
+      }));
+      setAuditLogs(prev => [
+        {
+          id: Date.now(),
+          admin: 'Quản Trị Viên (Admin)',
+          action: 'Phê duyệt xuất bản bài viết',
+          target: `Bài viết #${id}`,
+          time: 'Vừa xong',
+          type: 'success'
+        },
+        ...prev
+      ]);
+      toast.success(`Đã phê duyệt xuất bản bài viết #${id} thành công! Đã gửi thông báo cho tác giả.`);
+      if (selectedPostModal && selectedPostModal.id === id) {
+        setSelectedPostModal(null);
+      }
+    } catch (err) {
+      toast.error('Lỗi khi phê duyệt bài viết: ' + err.message);
+    }
+  };
+
   const handleDismissReport = async (id) => {
     try {
       await adminReportApi.dismissReport(id);
@@ -559,6 +587,13 @@ export const AdminReportsPage = () => {
                         <span>Xem toàn bộ</span>
                       </button>
                       <button
+                        onClick={() => handleApprovePost(report.id)}
+                        className="px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span>Duyệt xuất bản</span>
+                      </button>
+                      <button
                         onClick={() => handleDismissReport(report.id)}
                         className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors cursor-pointer"
                       >
@@ -769,7 +804,15 @@ export const AdminReportsPage = () => {
               </p>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => handleApprovePost(selectedPostModal.id)}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Duyệt xuất bản ngay</span>
+              </button>
               <button
                 type="button"
                 onClick={() => setSelectedPostModal(null)}

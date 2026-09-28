@@ -334,6 +334,18 @@ export const adminReportApi = {
     }
   },
 
+  async approvePost(postId) {
+    const response = await fetch(`${BASE_URL}/admin/reports/${postId}/approve`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  },
+
   async dismissReport(postId) {
     const response = await fetch(`${BASE_URL}/admin/reports/${postId}/dismiss`, {
       method: 'PUT',
