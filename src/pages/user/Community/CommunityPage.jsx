@@ -372,14 +372,28 @@ export const CommunityPage = () => {
 
       // Evaluate Moderation Result for Feedback Display
       if (result && result.status === 'PENDING_REVIEW') {
+        const isDebt = (result.category && result.category.includes('Đòi nợ')) || (result.aiFlagReason && result.aiFlagReason.toLowerCase().includes('đòi nợ'));
+        const isOffTopic = (result.category && result.category.includes('Lạc đề')) || (result.aiFlagReason && result.aiFlagReason.toLowerCase().includes('du lịch'));
+
         setModerationFeedback({
           type: 'PENDING_REVIEW',
-          title: 'Bài viết đang chờ Quản trị viên duyệt 🛡️',
-          score: result.aiSafetyScore || 45,
-          reason: result.aiFlagReason || 'Nội dung chứa cảnh báo an toàn du lịch / cần xác thực thêm.',
-          message: 'Hệ thống WanderAI Safety Shield đã phát hiện một số cảnh báo an toàn hoặc quy định bảo tồn rừng đặc dụng. Bài viết của bạn đã được chuyển vào hàng đợi kiểm duyệt thủ công của Quản trị viên. Bạn sẽ nhận được thông báo ngay khi bài được duyệt!'
+          title: isDebt 
+            ? 'Phát hiện nội dung Đòi nợ / Tranh chấp tài chính 🚫'
+            : isOffTopic
+            ? 'Nội dung chưa rõ chủ đề Du lịch 📍'
+            : 'Bài viết đang chờ Quản trị viên duyệt 🛡️',
+          score: result.aiSafetyScore || 20,
+          category: result.category,
+          reason: result.aiFlagReason || 'Nội dung chưa đạt tiêu chuẩn tự động duyệt của hệ thống.',
+          message: isDebt
+            ? 'Wayfare là nền tảng chia sẻ Du lịch & Khám phá, nghiêm cấm các bài viết đòi nợ, bóc phốt tài chính hoặc giải quyết mâu thuẫn tiền bạc cá nhân. Bài viết đã bị chặn xuất bản và đưa vào diện xem xét vi phạm của Quản trị viên.'
+            : isOffTopic
+            ? 'Wayfare chỉ tự động duyệt các bài viết liên quan đến Du lịch, Lịch trình, Trải nghiệm điểm đến hoặc Ẩm thực địa phương. Bài viết của bạn đã được chuyển vào hàng đợi để Quản trị viên thẩm định thủ công.'
+            : 'Hệ thống WanderAI Safety Shield đã phát hiện một số cảnh báo an toàn. Bài viết của bạn đã được chuyển vào hàng đợi kiểm duyệt thủ công của Quản trị viên. Bạn sẽ nhận được thông báo ngay khi bài được duyệt!'
         });
-        toast.showWarning('Bài viết đã chuyển vào hàng đợi CHỜ ADMIN DUYỆT THỦ CÔNG do AI phát hiện cảnh báo an toàn. ⚠️');
+        toast.showWarning(isDebt 
+          ? 'Bài viết bị chặn xuất bản do vi phạm quy tắc: Đòi nợ / Tranh chấp tài chính! 🚫'
+          : 'Bài viết đã chuyển vào hàng đợi CHỜ ADMIN DUYỆT THỦ CÔNG. ⚠️');
       } else {
         setModerationFeedback({
           type: 'APPROVED',
@@ -1121,14 +1135,19 @@ export const CommunityPage = () => {
           </div>
 
           {/* Community Guidelines Card */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 text-xs text-slate-500 space-y-2">
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/60 text-xs text-slate-500 space-y-2.5">
             <h5 className="font-bold text-slate-700 flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>Quy tắc Cộng đồng Wayfare</span>
             </h5>
             <p className="text-[11px] leading-relaxed">
-              Tất cả bài viết và lộ trình được kiểm tra tự động bởi hệ thống AI Safety để đảm bảo tính an toàn, bảo vệ môi trường và ngăn chặn tin giả du lịch.
+              Tất cả bài viết được kiểm duyệt tự động bởi hệ thống WanderAI Safety Shield:
             </p>
+            <ul className="text-[11px] space-y-1.5 text-slate-600 list-disc list-inside">
+              <li><strong className="text-slate-700">Chỉ duyệt chủ đề Du lịch:</strong> Lịch trình, review điểm đến, ẩm thực, phượt, văn hóa bản địa.</li>
+              <li><strong className="text-rose-600">Nghiêm cấm tuyệt đối:</strong> Đòi nợ, bóc phốt tài chính cá nhân, cờ bạc, rao vặt ngoài du lịch.</li>
+              <li><strong className="text-emerald-700">An toàn & Môi trường:</strong> Tuân thủ an toàn PCCC rừng, bảo tồn sinh thái và quy định địa phương.</li>
+            </ul>
           </div>
 
         </aside>
