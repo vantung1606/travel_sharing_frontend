@@ -6,6 +6,17 @@ export default {
   ],
   theme: {
     extend: {
+      fontSize: {
+        'xs': ['12.5px', { lineHeight: '18px' }],
+        'sm': ['16px', { lineHeight: '24px' }],
+        'base': ['17.5px', { lineHeight: '26px' }],
+        'lg': ['19.5px', { lineHeight: '28px' }],
+        'xl': ['22px', { lineHeight: '30px' }],
+        '2xl': ['26px', { lineHeight: '34px' }],
+        '3xl': ['32px', { lineHeight: '38px' }],
+        '4xl': ['40px', { lineHeight: '46px' }],
+        '5xl': ['50px', { lineHeight: '56px' }],
+      },
       colors: {
         oceanic: {
           50: '#f0f9ff',
