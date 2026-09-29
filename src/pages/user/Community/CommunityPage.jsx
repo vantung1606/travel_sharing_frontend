@@ -659,7 +659,7 @@ export const CommunityPage = () => {
         {/* ========================================================= */}
         {/* LEFT COLUMN: User Mini-Profile, Quick Nav, Trending Tags */}
         {/* ========================================================= */}
-        <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-20">
+        <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-[4.5rem] h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain sidebar-scrollbar pr-1.5 pb-12 select-none">
           
           {/* User Profile Card */}
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
@@ -1432,7 +1432,7 @@ export const CommunityPage = () => {
         {/* ========================================================= */}
         {/* RIGHT COLUMN: Trending Tours to Clone, Top Authors (3 cols) */}
         {/* ========================================================= */}
-        <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-20">
+        <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-[4.5rem] h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain sidebar-scrollbar pr-1.5 pb-12 select-none">
           
           {/* Top Curated Tours to Clone 1-Click */}
           <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-4">
