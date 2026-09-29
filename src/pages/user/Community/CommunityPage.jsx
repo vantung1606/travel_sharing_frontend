@@ -53,7 +53,8 @@ import {
   Trash2,
   Edit,
   UserPlus,
-  Users
+  Users,
+  CornerDownRight
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -196,7 +197,9 @@ export const CommunityPage = () => {
   const [postComments, setPostComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(false);
   const [commentInput, setCommentInput] = useState('');
+  const [replyingTo, setReplyingTo] = useState(null); // { commentId, authorId, authorName }
   const [submittingComment, setSubmittingComment] = useState(false);
+  const commentInputRef = useRef(null);
 
   // Copying Tour Action State
   const [cloningPostId, setCloningPostId] = useState(null);
@@ -443,10 +446,24 @@ export const CommunityPage = () => {
     );
 
     try {
-      await postApi.toggleLike(postId);
+      const res = await postApi.toggleLike(postId, currentUser?.email);
+      if (res?.isLiked !== undefined) {
+        setPosts(prev =>
+          prev.map(p => {
+            if (p.id === postId) {
+              return {
+                ...p,
+                isLiked: res.isLiked,
+                likeCount: res.likeCount !== undefined ? res.likeCount : p.likeCount
+              };
+            }
+            return p;
+          })
+        );
+      }
     } catch (err) {
-      toast.showError('Không thể cập nhật lượt thích: ' + err.message);
-      // Revert if error
+      if (toast?.showError) toast.showError('Không thể cập nhật lượt thích: ' + err.message);
+      else if (toast?.error) toast.error('Không thể cập nhật lượt thích: ' + err.message);
       fetchPosts();
     }
   };
@@ -536,6 +553,7 @@ export const CommunityPage = () => {
   // Open Comments Drawer
   const handleOpenComments = async (post) => {
     setActiveCommentPost(post);
+    setReplyingTo(null);
     setLoadingComments(true);
     setPostComments([]);
     try {
@@ -548,26 +566,50 @@ export const CommunityPage = () => {
     }
   };
 
-  // Submit New Comment
+  // Submit New Comment or Reply
   const handleAddComment = async (e) => {
     e.preventDefault();
-    if (!commentInput.trim() || !activeCommentPost) return;
+    if (!commentInput.trim() || !activeCommentPost || submittingComment) return;
 
     try {
       setSubmittingComment(true);
-      const newComment = await postApi.addComment(activeCommentPost.id, commentInput.trim());
+      const payload = {
+        content: commentInput.trim(),
+        parentId: replyingTo?.commentId || null,
+        replyToUserId: replyingTo?.authorId || null
+      };
 
-      setPostComments(prev => [...prev, newComment]);
+      const newComment = await postApi.addComment(activeCommentPost.id, payload, currentUser?.email);
+
+      if (replyingTo?.commentId) {
+        setPostComments(prev =>
+          prev.map(c => {
+            if (c.id === replyingTo.commentId) {
+              return {
+                ...c,
+                replies: [...(c.replies || []), newComment]
+              };
+            }
+            return c;
+          })
+        );
+      } else {
+        setPostComments(prev => [...prev, newComment]);
+      }
+
       setCommentInput('');
+      setReplyingTo(null);
 
       // Update post comment count locally
       setPosts(prev =>
         prev.map(p => (p.id === activeCommentPost.id ? { ...p, commentCount: (p.commentCount || 0) + 1 } : p))
       );
 
-      toast.showSuccess('Đã gửi bình luận của bạn thành công! 💬');
+      if (toast?.showSuccess) toast.showSuccess(replyingTo ? 'Đã gửi câu trả lời của bạn! 💬' : 'Đã gửi bình luận của bạn thành công! 💬');
+      else if (toast?.success) toast.success(replyingTo ? 'Đã gửi câu trả lời của bạn! 💬' : 'Đã gửi bình luận của bạn thành công! 💬');
     } catch (err) {
-      toast.showError('Không thể gửi bình luận: ' + err.message);
+      if (toast?.showError) toast.showError('Không thể gửi bình luận: ' + err.message);
+      else if (toast?.error) toast.error('Không thể gửi bình luận: ' + err.message);
     } finally {
       setSubmittingComment(false);
     }
@@ -2313,42 +2355,140 @@ export const CommunityPage = () => {
 
               {!loadingComments &&
                 postComments.map((cmt, idx) => (
-                  <div key={cmt.id || idx} className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-50">
-                    <img
-                      onClick={() => {
-                        if (cmt.userId) setSelectedUserIdForModal(cmt.userId);
-                      }}
-                      src={
-                        cmt.userAvatar ||
-                        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-                      }
-                      alt={cmt.userName || 'User'}
-                      className="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-0.5 cursor-pointer hover:ring-2 hover:ring-sky-400 transition-all"
-                      title="Xem trang cá nhân"
-                    />
-                    <div className="flex-1 bg-slate-100/80 rounded-2xl px-3.5 py-2">
-                      <div className="flex items-center justify-between">
-                        <span
-                          onClick={() => {
-                            if (cmt.userId) setSelectedUserIdForModal(cmt.userId);
-                          }}
-                          className="font-bold text-xs text-slate-900 cursor-pointer hover:text-sky-600 transition-colors"
-                        >
-                          {cmt.userName || 'Thành viên'}
-                        </span>
-                        <span className="text-[10px] text-slate-400">{cmt.timeAgo || 'Vừa xong'}</span>
+                  <div key={cmt.id || idx} className="space-y-2 p-2 rounded-2xl hover:bg-slate-50/70 transition-colors">
+                    <div className="flex items-start gap-2.5">
+                      <img
+                        onClick={() => {
+                          const targetId = cmt.authorId || cmt.userId;
+                          if (targetId) setSelectedUserIdForModal(targetId);
+                        }}
+                        src={
+                          cmt.authorAvatar ||
+                          cmt.userAvatar ||
+                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                        }
+                        alt={cmt.authorName || cmt.userName || 'User'}
+                        className="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-0.5 cursor-pointer hover:ring-2 hover:ring-sky-400 transition-all shadow-2xs"
+                        title="Xem trang cá nhân"
+                      />
+                      <div className="flex-1 bg-slate-100/80 rounded-2xl px-3.5 py-2.5">
+                        <div className="flex items-center justify-between">
+                          <span
+                            onClick={() => {
+                              const targetId = cmt.authorId || cmt.userId;
+                              if (targetId) setSelectedUserIdForModal(targetId);
+                            }}
+                            className="font-bold text-xs text-slate-900 cursor-pointer hover:text-sky-600 transition-colors"
+                          >
+                            {cmt.authorName || cmt.userName || 'Thành viên'}
+                          </span>
+                          <span className="text-[10px] text-slate-400">{cmt.timeAgo || cmt.formattedDate || 'Vừa xong'}</span>
+                        </div>
+                        <p className="text-xs text-slate-700 mt-1 leading-relaxed">{cmt.content}</p>
+                        <div className="mt-1.5 flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReplyingTo({
+                                commentId: cmt.id,
+                                authorId: cmt.authorId || cmt.userId,
+                                authorName: cmt.authorName || cmt.userName || 'Thành viên'
+                              });
+                              setTimeout(() => commentInputRef.current?.focus(), 50);
+                            }}
+                            className="text-[11px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 cursor-pointer transition-colors"
+                          >
+                            <CornerDownRight className="w-3.5 h-3.5" />
+                            <span>Trả lời</span>
+                          </button>
+                        </div>
                       </div>
-                      <p className="text-xs text-slate-700 mt-1 leading-relaxed">{cmt.content}</p>
                     </div>
+
+                    {/* Nested Replies */}
+                    {cmt.replies && cmt.replies.length > 0 && (
+                      <div className="ml-7 sm:ml-9 pl-3 border-l-2 border-sky-100 space-y-2">
+                        {cmt.replies.map((reply, rIdx) => (
+                          <div key={reply.id || rIdx} className="flex items-start gap-2 text-xs">
+                            <img
+                              onClick={() => {
+                                const targetId = reply.authorId || reply.userId;
+                                if (targetId) setSelectedUserIdForModal(targetId);
+                              }}
+                              src={
+                                reply.authorAvatar ||
+                                reply.userAvatar ||
+                                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                              }
+                              alt={reply.authorName || reply.userName}
+                              className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5 cursor-pointer hover:ring-1 hover:ring-sky-400"
+                            />
+                            <div className="flex-1 bg-white border border-slate-200/80 rounded-xl px-3 py-2 shadow-2xs">
+                              <div className="flex items-center justify-between">
+                                <span
+                                  onClick={() => {
+                                    const targetId = reply.authorId || reply.userId;
+                                    if (targetId) setSelectedUserIdForModal(targetId);
+                                  }}
+                                  className="font-bold text-[11px] text-slate-900 cursor-pointer hover:text-sky-600"
+                                >
+                                  {reply.authorName || reply.userName}
+                                </span>
+                                <span className="text-[10px] text-slate-400">{reply.timeAgo || reply.formattedDate || 'Vừa xong'}</span>
+                              </div>
+                              {reply.replyToUserName && (
+                                <div className="text-[10px] text-sky-600 font-bold mb-0.5">
+                                  @{reply.replyToUserName}
+                                </div>
+                              )}
+                              <p className="text-xs text-slate-700 leading-relaxed">{reply.content}</p>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setReplyingTo({
+                                    commentId: cmt.id,
+                                    authorId: reply.authorId || reply.userId,
+                                    authorName: reply.authorName || reply.userName
+                                  });
+                                  setTimeout(() => commentInputRef.current?.focus(), 50);
+                                }}
+                                className="text-[10px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 mt-1 cursor-pointer"
+                              >
+                                <CornerDownRight className="w-3 h-3" /> Trả lời
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
             </div>
 
+            {/* Replying Banner if active */}
+            {replyingTo && (
+              <div className="flex items-center justify-between px-3 py-1.5 bg-sky-50 border border-sky-200/80 rounded-xl text-xs text-sky-700 animate-in fade-in duration-150">
+                <span className="flex items-center gap-1.5 font-medium truncate">
+                  <CornerDownRight className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                  <span>Đang trả lời <strong className="font-bold text-sky-900">@{replyingTo.authorName}</strong></span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setReplyingTo(null)}
+                  className="p-1 hover:bg-sky-100 rounded-lg text-sky-600 transition-colors cursor-pointer shrink-0"
+                  title="Hủy trả lời"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
             {/* Comment Input Box */}
             <form onSubmit={handleAddComment} className="pt-2 border-t border-slate-100 flex items-center gap-2">
               <input
+                ref={commentInputRef}
                 type="text"
-                placeholder="Viết bình luận hoặc đặt câu hỏi về chuyến đi..."
+                placeholder={replyingTo ? `Trả lời @${replyingTo.authorName}...` : "Viết bình luận hoặc đặt câu hỏi về chuyến đi..."}
                 value={commentInput}
                 onChange={e => setCommentInput(e.target.value)}
                 className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"

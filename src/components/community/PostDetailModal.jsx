@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   X,
   Heart,
@@ -21,7 +21,8 @@ import {
   ChevronRight,
   Maximize2,
   UserPlus,
-  UserCheck
+  UserCheck,
+  CornerDownRight
 } from 'lucide-react';
 import { postApi, userApi } from '../../services/api';
 import { useToast } from '../common/Toast';
@@ -47,6 +48,8 @@ export const PostDetailModal = ({
   const [loadingComments, setLoadingComments] = useState(false);
   const [commentInput, setCommentInput] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null);
+  const commentInputRef = useRef(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
@@ -197,9 +200,15 @@ export const PostDetailModal = ({
       setIsLiked(nextLiked);
       setLikeCount(prev => (nextLiked ? prev + 1 : Math.max(0, prev - 1)));
 
-      await postApi.toggleLike(effectivePostId);
+      const res = await postApi.toggleLike(effectivePostId, currentUser?.email);
+      const finalLiked = res?.isLiked !== undefined ? res.isLiked : nextLiked;
+      const finalCount = res?.likeCount !== undefined ? res.likeCount : (nextLiked ? likeCount + 1 : Math.max(0, likeCount - 1));
+      
+      setIsLiked(finalLiked);
+      setLikeCount(finalCount);
+
       if (typeof onPostUpdated === 'function') {
-        onPostUpdated(effectivePostId, { isLiked: nextLiked, likeCount: nextLiked ? likeCount + 1 : Math.max(0, likeCount - 1) });
+        onPostUpdated(effectivePostId, { isLiked: finalLiked, likeCount: finalCount });
       }
     } catch (err) {
       // Revert on error
@@ -211,17 +220,40 @@ export const PostDetailModal = ({
     }
   };
 
-  // Add Comment
+  // Add Comment or Reply
   const handleAddComment = async e => {
     e.preventDefault();
     if (!commentInput.trim() || submittingComment || !effectivePostId) return;
 
     try {
       setSubmittingComment(true);
-      const newComment = await postApi.addComment(effectivePostId, commentInput.trim());
-      setComments(prev => [newComment, ...prev]);
+      const payload = {
+        content: commentInput.trim(),
+        parentId: replyingTo?.commentId || null,
+        replyToUserId: replyingTo?.authorId || null
+      };
+
+      const newComment = await postApi.addComment(effectivePostId, payload, currentUser?.email);
+
+      if (replyingTo?.commentId) {
+        setComments(prev =>
+          prev.map(c => {
+            if (c.id === replyingTo.commentId) {
+              return {
+                ...c,
+                replies: [...(c.replies || []), newComment]
+              };
+            }
+            return c;
+          })
+        );
+      } else {
+        setComments(prev => [newComment, ...prev]);
+      }
+
       setCommentInput('');
-      toast.showSuccess('Đã gửi bình luận của bạn! 💬');
+      setReplyingTo(null);
+      toast.showSuccess(replyingTo ? 'Đã gửi phản hồi của bạn! 💬' : 'Đã gửi bình luận của bạn! 💬');
 
       if (post) {
         setPost(prev => ({
@@ -265,6 +297,8 @@ export const PostDetailModal = ({
     (currentUser?.handle && authorHandle && authorHandle.trim().toLowerCase() === currentUser.handle.trim().toLowerCase()) ||
     (currentUser?.email && (post?.authorEmail || post?.author?.email) && (post?.authorEmail || post?.author?.email).toLowerCase() === currentUser.email.toLowerCase())
   );
+
+  const totalCommentCount = comments.reduce((acc, c) => acc + 1 + (c.replies?.length || 0), 0);
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
@@ -547,7 +581,7 @@ export const PostDetailModal = ({
 
                 <div className="px-3.5 py-2 rounded-xl flex items-center gap-1.5 text-slate-600">
                   <MessageCircle className="w-4 h-4 text-sky-600" />
-                  <span>{comments.length} Bình luận</span>
+                  <span>{totalCommentCount} Bình luận</span>
                 </div>
               </div>
 
@@ -586,9 +620,27 @@ export const PostDetailModal = ({
               <h3 className="font-extrabold text-sm sm:text-base text-slate-900 flex items-center gap-2">
                 <span>Bình luận</span>
                 <span className="px-2 py-0.5 rounded-full bg-slate-100 text-xs text-slate-600 font-bold">
-                  {comments.length}
+                  {totalCommentCount}
                 </span>
               </h3>
+
+              {/* Replying Banner if active */}
+              {replyingTo && (
+                <div className="flex items-center justify-between px-3.5 py-2 bg-sky-50 border border-sky-200/80 rounded-2xl text-xs text-sky-700 animate-in fade-in duration-150">
+                  <span className="flex items-center gap-1.5 font-medium truncate">
+                    <CornerDownRight className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                    <span>Đang trả lời <strong className="font-bold text-sky-900">@{replyingTo.authorName}</strong></span>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setReplyingTo(null)}
+                    className="p-1 hover:bg-sky-100 rounded-lg text-sky-600 transition-colors cursor-pointer shrink-0"
+                    title="Hủy trả lời"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
 
               {/* Add Comment Box */}
               <form onSubmit={handleAddComment} className="flex gap-2.5 items-start">
@@ -602,10 +654,11 @@ export const PostDetailModal = ({
                 />
                 <div className="flex-1 flex gap-2">
                   <input
+                    ref={commentInputRef}
                     type="text"
                     value={commentInput}
                     onChange={e => setCommentInput(e.target.value)}
-                    placeholder="Viết cảm nghĩ hoặc lời khuyên của bạn..."
+                    placeholder={replyingTo ? `Trả lời @${replyingTo.authorName}...` : "Viết cảm nghĩ hoặc lời khuyên của bạn..."}
                     className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
                   />
                   <button
@@ -638,29 +691,99 @@ export const PostDetailModal = ({
                   {comments.map((c, i) => (
                     <div
                       key={c.id || i}
-                      className="p-3 rounded-2xl bg-slate-50/80 border border-slate-100 flex items-start gap-3"
+                      className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 flex flex-col gap-2"
                     >
-                      <img
-                        src={
-                          c.userAvatar ||
-                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
-                        }
-                        alt={c.userName}
-                        className="w-8 h-8 rounded-xl object-cover shrink-0 ring-1 ring-white"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="font-bold text-xs text-slate-900">
-                            {c.userName || 'Du khách Wayfare'}
-                          </span>
-                          <span className="text-[10px] text-slate-400 font-medium">
-                            {c.formattedDate || c.timeAgo || 'Vừa xong'}
-                          </span>
+                      <div className="flex items-start gap-3">
+                        <img
+                          src={
+                            c.userAvatar ||
+                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
+                          }
+                          alt={c.userName}
+                          className="w-8 h-8 rounded-xl object-cover shrink-0 ring-1 ring-white"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-bold text-xs text-slate-900">
+                              {c.userName || 'Du khách Wayfare'}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-medium">
+                              {c.formattedDate || c.timeAgo || 'Vừa xong'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-700 mt-1 leading-relaxed">
+                            {c.content}
+                          </p>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReplyingTo({
+                                commentId: c.id,
+                                authorId: c.userId || c.authorId,
+                                authorName: c.userName || c.authorName || 'Du khách Wayfare'
+                              });
+                              setTimeout(() => commentInputRef.current?.focus(), 50);
+                            }}
+                            className="text-[11px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 mt-1.5 cursor-pointer"
+                          >
+                            <CornerDownRight className="w-3 h-3" /> Trả lời
+                          </button>
                         </div>
-                        <p className="text-xs text-slate-700 mt-1 leading-relaxed">
-                          {c.content}
-                        </p>
                       </div>
+
+                      {/* Nested Replies */}
+                      {c.replies && c.replies.length > 0 && (
+                        <div className="ml-6 sm:ml-8 mt-1 space-y-2 pl-3 border-l-2 border-slate-200">
+                          {c.replies.map((reply, rIdx) => (
+                            <div
+                              key={reply.id || rIdx}
+                              className="p-2.5 rounded-xl bg-white border border-slate-200/80 flex items-start gap-2.5 shadow-2xs"
+                            >
+                              <img
+                                src={
+                                  reply.userAvatar ||
+                                  reply.authorAvatar ||
+                                  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                                }
+                                alt={reply.userName || reply.authorName}
+                                className="w-7 h-7 rounded-lg object-cover shrink-0 ring-1 ring-slate-100"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span className="font-bold text-xs text-slate-900 truncate">
+                                    {reply.userName || reply.authorName || 'Du khách Wayfare'}
+                                  </span>
+                                  <span className="text-[10px] text-slate-400 shrink-0">
+                                    {reply.formattedDate || reply.timeAgo || 'Vừa xong'}
+                                  </span>
+                                </div>
+                                {reply.replyToUserName && (
+                                  <div className="text-[10px] text-sky-600 font-bold mb-0.5">
+                                    @{reply.replyToUserName}
+                                  </div>
+                                )}
+                                <p className="text-xs text-slate-700 leading-relaxed">
+                                  {reply.content}
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setReplyingTo({
+                                      commentId: c.id,
+                                      authorId: reply.userId || reply.authorId,
+                                      authorName: reply.userName || reply.authorName || 'Du khách Wayfare'
+                                    });
+                                    setTimeout(() => commentInputRef.current?.focus(), 50);
+                                  }}
+                                  className="text-[10px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 mt-1 cursor-pointer"
+                                >
+                                  <CornerDownRight className="w-3 h-3" /> Trả lời
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

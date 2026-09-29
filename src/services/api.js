@@ -852,8 +852,13 @@ export const postApi = {
     return json.data;
   },
 
-  async toggleLike(postId) {
-    const res = await fetch(`${BASE_URL}/posts/${postId}/like`, {
+  async toggleLike(postId, email = '') {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || '';
+    const url = userEmail
+      ? `${BASE_URL}/posts/${postId}/like?email=${encodeURIComponent(userEmail)}`
+      : `${BASE_URL}/posts/${postId}/like`;
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -944,14 +949,22 @@ export const postApi = {
     }
   },
 
-  async addComment(postId, content) {
-    const res = await fetch(`${BASE_URL}/posts/${postId}/comments`, {
+  async addComment(postId, payload, email = '') {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || '';
+    const url = userEmail
+      ? `${BASE_URL}/posts/${postId}/comments?email=${encodeURIComponent(userEmail)}`
+      : `${BASE_URL}/posts/${postId}/comments`;
+
+    const bodyObj = typeof payload === 'string' ? { content: payload } : payload;
+
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         ...getAuthHeader()
       },
-      body: JSON.stringify({ content })
+      body: JSON.stringify(bodyObj)
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
