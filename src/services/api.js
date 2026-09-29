@@ -865,6 +865,63 @@ export const postApi = {
     return json.data;
   },
 
+  async toggleBookmark(postId) {
+    const res = await fetch(`${BASE_URL}/posts/${postId}/bookmark`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  },
+
+  async getBookmarkedPostIds(email = '') {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || '';
+      const url = userEmail
+        ? `${BASE_URL}/posts/bookmarked/ids?email=${encodeURIComponent(userEmail)}`
+        : `${BASE_URL}/posts/bookmarked/ids`;
+      const res = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching bookmarked post IDs:', err.message);
+      return [];
+    }
+  },
+
+  async getBookmarkedPosts(email = '') {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || '';
+      const url = userEmail
+        ? `${BASE_URL}/posts/bookmarked?email=${encodeURIComponent(userEmail)}`
+        : `${BASE_URL}/posts/bookmarked`;
+      const res = await fetch(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching bookmarked posts:', err.message);
+      return [];
+    }
+  },
+
   async getComments(postId) {
     try {
       const res = await fetch(`${BASE_URL}/posts/${postId}/comments`, {

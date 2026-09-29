@@ -59,6 +59,7 @@ import {
 const CATEGORIES = [
   { id: 'Tất cả', label: 'Tất cả', icon: Compass },
   { id: 'Đang theo dõi', label: 'Đang theo dõi', icon: UserCheck },
+  { id: 'Đã lưu', label: 'Đã lưu', icon: Bookmark },
   { id: 'Ẩm thực & Check-in', label: 'Ẩm thực & Check-in', icon: MapPin },
   { id: 'Phượt & Khám phá', label: 'Phượt & Khám phá', icon: Flame },
   { id: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Sparkles },
@@ -224,6 +225,22 @@ export const CommunityPage = () => {
       .catch(err => console.warn('Lỗi khi tải danh sách theo dõi:', err));
   }, []);
 
+  // Fetch Bookmarked Post IDs on mount & user change
+  useEffect(() => {
+    let isMounted = true;
+    postApi
+      .getBookmarkedPostIds(currentUser?.email)
+      .then(ids => {
+        if (isMounted && Array.isArray(ids)) {
+          setBookmarkedPostIds(new Set(ids.map(Number)));
+        }
+      })
+      .catch(err => console.warn('Lỗi khi tải danh sách bài viết đã lưu:', err));
+    return () => {
+      isMounted = false;
+    };
+  }, [currentUser?.email]);
+
   const handleToggleFollowAuthor = async (authorId, authorName) => {
     if (!authorId) return;
     try {
@@ -256,6 +273,16 @@ export const CommunityPage = () => {
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
+      if (activeCategory === 'Đã lưu') {
+        const bookmarkedList = await postApi.getBookmarkedPosts(currentUser?.email);
+        if (Array.isArray(bookmarkedList)) {
+          setPosts(bookmarkedList);
+          setBookmarkedPostIds(new Set(bookmarkedList.map(p => Number(p.id))));
+        } else {
+          setPosts([]);
+        }
+        return;
+      }
       const categoryParam = (activeCategory === 'Có Lịch trình đính kèm' || activeCategory === 'Đang theo dõi') ? '' : activeCategory;
       const data = await postApi.getPosts({
         category: categoryParam,
@@ -265,6 +292,14 @@ export const CommunityPage = () => {
 
       if (Array.isArray(data) && data.length > 0) {
         setPosts(data);
+        // Synchronize bookmarked IDs from posts
+        setBookmarkedPostIds(prev => {
+          const next = new Set(prev);
+          data.forEach(p => {
+            if (p.isBookmarked) next.add(Number(p.id));
+          });
+          return next;
+        });
       } else {
         // Fallback demo posts if DB empty or starting up
         setPosts([]);
@@ -353,6 +388,8 @@ export const CommunityPage = () => {
     // Filter by Category
     if (activeCategory === 'Đang theo dõi') {
       result = result.filter(p => followingIds.has(Number(p.authorId || p.author?.id)));
+    } else if (activeCategory === 'Đã lưu') {
+      result = result.filter(p => bookmarkedPostIds.has(Number(p.id)) || Boolean(p.isBookmarked));
     } else if (activeCategory === 'Có Lịch trình đính kèm') {
       result = result.filter(p => p.itineraryId || p.itineraryTitle);
     } else if (activeCategory === 'Ẩm thực & Check-in') {
@@ -386,7 +423,7 @@ export const CommunityPage = () => {
     }
 
     return result;
-  }, [posts, activeCategory, activeSort, followingIds, searchQuery]);
+  }, [posts, activeCategory, activeSort, followingIds, bookmarkedPostIds, searchQuery]);
 
   // Handle Like Post
   const handleToggleLike = async (postId) => {
@@ -414,19 +451,61 @@ export const CommunityPage = () => {
     }
   };
 
-  // Handle Bookmark Post
-  const handleToggleBookmark = (postId) => {
+  // Handle Bookmark Post with persistent backend API & optimistic UI
+  const handleToggleBookmark = async (postId) => {
+    if (!postId) return;
+    const numericId = Number(postId);
+    const wasBookmarked = bookmarkedPostIds.has(numericId);
+
+    // Optimistic UI update
     setBookmarkedPostIds(prev => {
       const next = new Set(prev);
-      if (next.has(postId)) {
-        next.delete(postId);
-        toast.showInfo('Đã bỏ lưu bài viết khỏi bộ sưu tập');
+      if (wasBookmarked) {
+        next.delete(numericId);
       } else {
-        next.add(postId);
-        toast.showSuccess('Đã lưu bài viết vào Bộ sưu tập cá nhân ⭐');
+        next.add(numericId);
       }
       return next;
     });
+
+    setPosts(prev =>
+      prev.map(p => {
+        if (Number(p.id) === numericId) {
+          return { ...p, isBookmarked: !wasBookmarked };
+        }
+        return p;
+      })
+    );
+
+    try {
+      const res = await postApi.toggleBookmark(numericId);
+      const isNowBookmarked = res?.isBookmarked ?? !wasBookmarked;
+      if (isNowBookmarked) {
+        toast.showSuccess('Đã lưu bài viết vào Bộ sưu tập cá nhân ⭐');
+      } else {
+        toast.showInfo('Đã bỏ lưu bài viết khỏi bộ sưu tập');
+      }
+    } catch (err) {
+      // Revert if error
+      setBookmarkedPostIds(prev => {
+        const next = new Set(prev);
+        if (wasBookmarked) {
+          next.add(numericId);
+        } else {
+          next.delete(numericId);
+        }
+        return next;
+      });
+      setPosts(prev =>
+        prev.map(p => {
+          if (Number(p.id) === numericId) {
+            return { ...p, isBookmarked: wasBookmarked };
+          }
+          return p;
+        })
+      );
+      toast.showError('Thao tác lưu bài viết thất bại: ' + (err.message || 'Lỗi kết nối'));
+    }
   };
 
   // Open Comments Drawer
@@ -835,9 +914,15 @@ export const CommunityPage = () => {
                 </span>
                 <span className="text-[10px] text-slate-500 font-semibold group-hover:text-indigo-700">Đang follow</span>
               </div>
-              <div>
-                <span className="font-bold text-sm text-emerald-600 block">{bookmarkedPostIds.size}</span>
-                <span className="text-[10px] text-slate-500 font-semibold">Đã lưu</span>
+              <div
+                onClick={() => setActiveCategory(activeCategory === 'Đã lưu' ? 'Tất cả' : 'Đã lưu')}
+                className="cursor-pointer hover:bg-emerald-50 rounded-lg py-0.5 transition-colors group"
+                title="Bấm để lọc danh sách bài viết đã lưu"
+              >
+                <span className="font-bold text-sm text-emerald-600 group-hover:scale-105 transition-transform block">
+                  {bookmarkedPostIds.size}
+                </span>
+                <span className="text-[10px] text-slate-500 font-semibold group-hover:text-emerald-700">Đã lưu</span>
               </div>
             </div>
 
@@ -884,10 +969,11 @@ export const CommunityPage = () => {
                 action: () => setActiveSort(activeSort === 'popular' ? 'newest' : 'popular')
               },
               {
-                label: 'Bài viết đã lưu',
+                label: `Bài viết đã lưu (${bookmarkedPostIds.size})`,
                 icon: Bookmark,
-                active: false,
-                action: () => toast.showInfo(`Bạn đang lưu ${bookmarkedPostIds.size} bài viết trong bộ sưu tập.`)
+                active: activeCategory === 'Đã lưu',
+                action: () => setActiveCategory(activeCategory === 'Đã lưu' ? 'Tất cả' : 'Đã lưu'),
+                badge: bookmarkedPostIds.size > 0 ? `${bookmarkedPostIds.size}` : null
               }
             ].map((item, idx) => (
               <button
@@ -1115,6 +1201,8 @@ export const CommunityPage = () => {
               <div className="w-16 h-16 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto">
                 {activeCategory === 'Đang theo dõi' ? (
                   <UserCheck className="w-8 h-8 text-sky-600" />
+                ) : activeCategory === 'Đã lưu' ? (
+                  <Bookmark className="w-8 h-8 text-amber-500 fill-amber-500/20" />
                 ) : (
                   <Compass className="w-8 h-8" />
                 )}
@@ -1125,6 +1213,8 @@ export const CommunityPage = () => {
                     ? (followingIds.size === 0
                         ? 'Bạn chưa theo dõi tác giả nào'
                         : 'Các tác giả bạn theo dõi chưa có bài viết mới')
+                    : activeCategory === 'Đã lưu'
+                    ? 'Chưa có bài viết nào trong bộ sưu tập'
                     : 'Chưa tìm thấy bài viết phù hợp'}
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
@@ -1132,11 +1222,13 @@ export const CommunityPage = () => {
                     ? (followingIds.size === 0
                         ? 'Hãy bấm "Theo dõi" các phượt thủ hoặc tác giả nổi bật ở cột bên phải để luôn cập nhật những hành trình mới nhất từ họ!'
                         : 'Hãy khám phá thêm bài viết hấp dẫn tại mục Tất cả hoặc chia sẻ chuyến đi của riêng bạn!')
+                    : activeCategory === 'Đã lưu'
+                    ? 'Bạn có thể bấm vào biểu tượng Bookmark trên các bài viết hay để lưu vào bộ sưu tập cá nhân và xem lại bất cứ lúc nào!'
                     : 'Hãy thử tìm kiếm với từ khóa khác, chọn danh mục khác hoặc là người đầu tiên chia sẻ chuyến đi của bạn!'}
                 </p>
               </div>
               <div className="flex items-center justify-center gap-3">
-                {activeCategory === 'Đang theo dõi' && (
+                {(activeCategory === 'Đang theo dõi' || activeCategory === 'Đã lưu') && (
                   <button
                     onClick={() => setActiveCategory('Tất cả')}
                     className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer"
@@ -1159,7 +1251,7 @@ export const CommunityPage = () => {
           {!loading &&
             displayPosts.map(post => {
               const hasItinerary = Boolean(post.itineraryId || post.itineraryTitle);
-              const isBookmarked = bookmarkedPostIds.has(post.id);
+              const isBookmarked = bookmarkedPostIds.has(Number(post.id)) || Boolean(post.isBookmarked);
               const authorName = post.authorName || post.author?.fullName || post.author?.name || 'Thành viên Wayfare';
               const authorAvatar = post.authorAvatar || post.author?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
               const authorId = post.authorId || post.author?.id;
@@ -2304,8 +2396,19 @@ export const CommunityPage = () => {
           }}
           onPostUpdated={(postId, updates) => {
             setPosts(prev =>
-              prev.map(p => (p.id === postId ? { ...p, ...updates } : p))
+              prev.map(p => (Number(p.id) === Number(postId) ? { ...p, ...updates } : p))
             );
+            if (updates?.isBookmarked !== undefined) {
+              setBookmarkedPostIds(prev => {
+                const next = new Set(prev);
+                if (updates.isBookmarked) {
+                  next.add(Number(postId));
+                } else {
+                  next.delete(Number(postId));
+                }
+                return next;
+              });
+            }
           }}
         />
       )}

@@ -41,6 +41,8 @@ export const PostDetailModal = ({
   const [isLiked, setIsLiked] = useState(initialPost?.isLiked || false);
   const [likeCount, setLikeCount] = useState(initialPost?.likeCount || 0);
   const [likeLoading, setLikeLoading] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(Boolean(initialPost?.isBookmarked));
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
   const [comments, setComments] = useState([]);
   const [loadingComments, setLoadingComments] = useState(false);
   const [commentInput, setCommentInput] = useState('');
@@ -103,6 +105,9 @@ export const PostDetailModal = ({
             setPost(data);
             setIsLiked(data.isLiked || false);
             setLikeCount(data.likeCount || 0);
+            if (data.isBookmarked !== undefined) {
+              setIsBookmarked(Boolean(data.isBookmarked));
+            }
           }
         })
         .catch(err => {
@@ -139,6 +144,46 @@ export const PostDetailModal = ({
       isMounted = false;
     };
   }, [effectivePostId]);
+
+  // Check bookmark status if not provided initially
+  useEffect(() => {
+    let isMounted = true;
+    if (effectivePostId && initialPost?.isBookmarked === undefined) {
+      postApi
+        .getBookmarkedPostIds()
+        .then(ids => {
+          if (isMounted && Array.isArray(ids)) {
+            setIsBookmarked(ids.map(Number).includes(Number(effectivePostId)));
+          }
+        })
+        .catch(err => console.warn('Lỗi kiểm tra bookmark modal:', err));
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [effectivePostId, initialPost?.isBookmarked]);
+
+  const handleToggleBookmark = async () => {
+    if (!effectivePostId || bookmarkLoading) return;
+    try {
+      setBookmarkLoading(true);
+      const res = await postApi.toggleBookmark(effectivePostId);
+      const newStatus = res?.isBookmarked ?? !isBookmarked;
+      setIsBookmarked(newStatus);
+      if (newStatus) {
+        toast.showSuccess('Đã lưu bài viết vào Bộ sưu tập cá nhân ⭐');
+      } else {
+        toast.showInfo('Đã bỏ lưu bài viết khỏi bộ sưu tập');
+      }
+      if (onPostUpdated) {
+        onPostUpdated(effectivePostId, { isBookmarked: newStatus });
+      }
+    } catch (err) {
+      toast.showError('Thao tác lưu bài viết thất bại: ' + (err.message || 'Lỗi kết nối'));
+    } finally {
+      setBookmarkLoading(false);
+    }
+  };
 
   // Toggle Like
   const handleToggleLike = async () => {
@@ -503,14 +548,34 @@ export const PostDetailModal = ({
                 </div>
               </div>
 
-              <button
-                onClick={handleShare}
-                className="px-3.5 py-2 rounded-xl hover:bg-slate-100 text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer"
-                title="Chia sẻ liên kết"
-              >
-                <Share2 className="w-4 h-4" />
-                <span className="hidden sm:inline">Chia sẻ</span>
-              </button>
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <button
+                  onClick={handleToggleBookmark}
+                  disabled={bookmarkLoading}
+                  className={`px-3 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
+                    isBookmarked
+                      ? 'bg-amber-50 text-amber-600 font-bold border border-amber-200/60'
+                      : 'hover:bg-slate-100 text-slate-600'
+                  }`}
+                  title={isBookmarked ? 'Bỏ lưu bài viết' : 'Lưu bài viết vào bộ sưu tập'}
+                >
+                  <Bookmark
+                    className={`w-4 h-4 ${
+                      isBookmarked ? 'fill-amber-500 text-amber-500' : 'text-slate-500'
+                    }`}
+                  />
+                  <span className="hidden sm:inline">{isBookmarked ? 'Đã lưu' : 'Lưu'}</span>
+                </button>
+
+                <button
+                  onClick={handleShare}
+                  className="px-3.5 py-2 rounded-xl hover:bg-slate-100 text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Chia sẻ liên kết"
+                >
+                  <Share2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Chia sẻ</span>
+                </button>
+              </div>
             </div>
 
             {/* Comments List & Input */}
