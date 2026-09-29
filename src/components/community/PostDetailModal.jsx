@@ -27,6 +27,7 @@ import {
 import { postApi, userApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';
+import { ShareModal } from './ShareModal';
 
 export const PostDetailModal = ({
   postId,
@@ -51,6 +52,7 @@ export const PostDetailModal = ({
   const [replyingTo, setReplyingTo] = useState(null);
   const commentInputRef = useRef(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
 
@@ -274,9 +276,7 @@ export const PostDetailModal = ({
 
   // Share post
   const handleShare = () => {
-    const url = window.location.origin + `/community?post=${effectivePostId}`;
-    navigator.clipboard.writeText(url);
-    toast.showSuccess('Đã sao chép liên kết bài viết vào bộ nhớ tạm! 📋');
+    setIsShareModalOpen(true);
   };
 
   // Collect images
@@ -794,6 +794,14 @@ export const PostDetailModal = ({
         ) : null}
 
       </div>
+
+      {/* Modern Facebook-Style Share Modal */}
+      {isShareModalOpen && post && (
+        <ShareModal
+          post={post}
+          onClose={() => setIsShareModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

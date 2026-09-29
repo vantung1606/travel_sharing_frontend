@@ -7,6 +7,7 @@ import { UserProfileModal } from '../../../components/community/UserProfileModal
 import { EditPostModal } from '../../../components/community/EditPostModal';
 import { PostDetailModal } from '../../../components/community/PostDetailModal';
 import { FollowListModal } from '../../../components/community/FollowListModal';
+import { ShareModal } from '../../../components/community/ShareModal';
 import {
   Heart,
   MessageCircle,
@@ -181,6 +182,9 @@ export const CommunityPage = () => {
 
   // Single Post Detail Modal State
   const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
+
+  // Share Modal State
+  const [sharingPost, setSharingPost] = useState(null);
 
   // Post Actions Menu State
   const [openMenuPostId, setOpenMenuPostId] = useState(null);
@@ -1696,15 +1700,11 @@ export const CommunityPage = () => {
 
                       {/* Share Button */}
                       <button
-                        onClick={() => {
-                          if (navigator.clipboard) {
-                            navigator.clipboard.writeText(window.location.origin + `/community?post=${post.id}`);
-                            toast.showSuccess('Đã sao chép liên kết bài viết vào khay nhớ tạm! 📋');
-                          }
-                        }}
-                        className="flex items-center gap-1.5 font-semibold hover:text-slate-900 transition-colors cursor-pointer"
+                        onClick={() => setSharingPost(post)}
+                        className="flex items-center gap-1.5 font-semibold hover:text-blue-600 transition-colors cursor-pointer"
+                        title="Chia sẻ bài viết"
                       >
-                        <Share2 className="w-4 h-4 text-slate-400" />
+                        <Share2 className="w-4 h-4 text-slate-400 hover:text-blue-600" />
                         <span className="hidden sm:inline">Chia sẻ</span>
                       </button>
 
@@ -2601,6 +2601,19 @@ export const CommunityPage = () => {
               }
               return next;
             });
+          }}
+        />
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 8: MODERN FACEBOOK-STYLE SHARE MODAL                 */}
+      {/* ========================================================= */}
+      {sharingPost && (
+        <ShareModal
+          post={sharingPost}
+          onClose={() => setSharingPost(null)}
+          onPostShared={() => {
+            fetchPosts();
           }}
         />
       )}
