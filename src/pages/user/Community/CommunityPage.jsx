@@ -65,6 +65,85 @@ const CATEGORIES = [
   { id: 'Có Lịch trình đính kèm', label: 'Có Lịch trình đính kèm', icon: Route }
 ];
 
+// Pre-flight AI Content Moderation Helper (Runs BEFORE sending to API)
+const preFlightCheckContentSafety = (title, content, location) => {
+  const combined = `${title || ''} ${content || ''} ${location || ''}`.toLowerCase();
+  
+  // Normalization for unaccented search
+  const unaccented = combined
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd');
+
+  // Rule 1: Debt collection & Financial harassment (CRITICAL BLOCK)
+  const debtWords = [
+    'đòi nợ', 'doi no', 'trả nợ', 'tra no', 'quỵt nợ', 'quyt no', 'bùng nợ', 'bung no',
+    'vay nợ', 'vay no', 'vay tiền', 'vay tien', 'mượn tiền', 'muon tien', 'mượn nợ', 'muon no',
+    'trốn nợ', 'tron no', 'siết nợ', 'siet no', 'xiết nợ', 'xiet no', 'thu hồi nợ', 'thu hoi no',
+    'con nợ', 'con no', 'chủ nợ', 'chu no', 'trả tiền đây', 'tra tien day', 'mau trả tiền', 'mau tra tien',
+    'bốc bát họ', 'boc bat ho', 'tín dụng đen', 'tin dung den', 'lãi ngày', 'lãi suất cao',
+    'nợ tiền', 'no tien', 'thiếu nợ', 'thieu no', 'mắc nợ', 'mac no', 'đầu gấu đòi', 'tạt sơn'
+  ];
+
+  for (const word of debtWords) {
+    const unaccentedWord = word.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd');
+    if (combined.includes(word) || unaccented.includes(unaccentedWord)) {
+      return {
+        isBlocked: true,
+        category: 'Đòi nợ & Tranh chấp Tài chính Cá nhân',
+        score: 10,
+        keyword: word,
+        reason: `Phát hiện nội dung có dấu hiệu đòi nợ hoặc tranh chấp tài chính cá nhân (chứa từ khóa cấm: "${word}").`,
+        message: 'Wayfare là nền tảng chia sẻ Du lịch & Khám phá văn hóa, nghiêm cấm tuyệt đối các bài viết đòi nợ, bóc phốt vay mượn hay đe dọa tài chính cá nhân. Bài viết đã bị chặn trước khi gửi lên máy chủ!'
+      };
+    }
+  }
+
+  // Rule 2: Commercial spam, scams, gambling
+  const spamWords = [
+    'vay nóng', 'vay nong', 'tiền ảo', 'tien ao', 'crypto', 'cờ bạc', 'co bac', 'đánh bài', 'danh bai',
+    'kubet', 'bet88', 'tài xỉu', 'tai xiu', 'lô đề', 'lo de', 'đánh đề', 'danh de', 'soi cầu', 'soi cau',
+    'nhận tiền miễn phí', 'kiếm tiền online'
+  ];
+
+  for (const word of spamWords) {
+    const unaccentedWord = word.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd');
+    if (combined.includes(word) || unaccented.includes(unaccentedWord)) {
+      return {
+        isBlocked: true,
+        category: 'Spam Thương Mại & Cờ Bạc Lừa Đảo',
+        score: 15,
+        keyword: word,
+        reason: `Phát hiện nội dung quảng cáo cờ bạc, lừa đảo hoặc giao dịch tài chính trái phép (chứa từ khóa: "${word}").`,
+        message: 'Hệ thống AI từ chối bài viết chứa nội dung quảng cáo cờ bạc, tiền ảo hoặc lừa đảo tài chính.'
+      };
+    }
+  }
+
+  // Rule 3: Off-topic commercial (real estate, fake medicine)
+  const offTopicWords = [
+    'bán đất', 'ban dat', 'bán nhà', 'ban nha', 'bất động sản', 'bat dong san',
+    'sim số đẹp', 'sim so dep', 'việc nhẹ lương cao', 'viec nhe luong cao',
+    'chữa bệnh trĩ', 'chua benh tri', 'chữa yếu sinh lý', 'chua yeu sinh ly', 'thuốc nam trị'
+  ];
+
+  for (const word of offTopicWords) {
+    const unaccentedWord = word.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[đĐ]/g, 'd');
+    if (combined.includes(word) || unaccented.includes(unaccentedWord)) {
+      return {
+        isBlocked: true,
+        category: 'Rao vặt Lạc đề (Ngoài ngành Du lịch)',
+        score: 25,
+        keyword: word,
+        reason: `Bài viết mang tính chất rao vặt thương mại, bất động sản hoặc sản phẩm ngoài ngành du lịch (chứa từ khóa: "${word}").`,
+        message: 'Wayfare chỉ phục vụ bài viết chia sẻ trải nghiệm du lịch, ẩm thực và phượt. Vui lòng không đăng nội dung rao vặt ngoài lề.'
+      };
+    }
+  }
+
+  return { isBlocked: false };
+};
+
 export const CommunityPage = () => {
   const { currentUser, itineraries, setItineraries, setIsAIGeneratorOpen, fetchNotifications } = useApp();
   const toast = useToast();
@@ -596,12 +675,28 @@ export const CommunityPage = () => {
       setSubmittingPost(true);
       setModerationStep(1);
 
-      // AI Inspection Simulation Step 1: Text & context scan
-      await new Promise(r => setTimeout(r, 650));
-      setModerationStep(2);
+      // AI Inspection Step 1: Real-time Pre-flight Content Safety Check (BEFORE API)
+      await new Promise(r => setTimeout(r, 450));
+      const preFlight = preFlightCheckContentSafety(postTitle, postContent, postLocation);
+      if (preFlight.isBlocked) {
+        // Critical violation detected: Stop and do NOT send API call!
+        setSubmittingPost(false);
+        setModerationStep(0);
+        setModerationFeedback({
+          type: 'REJECTED_PREFLIGHT',
+          title: `🚫 ${preFlight.category}`,
+          score: preFlight.score,
+          category: preFlight.category,
+          reason: preFlight.reason,
+          message: preFlight.message
+        });
+        toast.showError(`AI từ chối bài viết: Phát hiện nội dung ${preFlight.category}! 🚫`);
+        return;
+      }
 
-      // AI Inspection Simulation Step 2: Environmental & safety regulations
-      await new Promise(r => setTimeout(r, 650));
+      setModerationStep(2);
+      // AI Inspection Step 2: Environmental & safety regulations
+      await new Promise(r => setTimeout(r, 450));
       setModerationStep(3);
 
       const payload = {
@@ -1979,6 +2074,8 @@ export const CommunityPage = () => {
                 background:
                   moderationFeedback.type === 'APPROVED'
                     ? 'linear-gradient(135deg, #059669 0%, #10b981 100%)'
+                    : moderationFeedback.type === 'REJECTED_PREFLIGHT'
+                    ? 'linear-gradient(135deg, #e11d48 0%, #be123c 100%)'
                     : 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)'
               }}
             >
@@ -1996,8 +2093,18 @@ export const CommunityPage = () => {
               <div
                 className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold mt-1"
                 style={{
-                  backgroundColor: moderationFeedback.type === 'APPROVED' ? '#ecfdf5' : '#fffbeb',
-                  color: moderationFeedback.type === 'APPROVED' ? '#047857' : '#b45309'
+                  backgroundColor:
+                    moderationFeedback.type === 'APPROVED'
+                      ? '#ecfdf5'
+                      : moderationFeedback.type === 'REJECTED_PREFLIGHT'
+                      ? '#ffe4e6'
+                      : '#fffbeb',
+                  color:
+                    moderationFeedback.type === 'APPROVED'
+                      ? '#047857'
+                      : moderationFeedback.type === 'REJECTED_PREFLIGHT'
+                      ? '#be123c'
+                      : '#b45309'
                 }}
               >
                 <Sparkles className="w-3.5 h-3.5" />
@@ -2006,12 +2113,22 @@ export const CommunityPage = () => {
             </div>
 
             {moderationFeedback.reason && (
-              <div className="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-3.5 text-left text-xs space-y-1">
-                <span className="font-bold text-amber-900 flex items-center gap-1">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+              <div
+                className={`border rounded-2xl p-3.5 text-left text-xs space-y-1 ${
+                  moderationFeedback.type === 'REJECTED_PREFLIGHT'
+                    ? 'bg-rose-50/90 border-rose-200/90 text-rose-900'
+                    : 'bg-amber-50/80 border-amber-200/80 text-amber-900'
+                }`}
+              >
+                <span className="font-bold flex items-center gap-1">
+                  <AlertTriangle
+                    className={`w-3.5 h-3.5 ${
+                      moderationFeedback.type === 'REJECTED_PREFLIGHT' ? 'text-rose-600' : 'text-amber-600'
+                    }`}
+                  />
                   Cảnh báo AI phát hiện:
                 </span>
-                <p className="text-[11px] text-amber-800 leading-relaxed">
+                <p className="text-[11px] leading-relaxed">
                   {moderationFeedback.reason}
                 </p>
               </div>
@@ -2023,9 +2140,17 @@ export const CommunityPage = () => {
 
             <button
               onClick={() => setModerationFeedback(null)}
-              className="w-full ocean-gradient text-white py-2.5 rounded-xl text-xs font-bold shadow-md shadow-sky-500/20 hover:shadow-lg transition-all cursor-pointer"
+              className={`w-full py-2.5 rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer text-white ${
+                moderationFeedback.type === 'REJECTED_PREFLIGHT'
+                  ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/20'
+                  : 'ocean-gradient shadow-sky-500/20'
+              }`}
             >
-              {moderationFeedback.type === 'APPROVED' ? 'Xem bài viết ngay' : 'Đã hiểu & Tiếp tục theo dõi'}
+              {moderationFeedback.type === 'APPROVED'
+                ? 'Xem bài viết ngay'
+                : moderationFeedback.type === 'REJECTED_PREFLIGHT'
+                ? 'Quay lại chỉnh sửa bài viết'
+                : 'Đã hiểu & Tiếp tục theo dõi'}
             </button>
           </div>
         </div>
