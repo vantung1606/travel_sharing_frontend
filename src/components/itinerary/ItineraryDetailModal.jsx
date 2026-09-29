@@ -29,10 +29,12 @@ import {
   ArrowRight,
   UserPlus
 } from 'lucide-react';
+import { ItineraryExportModal } from './ItineraryExportModal';
 
 export const ItineraryDetailModal = ({ itinerary, onClose }) => {
   const toast = useToast();
   const [activeDayIndex, setActiveDayIndex] = useState(0);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Checklist interactive state
   const [checklist, setChecklist] = useState([
@@ -97,10 +99,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
   };
 
   const handleDownloadPDF = () => {
-    toast.info('Hệ thống đang xuất bản file PDF lịch trình chi tiết kèm bản đồ offline...');
-    setTimeout(() => {
-      toast.success(`Đã tải xuống cẩm nang PDF cho chuyến đi ${itinerary.destination}!`);
-    }, 1200);
+    setIsExportModalOpen(true);
   };
 
   const handleWeatherOptimize = () => {
@@ -652,7 +651,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
 
             <button
               type="button"
-              onClick={() => toast.success('Đã đồng bộ lịch trình thành công sang Google Calendar!')}
+              onClick={() => setIsExportModalOpen(true)}
               className="flex-1 sm:flex-initial px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Send className="w-4 h-4 text-sky-600" />
@@ -671,6 +670,14 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
         </div>
 
       </div>
+
+      {/* Export & Download Modal */}
+      {isExportModalOpen && (
+        <ItineraryExportModal
+          itinerary={itinerary}
+          onClose={() => setIsExportModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

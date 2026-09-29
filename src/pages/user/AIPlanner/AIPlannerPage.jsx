@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
+import { ItineraryExportModal } from '../../../components/itinerary/ItineraryExportModal';
 import {
   Sparkles,
   MapPin,
@@ -166,12 +167,35 @@ export const AIPlannerPage = () => {
     toast.success('Đã sao chép liên kết chia sẻ lịch trình vào bộ nhớ tạm!');
   };
 
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
   const handleDownload = () => {
-    toast.info('Đang chuẩn bị file PDF lịch trình chi tiết và mã vé QR...');
-    setTimeout(() => {
-      toast.success('Đã sẵn sàng tải xuống bản PDF lịch trình du lịch!');
-    }, 1200);
+    setIsExportModalOpen(true);
   };
+
+  const exportItineraryData = useMemo(() => {
+    return {
+      title: customTitle || `${destination} – ${durationDays}N${durationNights}Đ Chinh Phục & Khám Phá`,
+      destination: destination,
+      duration: `${durationDays}N${durationNights}Đ`,
+      totalBudget: budgetVal,
+      budgetPerPerson: Math.round(budgetVal / 4),
+      days: (generatedPlan || []).map((p, idx) => ({
+        dayNumber: idx + 1,
+        title: p.dayTitle || `Ngày ${idx + 1}: ${p.theme || 'Khám phá'}`,
+        activities: (p.slots || []).map(s => ({
+          time: s.time,
+          category: s.category || 'Điểm tham quan',
+          title: s.title,
+          location: s.location || s.title,
+          address: s.address || `${destination}, Việt Nam`,
+          note: s.description,
+          aiTip: s.aiInsight,
+          cost: s.costEstimate
+        }))
+      }))
+    };
+  }, [customTitle, destination, durationDays, durationNights, budgetVal, generatedPlan]);
 
   // Dynamic calculations based on budget
   const estimatedTotal = Math.round(budgetVal * 0.85);
@@ -1113,8 +1137,15 @@ export const AIPlannerPage = () => {
 
           </main>
         </div>
-
       </div>
+
+      {/* Export & Download Modal */}
+      {isExportModalOpen && (
+        <ItineraryExportModal
+          itinerary={exportItineraryData}
+          onClose={() => setIsExportModalOpen(false)}
+        />
+      )}
 
     </div>
   );

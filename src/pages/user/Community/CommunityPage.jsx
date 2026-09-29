@@ -65,7 +65,7 @@ const CATEGORIES = [
   { id: 'Ẩm thực & Check-in', label: 'Ẩm thực & Check-in', icon: MapPin },
   { id: 'Phượt & Khám phá', label: 'Phượt & Khám phá', icon: Flame },
   { id: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Sparkles },
-  { id: 'Có Lịch trình đính kèm', label: 'Có Lịch trình đính kèm', icon: Route }
+  { id: 'Có Lịch trình đính kèm', label: 'Tour có Lịch trình AI', icon: Route }
 ];
 
 // Pre-flight AI Content Moderation Helper (Runs BEFORE sending to API)
@@ -410,7 +410,7 @@ export const CommunityPage = () => {
     } else if (activeCategory === 'Đã lưu') {
       result = result.filter(p => bookmarkedPostIds.has(Number(p.id)) || Boolean(p.isBookmarked));
     } else if (activeCategory === 'Có Lịch trình đính kèm') {
-      result = result.filter(p => p.itineraryId || p.itineraryTitle);
+      result = result.filter(p => p.itineraryId || p.itineraryTitle || (p.sharedPost && (p.sharedPost.itineraryId || p.sharedPost.itineraryTitle)));
     } else if (activeCategory === 'Ẩm thực & Check-in') {
       result = result.filter(p =>
         (p.tags && (p.tags.toLowerCase().includes('ẩm thực') || p.tags.toLowerCase().includes('check-in') || p.tags.toLowerCase().includes('food'))) ||
@@ -1816,13 +1816,14 @@ export const CommunityPage = () => {
 
                       {/* Action Buttons for Attached Itinerary */}
                       <div className="flex items-center gap-2 self-start sm:self-center flex-shrink-0">
-                        {/* Action 1: View Route Details in Modal */}
+                        {/* Action 1: View Route Details & Download Modal */}
                         <button
                           onClick={() => handleViewItineraryDetails(post)}
-                          className="px-3 py-2 rounded-xl bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                          className="px-3.5 py-2 rounded-xl bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 text-xs font-bold transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
+                          title="Xem chi tiết lộ trình và tải cẩm nang PDF / Lịch điện thoại"
                         >
                           <Eye className="w-3.5 h-3.5 text-sky-600" />
-                          <span>Xem lộ trình</span>
+                          <span>Xem lộ trình & Tải PDF</span>
                         </button>
 
                         {/* Action 2: 1-Click Clone to My Itineraries */}
