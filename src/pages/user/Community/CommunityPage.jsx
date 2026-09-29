@@ -118,6 +118,50 @@ export const CommunityPage = () => {
   // Copying Tour Action State
   const [cloningPostId, setCloningPostId] = useState(null);
 
+  // Following Authors State
+  const [followingIds, setFollowingIds] = useState(new Set());
+  const [followingLoadingIds, setFollowingLoadingIds] = useState(new Set());
+
+  // Fetch Following IDs on mount
+  useEffect(() => {
+    userApi
+      .getFollowingIds()
+      .then(ids => {
+        if (Array.isArray(ids)) {
+          setFollowingIds(new Set(ids.map(Number)));
+        }
+      })
+      .catch(err => console.warn('Lỗi khi tải danh sách theo dõi:', err));
+  }, []);
+
+  const handleToggleFollowAuthor = async (authorId, authorName) => {
+    if (!authorId) return;
+    try {
+      setFollowingLoadingIds(prev => new Set(prev).add(authorId));
+      const res = await userApi.toggleFollow(authorId);
+      const isNowFollowing = res?.isFollowing;
+      setFollowingIds(prev => {
+        const next = new Set(prev);
+        if (isNowFollowing) {
+          next.add(Number(authorId));
+          toast.showSuccess(`Đã theo dõi ${authorName || 'tác giả'}! ✨`);
+        } else {
+          next.delete(Number(authorId));
+          toast.showInfo(`Đã hủy theo dõi ${authorName || 'tác giả'}`);
+        }
+        return next;
+      });
+    } catch (err) {
+      toast.showError('Thao tác theo dõi thất bại: ' + err.message);
+    } finally {
+      setFollowingLoadingIds(prev => {
+        const next = new Set(prev);
+        next.delete(authorId);
+        return next;
+      });
+    }
+  };
+
   // Fetch Posts from Backend
   const fetchPosts = useCallback(async () => {
     try {
@@ -910,6 +954,35 @@ export const CommunityPage = () => {
                           >
                             {authorName}
                           </h4>
+                          {authorId && !post.isOwner && post.author?.email !== currentUser?.email && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleFollowAuthor(authorId, authorName);
+                              }}
+                              disabled={followingLoadingIds.has(authorId)}
+                              className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer shadow-2xs ${
+                                followingIds.has(Number(authorId))
+                                  ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 border border-slate-200'
+                                  : 'ocean-gradient text-white hover:opacity-95 shadow-sky-500/20'
+                              }`}
+                              title={followingIds.has(Number(authorId)) ? 'Hủy theo dõi tác giả' : 'Theo dõi tác giả'}
+                            >
+                              {followingLoadingIds.has(authorId) ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : followingIds.has(Number(authorId)) ? (
+                                <>
+                                  <UserCheck className="w-3 h-3 text-emerald-600" />
+                                  <span>Đang theo dõi</span>
+                                </>
+                              ) : (
+                                <>
+                                  <UserPlus className="w-3 h-3" />
+                                  <span>Theo dõi</span>
+                                </>
+                              )}
+                            </button>
+                          )}
                           {post.category && (
                             <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 text-xs font-bold border border-sky-100">
                               {post.category}
@@ -1312,13 +1385,15 @@ export const CommunityPage = () => {
             <div className="space-y-3">
               {[
                 {
-                  name: 'Minh Anh',
-                  handle: '@minhanh_travel',
-                  trips: '18 Tour',
-                  avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
+                  id: 1,
+                  name: 'Quản Trị Viên (Admin)',
+                  handle: '@admin_wayfare',
+                  trips: '18 Chuyến đi',
+                  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
                   badge: 'Top 1'
                 },
                 {
+                  id: 2,
                   name: 'Hoàng Nam Phượt',
                   handle: '@hoangnam_rider',
                   trips: '14 Tour',
@@ -1326,28 +1401,57 @@ export const CommunityPage = () => {
                   badge: 'Top 2'
                 },
                 {
-                  name: 'Linh Nguyễn',
-                  handle: '@linh_coffee',
+                  id: 3,
+                  name: 'Minh Anh',
+                  handle: '@minhanh_travel',
                   trips: '9 Tour',
-                  avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80',
+                  avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
                   badge: 'Top 3'
                 }
-              ].map((author, idx) => (
-                <div key={idx} className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-2.5 min-w-0">
+              ].map((author) => (
+                <div key={author.id} className="flex items-center justify-between gap-2.5 p-1 rounded-xl hover:bg-slate-50 transition-colors">
+                  <div
+                    onClick={() => setSelectedUserIdForModal(author.id)}
+                    className="flex items-center gap-2.5 min-w-0 cursor-pointer group"
+                    title="Bấm để xem hồ sơ"
+                  >
                     <img
                       src={author.avatar}
                       alt={author.name}
-                      className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-100"
+                      className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-100 group-hover:ring-sky-500 transition-all shrink-0"
                     />
                     <div className="min-w-0">
-                      <h5 className="font-bold text-xs text-slate-900 truncate">{author.name}</h5>
+                      <h5 className="font-bold text-xs text-slate-900 group-hover:text-sky-600 transition-colors truncate">{author.name}</h5>
                       <p className="text-[10px] text-slate-400 truncate">{author.trips}</p>
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 text-[10px] font-bold">
-                    {author.badge}
-                  </span>
+                  
+                  {currentUser?.name !== author.name && (
+                    <button
+                      onClick={() => handleToggleFollowAuthor(author.id, author.name)}
+                      disabled={followingLoadingIds.has(author.id)}
+                      className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs ${
+                        followingIds.has(Number(author.id))
+                          ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 border border-slate-200'
+                          : 'ocean-gradient text-white hover:opacity-95 shadow-sky-500/20'
+                      }`}
+                      title={followingIds.has(Number(author.id)) ? 'Hủy theo dõi' : 'Theo dõi tác giả'}
+                    >
+                      {followingLoadingIds.has(author.id) ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : followingIds.has(Number(author.id)) ? (
+                        <>
+                          <Check className="w-3 h-3 text-emerald-600" />
+                          <span>Đang theo</span>
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-3 h-3" />
+                          <span>Theo dõi</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

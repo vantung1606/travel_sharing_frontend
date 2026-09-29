@@ -35,7 +35,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
 
   const toast = useToast();
-  const { setItineraries } = useApp();
+  const { currentUser, setItineraries } = useApp();
 
   useEffect(() => {
     let isMounted = true;
@@ -167,29 +167,35 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
 
                 {/* Follow / Unfollow Action */}
                 <div className="sm:pb-1 flex items-center gap-2">
-                  <button
-                    onClick={handleToggleFollow}
-                    disabled={followLoading}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm ${
-                      profile.isFollowing
-                        ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600'
-                        : 'ocean-gradient text-white hover:opacity-95 shadow-sky-500/20'
-                    }`}
-                  >
-                    {followLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : profile.isFollowing ? (
-                      <>
-                        <UserCheck className="w-4 h-4 text-emerald-600" />
-                        <span>Đang theo dõi</span>
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="w-4 h-4" />
-                        <span>Theo dõi</span>
-                      </>
-                    )}
-                  </button>
+                  {currentUser && (currentUser.email === profile.email || currentUser.name === profile.fullName) ? (
+                    <span className="px-3.5 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200">
+                      Tài khoản của bạn
+                    </span>
+                  ) : (
+                    <button
+                      onClick={handleToggleFollow}
+                      disabled={followLoading}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm ${
+                        profile.isFollowing
+                          ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600'
+                          : 'ocean-gradient text-white hover:opacity-95 shadow-sky-500/20'
+                      }`}
+                    >
+                      {followLoading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : profile.isFollowing ? (
+                        <>
+                          <UserCheck className="w-4 h-4 text-emerald-600" />
+                          <span>Đang theo dõi</span>
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="w-4 h-4" />
+                          <span>Theo dõi</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
 

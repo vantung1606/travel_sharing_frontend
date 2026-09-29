@@ -55,18 +55,27 @@ export const HomePage = () => {
       {/* 1. ATMOSPHERIC HERO SECTION WITH 3D MASCOT SPOTLIGHT */}
       <section className="relative w-full overflow-hidden -mt-6 pt-10 pb-16 md:pb-20 bg-slate-950 text-white">
         
-        {/* Background Image with Dark Gradient Scrim */}
+        {/* Cinematic Travel Destination Background */}
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-700"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1800&q=80')`
+            backgroundImage: `url('https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=2400&q=90')`
           }}
         ></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/70 to-slate-900"></div>
+        
+        {/* Sophisticated Dual-Gradient Scrim: Keeps the photography lush & visible while guaranteeing pristine text contrast */}
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/70 sm:via-slate-950/50 to-slate-950/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-black/40"></div>
 
         {/* Ambient Glowing AI Light Effect */}
-        <div className="absolute top-1/4 right-1/4 w-[350px] h-[350px] rounded-full bg-sky-500/20 blur-3xl pointer-events-none animate-pulse-glow"></div>
-        <div className="absolute top-1/3 left-1/4 w-[300px] h-[300px] rounded-full bg-orange-500/15 blur-3xl pointer-events-none"></div>
+        <div className="absolute top-1/4 right-1/4 w-[350px] h-[350px] rounded-full bg-sky-500/25 blur-3xl pointer-events-none animate-pulse-glow"></div>
+        <div className="absolute top-1/3 left-1/4 w-[300px] h-[300px] rounded-full bg-amber-500/15 blur-3xl pointer-events-none"></div>
+
+        {/* Floating Destination Tag on Top-Right */}
+        <div className="absolute top-6 right-8 hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-white/90 text-xs font-semibold shadow-lg">
+          <MapPin className="w-3.5 h-3.5 text-amber-400" />
+          <span>Tràng An, Ninh Bình • Di sản Văn hóa & Thiên nhiên Thế giới</span>
+        </div>
 
         <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-12 z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">

@@ -927,8 +927,10 @@ export const uploadApi = {
 
 // ─── User Profile & Follow API ────────────────────────────────────────────────
 export const userApi = {
-  async getProfile(userId) {
-    const res = await fetch(`${BASE_URL}/users/${userId}/profile`, {
+  async getProfile(userId, email) {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || 'tung@gmail.com';
+    const res = await fetch(`${BASE_URL}/users/${userId}/profile?email=${encodeURIComponent(userEmail)}`, {
       headers: {
         'Content-Type': 'application/json',
         ...getAuthHeader()
@@ -939,8 +941,10 @@ export const userApi = {
     return json.data;
   },
 
-  async toggleFollow(userId) {
-    const res = await fetch(`${BASE_URL}/users/${userId}/follow`, {
+  async toggleFollow(userId, email) {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || 'tung@gmail.com';
+    const res = await fetch(`${BASE_URL}/users/${userId}/follow?email=${encodeURIComponent(userEmail)}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -950,6 +954,25 @@ export const userApi = {
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
     return json.data;
+  },
+
+  async getFollowingIds(email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/users/following/ids?email=${encodeURIComponent(userEmail)}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching following user IDs:', err.message);
+      return [];
+    }
   }
 };
 

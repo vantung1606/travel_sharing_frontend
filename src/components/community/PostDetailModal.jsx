@@ -19,9 +19,11 @@ import {
   ExternalLink,
   ChevronLeft,
   ChevronRight,
-  Maximize2
+  Maximize2,
+  UserPlus,
+  UserCheck
 } from 'lucide-react';
-import { postApi } from '../../services/api';
+import { postApi, userApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';
 
@@ -44,11 +46,50 @@ export const PostDetailModal = ({
   const [commentInput, setCommentInput] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
+  const [followLoading, setFollowLoading] = useState(false);
 
   const toast = useToast();
   const { currentUser } = useApp();
 
   const effectivePostId = post?.id || postId;
+  const effectiveAuthorId = post?.authorId || post?.author?.id;
+
+  // Check follow status for author
+  useEffect(() => {
+    let isMounted = true;
+    if (effectiveAuthorId) {
+      userApi
+        .getFollowingIds()
+        .then(ids => {
+          if (isMounted && Array.isArray(ids)) {
+            setIsFollowingAuthor(ids.includes(Number(effectiveAuthorId)));
+          }
+        })
+        .catch(err => console.warn('Lỗi kiểm tra trạng thái follow:', err));
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [effectiveAuthorId]);
+
+  const handleToggleFollowAuthor = async () => {
+    if (!effectiveAuthorId || followLoading) return;
+    try {
+      setFollowLoading(true);
+      const res = await userApi.toggleFollow(effectiveAuthorId);
+      setIsFollowingAuthor(res?.isFollowing);
+      if (res?.isFollowing) {
+        toast.showSuccess(`Đã theo dõi ${authorName}! ✨`);
+      } else {
+        toast.showInfo(`Đã hủy theo dõi ${authorName}`);
+      }
+    } catch (err) {
+      toast.showError('Thao tác theo dõi thất bại: ' + err.message);
+    } finally {
+      setFollowLoading(false);
+    }
+  };
 
   // Load post details if only postId is provided
   useEffect(() => {
@@ -207,6 +248,32 @@ export const PostDetailModal = ({
                 <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[10px] font-bold border border-sky-100 shrink-0">
                   {authorRole}
                 </span>
+                {effectiveAuthorId && (!currentUser || currentUser.email !== post?.author?.email) && (
+                  <button
+                    onClick={handleToggleFollowAuthor}
+                    disabled={followLoading}
+                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs ${
+                      isFollowingAuthor
+                        ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 border border-slate-200'
+                        : 'ocean-gradient text-white hover:opacity-95 shadow-sky-500/20'
+                    }`}
+                    title={isFollowingAuthor ? 'Hủy theo dõi tác giả' : 'Theo dõi tác giả'}
+                  >
+                    {followLoading ? (
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                    ) : isFollowingAuthor ? (
+                      <>
+                        <UserCheck className="w-3 h-3 text-emerald-600" />
+                        <span>Đang theo dõi</span>
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="w-3 h-3" />
+                        <span>Theo dõi</span>
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
                 <span>{authorHandle}</span>
