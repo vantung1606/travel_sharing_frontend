@@ -1390,6 +1390,23 @@ export const CommunityPage = () => {
                           >
                             {authorName}
                           </h4>
+
+                          {post.sharedPost && (
+                            <span className="text-xs sm:text-sm font-normal text-slate-500 flex items-center gap-1">
+                              <span>đã chia sẻ bài viết của</span>
+                              <strong
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const origAuthorId = post.sharedPost.authorId || post.sharedPost.author?.id;
+                                  if (origAuthorId) setSelectedUserIdForModal(origAuthorId);
+                                }}
+                                className="font-bold text-slate-900 hover:text-sky-600 transition-colors cursor-pointer"
+                              >
+                                {post.sharedPost.authorName || post.sharedPost.author?.fullName || 'thành viên'}
+                              </strong>
+                            </span>
+                          )}
+
                           {isSelf ? (
                             <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
                               Bạn
@@ -1515,93 +1532,236 @@ export const CommunityPage = () => {
                     </div>
                   </div>
 
-                  {/* Post Title & Content */}
-                  <div className="space-y-1.5">
-                    {post.title && (
-                      <h3
-                        onClick={() => setSelectedPostForDetail(post)}
-                        className="font-extrabold text-base sm:text-lg text-slate-900 leading-snug hover:text-sky-600 transition-colors cursor-pointer"
-                        title="Bấm để xem riêng chi tiết bài viết"
+                  {/* Post Content & Body */}
+                  {post.sharedPost ? (
+                    <div className="space-y-3">
+                      {/* Sharing User's Caption/Quote */}
+                      {post.content && (
+                        <p className="text-sm sm:text-base text-slate-800 leading-relaxed whitespace-pre-line font-normal">
+                          {post.content}
+                        </p>
+                      )}
+
+                      {/* Embedded Shared Post Card (Facebook Shared Post Style) */}
+                      <div
+                        onClick={() => setSelectedPostForDetail(post.sharedPost)}
+                        className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 space-y-3 hover:border-slate-300 hover:bg-slate-50 transition-all cursor-pointer shadow-2xs group"
                       >
-                        {post.title}
-                      </h3>
-                    )}
-                    <p className="text-sm sm:text-[15.5px] text-slate-700 leading-relaxed whitespace-pre-line">
-                      {post.content}
-                    </p>
-                  </div>
-
-                  {/* Post Video Display */}
-                  {post.videoUrl && (
-                    <div className="rounded-2xl overflow-hidden border border-slate-100 bg-black aspect-video max-h-96">
-                      <video
-                        src={post.videoUrl}
-                        controls
-                        className="w-full h-full object-contain"
-                        preload="metadata"
-                      />
-                    </div>
-                  )}
-
-                  {/* Post Photos Display */}
-                  {post.images && post.images.length > 0 && (
-                    <div
-                      onClick={() => setSelectedPostForDetail(post)}
-                      className="rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 cursor-pointer"
-                      title="Bấm để xem ảnh và chi tiết bài viết"
-                    >
-                      {post.images.length === 1 ? (
-                        <img
-                          src={post.images[0]}
-                          alt="Post photo"
-                          className="w-full max-h-96 object-cover hover:scale-[1.01] transition-transform duration-300"
-                        />
-                      ) : post.images.length === 2 ? (
-                        <div className="grid grid-cols-2 gap-1.5 h-64 sm:h-80">
-                          {post.images.map((img, i) => (
-                            <img
-                              key={i}
-                              src={img}
-                              alt={`Post photo ${i}`}
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="grid grid-cols-12 gap-1.5 h-72 sm:h-84">
-                          <div className="col-span-8 h-full">
-                            <img
-                              src={post.images[0]}
-                              alt="Post photo 1"
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                          </div>
-                          <div className="col-span-4 grid grid-rows-2 gap-1.5 h-full">
-                            <img
-                              src={post.images[1]}
-                              alt="Post photo 2"
-                              className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                            />
-                            <div className="relative h-full">
-                              <img
-                                src={post.images[2]}
-                                alt="Post photo 3"
-                                className="w-full h-full object-cover"
-                              />
-                              {post.images.length > 3 && (
-                                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center text-white text-xs font-bold">
-                                  +{post.images.length - 3} ảnh
-                                </div>
+                        {/* Original Author Header */}
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={
+                              post.sharedPost.authorAvatar ||
+                              post.sharedPost.author?.avatar ||
+                              'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                            }
+                            alt={post.sharedPost.authorName || 'Tác giả gốc'}
+                            className="w-10 h-10 rounded-full object-cover ring-1 ring-slate-200"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const origId = post.sharedPost.authorId || post.sharedPost.author?.id;
+                                  if (origId) setSelectedUserIdForModal(origId);
+                                }}
+                                className="font-bold text-sm text-slate-900 group-hover:text-sky-600 transition-colors cursor-pointer"
+                              >
+                                {post.sharedPost.authorName || post.sharedPost.author?.fullName || 'Thành viên Wayfare'}
+                              </span>
+                              {post.sharedPost.category && (
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 border border-sky-100">
+                                  {post.sharedPost.category}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium mt-0.5">
+                              <span>{post.sharedPost.formattedDate || post.sharedPost.timeAgo || 'Vừa xong'}</span>
+                              <span>•</span>
+                              <Globe className="w-3 h-3 text-slate-400" />
+                              {post.sharedPost.locationTag && (
+                                <>
+                                  <span>•</span>
+                                  <span className="flex items-center gap-1 text-slate-500">
+                                    <MapPin className="w-3 h-3 text-sky-500" />
+                                    {post.sharedPost.locationTag}
+                                  </span>
+                                </>
                               )}
                             </div>
                           </div>
                         </div>
-                      )}
+
+                        {/* Original Title & Content */}
+                        <div className="space-y-1">
+                          {post.sharedPost.title && (
+                            <h4 className="font-extrabold text-sm sm:text-base text-slate-900 leading-snug">
+                              {post.sharedPost.title}
+                            </h4>
+                          )}
+                          {post.sharedPost.content && (
+                            <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line line-clamp-4">
+                              {post.sharedPost.content}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Original Video Display */}
+                        {post.sharedPost.videoUrl && (
+                          <div className="rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video max-h-72">
+                            <video
+                              src={post.sharedPost.videoUrl}
+                              controls
+                              onClick={e => e.stopPropagation()}
+                              className="w-full h-full object-contain"
+                              preload="metadata"
+                            />
+                          </div>
+                        )}
+
+                        {/* Original Photos Display */}
+                        {post.sharedPost.images && post.sharedPost.images.length > 0 && !post.sharedPost.videoUrl && (
+                          <div className="rounded-xl overflow-hidden border border-slate-200">
+                            {post.sharedPost.images.length === 1 ? (
+                              <img
+                                src={post.sharedPost.images[0]}
+                                alt="Shared post"
+                                className="w-full max-h-80 object-cover"
+                              />
+                            ) : (
+                              <div className="grid grid-cols-2 gap-1 max-h-72 overflow-hidden">
+                                {post.sharedPost.images.slice(0, 2).map((img, idx) => (
+                                  <img
+                                    key={idx}
+                                    src={img}
+                                    alt={`Shared post ${idx}`}
+                                    className="w-full h-44 sm:h-52 object-cover"
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Original Attached Itinerary */}
+                        {(post.sharedPost.itineraryId || post.sharedPost.itineraryTitle) && (
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewItineraryDetails(post.sharedPost);
+                            }}
+                            className="p-3 bg-white rounded-xl border border-sky-100 flex items-center justify-between gap-3 shadow-2xs hover:border-sky-300 transition-colors"
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-9 h-9 rounded-lg ocean-gradient flex items-center justify-center text-white shrink-0">
+                                <Route className="w-4 h-4" />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="text-[10px] font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded-sm inline-block">
+                                  Lịch trình đính kèm
+                                </div>
+                                <div className="font-bold text-xs text-slate-900 truncate">
+                                  {post.sharedPost.itineraryTitle || 'Lịch trình du lịch'}
+                                </div>
+                              </div>
+                            </div>
+                            <span className="text-xs font-bold text-sky-600 shrink-0">Xem tour &rarr;</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
+                  ) : (
+                    <>
+                      {/* Post Title & Content */}
+                      <div className="space-y-1.5">
+                        {post.title && (
+                          <h3
+                            onClick={() => setSelectedPostForDetail(post)}
+                            className="font-extrabold text-base sm:text-lg text-slate-900 leading-snug hover:text-sky-600 transition-colors cursor-pointer"
+                            title="Bấm để xem riêng chi tiết bài viết"
+                          >
+                            {post.title}
+                          </h3>
+                        )}
+                        <p className="text-sm sm:text-[15.5px] text-slate-700 leading-relaxed whitespace-pre-line">
+                          {post.content}
+                        </p>
+                      </div>
+
+                      {/* Post Video Display */}
+                      {post.videoUrl && (
+                        <div className="rounded-2xl overflow-hidden border border-slate-100 bg-black aspect-video max-h-96">
+                          <video
+                            src={post.videoUrl}
+                            controls
+                            className="w-full h-full object-contain"
+                            preload="metadata"
+                          />
+                        </div>
+                      )}
+
+                      {/* Post Photos Display */}
+                      {post.images && post.images.length > 0 && (
+                        <div
+                          onClick={() => setSelectedPostForDetail(post)}
+                          className="rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 cursor-pointer"
+                          title="Bấm để xem ảnh và chi tiết bài viết"
+                        >
+                          {post.images.length === 1 ? (
+                            <img
+                              src={post.images[0]}
+                              alt="Post photo"
+                              className="w-full max-h-96 object-cover hover:scale-[1.01] transition-transform duration-300"
+                            />
+                          ) : post.images.length === 2 ? (
+                            <div className="grid grid-cols-2 gap-1.5 h-64 sm:h-80">
+                              {post.images.map((img, i) => (
+                                <img
+                                  key={i}
+                                  src={img}
+                                  alt={`Post photo ${i}`}
+                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-12 gap-1.5 h-72 sm:h-84">
+                              <div className="col-span-8 h-full">
+                                <img
+                                  src={post.images[0]}
+                                  alt="Post photo 1"
+                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                />
+                              </div>
+                              <div className="col-span-4 grid grid-rows-2 gap-1.5 h-full">
+                                <img
+                                  src={post.images[1]}
+                                  alt="Post photo 2"
+                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                />
+                                <div className="relative h-full">
+                                  <img
+                                    src={post.images[2]}
+                                    alt="Post photo 3"
+                                    className="w-full h-full object-cover"
+                                  />
+                                  {post.images.length > 3 && (
+                                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center text-white text-xs font-bold">
+                                      +{post.images.length - 3} ảnh
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
 
                   {/* ATTACHED TOUR / ITINERARY CARD (The Key Integration Component!) */}
-                  {hasItinerary && (
+                  {!post.sharedPost && hasItinerary && (
                     <div className="bg-gradient-to-r from-sky-50/90 via-teal-50/60 to-emerald-50/60 p-4 rounded-2xl border border-sky-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
                       <div className="flex items-start gap-3">
                         <div className="w-12 h-12 rounded-xl ocean-gradient flex items-center justify-center text-white flex-shrink-0 shadow-sm shadow-sky-500/20">

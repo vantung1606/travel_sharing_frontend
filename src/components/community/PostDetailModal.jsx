@@ -333,6 +333,23 @@ export const PostDetailModal = ({
                 >
                   {authorName}
                 </button>
+
+                {post.sharedPost && (
+                  <span className="text-xs sm:text-sm font-normal text-slate-500 flex items-center gap-1">
+                    <span>đã chia sẻ bài viết của</span>
+                    <strong
+                      onClick={() => {
+                        if (typeof onAuthorClick === 'function' && (post.sharedPost.authorId || post.sharedPost.author?.id)) {
+                          onAuthorClick(post.sharedPost.authorId || post.sharedPost.author?.id);
+                        }
+                      }}
+                      className="font-bold text-slate-900 hover:text-sky-600 transition-colors cursor-pointer"
+                    >
+                      {post.sharedPost.authorName || post.sharedPost.author?.fullName || 'thành viên'}
+                    </strong>
+                  </span>
+                )}
+
                 <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[10px] font-bold border border-sky-100 shrink-0">
                   {authorRole}
                 </span>
@@ -425,138 +442,269 @@ export const PostDetailModal = ({
               )}
             </div>
 
-            {/* Post Title */}
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug">
-              {post.title}
-            </h2>
-
-            {/* Post Content */}
-            <div className="text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
-              {post.content}
-            </div>
-
-            {/* Multimedia: Video Player */}
-            {post.videoUrl && (
-              <div className="rounded-2xl overflow-hidden bg-black shadow-md">
-                <video
-                  src={post.videoUrl}
-                  controls
-                  className="w-full max-h-[420px] object-contain"
-                />
-              </div>
-            )}
-
-            {/* Multimedia: Images Showcase */}
-            {images.length > 0 && (
-              <div className="space-y-3">
-                {/* Main Selected Image */}
-                <div className="relative rounded-2xl overflow-hidden bg-slate-950 group">
-                  <img
-                    src={images[activeImageIndex]}
-                    alt={`Ảnh ${activeImageIndex + 1}`}
-                    className="w-full max-h-[460px] object-contain mx-auto transition-transform duration-300"
-                  />
-                  {images.length > 1 && (
-                    <>
-                      <button
-                        onClick={() =>
-                          setActiveImageIndex(prev =>
-                            prev === 0 ? images.length - 1 : prev - 1
-                          )
-                        }
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition-all cursor-pointer opacity-90 hover:opacity-100"
-                      >
-                        <ChevronLeft className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() =>
-                          setActiveImageIndex(prev =>
-                            prev === images.length - 1 ? 0 : prev + 1
-                          )
-                        }
-                        className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition-all cursor-pointer opacity-90 hover:opacity-100"
-                      >
-                        <ChevronRight className="w-5 h-5" />
-                      </button>
-                      <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-black/60 text-white text-xs font-bold backdrop-blur-xs">
-                        {activeImageIndex + 1} / {images.length}
-                      </span>
-                    </>
-                  )}
-                </div>
-
-                {/* Thumbnails row */}
-                {images.length > 1 && (
-                  <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
-                    {images.map((img, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => setActiveImageIndex(idx)}
-                        className={`relative w-20 h-16 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
-                          activeImageIndex === idx
-                            ? 'border-sky-500 ring-2 ring-sky-300'
-                            : 'border-transparent opacity-70 hover:opacity-100'
-                        }`}
-                      >
-                        <img
-                          src={img}
-                          alt="thumb"
-                          className="w-full h-full object-cover"
-                        />
-                      </button>
-                    ))}
+            {post.sharedPost ? (
+              <div className="space-y-4">
+                {/* Sharing User's Caption */}
+                {post.content && (
+                  <div className="text-slate-800 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
+                    {post.content}
                   </div>
                 )}
-              </div>
-            )}
 
-            {/* Attached Itinerary Card */}
-            {(post.itineraryId || post.itineraryTitle) && (
-              <div className="p-4 rounded-2xl bg-gradient-to-br from-sky-50/70 via-indigo-50/40 to-teal-50/60 border border-sky-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-xs shrink-0">
-                    <Route className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-md">
-                        Lịch trình đính kèm
-                      </span>
-                      {post.itineraryIsAi && (
-                        <span className="flex items-center gap-0.5 text-[10px] text-amber-700 font-bold">
-                          <Sparkles className="w-3 h-3 text-amber-500" /> AI Tạo
+                {/* Embedded Shared Post Box */}
+                <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5 space-y-4 shadow-2xs">
+                  {/* Original Author Header */}
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={
+                        post.sharedPost.authorAvatar ||
+                        post.sharedPost.author?.avatar ||
+                        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                      }
+                      alt={post.sharedPost.authorName}
+                      className="w-10 h-10 rounded-full object-cover ring-1 ring-slate-200"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span
+                          onClick={() => {
+                            if (typeof onAuthorClick === 'function' && (post.sharedPost.authorId || post.sharedPost.author?.id)) {
+                              onAuthorClick(post.sharedPost.authorId || post.sharedPost.author?.id);
+                            }
+                          }}
+                          className="font-bold text-sm sm:text-base text-slate-900 hover:text-sky-600 transition-colors cursor-pointer"
+                        >
+                          {post.sharedPost.authorName || post.sharedPost.author?.fullName || 'Thành viên Wayfare'}
                         </span>
-                      )}
+                        {post.sharedPost.category && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 border border-sky-100">
+                            {post.sharedPost.category}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium mt-0.5">
+                        <span>{post.sharedPost.formattedDate || post.sharedPost.timeAgo || 'Vừa xong'}</span>
+                        <span>•</span>
+                        <Globe className="w-3 h-3 text-slate-400" />
+                        {post.sharedPost.locationTag && (
+                          <>
+                            <span>•</span>
+                            <span className="flex items-center gap-1 text-slate-500">
+                              <MapPin className="w-3 h-3 text-sky-500" />
+                              {post.sharedPost.locationTag}
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </div>
-                    <h4 className="font-extrabold text-sm sm:text-base text-slate-900 mt-0.5">
-                      {post.itineraryTitle || 'Lịch trình khám phá'}
-                    </h4>
-                    <p className="text-xs text-slate-500">
-                      {post.itineraryDestination || 'Điểm đến thú vị'} • Ngân sách:{' '}
-                      <span className="font-bold text-emerald-600">
-                        {Number(post.itineraryBudget || 0).toLocaleString('vi-VN')} đ
-                      </span>
-                    </p>
                   </div>
+
+                  {/* Original Title & Content */}
+                  <div className="space-y-1.5">
+                    {post.sharedPost.title && (
+                      <h3 className="font-extrabold text-base sm:text-lg text-slate-900 leading-snug">
+                        {post.sharedPost.title}
+                      </h3>
+                    )}
+                    {post.sharedPost.content && (
+                      <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                        {post.sharedPost.content}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Original Video Display */}
+                  {post.sharedPost.videoUrl && (
+                    <div className="rounded-2xl overflow-hidden border border-slate-200 bg-black aspect-video max-h-96">
+                      <video
+                        src={post.sharedPost.videoUrl}
+                        controls
+                        className="w-full h-full object-contain"
+                        preload="metadata"
+                      />
+                    </div>
+                  )}
+
+                  {/* Original Images Display */}
+                  {post.sharedPost.images && post.sharedPost.images.length > 0 && !post.sharedPost.videoUrl && (
+                    <div className="rounded-2xl overflow-hidden border border-slate-200">
+                      <img
+                        src={post.sharedPost.images[0]}
+                        alt="Shared post"
+                        className="w-full max-h-96 object-cover"
+                      />
+                    </div>
+                  )}
+
+                  {/* Original Attached Itinerary */}
+                  {(post.sharedPost.itineraryId || post.sharedPost.itineraryTitle) && (
+                    <div
+                      onClick={() => {
+                        if (typeof onSelectItinerary === 'function') {
+                          onSelectItinerary({
+                            id: post.sharedPost.itineraryId,
+                            title: post.sharedPost.itineraryTitle,
+                            destination: post.sharedPost.itineraryDestination,
+                            budgetTotal: post.sharedPost.itineraryBudget
+                          });
+                        }
+                      }}
+                      className="p-3.5 bg-white rounded-xl border border-sky-100 flex items-center justify-between gap-3 shadow-2xs hover:border-sky-300 transition-colors cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-xl ocean-gradient flex items-center justify-center text-white shrink-0">
+                          <Route className="w-5 h-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-[10px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-sm inline-block">
+                            Lịch trình đính kèm
+                          </div>
+                          <div className="font-bold text-xs sm:text-sm text-slate-900 truncate mt-0.5">
+                            {post.sharedPost.itineraryTitle || 'Lịch trình du lịch'}
+                          </div>
+                        </div>
+                      </div>
+                      <span className="text-xs font-bold text-sky-600 shrink-0">Xem tour &rarr;</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Post Title */}
+                <h2 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug">
+                  {post.title}
+                </h2>
+
+                {/* Post Content */}
+                <div className="text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
+                  {post.content}
                 </div>
 
-                <button
-                  onClick={() => {
-                    if (typeof onSelectItinerary === 'function') {
-                      onSelectItinerary({
-                        id: post.itineraryId,
-                        title: post.itineraryTitle,
-                        destination: post.itineraryDestination,
-                        budgetTotal: post.itineraryBudget
-                      });
-                    }
-                  }}
-                  className="px-4 py-2 rounded-xl ocean-gradient text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm hover:opacity-95 cursor-pointer shrink-0"
-                >
-                  <Eye className="w-4 h-4" />
-                  <span>Xem lịch trình</span>
-                </button>
-              </div>
+                {/* Multimedia: Video Player */}
+                {post.videoUrl && (
+                  <div className="rounded-2xl overflow-hidden bg-black shadow-md">
+                    <video
+                      src={post.videoUrl}
+                      controls
+                      className="w-full max-h-[420px] object-contain"
+                    />
+                  </div>
+                )}
+
+                {/* Multimedia: Images Showcase */}
+                {images.length > 0 && (
+                  <div className="space-y-3">
+                    {/* Main Selected Image */}
+                    <div className="relative rounded-2xl overflow-hidden bg-slate-950 group">
+                      <img
+                        src={images[activeImageIndex]}
+                        alt={`Ảnh ${activeImageIndex + 1}`}
+                        className="w-full max-h-[460px] object-contain mx-auto transition-transform duration-300"
+                      />
+                      {images.length > 1 && (
+                        <>
+                          <button
+                            onClick={() =>
+                              setActiveImageIndex(prev =>
+                                prev === 0 ? images.length - 1 : prev - 1
+                              )
+                            }
+                            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition-all cursor-pointer opacity-90 hover:opacity-100"
+                          >
+                            <ChevronLeft className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() =>
+                              setActiveImageIndex(prev =>
+                                prev === images.length - 1 ? 0 : prev + 1
+                              )
+                            }
+                            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center transition-all cursor-pointer opacity-90 hover:opacity-100"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </button>
+                          <span className="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg bg-black/60 text-white text-xs font-bold backdrop-blur-xs">
+                            {activeImageIndex + 1} / {images.length}
+                          </span>
+                        </>
+                      )}
+                    </div>
+
+                    {/* Thumbnails row */}
+                    {images.length > 1 && (
+                      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                        {images.map((img, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setActiveImageIndex(idx)}
+                            className={`relative w-20 h-16 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
+                              activeImageIndex === idx
+                                ? 'border-sky-500 ring-2 ring-sky-300'
+                                : 'border-transparent opacity-70 hover:opacity-100'
+                            }`}
+                          >
+                            <img
+                              src={img}
+                              alt="thumb"
+                              className="w-full h-full object-cover"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Attached Itinerary Card */}
+                {(post.itineraryId || post.itineraryTitle) && (
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-sky-50/70 via-indigo-50/40 to-teal-50/60 border border-sky-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                        <Route className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-md">
+                            Lịch trình đính kèm
+                          </span>
+                          {post.itineraryIsAi && (
+                            <span className="flex items-center gap-0.5 text-[10px] text-amber-700 font-bold">
+                              <Sparkles className="w-3 h-3 text-amber-500" /> AI Tạo
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="font-extrabold text-sm sm:text-base text-slate-900 mt-0.5">
+                          {post.itineraryTitle || 'Lịch trình khám phá'}
+                        </h4>
+                        <p className="text-xs text-slate-500">
+                          {post.itineraryDestination || 'Điểm đến thú vị'} • Ngân sách:{' '}
+                          <span className="font-bold text-emerald-600">
+                            {Number(post.itineraryBudget || 0).toLocaleString('vi-VN')} đ
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        if (typeof onSelectItinerary === 'function') {
+                          onSelectItinerary({
+                            id: post.itineraryId,
+                            title: post.itineraryTitle,
+                            destination: post.itineraryDestination,
+                            budgetTotal: post.itineraryBudget
+                          });
+                        }
+                      }}
+                      className="px-4 py-2 rounded-xl ocean-gradient text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm hover:opacity-95 cursor-pointer shrink-0"
+                    >
+                      <Eye className="w-4 h-4" />
+                      <span>Xem lịch trình</span>
+                    </button>
+                  </div>
+                )}
+              </>
             )}
 
             {/* Social Interaction Buttons */}

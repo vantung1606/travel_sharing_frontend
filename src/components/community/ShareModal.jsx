@@ -85,33 +85,27 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
     try {
       setIsSharingToFeed(true);
 
-      // Attempt to create a share post if endpoint exists or simulate post sharing
       const postPayload = {
-        title: `Chia sẻ bài viết: ${post.title || 'Kinh nghiệm du lịch'}`,
-        content: shareCaption.trim()
-          ? `${shareCaption.trim()}\n\n--- [Được chia sẻ từ bài viết của ${post.authorName || 'thành viên Wayfare'}]: ${post.title} ---`
-          : `Chia sẻ bài viết thú vị từ ${post.authorName || 'cộng đồng'}: "${post.title}"`,
+        title: shareCaption.trim()
+          ? (shareCaption.trim().length > 60 ? shareCaption.trim().substring(0, 57) + '...' : shareCaption.trim())
+          : `Chia sẻ bài viết của ${post.authorName || 'thành viên'}`,
+        content: shareCaption.trim() || 'Chia sẻ bài viết này cùng mọi người!',
+        sharedPostId: post.id,
         category: post.category || 'Phượt & Khám phá',
         locationTag: post.locationTag || '',
-        visibility: audience,
-        imageUrl: (post.images && post.images[0]) || post.imageUrl || null,
-        images: post.images || (post.imageUrl ? [post.imageUrl] : [])
+        visibility: audience
       };
 
-      try {
-        await postApi.createPost(postPayload, currentUser?.email);
-      } catch (e) {
-        console.warn('Share post fallback to local broadcast:', e);
-      }
+      const res = await postApi.createPost(postPayload, currentUser?.email);
 
       if (toast?.showSuccess) {
-        toast.showSuccess('Đã chia sẻ bài viết lên Bảng feed của bạn thành công! ✨');
+        toast.showSuccess(`Đã chia sẻ bài viết của ${post.authorName || 'bạn bè'} lên trang của bạn! ✨`);
       } else if (toast?.success) {
-        toast.success('Đã chia sẻ bài viết lên Bảng feed của bạn thành công! ✨');
+        toast.success(`Đã chia sẻ bài viết của ${post.authorName || 'bạn bè'} lên trang của bạn! ✨`);
       }
 
       if (typeof onPostShared === 'function') {
-        onPostShared(post.id);
+        onPostShared(res);
       }
 
       onClose();
