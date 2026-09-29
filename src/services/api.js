@@ -838,8 +838,13 @@ export const postApi = {
     }
   },
 
-  async createPost(payload) {
-    const res = await fetch(`${BASE_URL}/posts`, {
+  async createPost(payload, email = '') {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || '';
+    const url = userEmail
+      ? `${BASE_URL}/posts?email=${encodeURIComponent(userEmail)}`
+      : `${BASE_URL}/posts`;
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -984,8 +989,13 @@ export const postApi = {
     return json.data;
   },
 
-  async update(id, payload) {
-    const res = await fetch(`${BASE_URL}/posts/${id}`, {
+  async update(id, payload, email = '') {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || '';
+    const url = userEmail
+      ? `${BASE_URL}/posts/${id}?email=${encodeURIComponent(userEmail)}`
+      : `${BASE_URL}/posts/${id}`;
+    const res = await fetch(url, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -998,8 +1008,13 @@ export const postApi = {
     return json.data;
   },
 
-  async updateVisibility(id, visibility) {
-    const res = await fetch(`${BASE_URL}/posts/${id}/visibility?visibility=${encodeURIComponent(visibility)}`, {
+  async updateVisibility(id, visibility, email = '') {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || '';
+    const url = userEmail
+      ? `${BASE_URL}/posts/${id}/visibility?visibility=${encodeURIComponent(visibility)}&email=${encodeURIComponent(userEmail)}`
+      : `${BASE_URL}/posts/${id}/visibility?visibility=${encodeURIComponent(visibility)}`;
+    const res = await fetch(url, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -1011,8 +1026,13 @@ export const postApi = {
     return json.data;
   },
 
-  async delete(id) {
-    const res = await fetch(`${BASE_URL}/posts/${id}`, {
+  async delete(id, email = '') {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || '';
+    const url = userEmail
+      ? `${BASE_URL}/posts/${id}?email=${encodeURIComponent(userEmail)}`
+      : `${BASE_URL}/posts/${id}`;
+    const res = await fetch(url, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

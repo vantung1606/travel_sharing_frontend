@@ -775,7 +775,7 @@ export const CommunityPage = () => {
   const handleToggleVisibility = async (post) => {
     const nextVisibility = post.visibility === 'PRIVATE' ? 'PUBLIC' : 'PRIVATE';
     try {
-      await postApi.updateVisibility(post.id, nextVisibility);
+      await postApi.updateVisibility(post.id, nextVisibility, currentUser?.email);
       setPosts(prev =>
         prev.map(p => (p.id === post.id ? { ...p, visibility: nextVisibility } : p))
       );
@@ -796,7 +796,7 @@ export const CommunityPage = () => {
       return;
     }
     try {
-      await postApi.delete(post.id);
+      await postApi.delete(post.id, currentUser?.email);
       setPosts(prev => prev.filter(p => p.id !== post.id));
       toast.showSuccess('Đã xóa bài viết thành công! 🗑️');
       setOpenMenuPostId(null);
@@ -862,7 +862,7 @@ export const CommunityPage = () => {
         itineraryId: attachedItineraryId ? Number(attachedItineraryId) : null
       };
 
-      const result = await postApi.createPost(payload);
+      const result = await postApi.createPost(payload, currentUser?.email);
 
       // Close create modal and reset form
       setIsCreateModalOpen(false);
