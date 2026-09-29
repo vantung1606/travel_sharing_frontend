@@ -865,8 +865,13 @@ export const postApi = {
     return json.data;
   },
 
-  async toggleBookmark(postId) {
-    const res = await fetch(`${BASE_URL}/posts/${postId}/bookmark`, {
+  async toggleBookmark(postId, email = '') {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || '';
+    const url = userEmail
+      ? `${BASE_URL}/posts/${postId}/bookmark?email=${encodeURIComponent(userEmail)}`
+      : `${BASE_URL}/posts/${postId}/bookmark`;
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

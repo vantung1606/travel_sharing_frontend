@@ -478,14 +478,38 @@ export const CommunityPage = () => {
     );
 
     try {
-      const res = await postApi.toggleBookmark(numericId);
-      const isNowBookmarked = res?.isBookmarked ?? !wasBookmarked;
+      const res = await postApi.toggleBookmark(numericId, currentUser?.email);
+      const isNowBookmarked = res?.isBookmarked !== undefined ? res.isBookmarked : !wasBookmarked;
+
+      // Final synchronization with server-returned state
+      setBookmarkedPostIds(prev => {
+        const next = new Set(prev);
+        if (isNowBookmarked) {
+          next.add(numericId);
+        } else {
+          next.delete(numericId);
+        }
+        return next;
+      });
+
+      setPosts(prev =>
+        prev.map(p => {
+          if (Number(p.id) === numericId) {
+            return { ...p, isBookmarked: isNowBookmarked };
+          }
+          return p;
+        })
+      );
+
       if (isNowBookmarked) {
-        toast.showSuccess('Đã lưu bài viết vào Bộ sưu tập cá nhân ⭐');
+        if (toast?.showSuccess) toast.showSuccess('Đã lưu bài viết vào Bộ sưu tập cá nhân ⭐');
+        else if (toast?.success) toast.success('Đã lưu bài viết vào Bộ sưu tập cá nhân ⭐');
       } else {
-        toast.showInfo('Đã bỏ lưu bài viết khỏi bộ sưu tập');
+        if (toast?.showInfo) toast.showInfo('Đã bỏ lưu bài viết khỏi bộ sưu tập');
+        else if (toast?.info) toast.info('Đã bỏ lưu bài viết khỏi bộ sưu tập');
       }
     } catch (err) {
+      console.error('Error toggling bookmark:', err);
       // Revert if error
       setBookmarkedPostIds(prev => {
         const next = new Set(prev);
@@ -504,7 +528,8 @@ export const CommunityPage = () => {
           return p;
         })
       );
-      toast.showError('Thao tác lưu bài viết thất bại: ' + (err.message || 'Lỗi kết nối'));
+      if (toast?.showError) toast.showError('Thao tác lưu bài viết thất bại: ' + (err.message || 'Lỗi kết nối'));
+      else if (toast?.error) toast.error('Thao tác lưu bài viết thất bại: ' + (err.message || 'Lỗi kết nối'));
     }
   };
 

@@ -167,19 +167,22 @@ export const PostDetailModal = ({
     if (!effectivePostId || bookmarkLoading) return;
     try {
       setBookmarkLoading(true);
-      const res = await postApi.toggleBookmark(effectivePostId);
-      const newStatus = res?.isBookmarked ?? !isBookmarked;
+      const res = await postApi.toggleBookmark(effectivePostId, currentUser?.email);
+      const newStatus = res?.isBookmarked !== undefined ? res.isBookmarked : !isBookmarked;
       setIsBookmarked(newStatus);
       if (newStatus) {
-        toast.showSuccess('Đã lưu bài viết vào Bộ sưu tập cá nhân ⭐');
+        if (toast?.showSuccess) toast.showSuccess('Đã lưu bài viết vào Bộ sưu tập cá nhân ⭐');
+        else if (toast?.success) toast.success('Đã lưu bài viết vào Bộ sưu tập cá nhân ⭐');
       } else {
-        toast.showInfo('Đã bỏ lưu bài viết khỏi bộ sưu tập');
+        if (toast?.showInfo) toast.showInfo('Đã bỏ lưu bài viết khỏi bộ sưu tập');
+        else if (toast?.info) toast.info('Đã bỏ lưu bài viết khỏi bộ sưu tập');
       }
       if (onPostUpdated) {
         onPostUpdated(effectivePostId, { isBookmarked: newStatus });
       }
     } catch (err) {
-      toast.showError('Thao tác lưu bài viết thất bại: ' + (err.message || 'Lỗi kết nối'));
+      if (toast?.showError) toast.showError('Thao tác lưu bài viết thất bại: ' + (err.message || 'Lỗi kết nối'));
+      else if (toast?.error) toast.error('Thao tác lưu bài viết thất bại: ' + (err.message || 'Lỗi kết nối'));
     } finally {
       setBookmarkLoading(false);
     }
