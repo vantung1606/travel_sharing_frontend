@@ -13,7 +13,7 @@
 
   /* Clean, crisp & modern base font sizing with optimum readability */
   html {
-    font-size: 16px;
+    font-size: 14.5px;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -21,18 +21,18 @@
   }
   @media (min-width: 1024px) {
     html {
-      font-size: 16px;
+      font-size: 14.75px;
     }
   }
   @media (min-width: 1440px) {
     html {
-      font-size: 16.5px;
+      font-size: 15px;
     }
   }
 
   body {
-    font-family: 'Plus Jakarta Sans', 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
-    letter-spacing: -0.012em;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: -0.011em;
   }
 }
 

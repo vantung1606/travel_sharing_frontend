@@ -72,9 +72,9 @@ export const Navbar = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-2xl border-b border-slate-200/90 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_4px_6px_-2px_rgba(0,0,0,0.03)] select-none transition-all">
-        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="flex items-center justify-between h-16 gap-3">
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-xs select-none transition-all">
+        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-8 2xl:px-12">
+          <div className="flex items-center justify-between h-16 gap-2 sm:gap-3">
             
             {/* 1. Brand Logo */}
             <div className="flex items-center gap-3 shrink-0">
@@ -89,14 +89,13 @@ export const Navbar = () => {
                   <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 group-hover:text-sky-600 transition-colors">
                     Way<span className="text-sky-600">fare</span>
                   </span>
-                  
                 </div>
               </div>
             </div>
 
-            {/* 2. Sleek Rounded Navigation Bar (High Definition & Contrast) */}
+            {/* 2. Sleek Rounded Navigation Bar (Compact & Perfectly Fitting) */}
             {portalMode === 'user' && (
-              <nav className="hidden lg:flex items-center gap-1 p-1.5 bg-slate-100/90 hover:bg-slate-100 rounded-full border border-slate-200/80 shadow-xs shrink-0 transition-all">
+              <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 p-1 bg-slate-100/90 rounded-full border border-slate-200/70 shadow-2xs shrink-0">
                 {navItems.map(tab => {
                   const active = userTab === tab.id;
                   const Icon = tab.icon;
@@ -105,16 +104,16 @@ export const Navbar = () => {
                       key={tab.id}
                       onClick={() => handleNavClick(tab.id)}
                       title={tab.label}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 text-xs xl:text-[13px] font-bold rounded-full transition-all cursor-pointer whitespace-nowrap ${
+                      className={`flex items-center gap-1 xl:gap-1.5 px-2.5 py-1 xl:px-3 xl:py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap ${
                         active
-                          ? 'bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-500 text-white shadow-md shadow-sky-500/30'
-                          : 'text-slate-700 hover:text-slate-950 hover:bg-white hover:shadow-2xs'
+                          ? 'bg-sky-600 text-white font-bold shadow-xs'
+                          : 'text-slate-700 hover:text-slate-900 hover:bg-white'
                       }`}
                     >
                       {tab.isAi ? (
-                        <Sparkles className={`w-4 h-4 shrink-0 ${active ? 'text-amber-200' : 'text-amber-500'}`} />
+                        <Sparkles className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-amber-200' : 'text-amber-500'}`} />
                       ) : (
-                        <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-white' : 'text-slate-500'}`} />
+                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} />
                       )}
                       
                       {/* Responsive adaptive label */}
@@ -123,7 +122,7 @@ export const Navbar = () => {
 
                       {/* Smart Tag for AI Planner */}
                       {tab.isAi && (
-                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] xl:text-[10px] font-bold hidden xl:inline-flex items-center gap-0.5 ${
+                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold hidden xl:inline-flex items-center gap-0.5 ${
                           active
                             ? 'bg-sky-700/80 text-amber-200'
                             : 'bg-amber-100 text-amber-800'
@@ -134,7 +133,7 @@ export const Navbar = () => {
 
                       {/* Notification badge */}
                       {tab.badge && !active && (
-                        <span className={`px-1.5 py-0.5 rounded-full text-[8px] xl:text-[9px] font-bold ${
+                        <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold ${
                           tab.badge === 'HOT' ? 'bg-amber-100 text-amber-800 hidden xl:inline-block' : 'bg-rose-500 text-white'
                         }`}>
                           {tab.badge}
@@ -147,15 +146,15 @@ export const Navbar = () => {
             )}
 
             {/* 3. Right Action Bar */}
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="flex items-center gap-2 shrink-0">
               
-              {/* Search Pill Input (Desktop) */}
-              <div className="hidden 2xl:flex items-center bg-white hover:bg-slate-50 focus-within:bg-white rounded-full px-4 py-2 border border-slate-200 shadow-2xs focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20 transition-all text-xs">
+              {/* Search Pill Input (Desktop >= 1536px) */}
+              <div className="hidden 2xl:flex items-center bg-slate-100/80 hover:bg-slate-100 focus-within:bg-white rounded-full px-3.5 py-1.5 border border-slate-200/60 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20 transition-all text-xs">
                 <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
                 <input
                   type="text"
                   placeholder="Tìm điểm đến, ẩm thực..."
-                  className="bg-transparent border-0 outline-none text-xs text-slate-800 placeholder:text-slate-400 w-32 2xl:w-44 font-medium"
+                  className="bg-transparent border-0 outline-none text-xs text-slate-800 placeholder:text-slate-400 w-32 2xl:w-40 font-medium"
                 />
               </div>
 
@@ -169,7 +168,7 @@ export const Navbar = () => {
                         setIsNotificationOpen(!isNotificationOpen);
                         setIsProfileDropdownOpen(false);
                       }}
-                      className="w-10 h-10 rounded-full flex items-center justify-center bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-950 border border-slate-200 shadow-2xs transition-colors relative cursor-pointer"
+                      className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-100/90 hover:bg-slate-200/90 text-slate-700 hover:text-slate-900 border border-slate-200/60 shadow-2xs transition-colors relative cursor-pointer"
                       title="Thông báo"
                     >
                       <Bell className="w-4 h-4" />
@@ -185,11 +184,11 @@ export const Navbar = () => {
                     />
                   </div>
 
-                  {/* Refined "Tạo lịch trình" Button */}
+                  {/* Refined "Tạo lịch trình" Button (Shown on 2xl screens to avoid crowding) */}
                   <button
                     type="button"
                     onClick={() => setIsAIGeneratorOpen(true)}
-                    className="hidden xl:inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white rounded-full text-xs xl:text-[13px] font-extrabold shadow-sm shadow-sky-500/25 hover:shadow-md transition-all cursor-pointer shrink-0"
+                    className="hidden 2xl:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-200" />
                     <span>Tạo lịch trình</span>

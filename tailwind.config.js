@@ -30,8 +30,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', '"Be Vietnam Pro"', 'system-ui', '-apple-system', 'sans-serif'],
-        display: ['"Plus Jakarta Sans"', '"Be Vietnam Pro"', 'sans-serif'],
+        sans: ['"Inter"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        display: ['"Inter"', 'sans-serif'],
       }
     },
   },
