@@ -72,7 +72,7 @@ export const Navbar = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-white/85 backdrop-blur-xl border-b border-slate-200/70 shadow-xs select-none">
+      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-2xl border-b border-slate-200/90 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_4px_6px_-2px_rgba(0,0,0,0.03)] select-none transition-all">
         <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="flex items-center justify-between h-16 gap-3">
             
@@ -89,16 +89,14 @@ export const Navbar = () => {
                   <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 group-hover:text-sky-600 transition-colors">
                     Way<span className="text-sky-600">fare</span>
                   </span>
-                  <span className="hidden sm:block text-[9px] uppercase tracking-widest font-extrabold text-slate-400">
-                    Smart Travel AI
-                  </span>
+                  
                 </div>
               </div>
             </div>
 
-            {/* 2. Sleek Rounded Navigation Bar (Adaptive Responsive Sizing) */}
+            {/* 2. Sleek Rounded Navigation Bar (High Definition & Contrast) */}
             {portalMode === 'user' && (
-              <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 p-1 bg-slate-100/70 rounded-full border border-slate-200/50 shadow-2xs shrink-0">
+              <nav className="hidden lg:flex items-center gap-1 p-1.5 bg-slate-100/90 hover:bg-slate-100 rounded-full border border-slate-200/80 shadow-xs shrink-0 transition-all">
                 {navItems.map(tab => {
                   const active = userTab === tab.id;
                   const Icon = tab.icon;
@@ -107,16 +105,16 @@ export const Navbar = () => {
                       key={tab.id}
                       onClick={() => handleNavClick(tab.id)}
                       title={tab.label}
-                      className={`flex items-center gap-1 xl:gap-1.5 px-2 py-1 xl:px-3.5 xl:py-1.5 text-[11px] xl:text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 xl:px-4 xl:py-2 text-xs xl:text-[13px] font-bold rounded-full transition-all cursor-pointer whitespace-nowrap ${
                         active
-                          ? 'bg-sky-600 text-white font-bold shadow-xs'
-                          : 'text-slate-600 hover:text-slate-900 hover:bg-white/80'
+                          ? 'bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-500 text-white shadow-md shadow-sky-500/30'
+                          : 'text-slate-700 hover:text-slate-950 hover:bg-white hover:shadow-2xs'
                       }`}
                     >
                       {tab.isAi ? (
-                        <Sparkles className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-amber-200' : 'text-amber-500'}`} />
+                        <Sparkles className={`w-4 h-4 shrink-0 ${active ? 'text-amber-200' : 'text-amber-500'}`} />
                       ) : (
-                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} />
+                        <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-white' : 'text-slate-500'}`} />
                       )}
                       
                       {/* Responsive adaptive label */}
@@ -152,12 +150,12 @@ export const Navbar = () => {
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               
               {/* Search Pill Input (Desktop) */}
-              <div className="hidden 2xl:flex items-center bg-slate-100/80 hover:bg-slate-100 focus-within:bg-white rounded-full px-3.5 py-1.5 border border-slate-200/60 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20 transition-all text-xs">
+              <div className="hidden 2xl:flex items-center bg-white hover:bg-slate-50 focus-within:bg-white rounded-full px-4 py-2 border border-slate-200 shadow-2xs focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20 transition-all text-xs">
                 <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
                 <input
                   type="text"
                   placeholder="Tìm điểm đến, ẩm thực..."
-                  className="bg-transparent border-0 outline-none text-xs text-slate-800 placeholder:text-slate-400 w-32 2xl:w-44"
+                  className="bg-transparent border-0 outline-none text-xs text-slate-800 placeholder:text-slate-400 w-32 2xl:w-44 font-medium"
                 />
               </div>
 
@@ -171,7 +169,7 @@ export const Navbar = () => {
                         setIsNotificationOpen(!isNotificationOpen);
                         setIsProfileDropdownOpen(false);
                       }}
-                      className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 hover:text-slate-900 transition-colors relative cursor-pointer shadow-2xs"
+                      className="w-10 h-10 rounded-full flex items-center justify-center bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-950 border border-slate-200 shadow-2xs transition-colors relative cursor-pointer"
                       title="Thông báo"
                     >
                       <Bell className="w-4 h-4" />
@@ -191,7 +189,7 @@ export const Navbar = () => {
                   <button
                     type="button"
                     onClick={() => setIsAIGeneratorOpen(true)}
-                    className="hidden xl:inline-flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0"
+                    className="hidden xl:inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white rounded-full text-xs xl:text-[13px] font-extrabold shadow-sm shadow-sky-500/25 hover:shadow-md transition-all cursor-pointer shrink-0"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-200" />
                     <span>Tạo lịch trình</span>

@@ -849,6 +849,9 @@ export const CommunityPage = () => {
             displayPosts.map(post => {
               const hasItinerary = Boolean(post.itineraryId || post.itineraryTitle);
               const isBookmarked = bookmarkedPostIds.has(post.id);
+              const authorName = post.authorName || post.author?.fullName || post.author?.name || 'Thành viên Wayfare';
+              const authorAvatar = post.authorAvatar || post.author?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
+              const authorId = post.authorId || post.author?.id;
 
               return (
                 <article
@@ -857,16 +860,16 @@ export const CommunityPage = () => {
                 >
                   {/* Status Banner for Posts Pending Review */}
                   {post.status === 'PENDING_REVIEW' && (
-                    <div className="bg-amber-50/90 border border-amber-200 p-3.5 rounded-2xl flex items-start gap-3 text-xs text-amber-900 shadow-2xs">
+                    <div className="bg-amber-50/90 border border-amber-200 p-3.5 rounded-2xl flex items-start gap-3 text-xs sm:text-sm text-amber-900 shadow-2xs">
                       <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-bold text-slate-900">Đang chờ Quản trị viên duyệt thủ công</span>
-                          <span className="px-2 py-0.5 rounded-md bg-amber-200/80 text-amber-900 text-[10px] font-bold">
+                          <span className="px-2 py-0.5 rounded-md bg-amber-200/80 text-amber-900 text-xs font-bold">
                             Điểm AI: {post.aiSafetyScore || 45}/100
                           </span>
                         </div>
-                        <p className="text-[11px] text-amber-800 mt-1 leading-relaxed">
+                        <p className="text-xs text-amber-800 mt-1 leading-relaxed">
                           <strong>Lý do AI gắn cờ:</strong> {post.aiFlagReason || 'Nội dung chứa yếu tố cần xác thực thêm trước khi công khai.'} <span className="text-slate-500 italic">(Hiện tại chỉ hiển thị trong feed của bạn)</span>
                         </p>
                       </div>
@@ -878,55 +881,52 @@ export const CommunityPage = () => {
                     <div className="flex items-center gap-3">
                       <div
                         onClick={() => {
-                          if (post.author?.id) setSelectedUserIdForModal(post.author.id);
+                          if (authorId) setSelectedUserIdForModal(authorId);
                         }}
-                        className="relative cursor-pointer group"
+                        className="relative cursor-pointer group shrink-0"
                         title="Xem trang cá nhân của tác giả"
                       >
                         <img
-                          src={
-                            post.author?.avatar ||
-                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-                          }
-                          alt={post.author?.fullName || 'User'}
-                          className="w-11 h-11 rounded-full object-cover ring-2 ring-slate-100 group-hover:ring-sky-400 transition-all"
+                          src={authorAvatar}
+                          alt={authorName}
+                          className="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100 group-hover:ring-sky-500 transition-all shadow-xs"
                         />
-                        <span className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-sky-600 text-white flex items-center justify-center text-[8px] font-bold">
+                        <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-sky-600 text-white flex items-center justify-center text-[9px] font-bold ring-1 ring-white">
                           ✓
                         </span>
                       </div>
                       <div>
-                        <div className="flex items-center gap-1.5 flex-wrap">
+                        <div className="flex items-center gap-2 flex-wrap">
                           <h4
                             onClick={() => {
-                              if (post.author?.id) setSelectedUserIdForModal(post.author.id);
+                              if (authorId) setSelectedUserIdForModal(authorId);
                             }}
-                            className="font-bold text-xs sm:text-sm text-slate-900 hover:text-sky-600 cursor-pointer transition-colors"
+                            className="font-extrabold text-sm sm:text-base text-slate-900 hover:text-sky-600 cursor-pointer transition-colors"
                             title="Xem trang cá nhân của tác giả"
                           >
-                            {post.author?.fullName || 'Thành viên Wayfare'}
+                            {authorName}
                           </h4>
                           {post.category && (
-                            <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[10px] font-bold">
+                            <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 text-xs font-bold border border-sky-100">
                               {post.category}
                             </span>
                           )}
                           {post.visibility === 'PRIVATE' && (
-                            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold flex items-center gap-1 border border-slate-200">
-                              <Lock className="w-2.5 h-2.5" /> Chỉ mình tôi
+                            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1 border border-slate-200">
+                              <Lock className="w-3 h-3" /> Chỉ mình tôi
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5 flex-wrap">
+                        <p className="text-xs sm:text-[13px] text-slate-500 flex items-center gap-1.5 mt-0.5 flex-wrap font-medium">
                           <span title={post.formattedDate || post.timeAgo}>{post.timeAgo || 'Vừa xong'}</span>
                           {post.formattedDate && (
-                            <span className="text-[10px] text-slate-400 hidden sm:inline">({post.formattedDate})</span>
+                            <span className="text-slate-400">({post.formattedDate})</span>
                           )}
                           {post.locationTag && (
                             <>
                               <span>•</span>
-                              <MapPin className="w-3 h-3 text-sky-600" />
-                              <span className="text-slate-600 font-medium">{post.locationTag}</span>
+                              <MapPin className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                              <span className="text-slate-700 font-semibold">{post.locationTag}</span>
                             </>
                           )}
                         </p>
@@ -999,13 +999,13 @@ export const CommunityPage = () => {
                   </div>
 
                   {/* Post Title & Content */}
-                  <div>
+                  <div className="space-y-1.5">
                     {post.title && (
-                      <h3 className="font-bold text-sm sm:text-base text-slate-900 mb-1.5 leading-snug">
+                      <h3 className="font-extrabold text-base sm:text-lg text-slate-900 leading-snug">
                         {post.title}
                       </h3>
                     )}
-                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">
+                    <p className="text-sm sm:text-[15.5px] text-slate-700 leading-relaxed whitespace-pre-line">
                       {post.content}
                     </p>
                   </div>

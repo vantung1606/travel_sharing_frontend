@@ -13,7 +13,7 @@
 
   /* Clean, crisp & modern base font sizing with optimum readability */
   html {
-    font-size: 15px;
+    font-size: 16px;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -21,12 +21,12 @@
   }
   @media (min-width: 1024px) {
     html {
-      font-size: 15.5px;
+      font-size: 16px;
     }
   }
   @media (min-width: 1440px) {
     html {
-      font-size: 16px;
+      font-size: 16.5px;
     }
   }
 
