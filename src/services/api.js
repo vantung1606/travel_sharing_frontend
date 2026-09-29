@@ -139,6 +139,47 @@ export const adminApi = {
   }
 };
 
+// ─── Itineraries API ─────────────────────────────────────────────────────────
+export const itineraryApi = {
+  async getAllItineraries() {
+    try {
+      const response = await fetch(`${BASE_URL}/itineraries/all`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const res = await response.json();
+      return res.data || [];
+    } catch (err) {
+      console.warn('getAllItineraries API warning:', err.message);
+      return [];
+    }
+  },
+
+  async getMyItineraries(email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const response = await fetch(`${BASE_URL}/itineraries?email=${encodeURIComponent(userEmail)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const res = await response.json();
+      return res.data || [];
+    } catch (err) {
+      console.warn('getMyItineraries API warning:', err.message);
+      return [];
+    }
+  }
+};
+
 // ─── Admin Users & RBAC API (A03) ─────────────────────────────────────────────
 export const adminUserApi = {
   async getUsers({ keyword = '', role = '', status = '' } = {}) {
@@ -751,11 +792,14 @@ export const auditLogApi = {
 
 // ─── Community Posts & Social Interaction API ────────────────────────────────
 export const postApi = {
-  async getPosts({ category = '', keyword = '' } = {}) {
+  async getPosts({ category = '', keyword = '', email = '' } = {}) {
     try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || '';
       const params = new URLSearchParams();
       if (category && category !== 'Tất cả') params.append('category', category);
       if (keyword) params.append('keyword', keyword);
+      if (userEmail) params.append('email', userEmail);
 
       const res = await fetch(`${BASE_URL}/posts?${params.toString()}`, {
         headers: {
@@ -772,9 +816,14 @@ export const postApi = {
     }
   },
 
-  async getPostById(id) {
+  async getPostById(id, email = '') {
     try {
-      const res = await fetch(`${BASE_URL}/posts/${id}`, {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || '';
+      const url = userEmail
+        ? `${BASE_URL}/posts/${id}?email=${encodeURIComponent(userEmail)}`
+        : `${BASE_URL}/posts/${id}`;
+      const res = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeader()

@@ -210,7 +210,13 @@ export const PostDetailModal = ({
   const authorAvatar = post?.authorAvatar || post?.author?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
   const authorHandle = post?.authorHandle || post?.author?.handle || '@wayfarer';
   const authorRole = post?.authorRole || post?.author?.role || 'Phượt thủ';
-  const authorId = post?.authorId || post?.author?.id;
+  const isSelf = Boolean(
+    post?.isOwner ||
+    (effectiveAuthorId && currentUser?.id && Number(effectiveAuthorId) === Number(currentUser.id)) ||
+    (currentUser?.name && authorName && authorName.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) ||
+    (currentUser?.handle && authorHandle && authorHandle.trim().toLowerCase() === currentUser.handle.trim().toLowerCase()) ||
+    (currentUser?.email && (post?.authorEmail || post?.author?.email) && (post?.authorEmail || post?.author?.email).toLowerCase() === currentUser.email.toLowerCase())
+  );
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
@@ -248,7 +254,11 @@ export const PostDetailModal = ({
                 <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[10px] font-bold border border-sky-100 shrink-0">
                   {authorRole}
                 </span>
-                {effectiveAuthorId && (!currentUser || currentUser.email !== post?.author?.email) && (
+                {isSelf ? (
+                  <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
+                    Bạn
+                  </span>
+                ) : effectiveAuthorId ? (
                   <button
                     onClick={handleToggleFollowAuthor}
                     disabled={followLoading}
@@ -273,7 +283,7 @@ export const PostDetailModal = ({
                       </>
                     )}
                   </button>
-                )}
+                ) : null}
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
                 <span>{authorHandle}</span>
