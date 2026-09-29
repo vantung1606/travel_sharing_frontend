@@ -11,20 +11,28 @@
     --on-surface: #131b2e;
   }
 
-  /* Clean, crisp & modern base font sizing (proportional and balanced across all screens) */
+  /* Clean, crisp & modern base font sizing with optimum readability */
   html {
-    font-size: 14px;
+    font-size: 15px;
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   @media (min-width: 1024px) {
     html {
-      font-size: 14.5px;
+      font-size: 15.5px;
     }
   }
   @media (min-width: 1440px) {
     html {
-      font-size: 15px;
+      font-size: 16px;
     }
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.012em;
   }
 }
 
