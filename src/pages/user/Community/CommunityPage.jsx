@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
-import { postApi } from '../../../services/api';
+import { postApi, uploadApi, userApi } from '../../../services/api';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
+import { UserProfileModal } from '../../../components/community/UserProfileModal';
+import { EditPostModal } from '../../../components/community/EditPostModal';
 import {
   Heart,
   MessageCircle,
@@ -41,7 +43,14 @@ import {
   ShieldCheck,
   AlertCircle,
   AlertTriangle,
-  ShieldAlert
+  ShieldAlert,
+  Lock,
+  Globe,
+  Upload,
+  Video,
+  Trash2,
+  Edit,
+  UserPlus
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -70,9 +79,23 @@ export const CommunityPage = () => {
   const [postContent, setPostContent] = useState('');
   const [postLocation, setPostLocation] = useState('');
   const [postCategory, setPostCategory] = useState('Ẩm thực & Check-in');
-  const [postImagesInput, setPostImagesInput] = useState('');
+  const [postVisibility, setPostVisibility] = useState('PUBLIC');
+  const [postImagesList, setPostImagesList] = useState([]);
+  const [postVideoUrl, setPostVideoUrl] = useState('');
+  const [customImageUrl, setCustomImageUrl] = useState('');
+  const [uploadingMedia, setUploadingMedia] = useState(false);
   const [attachedItineraryId, setAttachedItineraryId] = useState('');
   const [submittingPost, setSubmittingPost] = useState(false);
+  const createFileInputRef = useRef(null);
+
+  // User Profile Modal State
+  const [selectedUserIdForModal, setSelectedUserIdForModal] = useState(null);
+
+  // Edit Post Modal State
+  const [postToEdit, setPostToEdit] = useState(null);
+
+  // Post Actions Menu State
+  const [openMenuPostId, setOpenMenuPostId] = useState(null);
 
   // AI Moderation Scanning Step & Feedback State
   const [moderationStep, setModerationStep] = useState(0); // 0: idle, 1: text scan, 2: safety rules, 3: AI scoring
@@ -323,6 +346,96 @@ export const CommunityPage = () => {
     }
   };
 
+  // Upload Media for Create Modal
+  const handleUploadMediaForCreate = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    try {
+      setUploadingMedia(true);
+      const uploadedUrls = await uploadApi.uploadFiles(files);
+      if (uploadedUrls && uploadedUrls.length > 0) {
+        const newImages = [...postImagesList];
+        uploadedUrls.forEach(url => {
+          if (url.match(/\.(mp4|webm|mov|mkv)$/i)) {
+            setPostVideoUrl(url);
+          } else {
+            newImages.push(url);
+          }
+        });
+        setPostImagesList(newImages);
+        toast.showSuccess(`Đã tải lên ${uploadedUrls.length} tệp thành công! 📸`);
+      }
+    } catch (err) {
+      toast.showError('Tải tệp lên thất bại: ' + err.message);
+    } finally {
+      setUploadingMedia(false);
+      if (createFileInputRef.current) createFileInputRef.current.value = '';
+    }
+  };
+
+  const handleAddCustomImageUrlForCreate = () => {
+    if (!customImageUrl.trim()) return;
+    if (customImageUrl.match(/\.(mp4|webm|mov|mkv)$/i)) {
+      setPostVideoUrl(customImageUrl.trim());
+      toast.showInfo('Đã gán đường dẫn Video!');
+    } else {
+      setPostImagesList(prev => [...prev, customImageUrl.trim()]);
+      toast.showSuccess('Đã thêm ảnh vào bài viết!');
+    }
+    setCustomImageUrl('');
+  };
+
+  const handleRemoveCreateImage = (indexToRemove) => {
+    setPostImagesList(prev => prev.filter((_, idx) => idx !== indexToRemove));
+  };
+
+  const handleRemoveCreateVideo = () => {
+    setPostVideoUrl('');
+  };
+
+  // Toggle Post Visibility (Public <-> Private)
+  const handleToggleVisibility = async (post) => {
+    const nextVisibility = post.visibility === 'PRIVATE' ? 'PUBLIC' : 'PRIVATE';
+    try {
+      await postApi.updateVisibility(post.id, nextVisibility);
+      setPosts(prev =>
+        prev.map(p => (p.id === post.id ? { ...p, visibility: nextVisibility } : p))
+      );
+      toast.showSuccess(
+        nextVisibility === 'PRIVATE'
+          ? 'Đã chuyển bài viết sang chế độ Chỉ mình tôi 🔒'
+          : 'Đã chuyển bài viết sang chế độ Công khai 🌐'
+      );
+      setOpenMenuPostId(null);
+    } catch (err) {
+      toast.showError('Không thể cập nhật quyền riêng tư: ' + err.message);
+    }
+  };
+
+  // Delete Post
+  const handleDeletePost = async (post) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa bài viết "${post.title}" không? Hành động này không thể hoàn tác.`)) {
+      return;
+    }
+    try {
+      await postApi.delete(post.id);
+      setPosts(prev => prev.filter(p => p.id !== post.id));
+      toast.showSuccess('Đã xóa bài viết thành công! 🗑️');
+      setOpenMenuPostId(null);
+    } catch (err) {
+      toast.showError('Không thể xóa bài viết: ' + err.message);
+    }
+  };
+
+  // Post Updated Callback from Edit Modal
+  const handlePostUpdated = (updatedPost) => {
+    setPosts(prev =>
+      prev.map(p => (p.id === updatedPost.id ? updatedPost : p))
+    );
+    fetchPosts();
+  };
+
   // Submit Create Post Form
   const handleCreatePostSubmit = async (e) => {
     e.preventDefault();
@@ -343,19 +456,16 @@ export const CommunityPage = () => {
       await new Promise(r => setTimeout(r, 650));
       setModerationStep(3);
 
-      const images = postImagesInput
-        .split('\n')
-        .map(url => url.trim())
-        .filter(url => url.length > 0);
-
       const payload = {
         title: postTitle.trim(),
         content: postContent.trim(),
         locationTag: postLocation.trim() || 'Việt Nam',
         category: postCategory,
-        images: images.length > 0 ? images : [
+        visibility: postVisibility,
+        images: postImagesList.length > 0 ? postImagesList : [
           'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80'
         ],
+        videoUrl: postVideoUrl || null,
         itineraryId: attachedItineraryId ? Number(attachedItineraryId) : null
       };
 
@@ -367,7 +477,10 @@ export const CommunityPage = () => {
       setPostContent('');
       setPostLocation('');
       setPostCategory('Ẩm thực & Check-in');
-      setPostImagesInput('');
+      setPostVisibility('PUBLIC');
+      setPostImagesList([]);
+      setPostVideoUrl('');
+      setCustomImageUrl('');
       setAttachedItineraryId('');
 
       // Evaluate Moderation Result for Feedback Display
@@ -763,14 +876,20 @@ export const CommunityPage = () => {
                   {/* Post Header: Author, Verification Badge, Time, Location */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="relative">
+                      <div
+                        onClick={() => {
+                          if (post.author?.id) setSelectedUserIdForModal(post.author.id);
+                        }}
+                        className="relative cursor-pointer group"
+                        title="Xem trang cá nhân của tác giả"
+                      >
                         <img
                           src={
                             post.author?.avatar ||
                             'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
                           }
                           alt={post.author?.fullName || 'User'}
-                          className="w-11 h-11 rounded-full object-cover ring-2 ring-slate-100"
+                          className="w-11 h-11 rounded-full object-cover ring-2 ring-slate-100 group-hover:ring-sky-400 transition-all"
                         />
                         <span className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-sky-600 text-white flex items-center justify-center text-[8px] font-bold">
                           ✓
@@ -778,7 +897,13 @@ export const CommunityPage = () => {
                       </div>
                       <div>
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <h4 className="font-bold text-xs sm:text-sm text-slate-900">
+                          <h4
+                            onClick={() => {
+                              if (post.author?.id) setSelectedUserIdForModal(post.author.id);
+                            }}
+                            className="font-bold text-xs sm:text-sm text-slate-900 hover:text-sky-600 cursor-pointer transition-colors"
+                            title="Xem trang cá nhân của tác giả"
+                          >
                             {post.author?.fullName || 'Thành viên Wayfare'}
                           </h4>
                           {post.category && (
@@ -786,9 +911,17 @@ export const CommunityPage = () => {
                               {post.category}
                             </span>
                           )}
+                          {post.visibility === 'PRIVATE' && (
+                            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold flex items-center gap-1 border border-slate-200">
+                              <Lock className="w-2.5 h-2.5" /> Chỉ mình tôi
+                            </span>
+                          )}
                         </div>
                         <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5 flex-wrap">
-                          <span>{post.timeAgo || 'Vừa xong'}</span>
+                          <span title={post.formattedDate || post.timeAgo}>{post.timeAgo || 'Vừa xong'}</span>
+                          {post.formattedDate && (
+                            <span className="text-[10px] text-slate-400 hidden sm:inline">({post.formattedDate})</span>
+                          )}
                           {post.locationTag && (
                             <>
                               <span>•</span>
@@ -800,16 +933,68 @@ export const CommunityPage = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 relative">
                       <button
                         onClick={() => handleToggleBookmark(post.id)}
-                        className={`p-2 rounded-xl transition-colors ${
+                        className={`p-2 rounded-xl transition-colors cursor-pointer ${
                           isBookmarked ? 'text-amber-500 bg-amber-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
                         }`}
                         title={isBookmarked ? 'Bỏ lưu' : 'Lưu bài viết'}
                       >
                         <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-amber-500' : ''}`} />
                       </button>
+
+                      {/* Actions Menu for Owner or Admin */}
+                      {(post.isOwner || post.author?.email === currentUser?.email) && (
+                        <div className="relative">
+                          <button
+                            onClick={() => setOpenMenuPostId(openMenuPostId === post.id ? null : post.id)}
+                            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                            title="Tùy chọn bài viết"
+                          >
+                            <MoreHorizontal className="w-4 h-4" />
+                          </button>
+
+                          {openMenuPostId === post.id && (
+                            <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-20 animate-in fade-in zoom-in-95 duration-150">
+                              <button
+                                onClick={() => {
+                                  setPostToEdit(post);
+                                  setOpenMenuPostId(null);
+                                }}
+                                className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2 cursor-pointer"
+                              >
+                                <Edit className="w-3.5 h-3.5 text-sky-600" />
+                                <span>Chỉnh sửa bài viết</span>
+                              </button>
+                              <button
+                                onClick={() => handleToggleVisibility(post)}
+                                className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
+                              >
+                                {post.visibility === 'PRIVATE' ? (
+                                  <>
+                                    <Globe className="w-3.5 h-3.5 text-teal-600" />
+                                    <span>Đặt làm Công khai 🌐</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Lock className="w-3.5 h-3.5 text-amber-600" />
+                                    <span>Đặt Chỉ mình tôi 🔒</span>
+                                  </>
+                                )}
+                              </button>
+                              <div className="border-t border-slate-100 my-1"></div>
+                              <button
+                                onClick={() => handleDeletePost(post)}
+                                className="w-full px-3.5 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Xóa bài viết</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -824,6 +1009,18 @@ export const CommunityPage = () => {
                       {post.content}
                     </p>
                   </div>
+
+                  {/* Post Video Display */}
+                  {post.videoUrl && (
+                    <div className="rounded-2xl overflow-hidden border border-slate-100 bg-black aspect-video max-h-96">
+                      <video
+                        src={post.videoUrl}
+                        controls
+                        className="w-full h-full object-contain"
+                        preload="metadata"
+                      />
+                    </div>
+                  )}
 
                   {/* Post Photos Display */}
                   {post.images && post.images.length > 0 && (
@@ -1210,16 +1407,48 @@ export const CommunityPage = () => {
             </div>
 
             <form onSubmit={handleCreatePostSubmit} className="space-y-4">
-              {/* User preview */}
-              <div className="flex items-center gap-3">
-                <img
-                  src={currentUser.avatar}
-                  alt={currentUser.name}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-sky-100"
-                />
-                <div>
-                  <h4 className="font-bold text-xs text-slate-900">{currentUser.name}</h4>
-                  <span className="text-[10px] text-slate-400">Đăng công khai trên toàn hệ thống</span>
+              {/* User preview and Visibility Selector */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={currentUser.avatar}
+                    alt={currentUser.name}
+                    className="w-10 h-10 rounded-full object-cover ring-2 ring-sky-100"
+                  />
+                  <div>
+                    <h4 className="font-bold text-xs text-slate-900">{currentUser.name}</h4>
+                    <span className="text-[10px] text-slate-400">
+                      {postVisibility === 'PUBLIC' ? 'Đăng công khai toàn hệ thống 🌐' : 'Chỉ mình tôi có thể xem 🔒'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Visibility selector */}
+                <div className="flex items-center gap-1.5 self-end sm:self-center">
+                  <button
+                    type="button"
+                    onClick={() => setPostVisibility('PUBLIC')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      postVisibility === 'PUBLIC'
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    <Globe className="w-3.5 h-3.5" />
+                    <span>Công khai</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPostVisibility('PRIVATE')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      postVisibility === 'PRIVATE'
+                        ? 'bg-slate-800 text-white shadow-xs'
+                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Chỉ mình tôi</span>
+                  </button>
                 </div>
               </div>
 
@@ -1330,18 +1559,90 @@ export const CommunityPage = () => {
                 )}
               </div>
 
-              {/* Image URLs input */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  URL Hình ảnh minh họa (Mỗi dòng một link)
-                </label>
-                <textarea
-                  rows={2}
-                  placeholder="https://images.unsplash.com/...&#10;https://images.unsplash.com/..."
-                  value={postImagesInput}
-                  onChange={e => setPostImagesInput(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 resize-none font-mono"
-                />
+              {/* MEDIA SECTION: DEVICE UPLOAD + URL */}
+              <div className="space-y-2 p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <ImageIcon className="w-4 h-4 text-sky-600" />
+                    <span>Hình ảnh & Video ({postImagesList.length} ảnh{postVideoUrl ? ', 1 video' : ''})</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => createFileInputRef.current?.click()}
+                    disabled={uploadingMedia}
+                    className="px-3 py-1.5 rounded-xl bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-50"
+                  >
+                    {uploadingMedia ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Đang tải lên...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Tải từ thiết bị</span>
+                      </>
+                    )}
+                  </button>
+                  <input
+                    ref={createFileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*,video/*"
+                    onChange={handleUploadMediaForCreate}
+                    className="hidden"
+                  />
+                </div>
+
+                {/* Custom URL Input */}
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Hoặc dán URL ảnh / video..."
+                    value={customImageUrl}
+                    onChange={e => setCustomImageUrl(e.target.value)}
+                    className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddCustomImageUrlForCreate}
+                    className="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                  >
+                    Thêm
+                  </button>
+                </div>
+
+                {/* Thumbnails preview */}
+                {(postImagesList.length > 0 || postVideoUrl) && (
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 pt-2">
+                    {postImagesList.map((img, idx) => (
+                      <div key={idx} className="relative group rounded-xl overflow-hidden aspect-square border border-slate-200 bg-white">
+                        <img src={img} alt="thumb" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveCreateImage(idx)}
+                          className="absolute top-1 right-1 w-6 h-6 rounded-full bg-rose-600/90 text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-700 cursor-pointer"
+                          title="Xóa ảnh"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                    {postVideoUrl && (
+                      <div className="relative group rounded-xl overflow-hidden aspect-square border border-sky-300 bg-slate-900 flex items-center justify-center text-white">
+                        <Video className="w-6 h-6 text-sky-400" />
+                        <button
+                          type="button"
+                          onClick={handleRemoveCreateVideo}
+                          className="absolute top-1 right-1 w-6 h-6 rounded-full bg-rose-600/90 text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-700 cursor-pointer"
+                          title="Xóa video"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Submit Buttons */}
@@ -1482,16 +1783,27 @@ export const CommunityPage = () => {
                 postComments.map((cmt, idx) => (
                   <div key={cmt.id || idx} className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-slate-50">
                     <img
+                      onClick={() => {
+                        if (cmt.userId) setSelectedUserIdForModal(cmt.userId);
+                      }}
                       src={
                         cmt.userAvatar ||
                         'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
                       }
                       alt={cmt.userName || 'User'}
-                      className="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-0.5"
+                      className="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-0.5 cursor-pointer hover:ring-2 hover:ring-sky-400 transition-all"
+                      title="Xem trang cá nhân"
                     />
                     <div className="flex-1 bg-slate-100/80 rounded-2xl px-3.5 py-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-xs text-slate-900">{cmt.userName || 'Thành viên'}</span>
+                        <span
+                          onClick={() => {
+                            if (cmt.userId) setSelectedUserIdForModal(cmt.userId);
+                          }}
+                          className="font-bold text-xs text-slate-900 cursor-pointer hover:text-sky-600 transition-colors"
+                        >
+                          {cmt.userName || 'Thành viên'}
+                        </span>
                         <span className="text-[10px] text-slate-400">{cmt.timeAgo || 'Vừa xong'}</span>
                       </div>
                       <p className="text-xs text-slate-700 mt-1 leading-relaxed">{cmt.content}</p>
@@ -1532,6 +1844,31 @@ export const CommunityPage = () => {
         <ItineraryDetailModal
           itinerary={selectedItineraryForModal}
           onClose={() => setSelectedItineraryForModal(null)}
+        />
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 4: USER PROFILE MODAL (Full User Details & Follow) */}
+      {/* ========================================================= */}
+      {selectedUserIdForModal && (
+        <UserProfileModal
+          userId={selectedUserIdForModal}
+          onClose={() => setSelectedUserIdForModal(null)}
+          onSelectItinerary={(itin) => {
+            setSelectedUserIdForModal(null);
+            setSelectedItineraryForModal(itin);
+          }}
+        />
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 5: EDIT POST MODAL (With AI Re-moderation)          */}
+      {/* ========================================================= */}
+      {postToEdit && (
+        <EditPostModal
+          post={postToEdit}
+          onClose={() => setPostToEdit(null)}
+          onPostUpdated={handlePostUpdated}
         />
       )}
 

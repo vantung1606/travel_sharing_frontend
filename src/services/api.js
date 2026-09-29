@@ -858,6 +858,99 @@ export const postApi = {
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
     return json.data;
+  },
+
+  async update(id, payload) {
+    const res = await fetch(`${BASE_URL}/posts/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  },
+
+  async updateVisibility(id, visibility) {
+    const res = await fetch(`${BASE_URL}/posts/${id}/visibility?visibility=${encodeURIComponent(visibility)}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  },
+
+  async delete(id) {
+    const res = await fetch(`${BASE_URL}/posts/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
   }
 };
+
+// ─── File Upload API (Images & Videos) ────────────────────────────────────────
+export const uploadApi = {
+  async uploadFiles(fileList) {
+    const formData = new FormData();
+    for (let i = 0; i < fileList.length; i++) {
+      formData.append('files', fileList[i]);
+    }
+    const token = localStorage.getItem('token');
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${BASE_URL}/upload/multiple`, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data || [];
+  }
+};
+
+// ─── User Profile & Follow API ────────────────────────────────────────────────
+export const userApi = {
+  async getProfile(userId) {
+    const res = await fetch(`${BASE_URL}/users/${userId}/profile`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  },
+
+  async toggleFollow(userId) {
+    const res = await fetch(`${BASE_URL}/users/${userId}/follow`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  }
+};
+
 
