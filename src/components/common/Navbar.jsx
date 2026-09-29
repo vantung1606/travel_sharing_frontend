@@ -196,22 +196,17 @@ export const Navbar = () => {
                 <div className="relative">
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                    className="flex items-center gap-2 p-1 sm:pr-2.5 rounded-full hover:bg-slate-100/80 border border-slate-200/80 transition-all cursor-pointer group shrink-0"
+                    className="flex items-center gap-2 p-1 sm:px-2.5 py-1 rounded-full hover:bg-slate-100/80 border border-slate-200/80 transition-all cursor-pointer group shrink-0"
                   >
                     <img
                       src={currentUser.avatar}
                       alt={currentUser.name}
-                      className="w-8 h-8 rounded-full object-cover ring-2 ring-sky-500/20"
+                      className="w-8 h-8 rounded-full object-cover ring-2 ring-sky-500/20 shrink-0"
                     />
-                    <div className="hidden xl:block text-left leading-tight">
-                      <span className="block text-xs font-bold text-slate-800">
-                        {currentUser.name}
-                      </span>
-                      <span className="block text-[10px] text-slate-400">
-                        {portalMode === 'admin' ? 'Quyền Admin' : currentUser.handle}
-                      </span>
-                    </div>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block group-hover:text-slate-700 transition-colors" />
+                    <span className="hidden sm:inline-block text-xs font-bold text-slate-800 max-w-[110px] md:max-w-[140px] truncate leading-none">
+                      {currentUser.name}
+                    </span>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 transition-colors shrink-0" />
                   </button>
 
                   {/* Profile Dropdown Menu */}
