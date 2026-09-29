@@ -24,7 +24,8 @@ import {
   SlidersHorizontal,
   Megaphone,
   Radio,
-  X
+  X,
+  Share2
 } from 'lucide-react';
 
 export const NotificationsPage = () => {
@@ -83,6 +84,28 @@ export const NotificationsPage = () => {
           badgeText: 'Bình Luận',
           actionText: 'Trả Lời Ngay'
         };
+      case 'COMMENT_REPLY':
+        return {
+          icon: MessageCircle,
+          color: 'text-sky-500 bg-sky-50 border-sky-200',
+          badgeText: 'Phản Hồi',
+          actionText: 'Trả Lời'
+        };
+      case 'SHARE':
+      case 'COMMUNITY_SHARE':
+        return {
+          icon: Share2,
+          color: 'text-sky-600 bg-sky-50 border-sky-200',
+          badgeText: 'Chia Sẻ',
+          actionText: 'Xem Bài Viết'
+        };
+      case 'ITINERARY_SHARED':
+        return {
+          icon: ExternalLink,
+          color: 'text-indigo-600 bg-indigo-50 border-indigo-200',
+          badgeText: 'Sao Chép Tour',
+          actionText: 'Xem Lịch Trình'
+        };
       case 'CHAT_INVITE':
         return {
           icon: Users,
@@ -127,7 +150,7 @@ export const NotificationsPage = () => {
       } else if (activeTab === 'ai') {
         tabMatch = item.type === 'AI_READY';
       } else if (activeTab === 'social') {
-        tabMatch = item.type === 'LIKE' || item.type === 'COMMENT';
+        tabMatch = ['LIKE', 'COMMENT', 'COMMENT_REPLY', 'SHARE', 'COMMUNITY_SHARE'].includes(item.type);
       } else if (activeTab === 'trips') {
         tabMatch = item.type === 'CHAT_INVITE' || item.type === 'ITINERARY_SHARED';
       } else if (activeTab === 'system') {
@@ -388,6 +411,9 @@ export const NotificationsPage = () => {
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-sky-500"
               >
                 <option value="AI_READY">✨ AI_READY (Trợ lý AI tạo lịch trình)</option>
+                <option value="SHARE">🔗 SHARE (Chia sẻ bài viết)</option>
+                <option value="LIKE">❤️ LIKE (Lượt thích bài viết)</option>
+                <option value="COMMENT">💬 COMMENT (Bình luận bài viết)</option>
                 <option value="LIKE">❤️ LIKE (Thích bài viết)</option>
                 <option value="COMMENT">💬 COMMENT (Bình luận bài viết)</option>
                 <option value="CHAT_INVITE">👥 CHAT_INVITE (Mời vào nhóm chat)</option>

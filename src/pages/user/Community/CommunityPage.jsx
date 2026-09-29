@@ -322,6 +322,18 @@ export const CommunityPage = () => {
     fetchPosts();
   }, [fetchPosts]);
 
+  // Handle URL query ?post=<id> to auto-open post detail modal from notification
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetPostId = urlParams.get('post');
+    if (targetPostId && posts.length > 0) {
+      const found = posts.find(p => String(p.id) === String(targetPostId));
+      if (found) {
+        setSelectedPostForDetail(found);
+      }
+    }
+  }, [posts]);
+
   // Real System Itineraries for "Tour được sao chép nhiều"
   const [trendingTours, setTrendingTours] = useState([]);
 

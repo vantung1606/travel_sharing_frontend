@@ -12,7 +12,8 @@ import {
   ExternalLink,
   ChevronRight,
   Clock3,
-  Trash2
+  Trash2,
+  Share2
 } from 'lucide-react';
 
 export const NotificationDropdown = ({ isOpen, onClose }) => {
@@ -49,7 +50,13 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
       case 'LIKE':
         return <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />;
       case 'COMMENT':
+      case 'COMMENT_REPLY':
         return <MessageCircle className="w-3.5 h-3.5 text-sky-500" />;
+      case 'SHARE':
+      case 'COMMUNITY_SHARE':
+        return <Share2 className="w-3.5 h-3.5 text-sky-500" />;
+      case 'ITINERARY_SHARED':
+        return <ExternalLink className="w-3.5 h-3.5 text-indigo-500" />;
       case 'CHAT_INVITE':
         return <Users className="w-3.5 h-3.5 text-indigo-500" />;
       case 'PLACE_APPROVED':
