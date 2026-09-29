@@ -7,15 +7,15 @@ export default {
   theme: {
     extend: {
       fontSize: {
-        'xs': ['12.5px', { lineHeight: '18px' }],
-        'sm': ['16px', { lineHeight: '24px' }],
-        'base': ['17.5px', { lineHeight: '26px' }],
-        'lg': ['19.5px', { lineHeight: '28px' }],
-        'xl': ['22px', { lineHeight: '30px' }],
-        '2xl': ['26px', { lineHeight: '34px' }],
-        '3xl': ['32px', { lineHeight: '38px' }],
-        '4xl': ['40px', { lineHeight: '46px' }],
-        '5xl': ['50px', { lineHeight: '56px' }],
+        'xs': ['16px', { lineHeight: '22px' }],
+        'sm': ['17px', { lineHeight: '25px' }],
+        'base': ['18.5px', { lineHeight: '27px' }],
+        'lg': ['20.5px', { lineHeight: '29px' }],
+        'xl': ['23px', { lineHeight: '31px' }],
+        '2xl': ['27px', { lineHeight: '35px' }],
+        '3xl': ['33px', { lineHeight: '39px' }],
+        '4xl': ['41px', { lineHeight: '47px' }],
+        '5xl': ['52px', { lineHeight: '58px' }],
       },
       colors: {
         oceanic: {
