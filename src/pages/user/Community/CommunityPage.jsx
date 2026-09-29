@@ -6,6 +6,7 @@ import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDet
 import { UserProfileModal } from '../../../components/community/UserProfileModal';
 import { EditPostModal } from '../../../components/community/EditPostModal';
 import { PostDetailModal } from '../../../components/community/PostDetailModal';
+import { FollowListModal } from '../../../components/community/FollowListModal';
 import {
   Heart,
   MessageCircle,
@@ -51,11 +52,13 @@ import {
   Video,
   Trash2,
   Edit,
-  UserPlus
+  UserPlus,
+  Users
 } from 'lucide-react';
 
 const CATEGORIES = [
   'Tất cả',
+  'Đang theo dõi',
   'Ẩm thực & Check-in',
   'Phượt & Khám phá',
   'Biển đảo & Nghỉ dưỡng',
@@ -122,6 +125,14 @@ export const CommunityPage = () => {
   const [followingIds, setFollowingIds] = useState(new Set());
   const [followingLoadingIds, setFollowingLoadingIds] = useState(new Set());
 
+  // Follow List Modal State (Followers & Following)
+  const [followListModalState, setFollowListModalState] = useState({
+    isOpen: false,
+    tab: 'following',
+    userId: null,
+    userName: ''
+  });
+
   // Fetch Following IDs on mount
   useEffect(() => {
     userApi
@@ -166,7 +177,7 @@ export const CommunityPage = () => {
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const categoryParam = activeCategory === 'Có Lịch trình đính kèm' ? '' : activeCategory;
+      const categoryParam = (activeCategory === 'Có Lịch trình đính kèm' || activeCategory === 'Đang theo dõi') ? '' : activeCategory;
       const data = await postApi.getPosts({
         category: categoryParam,
         keyword: searchQuery
@@ -193,7 +204,9 @@ export const CommunityPage = () => {
   const displayPosts = useMemo(() => {
     let result = [...posts];
 
-    if (activeCategory === 'Có Lịch trình đính kèm') {
+    if (activeCategory === 'Đang theo dõi') {
+      result = result.filter(p => followingIds.has(Number(p.authorId || p.author?.id)));
+    } else if (activeCategory === 'Có Lịch trình đính kèm') {
       result = result.filter(p => p.itineraryId || p.itineraryTitle);
     }
 
@@ -207,7 +220,7 @@ export const CommunityPage = () => {
     }
 
     return result;
-  }, [posts, activeCategory, activeSort]);
+  }, [posts, activeCategory, activeSort, followingIds]);
 
   // Handle Like Post
   const handleToggleLike = async (postId) => {
@@ -619,7 +632,7 @@ export const CommunityPage = () => {
             </div>
 
             {/* User Stats Grid */}
-            <div className="grid grid-cols-3 gap-2 p-3 bg-slate-50 rounded-xl text-center border border-slate-100">
+            <div className="grid grid-cols-4 gap-1.5 p-3 bg-slate-50 rounded-xl text-center border border-slate-100">
               <div>
                 <span className="font-bold text-sm text-sky-600 block">{itineraries.length}</span>
                 <span className="text-[10px] text-slate-500 font-semibold">Chuyến đi</span>
@@ -629,6 +642,16 @@ export const CommunityPage = () => {
                   {posts.filter(p => p.author?.email === currentUser.email).length}
                 </span>
                 <span className="text-[10px] text-slate-500 font-semibold">Bài viết</span>
+              </div>
+              <div
+                onClick={() => setFollowListModalState({ isOpen: true, tab: 'following', userId: currentUser.id, userName: currentUser.name })}
+                className="cursor-pointer hover:bg-sky-100/70 rounded-lg py-0.5 transition-colors group"
+                title="Bấm để xem danh sách đang theo dõi"
+              >
+                <span className="font-bold text-sm text-indigo-600 group-hover:scale-105 transition-transform block">
+                  {followingIds.size}
+                </span>
+                <span className="text-[10px] text-slate-500 font-semibold group-hover:text-indigo-700">Đang follow</span>
               </div>
               <div>
                 <span className="font-bold text-sm text-emerald-600 block">{bookmarkedPostIds.size}</span>
@@ -657,6 +680,13 @@ export const CommunityPage = () => {
                 icon: Compass,
                 active: activeCategory === 'Tất cả',
                 action: () => setActiveCategory('Tất cả')
+              },
+              {
+                label: `Đang theo dõi (${followingIds.size})`,
+                icon: UserCheck,
+                active: activeCategory === 'Đang theo dõi',
+                action: () => setActiveCategory('Đang theo dõi'),
+                badge: followingIds.size > 0 ? `${followingIds.size}` : null
               },
               {
                 label: 'Tour có Lịch trình AI',
@@ -698,6 +728,20 @@ export const CommunityPage = () => {
                 )}
               </button>
             ))}
+
+            <div className="pt-2 border-t border-slate-100">
+              <button
+                onClick={() => setFollowListModalState({ isOpen: true, tab: 'following', userId: currentUser.id, userName: currentUser.name })}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition-all cursor-pointer"
+                title="Xem danh sách người bạn đang theo dõi và người theo dõi bạn"
+              >
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-sky-600" />
+                  <span>Mạng lưới đang theo dõi</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
           </div>
 
           {/* Trending Topics & Hashtags */}
@@ -874,21 +918,45 @@ export const CommunityPage = () => {
           {!loading && displayPosts.length === 0 && (
             <div className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm text-center space-y-4">
               <div className="w-16 h-16 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto">
-                <Compass className="w-8 h-8" />
+                {activeCategory === 'Đang theo dõi' ? (
+                  <UserCheck className="w-8 h-8 text-sky-600" />
+                ) : (
+                  <Compass className="w-8 h-8" />
+                )}
               </div>
               <div className="max-w-md mx-auto">
-                <h3 className="text-base font-bold text-slate-900">Chưa tìm thấy bài viết phù hợp</h3>
+                <h3 className="text-base font-bold text-slate-900">
+                  {activeCategory === 'Đang theo dõi'
+                    ? (followingIds.size === 0
+                        ? 'Bạn chưa theo dõi tác giả nào'
+                        : 'Các tác giả bạn theo dõi chưa có bài viết mới')
+                    : 'Chưa tìm thấy bài viết phù hợp'}
+                </h3>
                 <p className="text-xs text-slate-500 mt-1">
-                  Hãy thử tìm kiếm với từ khóa khác, chọn danh mục khác hoặc là người đầu tiên chia sẻ chuyến đi của bạn!
+                  {activeCategory === 'Đang theo dõi'
+                    ? (followingIds.size === 0
+                        ? 'Hãy bấm "Theo dõi" các phượt thủ hoặc tác giả nổi bật ở cột bên phải để luôn cập nhật những hành trình mới nhất từ họ!'
+                        : 'Hãy khám phá thêm bài viết hấp dẫn tại mục Tất cả hoặc chia sẻ chuyến đi của riêng bạn!')
+                    : 'Hãy thử tìm kiếm với từ khóa khác, chọn danh mục khác hoặc là người đầu tiên chia sẻ chuyến đi của bạn!'}
                 </p>
               </div>
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="ocean-gradient text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-sky-500/20 hover:shadow-lg transition-all inline-flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tạo bài viết ngay</span>
-              </button>
+              <div className="flex items-center justify-center gap-3">
+                {activeCategory === 'Đang theo dõi' && (
+                  <button
+                    onClick={() => setActiveCategory('Tất cả')}
+                    className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer"
+                  >
+                    Xem tất cả bài viết
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="ocean-gradient text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-sky-500/20 hover:shadow-lg transition-all inline-flex items-center gap-2 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tạo bài viết ngay</span>
+                </button>
+              </div>
             </div>
           )}
 
@@ -2017,6 +2085,33 @@ export const CommunityPage = () => {
             setPosts(prev =>
               prev.map(p => (p.id === postId ? { ...p, ...updates } : p))
             );
+          }}
+        />
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 7: FOLLOW LIST MODAL (Followers & Following)        */}
+      {/* ========================================================= */}
+      {followListModalState.isOpen && (
+        <FollowListModal
+          userId={followListModalState.userId}
+          userName={followListModalState.userName}
+          initialTab={followListModalState.tab}
+          onClose={() => setFollowListModalState(prev => ({ ...prev, isOpen: false }))}
+          onSelectUser={(userId) => {
+            setFollowListModalState(prev => ({ ...prev, isOpen: false }));
+            setSelectedUserIdForModal(userId);
+          }}
+          onFollowChange={(targetUserId, isNowFollowing) => {
+            setFollowingIds(prev => {
+              const next = new Set(prev);
+              if (isNowFollowing) {
+                next.add(Number(targetUserId));
+              } else {
+                next.delete(Number(targetUserId));
+              }
+              return next;
+            });
           }}
         />
       )}

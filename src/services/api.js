@@ -973,6 +973,44 @@ export const userApi = {
       console.warn('API error fetching following user IDs:', err.message);
       return [];
     }
+  },
+
+  async getFollowing(userId, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/users/${userId}/following?email=${encodeURIComponent(userEmail)}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching following list:', err.message);
+      return [];
+    }
+  },
+
+  async getFollowers(userId, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/users/${userId}/followers?email=${encodeURIComponent(userEmail)}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching followers list:', err.message);
+      return [];
+    }
   }
 };
 

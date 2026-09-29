@@ -25,6 +25,7 @@ import { userApi, postApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';
 import { PostDetailModal } from './PostDetailModal';
+import { FollowListModal } from './FollowListModal';
 
 export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   const [profile, setProfile] = useState(null);
@@ -33,6 +34,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   const [activeTab, setActiveTab] = useState('posts'); // 'posts' | 'itineraries'
   const [cloningItinId, setCloningItinId] = useState(null);
   const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
+  const [followModalState, setFollowModalState] = useState({ isOpen: false, tab: 'following' });
 
   const toast = useToast();
   const { currentUser, setItineraries } = useApp();
@@ -230,17 +232,29 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                 </span>
                 <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold">Lịch trình</span>
               </div>
-              <div>
-                <span className="block text-base sm:text-lg font-black text-sky-600">
+              <div
+                onClick={() => setFollowModalState({ isOpen: true, tab: 'followers' })}
+                className="cursor-pointer hover:bg-sky-50 rounded-xl p-1 transition-all group"
+                title="Bấm để xem danh sách người theo dõi"
+              >
+                <span className="block text-base sm:text-lg font-black text-sky-600 group-hover:scale-105 transition-transform">
                   {profile.followersCount || 0}
                 </span>
-                <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold">Người theo dõi</span>
+                <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold group-hover:text-sky-700">
+                  Người theo dõi
+                </span>
               </div>
-              <div>
-                <span className="block text-base sm:text-lg font-black text-slate-900">
+              <div
+                onClick={() => setFollowModalState({ isOpen: true, tab: 'following' })}
+                className="cursor-pointer hover:bg-sky-50 rounded-xl p-1 transition-all group"
+                title="Bấm để xem danh sách đang theo dõi"
+              >
+                <span className="block text-base sm:text-lg font-black text-slate-900 group-hover:text-sky-600 group-hover:scale-105 transition-transform">
                   {profile.followingCount || 0}
                 </span>
-                <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold">Đang theo dõi</span>
+                <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold group-hover:text-sky-700">
+                  Đang theo dõi
+                </span>
               </div>
             </div>
 
@@ -443,6 +457,23 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
           onClose={() => setSelectedPostForDetail(null)}
           onSelectItinerary={onSelectItinerary}
           onAuthorClick={() => setSelectedPostForDetail(null)}
+        />
+      )}
+
+      {/* Follow List Modal (Following / Followers) */}
+      {followModalState.isOpen && profile && (
+        <FollowListModal
+          userId={profile.id}
+          userName={profile.fullName}
+          initialTab={followModalState.tab}
+          onClose={() => setFollowModalState(prev => ({ ...prev, isOpen: false }))}
+          onSelectUser={(newUserId) => {
+            setFollowModalState(prev => ({ ...prev, isOpen: false }));
+            // If selecting another user, refresh to that profile
+            if (typeof onClose === 'function') {
+              onClose();
+            }
+          }}
         />
       )}
     </div>

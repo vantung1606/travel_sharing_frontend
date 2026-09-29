@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
+import { userApi } from '../../../services/api';
+import { FollowListModal } from '../../../components/community/FollowListModal';
 import {
   User,
   MapPin,
@@ -25,7 +27,9 @@ import {
   Tag,
   Gift,
   MoreHorizontal,
-  X
+  X,
+  Users,
+  UserCheck
 } from 'lucide-react';
 
 export const ProfilePage = () => {
@@ -35,6 +39,30 @@ export const ProfilePage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [profileName, setProfileName] = useState(currentUser.name);
   const [profileBio, setProfileBio] = useState(currentUser.bio);
+
+  // Follow State & Modal
+  const [followModalState, setFollowModalState] = useState({ isOpen: false, tab: 'following' });
+  const [followingCount, setFollowingCount] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
+
+  const myUserId = currentUser.id || 1;
+
+  const loadFollowCounts = async () => {
+    try {
+      const [following, followers] = await Promise.all([
+        userApi.getFollowing(myUserId),
+        userApi.getFollowers(myUserId)
+      ]);
+      if (Array.isArray(following)) setFollowingCount(following.length);
+      if (Array.isArray(followers)) setFollowersCount(followers.length);
+    } catch (err) {
+      console.warn('Lỗi khi tải thông tin follow trang cá nhân:', err);
+    }
+  };
+
+  useEffect(() => {
+    loadFollowCounts();
+  }, [myUserId]);
 
   // Mock Achievements
   const achievements = [
@@ -101,6 +129,27 @@ export const ProfilePage = () => {
                     <MapPin className="w-3.5 h-3.5 text-sky-600" /> Đà Nẵng, Việt Nam
                   </span>
                 </p>
+
+                {/* Follow Counts Quick Bar */}
+                <div className="flex items-center gap-3 pt-1 text-xs">
+                  <button
+                    onClick={() => setFollowModalState({ isOpen: true, tab: 'followers' })}
+                    className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-sky-600 transition-colors cursor-pointer"
+                    title="Bấm để xem danh sách người theo dõi"
+                  >
+                    <span className="font-black text-sky-600 text-sm">{followersCount}</span>
+                    <span className="font-medium text-slate-500">người theo dõi</span>
+                  </button>
+                  <span className="text-slate-300">•</span>
+                  <button
+                    onClick={() => setFollowModalState({ isOpen: true, tab: 'following' })}
+                    className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-sky-600 transition-colors cursor-pointer"
+                    title="Bấm để xem danh sách đang theo dõi"
+                  >
+                    <span className="font-black text-slate-900 text-sm">{followingCount}</span>
+                    <span className="font-medium text-slate-500">đang theo dõi</span>
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -135,7 +184,7 @@ export const ProfilePage = () => {
           </p>
 
           {/* Key Travel Metrics Bento Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
             <div className="p-2">
               <span className="text-slate-400 block text-[11px] font-semibold">Điểm Đến Đã Ghé</span>
               <span className="font-display font-extrabold text-xl text-slate-900 mt-0.5 block flex items-center gap-1">
@@ -158,6 +207,30 @@ export const ProfilePage = () => {
                 {posts.length} <Globe className="w-4 h-4 text-emerald-600" />
               </span>
               <span className="text-[10px] text-slate-400">3.4k lượt thích</span>
+            </div>
+
+            <div
+              onClick={() => setFollowModalState({ isOpen: true, tab: 'followers' })}
+              className="p-2 border-l border-slate-200/80 cursor-pointer hover:bg-sky-100/60 rounded-xl transition-colors group"
+              title="Bấm để xem danh sách người theo dõi"
+            >
+              <span className="text-slate-400 block text-[11px] font-semibold group-hover:text-sky-700">Người Theo Dõi</span>
+              <span className="font-display font-extrabold text-xl text-sky-600 mt-0.5 block flex items-center gap-1 group-hover:scale-105 transition-transform">
+                {followersCount} <Users className="w-4 h-4 text-sky-500" />
+              </span>
+              <span className="text-[10px] text-sky-600 font-semibold group-hover:underline">Xem kết nối</span>
+            </div>
+
+            <div
+              onClick={() => setFollowModalState({ isOpen: true, tab: 'following' })}
+              className="p-2 border-l border-slate-200/80 cursor-pointer hover:bg-indigo-100/60 rounded-xl transition-colors group"
+              title="Bấm để xem danh sách đang theo dõi"
+            >
+              <span className="text-slate-400 block text-[11px] font-semibold group-hover:text-indigo-700">Đang Theo Dõi</span>
+              <span className="font-display font-extrabold text-xl text-indigo-600 mt-0.5 block flex items-center gap-1 group-hover:scale-105 transition-transform">
+                {followingCount} <UserCheck className="w-4 h-4 text-indigo-500" />
+              </span>
+              <span className="text-[10px] text-indigo-600 font-semibold group-hover:underline">Quản lý</span>
             </div>
 
             <div className="p-2 border-l border-slate-200/80">
@@ -504,6 +577,22 @@ export const ProfilePage = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Follow List Modal (Followers & Following) */}
+      {followModalState.isOpen && (
+        <FollowListModal
+          userId={myUserId}
+          userName={profileName || currentUser.name}
+          initialTab={followModalState.tab}
+          onClose={() => {
+            setFollowModalState(prev => ({ ...prev, isOpen: false }));
+            loadFollowCounts();
+          }}
+          onFollowChange={() => {
+            loadFollowCounts();
+          }}
+        />
       )}
 
     </div>
