@@ -18,11 +18,13 @@ import {
   CheckCircle2,
   Loader2,
   Lock,
-  Globe
+  Globe,
+  ArrowRight
 } from 'lucide-react';
 import { userApi, postApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';
+import { PostDetailModal } from './PostDetailModal';
 
 export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   const [profile, setProfile] = useState(null);
@@ -30,6 +32,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   const [followLoading, setFollowLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('posts'); // 'posts' | 'itineraries'
   const [cloningItinId, setCloningItinId] = useState(null);
+  const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
 
   const toast = useToast();
   const { setItineraries } = useApp();
@@ -107,84 +110,88 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+      <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-100 max-h-[90vh] flex flex-col overflow-hidden relative animate-in zoom-in-95 duration-200">
         
-        {/* Cover Banner & Close Button */}
-        <div className="relative h-32 sm:h-36 bg-gradient-to-r from-sky-600 via-teal-600 to-indigo-600 shrink-0">
-          <div className="absolute inset-0 bg-black/10"></div>
-          <button
-            onClick={onClose}
-            className="absolute top-3.5 right-3.5 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-colors cursor-pointer"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+        {/* Floating Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3.5 right-3.5 z-30 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors cursor-pointer shadow-md"
+          title="Đóng hồ sơ"
+        >
+          <X className="w-5 h-5" />
+        </button>
 
         {/* Profile Content Container */}
         {loading ? (
-          <div className="flex-1 flex flex-col items-center justify-center py-16 gap-3 text-slate-500">
+          <div className="flex-1 flex flex-col items-center justify-center py-20 gap-3 text-slate-500">
             <Loader2 className="w-8 h-8 animate-spin text-sky-600" />
             <span className="text-xs font-medium">Đang tải hồ sơ du khách...</span>
           </div>
         ) : profile ? (
-          <div className="flex-1 overflow-y-auto px-5 sm:px-7 pb-6 space-y-5">
-            {/* Header info: Avatar, Names, Follow button */}
-            <div className="relative -mt-14 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-              <div className="flex items-end gap-3.5">
-                <div className="relative">
-                  <img
-                    src={profile.avatarUrl}
-                    alt={profile.fullName}
-                    className="w-24 h-24 rounded-2xl object-cover ring-4 ring-white shadow-md bg-white"
-                  />
-                  {profile.isVerified && (
-                    <span className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-sky-600 text-white flex items-center justify-center text-[11px] font-bold shadow-xs">
-                      ✓
-                    </span>
-                  )}
-                </div>
-                <div className="pb-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 leading-tight">
-                      {profile.fullName}
-                    </h3>
-                    <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[11px] font-bold border border-sky-100">
-                      {profile.role}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    {profile.handle}
-                  </p>
-                </div>
-              </div>
-
-              {/* Follow / Unfollow Action */}
-              <div className="sm:pb-1 flex items-center gap-2">
-                <button
-                  onClick={handleToggleFollow}
-                  disabled={followLoading}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm ${
-                    profile.isFollowing
-                      ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600'
-                      : 'ocean-gradient text-white hover:opacity-95 shadow-sky-500/20'
-                  }`}
-                >
-                  {followLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : profile.isFollowing ? (
-                    <>
-                      <UserCheck className="w-4 h-4 text-emerald-600" />
-                      <span>Đang theo dõi</span>
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="w-4 h-4" />
-                      <span>Theo dõi</span>
-                    </>
-                  )}
-                </button>
-              </div>
+          <div className="flex-1 overflow-y-auto">
+            {/* Cover Banner */}
+            <div className="relative h-32 sm:h-36 bg-gradient-to-r from-sky-600 via-teal-600 to-indigo-600 shrink-0">
+              <div className="absolute inset-0 bg-black/10"></div>
             </div>
+
+            <div className="px-5 sm:px-7 pb-6 space-y-5">
+              {/* Header info: Avatar, Names, Follow button */}
+              <div className="relative -mt-12 sm:-mt-14 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div className="flex items-end gap-3.5">
+                  <div className="relative shrink-0">
+                    <img
+                      src={profile.avatarUrl}
+                      alt={profile.fullName}
+                      className="w-22 h-22 sm:w-26 sm:h-26 rounded-2xl object-cover ring-4 ring-white shadow-lg bg-white"
+                    />
+                    {profile.isVerified && (
+                      <span className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-sky-600 text-white flex items-center justify-center text-[11px] font-bold shadow-xs">
+                        ✓
+                      </span>
+                    )}
+                  </div>
+                  <div className="pt-2 sm:pt-0 pb-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug">
+                        {profile.fullName}
+                      </h3>
+                      <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 text-xs font-bold border border-sky-100 shadow-2xs">
+                        {profile.role}
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+                      {profile.handle}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Follow / Unfollow Action */}
+                <div className="sm:pb-1 flex items-center gap-2">
+                  <button
+                    onClick={handleToggleFollow}
+                    disabled={followLoading}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm ${
+                      profile.isFollowing
+                        ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600'
+                        : 'ocean-gradient text-white hover:opacity-95 shadow-sky-500/20'
+                    }`}
+                  >
+                    {followLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : profile.isFollowing ? (
+                      <>
+                        <UserCheck className="w-4 h-4 text-emerald-600" />
+                        <span>Đang theo dõi</span>
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="w-4 h-4" />
+                        <span>Theo dõi</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
 
             {/* Bio & Travel Preferences */}
             <div className="space-y-2">
@@ -265,14 +272,24 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
             {activeTab === 'posts' && (
               <div className="space-y-3">
                 {(!profile.posts || profile.posts.length === 0) ? (
-                  <div className="text-center py-8 text-slate-400 text-xs">
+                  <div className="text-center py-8 text-slate-400 text-xs bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
                     Người dùng này chưa có bài viết công khai nào.
                   </div>
                 ) : (
                   profile.posts.map(post => (
                     <div
                       key={post.id}
-                      className="p-3.5 rounded-2xl bg-white border border-slate-100 shadow-2xs hover:shadow-sm transition-all space-y-2"
+                      onClick={() =>
+                        setSelectedPostForDetail({
+                          ...post,
+                          authorName: profile.fullName,
+                          authorAvatar: profile.avatarUrl,
+                          authorHandle: profile.handle,
+                          authorRole: profile.role,
+                          authorId: profile.id
+                        })
+                      }
+                      className="p-4 rounded-2xl bg-white border border-slate-100 shadow-2xs hover:shadow-md hover:border-sky-200 transition-all space-y-2.5 cursor-pointer group"
                     >
                       <div className="flex items-center justify-between text-[11px] text-slate-400">
                         <span className="font-semibold text-slate-700">{post.formattedDate || post.timeAgo}</span>
@@ -295,7 +312,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                         </div>
                       </div>
 
-                      <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-snug">
+                      <h4 className="font-extrabold text-sm sm:text-base text-slate-900 leading-snug group-hover:text-sky-600 transition-colors">
                         {post.title}
                       </h4>
                       <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
@@ -315,7 +332,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                         </div>
                       )}
 
-                      <div className="flex items-center justify-between pt-2 border-t border-slate-50 text-xs text-slate-500">
+                      <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 text-xs text-slate-500">
                         <div className="flex items-center gap-3">
                           <span className="flex items-center gap-1">
                             <Heart className="w-3.5 h-3.5 text-rose-500" />
@@ -326,11 +343,10 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                             {post.commentCount || 0}
                           </span>
                         </div>
-                        {post.category && (
-                          <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-md">
-                            {post.category}
-                          </span>
-                        )}
+                        <span className="text-xs font-bold text-sky-600 group-hover:text-sky-700 flex items-center gap-1">
+                          <span>Xem chi tiết bài viết</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                        </span>
                       </div>
                     </div>
                   ))
@@ -408,10 +424,21 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
               </div>
             )}
 
+            </div>
           </div>
         ) : null}
 
       </div>
+
+      {/* Post Detail Modal */}
+      {selectedPostForDetail && (
+        <PostDetailModal
+          post={selectedPostForDetail}
+          onClose={() => setSelectedPostForDetail(null)}
+          onSelectItinerary={onSelectItinerary}
+          onAuthorClick={() => setSelectedPostForDetail(null)}
+        />
+      )}
     </div>
   );
 };

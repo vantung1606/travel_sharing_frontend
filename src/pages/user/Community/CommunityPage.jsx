@@ -5,6 +5,7 @@ import { postApi, uploadApi, userApi } from '../../../services/api';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { UserProfileModal } from '../../../components/community/UserProfileModal';
 import { EditPostModal } from '../../../components/community/EditPostModal';
+import { PostDetailModal } from '../../../components/community/PostDetailModal';
 import {
   Heart,
   MessageCircle,
@@ -93,6 +94,9 @@ export const CommunityPage = () => {
 
   // Edit Post Modal State
   const [postToEdit, setPostToEdit] = useState(null);
+
+  // Single Post Detail Modal State
+  const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
 
   // Post Actions Menu State
   const [openMenuPostId, setOpenMenuPostId] = useState(null);
@@ -1001,7 +1005,11 @@ export const CommunityPage = () => {
                   {/* Post Title & Content */}
                   <div className="space-y-1.5">
                     {post.title && (
-                      <h3 className="font-extrabold text-base sm:text-lg text-slate-900 leading-snug">
+                      <h3
+                        onClick={() => setSelectedPostForDetail(post)}
+                        className="font-extrabold text-base sm:text-lg text-slate-900 leading-snug hover:text-sky-600 transition-colors cursor-pointer"
+                        title="Bấm để xem riêng chi tiết bài viết"
+                      >
                         {post.title}
                       </h3>
                     )}
@@ -1024,7 +1032,11 @@ export const CommunityPage = () => {
 
                   {/* Post Photos Display */}
                   {post.images && post.images.length > 0 && (
-                    <div className="rounded-2xl overflow-hidden border border-slate-100 bg-slate-50">
+                    <div
+                      onClick={() => setSelectedPostForDetail(post)}
+                      className="rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 cursor-pointer"
+                      title="Bấm để xem ảnh và chi tiết bài viết"
+                    >
                       {post.images.length === 1 ? (
                         <img
                           src={post.images[0]}
@@ -1185,6 +1197,16 @@ export const CommunityPage = () => {
                       >
                         <Share2 className="w-4 h-4 text-slate-400" />
                         <span className="hidden sm:inline">Chia sẻ</span>
+                      </button>
+
+                      {/* View Single Post Button */}
+                      <button
+                        onClick={() => setSelectedPostForDetail(post)}
+                        className="flex items-center gap-1.5 font-bold text-sky-600 hover:text-sky-700 transition-colors cursor-pointer"
+                        title="Xem riêng bài viết"
+                      >
+                        <Eye className="w-4 h-4" />
+                        <span className="hidden sm:inline">Xem riêng</span>
                       </button>
                     </div>
 
@@ -1869,6 +1891,29 @@ export const CommunityPage = () => {
           post={postToEdit}
           onClose={() => setPostToEdit(null)}
           onPostUpdated={handlePostUpdated}
+        />
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 6: SINGLE POST DETAIL MODAL                         */}
+      {/* ========================================================= */}
+      {selectedPostForDetail && (
+        <PostDetailModal
+          post={selectedPostForDetail}
+          onClose={() => setSelectedPostForDetail(null)}
+          onAuthorClick={(authorId) => {
+            setSelectedPostForDetail(null);
+            setSelectedUserIdForModal(authorId);
+          }}
+          onSelectItinerary={(itin) => {
+            setSelectedPostForDetail(null);
+            setSelectedItineraryForModal(itin);
+          }}
+          onPostUpdated={(postId, updates) => {
+            setPosts(prev =>
+              prev.map(p => (p.id === postId ? { ...p, ...updates } : p))
+            );
+          }}
         />
       )}
 
