@@ -8,6 +8,7 @@ import { EditPostModal } from '../../../components/community/EditPostModal';
 import { PostDetailModal } from '../../../components/community/PostDetailModal';
 import { FollowListModal } from '../../../components/community/FollowListModal';
 import { ShareModal } from '../../../components/community/ShareModal';
+import { ReportPostModal } from '../../../components/community/ReportPostModal';
 import {
   Heart,
   MessageCircle,
@@ -55,7 +56,8 @@ import {
   Edit,
   UserPlus,
   Users,
-  CornerDownRight
+  CornerDownRight,
+  Flag
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -188,6 +190,12 @@ export const CommunityPage = () => {
 
   // Post Actions Menu State
   const [openMenuPostId, setOpenMenuPostId] = useState(null);
+
+  // Report Post Modal State
+  const [postToReport, setPostToReport] = useState(null);
+
+  // Hidden Post IDs (User local hide preference)
+  const [hiddenPostIds, setHiddenPostIds] = useState(new Set());
 
   // AI Moderation Scanning Step & Feedback State
   const [moderationStep, setModerationStep] = useState(0); // 0: idle, 1: text scan, 2: safety rules, 3: AI scoring
@@ -322,17 +330,23 @@ export const CommunityPage = () => {
     fetchPosts();
   }, [fetchPosts]);
 
-  // Handle URL query ?post=<id> to auto-open post detail modal from notification
+  // Handle URL query ?postId=<id> or ?post=<id> to auto-open post detail modal from notification or share link
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const targetPostId = urlParams.get('post');
-    if (targetPostId && posts.length > 0) {
+    const targetPostId = urlParams.get('postId') || urlParams.get('post');
+    if (targetPostId) {
       const found = posts.find(p => String(p.id) === String(targetPostId));
       if (found) {
         setSelectedPostForDetail(found);
+      } else {
+        postApi.getById(targetPostId, currentUser?.email)
+          .then(data => {
+            if (data) setSelectedPostForDetail(data);
+          })
+          .catch(err => console.warn('Could not fetch target deep link post:', err));
       }
     }
-  }, [posts]);
+  }, [posts, currentUser?.email]);
 
   // Real System Itineraries for "Tour được sao chép nhiều"
   const [trendingTours, setTrendingTours] = useState([]);
@@ -390,18 +404,26 @@ export const CommunityPage = () => {
   const displayPosts = useMemo(() => {
     let result = [...posts];
 
-    // Filter by Search Query
+    // Filter out posts hidden locally by user
+    if (hiddenPostIds.size > 0) {
+      result = result.filter(p => !hiddenPostIds.has(p.id));
+    }
+
+    // Filter by Search Query (with hashtag & tags support)
     if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      result = result.filter(p =>
-        (p.title && p.title.toLowerCase().includes(q)) ||
-        (p.content && p.content.toLowerCase().includes(q)) ||
-        (p.destination && p.destination.toLowerCase().includes(q)) ||
-        (p.location && p.location.toLowerCase().includes(q)) ||
-        (p.authorName && p.authorName.toLowerCase().includes(q)) ||
-        (p.author?.fullName && p.author.fullName.toLowerCase().includes(q)) ||
-        (p.author?.username && p.author.username.toLowerCase().includes(q))
-      );
+      const q = searchQuery.toLowerCase().trim().replace(/^#/, '');
+      const normalize = (str) =>
+        (str || '')
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[đĐ]/g, 'd');
+      const qNorm = normalize(q);
+
+      result = result.filter(p => {
+        const fullText = `${p.title || ''} ${p.content || ''} ${p.tags || ''} ${p.category || ''} ${p.locationTag || ''} ${p.destination || ''} ${p.location || ''} ${p.authorName || ''} ${p.author?.fullName || ''} ${p.author?.username || ''}`;
+        return fullText.toLowerCase().includes(q) || normalize(fullText).includes(qNorm);
+      });
     }
 
     // Filter by Category
@@ -442,7 +464,7 @@ export const CommunityPage = () => {
     }
 
     return result;
-  }, [posts, activeCategory, activeSort, followingIds, bookmarkedPostIds, searchQuery]);
+  }, [posts, activeCategory, activeSort, followingIds, bookmarkedPostIds, searchQuery, hiddenPostIds]);
 
   // Handle Like Post
   const handleToggleLike = async (postId) => {
@@ -629,6 +651,53 @@ export const CommunityPage = () => {
     } finally {
       setSubmittingComment(false);
     }
+  };
+
+  // Handle Delete Comment
+  const handleDeleteComment = async (commentId) => {
+    if (!activeCommentPost) return;
+    try {
+      await postApi.deleteComment(activeCommentPost.id, commentId, currentUser?.email);
+      setPostComments(prev =>
+        prev
+          .filter(c => c.id !== commentId)
+          .map(c => ({
+            ...c,
+            replies: c.replies ? c.replies.filter(r => r.id !== commentId) : []
+          }))
+      );
+      setPosts(prev =>
+        prev.map(p =>
+          p.id === activeCommentPost.id
+            ? { ...p, commentCount: Math.max(0, (p.commentCount || 1) - 1) }
+            : p
+        )
+      );
+      setActiveCommentPost(prev =>
+        prev ? { ...prev, commentCount: Math.max(0, (prev.commentCount || 1) - 1) } : null
+      );
+      if (toast?.showSuccess) toast.showSuccess('Đã xóa bình luận thành công!');
+      else if (toast?.success) toast.success('Đã xóa bình luận thành công!');
+    } catch (err) {
+      if (toast?.showError) toast.showError('Không thể xóa bình luận: ' + err.message);
+      else if (toast?.error) toast.error('Không thể xóa bình luận: ' + err.message);
+    }
+  };
+
+  // Handle Copy Post Link
+  const handleCopyPostLink = async (post) => {
+    const url = `${window.location.origin}/community?postId=${post.id}`;
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        if (toast?.showSuccess) toast.showSuccess('Đã sao chép liên kết bài viết vào bộ nhớ tạm! 📋');
+        else if (toast?.success) toast.success('Đã sao chép liên kết bài viết vào bộ nhớ tạm! 📋');
+      }
+    } catch (err) {
+      if (toast?.showInfo) toast.showInfo(`Liên kết: ${url}`);
+      else if (toast?.info) toast.info(`Liên kết: ${url}`);
+    }
+    setOpenMenuPostId(null);
   };
 
   // Handle 1-Click Clone Itinerary from Community Post
@@ -1490,57 +1559,99 @@ export const CommunityPage = () => {
                         <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-amber-500' : ''}`} />
                       </button>
 
-                      {/* Actions Menu for Owner or Admin */}
-                      {(post.isOwner || post.author?.email === currentUser?.email) && (
-                        <div className="relative">
-                          <button
-                            onClick={() => setOpenMenuPostId(openMenuPostId === post.id ? null : post.id)}
-                            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
-                            title="Tùy chọn bài viết"
-                          >
-                            <MoreHorizontal className="w-4 h-4" />
-                          </button>
+                      {/* Actions Menu for All Posts */}
+                      <div className="relative">
+                        <button
+                          onClick={() => setOpenMenuPostId(openMenuPostId === post.id ? null : post.id)}
+                          className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                          title="Tùy chọn bài viết"
+                        >
+                          <MoreHorizontal className="w-4 h-4" />
+                        </button>
 
-                          {openMenuPostId === post.id && (
-                            <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-20 animate-in fade-in zoom-in-95 duration-150">
-                              <button
-                                onClick={() => {
-                                  setPostToEdit(post);
-                                  setOpenMenuPostId(null);
-                                }}
-                                className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2 cursor-pointer"
-                              >
-                                <Edit className="w-3.5 h-3.5 text-sky-600" />
-                                <span>Chỉnh sửa bài viết</span>
-                              </button>
-                              <button
-                                onClick={() => handleToggleVisibility(post)}
-                                className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
-                              >
-                                {post.visibility === 'PRIVATE' ? (
-                                  <>
-                                    <Globe className="w-3.5 h-3.5 text-teal-600" />
-                                    <span>Đặt làm Công khai 🌐</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Lock className="w-3.5 h-3.5 text-amber-600" />
-                                    <span>Đặt Chỉ mình tôi 🔒</span>
-                                  </>
-                                )}
-                              </button>
-                              <div className="border-t border-slate-100 my-1"></div>
-                              <button
-                                onClick={() => handleDeletePost(post)}
-                                className="w-full px-3.5 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                                <span>Xóa bài viết</span>
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                        {openMenuPostId === post.id && (
+                          <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-20 animate-in fade-in zoom-in-95 duration-150">
+                            {isSelf ? (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    setPostToEdit(post);
+                                    setOpenMenuPostId(null);
+                                  }}
+                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Edit className="w-3.5 h-3.5 text-sky-600" />
+                                  <span>Chỉnh sửa bài viết</span>
+                                </button>
+                                <button
+                                  onClick={() => handleToggleVisibility(post)}
+                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
+                                >
+                                  {post.visibility === 'PRIVATE' ? (
+                                    <>
+                                      <Globe className="w-3.5 h-3.5 text-teal-600" />
+                                      <span>Đặt làm Công khai 🌐</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Lock className="w-3.5 h-3.5 text-amber-600" />
+                                      <span>Đặt Chỉ mình tôi 🔒</span>
+                                    </>
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => handleCopyPostLink(post)}
+                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Copy className="w-3.5 h-3.5 text-slate-500" />
+                                  <span>Sao chép liên kết</span>
+                                </button>
+                                <div className="border-t border-slate-100 my-1"></div>
+                                <button
+                                  onClick={() => handleDeletePost(post)}
+                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <span>Xóa bài viết</span>
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => handleCopyPostLink(post)}
+                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Copy className="w-3.5 h-3.5 text-sky-600" />
+                                  <span>Sao chép liên kết bài viết</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setHiddenPostIds(prev => new Set(prev).add(post.id));
+                                    setOpenMenuPostId(null);
+                                    if (toast?.showInfo) toast.showInfo('Đã ẩn bài viết khỏi bảng tin của bạn');
+                                    else if (toast?.info) toast.info('Đã ẩn bài viết khỏi bảng tin của bạn');
+                                  }}
+                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
+                                >
+                                  <EyeOff className="w-3.5 h-3.5 text-slate-500" />
+                                  <span>Ẩn bài viết khỏi bảng tin</span>
+                                </button>
+                                <div className="border-t border-slate-100 my-1"></div>
+                                <button
+                                  onClick={() => {
+                                    setPostToReport(post);
+                                    setOpenMenuPostId(null);
+                                  }}
+                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
+                                >
+                                  <Flag className="w-3.5 h-3.5 text-rose-500" />
+                                  <span>Báo cáo bài viết vi phạm</span>
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -2527,115 +2638,156 @@ export const CommunityPage = () => {
               )}
 
               {!loadingComments &&
-                postComments.map((cmt, idx) => (
-                  <div key={cmt.id || idx} className="space-y-2 p-2 rounded-2xl hover:bg-slate-50/70 transition-colors">
-                    <div className="flex items-start gap-2.5">
-                      <img
-                        onClick={() => {
-                          const targetId = cmt.authorId || cmt.userId;
-                          if (targetId) setSelectedUserIdForModal(targetId);
-                        }}
-                        src={
-                          cmt.authorAvatar ||
-                          cmt.userAvatar ||
-                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-                        }
-                        alt={cmt.authorName || cmt.userName || 'User'}
-                        className="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-0.5 cursor-pointer hover:ring-2 hover:ring-sky-400 transition-all shadow-2xs"
-                        title="Xem trang cá nhân"
-                      />
-                      <div className="flex-1 bg-slate-100/80 rounded-2xl px-3.5 py-2.5">
-                        <div className="flex items-center justify-between">
-                          <span
-                            onClick={() => {
-                              const targetId = cmt.authorId || cmt.userId;
-                              if (targetId) setSelectedUserIdForModal(targetId);
-                            }}
-                            className="font-bold text-xs text-slate-900 cursor-pointer hover:text-sky-600 transition-colors"
-                          >
-                            {cmt.authorName || cmt.userName || 'Thành viên'}
-                          </span>
-                          <span className="text-[10px] text-slate-400">{cmt.timeAgo || cmt.formattedDate || 'Vừa xong'}</span>
-                        </div>
-                        <p className="text-xs text-slate-700 mt-1 leading-relaxed">{cmt.content}</p>
-                        <div className="mt-1.5 flex items-center gap-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setReplyingTo({
-                                commentId: cmt.id,
-                                authorId: cmt.authorId || cmt.userId,
-                                authorName: cmt.authorName || cmt.userName || 'Thành viên'
-                              });
-                              setTimeout(() => commentInputRef.current?.focus(), 50);
-                            }}
-                            className="text-[11px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 cursor-pointer transition-colors"
-                          >
-                            <CornerDownRight className="w-3.5 h-3.5" />
-                            <span>Trả lời</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                postComments.map((cmt, idx) => {
+                  const isMyComment = Boolean(
+                    (cmt.authorId && currentUser?.id && Number(cmt.authorId) === Number(currentUser.id)) ||
+                    (cmt.userId && currentUser?.id && Number(cmt.userId) === Number(currentUser.id)) ||
+                    (cmt.authorEmail && currentUser?.email && cmt.authorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+                    (cmt.authorName && currentUser?.name && cmt.authorName.trim().toLowerCase() === currentUser.name.trim().toLowerCase())
+                  );
 
-                    {/* Nested Replies */}
-                    {cmt.replies && cmt.replies.length > 0 && (
-                      <div className="ml-7 sm:ml-9 pl-3 border-l-2 border-sky-100 space-y-2">
-                        {cmt.replies.map((reply, rIdx) => (
-                          <div key={reply.id || rIdx} className="flex items-start gap-2 text-xs">
-                            <img
+                  return (
+                    <div key={cmt.id || idx} className="space-y-2 p-2 rounded-2xl hover:bg-slate-50/70 transition-colors">
+                      <div className="flex items-start gap-2.5">
+                        <img
+                          onClick={() => {
+                            const targetId = cmt.authorId || cmt.userId;
+                            if (targetId) setSelectedUserIdForModal(targetId);
+                          }}
+                          src={
+                            cmt.authorAvatar ||
+                            cmt.userAvatar ||
+                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                          }
+                          alt={cmt.authorName || cmt.userName || 'User'}
+                          className="w-8 h-8 rounded-full object-cover flex-shrink-0 mt-0.5 cursor-pointer hover:ring-2 hover:ring-sky-400 transition-all shadow-2xs"
+                          title="Xem trang cá nhân"
+                        />
+                        <div className="flex-1 bg-slate-100/80 rounded-2xl px-3.5 py-2.5">
+                          <div className="flex items-center justify-between">
+                            <span
                               onClick={() => {
-                                const targetId = reply.authorId || reply.userId;
+                                const targetId = cmt.authorId || cmt.userId;
                                 if (targetId) setSelectedUserIdForModal(targetId);
                               }}
-                              src={
-                                reply.authorAvatar ||
-                                reply.userAvatar ||
-                                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-                              }
-                              alt={reply.authorName || reply.userName}
-                              className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5 cursor-pointer hover:ring-1 hover:ring-sky-400"
-                            />
-                            <div className="flex-1 bg-white border border-slate-200/80 rounded-xl px-3 py-2 shadow-2xs">
-                              <div className="flex items-center justify-between">
-                                <span
+                              className="font-bold text-xs text-slate-900 cursor-pointer hover:text-sky-600 transition-colors"
+                            >
+                              {cmt.authorName || cmt.userName || 'Thành viên'}
+                            </span>
+                            <span className="text-[10px] text-slate-400">{cmt.timeAgo || cmt.formattedDate || 'Vừa xong'}</span>
+                          </div>
+                          <p className="text-xs text-slate-700 mt-1 leading-relaxed">{cmt.content}</p>
+                          <div className="mt-1.5 flex items-center justify-between">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReplyingTo({
+                                  commentId: cmt.id,
+                                  authorId: cmt.authorId || cmt.userId,
+                                  authorName: cmt.authorName || cmt.userName || 'Thành viên'
+                                });
+                                setTimeout(() => commentInputRef.current?.focus(), 50);
+                              }}
+                              className="text-[11px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 cursor-pointer transition-colors"
+                            >
+                              <CornerDownRight className="w-3.5 h-3.5" />
+                              <span>Trả lời</span>
+                            </button>
+                            {(isMyComment || currentUser?.email?.toLowerCase().includes('admin')) && (
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteComment(cmt.id)}
+                                className="text-[11px] font-medium text-slate-400 hover:text-rose-600 flex items-center gap-1 cursor-pointer transition-colors"
+                                title="Xóa bình luận"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                                <span>Xóa</span>
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Nested Replies */}
+                      {cmt.replies && cmt.replies.length > 0 && (
+                        <div className="ml-7 sm:ml-9 pl-3 border-l-2 border-sky-100 space-y-2">
+                          {cmt.replies.map((reply, rIdx) => {
+                            const isMyReply = Boolean(
+                              (reply.authorId && currentUser?.id && Number(reply.authorId) === Number(currentUser.id)) ||
+                              (reply.userId && currentUser?.id && Number(reply.userId) === Number(currentUser.id)) ||
+                              (reply.authorEmail && currentUser?.email && reply.authorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+                              (reply.authorName && currentUser?.name && reply.authorName.trim().toLowerCase() === currentUser.name.trim().toLowerCase())
+                            );
+
+                            return (
+                              <div key={reply.id || rIdx} className="flex items-start gap-2 text-xs">
+                                <img
                                   onClick={() => {
                                     const targetId = reply.authorId || reply.userId;
                                     if (targetId) setSelectedUserIdForModal(targetId);
                                   }}
-                                  className="font-bold text-[11px] text-slate-900 cursor-pointer hover:text-sky-600"
-                                >
-                                  {reply.authorName || reply.userName}
-                                </span>
-                                <span className="text-[10px] text-slate-400">{reply.timeAgo || reply.formattedDate || 'Vừa xong'}</span>
-                              </div>
-                              {reply.replyToUserName && (
-                                <div className="text-[10px] text-sky-600 font-bold mb-0.5">
-                                  @{reply.replyToUserName}
+                                  src={
+                                    reply.authorAvatar ||
+                                    reply.userAvatar ||
+                                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                                  }
+                                  alt={reply.authorName || reply.userName}
+                                  className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5 cursor-pointer hover:ring-1 hover:ring-sky-400"
+                                />
+                                <div className="flex-1 bg-white border border-slate-200/80 rounded-xl px-3 py-2 shadow-2xs">
+                                  <div className="flex items-center justify-between">
+                                    <span
+                                      onClick={() => {
+                                        const targetId = reply.authorId || reply.userId;
+                                        if (targetId) setSelectedUserIdForModal(targetId);
+                                      }}
+                                      className="font-bold text-[11px] text-slate-900 cursor-pointer hover:text-sky-600"
+                                    >
+                                      {reply.authorName || reply.userName}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400">{reply.timeAgo || reply.formattedDate || 'Vừa xong'}</span>
+                                  </div>
+                                  {reply.replyToUserName && (
+                                    <div className="text-[10px] text-sky-600 font-bold mb-0.5">
+                                      @{reply.replyToUserName}
+                                    </div>
+                                  )}
+                                  <p className="text-xs text-slate-700 leading-relaxed">{reply.content}</p>
+                                  <div className="mt-1 flex items-center justify-between">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setReplyingTo({
+                                          commentId: cmt.id,
+                                          authorId: reply.authorId || reply.userId,
+                                          authorName: reply.authorName || reply.userName
+                                        });
+                                        setTimeout(() => commentInputRef.current?.focus(), 50);
+                                      }}
+                                      className="text-[10px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 cursor-pointer"
+                                    >
+                                      <CornerDownRight className="w-3 h-3" /> Trả lời
+                                    </button>
+                                    {(isMyReply || currentUser?.email?.toLowerCase().includes('admin')) && (
+                                      <button
+                                        type="button"
+                                        onClick={() => handleDeleteComment(reply.id)}
+                                        className="text-[10px] font-medium text-slate-400 hover:text-rose-600 flex items-center gap-1 cursor-pointer"
+                                        title="Xóa phản hồi"
+                                      >
+                                        <Trash2 className="w-3 h-3" /> Xóa
+                                      </button>
+                                    )}
+                                  </div>
                                 </div>
-                              )}
-                              <p className="text-xs text-slate-700 leading-relaxed">{reply.content}</p>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setReplyingTo({
-                                    commentId: cmt.id,
-                                    authorId: reply.authorId || reply.userId,
-                                    authorName: reply.authorName || reply.userName
-                                  });
-                                  setTimeout(() => commentInputRef.current?.focus(), 50);
-                                }}
-                                className="text-[10px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 mt-1 cursor-pointer"
-                              >
-                                <CornerDownRight className="w-3 h-3" /> Trả lời
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
             </div>
 
             {/* Replying Banner if active */}
@@ -2732,6 +2884,9 @@ export const CommunityPage = () => {
             setSelectedPostForDetail(null);
             setSelectedItineraryForModal(itin);
           }}
+          onReportPost={(post) => {
+            setPostToReport(post);
+          }}
           onPostUpdated={(postId, updates) => {
             setPosts(prev =>
               prev.map(p => (Number(p.id) === Number(postId) ? { ...p, ...updates } : p))
@@ -2787,6 +2942,21 @@ export const CommunityPage = () => {
           onClose={() => setSharingPost(null)}
           onPostShared={() => {
             fetchPosts();
+          }}
+        />
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 9: REPORT POST MODAL                                */}
+      {/* ========================================================= */}
+      {postToReport && (
+        <ReportPostModal
+          post={postToReport}
+          onClose={() => setPostToReport(null)}
+          onReportSuccess={() => {
+            if (postToReport?.id) {
+              setHiddenPostIds(prev => new Set(prev).add(Number(postToReport.id)));
+            }
           }}
         />
       )}

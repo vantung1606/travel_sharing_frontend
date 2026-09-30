@@ -1008,6 +1008,45 @@ export const postApi = {
     return json.data;
   },
 
+  async deleteComment(postId, commentId, email = '') {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || '';
+    const url = userEmail
+      ? `${BASE_URL}/posts/${postId}/comments/${commentId}?email=${encodeURIComponent(userEmail)}`
+      : `${BASE_URL}/posts/${postId}/comments/${commentId}`;
+
+    const res = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  },
+
+  async reportPost(postId, payload, email = '') {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || '';
+    const url = userEmail
+      ? `${BASE_URL}/posts/${postId}/report?email=${encodeURIComponent(userEmail)}`
+      : `${BASE_URL}/posts/${postId}/report`;
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  },
+
   async update(id, payload, email = '') {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
     const userEmail = email || user.email || '';

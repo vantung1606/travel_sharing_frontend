@@ -22,12 +22,17 @@ import {
   Maximize2,
   UserPlus,
   UserCheck,
-  CornerDownRight
+  CornerDownRight,
+  MoreHorizontal,
+  Copy,
+  Flag,
+  Trash2
 } from 'lucide-react';
 import { postApi, userApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';
 import { ShareModal } from './ShareModal';
+import { ReportPostModal } from './ReportPostModal';
 
 export const PostDetailModal = ({
   postId,
@@ -35,7 +40,8 @@ export const PostDetailModal = ({
   onClose,
   onAuthorClick,
   onSelectItinerary,
-  onPostUpdated
+  onPostUpdated,
+  onReportPost
 }) => {
   const [post, setPost] = useState(initialPost || null);
   const [loading, setLoading] = useState(!initialPost && !!postId);
@@ -55,12 +61,28 @@ export const PostDetailModal = ({
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
+  const [isPostMenuOpen, setIsPostMenuOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const postMenuRef = useRef(null);
 
   const toast = useToast();
   const { currentUser } = useApp();
 
   const effectivePostId = post?.id || postId;
   const effectiveAuthorId = post?.authorId || post?.author?.id;
+
+  // Click outside to close post menu
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (postMenuRef.current && !postMenuRef.current.contains(e.target)) {
+        setIsPostMenuOpen(false);
+      }
+    };
+    if (isPostMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isPostMenuOpen]);
 
   // Check follow status for author
   useEffect(() => {
@@ -279,6 +301,50 @@ export const PostDetailModal = ({
     setIsShareModalOpen(true);
   };
 
+  // Copy Link
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/community?postId=${effectivePostId}`;
+    navigator.clipboard?.writeText(url)
+      .then(() => toast.showSuccess('Đã sao chép liên kết bài viết vào bộ nhớ tạm! 📋'))
+      .catch(() => toast.showError('Không thể sao chép liên kết'));
+    setIsPostMenuOpen(false);
+  };
+
+  // Delete Comment / Reply
+  const handleDeleteComment = async (commentId, isReply = false, parentId = null) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa bình luận này?')) return;
+    try {
+      await postApi.deleteComment(effectivePostId, commentId, currentUser?.email);
+      if (isReply && parentId) {
+        setComments(prev =>
+          prev.map(c => {
+            if (c.id === parentId) {
+              return {
+                ...c,
+                replies: (c.replies || []).filter(r => r.id !== commentId)
+              };
+            }
+            return c;
+          })
+        );
+      } else {
+        setComments(prev => prev.filter(c => c.id !== commentId));
+      }
+      if (post) {
+        setPost(prev => ({
+          ...prev,
+          commentCount: Math.max(0, (prev.commentCount || 1) - 1)
+        }));
+      }
+      if (typeof onPostUpdated === 'function') {
+        onPostUpdated(effectivePostId, { commentCount: Math.max(0, (post?.commentCount || 1) - 1) });
+      }
+      toast.showSuccess('Đã xóa bình luận thành công! 🗑️');
+    } catch (err) {
+      toast.showError('Không thể xóa bình luận: ' + (err.message || 'Lỗi hệ thống'));
+    }
+  };
+
   // Collect images
   const images = (post?.images && post.images.length > 0)
     ? post.images
@@ -402,6 +468,49 @@ export const PostDetailModal = ({
                 <Globe className="w-3.5 h-3.5" /> Công khai
               </span>
             )}
+            {/* More options menu (Copy link, Report) */}
+            <div className="relative" ref={postMenuRef}>
+              <button
+                type="button"
+                onClick={() => setIsPostMenuOpen(prev => !prev)}
+                className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+                title="Tùy chọn bài viết"
+              >
+                <MoreHorizontal className="w-5 h-5" />
+              </button>
+
+              {isPostMenuOpen && (
+                <div className="absolute right-0 top-11 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors cursor-pointer"
+                  >
+                    <Copy className="w-4 h-4 text-slate-400" />
+                    <span>Sao chép liên kết</span>
+                  </button>
+
+                  {!isSelf && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsPostMenuOpen(false);
+                        if (typeof onReportPost === 'function') {
+                          onReportPost(post);
+                        } else {
+                          setIsReportModalOpen(true);
+                        }
+                      }}
+                      className="w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors cursor-pointer"
+                    >
+                      <Flag className="w-4 h-4 text-rose-500" />
+                      <span>Báo cáo bài viết</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
             <button
               onClick={onClose}
               className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
@@ -836,104 +945,146 @@ export const PostDetailModal = ({
                 </div>
               ) : (
                 <div className="space-y-3 pt-1">
-                  {comments.map((c, i) => (
-                    <div
-                      key={c.id || i}
-                      className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 flex flex-col gap-2"
-                    >
-                      <div className="flex items-start gap-3">
-                        <img
-                          src={
-                            c.userAvatar ||
-                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
-                          }
-                          alt={c.userName}
-                          className="w-8 h-8 rounded-xl object-cover shrink-0 ring-1 ring-white"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-bold text-xs text-slate-900">
-                              {c.userName || 'Du khách Wayfare'}
-                            </span>
-                            <span className="text-[10px] text-slate-400 font-medium">
-                              {c.formattedDate || c.timeAgo || 'Vừa xong'}
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-700 mt-1 leading-relaxed">
-                            {c.content}
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setReplyingTo({
-                                commentId: c.id,
-                                authorId: c.userId || c.authorId,
-                                authorName: c.userName || c.authorName || 'Du khách Wayfare'
-                              });
-                              setTimeout(() => commentInputRef.current?.focus(), 50);
-                            }}
-                            className="text-[11px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 mt-1.5 cursor-pointer"
-                          >
-                            <CornerDownRight className="w-3 h-3" /> Trả lời
-                          </button>
-                        </div>
-                      </div>
+                  {comments.map((c, i) => {
+                    const isMyComment = Boolean(
+                      (currentUser?.id && (Number(c.userId || c.authorId) === Number(currentUser.id))) ||
+                      (currentUser?.email && c.userEmail && c.userEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+                      (currentUser?.name && c.userName && c.userName.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) ||
+                      currentUser?.role === 'ADMIN' || currentUser?.role === 'ROLE_ADMIN'
+                    );
 
-                      {/* Nested Replies */}
-                      {c.replies && c.replies.length > 0 && (
-                        <div className="ml-6 sm:ml-8 mt-1 space-y-2 pl-3 border-l-2 border-slate-200">
-                          {c.replies.map((reply, rIdx) => (
-                            <div
-                              key={reply.id || rIdx}
-                              className="p-2.5 rounded-xl bg-white border border-slate-200/80 flex items-start gap-2.5 shadow-2xs"
-                            >
-                              <img
-                                src={
-                                  reply.userAvatar ||
-                                  reply.authorAvatar ||
-                                  'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-                                }
-                                alt={reply.userName || reply.authorName}
-                                className="w-7 h-7 rounded-lg object-cover shrink-0 ring-1 ring-slate-100"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between gap-2">
-                                  <span className="font-bold text-xs text-slate-900 truncate">
-                                    {reply.userName || reply.authorName || 'Du khách Wayfare'}
-                                  </span>
-                                  <span className="text-[10px] text-slate-400 shrink-0">
-                                    {reply.formattedDate || reply.timeAgo || 'Vừa xong'}
-                                  </span>
-                                </div>
-                                {reply.replyToUserName && (
-                                  <div className="text-[10px] text-sky-600 font-bold mb-0.5">
-                                    @{reply.replyToUserName}
-                                  </div>
+                    return (
+                      <div
+                        key={c.id || i}
+                        className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-100 flex flex-col gap-2"
+                      >
+                        <div className="flex items-start gap-3">
+                          <img
+                            src={
+                              c.userAvatar ||
+                              'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
+                            }
+                            alt={c.userName}
+                            className="w-8 h-8 rounded-xl object-cover shrink-0 ring-1 ring-white"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-bold text-xs text-slate-900">
+                                {c.userName || 'Du khách Wayfare'}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] text-slate-400 font-medium">
+                                  {c.formattedDate || c.timeAgo || 'Vừa xong'}
+                                </span>
+                                {isMyComment && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteComment(c.id, false)}
+                                    className="p-1 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                    title="Xóa bình luận"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
                                 )}
-                                <p className="text-xs text-slate-700 leading-relaxed">
-                                  {reply.content}
-                                </p>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setReplyingTo({
-                                      commentId: c.id,
-                                      authorId: reply.userId || reply.authorId,
-                                      authorName: reply.userName || reply.authorName || 'Du khách Wayfare'
-                                    });
-                                    setTimeout(() => commentInputRef.current?.focus(), 50);
-                                  }}
-                                  className="text-[10px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 mt-1 cursor-pointer"
-                                >
-                                  <CornerDownRight className="w-3 h-3" /> Trả lời
-                                </button>
                               </div>
                             </div>
-                          ))}
+                            <p className="text-xs text-slate-700 mt-1 leading-relaxed">
+                              {c.content}
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setReplyingTo({
+                                  commentId: c.id,
+                                  authorId: c.userId || c.authorId,
+                                  authorName: c.userName || c.authorName || 'Du khách Wayfare'
+                                });
+                                setTimeout(() => commentInputRef.current?.focus(), 50);
+                              }}
+                              className="text-[11px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 mt-1.5 cursor-pointer"
+                            >
+                              <CornerDownRight className="w-3 h-3" /> Trả lời
+                            </button>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
+
+                        {/* Nested Replies */}
+                        {c.replies && c.replies.length > 0 && (
+                          <div className="ml-6 sm:ml-8 mt-1 space-y-2 pl-3 border-l-2 border-slate-200">
+                            {c.replies.map((reply, rIdx) => {
+                              const isMyReply = Boolean(
+                                (currentUser?.id && (Number(reply.userId || reply.authorId) === Number(currentUser.id))) ||
+                                (currentUser?.email && reply.userEmail && reply.userEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+                                (currentUser?.name && (reply.userName || reply.authorName) && (reply.userName || reply.authorName).trim().toLowerCase() === currentUser.name.trim().toLowerCase()) ||
+                                currentUser?.role === 'ADMIN' || currentUser?.role === 'ROLE_ADMIN'
+                              );
+
+                              return (
+                                <div
+                                  key={reply.id || rIdx}
+                                  className="p-2.5 rounded-xl bg-white border border-slate-200/80 flex items-start gap-2.5 shadow-2xs"
+                                >
+                                  <img
+                                    src={
+                                      reply.userAvatar ||
+                                      reply.authorAvatar ||
+                                      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                                    }
+                                    alt={reply.userName || reply.authorName}
+                                    className="w-7 h-7 rounded-lg object-cover shrink-0 ring-1 ring-slate-100"
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="font-bold text-xs text-slate-900 truncate">
+                                        {reply.userName || reply.authorName || 'Du khách Wayfare'}
+                                      </span>
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="text-[10px] text-slate-400 shrink-0">
+                                          {reply.formattedDate || reply.timeAgo || 'Vừa xong'}
+                                        </span>
+                                        {isMyReply && (
+                                          <button
+                                            type="button"
+                                            onClick={() => handleDeleteComment(reply.id, true, c.id)}
+                                            className="p-1 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                                            title="Xóa phản hồi"
+                                          >
+                                            <Trash2 className="w-3 h-3" />
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
+                                    {reply.replyToUserName && (
+                                      <div className="text-[10px] text-sky-600 font-bold mb-0.5">
+                                        @{reply.replyToUserName}
+                                      </div>
+                                    )}
+                                    <p className="text-xs text-slate-700 leading-relaxed">
+                                      {reply.content}
+                                    </p>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setReplyingTo({
+                                          commentId: c.id,
+                                          authorId: reply.userId || reply.authorId,
+                                          authorName: reply.userName || reply.authorName || 'Du khách Wayfare'
+                                        });
+                                        setTimeout(() => commentInputRef.current?.focus(), 50);
+                                      }}
+                                      className="text-[10px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 mt-1 cursor-pointer"
+                                    >
+                                      <CornerDownRight className="w-3 h-3" /> Trả lời
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -948,6 +1099,20 @@ export const PostDetailModal = ({
         <ShareModal
           post={post}
           onClose={() => setIsShareModalOpen(false)}
+        />
+      )}
+
+      {/* Report Post Modal */}
+      {isReportModalOpen && post && (
+        <ReportPostModal
+          post={post}
+          onClose={() => setIsReportModalOpen(false)}
+          onReportSuccess={() => {
+            setIsReportModalOpen(false);
+            if (typeof onClose === 'function') {
+              onClose();
+            }
+          }}
         />
       )}
     </div>
