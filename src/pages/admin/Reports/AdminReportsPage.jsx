@@ -499,7 +499,7 @@ export const AdminReportsPage = () => {
             filteredReports.map(report => (
               <article
                 key={report.id}
-                className="bg-white rounded-2xl p-6 shadow-xs border border-slate-200/80 hover:shadow-md transition-shadow relative flex flex-col xl:flex-row gap-6"
+                className="bg-white rounded-2xl p-5 sm:p-6 shadow-xs border border-slate-200/80 hover:shadow-md transition-shadow relative flex flex-col md:flex-row gap-6 overflow-hidden"
               >
                 {/* Left Accent Bar */}
                 <div className={`absolute top-0 left-0 bottom-0 w-1.5 rounded-l-2xl ${
@@ -507,23 +507,25 @@ export const AdminReportsPage = () => {
                 }`}></div>
 
                 {/* Image Preview */}
-                <div className="w-full xl:w-72 shrink-0">
-                  <div className="relative rounded-xl overflow-hidden aspect-video xl:h-full bg-slate-100">
+                <div className="w-full md:w-64 lg:w-72 shrink-0">
+                  <div className="relative rounded-xl overflow-hidden w-full h-48 md:h-full min-h-[190px] max-h-[280px] bg-slate-100">
                     <img 
                       src={report.imageUrl} 
                       alt={report.title} 
-                      className="w-full h-full object-cover" 
+                      className="w-full h-full object-cover block" 
                       onError={(e) => {
                         e.target.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
                       }}
                     />
-                    <span className="absolute top-2 left-2 px-2.5 py-1 rounded-full bg-rose-600 text-white font-extrabold text-[10px] flex items-center gap-1 shadow-sm">
+                    <span className="absolute top-2 left-2 px-2.5 py-1 rounded-full bg-rose-600 text-white font-extrabold text-[10px] flex items-center gap-1 shadow-sm z-10">
                       <Flame className="w-3 h-3" />
                       <span>{report.badgeText || (report.reportsCount + ' Lượt báo cáo')}</span>
                     </span>
-                    <span className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-slate-950/80 text-white font-bold text-[10px] backdrop-blur-md">
-                      {report.locationTag}
-                    </span>
+                    {report.locationTag && (
+                      <span className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-slate-950/80 text-white font-bold text-[10px] backdrop-blur-md z-10">
+                        {report.locationTag}
+                      </span>
+                    )}
                   </div>
                 </div>
 
