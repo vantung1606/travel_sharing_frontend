@@ -296,7 +296,7 @@ export const Navbar = () => {
                           className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                         >
                           <Shield className="w-4 h-4 text-emerald-600" />
-                          <span>{portalMode === 'admin' ? 'Về giao diện Người dùng' : 'Giao diện Quản Trị (Admin)'}</span>
+                          <span>{portalMode === 'admin' ? 'Về giao diện Người dùng' : 'Giao diện Quản Trị'}</span>
                         </button>
                       )}
 

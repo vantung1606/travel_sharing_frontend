@@ -159,20 +159,30 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
             >
               {/* Actor Avatar with Type Badge */}
               <div className="relative shrink-0 mt-0.5">
-                <img
-                  src={item.actorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
-                  alt={item.actorName || 'User'}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100"
-                />
-                <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center">
-                  {getNotificationIcon(item.type)}
-                </span>
+                {item.type === 'SYSTEM' || !item.actorId ? (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center ring-2 ring-emerald-100 shadow-xs">
+                    <ShieldCheck className="w-5 h-5 text-white" />
+                  </div>
+                ) : (
+                  <>
+                    <img
+                      src={item.actorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
+                      alt={item.actorName || 'User'}
+                      className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100"
+                    />
+                    <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center">
+                      {getNotificationIcon(item.type)}
+                    </span>
+                  </>
+                )}
               </div>
 
               {/* Message Details */}
               <div className="flex-1 min-w-0 pr-2">
                 <p className="text-xs text-slate-800 leading-snug font-medium line-clamp-2">
-                  <strong className="font-bold text-slate-900">{item.actorName} </strong>
+                  {item.type !== 'SYSTEM' && item.actorId && (
+                    <strong className="font-bold text-slate-900">{item.actorName} </strong>
+                  )}
                   {item.message}
                 </p>
                 <span className="flex items-center gap-1 text-[10px] text-slate-400 mt-1">
