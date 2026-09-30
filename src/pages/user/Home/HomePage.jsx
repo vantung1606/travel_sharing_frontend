@@ -17,7 +17,6 @@ import {
   Layers,
   Search,
   Zap,
-  TrendingUp,
   BrainCircuit,
   PieChart,
   Navigation,
@@ -329,148 +328,148 @@ export const HomePage = () => {
         </div>
       </section>
 
-      {/* 3. TRENDING TRAVEL DESTINATIONS */}
-      <section className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 space-y-6 pt-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-1.5 text-xs font-bold text-orange-600 uppercase tracking-wider mb-1">
-              <TrendingUp className="w-4 h-4" />
-              <span>Điểm hẹn cuốn hút</span>
+      {/* 3. TRENDING TRAVEL DESTINATIONS - PREMIUM SHOWCASE CANVAS */}
+      <section className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 my-6">
+        <div className="relative rounded-3xl bg-gradient-to-b from-slate-50/90 via-sky-50/30 to-white border border-slate-200/80 shadow-sm p-6 sm:p-8 lg:p-10 overflow-hidden space-y-6">
+          {/* Ambient Lighting Orbs */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-gradient-to-br from-sky-200/35 to-indigo-200/25 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-gradient-to-tr from-amber-200/25 to-orange-200/20 rounded-full blur-3xl pointer-events-none" />
+
+          {/* Header Row: Clean, Bold Single Title */}
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
+                Điểm Hẹn Cuốn Hút
+              </h2>
             </div>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-slate-900">
-              Địa điểm thịnh hành tuần này
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500">
-              Lựa chọn hàng đầu được hàng chục nghìn xê dịch thủ đánh giá cao nhất trên hệ thống
-            </p>
+
+            <button
+              onClick={() => setUserTab('explore')}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white/90 hover:bg-sky-50 text-sky-700 hover:text-sky-800 font-bold text-xs border border-slate-200/90 hover:border-sky-300 shadow-xs transition-all self-start md:self-auto group cursor-pointer"
+            >
+              <span>Xem tất cả 1,200+ địa điểm</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </button>
           </div>
 
-          <button
-            onClick={() => setUserTab('explore')}
-            className="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 group self-start md:self-auto"
-          >
-            <span>Xem tất cả 1,200+ địa điểm</span>
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
+          {/* Region Pills */}
+          <div className="relative z-10 flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
+            {regions.map(r => (
+              <button
+                key={r}
+                onClick={() => setSelectedRegion(r)}
+                className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                  selectedRegion === r
+                    ? 'bg-slate-900 text-white shadow-md shadow-slate-900/15 scale-[1.02]'
+                    : 'bg-white/95 backdrop-blur-sm text-slate-600 border border-slate-200/80 hover:bg-white hover:text-slate-900 hover:border-slate-300 shadow-xs'
+                }`}
+              >
+                {r}
+              </button>
+            ))}
+          </div>
 
-        {/* Region Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
-          {regions.map(r => (
-            <button
-              key={r}
-              onClick={() => setSelectedRegion(r)}
-              className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
-                selectedRegion === r
-                  ? 'bg-slate-900 text-white shadow-sm'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              {r}
-            </button>
-          ))}
-        </div>
-
-        {/* Destination Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            {
-              id: 'ba-na',
-              name: 'Bà Nà Hills & Cầu Vàng',
-              province: 'Đà Nẵng',
-              tag: 'Bán chạy nhất',
-              tagBg: 'bg-orange-500 text-white',
-              rating: 4.9,
-              reviews: '1,420 đánh giá',
-              desc: 'Kỳ quan kiến trúc đẳng cấp thế giới cùng làng Pháp cổ điển và khí hậu bốn mùa độc đáo.',
-              price: '850.000₫',
-              img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80'
-            },
-            {
-              id: 'fansipan',
-              name: 'Đỉnh Fansipan & Bản Cát Cát',
-              province: 'Sa Pa, Lào Cai',
-              tag: 'Săn mây đỉnh cao',
-              tagBg: 'bg-sky-600 text-white',
-              rating: 4.8,
-              reviews: '980 đánh giá',
-              desc: 'Chinh phục Nóc nhà Đông Dương, trải nghiệm hệ thống cáp treo kỷ lục và văn hóa H’Mông.',
-              price: '750.000₫',
-              img: 'https://images.unsplash.com/photo-1570784409178-be94786231ba?auto=format&fit=crop&w=800&q=80'
-            },
-            {
-              id: 'trang-an',
-              name: 'Quần thể Danh thắng Tràng An',
-              province: 'Ninh Bình',
-              tag: 'Di sản thế giới',
-              tagBg: 'bg-emerald-600 text-white',
-              rating: 4.9,
-              reviews: '2,150 đánh giá',
-              desc: 'Xuôi thuyền nan qua các hang động thủy mặc kỳ bí và phim trường Kong Skull Island.',
-              price: '250.000₫',
-              img: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80'
-            },
-            {
-              id: 'an-thoi',
-              name: 'Quần đảo An Thới & Hòn Thơm',
-              province: 'Phú Quốc',
-              tag: 'Nghỉ dưỡng biển',
-              tagBg: 'bg-teal-600 text-white',
-              rating: 4.7,
-              reviews: '890 đánh giá',
-              desc: 'Lặn ngắm rạn san hô tự nhiên rực rỡ, lướt cáp treo vượt biển dài nhất thế giới.',
-              price: '650.000₫',
-              img: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80'
-            }
-          ].map(item => (
-            <div
-              key={item.id}
-              onClick={() => setUserTab('explore')}
-              className="bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-300 group cursor-pointer flex flex-col justify-between"
-            >
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={item.img}
-                  alt={item.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-                <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold shadow-md ${item.tagBg}`}>
-                  {item.tag}
-                </div>
-                <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-amber-400 text-slate-900 text-[10px] font-extrabold flex items-center gap-1 shadow-md">
-                  <Star className="w-3 h-3 fill-slate-900" />
-                  <span>{item.rating}</span>
-                </div>
-                <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-medium flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-sky-400" />
-                  <span>{item.province}</span>
-                </div>
-              </div>
-
-              <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-                <div>
-                  <h3 className="font-bold text-sm text-slate-900 group-hover:text-sky-600 transition-colors">
-                    {item.name}
-                  </h3>
-                  <p className="text-xs text-slate-500 line-clamp-2 mt-1">{item.desc}</p>
+          {/* Destination Cards Grid */}
+          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                id: 'ba-na',
+                name: 'Bà Nà Hills & Cầu Vàng',
+                province: 'Đà Nẵng',
+                tag: 'Bán chạy nhất',
+                tagBg: 'bg-orange-500 text-white',
+                rating: 4.9,
+                reviews: '1,420 đánh giá',
+                desc: 'Kỳ quan kiến trúc đẳng cấp thế giới cùng làng Pháp cổ điển và khí hậu bốn mùa độc đáo.',
+                price: '850.000₫',
+                img: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80'
+              },
+              {
+                id: 'fansipan',
+                name: 'Đỉnh Fansipan & Bản Cát Cát',
+                province: 'Sa Pa, Lào Cai',
+                tag: 'Săn mây đỉnh cao',
+                tagBg: 'bg-sky-600 text-white',
+                rating: 4.8,
+                reviews: '980 đánh giá',
+                desc: 'Chinh phục Nóc nhà Đông Dương, trải nghiệm hệ thống cáp treo kỷ lục và văn hóa H’Mông.',
+                price: '750.000₫',
+                img: 'https://images.unsplash.com/photo-1570784409178-be94786231ba?auto=format&fit=crop&w=800&q=80'
+              },
+              {
+                id: 'trang-an',
+                name: 'Quần thể Danh thắng Tràng An',
+                province: 'Ninh Bình',
+                tag: 'Di sản thế giới',
+                tagBg: 'bg-emerald-600 text-white',
+                rating: 4.9,
+                reviews: '2,150 đánh giá',
+                desc: 'Xuôi thuyền nan qua các hang động thủy mặc kỳ bí và phim trường Kong Skull Island.',
+                price: '250.000₫',
+                img: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80'
+              },
+              {
+                id: 'an-thoi',
+                name: 'Quần đảo An Thới & Hòn Thơm',
+                province: 'Phú Quốc',
+                tag: 'Nghỉ dưỡng biển',
+                tagBg: 'bg-teal-600 text-white',
+                rating: 4.7,
+                reviews: '890 đánh giá',
+                desc: 'Lặn ngắm rạn san hô tự nhiên rực rỡ, lướt cáp treo vượt biển dài nhất thế giới.',
+                price: '650.000₫',
+                img: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80'
+              }
+            ].map(item => (
+              <div
+                key={item.id}
+                onClick={() => setUserTab('explore')}
+                className="bg-white/95 backdrop-blur-sm rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer flex flex-col justify-between"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={item.img}
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold shadow-md ${item.tagBg}`}>
+                    {item.tag}
+                  </div>
+                  <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-amber-400 text-slate-900 text-[10px] font-extrabold flex items-center gap-1 shadow-md">
+                    <Star className="w-3 h-3 fill-slate-900" />
+                    <span>{item.rating}</span>
+                  </div>
+                  <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur-sm text-white text-[10px] font-medium flex items-center gap-1">
+                    <MapPin className="w-3 h-3 text-sky-400" />
+                    <span>{item.province}</span>
+                  </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
                   <div>
-                    <span className="text-[10px] text-slate-400 block font-medium">Giá vé từ</span>
-                    <span className="font-bold text-sky-600">{item.price}</span>
+                    <h3 className="font-bold text-sm text-slate-900 group-hover:text-sky-600 transition-colors">
+                      {item.name}
+                    </h3>
+                    <p className="text-xs text-slate-500 line-clamp-2 mt-1">{item.desc}</p>
                   </div>
 
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setIsAIGeneratorOpen(true); }}
-                    className="px-3 py-1.5 rounded-full bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white text-xs font-bold transition-all"
-                  >
-                    + Lịch trình
-                  </button>
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block font-medium">Giá vé từ</span>
+                      <span className="font-bold text-sky-600">{item.price}</span>
+                    </div>
+
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setIsAIGeneratorOpen(true); }}
+                      className="px-3.5 py-1.5 rounded-full bg-sky-50 text-sky-700 hover:bg-sky-600 hover:text-white text-xs font-bold transition-all shadow-xs"
+                    >
+                      + Lịch trình
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
