@@ -16,7 +16,8 @@ import {
   Share2,
   CheckCircle2,
   EyeOff,
-  ShieldAlert
+  ShieldAlert,
+  Flag
 } from 'lucide-react';
 
 export const NotificationDropdown = ({ isOpen, onClose }) => {
@@ -74,6 +75,8 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
         return <ShieldCheck className="w-3.5 h-3.5 text-sky-500" />;
       case 'POST_DELETED':
         return <Trash2 className="w-3.5 h-3.5 text-rose-500" />;
+      case 'REPORT_ALERT':
+        return <Flag className="w-3.5 h-3.5 text-rose-500" />;
       case 'SYSTEM':
       default:
         return <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />;
@@ -97,7 +100,10 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
 
     // Route depending on targetUrl
     if (item.targetUrl) {
-      if (item.targetUrl.includes('itinerar')) {
+      if (item.targetUrl.includes('admin/reports') || item.targetUrl.includes('reports')) {
+        setPortalMode('admin');
+        window.location.href = '/admin/reports';
+      } else if (item.targetUrl.includes('itinerar')) {
         setPortalMode('user');
         setUserTab('itineraries');
       } else if (item.targetUrl.includes('community')) {

@@ -27,7 +27,8 @@ import {
   X,
   Share2,
   EyeOff,
-  ShieldAlert
+  ShieldAlert,
+  Flag
 } from 'lucide-react';
 
 export const NotificationsPage = () => {
@@ -157,6 +158,13 @@ export const NotificationsPage = () => {
           badgeText: 'Xóa Bài Viết',
           actionText: 'Chi Tiết'
         };
+      case 'REPORT_ALERT':
+        return {
+          icon: Flag,
+          color: 'text-rose-600 bg-rose-50 border-rose-200',
+          badgeText: 'Báo Cáo Vi Phạm',
+          actionText: 'Xử Lý Báo Cáo'
+        };
       case 'SYSTEM':
       default:
         return {
@@ -225,6 +233,9 @@ export const NotificationsPage = () => {
         setUserTab('explore');
       } else if (item.targetUrl.includes('ai-config')) {
         setPortalMode('admin');
+      } else if (item.targetUrl.includes('admin/reports') || item.targetUrl.includes('reports')) {
+        setPortalMode('admin');
+        window.location.href = '/admin/reports';
       }
     }
   };
