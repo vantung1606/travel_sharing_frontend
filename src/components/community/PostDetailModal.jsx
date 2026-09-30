@@ -79,9 +79,9 @@ export const PostDetailModal = ({
       }
     };
     if (isPostMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('click', handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, [isPostMenuOpen]);
 
   // Check follow status for author
@@ -472,18 +472,27 @@ export const PostDetailModal = ({
             <div className="relative" ref={postMenuRef}>
               <button
                 type="button"
-                onClick={() => setIsPostMenuOpen(prev => !prev)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsPostMenuOpen(prev => !prev);
+                }}
                 className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
                 title="Tùy chọn bài viết"
               >
-                <MoreHorizontal className="w-5 h-5" />
+                <MoreHorizontal className="w-5 h-5 pointer-events-none" />
               </button>
 
               {isPostMenuOpen && (
-                <div className="absolute right-0 top-11 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="absolute right-0 top-11 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                >
                   <button
                     type="button"
-                    onClick={handleCopyLink}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCopyLink();
+                    }}
                     className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors cursor-pointer"
                   >
                     <Copy className="w-4 h-4 text-slate-400" />
@@ -493,7 +502,8 @@ export const PostDetailModal = ({
                   {!isSelf && (
                     <button
                       type="button"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setIsPostMenuOpen(false);
                         if (typeof onReportPost === 'function') {
                           onReportPost(post);

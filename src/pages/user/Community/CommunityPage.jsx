@@ -57,7 +57,8 @@ import {
   UserPlus,
   Users,
   CornerDownRight,
-  Flag
+  Flag,
+  EyeOff
 } from 'lucide-react';
 
 const CATEGORIES = [
@@ -190,6 +191,17 @@ export const CommunityPage = () => {
 
   // Post Actions Menu State
   const [openMenuPostId, setOpenMenuPostId] = useState(null);
+
+  // Close post actions menu when clicking outside
+  useEffect(() => {
+    const handleGlobalClick = () => {
+      setOpenMenuPostId(null);
+    };
+    if (openMenuPostId !== null) {
+      document.addEventListener('click', handleGlobalClick);
+    }
+    return () => document.removeEventListener('click', handleGlobalClick);
+  }, [openMenuPostId]);
 
   // Report Post Modal State
   const [postToReport, setPostToReport] = useState(null);
@@ -1562,19 +1574,28 @@ export const CommunityPage = () => {
                       {/* Actions Menu for All Posts */}
                       <div className="relative">
                         <button
-                          onClick={() => setOpenMenuPostId(openMenuPostId === post.id ? null : post.id)}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenMenuPostId(prev => (prev === post.id ? null : post.id));
+                          }}
                           className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                           title="Tùy chọn bài viết"
                         >
-                          <MoreHorizontal className="w-4 h-4" />
+                          <MoreHorizontal className="w-4 h-4 pointer-events-none" />
                         </button>
 
                         {openMenuPostId === post.id && (
-                          <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-20 animate-in fade-in zoom-in-95 duration-150">
+                          <div
+                            onClick={(e) => e.stopPropagation()}
+                            className="absolute right-0 top-full mt-1 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-30 animate-in fade-in zoom-in-95 duration-150"
+                          >
                             {isSelf ? (
                               <>
                                 <button
-                                  onClick={() => {
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
                                     setPostToEdit(post);
                                     setOpenMenuPostId(null);
                                   }}
@@ -1584,7 +1605,12 @@ export const CommunityPage = () => {
                                   <span>Chỉnh sửa bài viết</span>
                                 </button>
                                 <button
-                                  onClick={() => handleToggleVisibility(post)}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenMenuPostId(null);
+                                    handleToggleVisibility(post);
+                                  }}
                                   className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
                                 >
                                   {post.visibility === 'PRIVATE' ? (
@@ -1600,7 +1626,12 @@ export const CommunityPage = () => {
                                   )}
                                 </button>
                                 <button
-                                  onClick={() => handleCopyPostLink(post)}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenMenuPostId(null);
+                                    handleCopyPostLink(post);
+                                  }}
                                   className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2 cursor-pointer"
                                 >
                                   <Copy className="w-3.5 h-3.5 text-slate-500" />
@@ -1608,7 +1639,12 @@ export const CommunityPage = () => {
                                 </button>
                                 <div className="border-t border-slate-100 my-1"></div>
                                 <button
-                                  onClick={() => handleDeletePost(post)}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenMenuPostId(null);
+                                    handleDeletePost(post);
+                                  }}
                                   className="w-full px-3.5 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -1618,14 +1654,21 @@ export const CommunityPage = () => {
                             ) : (
                               <>
                                 <button
-                                  onClick={() => handleCopyPostLink(post)}
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenMenuPostId(null);
+                                    handleCopyPostLink(post);
+                                  }}
                                   className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2 cursor-pointer"
                                 >
                                   <Copy className="w-3.5 h-3.5 text-sky-600" />
                                   <span>Sao chép liên kết bài viết</span>
                                 </button>
                                 <button
-                                  onClick={() => {
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
                                     setHiddenPostIds(prev => new Set(prev).add(post.id));
                                     setOpenMenuPostId(null);
                                     if (toast?.showInfo) toast.showInfo('Đã ẩn bài viết khỏi bảng tin của bạn');
@@ -1638,7 +1681,9 @@ export const CommunityPage = () => {
                                 </button>
                                 <div className="border-t border-slate-100 my-1"></div>
                                 <button
-                                  onClick={() => {
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
                                     setPostToReport(post);
                                     setOpenMenuPostId(null);
                                   }}
