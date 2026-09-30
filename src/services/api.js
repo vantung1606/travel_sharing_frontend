@@ -731,11 +731,12 @@ export const notificationApi = {
 
 // ─── AUDIT LOGS API ─────────────────────────────────────────────────────────
 export const auditLogApi = {
-  async getLogs({ keyword = '', userId = '', action = '', page = 0, size = 15 } = {}) {
+  async getLogs({ keyword = '', userId = '', action = '', category = '', page = 0, size = 15 } = {}) {
     const params = new URLSearchParams();
     if (keyword) params.append('keyword', keyword);
     if (userId) params.append('userId', userId);
     if (action && action !== 'ALL') params.append('action', action);
+    if (category && category !== 'ALL') params.append('category', category);
     params.append('page', page);
     params.append('size', size);
 
@@ -787,6 +788,24 @@ export const auditLogApi = {
       console.warn('API error fetching audit stats:', err.message);
       return {};
     }
+  },
+
+  async downloadLogFile(category = 'ALL') {
+    const res = await fetch(`${BASE_URL}/admin/audit-logs/download?category=${category}`, {
+      headers: {
+        ...getAuthHeader()
+      }
+    });
+    if (!res.ok) throw new Error(`Tải file log thất bại: HTTP ${res.status}`);
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `wayfare-${category.toLowerCase()}-${Date.now()}.log`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   }
 };
 

@@ -42,6 +42,7 @@ export const AdminAuditLogsPage = () => {
   const [keyword, setKeyword] = useState('');
   const [selectedUserId, setSelectedUserId] = useState('');
   const [selectedAction, setSelectedAction] = useState('ALL');
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(0);
@@ -74,6 +75,7 @@ export const AdminAuditLogsPage = () => {
         keyword: keyword.trim(),
         userId: selectedUserId,
         action: selectedAction,
+        category: selectedCategory,
         page,
         size: pageSize
       });
@@ -92,7 +94,7 @@ export const AdminAuditLogsPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [keyword, selectedUserId, selectedAction, page, pageSize, toast]);
+  }, [keyword, selectedUserId, selectedAction, selectedCategory, page, pageSize, toast]);
 
   useEffect(() => {
     fetchMetadata();
@@ -106,7 +108,17 @@ export const AdminAuditLogsPage = () => {
     setKeyword('');
     setSelectedUserId('');
     setSelectedAction('ALL');
+    setSelectedCategory('ALL');
     setPage(0);
+  };
+
+  const handleDownloadFile = async (cat = 'ALL') => {
+    try {
+      await auditLogApi.downloadLogFile(cat);
+      toast.success(`Đã tải xuống file nhật ký wayfare-${cat.toLowerCase()}.log thành công!`);
+    } catch (err) {
+      toast.error('Không thể tải file log: ' + err.message);
+    }
   };
 
   const handleSelectUserFilter = (uid) => {
@@ -178,6 +190,37 @@ export const AdminAuditLogsPage = () => {
       icon: Layers,
       label: action
     };
+  };
+
+  const getCategoryBadge = (category) => {
+    const cat = (category || 'ACTIVITY').toUpperCase();
+    switch (cat) {
+      case 'AUTH':
+        return {
+          bg: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800',
+          label: '🔐 AUTH',
+          title: 'Nhật ký Xác thực & Tài khoản'
+        };
+      case 'SECURITY':
+        return {
+          bg: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800',
+          label: '🛡️ SECURITY',
+          title: 'Nhật ký An toàn & Kiểm duyệt'
+        };
+      case 'SYSTEM':
+        return {
+          bg: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-400 dark:border-violet-800',
+          label: '⚙️ SYSTEM',
+          title: 'Nhật ký Cấu hình & Hệ thống'
+        };
+      case 'ACTIVITY':
+      default:
+        return {
+          bg: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800',
+          label: '🧭 ACTIVITY',
+          title: 'Nhật ký Hoạt động Nghiệp vụ'
+        };
+    }
   };
 
   const formatDate = (dateStr) => {
@@ -280,7 +323,7 @@ export const AdminAuditLogsPage = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           <button
             onClick={fetchLogs}
             className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
@@ -288,6 +331,15 @@ export const AdminAuditLogsPage = () => {
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-sky-600' : ''}`} />
             <span>Làm mới</span>
+          </button>
+
+          <button
+            onClick={() => handleDownloadFile(selectedCategory)}
+            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs hover:shadow-md cursor-pointer"
+            title="Tải xuống tệp nhật ký nguyên bản (.log) được phân loại và lưu trữ trên máy chủ"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Tải File Log (.log)</span>
           </button>
 
           <button
@@ -307,10 +359,11 @@ export const AdminAuditLogsPage = () => {
             <Layers className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Tổng số bản ghi</p>
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Lưu trữ File Log</p>
             <p className="text-xl font-extrabold text-slate-900 dark:text-white mt-0.5">
               {stats.totalLogs?.toLocaleString() || 0}
             </p>
+            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">✓ Không tốn CSDL</span>
           </div>
         </div>
 
@@ -323,6 +376,7 @@ export const AdminAuditLogsPage = () => {
             <p className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5">
               {stats.logsToday?.toLocaleString() || 0}
             </p>
+            <span className="text-[10px] font-bold text-slate-400">Theo thời gian thực</span>
           </div>
         </div>
 
@@ -333,8 +387,9 @@ export const AdminAuditLogsPage = () => {
           <div>
             <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Phân loại hành động</p>
             <p className="text-xl font-extrabold text-violet-600 dark:text-violet-400 mt-0.5">
-              {stats.distinctActionsCount || actionsList.length || 0} danh mục
+              {stats.distinctActionsCount || actionsList.length || 0} loại
             </p>
+            <span className="text-[10px] font-bold text-violet-600 dark:text-violet-400">4 file phân loại độc lập</span>
           </div>
         </div>
 
@@ -343,17 +398,51 @@ export const AdminAuditLogsPage = () => {
             <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Giám sát Real-time</p>
+            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Cơ chế File Rolling</p>
             <p className="text-sm font-bold text-amber-600 dark:text-amber-400 mt-0.5 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              Đang hoạt động 100%
+              Xoay vòng 30 ngày
             </p>
+            <span className="text-[10px] text-slate-400">Tự động nén .gz</span>
           </div>
         </div>
       </div>
 
       {/* 3. Search & Filter Bar */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs space-y-3">
+      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs space-y-4">
+        {/* Category Filter Tabs */}
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar border-b border-slate-100 dark:border-slate-700/60">
+          {[
+            { id: 'ALL', label: 'Tất cả phân loại', count: stats.totalLogs, icon: Layers },
+            { id: 'AUTH', label: '🔐 Xác thực (AUTH)', count: stats.authCount, icon: KeyRound },
+            { id: 'SECURITY', label: '🛡️ An ninh (SECURITY)', count: stats.securityCount, icon: ShieldCheck },
+            { id: 'ACTIVITY', label: '🧭 Nghiệp vụ (ACTIVITY)', count: stats.activityCount, icon: Compass },
+            { id: 'SYSTEM', label: '⚙️ Hệ thống (SYSTEM)', count: stats.systemCount, icon: Cpu }
+          ].map((tab) => {
+            const Icon = tab.icon;
+            const active = selectedCategory === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => { setSelectedCategory(tab.id); setPage(0); }}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                  active
+                    ? 'bg-slate-900 text-white shadow-xs dark:bg-sky-600'
+                    : 'bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{tab.label}</span>
+                {typeof tab.count === 'number' && (
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${active ? 'bg-white/20 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-2xs'}`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
           
           {/* Keyword Search Input */}
@@ -407,10 +496,22 @@ export const AdminAuditLogsPage = () => {
         </div>
 
         {/* Active Filters Pill Bar */}
-        {(keyword || selectedUserId || selectedAction !== 'ALL') && (
+        {(keyword || selectedUserId || selectedAction !== 'ALL' || selectedCategory !== 'ALL') && (
           <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/50">
             <span className="text-[11px] font-semibold text-slate-400">Bộ lọc đang bật:</span>
-            
+
+            {selectedCategory !== 'ALL' && (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold">
+                <span>Phân loại: {selectedCategory}</span>
+                <button
+                  onClick={() => setSelectedCategory('ALL')}
+                  className="hover:text-rose-600 transition-colors ml-1 cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            )}
+
             {selectedUserObj && (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-semibold">
                 <User className="w-3 h-3" />
@@ -465,18 +566,19 @@ export const AdminAuditLogsPage = () => {
             <thead>
               <tr className="bg-slate-50/80 dark:bg-slate-900/50 border-b border-slate-200/80 dark:border-slate-700/60 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                 <th className="py-3 px-4 w-12 text-center">#</th>
-                <th className="py-3 px-4 min-w-[170px]">Thời gian</th>
-                <th className="py-3 px-4 min-w-[220px]">Người dùng phát sinh</th>
-                <th className="py-3 px-4 min-w-[160px]">Hành động</th>
+                <th className="py-3 px-4 min-w-[160px]">Thời gian</th>
+                <th className="py-3 px-4 min-w-[200px]">Người dùng phát sinh</th>
+                <th className="py-3 px-4 min-w-[120px]">Phân loại</th>
+                <th className="py-3 px-4 min-w-[150px]">Hành động</th>
                 <th className="py-3 px-4 min-w-[280px]">Nội dung & Chi tiết nghiệp vụ</th>
-                <th className="py-3 px-4 min-w-[160px]">IP & Thiết bị</th>
+                <th className="py-3 px-4 min-w-[150px]">IP & Thiết bị</th>
                 <th className="py-3 px-4 w-20 text-center">Chi tiết</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60 text-xs text-slate-700 dark:text-slate-200">
               {loading ? (
                 <tr>
-                  <td colSpan="7" className="py-12 text-center">
+                  <td colSpan="8" className="py-12 text-center">
                     <div className="inline-flex flex-col items-center gap-2 text-slate-400">
                       <RefreshCw className="w-6 h-6 animate-spin text-sky-600" />
                       <span>Đang tải nhật ký hệ thống...</span>
@@ -485,7 +587,7 @@ export const AdminAuditLogsPage = () => {
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="py-12 text-center text-slate-400">
+                  <td colSpan="8" className="py-12 text-center text-slate-400">
                     <div className="inline-flex flex-col items-center gap-2">
                       <Info className="w-8 h-8 text-slate-300" />
                       <p className="font-semibold text-slate-600 dark:text-slate-300">Không tìm thấy bản ghi nhật ký phù hợp</p>
@@ -559,6 +661,21 @@ export const AdminAuditLogsPage = () => {
                             </p>
                           </div>
                         </div>
+                      </td>
+
+                      {/* Category Badge */}
+                      <td className="py-3 px-4 whitespace-nowrap">
+                        {(() => {
+                          const catBadge = getCategoryBadge(logItem.category || logItem.action);
+                          return (
+                            <span
+                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${catBadge.bg}`}
+                              title={catBadge.title}
+                            >
+                              {catBadge.label}
+                            </span>
+                          );
+                        })()}
                       </td>
 
                       {/* Action Badge */}
@@ -700,13 +817,30 @@ export const AdminAuditLogsPage = () => {
                 </div>
               </div>
 
-              {/* Action type */}
-              <div>
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                  Hành động (Action)
-                </label>
-                <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 font-mono font-bold text-sky-600 dark:text-sky-400">
-                  {selectedLog.action}
+              {/* Category & Action type */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                    Phân loại (Category)
+                  </label>
+                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center">
+                    {(() => {
+                      const cb = getCategoryBadge(selectedLog.category || selectedLog.action);
+                      return (
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${cb.bg}`}>
+                          {cb.label}
+                        </span>
+                      );
+                    })()}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                    Hành động (Action)
+                  </label>
+                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 font-mono font-bold text-sky-600 dark:text-sky-400 flex items-center">
+                    {selectedLog.action}
+                  </div>
                 </div>
               </div>
 
