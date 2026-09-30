@@ -25,7 +25,9 @@ import {
   Megaphone,
   Radio,
   X,
-  Share2
+  Share2,
+  EyeOff,
+  ShieldAlert
 } from 'lucide-react';
 
 export const NotificationsPage = () => {
@@ -119,6 +121,41 @@ export const NotificationsPage = () => {
           color: 'text-teal-500 bg-teal-50 border-teal-200',
           badgeText: 'Địa Điểm',
           actionText: 'Xem Địa Điểm'
+        };
+      case 'POST_APPROVED':
+        return {
+          icon: CheckCircle2,
+          color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
+          badgeText: 'Duyệt Bài Viết',
+          actionText: 'Xem Bài Viết'
+        };
+      case 'POST_HIDDEN':
+        return {
+          icon: EyeOff,
+          color: 'text-amber-600 bg-amber-50 border-amber-200',
+          badgeText: 'Tạm Ẩn Bài',
+          actionText: 'Xem Chi Tiết'
+        };
+      case 'POST_LOCKED':
+        return {
+          icon: ShieldAlert,
+          color: 'text-rose-600 bg-rose-50 border-rose-200',
+          badgeText: 'Khóa & Cảnh Cáo',
+          actionText: 'Xem Chi Tiết'
+        };
+      case 'REPORT_DISMISSED':
+        return {
+          icon: ShieldCheck,
+          color: 'text-sky-600 bg-sky-50 border-sky-200',
+          badgeText: 'Bác Bỏ Báo Cáo',
+          actionText: 'Xem Bài Viết'
+        };
+      case 'POST_DELETED':
+        return {
+          icon: Trash2,
+          color: 'text-rose-600 bg-rose-50 border-rose-200',
+          badgeText: 'Xóa Bài Viết',
+          actionText: 'Chi Tiết'
         };
       case 'SYSTEM':
       default:

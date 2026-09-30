@@ -49,6 +49,7 @@ export const AdminReportsPage = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedPostModal, setSelectedPostModal] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null);
 
   // Local Audit Log session
   const [auditLogs, setAuditLogs] = useState([
@@ -95,7 +96,7 @@ export const AdminReportsPage = () => {
   }, [activeTab]);
 
   // Actions on Reported Posts
-  const handleApprovePost = async (id) => {
+  const handleApprovePost = async (id, title = '') => {
     try {
       await adminReportApi.approvePost(id);
       setReports(prev => prev.filter(r => r.id !== id));
@@ -108,13 +109,13 @@ export const AdminReportsPage = () => {
           id: Date.now(),
           admin: 'Quản Trị Viên (Admin)',
           action: 'Phê duyệt xuất bản bài viết',
-          target: `Bài viết #${id}`,
+          target: `Bài viết #${id} ${title ? `("${title}")` : ''}`,
           time: 'Vừa xong',
           type: 'success'
         },
         ...prev
       ]);
-      toast.success(`Đã phê duyệt xuất bản bài viết #${id} thành công! Đã gửi thông báo cho tác giả.`);
+      toast.success(`Đã phê duyệt xuất bản bài viết #${id} thành công! Hệ thống đã gửi thông báo đến tác giả.`);
       if (selectedPostModal && selectedPostModal.id === id) {
         setSelectedPostModal(null);
       }
@@ -123,7 +124,7 @@ export const AdminReportsPage = () => {
     }
   };
 
-  const handleDismissReport = async (id) => {
+  const handleDismissReport = async (id, title = '') => {
     try {
       await adminReportApi.dismissReport(id);
       setReports(prev => prev.filter(r => r.id !== id));
@@ -134,21 +135,24 @@ export const AdminReportsPage = () => {
       setAuditLogs(prev => [
         {
           id: Date.now(),
-          admin: 'Admin',
+          admin: 'Quản Trị Viên (Admin)',
           action: 'Bác bỏ báo cáo (Hợp lệ)',
-          target: `Bài viết #${id}`,
+          target: `Bài viết #${id} ${title ? `("${title}")` : ''}`,
           time: 'Vừa xong',
           type: 'info'
         },
         ...prev
       ]);
-      toast.info(`Đã bác bỏ báo cáo bài viết #${id} (Nội dung hợp lệ)`);
+      toast.info(`Đã bác bỏ báo cáo bài viết #${id} (Nội dung hợp lệ). Hệ thống đã gửi thông báo xác nhận đến tác giả.`);
+      if (selectedPostModal && selectedPostModal.id === id) {
+        setSelectedPostModal(null);
+      }
     } catch (err) {
       toast.error('Lỗi khi bác bỏ báo cáo: ' + err.message);
     }
   };
 
-  const handleHidePost = async (id) => {
+  const executeHidePost = async (id, title = '') => {
     try {
       await adminReportApi.hidePost(id);
       setReports(prev => prev.filter(r => r.id !== id));
@@ -160,21 +164,25 @@ export const AdminReportsPage = () => {
       setAuditLogs(prev => [
         {
           id: Date.now(),
-          admin: 'Admin',
+          admin: 'Quản Trị Viên (Admin)',
           action: 'Tạm ẩn bài viết',
-          target: `Bài viết #${id}`,
+          target: `Bài viết #${id} ${title ? `("${title}")` : ''}`,
           time: 'Vừa xong',
           type: 'warning'
         },
         ...prev
       ]);
-      toast.warning(`Đã tạm ẩn bài viết #${id} khỏi cộng đồng!`);
+      toast.warning(`Đã tạm ẩn bài viết #${id} khỏi cộng đồng! Hệ thống đã gửi thông báo cảnh báo đến tác giả.`);
+      if (selectedPostModal && selectedPostModal.id === id) {
+        setSelectedPostModal(null);
+      }
+      setConfirmModal(null);
     } catch (err) {
       toast.error('Lỗi khi tạm ẩn bài viết: ' + err.message);
     }
   };
 
-  const handleBanUser = async (id, authorName) => {
+  const executeBanUser = async (id, authorName, title = '') => {
     try {
       await adminReportApi.removePostAndBanAuthor(id);
       setReports(prev => prev.filter(r => r.id !== id));
@@ -186,7 +194,7 @@ export const AdminReportsPage = () => {
       setAuditLogs(prev => [
         {
           id: Date.now(),
-          admin: 'Admin',
+          admin: 'Quản Trị Viên (Admin)',
           action: 'Gỡ bài & Khóa tài khoản',
           target: `Tác giả: ${authorName} (Bài #${id})`,
           time: 'Vừa xong',
@@ -194,18 +202,26 @@ export const AdminReportsPage = () => {
         },
         ...prev
       ]);
-      toast.error(`Đã gỡ bài #${id} và khóa tài khoản ${authorName}!`);
+      toast.error(`Đã gỡ bài #${id}, khóa tài khoản ${authorName} và gửi thông báo cảnh cáo chính thức.`);
+      if (selectedPostModal && selectedPostModal.id === id) {
+        setSelectedPostModal(null);
+      }
+      setConfirmModal(null);
     } catch (err) {
       toast.error('Lỗi khi gỡ bài và khóa tài khoản: ' + err.message);
     }
   };
 
-  const handleDeletePost = async (id) => {
+  const executeDeletePost = async (id, title = '') => {
     try {
       await adminReportApi.deletePost(id);
       setArticles(prev => prev.filter(a => a.id !== id));
       setReports(prev => prev.filter(r => r.id !== id));
-      toast.success(`Đã xóa vĩnh viễn bài viết #${id}`);
+      toast.success(`Đã xóa vĩnh viễn bài viết #${id} và gửi thông báo đến tác giả.`);
+      if (selectedPostModal && selectedPostModal.id === id) {
+        setSelectedPostModal(null);
+      }
+      setConfirmModal(null);
     } catch (err) {
       toast.error('Không thể xóa bài viết: ' + err.message);
     }
@@ -589,14 +605,14 @@ export const AdminReportsPage = () => {
                         <span>Xem toàn bộ</span>
                       </button>
                       <button
-                        onClick={() => handleApprovePost(report.id)}
+                        onClick={() => handleApprovePost(report.id, report.title)}
                         className="px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Duyệt xuất bản</span>
                       </button>
                       <button
-                        onClick={() => handleDismissReport(report.id)}
+                        onClick={() => handleDismissReport(report.id, report.title)}
                         className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors cursor-pointer"
                       >
                         Bỏ qua (Hợp lệ)
@@ -605,14 +621,14 @@ export const AdminReportsPage = () => {
 
                     <div className="flex items-center gap-2">
                       <button
-                        onClick={() => handleHidePost(report.id)}
+                        onClick={() => setConfirmModal({ type: 'hide', post: report })}
                         className="px-3.5 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
                       >
                         <EyeOff className="w-3.5 h-3.5" />
                         <span>Tạm ẩn bài</span>
                       </button>
                       <button
-                        onClick={() => handleBanUser(report.id, report.authorName)}
+                        onClick={() => setConfirmModal({ type: 'ban', post: report })}
                         className="px-3.5 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
                       >
                         <UserX className="w-3.5 h-3.5" />
@@ -698,7 +714,7 @@ export const AdminReportsPage = () => {
                           <Eye className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handleDeletePost(art.id)}
+                          onClick={() => setConfirmModal({ type: 'delete', post: art })}
                           className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
                           title="Xóa bài viết"
                         >
@@ -806,21 +822,122 @@ export const AdminReportsPage = () => {
               </p>
             </div>
 
-            <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => handleApprovePost(selectedPostModal.id)}
-                className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-              >
-                <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Duyệt xuất bản ngay</span>
-              </button>
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleApprovePost(selectedPostModal.id, selectedPostModal.title)}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Duyệt xuất bản</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDismissReport(selectedPostModal.id, selectedPostModal.title)}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                >
+                  Bỏ qua (Hợp lệ)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmModal({ type: 'hide', post: selectedPostModal })}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <EyeOff className="w-3.5 h-3.5" />
+                  <span>Tạm ẩn bài</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmModal({ type: 'ban', post: selectedPostModal })}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                >
+                  <UserX className="w-3.5 h-3.5" />
+                  <span>Khóa bài & Cảnh cáo</span>
+                </button>
+              </div>
               <button
                 type="button"
                 onClick={() => setSelectedPostModal(null)}
-                className="px-5 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer"
+                className="px-4 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 cursor-pointer"
               >
                 Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 8. Action Confirmation Modal */}
+      {confirmModal && (
+        <div className="fixed inset-0 z-[9998] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150 border border-slate-100">
+            <div className="flex items-start gap-3">
+              <div className={`p-3 rounded-2xl shrink-0 ${
+                confirmModal.type === 'ban' 
+                  ? 'bg-rose-50 text-rose-600 border border-rose-100' 
+                  : confirmModal.type === 'hide'
+                    ? 'bg-amber-50 text-amber-600 border border-amber-100'
+                    : 'bg-rose-50 text-rose-600 border border-rose-100'
+              }`}>
+                {confirmModal.type === 'ban' && <ShieldAlert className="w-6 h-6" />}
+                {confirmModal.type === 'hide' && <EyeOff className="w-6 h-6" />}
+                {confirmModal.type === 'delete' && <Trash2 className="w-6 h-6" />}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-display font-extrabold text-base text-slate-900 mb-1">
+                  {confirmModal.type === 'ban' && 'Xác nhận Khóa bài & Cảnh cáo'}
+                  {confirmModal.type === 'hide' && 'Xác nhận Tạm ẩn bài viết'}
+                  {confirmModal.type === 'delete' && 'Xác nhận Xóa bài viết vĩnh viễn'}
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  {confirmModal.type === 'ban' && (
+                    <>
+                      Bạn có chắc muốn gỡ bài viết <strong className="text-slate-800">#{confirmModal.post?.id}</strong> và tạm khóa tài khoản của tác giả <strong className="text-slate-800">{confirmModal.post?.authorName}</strong>? Hệ thống sẽ gửi thông báo cảnh cáo vi phạm đến người dùng.
+                    </>
+                  )}
+                  {confirmModal.type === 'hide' && (
+                    <>
+                      Bài viết <strong className="text-slate-800">#{confirmModal.post?.id}</strong> sẽ bị tạm ẩn khỏi không gian công cộng. Hệ thống sẽ gửi thông báo đến tác giả.
+                    </>
+                  )}
+                  {confirmModal.type === 'delete' && (
+                    <>
+                      Bài viết <strong className="text-slate-800">#{confirmModal.post?.id}</strong> sẽ bị xóa vĩnh viễn khỏi hệ thống. Thao tác này không thể hoàn tác và hệ thống sẽ gửi thông báo đến tác giả.
+                    </>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setConfirmModal(null)}
+                className="px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (confirmModal.type === 'ban') {
+                    executeBanUser(confirmModal.post?.id, confirmModal.post?.authorName, confirmModal.post?.title);
+                  } else if (confirmModal.type === 'hide') {
+                    executeHidePost(confirmModal.post?.id, confirmModal.post?.title);
+                  } else if (confirmModal.type === 'delete') {
+                    executeDeletePost(confirmModal.post?.id, confirmModal.post?.title);
+                  }
+                }}
+                className={`px-4 py-2 rounded-xl text-xs font-bold text-white transition-colors cursor-pointer shadow-xs ${
+                  confirmModal.type === 'ban' || confirmModal.type === 'delete'
+                    ? 'bg-rose-600 hover:bg-rose-700'
+                    : 'bg-amber-600 hover:bg-amber-700'
+                }`}
+              >
+                {confirmModal.type === 'ban' && 'Khóa bài & Cảnh cáo'}
+                {confirmModal.type === 'hide' && 'Xác nhận Ẩn bài'}
+                {confirmModal.type === 'delete' && 'Xóa vĩnh viễn'}
               </button>
             </div>
           </div>

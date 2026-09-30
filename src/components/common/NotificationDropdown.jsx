@@ -13,7 +13,10 @@ import {
   ChevronRight,
   Clock3,
   Trash2,
-  Share2
+  Share2,
+  CheckCircle2,
+  EyeOff,
+  ShieldAlert
 } from 'lucide-react';
 
 export const NotificationDropdown = ({ isOpen, onClose }) => {
@@ -61,6 +64,16 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
         return <Users className="w-3.5 h-3.5 text-indigo-500" />;
       case 'PLACE_APPROVED':
         return <MapPin className="w-3.5 h-3.5 text-teal-500" />;
+      case 'POST_APPROVED':
+        return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />;
+      case 'POST_HIDDEN':
+        return <EyeOff className="w-3.5 h-3.5 text-amber-500" />;
+      case 'POST_LOCKED':
+        return <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />;
+      case 'REPORT_DISMISSED':
+        return <ShieldCheck className="w-3.5 h-3.5 text-sky-500" />;
+      case 'POST_DELETED':
+        return <Trash2 className="w-3.5 h-3.5 text-rose-500" />;
       case 'SYSTEM':
       default:
         return <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />;

@@ -36,7 +36,7 @@ export const ToastProvider = ({ children }) => {
     <ToastContext.Provider value={toast}>
       {children}
       {/* Global Toast Floating Notification Container */}
-      <div className="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4 sm:px-0">
+      <div className="fixed top-5 right-5 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4 sm:px-0">
         {toasts.map(t => {
           let bgClass = 'bg-slate-900 border-slate-700 text-white';
           let Icon = CheckCircle2;
