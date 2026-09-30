@@ -260,7 +260,7 @@ export const NotificationsPage = () => {
               Trang chủ
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-            <span className="text-sky-600 font-bold">M08. Trung tâm Thông Báo</span>
+            <span className="text-sky-600 font-bold">Trung tâm Thông Báo</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">

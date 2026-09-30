@@ -84,7 +84,7 @@ export const AdminHeader = () => {
               type="button"
               onClick={() => setIsNotificationOpen(!isNotificationOpen)}
               className="relative p-2 rounded-full text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
-              title="Thông báo hệ thống (M08)"
+              title="Thông báo hệ thống"
             >
               <Bell className="w-5 h-5" />
               {unreadNotificationsCount > 0 && (

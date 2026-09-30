@@ -227,7 +227,7 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
           onClick={handleViewAll}
           className="w-full py-2 rounded-xl bg-slate-50 hover:bg-sky-50 text-sky-700 font-extrabold text-xs flex items-center justify-center gap-1.5 transition-colors"
         >
-          <span>Xem tất cả thông báo (Trung tâm M08)</span>
+          <span>Xem tất cả thông báo</span>
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>

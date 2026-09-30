@@ -173,7 +173,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Notification State (M08) - Synced with currentUser
+  // Notification State - Synced with currentUser
   const [notifications, setNotifications] = useState(INITIAL_MOCK_NOTIFICATIONS);
   const [isNotificationLiveBackend, setIsNotificationLiveBackend] = useState(false);
 

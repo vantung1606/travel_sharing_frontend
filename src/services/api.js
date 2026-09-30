@@ -436,7 +436,7 @@ export const adminReportApi = {
   }
 };
 
-// ─── Notification API (M08) ──────────────────────────────────────────────────
+// ─── Notification API ────────────────────────────────────────────────────────
 export const INITIAL_MOCK_NOTIFICATIONS = [
   {
     id: 1,
