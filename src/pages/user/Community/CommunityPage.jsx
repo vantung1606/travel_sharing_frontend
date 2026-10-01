@@ -1023,7 +1023,7 @@ export const CommunityPage = () => {
   }, [attachedItineraryId, itineraries]);
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8 space-y-8">
+    <div className="w-full max-w-[1520px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8 space-y-8">
       {/* ──────────────────────────────────────────────────────────────────────────
           COMMUNITY HERO HEADER BANNER
           - Elegant Deep Navy / Ocean gradient with glowing accents
