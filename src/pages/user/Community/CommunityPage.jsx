@@ -1069,7 +1069,7 @@ export const CommunityPage = () => {
             <button
               type="button"
               onClick={() => setIsCreateModalOpen(true)}
-              className="px-6 py-3.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm shadow-lg shadow-blue-600/30 hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="px-6 py-3.5 rounded-full bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-sm shadow-lg shadow-teal-600/30 hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Đăng Bài & Đính Kèm Tour</span>
@@ -1102,9 +1102,9 @@ export const CommunityPage = () => {
                 <img
                   src={currentUser.avatar}
                   alt={currentUser.name}
-                  className="w-14 h-14 rounded-full object-cover ring-2 ring-blue-500/30 shadow-xs"
+                  className="w-14 h-14 rounded-full object-cover ring-2 ring-teal-500/30 shadow-xs"
                 />
-                <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] ring-2 ring-white font-bold">
+                <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-teal-600 text-white flex items-center justify-center text-[10px] ring-2 ring-white font-bold">
                   ✓
                 </span>
               </div>
@@ -1121,7 +1121,7 @@ export const CommunityPage = () => {
             {/* User Stats Grid */}
             <div className="grid grid-cols-4 gap-1.5 p-2.5 bg-slate-50 rounded-2xl text-center border border-slate-200/70">
               <div className="p-1 rounded-xl bg-white border border-slate-100">
-                <span className="font-extrabold text-sm text-blue-600 block">{itineraries.length}</span>
+                <span className="font-extrabold text-sm text-teal-600 block">{itineraries.length}</span>
                 <span className="text-[10px] text-slate-500 font-semibold">Chuyến đi</span>
               </div>
               <div className="p-1 rounded-xl bg-white border border-slate-100">
@@ -1132,7 +1132,7 @@ export const CommunityPage = () => {
               </div>
               <div
                 onClick={() => setFollowListModalState({ isOpen: true, tab: 'following', userId: currentUser.id, userName: currentUser.name })}
-                className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-blue-50 transition-colors group"
+                className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-teal-50 transition-colors group"
                 title="Bấm để xem danh sách đang theo dõi"
               >
                 <span className="font-extrabold text-sm text-teal-700 group-hover:scale-105 transition-transform block">
@@ -1142,20 +1142,20 @@ export const CommunityPage = () => {
               </div>
               <div
                 onClick={() => setActiveCategory(activeCategory === 'Đã lưu' ? 'Tất cả' : 'Đã lưu')}
-                className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-blue-50 transition-colors group"
+                className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-teal-50 transition-colors group"
                 title="Bấm để lọc danh sách bài viết đã lưu"
               >
-                <span className="font-extrabold text-sm text-blue-600 group-hover:scale-105 transition-transform block">
+                <span className="font-extrabold text-sm text-teal-600 group-hover:scale-105 transition-transform block">
                   {bookmarkedPostIds.size}
                 </span>
-                <span className="text-[10px] text-slate-500 font-semibold group-hover:text-blue-700">Đã lưu</span>
+                <span className="text-[10px] text-slate-500 font-semibold group-hover:text-teal-700">Đã lưu</span>
               </div>
             </div>
 
             {/* Quick Action Button */}
             <button
               onClick={() => setIsCreateModalOpen(true)}
-              className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-md shadow-blue-600/25 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-2.5 px-4 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-extrabold shadow-md shadow-teal-600/25 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>Đăng Bài & Đính Kèm Tour</span>
@@ -1207,17 +1207,17 @@ export const CommunityPage = () => {
                 onClick={item.action}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
                   item.active
-                    ? 'bg-blue-50 text-blue-700 border border-blue-200/80 shadow-xs'
+                    ? 'bg-teal-50 text-teal-700 border border-teal-200/80 shadow-xs'
                     : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <item.icon className={`w-4 h-4 ${item.active ? 'text-blue-600' : 'text-slate-400'}`} />
+                  <item.icon className={`w-4 h-4 ${item.active ? 'text-teal-600' : 'text-slate-400'}`} />
                   <span>{item.label}</span>
                 </div>
                 {item.badge && (
                   <span className={`px-2 py-0.5 rounded-full font-extrabold text-[10px] ${
-                    item.badge === 'Hot' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'
+                    item.badge === 'Hot' ? 'bg-amber-100 text-amber-800' : 'bg-teal-100 text-teal-800'
                   }`}>
                     {item.badge}
                   </span>
@@ -1228,11 +1228,11 @@ export const CommunityPage = () => {
             <div className="pt-2 border-t border-slate-100">
               <button
                 onClick={() => setFollowListModalState({ isOpen: true, tab: 'following', userId: currentUser.id, userName: currentUser.name })}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:text-blue-700 hover:bg-blue-50 transition-all cursor-pointer"
+                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:text-teal-700 hover:bg-teal-50 transition-all cursor-pointer"
                 title="Xem danh sách người bạn đang theo dõi và người theo dõi bạn"
               >
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-blue-600" />
+                  <Users className="w-4 h-4 text-teal-600" />
                   <span>Mạng lưới đang theo dõi</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-slate-400" />
@@ -1244,7 +1244,7 @@ export const CommunityPage = () => {
           <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
-                <TrendingUp className="w-4 h-4 text-blue-600" />
+                <TrendingUp className="w-4 h-4 text-teal-600" />
                 <span>Chủ đề nổi bật</span>
               </h4>
             </div>
@@ -1259,7 +1259,7 @@ export const CommunityPage = () => {
                 <button
                   key={idx}
                   onClick={() => setSearchQuery(item.tag.replace('#', ''))}
-                  className="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 border border-transparent text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200 border border-transparent text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer"
                 >
                   <span>{item.tag}</span>
                   <span className="text-[10px] text-slate-400">{item.count}</span>
@@ -1269,13 +1269,13 @@ export const CommunityPage = () => {
           </div>
 
           {/* WanderAI Community Insight */}
-          <div className="bg-gradient-to-br from-blue-50/70 via-white to-emerald-50/50 p-5 rounded-3xl border border-blue-200/70 shadow-sm space-y-2">
-            <div className="flex items-center gap-1.5 text-blue-800 text-xs font-extrabold uppercase tracking-wider">
+          <div className="bg-gradient-to-br from-teal-50/70 via-white to-cyan-50/50 p-5 rounded-3xl border border-teal-200/70 shadow-sm space-y-2">
+            <div className="flex items-center gap-1.5 text-teal-800 text-xs font-extrabold uppercase tracking-wider">
               <Sparkles className="w-4 h-4 text-amber-500" />
               <span>Gợi ý du lịch thông minh</span>
             </div>
             <p className="text-xs text-slate-600 leading-relaxed font-normal">
-              Bạn có thể bấm <strong className="text-blue-700">"Sao chép Tour 1-Click"</strong> ở bất kỳ bài viết nào để tự động thêm toàn bộ lộ trình chi tiết vào kho cá nhân của bạn!
+              Bạn có thể bấm <strong className="text-teal-700">"Sao chép Tour 1-Click"</strong> ở bất kỳ bài viết nào để tự động thêm toàn bộ lộ trình chi tiết vào kho cá nhân của bạn!
             </p>
           </div>
 
@@ -1299,16 +1299,16 @@ export const CommunityPage = () => {
                 className="w-full text-left bg-slate-50 hover:bg-blue-50/50 text-slate-400 hover:text-slate-600 px-5 py-3 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer flex items-center justify-between border border-slate-200/80 shadow-2xs"
               >
                 <span>Chia sẻ review, ảnh đẹp hoặc đính kèm lịch trình của bạn...</span>
-                <Sparkles className="w-4 h-4 text-blue-600" />
+                <Sparkles className="w-4 h-4 text-teal-600" />
               </button>
             </div>
 
             <div className="flex items-center justify-between gap-1 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-700">
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-colors cursor-pointer"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 hover:bg-teal-50 hover:text-teal-700 rounded-xl transition-colors cursor-pointer"
               >
-                <ImageIcon className="w-4 h-4 text-blue-600" />
+                <ImageIcon className="w-4 h-4 text-teal-600" />
                 <span className="hidden sm:inline">Ảnh/Video</span>
               </button>
               <button
@@ -1320,16 +1320,16 @@ export const CommunityPage = () => {
               </button>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-blue-50 text-blue-800 hover:bg-blue-100 rounded-xl font-bold transition-colors cursor-pointer border border-blue-200/60"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-xl font-bold transition-colors cursor-pointer border border-teal-200/60"
               >
-                <Route className="w-4 h-4 text-blue-600" />
+                <Route className="w-4 h-4 text-teal-600" />
                 <span className="hidden sm:inline">Đính kèm Tour</span>
               </button>
               <button
                 onClick={() => setIsAIGeneratorOpen(true)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 rounded-xl font-bold transition-colors cursor-pointer border border-emerald-200/60"
+                className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-teal-50 text-teal-800 hover:bg-teal-100 rounded-xl font-bold transition-colors cursor-pointer border border-teal-200/60"
               >
-                <Sparkles className="w-4 h-4 text-emerald-600" />
+                <Sparkles className="w-4 h-4 text-teal-600" />
                 <span className="hidden sm:inline">Tạo Tour AI</span>
               </button>
             </div>
@@ -1346,7 +1346,7 @@ export const CommunityPage = () => {
                   placeholder="Tìm bài viết theo tác giả, địa điểm, nội dung..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200/90 rounded-2xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-4 focus:ring-blue-100 focus:border-blue-600 transition-all shadow-xs font-medium"
+                  className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200/90 rounded-2xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-4 focus:ring-teal-100 focus:border-teal-600 transition-all shadow-xs font-medium"
                 />
                 {searchQuery && (
                   <button
@@ -1360,8 +1360,8 @@ export const CommunityPage = () => {
               </div>
 
               {/* Sort Selector Dropdown */}
-              <div className="flex items-center gap-1.5 px-3.5 py-2.5 bg-white border border-slate-200/90 rounded-2xl text-xs font-bold text-slate-700 shadow-xs hover:border-blue-300 transition-all shrink-0">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <div className="flex items-center gap-1.5 px-3.5 py-2.5 bg-white border border-slate-200/90 rounded-2xl text-xs font-bold text-slate-700 shadow-xs hover:border-teal-300 transition-all shrink-0">
+                <SlidersHorizontal className="w-3.5 h-3.5 text-teal-600 shrink-0" />
                 <select
                   value={activeSort}
                   onChange={e => setActiveSort(e.target.value)}
@@ -1385,15 +1385,15 @@ export const CommunityPage = () => {
                     onClick={() => setActiveCategory(cat.id)}
                     className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-blue-600 text-white shadow-md shadow-blue-600/25 font-extrabold'
-                        : 'bg-white text-slate-700 border border-slate-200/90 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 shadow-2xs font-semibold'
+                        ? 'bg-teal-600 text-white shadow-md shadow-teal-600/25 font-extrabold'
+                        : 'bg-white text-slate-700 border border-slate-200/90 hover:bg-teal-50 hover:text-teal-700 hover:border-teal-200 shadow-2xs font-semibold'
                     }`}
                   >
                     <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                     <span>{cat.label}</span>
                     {cat.id === 'Đang theo dõi' && followingIds.size > 0 && (
                       <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold leading-tight ${
-                        isActive ? 'bg-white/25 text-white' : 'bg-blue-50 text-blue-700 border border-blue-200'
+                        isActive ? 'bg-white/25 text-white' : 'bg-teal-50 text-teal-700 border border-teal-200'
                       }`}>
                         {followingIds.size}
                       </span>
@@ -1426,13 +1426,13 @@ export const CommunityPage = () => {
           {/* Empty State */}
           {!loading && displayPosts.length === 0 && (
             <div className="bg-white rounded-3xl p-10 border border-slate-200/90 shadow-sm text-center space-y-4">
-              <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-sm">
+              <div className="w-16 h-16 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto shadow-sm">
                 {activeCategory === 'Đang theo dõi' ? (
-                  <UserCheck className="w-8 h-8 text-blue-600" />
+                  <UserCheck className="w-8 h-8 text-teal-600" />
                 ) : activeCategory === 'Đã lưu' ? (
                   <Bookmark className="w-8 h-8 text-amber-500 fill-amber-500/20" />
                 ) : (
-                  <Compass className="w-8 h-8 text-blue-600" />
+                  <Compass className="w-8 h-8 text-teal-600" />
                 )}
               </div>
               <div className="max-w-md mx-auto">
@@ -1466,7 +1466,7 @@ export const CommunityPage = () => {
                 )}
                 <button
                   onClick={() => setIsCreateModalOpen(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full text-xs font-extrabold shadow-md shadow-blue-600/25 hover:shadow-lg transition-all inline-flex items-center gap-2 cursor-pointer"
+                  className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-full text-xs font-extrabold shadow-md shadow-teal-600/25 hover:shadow-lg transition-all inline-flex items-center gap-2 cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tạo bài viết ngay</span>
@@ -1578,7 +1578,7 @@ export const CommunityPage = () => {
                               className={`px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shadow-2xs ${
                                 followingIds.has(Number(authorId))
                                   ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 border border-slate-200'
-                                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
+                                  : 'bg-teal-600 hover:bg-teal-700 text-white shadow-teal-600/20'
                               }`}
                               title={followingIds.has(Number(authorId)) ? 'Hủy theo dõi tác giả' : 'Theo dõi tác giả'}
                             >
@@ -1586,7 +1586,7 @@ export const CommunityPage = () => {
                                 <Loader2 className="w-3 h-3 animate-spin" />
                               ) : followingIds.has(Number(authorId)) ? (
                                 <>
-                                  <UserCheck className="w-3.5 h-3.5 text-blue-600" />
+                                  <UserCheck className="w-3.5 h-3.5 text-teal-600" />
                                   <span>Đang theo dõi</span>
                                 </>
                               ) : (
@@ -2042,7 +2042,7 @@ export const CommunityPage = () => {
                           className="px-4 py-2.5 rounded-full bg-white border border-blue-200 text-blue-700 hover:bg-blue-50 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
                           title="Xem chi tiết lộ trình và tải cẩm nang PDF"
                         >
-                          <Eye className="w-3.5 h-3.5 text-blue-600" />
+                          <Eye className="w-3.5 h-3.5 text-teal-600" />
                           <span>Xem chi tiết</span>
                         </button>
 
@@ -2050,7 +2050,7 @@ export const CommunityPage = () => {
                         <button
                           onClick={() => handleCloneItinerary(post)}
                           disabled={cloningPostId === post.id}
-                          className="px-4 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-md shadow-blue-600/25 hover:shadow-lg transition-all cursor-pointer disabled:opacity-50"
+                          className="px-4 py-2.5 rounded-full bg-teal-600 hover:bg-teal-700 text-white text-xs font-extrabold flex items-center gap-1.5 shadow-md shadow-teal-600/25 hover:shadow-lg transition-all cursor-pointer disabled:opacity-50"
                         >
                           {cloningPostId === post.id ? (
                             <>
@@ -2184,7 +2184,7 @@ export const CommunityPage = () => {
 
             <button
               onClick={() => setIsAIGeneratorOpen(true)}
-              className="w-full py-2.5 rounded-xl bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 text-xs font-extrabold transition-all border border-blue-200/80 flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full py-2.5 rounded-xl bg-teal-50 hover:bg-teal-600 hover:text-white text-teal-700 text-xs font-extrabold transition-all border border-teal-200/80 flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Tạo Tour Tùy Biến Với AI</span>
@@ -2220,10 +2220,10 @@ export const CommunityPage = () => {
                       <img
                         src={author.avatar}
                         alt={author.name}
-                        className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-100 group-hover:ring-blue-500 transition-all shrink-0"
+                        className="w-9 h-9 rounded-full object-cover ring-1 ring-slate-100 group-hover:ring-teal-500 transition-all shrink-0"
                       />
                       <div className="min-w-0">
-                        <h5 className="font-extrabold text-xs text-slate-900 group-hover:text-blue-700 transition-colors truncate">
+                        <h5 className="font-extrabold text-xs text-slate-900 group-hover:text-teal-700 transition-colors truncate">
                           {author.name}
                         </h5>
                         <p className="text-[10px] text-slate-400 truncate">
@@ -2243,7 +2243,7 @@ export const CommunityPage = () => {
                         className={`px-3 py-1 rounded-full text-[11px] font-extrabold transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs ${
                           followingIds.has(Number(author.id))
                             ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 border border-slate-200'
-                            : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
+                            : 'bg-teal-600 hover:bg-teal-700 text-white shadow-teal-600/20'
                         }`}
                         title={followingIds.has(Number(author.id)) ? 'Hủy theo dõi' : 'Theo dõi tác giả'}
                       >
@@ -2251,7 +2251,7 @@ export const CommunityPage = () => {
                           <Loader2 className="w-3 h-3 animate-spin" />
                         ) : followingIds.has(Number(author.id)) ? (
                           <>
-                            <UserCheck className="w-3 h-3 text-blue-600" />
+                            <UserCheck className="w-3 h-3 text-teal-600" />
                             <span>Đang theo dõi</span>
                           </>
                         ) : (
@@ -2594,7 +2594,7 @@ export const CommunityPage = () => {
                 <button
                   type="submit"
                   disabled={submittingPost}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-extrabold shadow-md shadow-blue-600/25 hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 rounded-xl text-xs font-extrabold shadow-md shadow-teal-600/25 hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   {submittingPost ? (
                     <>
@@ -2695,7 +2695,7 @@ export const CommunityPage = () => {
               className={`w-full py-2.5 rounded-xl text-xs font-extrabold shadow-md hover:shadow-lg transition-all cursor-pointer text-white ${
                 moderationFeedback.type === 'REJECTED_PREFLIGHT'
                   ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/20'
-                  : 'bg-blue-600 hover:bg-blue-700 shadow-blue-500/25'
+                  : 'bg-teal-600 hover:bg-teal-700 shadow-teal-500/25'
               }`}
             >
               {moderationFeedback.type === 'APPROVED'
@@ -2925,12 +2925,12 @@ export const CommunityPage = () => {
                 placeholder={replyingTo ? `Trả lời @${replyingTo.authorName}...` : "Viết bình luận hoặc đặt câu hỏi về chuyến đi..."}
                 value={commentInput}
                 onChange={e => setCommentInput(e.target.value)}
-                className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
               />
               <button
                 type="submit"
                 disabled={submittingComment || !commentInput.trim()}
-                className="bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-full hover:shadow-md transition-all disabled:opacity-50 cursor-pointer shadow-sm shadow-blue-500/20"
+                className="bg-teal-600 hover:bg-teal-700 text-white p-2.5 rounded-full hover:shadow-md transition-all disabled:opacity-50 cursor-pointer shadow-sm shadow-teal-500/20"
               >
                 {submittingComment ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

@@ -443,8 +443,8 @@ export const HomePage = () => {
                 onClick={() => setActiveDockTab('ai')}
                 className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-xs flex items-center gap-2 transition-all cursor-pointer ${
                   activeDockTab === 'ai'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                    : 'text-slate-700 hover:text-blue-700 hover:bg-white'
+                    ? 'bg-teal-600 text-white shadow-md shadow-teal-600/30'
+                    : 'text-slate-700 hover:text-teal-700 hover:bg-white'
                 }`}
               >
                 <Sparkles className="w-4 h-4 text-amber-300" />
@@ -459,8 +459,8 @@ export const HomePage = () => {
                 }}
                 className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
                   activeDockTab === 'explore'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                    : 'text-slate-700 hover:text-blue-700 hover:bg-white'
+                    ? 'bg-teal-600 text-white shadow-md shadow-teal-600/30'
+                    : 'text-slate-700 hover:text-teal-700 hover:bg-white'
                 }`}
               >
                 <MapPin className="w-4 h-4" />
@@ -475,8 +475,8 @@ export const HomePage = () => {
                 }}
                 className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
                   activeDockTab === 'community'
-                    ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                    : 'text-slate-700 hover:text-blue-700 hover:bg-white'
+                    ? 'bg-teal-600 text-white shadow-md shadow-teal-600/30'
+                    : 'text-slate-700 hover:text-teal-700 hover:bg-white'
                 }`}
               >
                 <Users className="w-4 h-4" />
@@ -585,8 +585,8 @@ export const HomePage = () => {
                   onClick={() => setDockDest(chip.val)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer shadow-2xs hover:scale-105 ${
                     dockDest === chip.val
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                      : 'bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border-slate-200'
+                      ? 'bg-teal-600 text-white border-teal-600 shadow-xs'
+                      : 'bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 border-slate-200'
                   }`}
                 >
                   {chip.label}
@@ -598,7 +598,7 @@ export const HomePage = () => {
               type="button"
               disabled={isDockGenerating}
               onClick={handleDockGenerate}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-blue-500/25 hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 tracking-[0.015em]"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-teal-600 via-teal-500 to-cyan-500 hover:from-teal-700 hover:to-cyan-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-teal-500/25 hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 tracking-[0.015em]"
             >
               {isDockGenerating ? (
                 <>
@@ -770,12 +770,12 @@ export const HomePage = () => {
                     rows={4}
                     value={sandboxPrompt}
                     onChange={(e) => setSandboxPrompt(e.target.value)}
-                    className="w-full p-4 rounded-2xl bg-slate-50/70 font-medium text-sm sm:text-[15px] text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-600 focus:bg-white border border-slate-300/80 resize-none shadow-xs placeholder:text-slate-400 tracking-[0.015em] transition-all"
+                    className="w-full p-4 rounded-2xl bg-slate-50/70 font-medium text-sm sm:text-[15px] text-slate-900 focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-600 focus:bg-white border border-slate-300/80 resize-none shadow-xs placeholder:text-slate-400 tracking-[0.015em] transition-all"
                   />
                   <button
                     type="button"
                     onClick={handleRunSandbox}
-                    className="absolute bottom-3 right-3 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105"
+                    className="absolute bottom-3 right-3 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105"
                   >
                     <Sparkles className="w-4 h-4 text-amber-300" />
                     <span>Phân tích</span>
@@ -792,7 +792,7 @@ export const HomePage = () => {
                         'Gia đình 4 người đi Đà Nẵng 4N3Đ có người lớn tuổi, ưu tiên resort biển và ẩm thực nhẹ nhàng.'
                       );
                     }}
-                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs"
+                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs"
                   >
                     👨‍👩‍👧‍👦 Gia đình Đà Nẵng
                   </button>
@@ -803,7 +803,7 @@ export const HomePage = () => {
                         'Solo trekking Hà Giang 3N2Đ săn mây Mã Pí Lèng, ngân sách sinh viên tiết kiệm.'
                       );
                     }}
-                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs"
+                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs"
                   >
                     🏍️ Phượt Hà Giang
                   </button>
@@ -815,7 +815,7 @@ export const HomePage = () => {
                 {/* Header with Title and Day Switcher */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200/80 gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
+                    <div className="w-10 h-10 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
                       AI
                     </div>
                     <div>
@@ -837,8 +837,8 @@ export const HomePage = () => {
                         onClick={() => setSandboxActiveDay(dayNum)}
                         className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                           sandboxActiveDay === dayNum
-                            ? 'bg-blue-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:text-blue-700 hover:bg-slate-100'
+                            ? 'bg-teal-600 text-white shadow-xs'
+                            : 'text-slate-600 hover:text-teal-700 hover:bg-slate-100'
                         }`}
                       >
                         Ngày {dayNum}
@@ -848,7 +848,7 @@ export const HomePage = () => {
                 </div>
 
                 {/* Day Subtitle */}
-                <div className="py-2.5 text-xs sm:text-sm font-bold text-blue-700 flex items-center gap-2">
+                <div className="py-2.5 text-xs sm:text-sm font-bold text-teal-700 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-amber-500" />
                   <span>{sandboxMultiDayData[sandboxActiveDay].dayTitle}</span>
                 </div>
@@ -858,14 +858,14 @@ export const HomePage = () => {
                   {sandboxMultiDayData[sandboxActiveDay].items.map((item, idx) => (
                     <div key={idx} className="flex items-start gap-3.5">
                       <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-xs shadow-xs">
+                        <div className="w-8 h-8 rounded-full bg-teal-600 text-white font-extrabold flex items-center justify-center text-xs shadow-xs">
                           {item.time}
                         </div>
                         {idx < sandboxMultiDayData[sandboxActiveDay].items.length - 1 && (
                           <div className="w-0.5 h-8 bg-slate-300 mt-1" />
                         )}
                       </div>
-                      <div className="bg-white p-3.5 rounded-2xl flex-1 shadow-2xs border border-slate-200/90 hover:border-blue-300 transition-colors">
+                      <div className="bg-white p-3.5 rounded-2xl flex-1 shadow-2xs border border-slate-200/90 hover:border-teal-300 transition-colors">
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-bold text-sm sm:text-base text-slate-900">
                             {item.title}
@@ -900,7 +900,7 @@ export const HomePage = () => {
                       });
                       toast.success('Đang mở chi tiết toàn bộ lộ trình 3 ngày! ✨');
                     }}
-                    className="px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105"
+                    className="px-6 py-2.5 rounded-full bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105"
                   >
                     <span>Mở toàn bộ lộ trình 3 ngày</span>
                     <ArrowRight className="w-4 h-4" />
@@ -948,8 +948,8 @@ export const HomePage = () => {
                   onClick={() => setShowcaseRegion(tab.id)}
                   className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
                     showcaseRegion === tab.id
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                      : 'bg-white hover:bg-emerald-50 text-slate-700 border border-emerald-200/80 shadow-2xs'
+                      ? 'bg-teal-600 text-white shadow-md shadow-teal-600/30'
+                      : 'bg-white hover:bg-teal-50 text-slate-700 border border-teal-200/80 shadow-2xs'
                   }`}
                 >
                   {tab.label}
@@ -963,7 +963,7 @@ export const HomePage = () => {
             {filteredTours.map((tour) => (
               <div
                 key={tour.id}
-                className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col group border border-emerald-100 hover:border-blue-400"
+                className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col group border border-teal-100 hover:border-teal-400"
               >
                 <div className="relative h-56 w-full overflow-hidden">
                   <img
@@ -971,10 +971,10 @@ export const HomePage = () => {
                     alt={tour.title}
                     src={tour.image}
                   />
-                  <div className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-xs font-black text-blue-900 shadow-md">
+                  <div className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-xs font-black text-teal-900 shadow-md">
                     {tour.duration}
                   </div>
-                  <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center gap-1 shadow-md">
+                  <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center gap-1 shadow-md">
                     <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                     <span>{tour.tag}</span>
                   </div>
@@ -990,10 +990,10 @@ export const HomePage = () => {
                         <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
                         <strong className="text-slate-900">{tour.rating}</strong> ({tour.saves} lưu)
                       </span>
-                      <span className="text-blue-700 font-bold">{tour.location}</span>
+                      <span className="text-teal-700 font-bold">{tour.location}</span>
                     </div>
 
-                    <h3 className="font-extrabold text-base text-slate-900 mb-2 group-hover:text-blue-700 transition-colors line-clamp-1">
+                    <h3 className="font-extrabold text-base text-slate-900 mb-2 group-hover:text-teal-700 transition-colors line-clamp-1">
                       {tour.title}
                     </h3>
                     <p className="text-slate-600 text-sm mb-5 line-clamp-2 leading-relaxed font-normal tracking-[0.015em]">
@@ -1006,7 +1006,7 @@ export const HomePage = () => {
                       <span className="text-xs text-slate-500 font-semibold block">
                         Dự toán/người
                       </span>
-                      <span className="font-black text-base sm:text-lg text-blue-700">
+                      <span className="font-black text-base sm:text-lg text-teal-700">
                         {tour.price}
                       </span>
                     </div>
@@ -1015,8 +1015,8 @@ export const HomePage = () => {
                       onClick={() => handleCopyTour(tour)}
                       className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border flex items-center gap-1.5 cursor-pointer ${
                         savedTours[tour.id]
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : 'bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-800 border-blue-200'
+                          ? 'bg-teal-600 text-white border-teal-600'
+                          : 'bg-teal-50 hover:bg-teal-600 hover:text-white text-teal-800 border-teal-200'
                       }`}
                     >
                       {savedTours[tour.id] ? (
@@ -1289,7 +1289,7 @@ export const HomePage = () => {
               <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto pt-2">
                 <a
                   href="#ai-dock"
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-sm sm:text-base shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-sm sm:text-base shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
                 >
                   <Sparkles className="w-5 h-5 text-amber-300" />
                   <span>Lập Lịch Trình Miễn Phí Ngay</span>

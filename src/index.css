@@ -4,12 +4,12 @@
 
 @layer base {
   :root {
-    --primary: #059669;
-    --primary-hover: #047857;
-    --secondary: #064e3b;
+    --primary: #0d9488;
+    --primary-hover: #0f766e;
+    --secondary: #115e59;
     --tertiary: #f59e0b;
-    --surface: #f0fdf4;
-    --on-surface: #064e3b;
+    --surface: #f0fdfa;
+    --on-surface: #134e4a;
   }
 
   /* Clean, crisp & modern base font sizing with optimum readability */
@@ -88,14 +88,14 @@
 
 .emerald-gradient,
 .ocean-gradient {
-  background: linear-gradient(135deg, #059669 0%, #047857 50%, #064e3b 100%);
-  box-shadow: 0 4px 18px -2px rgba(5, 150, 105, 0.32);
+  background: linear-gradient(135deg, #0d9488 0%, #0f766e 50%, #0e7490 100%);
+  box-shadow: 0 4px 18px -2px rgba(13, 148, 136, 0.32);
   transition: all 0.25s ease;
 }
 
 .emerald-gradient:hover,
 .ocean-gradient:hover {
-  box-shadow: 0 6px 22px -2px rgba(5, 150, 105, 0.45);
+  box-shadow: 0 6px 22px -2px rgba(13, 148, 136, 0.45);
 }
 
 .forest-gradient {
