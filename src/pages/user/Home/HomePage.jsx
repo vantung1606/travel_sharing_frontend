@@ -372,7 +372,7 @@ export const HomePage = () => {
         </div>
 
         {/* Content Container Aligned with Navbar Width */}
-        <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div className="relative z-10 w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Main Hero Header Stack */}
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6">
             {/* Top Announcement Tag */}
@@ -431,7 +431,7 @@ export const HomePage = () => {
           - Aligned with Navbar container padding
       ────────────────────────────────────────────────────────────────────────── */}
       <section
-        className="relative z-20 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 -mt-12 lg:-mt-16 mb-20"
+        className="relative z-20 w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 -mt-12 lg:-mt-16 mb-20"
         id="ai-dock"
       >
         <div className="p-6 sm:p-8 rounded-3xl bg-white/95 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(2,44,34,0.18)] border border-slate-200/90">
@@ -626,7 +626,7 @@ export const HomePage = () => {
           - Gradient icon bubbles & crisp 14px typography
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-20 bg-gradient-to-b from-[#f2f7f4] via-[#f8faf9] to-[#edf5f0] border-t border-b border-emerald-900/10">
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div className="w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header */}
           <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-14 space-y-3">
             <span className="px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-xs uppercase tracking-wider border border-emerald-300 shadow-2xs">
@@ -746,7 +746,7 @@ export const HomePage = () => {
           - Right: Dynamic multi-day timeline with instant estimates
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-20 bg-gradient-to-b from-[#eaf2f8] via-[#f1f6fa] to-[#e4eef6] border-b border-blue-900/10">
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div className="w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="rounded-[2.5rem] bg-white p-7 sm:p-10 lg:p-12 shadow-xl border border-blue-200/80">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Left Column: Interactive Prompt Lab (5 cols) */}
@@ -919,7 +919,7 @@ export const HomePage = () => {
           - White photo cards with verified metrics & prices
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-20 bg-gradient-to-b from-[#f0f8f3] via-[#f6fbf8] to-[#eaf5ee] border-b border-emerald-900/10" id="kham-pha">
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div className="w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header with Filter Tabs */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
             <div>
@@ -1045,7 +1045,7 @@ export const HomePage = () => {
           - High-tech glowing satellite radar & destination preview
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-20 bg-gradient-to-b from-[#0a111a] via-[#0f1926] to-[#070d14] text-white border-b border-slate-800">
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div className="w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="rounded-3xl bg-slate-900/90 backdrop-blur-xl text-white p-7 sm:p-12 shadow-2xl border border-slate-700/80">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Text & List Details (5 cols) */}
@@ -1162,7 +1162,7 @@ export const HomePage = () => {
           - Crisp warm slate canvas with color-accented review cards
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-20 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#eef2f6] border-b border-slate-200/90">
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div className="w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-2.5">
             <span className="px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 font-extrabold text-xs uppercase tracking-wider border border-blue-200/80 shadow-2xs">
               ❤️ Cộng Đồng Yêu Mến
@@ -1266,7 +1266,7 @@ export const HomePage = () => {
           - Framed on a soft leaf pedestal with vibrant emerald gradient
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-16 bg-gradient-to-b from-[#eaf4ed] to-[#f4f9f6]">
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div className="w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 bg-gradient-to-r from-[#022c22] via-[#064e3b] to-teal-800 text-white shadow-2xl">
             {/* Subtle Glow Backdrop */}
             <div className="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-blue-500/20 blur-3xl pointer-events-none" />

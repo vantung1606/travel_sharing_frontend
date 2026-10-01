@@ -192,7 +192,7 @@ export const ItineraryManagerPage = () => {
   };
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-12 py-6 space-y-8 pb-20">
+    <div className="w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 space-y-8 pb-20">
       {/* ─── 1. TOP AMBIENT GLOW & HEADER (M04 STITCH CANVAS) ──────────────────── */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600/10 via-cyan-500/10 to-amber-500/10 p-6 sm:p-8 border border-emerald-100 shadow-sm">
         <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1000px] h-[300px] bg-gradient-to-r from-emerald-400/20 via-cyan-300/20 to-amber-300/15 blur-3xl pointer-events-none -z-10"></div>
