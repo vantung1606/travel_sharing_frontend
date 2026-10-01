@@ -621,15 +621,15 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           3. 4 VALUE PILLARS (CLEAN MODERN BENTO CARDS)
-          - Unified light luxury palette
+          - Subtle sage leaf gradient canvas
+          - Crisp white cards with distinctive accent borders
           - Gradient icon bubbles & crisp 14px typography
-          - Smooth hover elevation
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-16 bg-[#f8fafc] border-t border-slate-200/80">
+      <section className="w-full py-20 bg-gradient-to-b from-[#f2f7f4] via-[#f8faf9] to-[#edf5f0] border-t border-b border-emerald-900/10">
         <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header */}
-          <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-12 space-y-3">
-            <span className="px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 font-extrabold text-xs uppercase tracking-wider border border-blue-200/80 shadow-2xs">
+          <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-14 space-y-3">
+            <span className="px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-xs uppercase tracking-wider border border-emerald-300 shadow-2xs">
               ✨ Công Nghệ Du Lịch Đột Phá
             </span>
             <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -644,7 +644,7 @@ export const HomePage = () => {
           {/* 4 Cards Bento Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Pillar 1 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-slate-50/60 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/80 hover:border-blue-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-emerald-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400">
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-500 to-sky-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-110 transition-transform">
@@ -667,7 +667,7 @@ export const HomePage = () => {
             </div>
 
             {/* Pillar 2 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-slate-50/60 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/80 hover:border-teal-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-emerald-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-teal-400">
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center shadow-md shadow-teal-500/25 group-hover:scale-110 transition-transform">
@@ -690,7 +690,7 @@ export const HomePage = () => {
             </div>
 
             {/* Pillar 3 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-slate-50/60 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/80 hover:border-blue-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-emerald-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400">
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-600/25 group-hover:scale-110 transition-transform">
@@ -713,7 +713,7 @@ export const HomePage = () => {
             </div>
 
             {/* Pillar 4 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-slate-50/60 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/80 hover:border-amber-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-emerald-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-amber-400">
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-hover:scale-110 transition-transform">
@@ -740,13 +740,14 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           4. LIVE INTERACTIVE AI TRAVEL STUDIO
-          - Crisp elevated White Studio container
+          - Dedicated soft blue-slate lab environment
+          - Elevated grand white workspace card
           - Left: Natural Prompt Lab with chips & Royal Blue action
           - Right: Dynamic multi-day timeline with instant estimates
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-16 bg-white border-y border-slate-200/80">
+      <section className="w-full py-20 bg-gradient-to-b from-[#eaf2f8] via-[#f1f6fa] to-[#e4eef6] border-b border-blue-900/10">
         <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="rounded-3xl bg-gradient-to-b from-slate-50 to-white p-7 sm:p-10 shadow-lg border border-slate-200/90">
+          <div className="rounded-[2.5rem] bg-white p-7 sm:p-10 lg:p-12 shadow-xl border border-blue-200/80">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Left Column: Interactive Prompt Lab (5 cols) */}
               <div className="lg:col-span-5 flex flex-col">
@@ -769,7 +770,7 @@ export const HomePage = () => {
                     rows={4}
                     value={sandboxPrompt}
                     onChange={(e) => setSandboxPrompt(e.target.value)}
-                    className="w-full p-4 rounded-2xl bg-white font-medium text-sm sm:text-[15px] text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-600 border border-slate-300/80 resize-none shadow-xs placeholder:text-slate-400 tracking-[0.015em]"
+                    className="w-full p-4 rounded-2xl bg-slate-50/70 font-medium text-sm sm:text-[15px] text-slate-900 focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-600 focus:bg-white border border-slate-300/80 resize-none shadow-xs placeholder:text-slate-400 tracking-[0.015em] transition-all"
                   />
                   <button
                     type="button"
@@ -810,9 +811,9 @@ export const HomePage = () => {
               </div>
 
               {/* Right Column: Real-time Multi-Day Interactive Canvas (7 cols) */}
-              <div className="lg:col-span-7 rounded-2xl bg-white p-6 sm:p-7 flex flex-col justify-between text-slate-900 shadow-md border border-slate-200/90">
+              <div className="lg:col-span-7 rounded-3xl bg-slate-50/90 p-6 sm:p-7 flex flex-col justify-between text-slate-900 shadow-sm border border-slate-200/90">
                 {/* Header with Title and Day Switcher */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200/80 gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
                       AI
@@ -828,16 +829,16 @@ export const HomePage = () => {
                   </div>
 
                   {/* Multi-Day Tabs in Royal Blue */}
-                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 border border-slate-200/60 shadow-2xs">
+                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white border border-slate-200 shadow-2xs">
                     {[1, 2, 3].map((dayNum) => (
                       <button
                         key={dayNum}
                         type="button"
                         onClick={() => setSandboxActiveDay(dayNum)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                           sandboxActiveDay === dayNum
                             ? 'bg-blue-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:text-blue-700 hover:bg-white'
+                            : 'text-slate-600 hover:text-blue-700 hover:bg-slate-100'
                         }`}
                       >
                         Ngày {dayNum}
@@ -861,10 +862,10 @@ export const HomePage = () => {
                           {item.time}
                         </div>
                         {idx < sandboxMultiDayData[sandboxActiveDay].items.length - 1 && (
-                          <div className="w-0.5 h-8 bg-slate-200 mt-1" />
+                          <div className="w-0.5 h-8 bg-slate-300 mt-1" />
                         )}
                       </div>
-                      <div className="bg-slate-50/80 p-3.5 rounded-2xl flex-1 shadow-2xs border border-slate-200/70 hover:bg-slate-50 transition-colors">
+                      <div className="bg-white p-3.5 rounded-2xl flex-1 shadow-2xs border border-slate-200/90 hover:border-blue-300 transition-colors">
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-bold text-sm sm:text-base text-slate-900">
                             {item.title}
@@ -884,7 +885,7 @@ export const HomePage = () => {
                 </div>
 
                 {/* Footer Action within widget */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-200/80">
                   <span className="text-xs text-slate-500 font-semibold">
                     Đã đồng bộ Google Maps & Thời tiết thực tế
                   </span>
@@ -913,19 +914,20 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           5. CURATED TRENDING ITINERARIES SHOWCASE
+          - Soft leaf-green natural canvas
           - Category filter pills with Royal Blue active state
-          - High quality photo cards with verified metrics & prices
+          - White photo cards with verified metrics & prices
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-16 bg-[#f8fafc]" id="kham-pha">
+      <section className="w-full py-20 bg-gradient-to-b from-[#f0f8f3] via-[#f6fbf8] to-[#eaf5ee] border-b border-emerald-900/10" id="kham-pha">
         <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header with Filter Tabs */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-blue-700 font-extrabold text-xs uppercase tracking-wider mb-2">
+              <div className="inline-flex items-center gap-1.5 text-emerald-800 font-extrabold text-xs uppercase tracking-wider mb-2 px-3 py-1 rounded-full bg-emerald-100 border border-emerald-300">
                 <Compass className="w-4 h-4" />
                 <span>Hành trình được yêu thích nhất</span>
               </div>
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
                 Bộ Sưu Tập Lộ Trình AI Nổi Bật
               </h2>
               <p className="text-slate-600 text-sm sm:text-base mt-1 font-normal tracking-[0.015em]">
@@ -947,7 +949,7 @@ export const HomePage = () => {
                   className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
                     showcaseRegion === tab.id
                       ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                      : 'bg-white hover:bg-blue-50 text-slate-700 border border-slate-200'
+                      : 'bg-white hover:bg-emerald-50 text-slate-700 border border-emerald-200/80 shadow-2xs'
                   }`}
                 >
                   {tab.label}
@@ -961,7 +963,7 @@ export const HomePage = () => {
             {filteredTours.map((tour) => (
               <div
                 key={tour.id}
-                className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col group border border-slate-200/80 hover:border-blue-400"
+                className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col group border border-emerald-100 hover:border-blue-400"
               >
                 <div className="relative h-56 w-full overflow-hidden">
                   <img
@@ -1039,16 +1041,16 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           6. INTERACTIVE MAP & HIDDEN GEMS RADAR
-          - Modern luxury architectural frame
-          - Interactive gem selector with smooth preview update
+          - Immersive midnight obsidian section canvas
+          - High-tech glowing satellite radar & destination preview
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-16 bg-white border-y border-slate-200/80">
+      <section className="w-full py-20 bg-gradient-to-b from-[#0a111a] via-[#0f1926] to-[#070d14] text-white border-b border-slate-800">
         <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="rounded-3xl bg-slate-900 text-white p-7 sm:p-12 shadow-2xl border border-slate-800">
+          <div className="rounded-3xl bg-slate-900/90 backdrop-blur-xl text-white p-7 sm:p-12 shadow-2xl border border-slate-700/80">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Text & List Details (5 cols) */}
               <div className="lg:col-span-5 flex flex-col">
-                <span className="px-4 py-1 rounded-full bg-blue-500/20 text-sky-300 font-extrabold text-xs uppercase tracking-wider mb-3 w-fit border border-blue-400/40">
+                <span className="px-4 py-1.5 rounded-full bg-blue-500/20 text-sky-300 font-extrabold text-xs uppercase tracking-wider mb-3 w-fit border border-blue-400/40">
                   Radar Vệ Tinh Độc Bản
                 </span>
 
@@ -1074,7 +1076,7 @@ export const HomePage = () => {
                       onClick={() => setSelectedGemId(gem.id)}
                       className={`w-full p-4 rounded-2xl flex items-center justify-between transition-all text-left cursor-pointer border ${
                         selectedGemId === gem.id
-                          ? 'bg-blue-600/30 border-blue-400 shadow-md'
+                          ? 'bg-blue-600/35 border-blue-400 shadow-md ring-1 ring-blue-400/30'
                           : 'bg-white/10 hover:bg-white/15 border-white/15'
                       }`}
                     >
@@ -1157,9 +1159,9 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           7. SOCIAL PROOF & TESTIMONIALS
-          - Clean white review cards on neutral canvas
+          - Crisp warm slate canvas with color-accented review cards
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-16 bg-[#f8fafc]">
+      <section className="w-full py-20 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#eef2f6] border-b border-slate-200/90">
         <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-2.5">
             <span className="px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 font-extrabold text-xs uppercase tracking-wider border border-blue-200/80 shadow-2xs">
@@ -1176,7 +1178,7 @@ export const HomePage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Review 1 */}
-            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between border border-slate-200/80">
+            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border-t-4 border-t-blue-600 border border-slate-200/90 hover:-translate-y-1">
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1203,7 +1205,7 @@ export const HomePage = () => {
             </div>
 
             {/* Review 2 */}
-            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between border border-slate-200/80">
+            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border-t-4 border-t-emerald-600 border border-slate-200/90 hover:-translate-y-1">
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1217,7 +1219,7 @@ export const HomePage = () => {
               </div>
               <div className="flex items-center gap-3.5 pt-4 border-t border-slate-100">
                 <img
-                  className="w-11 h-11 rounded-full object-cover ring-2 ring-blue-500"
+                  className="w-11 h-11 rounded-full object-cover ring-2 ring-emerald-500"
                   alt="Hoàng Nam"
                   src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80"
                 />
@@ -1231,7 +1233,7 @@ export const HomePage = () => {
             </div>
 
             {/* Review 3 */}
-            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-md transition-all flex flex-col justify-between border border-slate-200/80">
+            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border-t-4 border-t-amber-500 border border-slate-200/90 hover:-translate-y-1">
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1245,7 +1247,7 @@ export const HomePage = () => {
               </div>
               <div className="flex items-center gap-3.5 pt-4 border-t border-slate-100">
                 <img
-                  className="w-11 h-11 rounded-full object-cover ring-2 ring-blue-500"
+                  className="w-11 h-11 rounded-full object-cover ring-2 ring-amber-500"
                   alt="Quang & Thảo"
                   src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80"
                 />
@@ -1261,9 +1263,9 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           8. GRAND FINALE CTA BANNER
-          - Elegant emerald to teal gradient with Royal Blue CTA
+          - Framed on a soft leaf pedestal with vibrant emerald gradient
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-12 bg-white">
+      <section className="w-full py-16 bg-gradient-to-b from-[#eaf4ed] to-[#f4f9f6]">
         <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 bg-gradient-to-r from-[#022c22] via-[#064e3b] to-teal-800 text-white shadow-2xl">
             {/* Subtle Glow Backdrop */}
