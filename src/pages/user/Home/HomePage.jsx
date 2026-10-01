@@ -105,14 +105,14 @@ export const HomePage = () => {
           title: 'Check-in Homestay Nhà Gỗ Thung Lũng & Nghỉ ngơi',
           cost: 'Tối ưu 30%',
           desc: 'Phòng view trọn vẹn đồi thông xanh mát, không khí trong lành yên tĩnh tuyệt đối.',
-          tagColor: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+          tagColor: 'text-sky-800 bg-sky-50 border-sky-200'
         },
         {
           time: '18:30',
           title: 'Lẩu gà lá é Tao Ngộ & Kem bơ Thanh Thảo',
           cost: '280.000đ/2 người',
           desc: 'Hương vị cay nồng lá é trứ danh, nhận ưu đãi độc quyền 10% thành viên Wayfare.',
-          tagColor: 'text-teal-800 bg-teal-50 border-teal-200'
+          tagColor: 'text-sky-800 bg-sky-50 border-sky-200'
         }
       ]
     },
@@ -157,14 +157,14 @@ export const HomePage = () => {
           title: 'Mua quà mứt dâu tây L’angfarm & Chợ đồ len',
           cost: 'Được giảm giá AI',
           desc: 'Gợi ý các quầy hàng uy tín có kiểm định nguồn gốc xuất xứ, tránh tình trạng ép giá.',
-          tagColor: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+          tagColor: 'text-sky-800 bg-sky-50 border-sky-200'
         },
         {
           time: '13:00',
           title: 'Check-out Homestay & Xe Limousine ra sân bay Liên Khương',
           cost: '120.000đ/vé',
           desc: 'Xe đón tận nơi đúng giờ, kết thúc chuyến đi thư giãn trọn vẹn không một chút mệt mỏi.',
-          tagColor: 'text-teal-800 bg-teal-50 border-teal-200'
+          tagColor: 'text-sky-800 bg-sky-50 border-sky-200'
         }
       ]
     }
@@ -367,7 +367,7 @@ export const HomePage = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#02231a]/40 to-[#02231a]" />
 
           {/* Radiant Subtle Ambient Light */}
-          <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-emerald-500/20 blur-[140px] pointer-events-none" />
+          <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-sky-500/20 blur-[140px] pointer-events-none" />
           <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/15 blur-[130px] pointer-events-none" />
         </div>
 
@@ -376,8 +376,8 @@ export const HomePage = () => {
           {/* Main Hero Header Stack */}
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6">
             {/* Top Announcement Tag */}
-            <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl text-emerald-300 font-bold text-xs sm:text-sm shadow-lg border border-emerald-400/40 tracking-[0.015em]">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+            <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl text-sky-300 font-bold text-xs sm:text-sm shadow-lg border border-sky-400/40 tracking-[0.015em]">
+              <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping" />
               <Sparkles className="w-4 h-4 text-amber-300" />
               <span>Trí Tuệ Nhân Tạo Lập Lịch Trình Thế Hệ Mới • Wayfare AI 4.0</span>
             </div>
@@ -385,7 +385,7 @@ export const HomePage = () => {
             {/* Expansive Grand Headline */}
             <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.18] text-white">
               Kiến Tạo Chuyến Đi Mơ Ước <br className="hidden sm:inline" />
-              <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-sky-300 bg-clip-text text-transparent drop-shadow-sm">
+              <span className="bg-gradient-to-r from-sky-300 via-sky-200 to-sky-300 bg-clip-text text-transparent drop-shadow-sm">
                 Chỉ Trong 3 Giây
               </span>{' '}
               Cùng AI Wayfare
@@ -443,8 +443,8 @@ export const HomePage = () => {
                 onClick={() => setActiveDockTab('ai')}
                 className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-xs flex items-center gap-2 transition-all cursor-pointer ${
                   activeDockTab === 'ai'
-                    ? 'bg-teal-600 text-white shadow-md shadow-teal-600/30'
-                    : 'text-slate-700 hover:text-teal-700 hover:bg-white'
+                    ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
+                    : 'text-slate-700 hover:text-sky-700 hover:bg-white'
                 }`}
               >
                 <Sparkles className="w-4 h-4 text-amber-300" />
@@ -459,8 +459,8 @@ export const HomePage = () => {
                 }}
                 className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
                   activeDockTab === 'explore'
-                    ? 'bg-teal-600 text-white shadow-md shadow-teal-600/30'
-                    : 'text-slate-700 hover:text-teal-700 hover:bg-white'
+                    ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
+                    : 'text-slate-700 hover:text-sky-700 hover:bg-white'
                 }`}
               >
                 <MapPin className="w-4 h-4" />
@@ -475,8 +475,8 @@ export const HomePage = () => {
                 }}
                 className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
                   activeDockTab === 'community'
-                    ? 'bg-teal-600 text-white shadow-md shadow-teal-600/30'
-                    : 'text-slate-700 hover:text-teal-700 hover:bg-white'
+                    ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
+                    : 'text-slate-700 hover:text-sky-700 hover:bg-white'
                 }`}
               >
                 <Users className="w-4 h-4" />
@@ -486,11 +486,11 @@ export const HomePage = () => {
 
             {/* Dynamic AI Estimate Pill */}
             <div className="flex items-center gap-3">
-              <div className="px-3.5 py-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-2xs flex items-center gap-2.5 text-xs sm:text-sm font-semibold">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <div className="px-3.5 py-1.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200/80 shadow-2xs flex items-center gap-2.5 text-xs sm:text-sm font-semibold">
+                <ShieldCheck className="w-4 h-4 text-sky-600" />
                 <span>Dự toán: ~{dockEstimate.budgetText}</span>
-                <span className="w-1 h-1 rounded-full bg-emerald-400" />
-                <span className="text-emerald-700 font-bold">{dockEstimate.savings}</span>
+                <span className="w-1 h-1 rounded-full bg-sky-400" />
+                <span className="text-sky-700 font-bold">{dockEstimate.savings}</span>
               </div>
             </div>
           </div>
@@ -585,8 +585,8 @@ export const HomePage = () => {
                   onClick={() => setDockDest(chip.val)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer shadow-2xs hover:scale-105 ${
                     dockDest === chip.val
-                      ? 'bg-teal-600 text-white border-teal-600 shadow-xs'
-                      : 'bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 border-slate-200'
+                      ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
+                      : 'bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 border-slate-200'
                   }`}
                 >
                   {chip.label}
@@ -598,7 +598,7 @@ export const HomePage = () => {
               type="button"
               disabled={isDockGenerating}
               onClick={handleDockGenerate}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-teal-600 via-teal-500 to-cyan-500 hover:from-teal-700 hover:to-cyan-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-teal-500/25 hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 tracking-[0.015em]"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-cyan-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-sky-500/25 hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 tracking-[0.015em]"
             >
               {isDockGenerating ? (
                 <>
@@ -625,11 +625,11 @@ export const HomePage = () => {
           - Crisp white cards with distinctive accent borders
           - Gradient icon bubbles & crisp 14px typography
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-20 bg-gradient-to-b from-[#f2f7f4] via-[#f8faf9] to-[#edf5f0] border-t border-b border-emerald-900/10">
+      <section className="w-full py-20 bg-gradient-to-b from-[#f2f7f4] via-[#f8faf9] to-[#edf5f0] border-t border-b border-sky-900/10">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header */}
           <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-14 space-y-3">
-            <span className="px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold text-xs uppercase tracking-wider border border-emerald-300 shadow-2xs">
+            <span className="px-4 py-1.5 rounded-full bg-sky-100 text-sky-800 font-extrabold text-xs uppercase tracking-wider border border-sky-300 shadow-2xs">
               ✨ Công Nghệ Du Lịch Đột Phá
             </span>
             <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -644,7 +644,7 @@ export const HomePage = () => {
           {/* 4 Cards Bento Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Pillar 1 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-emerald-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400">
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-500 to-sky-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-110 transition-transform">
@@ -667,13 +667,13 @@ export const HomePage = () => {
             </div>
 
             {/* Pillar 2 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-emerald-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-teal-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-sky-400">
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center shadow-md shadow-teal-500/25 group-hover:scale-110 transition-transform">
+                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-sky-500/25 group-hover:scale-110 transition-transform">
                     <Wallet className="w-6 h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-teal-50 text-teal-700 font-bold text-xs border border-teal-200/60">
+                  <span className="px-3 py-1 rounded-full bg-sky-50 text-sky-700 font-bold text-xs border border-sky-200/60">
                     Tiết kiệm 22%
                   </span>
                 </div>
@@ -683,14 +683,14 @@ export const HomePage = () => {
                   phòng phát sinh chính xác đến 95%.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-teal-700 font-bold text-sm">
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-sky-700 font-bold text-sm">
                 <span>Cắt giảm chi phí thừa</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
 
             {/* Pillar 3 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-emerald-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400">
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-600/25 group-hover:scale-110 transition-transform">
@@ -713,7 +713,7 @@ export const HomePage = () => {
             </div>
 
             {/* Pillar 4 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-emerald-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-amber-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-amber-400">
               <div>
                 <div className="flex items-center justify-between mb-5">
                   <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-hover:scale-110 transition-transform">
@@ -770,12 +770,12 @@ export const HomePage = () => {
                     rows={4}
                     value={sandboxPrompt}
                     onChange={(e) => setSandboxPrompt(e.target.value)}
-                    className="w-full p-4 rounded-2xl bg-slate-50/70 font-medium text-sm sm:text-[15px] text-slate-900 focus:outline-none focus:ring-4 focus:ring-teal-100 focus:border-teal-600 focus:bg-white border border-slate-300/80 resize-none shadow-xs placeholder:text-slate-400 tracking-[0.015em] transition-all"
+                    className="w-full p-4 rounded-2xl bg-slate-50/70 font-medium text-sm sm:text-[15px] text-slate-900 focus:outline-none focus:ring-4 focus:ring-sky-100 focus:border-sky-600 focus:bg-white border border-slate-300/80 resize-none shadow-xs placeholder:text-slate-400 tracking-[0.015em] transition-all"
                   />
                   <button
                     type="button"
                     onClick={handleRunSandbox}
-                    className="absolute bottom-3 right-3 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105"
+                    className="absolute bottom-3 right-3 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105"
                   >
                     <Sparkles className="w-4 h-4 text-amber-300" />
                     <span>Phân tích</span>
@@ -792,7 +792,7 @@ export const HomePage = () => {
                         'Gia đình 4 người đi Đà Nẵng 4N3Đ có người lớn tuổi, ưu tiên resort biển và ẩm thực nhẹ nhàng.'
                       );
                     }}
-                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs"
+                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs"
                   >
                     👨‍👩‍👧‍👦 Gia đình Đà Nẵng
                   </button>
@@ -803,7 +803,7 @@ export const HomePage = () => {
                         'Solo trekking Hà Giang 3N2Đ săn mây Mã Pí Lèng, ngân sách sinh viên tiết kiệm.'
                       );
                     }}
-                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-teal-50 text-slate-700 hover:text-teal-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs"
+                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs"
                   >
                     🏍️ Phượt Hà Giang
                   </button>
@@ -815,7 +815,7 @@ export const HomePage = () => {
                 {/* Header with Title and Day Switcher */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200/80 gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-teal-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
+                    <div className="w-10 h-10 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
                       AI
                     </div>
                     <div>
@@ -837,8 +837,8 @@ export const HomePage = () => {
                         onClick={() => setSandboxActiveDay(dayNum)}
                         className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                           sandboxActiveDay === dayNum
-                            ? 'bg-teal-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:text-teal-700 hover:bg-slate-100'
+                            ? 'bg-sky-600 text-white shadow-xs'
+                            : 'text-slate-600 hover:text-sky-700 hover:bg-slate-100'
                         }`}
                       >
                         Ngày {dayNum}
@@ -848,7 +848,7 @@ export const HomePage = () => {
                 </div>
 
                 {/* Day Subtitle */}
-                <div className="py-2.5 text-xs sm:text-sm font-bold text-teal-700 flex items-center gap-2">
+                <div className="py-2.5 text-xs sm:text-sm font-bold text-sky-700 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-amber-500" />
                   <span>{sandboxMultiDayData[sandboxActiveDay].dayTitle}</span>
                 </div>
@@ -858,14 +858,14 @@ export const HomePage = () => {
                   {sandboxMultiDayData[sandboxActiveDay].items.map((item, idx) => (
                     <div key={idx} className="flex items-start gap-3.5">
                       <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 rounded-full bg-teal-600 text-white font-extrabold flex items-center justify-center text-xs shadow-xs">
+                        <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-extrabold flex items-center justify-center text-xs shadow-xs">
                           {item.time}
                         </div>
                         {idx < sandboxMultiDayData[sandboxActiveDay].items.length - 1 && (
                           <div className="w-0.5 h-8 bg-slate-300 mt-1" />
                         )}
                       </div>
-                      <div className="bg-white p-3.5 rounded-2xl flex-1 shadow-2xs border border-slate-200/90 hover:border-teal-300 transition-colors">
+                      <div className="bg-white p-3.5 rounded-2xl flex-1 shadow-2xs border border-slate-200/90 hover:border-sky-300 transition-colors">
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-bold text-sm sm:text-base text-slate-900">
                             {item.title}
@@ -900,7 +900,7 @@ export const HomePage = () => {
                       });
                       toast.success('Đang mở chi tiết toàn bộ lộ trình 3 ngày! ✨');
                     }}
-                    className="px-6 py-2.5 rounded-full bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105"
+                    className="px-6 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105"
                   >
                     <span>Mở toàn bộ lộ trình 3 ngày</span>
                     <ArrowRight className="w-4 h-4" />
@@ -918,12 +918,12 @@ export const HomePage = () => {
           - Category filter pills with Royal Blue active state
           - White photo cards with verified metrics & prices
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-20 bg-gradient-to-b from-[#f0f8f3] via-[#f6fbf8] to-[#eaf5ee] border-b border-emerald-900/10" id="kham-pha">
+      <section className="w-full py-20 bg-gradient-to-b from-[#f0f9ff] via-[#f8fafc] to-[#e0f2fe] border-b border-sky-900/10" id="kham-pha">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header with Filter Tabs */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-emerald-800 font-extrabold text-xs uppercase tracking-wider mb-2 px-3 py-1 rounded-full bg-emerald-100 border border-emerald-300">
+              <div className="inline-flex items-center gap-1.5 text-sky-800 font-extrabold text-xs uppercase tracking-wider mb-2 px-3 py-1 rounded-full bg-sky-100 border border-sky-300">
                 <Compass className="w-4 h-4" />
                 <span>Hành trình được yêu thích nhất</span>
               </div>
@@ -948,8 +948,8 @@ export const HomePage = () => {
                   onClick={() => setShowcaseRegion(tab.id)}
                   className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
                     showcaseRegion === tab.id
-                      ? 'bg-teal-600 text-white shadow-md shadow-teal-600/30'
-                      : 'bg-white hover:bg-teal-50 text-slate-700 border border-teal-200/80 shadow-2xs'
+                      ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
+                      : 'bg-white hover:bg-sky-50 text-slate-700 border border-sky-200/80 shadow-2xs'
                   }`}
                 >
                   {tab.label}
@@ -963,7 +963,7 @@ export const HomePage = () => {
             {filteredTours.map((tour) => (
               <div
                 key={tour.id}
-                className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col group border border-teal-100 hover:border-teal-400"
+                className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col group border border-sky-100 hover:border-sky-400"
               >
                 <div className="relative h-56 w-full overflow-hidden">
                   <img
@@ -971,10 +971,10 @@ export const HomePage = () => {
                     alt={tour.title}
                     src={tour.image}
                   />
-                  <div className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-xs font-black text-teal-900 shadow-md">
+                  <div className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-xs font-black text-sky-900 shadow-md">
                     {tour.duration}
                   </div>
-                  <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-teal-600 text-white text-xs font-bold flex items-center gap-1 shadow-md">
+                  <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-sky-600 text-white text-xs font-bold flex items-center gap-1 shadow-md">
                     <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                     <span>{tour.tag}</span>
                   </div>
@@ -990,10 +990,10 @@ export const HomePage = () => {
                         <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
                         <strong className="text-slate-900">{tour.rating}</strong> ({tour.saves} lưu)
                       </span>
-                      <span className="text-teal-700 font-bold">{tour.location}</span>
+                      <span className="text-sky-700 font-bold">{tour.location}</span>
                     </div>
 
-                    <h3 className="font-extrabold text-base text-slate-900 mb-2 group-hover:text-teal-700 transition-colors line-clamp-1">
+                    <h3 className="font-extrabold text-base text-slate-900 mb-2 group-hover:text-sky-700 transition-colors line-clamp-1">
                       {tour.title}
                     </h3>
                     <p className="text-slate-600 text-sm mb-5 line-clamp-2 leading-relaxed font-normal tracking-[0.015em]">
@@ -1006,7 +1006,7 @@ export const HomePage = () => {
                       <span className="text-xs text-slate-500 font-semibold block">
                         Dự toán/người
                       </span>
-                      <span className="font-black text-base sm:text-lg text-teal-700">
+                      <span className="font-black text-base sm:text-lg text-sky-700">
                         {tour.price}
                       </span>
                     </div>
@@ -1015,8 +1015,8 @@ export const HomePage = () => {
                       onClick={() => handleCopyTour(tour)}
                       className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border flex items-center gap-1.5 cursor-pointer ${
                         savedTours[tour.id]
-                          ? 'bg-teal-600 text-white border-teal-600'
-                          : 'bg-teal-50 hover:bg-teal-600 hover:text-white text-teal-800 border-teal-200'
+                          ? 'bg-sky-600 text-white border-sky-600'
+                          : 'bg-sky-50 hover:bg-sky-600 hover:text-white text-sky-800 border-sky-200'
                       }`}
                     >
                       {savedTours[tour.id] ? (
@@ -1083,7 +1083,7 @@ export const HomePage = () => {
                       <div className="flex items-center gap-3">
                         <span
                           className={`w-3 h-3 rounded-full ${
-                            selectedGemId === gem.id ? 'bg-sky-400 animate-ping' : 'bg-emerald-400'
+                            selectedGemId === gem.id ? 'bg-sky-400 animate-ping' : 'bg-sky-400'
                           }`}
                         />
                         <div>
@@ -1131,7 +1131,7 @@ export const HomePage = () => {
                     <span className="px-3 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-sky-300 text-xs font-bold border border-sky-400/40">
                       🌤️ {hiddenGems[selectedGemId].temp}
                     </span>
-                    <span className="px-3 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-emerald-300 text-xs font-bold border border-emerald-400/40">
+                    <span className="px-3 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-sky-300 text-xs font-bold border border-sky-400/40">
                       👥 {hiddenGems[selectedGemId].crowd}
                     </span>
                   </div>
@@ -1205,7 +1205,7 @@ export const HomePage = () => {
             </div>
 
             {/* Review 2 */}
-            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border-t-4 border-t-emerald-600 border border-slate-200/90 hover:-translate-y-1">
+            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border-t-4 border-t-sky-600 border border-slate-200/90 hover:-translate-y-1">
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1219,7 +1219,7 @@ export const HomePage = () => {
               </div>
               <div className="flex items-center gap-3.5 pt-4 border-t border-slate-100">
                 <img
-                  className="w-11 h-11 rounded-full object-cover ring-2 ring-emerald-500"
+                  className="w-11 h-11 rounded-full object-cover ring-2 ring-sky-500"
                   alt="Hoàng Nam"
                   src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80"
                 />
@@ -1267,10 +1267,10 @@ export const HomePage = () => {
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-16 bg-gradient-to-b from-[#eaf4ed] to-[#f4f9f6]">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 bg-gradient-to-r from-[#022c22] via-[#064e3b] to-teal-800 text-white shadow-2xl">
+          <div className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 bg-gradient-to-r from-[#031726] via-[#082845] to-[#0c385f] text-white shadow-2xl">
             {/* Subtle Glow Backdrop */}
             <div className="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-blue-500/20 blur-3xl pointer-events-none" />
-            <div className="absolute top-0 right-1/3 w-64 h-64 rounded-full bg-emerald-400/20 blur-2xl pointer-events-none" />
+            <div className="absolute top-0 right-1/3 w-64 h-64 rounded-full bg-sky-400/20 blur-2xl pointer-events-none" />
 
             <div className="relative z-10 max-w-2xl flex flex-col items-start space-y-6">
               <span className="px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white font-extrabold text-xs border border-white/30">
@@ -1281,7 +1281,7 @@ export const HomePage = () => {
                 Sẵn Sàng Cho Chuyến Phiêu Lưu Kế Tiếp?
               </h2>
 
-              <p className="text-emerald-100 text-sm sm:text-base leading-relaxed font-normal tracking-[0.015em]">
+              <p className="text-sky-100 text-sm sm:text-base leading-relaxed font-normal tracking-[0.015em]">
                 Hãy để AI lo mọi khâu chuẩn bị, nghiên cứu và tối ưu chi phí. Bạn chỉ cần tận hưởng
                 từng khoảnh khắc trọn vẹn bên người thân yêu.
               </p>
@@ -1289,14 +1289,14 @@ export const HomePage = () => {
               <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto pt-2">
                 <a
                   href="#ai-dock"
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-teal-600 hover:bg-teal-700 text-white font-extrabold text-sm sm:text-base shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm sm:text-base shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
                 >
                   <Sparkles className="w-5 h-5 text-amber-300" />
                   <span>Lập Lịch Trình Miễn Phí Ngay</span>
                 </a>
 
-                <div className="flex items-center gap-2 text-emerald-100 text-xs sm:text-sm font-semibold">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+                <div className="flex items-center gap-2 text-sky-100 text-xs sm:text-sm font-semibold">
+                  <CheckCircle2 className="w-4 h-4 text-sky-300" />
                   <span>Không cần thẻ tín dụng • Trải nghiệm ngay 100% miễn phí</span>
                 </div>
               </div>

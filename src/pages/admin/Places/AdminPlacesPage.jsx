@@ -61,13 +61,13 @@ export const AdminPlacesPage = () => {
           <nav className="flex items-center gap-1.5 text-xs text-slate-400 font-semibold">
             <span>Quản trị hệ thống</span>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-emerald-600">Quản lý địa điểm & Check-in</span>
+            <span className="text-sky-600">Quản lý địa điểm & Check-in</span>
           </nav>
           <div className="flex items-center gap-3">
             <h1 className="font-display text-2xl font-bold text-slate-900 tracking-tight">
               Quản lý Địa điểm & Phê duyệt Điểm Check-in
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-emerald-600 font-bold text-xs border border-slate-200">
+            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-sky-600 font-bold text-xs border border-slate-200">
               Live Data Sync
             </span>
           </div>
@@ -76,16 +76,16 @@ export const AdminPlacesPage = () => {
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-2 self-start md:self-auto">
           <button className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-sm transition-all cursor-pointer">
-            <Download className="w-4 h-4 text-teal-600" />
+            <Download className="w-4 h-4 text-sky-600" />
             <span>Xuất CSV / Excel</span>
           </button>
 
           <button className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-200 shadow-sm transition-all cursor-pointer">
-            <SlidersHorizontal className="w-4 h-4 text-emerald-600" />
+            <SlidersHorizontal className="w-4 h-4 text-sky-600" />
             <span>Lọc nâng cao</span>
           </button>
 
-          <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
+          <button className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer">
             <PlusCircle className="w-4 h-4" />
             <span>Thêm địa điểm mới</span>
           </button>
@@ -102,16 +102,16 @@ export const AdminPlacesPage = () => {
               <p className="text-xs text-slate-400 font-semibold">Tổng địa điểm trên hệ thống</p>
               <div className="flex items-baseline gap-2">
                 <span className="font-display text-2xl font-extrabold text-slate-900">8.940</span>
-                <span className="text-xs font-bold text-teal-600">+120</span>
+                <span className="text-xs font-bold text-sky-600">+120</span>
               </div>
               <p className="text-[11px] text-slate-400">Phủ sóng 63 tỉnh thành phố</p>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center">
               <Map className="w-5 h-5" />
             </div>
           </div>
           <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-            <div className="bg-emerald-600 h-full rounded-full" style={{ width: '78%' }}></div>
+            <div className="bg-sky-600 h-full rounded-full" style={{ width: '78%' }}></div>
           </div>
         </div>
 
@@ -145,16 +145,16 @@ export const AdminPlacesPage = () => {
               <p className="text-xs text-slate-400 font-semibold">Tọa độ AI gắn nhãn chuẩn</p>
               <div className="flex items-baseline gap-2">
                 <span className="font-display text-2xl font-extrabold text-slate-900">96.4%</span>
-                <span className="text-xs font-bold text-emerald-600">Auto-Sync</span>
+                <span className="text-xs font-bold text-sky-600">Auto-Sync</span>
               </div>
               <p className="text-[11px] text-slate-400">Tối ưu cho WanderAI Planner</p>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center">
               <Sparkles className="w-5 h-5" />
             </div>
           </div>
           <div className="w-full bg-slate-100 h-1 rounded-full overflow-hidden">
-            <div className="bg-emerald-600 h-full rounded-full" style={{ width: '96.4%' }}></div>
+            <div className="bg-sky-600 h-full rounded-full" style={{ width: '96.4%' }}></div>
           </div>
         </div>
 
@@ -196,7 +196,7 @@ export const AdminPlacesPage = () => {
               onClick={() => setActiveTab(tab.label)}
               className={`px-4 py-2 rounded-full whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
                 activeTab === tab.label
-                  ? 'bg-emerald-600 text-white shadow-sm'
+                  ? 'bg-sky-600 text-white shadow-sm'
                   : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -219,7 +219,7 @@ export const AdminPlacesPage = () => {
                 placeholder="Tìm theo tên địa danh, thành phố, địa chỉ, người tạo..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 text-slate-800 rounded-full text-xs placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/20 border border-slate-200"
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 text-slate-800 rounded-full text-xs placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-sky-500/20 border border-slate-200"
               />
             </div>
 
@@ -271,7 +271,7 @@ export const AdminPlacesPage = () => {
             {['☁️ Điểm săn mây mùa thu', '🌅 View hoàng hôn thung lũng', '☕ Cafe Vintage', '⛰️ Đèo Hà Giang', '📸 Top 10 Instagrammable'].map(chip => (
               <button
                 key={chip}
-                className="px-3 py-1 rounded-full bg-slate-100 hover:bg-emerald-100 hover:text-emerald-700 text-slate-700 transition-colors cursor-pointer"
+                className="px-3 py-1 rounded-full bg-slate-100 hover:bg-sky-100 hover:text-sky-700 text-slate-700 transition-colors cursor-pointer"
               >
                 {chip}
               </button>
@@ -285,14 +285,14 @@ export const AdminPlacesPage = () => {
       {selectedRows.length > 0 && (
         <div className="flex items-center justify-between px-5 py-3 rounded-2xl bg-[#283044] text-white shadow-lg transition-all">
           <div className="flex items-center gap-3">
-            <span className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold">
+            <span className="w-6 h-6 rounded-full bg-sky-500 text-white flex items-center justify-center text-xs font-bold">
               {selectedRows.length}
             </span>
             <span className="text-xs font-bold">địa điểm đang được chọn</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="px-4 py-1.5 rounded-full bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer">
+            <button className="px-4 py-1.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer">
               <Check className="w-4 h-4" /> Phê duyệt hàng loạt
             </button>
             <button className="px-4 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer">
@@ -315,7 +315,7 @@ export const AdminPlacesPage = () => {
               <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-100 uppercase tracking-wider">
                 <tr>
                   <th className="py-3.5 px-4 w-10 text-center">
-                    <input type="checkbox" className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer" />
+                    <input type="checkbox" className="rounded text-sky-600 focus:ring-sky-500 cursor-pointer" />
                   </th>
                   <th className="py-3.5 px-4">Địa điểm & Phân loại</th>
                   <th className="py-3.5 px-4">Khu vực & Tọa độ</th>
@@ -351,7 +351,7 @@ export const AdminPlacesPage = () => {
                       type="checkbox"
                       checked={selectedRows.includes('lolo')}
                       onChange={() => toggleRow('lolo')}
-                      className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                      className="rounded text-sky-600 focus:ring-sky-500 cursor-pointer"
                     />
                   </td>
                   <td className="py-3.5 px-4">
@@ -367,7 +367,7 @@ export const AdminPlacesPage = () => {
                       <div className="space-y-0.5 min-w-0">
                         <h4 className="font-bold text-slate-900 truncate">Homestay Bản Lô Lô Chải</h4>
                         <div className="flex items-center gap-1.5">
-                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold">Khách sạn / Homestay</span>
+                          <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[10px] font-bold">Khách sạn / Homestay</span>
                           <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">User đề xuất</span>
                         </div>
                       </div>
@@ -376,7 +376,7 @@ export const AdminPlacesPage = () => {
                   <td className="py-3.5 px-4">
                     <span className="font-bold text-slate-800 block">Đồng Văn, Hà Giang</span>
                     <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-emerald-600" /> 23.3592° N, 105.3184° E
+                      <MapPin className="w-3 h-3 text-sky-600" /> 23.3592° N, 105.3184° E
                     </span>
                   </td>
                   <td className="py-3.5 px-4">
@@ -405,7 +405,7 @@ export const AdminPlacesPage = () => {
                     <div className="inline-flex items-center gap-1">
                       <button
                         onClick={() => approvePlace('lolo')}
-                        className="p-1.5 rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors"
+                        className="p-1.5 rounded-full bg-sky-50 text-sky-600 hover:bg-sky-600 hover:text-white transition-colors"
                         title="Duyệt"
                       >
                         <Check className="w-4 h-4" />
@@ -444,7 +444,7 @@ export const AdminPlacesPage = () => {
                       type="checkbox"
                       checked={selectedRows.includes('doigio')}
                       onChange={() => toggleRow('doigio')}
-                      className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                      className="rounded text-sky-600 focus:ring-sky-500 cursor-pointer"
                     />
                   </td>
                   <td className="py-3.5 px-4">
@@ -460,7 +460,7 @@ export const AdminPlacesPage = () => {
                       <div className="space-y-0.5 min-w-0">
                         <h4 className="font-bold text-slate-900 truncate">Quán Cafe Đồi Gió Đà Lạt</h4>
                         <div className="flex items-center gap-1.5">
-                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold">Quán Cafe / Ẩm thực</span>
+                          <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[10px] font-bold">Quán Cafe / Ẩm thực</span>
                           <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">User đề xuất</span>
                         </div>
                       </div>
@@ -469,7 +469,7 @@ export const AdminPlacesPage = () => {
                   <td className="py-3.5 px-4">
                     <span className="font-bold text-slate-800 block">Phường 11, Đà Lạt</span>
                     <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-emerald-600" /> 11.9404° N, 108.4583° E
+                      <MapPin className="w-3 h-3 text-sky-600" /> 11.9404° N, 108.4583° E
                     </span>
                   </td>
                   <td className="py-3.5 px-4">
@@ -498,7 +498,7 @@ export const AdminPlacesPage = () => {
                     <div className="inline-flex items-center gap-1">
                       <button
                         onClick={() => approvePlace('doigio')}
-                        className="p-1.5 rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors"
+                        className="p-1.5 rounded-full bg-sky-50 text-sky-600 hover:bg-sky-600 hover:text-white transition-colors"
                         title="Duyệt"
                       >
                         <Check className="w-4 h-4" />
@@ -535,7 +535,7 @@ export const AdminPlacesPage = () => {
                     className="hover:bg-slate-50/70 transition-colors cursor-pointer"
                   >
                     <td className="py-3.5 px-4 text-center" onClick={(e) => e.stopPropagation()}>
-                      <input type="checkbox" className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer" />
+                      <input type="checkbox" className="rounded text-sky-600 focus:ring-sky-500 cursor-pointer" />
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
@@ -543,9 +543,9 @@ export const AdminPlacesPage = () => {
                         <div className="space-y-0.5 min-w-0">
                           <h4 className="font-bold text-slate-900 truncate">{d.name}</h4>
                           <div className="flex items-center gap-1.5">
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold">{d.category}</span>
-                            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold flex items-center gap-0.5">
-                              <ShieldCheck className="w-3 h-3 text-emerald-600" /> AI Verified
+                            <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[10px] font-bold">{d.category}</span>
+                            <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[10px] font-bold flex items-center gap-0.5">
+                              <ShieldCheck className="w-3 h-3 text-sky-600" /> AI Verified
                             </span>
                           </div>
                         </div>
@@ -554,7 +554,7 @@ export const AdminPlacesPage = () => {
                     <td className="py-3.5 px-4">
                       <span className="font-bold text-slate-800 block">{d.name}</span>
                       <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-emerald-600" /> {d.coordinates.lat}° N, {d.coordinates.lng}° E
+                        <MapPin className="w-3 h-3 text-sky-600" /> {d.coordinates.lat}° N, {d.coordinates.lng}° E
                       </span>
                     </td>
                     <td className="py-3.5 px-4">
@@ -572,7 +572,7 @@ export const AdminPlacesPage = () => {
                       <span className="text-[10px] text-slate-400">{d.reviewsCount} check-in</span>
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                      <span className="px-2.5 py-1 rounded-full bg-sky-100 text-sky-800 text-[10px] font-bold">
                         Đã xuất bản
                       </span>
                     </td>
@@ -582,8 +582,8 @@ export const AdminPlacesPage = () => {
                     </td>
                     <td className="py-3.5 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="inline-flex items-center gap-1 text-slate-400">
-                        <button className="p-1.5 hover:text-emerald-600"><Eye className="w-4 h-4" /></button>
-                        <button className="p-1.5 hover:text-emerald-600"><Edit className="w-4 h-4" /></button>
+                        <button className="p-1.5 hover:text-sky-600"><Eye className="w-4 h-4" /></button>
+                        <button className="p-1.5 hover:text-sky-600"><Edit className="w-4 h-4" /></button>
                       </div>
                     </td>
                   </tr>
@@ -598,10 +598,10 @@ export const AdminPlacesPage = () => {
         <div className="lg:col-span-4 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4 sticky top-20">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <span className="font-bold text-sm text-slate-900 flex items-center gap-2">
-              <Eye className="w-4 h-4 text-emerald-600" /> Chi Tiết Địa Điểm Đề Xuất
+              <Eye className="w-4 h-4 text-sky-600" /> Chi Tiết Địa Điểm Đề Xuất
             </span>
             <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-              selectedPlace.status === 'Chờ duyệt' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+              selectedPlace.status === 'Chờ duyệt' ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'
             }`}>
               {selectedPlace.status}
             </span>
@@ -630,7 +630,7 @@ export const AdminPlacesPage = () => {
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Nhãn AI Tự Động Phân Loại</span>
               <div className="flex flex-wrap gap-1">
                 {selectedPlace.tags.map((t, i) => (
-                  <span key={i} className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                  <span key={i} className="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-semibold">
                     #{t}
                   </span>
                 ))}
@@ -646,7 +646,7 @@ export const AdminPlacesPage = () => {
               <div className="flex items-center gap-2 pt-2">
                 <button
                   onClick={() => approvePlace(selectedPlace.id)}
-                  className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-1.5"
                 >
                   <Check className="w-4 h-4" /> Phê duyệt địa điểm
                 </button>

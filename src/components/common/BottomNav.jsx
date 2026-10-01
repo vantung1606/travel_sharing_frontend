@@ -13,7 +13,7 @@ export const BottomNav = () => {
         <button
           onClick={() => setUserTab('home')}
           className={`flex-1 flex flex-col items-center justify-center gap-1 h-full transition-colors cursor-pointer ${
-            userTab === 'home' ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'
+            userTab === 'home' ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'
           }`}
         >
           <Home className={`w-5 h-5 ${userTab === 'home' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
@@ -24,7 +24,7 @@ export const BottomNav = () => {
         <button
           onClick={() => setUserTab('explore')}
           className={`flex-1 flex flex-col items-center justify-center gap-1 h-full transition-colors cursor-pointer ${
-            userTab === 'explore' ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'
+            userTab === 'explore' ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'
           }`}
         >
           <Compass className={`w-5 h-5 ${userTab === 'explore' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
@@ -51,7 +51,7 @@ export const BottomNav = () => {
         <button
           onClick={() => setUserTab('itineraries')}
           className={`flex-1 flex flex-col items-center justify-center gap-1 h-full transition-colors cursor-pointer ${
-            userTab === 'itineraries' ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'
+            userTab === 'itineraries' ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'
           }`}
         >
           <Map className={`w-5 h-5 ${userTab === 'itineraries' ? 'stroke-[2.5px]' : 'stroke-2'}`} />
@@ -62,7 +62,7 @@ export const BottomNav = () => {
         <button
           onClick={() => setUserTab('profile')}
           className={`flex-1 flex flex-col items-center justify-center gap-1 h-full transition-colors cursor-pointer ${
-            userTab === 'profile' ? 'text-emerald-600 font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'
+            userTab === 'profile' ? 'text-sky-600 font-bold' : 'text-slate-600 hover:text-slate-900 font-medium'
           }`}
         >
           <User className={`w-5 h-5 ${userTab === 'profile' ? 'stroke-[2.5px]' : 'stroke-2'}`} />

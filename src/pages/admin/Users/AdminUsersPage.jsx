@@ -351,8 +351,8 @@ export const AdminUsersPage = () => {
     }
     if (roles.includes('ROLE_GUIDE')) {
       return (
-        <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold inline-flex items-center gap-1">
-          <UserCheck className="w-3.5 h-3.5 text-emerald-600" /> Đối tác / HDV
+        <span className="px-3 py-1 rounded-full bg-sky-100 text-sky-800 font-bold inline-flex items-center gap-1">
+          <UserCheck className="w-3.5 h-3.5 text-sky-600" /> Đối tác / HDV
         </span>
       );
     }
@@ -373,15 +373,15 @@ export const AdminUsersPage = () => {
             <Shield className="w-3.5 h-3.5" /> Quản trị hệ thống
           </span>
           <span>/</span>
-          <span className="text-emerald-600 font-bold">Quản lý người dùng & Phân quyền</span>
+          <span className="text-sky-600 font-bold">Quản lý người dùng & Phân quyền</span>
         </nav>
 
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mt-1">
           <div>
             <h1 className="font-display text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
               Quản lý Người dùng & An toàn Cộng đồng
-              <span className="px-3 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
+              <span className="px-3 py-0.5 rounded-full text-xs font-extrabold bg-sky-100 text-sky-800 flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-sky-600 animate-ping"></span>
                 Dữ liệu thật (DB Active)
               </span>
             </h1>
@@ -408,7 +408,7 @@ export const AdminUsersPage = () => {
             </button>
             <button 
               onClick={() => setShowAddUserModal(true)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
             >
               <UserPlus className="w-4 h-4" />
               + Thêm nhân sự / Phân quyền
@@ -429,20 +429,20 @@ export const AdminUsersPage = () => {
                 {metrics.totalUsers} <span className="text-xs text-slate-400 font-normal">tài khoản</span>
               </div>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center">
               <Users className="w-6 h-6" />
             </div>
           </div>
           <div className="space-y-1 pt-1">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-emerald-600 font-bold flex items-center gap-0.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span> +{metrics.newUsersToday} mới hôm nay
+              <span className="text-sky-600 font-bold flex items-center gap-0.5">
+                <span className="w-2 h-2 rounded-full bg-sky-500"></span> +{metrics.newUsersToday} mới hôm nay
               </span>
               <span className="text-slate-500 font-semibold">{metrics.activeUsers} hoạt động</span>
             </div>
             <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
               <div 
-                className="bg-emerald-600 h-full rounded-full transition-all duration-500" 
+                className="bg-sky-600 h-full rounded-full transition-all duration-500" 
                 style={{ width: `${metrics.totalUsers > 0 ? (metrics.activeUsers / metrics.totalUsers) * 100 : 0}%` }}
               ></div>
             </div>
@@ -496,17 +496,17 @@ export const AdminUsersPage = () => {
           <div className="flex items-start justify-between">
             <div>
               <span className="text-[11px] text-slate-400 font-extrabold uppercase tracking-wider block">AI Trust Score Trung Bình</span>
-              <div className="font-display font-extrabold text-2xl text-teal-600 mt-1 flex items-baseline gap-1">
+              <div className="font-display font-extrabold text-2xl text-sky-600 mt-1 flex items-baseline gap-1">
                 {avgTrustScore} <span className="text-xs text-slate-400 font-normal">/ 100</span>
               </div>
             </div>
-            <div className="w-11 h-11 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center">
+            <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center">
               <Award className="w-6 h-6" />
             </div>
           </div>
           <div className="flex items-center justify-between text-xs">
             <span className="text-slate-500 font-semibold">Độ tin cậy:</span>
-            <span className="text-teal-600 font-bold flex items-center gap-1">
+            <span className="text-sky-600 font-bold flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5" /> Chuẩn WanderAI
             </span>
           </div>
@@ -528,7 +528,7 @@ export const AdminUsersPage = () => {
               onClick={() => setActiveTab(t.label)}
               className={`px-4 py-2 rounded-full transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                 activeTab === t.label
-                  ? 'bg-emerald-600 text-white shadow-sm'
+                  ? 'bg-sky-600 text-white shadow-sm'
                   : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
               }`}
             >
@@ -542,7 +542,7 @@ export const AdminUsersPage = () => {
           ))}
         </div>
         <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span> Backend API Connected (Port 8081)
+          <span className="w-2 h-2 rounded-full bg-sky-500"></span> Backend API Connected (Port 8081)
         </div>
       </div>
 
@@ -614,7 +614,7 @@ export const AdminUsersPage = () => {
                   type="checkbox" 
                   checked={filteredUsers.length > 0 && selectedUserIds.length === filteredUsers.length}
                   onChange={toggleSelectAll}
-                  className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer" 
+                  className="rounded text-sky-600 focus:ring-sky-500 cursor-pointer" 
                 />
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                   Đã chọn {selectedUserIds.length} / {filteredUsers.length} tài khoản
@@ -651,7 +651,7 @@ export const AdminUsersPage = () => {
                   {loading ? (
                     <tr>
                       <td colSpan={7} className="py-12 text-center text-slate-400">
-                        <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-emerald-500" />
+                        <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-sky-500" />
                         Đang đồng bộ dữ liệu người dùng từ cơ sở dữ liệu...
                       </td>
                     </tr>
@@ -671,7 +671,7 @@ export const AdminUsersPage = () => {
                           key={user.id} 
                           onClick={() => setSelectedAuditUser(user)}
                           className={`hover:bg-slate-50/80 transition-colors cursor-pointer ${
-                            isAudited ? 'bg-emerald-50/40' : ''
+                            isAudited ? 'bg-sky-50/40' : ''
                           }`}
                         >
                           {/* Checkbox */}
@@ -680,7 +680,7 @@ export const AdminUsersPage = () => {
                               type="checkbox" 
                               checked={isSelected}
                               onChange={() => toggleSelectUser(user.id)}
-                              className="rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer" 
+                              className="rounded text-sky-600 focus:ring-sky-500 cursor-pointer" 
                             />
                           </td>
 
@@ -694,7 +694,7 @@ export const AdminUsersPage = () => {
                                   className="w-10 h-10 rounded-full object-cover border border-slate-200" 
                                 />
                               ) : (
-                                <div className="w-10 h-10 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs">
+                                <div className="w-10 h-10 rounded-full bg-sky-600 text-white font-bold flex items-center justify-center text-xs">
                                   {user.fullName ? user.fullName.charAt(0).toUpperCase() : 'U'}
                                 </div>
                               )}
@@ -702,7 +702,7 @@ export const AdminUsersPage = () => {
                                 <div className="font-bold text-slate-900 flex items-center gap-1.5">
                                   {user.fullName}
                                   {user.isVerified && (
-                                    <BadgeCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" title="Đã xác thực" />
+                                    <BadgeCheck className="w-3.5 h-3.5 text-sky-500 shrink-0" title="Đã xác thực" />
                                   )}
                                 </div>
                                 <span className="text-slate-400 text-[11px]">
@@ -727,7 +727,7 @@ export const AdminUsersPage = () => {
                           <td className="py-3.5 px-4 text-center">
                             <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold ${
                               (user.trustScore || 80) >= 80 
-                                ? 'bg-teal-100 text-teal-800' 
+                                ? 'bg-sky-100 text-sky-800' 
                                 : (user.trustScore || 80) >= 50 
                                   ? 'bg-amber-100 text-amber-800' 
                                   : 'bg-rose-100 text-rose-800'
@@ -743,7 +743,7 @@ export const AdminUsersPage = () => {
                                 ● Đã khóa (Banned)
                               </span>
                             ) : (
-                              <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold text-[10px]">
+                              <span className="px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold text-[10px]">
                                 ● Hoạt động
                               </span>
                             )}
@@ -755,7 +755,7 @@ export const AdminUsersPage = () => {
                               {/* View detail in audit */}
                               <button 
                                 onClick={() => setSelectedAuditUser(user)}
-                                className="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-500 hover:text-emerald-600 flex items-center justify-center transition-colors" 
+                                className="w-8 h-8 rounded-full hover:bg-slate-200 text-slate-500 hover:text-sky-600 flex items-center justify-center transition-colors" 
                                 title="Xem hồ sơ & Audit"
                               >
                                 <Eye className="w-4 h-4" />
@@ -775,7 +775,7 @@ export const AdminUsersPage = () => {
                                 onClick={() => handleToggleStatus(user)}
                                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
                                   user.status === 'LOCKED'
-                                    ? 'hover:bg-emerald-100 text-emerald-600 hover:text-emerald-700'
+                                    ? 'hover:bg-sky-100 text-sky-600 hover:text-sky-700'
                                     : 'hover:bg-rose-100 text-slate-400 hover:text-rose-600'
                                 }`} 
                                 title={user.status === 'LOCKED' ? 'Mở khóa tài khoản' : 'Khóa tài khoản'}
@@ -802,7 +802,7 @@ export const AdminUsersPage = () => {
                 <button className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 disabled:opacity-40" disabled>
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <button className="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold">1</button>
+                <button className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold">1</button>
                 <button className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-700 disabled:opacity-40" disabled>
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -819,7 +819,7 @@ export const AdminUsersPage = () => {
             {/* Header Drawer */}
             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <span className={`w-2.5 h-2.5 rounded-full ${selectedAuditUser?.status === 'LOCKED' ? 'bg-rose-600 animate-ping' : 'bg-emerald-500'}`}></span>
+                <span className={`w-2.5 h-2.5 rounded-full ${selectedAuditUser?.status === 'LOCKED' ? 'bg-rose-600 animate-ping' : 'bg-sky-500'}`}></span>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-800">
                   Xử lý tài khoản & Audit
                 </span>
@@ -829,7 +829,7 @@ export const AdminUsersPage = () => {
                   Đã bị hạn chế
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">
+                <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[10px] font-extrabold">
                   Bình thường
                 </span>
               )}
@@ -846,7 +846,7 @@ export const AdminUsersPage = () => {
                       className="w-12 h-12 rounded-2xl object-cover border border-slate-200 shrink-0" 
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                    <div className="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-bold text-sm shrink-0">
                       {selectedAuditUser.fullName?.charAt(0).toUpperCase() || 'U'}
                     </div>
                   )}
@@ -864,7 +864,7 @@ export const AdminUsersPage = () => {
                           <Ban className="w-3.5 h-3.5" /> Tài khoản bị khóa
                         </span>
                       ) : (
-                        <span className="text-emerald-600 font-bold flex items-center gap-1">
+                        <span className="text-sky-600 font-bold flex items-center gap-1">
                           <CheckCircle2 className="w-3.5 h-3.5" /> Hoạt động hợp lệ
                         </span>
                       )}
@@ -877,14 +877,14 @@ export const AdminUsersPage = () => {
                 <div className={`p-4 rounded-2xl border space-y-2 ${
                   (selectedAuditUser.riskScore || 0) >= 50 
                     ? 'bg-amber-50 border-amber-200/60' 
-                    : 'bg-teal-50 border-teal-200/60'
+                    : 'bg-sky-50 border-sky-200/60'
                 }`}>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900 flex items-center gap-1">
-                      <Sparkles className="w-4 h-4 text-emerald-600" /> WanderAI Security Shield
+                      <Sparkles className="w-4 h-4 text-sky-600" /> WanderAI Security Shield
                     </span>
                     <span className={`text-xs font-extrabold ${
-                      (selectedAuditUser.riskScore || 0) >= 50 ? 'text-amber-700' : 'text-teal-700'
+                      (selectedAuditUser.riskScore || 0) >= 50 ? 'text-amber-700' : 'text-sky-700'
                     }`}>
                       Mức rủi ro: {selectedAuditUser.riskScore || 12}%
                     </span>
@@ -897,7 +897,7 @@ export const AdminUsersPage = () => {
                   <div className="w-full bg-slate-200/80 rounded-full h-1.5 overflow-hidden">
                     <div 
                       className={`h-full rounded-full transition-all duration-500 ${
-                        (selectedAuditUser.riskScore || 0) >= 50 ? 'bg-amber-600' : 'bg-teal-600'
+                        (selectedAuditUser.riskScore || 0) >= 50 ? 'bg-amber-600' : 'bg-sky-600'
                       }`} 
                       style={{ width: `${selectedAuditUser.riskScore || 12}%` }}
                     ></div>
@@ -937,7 +937,7 @@ export const AdminUsersPage = () => {
                   <textarea
                     defaultValue={selectedAuditUser.status === 'LOCKED' ? 'Tài khoản đang bị khóa do vi phạm chính sách spam.' : 'Tài khoản thành viên hoạt động tích cực.'}
                     rows={2}
-                    className="w-full p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500/20 resize-none"
+                    className="w-full p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-800 outline-none focus:ring-2 focus:ring-sky-500/20 resize-none"
                   />
                 </div>
 
@@ -947,7 +947,7 @@ export const AdminUsersPage = () => {
                     onClick={() => handleToggleStatus(selectedAuditUser)}
                     className={`w-full py-2.5 rounded-xl font-bold text-xs transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-2 ${
                       selectedAuditUser.status === 'LOCKED'
-                        ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                        ? 'bg-sky-600 hover:bg-sky-700 text-white'
                         : 'bg-rose-600 hover:bg-rose-700 text-white'
                     }`}
                   >
@@ -1008,7 +1008,7 @@ export const AdminUsersPage = () => {
             </div>
 
             <div className="p-3 bg-slate-50 rounded-2xl flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-xs">
+              <div className="w-10 h-10 rounded-full bg-sky-600 text-white font-bold flex items-center justify-center text-xs">
                 {userToChangeRole.fullName?.charAt(0).toUpperCase() || 'U'}
               </div>
               <div>
@@ -1079,7 +1079,7 @@ export const AdminUsersPage = () => {
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center">
                   <UserPlus className="w-4 h-4" />
                 </div>
                 <h3 className="font-bold text-slate-900 text-sm">Thêm nhân sự / Phân quyền mới</h3>
@@ -1101,7 +1101,7 @@ export const AdminUsersPage = () => {
                   placeholder="Ví dụ: Lê Bảo Hoàng"
                   value={newUserForm.fullName}
                   onChange={(e) => setNewUserForm({ ...newUserForm, fullName: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20"
                 />
               </div>
 
@@ -1114,7 +1114,7 @@ export const AdminUsersPage = () => {
                     placeholder="name@wayfare.vn"
                     value={newUserForm.email}
                     onChange={(e) => setNewUserForm({ ...newUserForm, email: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20"
                   />
                 </div>
                 <div>
@@ -1125,7 +1125,7 @@ export const AdminUsersPage = () => {
                     placeholder="Tối thiểu 6 ký tự"
                     value={newUserForm.password}
                     onChange={(e) => setNewUserForm({ ...newUserForm, password: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20"
                   />
                 </div>
               </div>
@@ -1138,7 +1138,7 @@ export const AdminUsersPage = () => {
                     placeholder="@hoangle_wander"
                     value={newUserForm.handle}
                     onChange={(e) => setNewUserForm({ ...newUserForm, handle: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20"
                   />
                 </div>
                 <div>
@@ -1148,7 +1148,7 @@ export const AdminUsersPage = () => {
                     placeholder="0912 345 678"
                     value={newUserForm.phoneNumber}
                     onChange={(e) => setNewUserForm({ ...newUserForm, phoneNumber: e.target.value })}
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20"
                   />
                 </div>
               </div>
@@ -1178,7 +1178,7 @@ export const AdminUsersPage = () => {
                 <button
                   type="submit"
                   disabled={isSubmittingUser}
-                  className="px-5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white shadow-md transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   {isSubmittingUser && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
                   Tạo tài khoản & Phân quyền

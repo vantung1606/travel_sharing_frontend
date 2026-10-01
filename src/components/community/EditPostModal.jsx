@@ -138,7 +138,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
         {submitting && (
           <div className="absolute inset-0 bg-white/95 backdrop-blur-xs rounded-3xl z-30 flex flex-col items-center justify-center p-6 text-center space-y-4 animate-in fade-in">
             <div className="relative">
-              <div className="w-14 h-14 rounded-2xl ocean-gradient text-white flex items-center justify-center shadow-lg shadow-emerald-500/25 animate-pulse">
+              <div className="w-14 h-14 rounded-2xl ocean-gradient text-white flex items-center justify-center shadow-lg shadow-sky-500/25 animate-pulse">
                 <ShieldCheck className="w-7 h-7" />
               </div>
               <Sparkles className="w-5 h-5 text-amber-500 absolute -top-1 -right-1 animate-spin" />
@@ -157,7 +157,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
             </div>
             <div className="w-44 h-1.5 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500 transition-all duration-300 rounded-full"
+                className="h-full bg-gradient-to-r from-sky-500 via-sky-500 to-amber-500 transition-all duration-300 rounded-full"
                 style={{ width: `${(moderationStep / 3) * 100}%` }}
               ></div>
             </div>
@@ -169,7 +169,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
           <div>
             <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
               <span>Chỉnh sửa bài viết</span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-bold">
+              <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[10px] font-bold">
                 Có AI Duyệt lại
               </span>
             </h3>
@@ -193,7 +193,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
                 onClick={() => setVisibility('PUBLIC')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                   visibility === 'PUBLIC'
-                    ? 'bg-emerald-600 text-white shadow-xs'
+                    ? 'bg-sky-600 text-white shadow-xs'
                     : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
                 }`}
               >
@@ -222,7 +222,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
               type="text"
               value={title}
               onChange={e => setTitle(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-semibold"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-semibold"
               required
             />
           </div>
@@ -234,7 +234,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value)}
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
               >
                 <option value="Ẩm thực & Check-in">Ẩm thực & Check-in</option>
                 <option value="Phượt & Khám phá">Phượt & Khám phá</option>
@@ -250,7 +250,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
                   type="text"
                   value={locationTag}
                   onChange={e => setLocationTag(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
                 />
               </div>
             </div>
@@ -263,7 +263,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
               rows={4}
               value={content}
               onChange={e => setContent(e.target.value)}
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 resize-none"
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 resize-none"
               required
             />
           </div>
@@ -272,14 +272,14 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
           <div className="space-y-2 p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <ImageIcon className="w-4 h-4 text-emerald-600" />
+                <ImageIcon className="w-4 h-4 text-sky-600" />
                 <span>Hình ảnh & Video đính kèm ({images.length} ảnh{videoUrl ? ', 1 video' : ''})</span>
               </label>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploading}
-                className="px-3 py-1.5 rounded-xl bg-white border border-emerald-200 text-emerald-700 hover:bg-emerald-50 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-50"
+                className="px-3 py-1.5 rounded-xl bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-50"
               >
                 {uploading ? (
                   <>
@@ -310,7 +310,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
                 placeholder="Hoặc dán URL ảnh / video..."
                 value={customImageUrl}
                 onChange={e => setCustomImageUrl(e.target.value)}
-                className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-emerald-500/20 font-mono"
+                className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 font-mono"
               />
               <button
                 type="button"
@@ -338,8 +338,8 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
                   </div>
                 ))}
                 {videoUrl && (
-                  <div className="relative group rounded-xl overflow-hidden aspect-square border border-emerald-300 bg-slate-900 flex items-center justify-center text-white">
-                    <Video className="w-6 h-6 text-emerald-400" />
+                  <div className="relative group rounded-xl overflow-hidden aspect-square border border-sky-300 bg-slate-900 flex items-center justify-center text-white">
+                    <Video className="w-6 h-6 text-sky-400" />
                     <button
                       type="button"
                       onClick={handleRemoveVideo}
@@ -366,7 +366,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
             <button
               type="submit"
               disabled={submitting || uploading}
-              className="ocean-gradient text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-emerald-500/20 hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="ocean-gradient text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md shadow-sky-500/20 hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {submitting ? (
                 <>

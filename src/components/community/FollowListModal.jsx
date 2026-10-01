@@ -121,7 +121,7 @@ export const FollowListModal = ({
               Mạng lưới kết nối
             </h3>
             <p className="text-xs text-slate-500 font-medium">
-              Hồ sơ của <span className="font-bold text-emerald-600">{userName}</span>
+              Hồ sơ của <span className="font-bold text-sky-600">{userName}</span>
             </p>
           </div>
           <button
@@ -138,7 +138,7 @@ export const FollowListModal = ({
             onClick={() => setActiveTab('following')}
             className={`flex-1 py-3 text-xs font-bold text-center border-b-2 transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
               activeTab === 'following'
-                ? 'border-emerald-600 text-emerald-700 bg-white'
+                ? 'border-sky-600 text-sky-700 bg-white'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -152,7 +152,7 @@ export const FollowListModal = ({
             onClick={() => setActiveTab('followers')}
             className={`flex-1 py-3 text-xs font-bold text-center border-b-2 transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
               activeTab === 'followers'
-                ? 'border-emerald-600 text-emerald-700 bg-white'
+                ? 'border-sky-600 text-sky-700 bg-white'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
@@ -173,7 +173,7 @@ export const FollowListModal = ({
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Tìm theo tên hoặc @handle..."
-              className="w-full pl-9 pr-8 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+              className="w-full pl-9 pr-8 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
             />
             {searchQuery && (
               <button
@@ -190,12 +190,12 @@ export const FollowListModal = ({
         <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16 gap-2 text-slate-400 text-xs">
-              <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
+              <Loader2 className="w-6 h-6 animate-spin text-sky-600" />
               <span>Đang tải danh sách kết nối...</span>
             </div>
           ) : filteredList.length === 0 ? (
             <div className="text-center py-14 space-y-2">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto">
                 <Users className="w-6 h-6" />
               </div>
               <p className="text-xs font-semibold text-slate-700">
@@ -215,7 +215,7 @@ export const FollowListModal = ({
               return (
                 <div
                   key={u.id}
-                  className="p-3 rounded-2xl border border-slate-100 hover:border-emerald-100 hover:bg-emerald-50/20 transition-all flex items-center justify-between gap-3 bg-white shadow-2xs"
+                  className="p-3 rounded-2xl border border-slate-100 hover:border-sky-100 hover:bg-sky-50/20 transition-all flex items-center justify-between gap-3 bg-white shadow-2xs"
                 >
                   {/* User Avatar + Info */}
                   <div
@@ -229,15 +229,15 @@ export const FollowListModal = ({
                     <img
                       src={u.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
                       alt={u.fullName}
-                      className="w-11 h-11 rounded-2xl object-cover ring-2 ring-slate-100 group-hover:ring-emerald-500 transition-all shrink-0"
+                      className="w-11 h-11 rounded-2xl object-cover ring-2 ring-slate-100 group-hover:ring-sky-500 transition-all shrink-0"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-emerald-600 transition-colors truncate">
+                        <h4 className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-sky-600 transition-colors truncate">
                           {u.fullName}
                         </h4>
                         {u.role && (
-                          <span className="px-2 py-0.2 rounded-md bg-emerald-50 text-emerald-700 text-[10px] font-semibold border border-emerald-100 shrink-0">
+                          <span className="px-2 py-0.2 rounded-md bg-sky-50 text-sky-700 text-[10px] font-semibold border border-sky-100 shrink-0">
                             {u.role}
                           </span>
                         )}
@@ -261,14 +261,14 @@ export const FollowListModal = ({
                       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs ${
                         u.isFollowing
                           ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 border border-slate-200'
-                          : 'ocean-gradient text-white hover:opacity-95 shadow-emerald-500/20'
+                          : 'ocean-gradient text-white hover:opacity-95 shadow-sky-500/20'
                       }`}
                     >
                       {isToggling ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       ) : u.isFollowing ? (
                         <>
-                          <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+                          <UserCheck className="w-3.5 h-3.5 text-sky-600" />
                           <span>Đang theo dõi</span>
                         </>
                       ) : (

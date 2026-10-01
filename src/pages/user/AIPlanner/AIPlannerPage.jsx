@@ -210,16 +210,16 @@ export const AIPlannerPage = () => {
       
       {/* Background Subtle Ambient Glow Orbs */}
       <div className="relative w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6 space-y-6 overflow-hidden">
-        <div className="absolute -top-32 right-12 w-96 h-96 bg-emerald-200/30 rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute -top-32 right-12 w-96 h-96 bg-sky-200/30 rounded-full blur-3xl pointer-events-none -z-10" />
         <div className="absolute top-48 left-10 w-80 h-80 bg-amber-200/20 rounded-full blur-3xl pointer-events-none -z-10" />
-        <div className="absolute top-96 right-1/4 w-72 h-72 bg-emerald-200/20 rounded-full blur-3xl pointer-events-none -z-10" />
+        <div className="absolute top-96 right-1/4 w-72 h-72 bg-sky-200/20 rounded-full blur-3xl pointer-events-none -z-10" />
 
         {/* 1. BREADCRUMB & HEADER AREA */}
         <section className="space-y-3">
           <nav className="flex items-center gap-1.5 text-xs text-slate-400 font-medium">
-            <a href="#" className="hover:text-emerald-600 transition-colors">Trang chủ</a>
+            <a href="#" className="hover:text-sky-600 transition-colors">Trang chủ</a>
             <ChevronRight className="w-3.5 h-3.5" />
-            <span className="text-emerald-600 font-bold">AI Travel Planner</span>
+            <span className="text-sky-600 font-bold">AI Travel Planner</span>
           </nav>
 
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
@@ -238,7 +238,7 @@ export const AIPlannerPage = () => {
 
             {/* System Capability Chip */}
             <div className="flex items-center gap-2 px-3.5 py-2 rounded-full bg-white shadow-xs border border-slate-200 text-xs font-semibold text-slate-700 flex-shrink-0 self-start lg:self-auto">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+              <span className="w-2.5 h-2.5 rounded-full bg-sky-600 animate-pulse"></span>
               <span>Dữ liệu thời tiết & vé thực tế 2026</span>
             </div>
           </div>
@@ -258,7 +258,7 @@ export const AIPlannerPage = () => {
                   onClick={() => handleApplyPreset(idx)}
                   className={`px-3 py-1.5 rounded-full transition-all whitespace-nowrap flex items-center gap-1.5 font-medium cursor-pointer shadow-2xs ${
                     active
-                      ? 'bg-emerald-700 text-white font-bold shadow-xs'
+                      ? 'bg-sky-700 text-white font-bold shadow-xs'
                       : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/80'
                   }`}
                 >
@@ -281,7 +281,7 @@ export const AIPlannerPage = () => {
               {/* Card Header */}
               <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-700 font-bold border border-emerald-100">
+                  <div className="w-8 h-8 rounded-full bg-sky-50 flex items-center justify-center text-sky-700 font-bold border border-sky-100">
                     <SlidersHorizontal className="w-4 h-4" />
                   </div>
                   <h2 className="font-bold text-base text-slate-900">Tùy Chọn Chuyến Đi</h2>
@@ -289,7 +289,7 @@ export const AIPlannerPage = () => {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="text-xs font-semibold text-slate-400 hover:text-emerald-600 flex items-center gap-1 transition-colors cursor-pointer"
+                  className="text-xs font-semibold text-slate-400 hover:text-sky-600 flex items-center gap-1 transition-colors cursor-pointer"
                   title="Đặt lại bộ lọc"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
@@ -301,19 +301,19 @@ export const AIPlannerPage = () => {
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                   <span>Điểm đến mong muốn</span>
-                  <span className="text-[11px] text-emerald-600 font-semibold flex items-center gap-1">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                  <span className="text-[11px] text-sky-600 font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-sky-600" />
                     Đã nhận diện vị trí
                   </span>
                 </label>
                 <div className="relative">
-                  <MapPin className="w-4 h-4 absolute left-3 top-3 text-emerald-600" />
+                  <MapPin className="w-4 h-4 absolute left-3 top-3 text-sky-600" />
                   <input
                     type="text"
                     value={destination}
                     onChange={(e) => setDestination(e.target.value)}
                     placeholder="Nhập thành phố hoặc danh thắng..."
-                    className="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 text-xs font-semibold text-slate-900 shadow-inner focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                    className="w-full pl-9 pr-8 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 text-xs font-semibold text-slate-900 shadow-inner focus:outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 transition-all"
                   />
                   {destination && (
                     <button
@@ -334,7 +334,7 @@ export const AIPlannerPage = () => {
                   <select
                     value={duration}
                     onChange={(e) => setDuration(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                    className="w-full px-3 py-2.5 rounded-xl bg-slate-50/80 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 transition-all"
                   >
                     <option>2 Ngày 1 Đêm</option>
                     <option>3 Ngày 2 Đêm</option>
@@ -349,7 +349,7 @@ export const AIPlannerPage = () => {
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-50/80 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50/80 border border-slate-200 text-xs font-semibold text-slate-900 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 transition-all"
                   />
                 </div>
               </div>
@@ -358,7 +358,7 @@ export const AIPlannerPage = () => {
               <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className="font-bold text-slate-800 text-xs">Ngân sách dự kiến</label>
-                  <span className="font-bold text-emerald-700 text-sm">
+                  <span className="font-bold text-sky-700 text-sm">
                     {budgetVal.toLocaleString('vi-VN')}đ
                     <span className="text-[11px] text-slate-400 font-normal"> / người</span>
                   </span>
@@ -370,7 +370,7 @@ export const AIPlannerPage = () => {
                   step={250000}
                   value={budgetVal}
                   onChange={(e) => setBudgetVal(Number(e.target.value))}
-                  className="w-full accent-emerald-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
+                  className="w-full accent-sky-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer"
                 />
                 <div className="flex items-center justify-between gap-1.5 pt-1">
                   {['Tiết kiệm', 'Tiêu chuẩn', 'Cao cấp'].map((tier) => {
@@ -382,7 +382,7 @@ export const AIPlannerPage = () => {
                         onClick={() => handleSelectTier(tier)}
                         className={`flex-1 py-1 px-2 rounded-lg text-xs font-semibold transition-all text-center cursor-pointer ${
                           active
-                            ? 'bg-emerald-700 text-white shadow-xs'
+                            ? 'bg-sky-700 text-white shadow-xs'
                             : 'bg-white hover:bg-slate-200/70 text-slate-600 border border-slate-200'
                         }`}
                       >
@@ -412,12 +412,12 @@ export const AIPlannerPage = () => {
                         onClick={() => toggleStyle(st)}
                         className={`px-2.5 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer shadow-2xs ${
                           active
-                            ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                            ? 'bg-sky-100 text-sky-900 border border-sky-300'
                             : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 border border-slate-200/60'
                         }`}
                       >
                         <span>{st}</span>
-                        {active && <Check className="w-3 h-3 text-emerald-700" />}
+                        {active && <Check className="w-3 h-3 text-sky-700" />}
                       </button>
                     );
                   })}
@@ -442,7 +442,7 @@ export const AIPlannerPage = () => {
                         onClick={() => setTransport(item.name)}
                         className={`p-2.5 rounded-xl flex flex-col items-center justify-center gap-1 text-center text-xs transition-all cursor-pointer ${
                           active
-                            ? 'bg-emerald-700 text-white font-bold shadow-xs'
+                            ? 'bg-sky-700 text-white font-bold shadow-xs'
                             : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200 font-medium'
                         }`}
                       >
@@ -462,7 +462,7 @@ export const AIPlannerPage = () => {
                   value={userNote}
                   onChange={(e) => setUserNote(e.target.value)}
                   placeholder="Ví dụ: Đi nhóm bạn 4 người, thích ngắm hoàng hôn và muốn trải nghiệm ăn hải sản giá bình dân..."
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50/80 border border-slate-200 text-xs font-normal text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-500/20 resize-none transition-all"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50/80 border border-slate-200 text-xs font-normal text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sky-500/20 resize-none transition-all"
                 />
               </div>
 
@@ -481,7 +481,7 @@ export const AIPlannerPage = () => {
 
               {/* AI Engine Capability Meta Badge */}
               <div className="flex items-start gap-2 p-2.5 rounded-xl bg-slate-100/80 text-[11px] text-slate-500 font-medium border border-slate-200/60">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <ShieldCheck className="w-4 h-4 text-sky-600 flex-shrink-0 mt-0.5" />
                 <span>Mạng lưới học máy kết hợp dữ liệu Google Places & hệ thống định tuyến phân luồng du lịch WanderAI.</span>
               </div>
 
@@ -495,17 +495,17 @@ export const AIPlannerPage = () => {
             
             {/* Top Summary Card with Rich Visuals */}
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-md relative overflow-hidden space-y-6">
-              <div className="absolute -right-16 -top-16 w-56 h-56 bg-emerald-200/30 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute -right-16 -top-16 w-56 h-56 bg-sky-200/30 rounded-full blur-2xl pointer-events-none" />
 
               {/* Header & Title */}
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                 <div>
                   <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <span className="px-3 py-1 rounded-full bg-teal-700 text-white text-xs font-bold flex items-center gap-1 shadow-xs">
+                    <span className="px-3 py-1 rounded-full bg-sky-700 text-white text-xs font-bold flex items-center gap-1 shadow-xs">
                       <Zap className="w-3.5 h-3.5 text-amber-300" />
                       Độ phù hợp AI: 98%
                     </span>
-                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold border border-emerald-200">
+                    <span className="px-3 py-1 rounded-full bg-sky-100 text-sky-900 text-xs font-bold border border-sky-200">
                       Ngân sách tối ưu
                     </span>
                     <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-900 text-xs font-bold flex items-center gap-1 border border-amber-200">
@@ -545,8 +545,8 @@ export const AIPlannerPage = () => {
                     onClick={handleSaveItinerary}
                     className={`px-4 py-2.5 rounded-full text-xs font-bold shadow-md transition-all flex items-center gap-1.5 cursor-pointer ${
                       isSaved
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                        ? 'bg-sky-600 text-white'
+                        : 'bg-sky-700 hover:bg-sky-800 text-white'
                     }`}
                   >
                     <Bookmark className="w-4 h-4" />
@@ -561,9 +561,9 @@ export const AIPlannerPage = () => {
                   <span className="text-slate-400 text-[11px]">Tổng quãng đường</span>
                   <span className="font-bold text-base text-slate-900 mt-0.5 flex items-center gap-1">
                     68 km
-                    <Route className="w-4 h-4 text-emerald-600" />
+                    <Route className="w-4 h-4 text-sky-600" />
                   </span>
-                  <span className="text-[11px] text-teal-700 font-semibold">Tối ưu 18% so với gốc</span>
+                  <span className="text-[11px] text-sky-700 font-semibold">Tối ưu 18% so với gốc</span>
                 </div>
 
                 <div className="flex flex-col">
@@ -577,7 +577,7 @@ export const AIPlannerPage = () => {
 
                 <div className="flex flex-col">
                   <span className="text-slate-400 text-[11px]">Ước tính chi phí</span>
-                  <span className="font-bold text-base text-emerald-700 mt-0.5">
+                  <span className="font-bold text-base text-sky-700 mt-0.5">
                     {estimatedTotal.toLocaleString('vi-VN')}đ
                   </span>
                   <span className="text-[11px] text-amber-700">Hạn mức: {budgetVal.toLocaleString('vi-VN')}đ</span>
@@ -585,7 +585,7 @@ export const AIPlannerPage = () => {
 
                 <div className="flex flex-col">
                   <span className="text-slate-400 text-[11px]">Dôi dư an toàn</span>
-                  <span className="font-bold text-base text-emerald-600 mt-0.5">
+                  <span className="font-bold text-base text-sky-600 mt-0.5">
                     +{surplus.toLocaleString('vi-VN')}đ
                   </span>
                   <span className="text-[11px] text-slate-400">Dự phòng phát sinh</span>
@@ -601,16 +601,16 @@ export const AIPlannerPage = () => {
                 
                 {/* Multi-colored segment bar */}
                 <div className="h-3 w-full bg-slate-200 rounded-full overflow-hidden flex">
-                  <div className="h-full bg-emerald-700" style={{ width: '35%' }} title="Lưu trú: 35%" />
+                  <div className="h-full bg-sky-700" style={{ width: '35%' }} title="Lưu trú: 35%" />
                   <div className="h-full bg-amber-600" style={{ width: '30%' }} title="Ăn uống: 30%" />
-                  <div className="h-full bg-teal-600" style={{ width: '20%' }} title="Vé tham quan: 20%" />
+                  <div className="h-full bg-sky-600" style={{ width: '20%' }} title="Vé tham quan: 20%" />
                   <div className="h-full bg-slate-400" style={{ width: '15%' }} title="Di chuyển: 15%" />
                 </div>
 
                 {/* Legend */}
                 <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 font-medium pt-1">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-700" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-sky-700" />
                     <span>Lưu trú: <strong>35%</strong> ({stayCost.toLocaleString('vi-VN')}đ)</span>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -618,7 +618,7 @@ export const AIPlannerPage = () => {
                     <span>Ăn uống: <strong>30%</strong> ({foodCost.toLocaleString('vi-VN')}đ)</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-teal-600" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-sky-600" />
                     <span>Vé tham quan: <strong>20%</strong> ({ticketCost.toLocaleString('vi-VN')}đ)</span>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -634,12 +634,12 @@ export const AIPlannerPage = () => {
             <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-xs space-y-3">
               <div className="flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2 font-bold text-slate-900">
-                  <Map className="w-4 h-4 text-emerald-600" />
+                  <Map className="w-4 h-4 text-sky-600" />
                   <span>Bản Đồ Cung Đường Thông Minh</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 flex items-center gap-1 font-semibold text-[11px]">
-                    <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                    <span className="w-2 h-2 rounded-full bg-sky-600" />
                     8 Điểm chính
                   </span>
                   <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 flex items-center gap-1 font-bold text-[11px]">
@@ -660,7 +660,7 @@ export const AIPlannerPage = () => {
                 
                 {/* Floating HUD over map */}
                 <div className="relative z-10 bg-white/90 backdrop-blur-md px-3.5 py-2 rounded-xl shadow-md flex flex-wrap items-center gap-3 text-xs">
-                  <div className="flex items-center gap-1 text-emerald-700 font-bold">
+                  <div className="flex items-center gap-1 text-sky-700 font-bold">
                     <Navigation className="w-3.5 h-3.5" />
                     <span>Sân bay DAD → Mỹ Khê → Bà Nà → Hội An</span>
                   </div>
@@ -679,11 +679,11 @@ export const AIPlannerPage = () => {
               {/* Day Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 bg-slate-50 px-4 py-3 rounded-2xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-700 text-white text-base flex items-center justify-center font-bold shadow-xs">
+                  <div className="w-10 h-10 rounded-xl bg-sky-700 text-white text-base flex items-center justify-center font-bold shadow-xs">
                     01
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-emerald-700 tracking-wider uppercase block">
+                    <span className="text-[10px] font-bold text-sky-700 tracking-wider uppercase block">
                       Ngày 1 • Thứ Sáu, 15/11
                     </span>
                     <h3 className="text-base font-bold text-slate-900">
@@ -701,12 +701,12 @@ export const AIPlannerPage = () => {
                 
                 {/* Item 1 */}
                 <div className="relative flex flex-col sm:flex-row sm:items-start justify-between gap-3 group">
-                  <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-emerald-600 flex items-center justify-center shadow-xs">
-                    <Plane className="w-3 h-3 text-emerald-700" />
+                  <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-sky-600 flex items-center justify-center shadow-xs">
+                    <Plane className="w-3 h-3 text-sky-700" />
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="font-bold text-emerald-700 font-mono">08:30</span>
+                      <span className="font-bold text-sky-700 font-mono">08:30</span>
                       <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-semibold">
                         Di chuyển & Nhận phòng
                       </span>
@@ -751,13 +751,13 @@ export const AIPlannerPage = () => {
 
                 {/* Item 3 */}
                 <div className="relative flex flex-col sm:flex-row sm:items-start justify-between gap-3 group">
-                  <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-emerald-600 flex items-center justify-center shadow-xs">
-                    <Camera className="w-3 h-3 text-emerald-700" />
+                  <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-sky-600 flex items-center justify-center shadow-xs">
+                    <Camera className="w-3 h-3 text-sky-700" />
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="font-bold text-emerald-700 font-mono">14:30</span>
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-semibold">
+                      <span className="font-bold text-sky-700 font-mono">14:30</span>
+                      <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[10px] font-semibold">
                         Danh lam thắng cảnh
                       </span>
                     </div>
@@ -774,7 +774,7 @@ export const AIPlannerPage = () => {
                     </div>
                   </div>
                   <div className="text-right sm:flex-shrink-0 text-xs">
-                    <span className="font-bold text-emerald-600 block">Miễn phí</span>
+                    <span className="font-bold text-sky-600 block">Miễn phí</span>
                     <span className="text-[10px] text-slate-400">Vé vào cổng 0đ</span>
                   </div>
                 </div>
@@ -799,19 +799,19 @@ export const AIPlannerPage = () => {
                     </p>
                   </div>
                   <div className="text-right sm:flex-shrink-0 text-xs">
-                    <span className="font-bold text-emerald-600 block">Miễn phí</span>
+                    <span className="font-bold text-sky-600 block">Miễn phí</span>
                     <span className="text-[10px] text-slate-400">Tự do tắm biển</span>
                   </div>
                 </div>
 
                 {/* Item 5 */}
                 <div className="relative flex flex-col sm:flex-row sm:items-start justify-between gap-3 group">
-                  <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-emerald-600 flex items-center justify-center shadow-xs">
-                    <Utensils className="w-3 h-3 text-emerald-700" />
+                  <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-sky-600 flex items-center justify-center shadow-xs">
+                    <Utensils className="w-3 h-3 text-sky-700" />
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="font-bold text-emerald-700 font-mono">19:30</span>
+                      <span className="font-bold text-sky-700 font-mono">19:30</span>
                       <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-semibold">
                         Bữa tối & Check-in
                       </span>
@@ -837,11 +837,11 @@ export const AIPlannerPage = () => {
               {/* Day Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 bg-slate-50 px-4 py-3 rounded-2xl">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-teal-700 text-white text-base flex items-center justify-center font-bold shadow-xs">
+                  <div className="w-10 h-10 rounded-xl bg-sky-700 text-white text-base flex items-center justify-center font-bold shadow-xs">
                     02
                   </div>
                   <div>
-                    <span className="text-[10px] font-bold text-teal-700 tracking-wider uppercase block">
+                    <span className="text-[10px] font-bold text-sky-700 tracking-wider uppercase block">
                       Ngày 2 • Thứ Bảy, 16/11
                     </span>
                     <h3 className="text-base font-bold text-slate-900">
@@ -865,7 +865,7 @@ export const AIPlannerPage = () => {
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2 text-xs">
                       <span className="font-bold text-amber-600 font-mono">07:30</span>
-                      <span className="px-2 py-0.5 rounded-full bg-teal-100 text-teal-900 text-[10px] font-semibold">
+                      <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-900 text-[10px] font-semibold">
                         Điểm nhấn tour
                       </span>
                     </div>
@@ -875,8 +875,8 @@ export const AIPlannerPage = () => {
                     <p className="text-xs text-slate-500 leading-relaxed">
                       Trải nghiệm hệ thống cáp treo đạt kỷ lục thế giới, dạo bước trên đôi bàn tay khổng lồ Cầu Vàng trong sương sớm, thăm Làng Pháp và hầm rượu Debay cổ kính.
                     </p>
-                    <div className="mt-2 p-2.5 rounded-xl bg-teal-50 border border-teal-100/80 flex items-center gap-2 text-xs text-slate-700">
-                      <Sparkles className="w-4 h-4 text-teal-600 flex-shrink-0" />
+                    <div className="mt-2 p-2.5 rounded-xl bg-sky-50 border border-sky-100/80 flex items-center gap-2 text-xs text-slate-700">
+                      <Sparkles className="w-4 h-4 text-sky-600 flex-shrink-0" />
                       <span><strong>AI Insight:</strong> Lên cáp treo lúc 08:00 giúp chụp ảnh Cầu Vàng vắng bóng người trước khi các đoàn tour lớn đổ về.</span>
                     </div>
                   </div>
@@ -888,12 +888,12 @@ export const AIPlannerPage = () => {
 
                 {/* Item 2 */}
                 <div className="relative flex flex-col sm:flex-row sm:items-start justify-between gap-3 group">
-                  <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-emerald-600 flex items-center justify-center shadow-xs">
-                    <Utensils className="w-3 h-3 text-emerald-700" />
+                  <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-sky-600 flex items-center justify-center shadow-xs">
+                    <Utensils className="w-3 h-3 text-sky-700" />
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="font-bold text-emerald-700 font-mono">12:00</span>
+                      <span className="font-bold text-sky-700 font-mono">12:00</span>
                       <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-semibold">
                         Bữa trưa Buffet
                       </span>
@@ -906,19 +906,19 @@ export const AIPlannerPage = () => {
                     </p>
                   </div>
                   <div className="text-right sm:flex-shrink-0 text-xs">
-                    <span className="font-bold text-teal-700 block">Đã bao gồm</span>
+                    <span className="font-bold text-sky-700 block">Đã bao gồm</span>
                     <span className="text-[10px] text-slate-400">Gói combo cáp treo</span>
                   </div>
                 </div>
 
                 {/* Item 3 */}
                 <div className="relative flex flex-col sm:flex-row sm:items-start justify-between gap-3 group">
-                  <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-emerald-600 flex items-center justify-center shadow-xs">
-                    <Car className="w-3 h-3 text-emerald-700" />
+                  <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-sky-600 flex items-center justify-center shadow-xs">
+                    <Car className="w-3 h-3 text-sky-700" />
                   </div>
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="font-bold text-emerald-700 font-mono">16:00</span>
+                      <span className="font-bold text-sky-700 font-mono">16:00</span>
                       <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-semibold">
                         Di chuyển & Homestay
                       </span>
@@ -992,12 +992,12 @@ export const AIPlannerPage = () => {
                   
                   {/* Item 1 */}
                   <div className="relative flex flex-col sm:flex-row sm:items-start justify-between gap-3 group">
-                    <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-emerald-600 flex items-center justify-center shadow-xs">
-                      <Coffee className="w-3 h-3 text-emerald-700" />
+                    <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-sky-600 flex items-center justify-center shadow-xs">
+                      <Coffee className="w-3 h-3 text-sky-700" />
                     </div>
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-2 text-xs">
-                        <span className="font-bold text-emerald-700 font-mono">06:30</span>
+                        <span className="font-bold text-sky-700 font-mono">06:30</span>
                         <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-semibold">
                           Bình minh đồng quê
                         </span>
@@ -1017,13 +1017,13 @@ export const AIPlannerPage = () => {
 
                   {/* Item 2 */}
                   <div className="relative flex flex-col sm:flex-row sm:items-start justify-between gap-3 group">
-                    <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-teal-600 flex items-center justify-center shadow-xs">
-                      <Waves className="w-3 h-3 text-teal-700" />
+                    <div className="absolute -left-[27px] sm:-left-[35px] top-0 w-6 h-6 rounded-full bg-white ring-4 ring-sky-600 flex items-center justify-center shadow-xs">
+                      <Waves className="w-3 h-3 text-sky-700" />
                     </div>
                     <div className="flex-1 space-y-1">
                       <div className="flex items-center gap-2 text-xs">
-                        <span className="font-bold text-teal-700 font-mono">09:30</span>
-                        <span className="px-2 py-0.5 rounded-full bg-teal-100 text-teal-900 text-[10px] font-semibold">
+                        <span className="font-bold text-sky-700 font-mono">09:30</span>
+                        <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-900 text-[10px] font-semibold">
                           Trải nghiệm sông nước
                         </span>
                       </div>
@@ -1060,7 +1060,7 @@ export const AIPlannerPage = () => {
                       </p>
                     </div>
                     <div className="text-right sm:flex-shrink-0 text-xs">
-                      <span className="font-bold text-teal-700 block">Kết thúc</span>
+                      <span className="font-bold text-sky-700 block">Kết thúc</span>
                       <span className="text-[10px] text-slate-400">Chuyến bay chiều</span>
                     </div>
                   </div>
@@ -1070,7 +1070,7 @@ export const AIPlannerPage = () => {
             )}
 
             {/* Bottom Advice Box from AI */}
-            <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-50 via-slate-50 to-amber-50/60 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start gap-4">
+            <div className="p-6 rounded-3xl bg-gradient-to-r from-sky-50 via-slate-50 to-amber-50/60 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-start gap-4">
               <div className="w-12 h-12 rounded-2xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
                 <Lightbulb className="w-6 h-6 text-amber-100" />
               </div>
@@ -1082,12 +1082,12 @@ export const AIPlannerPage = () => {
                   Thời điểm lý tưởng nhất để lên đỉnh Bà Nà Hills là lúc <strong>08:00 sáng</strong>. Đặt trước vé điện tử trên app WanderAI để quét mã QR trực tiếp tại cổng cáp treo, giúp bạn tiết kiệm trung bình <strong>30 - 45 phút xếp hàng</strong> vào những ngày cuối tuần.
                 </p>
                 <div className="mt-2 flex flex-wrap items-center gap-3 text-xs pt-1">
-                  <a href="#" className="font-bold text-emerald-700 hover:underline flex items-center gap-1">
+                  <a href="#" className="font-bold text-sky-700 hover:underline flex items-center gap-1">
                     <span>Xem bản đồ offline khu vực phố cổ</span>
                     <ChevronRight className="w-3.5 h-3.5" />
                   </a>
                   <span className="text-slate-300">•</span>
-                  <a href="#" className="font-bold text-emerald-700 hover:underline flex items-center gap-1">
+                  <a href="#" className="font-bold text-sky-700 hover:underline flex items-center gap-1">
                     <span>Đặt vé Sun World ưu đãi độc quyền WanderAI (-10%)</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
@@ -1125,8 +1125,8 @@ export const AIPlannerPage = () => {
                   onClick={handleSaveItinerary}
                   className={`px-5 py-2 rounded-full text-xs font-bold shadow-md transition-all flex items-center gap-1.5 cursor-pointer ${
                     isSaved
-                      ? 'bg-emerald-600 text-white'
-                      : 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                      ? 'bg-sky-600 text-white'
+                      : 'bg-sky-700 hover:bg-sky-800 text-white'
                   }`}
                 >
                   <Heart className="w-3.5 h-3.5 fill-current" />

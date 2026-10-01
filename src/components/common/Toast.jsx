@@ -40,20 +40,20 @@ export const ToastProvider = ({ children }) => {
         {toasts.map(t => {
           let bgClass = 'bg-slate-900 border-slate-700 text-white';
           let Icon = CheckCircle2;
-          let iconColor = 'text-emerald-400';
+          let iconColor = 'text-sky-400';
 
           if (t.type === 'success') {
-            bgClass = 'bg-slate-900/95 border-emerald-500/30 text-white shadow-emerald-500/10';
+            bgClass = 'bg-slate-900/95 border-sky-500/30 text-white shadow-sky-500/10';
             Icon = CheckCircle2;
-            iconColor = 'text-emerald-400';
+            iconColor = 'text-sky-400';
           } else if (t.type === 'error') {
             bgClass = 'bg-rose-950/95 border-rose-500/30 text-white shadow-rose-500/10';
             Icon = AlertCircle;
             iconColor = 'text-rose-400';
           } else if (t.type === 'info') {
-            bgClass = 'bg-slate-900/95 border-emerald-500/30 text-white shadow-emerald-500/10';
+            bgClass = 'bg-slate-900/95 border-sky-500/30 text-white shadow-sky-500/10';
             Icon = Info;
-            iconColor = 'text-emerald-400';
+            iconColor = 'text-sky-400';
           } else if (t.type === 'warning') {
             bgClass = 'bg-slate-900/95 border-amber-500/30 text-white shadow-amber-500/10';
             Icon = AlertTriangle;

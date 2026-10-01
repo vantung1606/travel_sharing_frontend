@@ -65,7 +65,7 @@ const KpiCard = ({ icon: Icon, label, value, sub, color, bgColor, trend, loading
       )}
       {sub && (
         <div className="flex items-center gap-1 text-xs font-bold text-slate-500">
-          {trend === 'up' && <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />}
+          {trend === 'up' && <TrendingUp className="w-3.5 h-3.5 text-sky-500" />}
           {trend === 'down' && <TrendingDown className="w-3.5 h-3.5 text-rose-500" />}
           <span>{sub}</span>
         </div>
@@ -194,8 +194,8 @@ export const AdminStatisticsPage = () => {
           label="Tổng bài viết"
           value={fmt(stats?.totalPosts)}
           sub={`+${fmt(stats?.newPostsThisMonth)} tháng này`}
-          color="text-emerald-600"
-          bgColor="bg-emerald-50"
+          color="text-sky-600"
+          bgColor="bg-sky-50"
           trend="up"
           loading={loading}
         />
@@ -204,8 +204,8 @@ export const AdminStatisticsPage = () => {
           label="Địa điểm du lịch"
           value={fmt(stats?.totalPlaces)}
           sub={`Rating TB: ${fmtRating(stats?.averagePlaceRating)} ★`}
-          color="text-emerald-600"
-          bgColor="bg-emerald-50"
+          color="text-sky-600"
+          bgColor="bg-sky-50"
           loading={loading}
         />
         <KpiCard
@@ -274,7 +274,7 @@ export const AdminStatisticsPage = () => {
                 <p className="text-[10px] text-slate-400">6 tháng gần nhất</p>
               </div>
             </div>
-            <span className="flex items-center gap-1 text-xs font-bold text-emerald-600">
+            <span className="flex items-center gap-1 text-xs font-bold text-sky-600">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>+{fmt(stats?.newUsersThisMonth)} tháng này</span>
             </span>
@@ -290,7 +290,7 @@ export const AdminStatisticsPage = () => {
         <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
                 <BarChart3 className="w-4 h-4" />
               </div>
               <div>
@@ -298,7 +298,7 @@ export const AdminStatisticsPage = () => {
                 <p className="text-[10px] text-slate-400">6 tháng gần nhất</p>
               </div>
             </div>
-            <span className="flex items-center gap-1 text-xs font-bold text-emerald-600">
+            <span className="flex items-center gap-1 text-xs font-bold text-sky-600">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>+{fmt(stats?.newPostsThisMonth)} tháng này</span>
             </span>
@@ -316,7 +316,7 @@ export const AdminStatisticsPage = () => {
         {/* Top Destinations */}
         <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
               <Map className="w-4 h-4" />
             </div>
             <div>
@@ -406,9 +406,9 @@ export const AdminStatisticsPage = () => {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { label: 'Tổng hành trình', value: stats?.totalItineraries, color: 'text-slate-700', bg: 'bg-slate-50' },
-            { label: 'Đang hoạt động', value: stats?.activeItineraries, color: 'text-emerald-700', bg: 'bg-emerald-50' },
+            { label: 'Đang hoạt động', value: stats?.activeItineraries, color: 'text-sky-700', bg: 'bg-sky-50' },
             { label: 'Mới tháng này', value: stats?.newItinerariesThisMonth, color: 'text-indigo-700', bg: 'bg-indigo-50' },
-            { label: 'Người dùng mới TM', value: stats?.newUsersThisMonth, color: 'text-emerald-700', bg: 'bg-emerald-50' },
+            { label: 'Người dùng mới TM', value: stats?.newUsersThisMonth, color: 'text-sky-700', bg: 'bg-sky-50' },
           ].map((item, i) => (
             <div key={i} className={`${item.bg} rounded-xl p-4 text-center`}>
               <p className="text-[10px] font-bold text-slate-500 mb-1">{item.label}</p>

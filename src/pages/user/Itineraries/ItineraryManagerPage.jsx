@@ -194,24 +194,24 @@ export const ItineraryManagerPage = () => {
   return (
     <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 space-y-8 pb-20">
       {/* ─── 1. TOP AMBIENT GLOW & HEADER (M04 STITCH CANVAS) ──────────────────── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600/10 via-cyan-500/10 to-amber-500/10 p-6 sm:p-8 border border-emerald-100 shadow-sm">
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1000px] h-[300px] bg-gradient-to-r from-emerald-400/20 via-cyan-300/20 to-amber-300/15 blur-3xl pointer-events-none -z-10"></div>
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-600/10 via-cyan-500/10 to-amber-500/10 p-6 sm:p-8 border border-sky-100 shadow-sm">
+        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1000px] h-[300px] bg-gradient-to-r from-sky-400/20 via-cyan-300/20 to-amber-300/15 blur-3xl pointer-events-none -z-10"></div>
         
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-3">
-          <span className="flex items-center gap-1 hover:text-emerald-600 transition-colors cursor-pointer">
+          <span className="flex items-center gap-1 hover:text-sky-600 transition-colors cursor-pointer">
             <Compass className="w-3.5 h-3.5" />
             Trang chủ
           </span>
           <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-          <span className="text-emerald-600 font-bold">Lịch trình của tôi</span>
+          <span className="text-sky-600 font-bold">Lịch trình của tôi</span>
         </div>
 
         {/* Title & Action Cluster */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
           <div className="max-w-3xl space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-bold shadow-xs">
-              <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100/80 text-sky-800 text-xs font-bold shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-sky-600" />
               <span>Trung tâm quản lý hành trình cá nhân</span>
             </div>
 
@@ -243,7 +243,7 @@ export const ItineraryManagerPage = () => {
             <button
               type="button"
               onClick={() => setIsManualCreateOpen(true)}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               <span>+ Tạo chuyến đi mới</span>
@@ -255,8 +255,8 @@ export const ItineraryManagerPage = () => {
       {/* ─── 2. SUMMARY STATS STRIP (4 KPI CARDS) ──────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1 */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0">
             <Compass className="w-6 h-6" />
           </div>
           <div>
@@ -269,8 +269,8 @@ export const ItineraryManagerPage = () => {
         </div>
 
         {/* KPI 2 */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-teal-300 transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center flex-shrink-0">
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0">
             <MapPin className="w-6 h-6" />
           </div>
           <div>
@@ -283,15 +283,15 @@ export const ItineraryManagerPage = () => {
         </div>
 
         {/* KPI 3 */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-emerald-300 transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 transition-all flex items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0">
             <DollarSign className="w-6 h-6" />
           </div>
           <div>
             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Ngân sách tối ưu</p>
             <div className="flex items-baseline gap-1.5 mt-0.5 flex-wrap">
-              <span className="font-display text-lg sm:text-xl font-extrabold text-slate-900 text-emerald-700">42.500.000đ</span>
-              <span className="inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">
+              <span className="font-display text-lg sm:text-xl font-extrabold text-slate-900 text-sky-700">42.500.000đ</span>
+              <span className="inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded bg-sky-50 text-sky-700">
                 -15% AI
               </span>
             </div>
@@ -330,7 +330,7 @@ export const ItineraryManagerPage = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`px-4 sm:px-5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
                     isActive
-                      ? 'bg-emerald-600 text-white shadow-sm'
+                      ? 'bg-sky-600 text-white shadow-sm'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
                   }`}
                 >
@@ -354,7 +354,7 @@ export const ItineraryManagerPage = () => {
               type="button"
               onClick={() => setLayoutMode('grid')}
               className={`p-2 rounded-lg transition-all cursor-pointer ${
-                layoutMode === 'grid' ? 'bg-white text-emerald-600 shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                layoutMode === 'grid' ? 'bg-white text-sky-600 shadow-xs' : 'text-slate-400 hover:text-slate-600'
               }`}
               title="Dạng lưới thẻ"
             >
@@ -364,7 +364,7 @@ export const ItineraryManagerPage = () => {
               type="button"
               onClick={() => setLayoutMode('list')}
               className={`p-2 rounded-lg transition-all cursor-pointer ${
-                layoutMode === 'list' ? 'bg-white text-emerald-600 shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                layoutMode === 'list' ? 'bg-white text-sky-600 shadow-xs' : 'text-slate-400 hover:text-slate-600'
               }`}
               title="Dạng danh sách"
             >
@@ -383,7 +383,7 @@ export const ItineraryManagerPage = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm chuyến đi theo tên, điểm đến, thẻ..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-800 outline-none focus:border-emerald-500 focus:bg-white focus:ring-2 focus:ring-emerald-500/10 transition-all"
+              className="w-full pl-10 pr-4 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-800 outline-none focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-500/10 transition-all"
             />
           </div>
 
@@ -392,7 +392,7 @@ export const ItineraryManagerPage = () => {
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 outline-none focus:border-emerald-500 focus:bg-white cursor-pointer"
+              className="w-full px-4 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 outline-none focus:border-sky-500 focus:bg-white cursor-pointer"
             >
               <option value="nearest">Sắp xếp: Khởi hành gần nhất</option>
               <option value="newest">Sắp xếp: Mới tạo gần đây</option>
@@ -448,7 +448,7 @@ export const ItineraryManagerPage = () => {
           <button
             type="button"
             onClick={() => setIsManualCreateOpen(true)}
-            className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all"
+            className="px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-sm transition-all"
           >
             Tạo Lịch Trình AI Ngay ✨
           </button>
@@ -481,7 +481,7 @@ export const ItineraryManagerPage = () => {
                     )}
 
                     {itin.isAiGenerated && (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-600/90 text-white text-[11px] font-bold backdrop-blur-md shadow-sm">
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sky-600/90 text-white text-[11px] font-bold backdrop-blur-md shadow-sm">
                         <Sparkles className="w-3 h-3 text-amber-300" />
                         Tạo bởi AI
                       </span>
@@ -491,7 +491,7 @@ export const ItineraryManagerPage = () => {
                   {/* Destination & Duration Bottom Overlay */}
                   <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between text-white">
                     <div>
-                      <p className="text-[10px] font-bold text-emerald-200 uppercase tracking-wider">
+                      <p className="text-[10px] font-bold text-sky-200 uppercase tracking-wider">
                         {itin.region || 'Điểm đến du lịch'}
                       </p>
                       <div className="flex items-center gap-1 font-bold text-xs sm:text-sm">
@@ -499,7 +499,7 @@ export const ItineraryManagerPage = () => {
                         <span className="truncate">{itin.destination}</span>
                       </div>
                     </div>
-                    <span className="px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md text-emerald-800 text-xs font-extrabold">
+                    <span className="px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md text-sky-800 text-xs font-extrabold">
                       {itin.duration || `${itin.daysCount || 3}N${(itin.daysCount || 3) - 1}Đ`}
                     </span>
                   </div>
@@ -507,14 +507,14 @@ export const ItineraryManagerPage = () => {
 
                 {/* Card Body */}
                 <div className="p-5 flex flex-col flex-1 space-y-3">
-                  <h3 className="font-display font-extrabold text-sm sm:text-base text-slate-900 group-hover:text-emerald-700 transition-colors line-clamp-2">
+                  <h3 className="font-display font-extrabold text-sm sm:text-base text-slate-900 group-hover:text-sky-700 transition-colors line-clamp-2">
                     {itin.title}
                   </h3>
 
                   {/* Metadata List */}
                   <div className="space-y-1.5 text-xs text-slate-500">
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <Calendar className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                       <span className="font-medium text-slate-700">{itin.departureDate || 'Ngày khởi hành linh hoạt'}</span>
                     </div>
 
@@ -523,7 +523,7 @@ export const ItineraryManagerPage = () => {
                         <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                         <span>{itin.groupType || 'Cá nhân'}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-emerald-700 font-bold text-[11px]">
+                      <div className="flex items-center gap-1 text-sky-700 font-bold text-[11px]">
                         <MapPin className="w-3 h-3" />
                         <span>{itin.placesCount || 8} địa điểm</span>
                       </div>
@@ -539,7 +539,7 @@ export const ItineraryManagerPage = () => {
                         </span>
                       ))}
                       {itin.placesList.length > 3 && (
-                        <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-[10px] font-bold text-emerald-800">
+                        <span className="px-2 py-0.5 rounded-md bg-sky-50 text-[10px] font-bold text-sky-800">
                           +{itin.placesList.length - 3} điểm
                         </span>
                       )}
@@ -554,7 +554,7 @@ export const ItineraryManagerPage = () => {
                           <img src={img} alt="Memory" className="w-full h-full object-cover" />
                         </div>
                       ))}
-                      <div className="h-16 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-800 font-bold text-xs">
+                      <div className="h-16 rounded-xl bg-sky-50 flex items-center justify-center text-sky-800 font-bold text-xs">
                         +{itin.photosCount || 24} ảnh
                       </div>
                     </div>
@@ -564,7 +564,7 @@ export const ItineraryManagerPage = () => {
                   <div className="mt-auto pt-3 border-t border-slate-100">
                     <div className="flex items-center justify-between text-xs mb-1">
                       <span className="text-slate-400">Dự toán cá nhân:</span>
-                      <span className="font-extrabold text-emerald-700">
+                      <span className="font-extrabold text-sky-700">
                         {itin.budgetPerPerson ? `${itin.budgetPerPerson.toLocaleString('vi-VN')}đ` : itin.budgetTotal}{' '}
                         <span className="font-normal text-[10px] text-slate-400">/người</span>
                       </span>
@@ -572,7 +572,7 @@ export const ItineraryManagerPage = () => {
 
                     <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
                       <div
-                        className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
+                        className="h-full bg-gradient-to-r from-sky-500 to-sky-500 rounded-full"
                         style={{ width: `${itin.budgetProgress || 70}%` }}
                       ></div>
                     </div>
@@ -586,7 +586,7 @@ export const ItineraryManagerPage = () => {
                     <button
                       type="button"
                       onClick={() => setSelectedItinerary(itin)}
-                      className="flex-1 py-2 px-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="flex-1 py-2 px-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                     >
                       <span>Xem chi tiết</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -619,8 +619,8 @@ export const ItineraryManagerPage = () => {
           })}
 
           {/* Special Inline Card: AI Discovery Prompt (Stitch M04 Component) */}
-          <div className="bg-gradient-to-br from-emerald-50 via-teal-50/70 to-amber-50/50 rounded-3xl p-6 border border-emerald-200/80 flex flex-col justify-between shadow-xs relative overflow-hidden group">
-            <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-emerald-400/10 blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
+          <div className="bg-gradient-to-br from-sky-50 via-sky-50/70 to-amber-50/50 rounded-3xl p-6 border border-sky-200/80 flex flex-col justify-between shadow-xs relative overflow-hidden group">
+            <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-sky-400/10 blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
 
             <div className="space-y-3">
               <div className="w-12 h-12 rounded-2xl bg-white shadow-xs flex items-center justify-center text-amber-500 mb-2">
@@ -644,19 +644,19 @@ export const ItineraryManagerPage = () => {
                 <button
                   type="button"
                   onClick={() => setIsAIGeneratorOpen(true)}
-                  className="w-full text-left px-3.5 py-2.5 rounded-xl bg-white hover:bg-emerald-50 border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors shadow-xs cursor-pointer"
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl bg-white hover:bg-sky-50 border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors shadow-xs cursor-pointer"
                 >
                   <span>🏖️ Nghỉ dưỡng biển 3N2Đ &lt; 4 triệu</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-emerald-600" />
+                  <ChevronRight className="w-3.5 h-3.5 text-sky-600" />
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setIsAIGeneratorOpen(true)}
-                  className="w-full text-left px-3.5 py-2.5 rounded-xl bg-white hover:bg-emerald-50 border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors shadow-xs cursor-pointer"
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl bg-white hover:bg-sky-50 border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors shadow-xs cursor-pointer"
                 >
                   <span>☕ Săn mây Cafe Đà Lạt 2N1Đ</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-emerald-600" />
+                  <ChevronRight className="w-3.5 h-3.5 text-sky-600" />
                 </button>
               </div>
             </div>
@@ -664,7 +664,7 @@ export const ItineraryManagerPage = () => {
             <button
               type="button"
               onClick={() => setIsAIGeneratorOpen(true)}
-              className="mt-5 w-full py-2.5 px-4 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="mt-5 w-full py-2.5 px-4 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
               <span>Khởi tạo chuyến đi cùng WanderAI</span>
@@ -676,7 +676,7 @@ export const ItineraryManagerPage = () => {
       {/* ─── 5. STATUS COUNTER BAR ──────────────────────────────────────────────── */}
       <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="text-xs text-slate-500 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-600"></span>
+          <span className="w-2 h-2 rounded-full bg-sky-600"></span>
           <span>
             Hiển thị <strong>{filteredItineraries.length}</strong> trong tổng số <strong>{itineraries.length + 8}</strong> lịch trình du lịch của bạn
           </span>
@@ -719,7 +719,7 @@ export const ItineraryManagerPage = () => {
             {/* Header */}
             <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+                <div className="w-10 h-10 rounded-2xl bg-sky-600 text-white flex items-center justify-center shadow-sm">
                   <Plus className="w-5 h-5" />
                 </div>
                 <div>
@@ -754,7 +754,7 @@ export const ItineraryManagerPage = () => {
                   value={manualTitle}
                   onChange={(e) => setManualTitle(e.target.value)}
                   placeholder="Ví dụ: Phượt săn mây Đà Lạt cùng hội bạn, Nghỉ dưỡng Phú Quốc 4N3Đ..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-sky-500"
                 />
               </div>
 
@@ -762,7 +762,7 @@ export const ItineraryManagerPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                    <MapPin className="w-3.5 h-3.5 text-sky-600" />
                     <span>Điểm đến chính</span>
                     <span className="text-rose-500">*</span>
                   </label>
@@ -772,7 +772,7 @@ export const ItineraryManagerPage = () => {
                     value={manualDest}
                     onChange={(e) => setManualDest(e.target.value)}
                     placeholder="Ví dụ: Đà Lạt, Phú Quốc, Ninh Bình..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-emerald-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-sky-500"
                   />
                 </div>
 
@@ -784,7 +784,7 @@ export const ItineraryManagerPage = () => {
                   <select
                     value={manualRegion}
                     onChange={(e) => setManualRegion(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-emerald-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-sky-500"
                   >
                     <option value="Tây Nguyên">Tây Nguyên</option>
                     <option value="Miền Trung">Miền Trung di sản</option>
@@ -800,7 +800,7 @@ export const ItineraryManagerPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
                   <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-teal-600" />
+                    <Calendar className="w-3.5 h-3.5 text-sky-600" />
                     <span>Ngày bắt đầu</span>
                   </label>
                   <input
@@ -814,13 +814,13 @@ export const ItineraryManagerPage = () => {
                         if (diffDays > 0) setManualDays(diffDays);
                       }
                     }}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-emerald-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-teal-600" />
+                    <Calendar className="w-3.5 h-3.5 text-sky-600" />
                     <span>Ngày kết thúc</span>
                   </label>
                   <input
@@ -834,7 +834,7 @@ export const ItineraryManagerPage = () => {
                         if (diffDays > 0) setManualDays(diffDays);
                       }
                     }}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-emerald-500"
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
                   />
                 </div>
 
@@ -846,7 +846,7 @@ export const ItineraryManagerPage = () => {
                   <select
                     value={manualDays}
                     onChange={(e) => setManualDays(Number(e.target.value))}
-                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-emerald-500"
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(d => (
                       <option key={d} value={d}>{d} Ngày {Math.max(1, d - 1)} Đêm</option>
@@ -865,7 +865,7 @@ export const ItineraryManagerPage = () => {
                   <select
                     value={manualGroup}
                     onChange={(e) => setManualGroup(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-emerald-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
                   >
                     <option value="Đi một mình (Solo)">Đi một mình (Solo)</option>
                     <option value="Cặp đôi (2 người)">Cặp đôi (2 người)</option>
@@ -877,7 +877,7 @@ export const ItineraryManagerPage = () => {
 
                 <div className="space-y-1.5">
                   <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                    <DollarSign className="w-3.5 h-3.5 text-sky-600" />
                     <span>Dự trù tổng ngân sách (VNĐ)</span>
                   </label>
                   <input
@@ -885,7 +885,7 @@ export const ItineraryManagerPage = () => {
                     step={500000}
                     value={manualBudget}
                     onChange={(e) => setManualBudget(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-bold outline-none focus:bg-white focus:border-emerald-500"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-bold outline-none focus:bg-white focus:border-sky-500"
                   />
                 </div>
               </div>
@@ -902,7 +902,7 @@ export const ItineraryManagerPage = () => {
                       key={idx}
                       onClick={() => setManualCover(p.url)}
                       className={`relative rounded-xl overflow-hidden aspect-video border-2 transition-all cursor-pointer group ${
-                        manualCover === p.url ? 'border-emerald-600 ring-2 ring-emerald-500/20 shadow-xs' : 'border-slate-200 hover:border-slate-300'
+                        manualCover === p.url ? 'border-sky-600 ring-2 ring-sky-500/20 shadow-xs' : 'border-slate-200 hover:border-slate-300'
                       }`}
                     >
                       <img src={p.url} alt={p.label} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
@@ -910,7 +910,7 @@ export const ItineraryManagerPage = () => {
                         <span className="text-[9px] font-bold text-white truncate">{p.label}</span>
                       </div>
                       {manualCover === p.url && (
-                        <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center">
+                        <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-sky-600 text-white flex items-center justify-center">
                           <Check className="w-2.5 h-2.5" />
                         </div>
                       )}
@@ -927,7 +927,7 @@ export const ItineraryManagerPage = () => {
                   value={manualPlaces}
                   onChange={(e) => setManualPlaces(e.target.value)}
                   placeholder="Ví dụ: Cầu Rồng, Bán đảo Sơn Trà, Biển Mỹ Khê, Chùa Cầu Hội An..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
                 />
               </div>
 
@@ -939,7 +939,7 @@ export const ItineraryManagerPage = () => {
                   value={manualNote}
                   onChange={(e) => setManualNote(e.target.value)}
                   placeholder="Ghi chú đồ dùng cần chuẩn bị, liên hệ thuê xe, danh sách địa điểm cần đặt vé trước..."
-                  className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-emerald-500 resize-none"
+                  className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500 resize-none"
                 />
               </div>
 
@@ -954,7 +954,7 @@ export const ItineraryManagerPage = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm hover:shadow-md"
+                  className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm hover:shadow-md"
                 >
                   <Plus className="w-4 h-4" />
                   <span>Tạo chuyến đi ngay</span>

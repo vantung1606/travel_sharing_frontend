@@ -51,7 +51,7 @@ export const ExplorePage = () => {
               placeholder="Tìm kiếm theo tên điểm đến, từ khoá..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-white focus:ring-2 focus:ring-teal-500 outline-none"
+              className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 bg-white focus:ring-2 focus:ring-sky-500 outline-none"
             />
           </div>
 
@@ -62,8 +62,8 @@ export const ExplorePage = () => {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-teal-600 text-white shadow-sm font-bold shadow-teal-900/10'
-                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-teal-50/50 hover:text-teal-900'
+                    ? 'bg-sky-600 text-white shadow-sm font-bold shadow-sky-900/10'
+                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-sky-50/50 hover:text-sky-900'
                 }`}
               >
                 {cat}
@@ -77,7 +77,7 @@ export const ExplorePage = () => {
           <button
             onClick={() => setMobileViewMode('list')}
             className={`px-4 py-1.5 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
-              mobileViewMode === 'list' ? 'bg-white text-teal-800 shadow-sm' : 'text-slate-600'
+              mobileViewMode === 'list' ? 'bg-white text-sky-800 shadow-sm' : 'text-slate-600'
             }`}
           >
             <List className="w-4 h-4" /> Danh sách ({filteredPlaces.length})
@@ -114,7 +114,7 @@ export const ExplorePage = () => {
                 }}
                 className={`bg-white p-4 rounded-2xl border transition-all cursor-pointer flex gap-4 ${
                   activePlace?.id === item.id
-                    ? 'border-teal-500 ring-2 ring-teal-500/20 shadow-md'
+                    ? 'border-sky-500 ring-2 ring-sky-500/20 shadow-md'
                     : 'border-slate-200/80 hover:border-slate-300 shadow-sm'
                 }`}
               >
@@ -127,7 +127,7 @@ export const ExplorePage = () => {
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded-md bg-teal-50 text-teal-800 text-[10px] font-bold">
+                      <span className="px-2 py-0.5 rounded-md bg-sky-50 text-sky-800 text-[10px] font-bold">
                         {item.category}
                       </span>
                       <div className="flex items-center gap-1 text-[11px] font-extrabold text-amber-500">
@@ -150,7 +150,7 @@ export const ExplorePage = () => {
 
                   <div className="flex items-center justify-between text-xs pt-2 border-t border-slate-100 mt-2">
                     <span className="text-slate-500 font-medium">{item.duration}</span>
-                    <span className="font-bold text-teal-700">{item.priceEstimate}</span>
+                    <span className="font-bold text-sky-700">{item.priceEstimate}</span>
                   </div>
                 </div>
               </div>
@@ -164,30 +164,30 @@ export const ExplorePage = () => {
         }`}>
           
           {/* Map Grid Pattern background */}
-          <div className="absolute inset-0 bg-[radial-gradient(#0d9488_1px,transparent_1px)] [background-size:16px_16px] opacity-20"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(#0284c7_1px,transparent_1px)] [background-size:16px_16px] opacity-20"></div>
 
           {/* Top Bar */}
           <div className="relative z-10 flex items-center justify-between bg-slate-800/80 backdrop-blur-md p-3 rounded-2xl border border-slate-700">
-            <div className="flex items-center gap-2 text-xs font-bold text-teal-300">
-              <Navigation className="w-4 h-4 text-teal-400 animate-pulse" />
+            <div className="flex items-center gap-2 text-xs font-bold text-sky-300">
+              <Navigation className="w-4 h-4 text-sky-400 animate-pulse" />
               <span>Bản Đồ Tọa Độ AI Live Map</span>
             </div>
-            <span className="text-[10px] bg-teal-500/20 text-teal-300 border border-teal-500/30 px-2 py-0.5 rounded-full font-mono">
+            <span className="text-[10px] bg-sky-500/20 text-sky-300 border border-sky-500/30 px-2 py-0.5 rounded-full font-mono">
               GPS Lat: {activePlace?.coordinates.lat.toFixed(4)} | Lng: {activePlace?.coordinates.lng.toFixed(4)}
             </span>
           </div>
 
           {/* Center Pin & Active Detail Card */}
           <div className="relative z-10 my-auto text-center space-y-4 py-6">
-            <div className="inline-flex p-4 rounded-full bg-teal-500/20 text-teal-400 border border-teal-400/30 animate-bounce">
-              <MapPin className="w-8 h-8 fill-teal-500 text-white" />
+            <div className="inline-flex p-4 rounded-full bg-sky-500/20 text-sky-400 border border-sky-400/30 animate-bounce">
+              <MapPin className="w-8 h-8 fill-sky-500 text-white" />
             </div>
 
             {activePlace && (
               <div className="max-w-md mx-auto bg-slate-800/90 backdrop-blur-md p-5 rounded-2xl border border-slate-700 text-left space-y-2 shadow-2xl">
                 <div className="flex items-center justify-between">
                   <h4 className="font-bold text-sm text-white">{activePlace.name}</h4>
-                  <span className="text-xs font-bold text-teal-400">{activePlace.priceEstimate}</span>
+                  <span className="text-xs font-bold text-sky-400">{activePlace.priceEstimate}</span>
                 </div>
                 <p className="text-xs text-slate-300">{activePlace.aiHighlights}</p>
 

@@ -36,7 +36,7 @@ const AppContent = () => {
   const isAdminPath = location.pathname.startsWith('/admin');
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900 selection:bg-emerald-600 selection:text-white">
+    <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900 selection:bg-sky-600 selection:text-white">
       {/* Dynamic Title Manager for Browser Tab */}
       <PageTitleManager />
 

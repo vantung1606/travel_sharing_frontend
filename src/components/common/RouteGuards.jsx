@@ -75,7 +75,7 @@ export const AdminRouteGuard = ({ children }) => {
           <div className="pt-2 flex flex-col gap-2.5">
             <button
               onClick={handleQuickAdminLogin}
-              className="w-full py-3 rounded-full bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-md shadow-emerald-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-md shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               <LogIn className="w-4 h-4" /> ⚡ Đăng nhập Nhanh Quản Trị Viên (Admin)
             </button>
@@ -120,7 +120,7 @@ export const AdminRouteGuard = ({ children }) => {
           <div className="pt-2 flex flex-col gap-2.5">
             <button
               onClick={handleQuickAdminLogin}
-              className="w-full py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
             >
               ⚡ Chuyển sang Tài khoản Quản Trị Viên
             </button>
@@ -149,7 +149,7 @@ export const UserAuthGuard = ({ children, title = 'Nội dung cá nhân' }) => {
     return (
       <div className="min-h-[60vh] flex items-center justify-center p-4">
         <div className="max-w-sm w-full bg-white rounded-3xl p-6 border border-slate-200/80 shadow-lg text-center space-y-4 animate-in fade-in">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+          <div className="w-14 h-14 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center mx-auto">
             <Lock className="w-7 h-7" />
           </div>
           <div>
@@ -164,7 +164,7 @@ export const UserAuthGuard = ({ children, title = 'Nội dung cá nhân' }) => {
                 setAuthMode('login');
                 setIsAuthModalOpen(true);
               }}
-              className="w-full py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
               <LogIn className="w-4 h-4" /> Đăng nhập ngay
             </button>
