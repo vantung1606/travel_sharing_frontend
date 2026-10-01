@@ -51,9 +51,9 @@ export const ToastProvider = ({ children }) => {
             Icon = AlertCircle;
             iconColor = 'text-rose-400';
           } else if (t.type === 'info') {
-            bgClass = 'bg-slate-900/95 border-sky-500/30 text-white shadow-sky-500/10';
+            bgClass = 'bg-slate-900/95 border-emerald-500/30 text-white shadow-emerald-500/10';
             Icon = Info;
-            iconColor = 'text-sky-400';
+            iconColor = 'text-emerald-400';
           } else if (t.type === 'warning') {
             bgClass = 'bg-slate-900/95 border-amber-500/30 text-white shadow-amber-500/10';
             Icon = AlertTriangle;
@@ -90,3 +90,4 @@ export const useToast = () => {
   }
   return context;
 };
+

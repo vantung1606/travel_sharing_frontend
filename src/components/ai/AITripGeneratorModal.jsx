@@ -307,13 +307,13 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
       <div className="relative w-full max-w-[980px] bg-white text-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh] border border-slate-200/80">
         
         {/* Top Ambient Accent Bar */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-sky-600 via-teal-500 to-amber-500 shrink-0" />
+        <div className="h-1.5 w-full bg-gradient-to-r from-emerald-600 via-teal-500 to-amber-500 shrink-0" />
 
         {/* MODAL HEADER */}
         <div className="px-5 sm:px-8 pt-5 sm:pt-6 pb-4 bg-white flex items-start justify-between gap-4 shrink-0 border-b border-slate-100">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2.5">
-              <span className="p-2 rounded-xl bg-gradient-to-tr from-sky-500 to-teal-500 text-white flex items-center justify-center shadow-md">
+              <span className="p-2 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-500 text-white flex items-center justify-center shadow-md">
                 <Sparkles className="w-5 h-5 text-amber-200 animate-pulse" />
               </span>
               <h1 className="font-display text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2 tracking-tight">
@@ -329,7 +329,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
           </div>
 
           <div className="flex items-center gap-2.5 shrink-0">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200/60 text-sky-800 text-[11px] font-bold">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-800 text-[11px] font-bold">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
               <span>Gemini 3.6 Flash · GPS Grounding</span>
             </div>
@@ -355,7 +355,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
               <div className="bg-slate-50/90 p-4 rounded-2xl flex flex-col gap-2.5 border border-slate-200/70 shadow-2xs">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-sky-600" />
+                    <MapPin className="w-4 h-4 text-emerald-600" />
                     <span>Điểm đến mong muốn</span>
                   </label>
                   <button
@@ -366,7 +366,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                       setDestination(randomPick);
                       toast.info(`Đã áp dụng gợi ý theo mùa: ${randomPick}`);
                     }}
-                    className="text-[11px] text-sky-600 font-bold hover:underline cursor-pointer flex items-center gap-1"
+                    className="text-[11px] text-emerald-600 font-bold hover:underline cursor-pointer flex items-center gap-1"
                   >
                     <span>Gợi ý theo mùa ✨</span>
                   </button>
@@ -379,7 +379,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                     value={destination}
                     onChange={(e) => setDestination(e.target.value)}
                     placeholder="Nhập tỉnh, thành phố hoặc vùng vịnh..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white text-slate-900 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white text-slate-900 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-2xs"
                   />
                   {destination && (
                     <button
@@ -402,7 +402,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                       onClick={() => setDestination(tag)}
                       className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
                         destination === tag
-                          ? 'bg-sky-600 text-white shadow-2xs'
+                          ? 'bg-emerald-600 text-white shadow-2xs'
                           : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'
                       }`}
                     >
@@ -431,7 +431,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                       onClick={() => handleSelectDuration(pill)}
                       className={`py-2 px-2 rounded-xl text-center text-xs font-bold transition-all cursor-pointer ${
                         durationPill === pill
-                          ? 'bg-sky-600 text-white shadow-2xs'
+                          ? 'bg-emerald-600 text-white shadow-2xs'
                           : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
                       }`}
                     >
@@ -448,7 +448,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-white text-slate-800 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                      className="w-full px-3 py-2 rounded-xl bg-white text-slate-800 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                     />
                   </div>
 
@@ -484,7 +484,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                         onClick={() => setCompanion(item.id)}
                         className={`p-2.5 rounded-xl border transition-all flex items-start gap-2.5 cursor-pointer ${
                           isSelected
-                            ? 'bg-sky-50/80 border-sky-400 shadow-2xs text-sky-900'
+                            ? 'bg-emerald-50/80 border-emerald-400 shadow-2xs text-emerald-900'
                             : 'bg-white border-slate-200 hover:bg-slate-100/80 text-slate-700'
                         }`}
                       >
@@ -493,7 +493,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                           name="companion"
                           checked={isSelected}
                           onChange={() => setCompanion(item.id)}
-                          className="accent-sky-600 w-3.5 h-3.5 mt-0.5"
+                          className="accent-emerald-600 w-3.5 h-3.5 mt-0.5"
                         />
                         <div className="flex flex-col">
                           <span className="text-xs font-bold flex items-center gap-1">
@@ -511,7 +511,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
               {/* 4. Preferred Transit (Phương tiện di chuyển) */}
               <div className="bg-slate-50/90 p-4 rounded-2xl flex flex-col gap-2.5 border border-slate-200/70 shadow-2xs">
                 <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Car className="w-4 h-4 text-sky-600" />
+                  <Car className="w-4 h-4 text-emerald-600" />
                   <span>Phương tiện ưu tiên tại điểm đến</span>
                 </label>
 
@@ -531,7 +531,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                         onClick={() => setTransit(item.id)}
                         className={`flex flex-col items-center justify-center p-2.5 rounded-xl gap-1 text-center transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-sky-600 text-white shadow-2xs'
+                            ? 'bg-emerald-600 text-white shadow-2xs'
                             : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
                         }`}
                       >
@@ -562,13 +562,13 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                     max="4"
                     value={budgetTier}
                     onChange={(e) => setBudgetTier(Number(e.target.value))}
-                    className="w-full accent-sky-600 cursor-pointer"
+                    className="w-full accent-emerald-600 cursor-pointer"
                   />
                   <div className="flex justify-between text-[10px] text-slate-500 font-bold mt-1">
-                    <span className={budgetTier === 1 ? 'text-sky-600 font-black' : ''}>Tiết kiệm (2-4tr)</span>
-                    <span className={budgetTier === 2 ? 'text-sky-600 font-black' : ''}>Tiêu chuẩn (4-7tr)</span>
-                    <span className={budgetTier === 3 ? 'text-sky-600 font-black' : ''}>Thoải mái (7-12tr)</span>
-                    <span className={budgetTier === 4 ? 'text-sky-600 font-black' : ''}>Cao cấp (&gt;15tr)</span>
+                    <span className={budgetTier === 1 ? 'text-emerald-600 font-black' : ''}>Tiết kiệm (2-4tr)</span>
+                    <span className={budgetTier === 2 ? 'text-emerald-600 font-black' : ''}>Tiêu chuẩn (4-7tr)</span>
+                    <span className={budgetTier === 3 ? 'text-emerald-600 font-black' : ''}>Thoải mái (7-12tr)</span>
+                    <span className={budgetTier === 4 ? 'text-emerald-600 font-black' : ''}>Cao cấp (&gt;15tr)</span>
                   </div>
                 </div>
 
@@ -578,7 +578,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                     id="includeFlight"
                     checked={includeFlight}
                     onChange={(e) => setIncludeFlight(e.target.checked)}
-                    className="accent-sky-600 w-3.5 h-3.5 rounded cursor-pointer"
+                    className="accent-emerald-600 w-3.5 h-3.5 rounded cursor-pointer"
                   />
                   <label htmlFor="includeFlight" className="text-[11px] text-slate-600 cursor-pointer select-none font-medium">
                     Bao gồm chi phí vé máy bay khứ hồi hoặc vé xe liên tỉnh
@@ -598,7 +598,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                     <Sparkles className="w-4 h-4 text-purple-600" />
                     <span>Gu du lịch & Trải nghiệm mong muốn</span>
                   </label>
-                  <span className="text-[11px] text-sky-600 font-bold">
+                  <span className="text-[11px] text-emerald-600 font-bold">
                     {selectedInterests.length} đã chọn
                   </span>
                 </div>
@@ -614,11 +614,11 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                         onClick={() => toggleInterest(opt.id)}
                         className={`px-3 py-1.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                           isSelected
-                            ? 'bg-sky-600 text-white shadow-2xs'
+                            ? 'bg-emerald-600 text-white shadow-2xs'
                             : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'
                         }`}
                       >
-                        <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-sky-600'}`} />
+                        <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-emerald-600'}`} />
                         <span>{opt.label}</span>
                       </button>
                     );
@@ -646,12 +646,12 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                         onClick={() => setPacing(item.id)}
                         className={`p-2.5 rounded-xl flex flex-col gap-1 cursor-pointer transition-all text-center border ${
                           isSelected
-                            ? 'bg-sky-600 text-white border-sky-600 shadow-2xs'
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
                             : 'bg-white border-slate-200 hover:bg-slate-100 text-slate-800'
                         }`}
                       >
                         <span className="text-xs font-bold">{item.title}</span>
-                        <span className={`text-[10px] leading-tight ${isSelected ? 'text-sky-100' : 'text-slate-500'}`}>
+                        <span className={`text-[10px] leading-tight ${isSelected ? 'text-emerald-100' : 'text-slate-500'}`}>
                           {item.desc}
                         </span>
                       </div>
@@ -666,13 +666,13 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                   {/* Stay Style */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                      <Home className="w-3.5 h-3.5 text-sky-600" />
+                      <Home className="w-3.5 h-3.5 text-emerald-600" />
                       <span>Loại lưu trú</span>
                     </label>
                     <select
                       value={accommodation}
                       onChange={(e) => setAccommodation(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-white text-slate-800 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                      className="w-full px-3 py-2 rounded-xl bg-white text-slate-800 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                     >
                       <option>Khách sạn 3 sao tiện nghi, trung tâm</option>
                       <option>Khách sạn 4-5 sao sang trọng</option>
@@ -691,7 +691,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                     <select
                       value={diningStyle}
                       onChange={(e) => setDiningStyle(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-white text-slate-800 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                      className="w-full px-3 py-2 rounded-xl bg-white text-slate-800 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                     >
                       <option>Quán ăn bản địa chuẩn vị & nổi tiếng</option>
                       <option>Nhà hàng cao cấp, không gian đẹp</option>
@@ -716,14 +716,14 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                   onChange={(e) => setCustomPrompt(e.target.value)}
                   placeholder="Ví dụ: Muốn ngắm hoàng hôn ở bán đảo Sơn Trà ngày thứ hai, thích ăn mì Quảng chuẩn vị người bản xứ, đoàn không dậy sớm trước 8h sáng..."
                   rows="3"
-                  className="w-full p-3 rounded-xl bg-white text-slate-900 text-xs font-medium border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 placeholder:text-slate-400 resize-none shadow-2xs"
+                  className="w-full p-3 rounded-xl bg-white text-slate-900 text-xs font-medium border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 placeholder:text-slate-400 resize-none shadow-2xs"
                 />
               </div>
 
               {/* 5. Advanced AI Tuning Toggles */}
               <div className="bg-slate-50/90 px-4 py-3 rounded-2xl flex flex-col gap-2 border border-slate-200/70 shadow-2xs">
                 <span className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
-                  <Sliders className="w-3.5 h-3.5 text-sky-600" />
+                  <Sliders className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Thuật toán thông minh tích hợp</span>
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -732,7 +732,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                       type="checkbox"
                       checked={smartAvoidTraffic}
                       onChange={(e) => setSmartAvoidTraffic(e.target.checked)}
-                      className="accent-sky-600 w-3.5 h-3.5 rounded"
+                      className="accent-emerald-600 w-3.5 h-3.5 rounded"
                     />
                     <span className="text-[11px] text-slate-600 font-medium">Tránh tắc đường cao điểm</span>
                   </label>
@@ -741,7 +741,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                       type="checkbox"
                       checked={smartLoopRoute}
                       onChange={(e) => setSmartLoopRoute(e.target.checked)}
-                      className="accent-sky-600 w-3.5 h-3.5 rounded"
+                      className="accent-emerald-600 w-3.5 h-3.5 rounded"
                     />
                     <span className="text-[11px] text-slate-600 font-medium">Lộ trình vòng tròn không lặp</span>
                   </label>
@@ -750,7 +750,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
                       type="checkbox"
                       checked={smartWeather}
                       onChange={(e) => setSmartWeather(e.target.checked)}
-                      className="accent-sky-600 w-3.5 h-3.5 rounded"
+                      className="accent-emerald-600 w-3.5 h-3.5 rounded"
                     />
                     <span className="text-[11px] text-slate-600 font-medium">Dự báo thời tiết & nắng râm</span>
                   </label>
@@ -769,8 +769,8 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
           <div className="flex items-center gap-3 text-slate-500 text-[11px]">
             <div className="flex items-center gap-2">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-600"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
               </span>
               <span className="text-slate-700 font-bold">Thời gian tạo: ~2.8s</span>
             </div>
@@ -806,7 +806,7 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
               type="button"
               onClick={() => handleGenerate(false)}
               disabled={isGenerating}
-              className="relative group px-5 sm:px-6 py-2.5 rounded-full bg-gradient-to-r from-sky-600 via-sky-700 to-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg hover:scale-[1.01] transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="relative group px-5 sm:px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-600 via-emerald-700 to-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg hover:scale-[1.01] transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isGenerating ? (
                 <>
@@ -831,3 +831,4 @@ Hãy chỉ đưa ra 1 mẹo di chuyển thông minh và 1 điểm ăn uống đ�
     </div>
   );
 };
+

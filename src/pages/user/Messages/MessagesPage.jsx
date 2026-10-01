@@ -37,7 +37,7 @@ export const MessagesPage = () => {
         <div className={`md:col-span-4 border-r border-slate-200 p-4 space-y-4 bg-slate-50/50 ${showMobileChat ? 'hidden md:block' : 'block'}`}>
           <div className="flex items-center justify-between">
             <h2 className="font-bold text-base text-slate-900">Trò Chuyện & Nhóm Tour</h2>
-            <button className="p-1.5 rounded-lg bg-sky-100 text-sky-700 hover:bg-sky-200 text-xs font-bold flex items-center gap-1">
+            <button className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/60 text-xs font-bold flex items-center gap-1 transition-colors">
               <Plus className="w-4 h-4" />
               <span>Tạo Nhóm</span>
             </button>
@@ -53,7 +53,7 @@ export const MessagesPage = () => {
                 }}
                 className={`p-3 rounded-2xl cursor-pointer transition-all flex items-center gap-3 ${
                   activeThread === thread.id
-                    ? 'bg-white shadow-md border border-sky-200 ring-2 ring-sky-500/10'
+                    ? 'bg-white shadow-md border border-emerald-200 ring-2 ring-emerald-500/15'
                     : 'hover:bg-slate-100'
                 }`}
               >
@@ -104,7 +104,7 @@ export const MessagesPage = () => {
               </div>
             </div>
             <div className="flex gap-3 flex-row-reverse">
-              <div className="bg-sky-600 text-white p-3 rounded-2xl rounded-tr-none text-xs max-w-sm">
+              <div className="bg-emerald-600 text-white p-3 rounded-2xl rounded-tr-none text-xs max-w-sm shadow-sm shadow-emerald-600/20">
                 Đã chuẩn bị đầy đủ rồi nha. Đặt vé thuyền sông Nho Quế thành công luôn rồi!
               </div>
             </div>
@@ -114,9 +114,9 @@ export const MessagesPage = () => {
             <input
               type="text"
               placeholder="Nhập tin nhắn nhóm chuyến đi..."
-              className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs outline-none focus:ring-2 focus:ring-sky-500"
+              className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs outline-none focus:ring-2 focus:ring-emerald-500"
             />
-            <button className="sparkle-btn px-4 py-2.5 rounded-xl text-white text-xs font-bold shrink-0">
+            <button className="emerald-gradient hover:opacity-95 px-5 py-2.5 rounded-xl text-white text-xs font-bold shrink-0 shadow-md shadow-emerald-600/20 transition-all">
               Gửi
             </button>
           </div>

@@ -83,14 +83,14 @@ export const NotificationsPage = () => {
       case 'COMMENT':
         return {
           icon: MessageCircle,
-          color: 'text-sky-500 bg-sky-50 border-sky-200',
+          color: 'text-emerald-500 bg-emerald-50 border-emerald-200',
           badgeText: 'Bình Luận',
           actionText: 'Trả Lời Ngay'
         };
       case 'COMMENT_REPLY':
         return {
           icon: MessageCircle,
-          color: 'text-sky-500 bg-sky-50 border-sky-200',
+          color: 'text-emerald-500 bg-emerald-50 border-emerald-200',
           badgeText: 'Phản Hồi',
           actionText: 'Trả Lời'
         };
@@ -98,7 +98,7 @@ export const NotificationsPage = () => {
       case 'COMMUNITY_SHARE':
         return {
           icon: Share2,
-          color: 'text-sky-600 bg-sky-50 border-sky-200',
+          color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
           badgeText: 'Chia Sẻ',
           actionText: 'Xem Bài Viết'
         };
@@ -147,7 +147,7 @@ export const NotificationsPage = () => {
       case 'REPORT_DISMISSED':
         return {
           icon: ShieldCheck,
-          color: 'text-sky-600 bg-sky-50 border-sky-200',
+          color: 'text-emerald-600 bg-emerald-50 border-emerald-200',
           badgeText: 'Bác Bỏ Báo Cáo',
           actionText: 'Xem Bài Viết'
         };
@@ -303,12 +303,12 @@ export const NotificationsPage = () => {
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
             <span
               onClick={() => setUserTab('home')}
-              className="hover:text-sky-600 transition-colors cursor-pointer"
+              className="hover:text-emerald-600 transition-colors cursor-pointer"
             >
               Trang chủ
             </span>
             <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-            <span className="text-sky-600 font-bold">Trung tâm Thông Báo</span>
+            <span className="text-emerald-600 font-bold">Trung tâm Thông Báo</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -342,18 +342,18 @@ export const NotificationsPage = () => {
             type="button"
             onClick={handleManualRefresh}
             disabled={isRefreshing}
-            className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-sky-600 transition-colors shadow-xs"
+            className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-emerald-600 transition-colors shadow-xs"
             title="Đồng bộ lại thông báo từ CSDL"
           >
-            <RotateCcw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-sky-600' : ''}`} />
+            <RotateCcw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-emerald-600' : ''}`} />
           </button>
 
           <button
             type="button"
             onClick={() => setIsTestDispatcherOpen(!isTestDispatcherOpen)}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition-all shadow-xs"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-all shadow-xs"
           >
-            <PlusCircle className="w-4 h-4 text-sky-600" />
+            <PlusCircle className="w-4 h-4 text-emerald-600" />
             <span>Gửi thông báo / Phát tin</span>
           </button>
 
@@ -361,7 +361,7 @@ export const NotificationsPage = () => {
             <button
               type="button"
               onClick={handleMarkAllRead}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-all shadow-sm"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm shadow-emerald-600/20"
             >
               <CheckCheck className="w-4 h-4" />
               <span>Đọc tất cả</span>
@@ -381,10 +381,10 @@ export const NotificationsPage = () => {
 
       {/* ─── 2. LIVE PUSH / TEST NOTIFICATION DISPATCHER CARD ─────────────────── */}
       {isTestDispatcherOpen && (
-        <div className="bg-gradient-to-br from-sky-50 via-white to-orange-50/30 rounded-3xl p-6 border-2 border-sky-300/80 shadow-md animate-in fade-in slide-in-from-top-3 duration-200 space-y-4">
-          <div className="flex items-center justify-between border-b border-sky-100 pb-3">
+        <div className="bg-gradient-to-br from-emerald-50 via-white to-amber-50/30 rounded-3xl p-6 border-2 border-emerald-300/80 shadow-md animate-in fade-in slide-in-from-top-3 duration-200 space-y-4">
+          <div className="flex items-center justify-between border-b border-emerald-100 pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
                 <Send className="w-4 h-4" />
               </div>
               <div>
@@ -405,13 +405,13 @@ export const NotificationsPage = () => {
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 border-b border-sky-100 pb-3">
+          <div className="flex flex-wrap items-center gap-2 border-b border-emerald-100 pb-3">
             <button
               type="button"
               onClick={() => setDispatchMode('test')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ${
                 dispatchMode === 'test'
-                  ? 'bg-sky-600 text-white shadow-xs'
+                  ? 'bg-emerald-600 text-white shadow-xs'
                   : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
               }`}
             >
@@ -456,13 +456,11 @@ export const NotificationsPage = () => {
                     setTestTargetUrl('/messages');
                   }
                 }}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-sky-500"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-emerald-500"
               >
                 <option value="AI_READY">✨ AI_READY (Trợ lý AI tạo lịch trình)</option>
                 <option value="SHARE">🔗 SHARE (Chia sẻ bài viết)</option>
                 <option value="LIKE">❤️ LIKE (Lượt thích bài viết)</option>
-                <option value="COMMENT">💬 COMMENT (Bình luận bài viết)</option>
-                <option value="LIKE">❤️ LIKE (Thích bài viết)</option>
                 <option value="COMMENT">💬 COMMENT (Bình luận bài viết)</option>
                 <option value="CHAT_INVITE">👥 CHAT_INVITE (Mời vào nhóm chat)</option>
                 <option value="PLACE_APPROVED">📍 PLACE_APPROVED (Địa điểm được duyệt)</option>
@@ -478,7 +476,7 @@ export const NotificationsPage = () => {
                   value={testActorName}
                   onChange={(e) => setTestActorName(e.target.value)}
                   required
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none focus:border-sky-500"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none focus:border-emerald-500"
                 />
               </div>
             )}
@@ -490,7 +488,7 @@ export const NotificationsPage = () => {
                 value={testTargetUrl}
                 onChange={(e) => setTestTargetUrl(e.target.value)}
                 required
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none focus:border-sky-500"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none focus:border-emerald-500"
               />
             </div>
 
@@ -502,7 +500,7 @@ export const NotificationsPage = () => {
                 onChange={(e) => setTestMessage(e.target.value)}
                 required
                 placeholder={dispatchMode === 'broadcast' ? 'Nhập thông báo gửi đến toàn thể cộng đồng du khách Wayfare...' : 'Nhập nội dung thông báo...'}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-sky-500"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-emerald-500"
               />
             </div>
 
@@ -520,7 +518,7 @@ export const NotificationsPage = () => {
                 className={`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-white font-bold text-xs shadow-sm transition-all disabled:opacity-50 ${
                   dispatchMode === 'broadcast'
                     ? 'bg-amber-600 hover:bg-amber-700'
-                    : 'bg-sky-600 hover:bg-sky-700'
+                    : 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20'
                 }`}
               >
                 {dispatchMode === 'broadcast' ? <Megaphone className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
@@ -555,7 +553,7 @@ export const NotificationsPage = () => {
               onClick={() => setActiveTab(tab.id)}
               className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 activeTab === tab.id
-                  ? 'bg-sky-600 text-white shadow-xs'
+                  ? 'bg-emerald-600 text-white shadow-xs'
                   : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
               }`}
             >
@@ -572,7 +570,7 @@ export const NotificationsPage = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm theo từ khóa, người gửi..."
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 py-1.5 text-xs text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 py-1.5 text-xs text-slate-800 outline-none focus:border-emerald-500 focus:bg-white"
           />
         </div>
       </div>
@@ -589,7 +587,7 @@ export const NotificationsPage = () => {
                 key={item.id}
                 className={`bg-white rounded-2xl p-4 sm:p-5 border transition-all hover:shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group relative ${
                   !item.isRead
-                    ? 'border-sky-200/90 bg-sky-50/20 shadow-xs'
+                    ? 'border-emerald-200/90 bg-emerald-50/20 shadow-xs'
                     : 'border-slate-200/80'
                 }`}
               >
@@ -630,7 +628,7 @@ export const NotificationsPage = () => {
                         {meta.badgeText}
                       </span>
                       {!item.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-sky-600 inline-block"></span>
+                        <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block"></span>
                       )}
                     </div>
 
@@ -656,7 +654,7 @@ export const NotificationsPage = () => {
                   <button
                     type="button"
                     onClick={() => handleActionClick(item)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-xs transition-colors shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs transition-colors shadow-xs"
                   >
                     <span>{meta.actionText}</span>
                     <ExternalLink className="w-3.5 h-3.5" />
@@ -674,7 +672,7 @@ export const NotificationsPage = () => {
                     className={`p-2 rounded-xl border text-xs transition-colors ${
                       item.isRead
                         ? 'border-transparent text-slate-300 cursor-default'
-                        : 'border-slate-200 bg-white text-slate-600 hover:text-sky-600 shadow-xs'
+                        : 'border-slate-200 bg-white text-slate-600 hover:text-emerald-600 shadow-xs'
                     }`}
                     title={item.isRead ? 'Đã đọc' : 'Đánh dấu đã đọc'}
                   >
@@ -699,7 +697,7 @@ export const NotificationsPage = () => {
         ) : (
           /* Empty state */
           <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 shadow-xs space-y-4">
-            <div className="w-16 h-16 rounded-3xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto shadow-inner">
+            <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
               <Bell className="w-8 h-8" />
             </div>
             <div className="space-y-1">
@@ -728,3 +726,4 @@ export const NotificationsPage = () => {
     </div>
   );
 };
+

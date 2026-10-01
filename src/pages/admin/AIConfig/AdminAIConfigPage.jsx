@@ -263,12 +263,12 @@ export function AdminAIConfigPage() {
         <div className="space-y-2 max-w-3xl">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-            <span className="flex items-center gap-1 hover:text-sky-600 transition-colors">
+            <span className="flex items-center gap-1 hover:text-emerald-600 transition-colors">
               <ShieldCheck className="w-3.5 h-3.5" />
               Ban Quản Trị Hệ Thống
             </span>
             <ChevronRightSm className="w-3.5 h-3.5 text-slate-300" />
-            <span className="text-sky-600 font-bold">Cấu hình Trợ lý AI & Model</span>
+            <span className="text-emerald-600 font-bold">Cấu hình Trợ lý AI & Model</span>
           </div>
 
           {/* Title & Core Live Badge */}
@@ -276,10 +276,10 @@ export function AdminAIConfigPage() {
             <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               Cấu hình Hệ thống AI & Giám sát Model (AI Engine)
             </h1>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 text-sky-700 border border-sky-200 text-xs font-bold shadow-xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold shadow-xs">
               <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-600"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
               </span>
               <span>AI Core: Online (v2.4-turbo)</span>
             </div>
@@ -304,9 +304,9 @@ export function AdminAIConfigPage() {
           <button
             type="button"
             onClick={handleRunConnectionTest}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition-all shadow-xs"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-all shadow-xs"
           >
-            <Wifi className="w-4 h-4 text-sky-600" />
+            <Wifi className="w-4 h-4 text-emerald-600" />
             <span>Kiểm tra kết nối (Test API)</span>
           </button>
 
@@ -316,7 +316,7 @@ export function AdminAIConfigPage() {
             disabled={!isDirty}
             className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition-all shadow-sm ${
               isDirty
-                ? 'bg-sky-600 hover:bg-sky-700 text-white shadow-sky-500/20 ring-2 ring-sky-500/30'
+                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-500/20 ring-2 ring-emerald-500/30'
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed'
             }`}
           >
@@ -329,10 +329,10 @@ export function AdminAIConfigPage() {
       {/* ─── 2. TELEMETRY KPI QUOTA CARDS (ROW 1) ─────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* KPI 1: Tokens used */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:border-sky-300 transition-all">
+        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:border-emerald-300 transition-all">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-bold text-slate-500">Tokens dùng hôm nay</span>
-            <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Zap className="w-4 h-4" />
             </div>
           </div>
@@ -340,10 +340,10 @@ export function AdminAIConfigPage() {
             <p className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">1.482.500</p>
             <div className="flex items-center justify-between text-[11px] text-slate-500 mt-2 mb-1.5">
               <span>Hạn mức 1.8M/ngày</span>
-              <span className="font-extrabold text-sky-600">82%</span>
+              <span className="font-extrabold text-emerald-600">82%</span>
             </div>
             <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-              <div className="bg-gradient-to-r from-sky-500 to-cyan-500 h-full rounded-full transition-all duration-500" style={{ width: '82%' }}></div>
+              <div className="bg-gradient-to-r from-emerald-500 to-cyan-500 h-full rounded-full transition-all duration-500" style={{ width: '82%' }}></div>
             </div>
           </div>
         </div>
@@ -366,7 +366,7 @@ export function AdminAIConfigPage() {
             <p className="text-[11px] text-slate-500 mt-1 truncate">
               Fallback: <span className="font-semibold text-slate-700">GPT-4o-mini & Haiku</span>
             </p>
-            <div className="mt-3 text-sky-600 text-[11px] font-bold flex items-center gap-1.5">
+            <div className="mt-3 text-emerald-600 text-[11px] font-bold flex items-center gap-1.5">
               <RefreshCw className="w-3.5 h-3.5 animate-spin-slow" />
               <span>Auto-Switching Ready</span>
             </div>
@@ -426,7 +426,7 @@ export function AdminAIConfigPage() {
         <div className="lg:col-span-6 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <SlidersHorizontal className="w-5 h-5" />
               </div>
               <div>
@@ -434,7 +434,7 @@ export function AdminAIConfigPage() {
                 <p className="text-xs text-slate-400">Thiết lập kết nối mô hình và tham số suy luận du lịch.</p>
               </div>
             </div>
-            <span className="px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 font-bold text-[10px] tracking-wider uppercase">
+            <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[10px] tracking-wider uppercase">
               Inference Tuning
             </span>
           </div>
@@ -447,7 +447,7 @@ export function AdminAIConfigPage() {
             <select
               value={config.model}
               onChange={(e) => updateConfig('model', e.target.value)}
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm text-slate-800 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 font-medium"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm text-slate-800 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 font-medium"
             >
               {MODELS.map(item => (
                 <option key={item.id} value={item.id}>
@@ -461,12 +461,12 @@ export function AdminAIConfigPage() {
           </div>
 
           {/* Temperature Slider */}
-          <div className="bg-sky-50/50 rounded-2xl p-4 border border-sky-100/80 space-y-3">
+          <div className="bg-emerald-50/50 rounded-2xl p-4 border border-emerald-100/80 space-y-3">
             <div className="flex items-center justify-between">
               <label htmlFor="temperature-slider" className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                 <span>Temperature (Độ ngẫu nhiên / Sáng tạo)</span>
               </label>
-              <span className="px-3 py-1 rounded-lg bg-white border border-sky-200 text-sky-700 font-mono font-extrabold text-xs shadow-xs">
+              <span className="px-3 py-1 rounded-lg bg-white border border-emerald-200 text-emerald-700 font-mono font-extrabold text-xs shadow-xs">
                 {Number(config.temperature).toFixed(2)}
               </span>
             </div>
@@ -479,12 +479,12 @@ export function AdminAIConfigPage() {
               step="0.05"
               value={config.temperature}
               onChange={(e) => updateConfig('temperature', Number(e.target.value))}
-              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-sky-600"
+              className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
             />
 
             <div className="flex items-center justify-between text-[10px] text-slate-500 font-medium">
               <span>0.0 (Chính xác địa lý tuyệt đối)</span>
-              <span className="text-sky-700 font-bold">0.4 (Cân bằng du lịch chuẩn)</span>
+              <span className="text-emerald-700 font-bold">0.4 (Cân bằng du lịch chuẩn)</span>
               <span>1.0 (Rất sáng tạo)</span>
             </div>
           </div>
@@ -503,7 +503,7 @@ export function AdminAIConfigPage() {
                 step="64"
                 value={config.maxTokens}
                 onChange={(e) => updateConfig('maxTokens', e.target.value === '' ? '' : Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm text-slate-800 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm text-slate-800 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
               />
               <p className="text-[10px] text-slate-400">Giới hạn output lịch trình tối đa.</p>
               {errors.maxTokens && <p className="text-[10px] text-rose-600">{errors.maxTokens}</p>}
@@ -521,7 +521,7 @@ export function AdminAIConfigPage() {
                 step="0.05"
                 value={config.topP}
                 onChange={(e) => updateConfig('topP', e.target.value === '' ? '' : Number(e.target.value))}
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm text-slate-800 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs sm:text-sm text-slate-800 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
               />
               <p className="text-[10px] text-slate-400">Ngưỡng Nucleus sampling.</p>
               {errors.topP && <p className="text-[10px] text-rose-600">{errors.topP}</p>}
@@ -540,7 +540,7 @@ export function AdminAIConfigPage() {
               className="flex items-start justify-between gap-3 p-3.5 rounded-2xl bg-slate-50 hover:bg-slate-100/80 border border-slate-200/60 transition-colors cursor-pointer"
             >
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center shrink-0 mt-0.5">
+                <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
                   <Database className="w-4 h-4" />
                 </div>
                 <div>
@@ -550,7 +550,7 @@ export function AdminAIConfigPage() {
                   </p>
                 </div>
               </div>
-              <div className={`w-10 h-6 rounded-full transition-colors relative shrink-0 mt-1 ${config.cache ? 'bg-sky-600' : 'bg-slate-300'}`}>
+              <div className={`w-10 h-6 rounded-full transition-colors relative shrink-0 mt-1 ${config.cache ? 'bg-emerald-600' : 'bg-slate-300'}`}>
                 <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${config.cache ? 'left-5' : 'left-1'}`}></div>
               </div>
             </div>
@@ -571,7 +571,7 @@ export function AdminAIConfigPage() {
                   </p>
                 </div>
               </div>
-              <div className={`w-10 h-6 rounded-full transition-colors relative shrink-0 mt-1 ${config.fallback ? 'bg-sky-600' : 'bg-slate-300'}`}>
+              <div className={`w-10 h-6 rounded-full transition-colors relative shrink-0 mt-1 ${config.fallback ? 'bg-emerald-600' : 'bg-slate-300'}`}>
                 <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${config.fallback ? 'left-5' : 'left-1'}`}></div>
               </div>
             </div>
@@ -623,21 +623,21 @@ export function AdminAIConfigPage() {
                   </p>
                 </div>
               </div>
-              <div className={`w-10 h-6 rounded-full transition-colors relative shrink-0 mt-1 ${config.grounding ? 'bg-sky-600' : 'bg-slate-300'}`}>
+              <div className={`w-10 h-6 rounded-full transition-colors relative shrink-0 mt-1 ${config.grounding ? 'bg-emerald-600' : 'bg-slate-300'}`}>
                 <div className={`w-4 h-4 rounded-full bg-white absolute top-1 transition-transform ${config.grounding ? 'left-5' : 'left-1'}`}></div>
               </div>
             </div>
           </div>
 
           {/* Gemini API Key Vault & Endpoint Gateway Card */}
-          <div className="p-4 rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50/70 to-white space-y-3.5">
+          <div className="p-4 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-50/70 to-white space-y-3.5">
             {/* Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <KeyRound className="w-4 h-4 text-sky-600" />
+                <KeyRound className="w-4 h-4 text-emerald-600" />
                 <span className="text-xs font-bold text-slate-800">Gemini API Key & Endpoint Gateway</span>
               </div>
-              <span className="px-2 py-0.5 rounded-md bg-sky-100 text-sky-700 font-bold text-[10px]">
+              <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-700 font-bold text-[10px]">
                 Google AI Studio / Live
               </span>
             </div>
@@ -676,10 +676,10 @@ export function AdminAIConfigPage() {
             </div>
 
             {/* API Endpoint Gateway URL Row */}
-            <div className="space-y-1 pt-1 border-t border-sky-100">
+            <div className="space-y-1 pt-1 border-t border-emerald-100">
               <div className="flex items-center justify-between">
                 <label className="text-[11px] font-bold text-slate-600 flex items-center gap-1.5">
-                  <Globe className="w-3 h-3 text-sky-600" />
+                  <Globe className="w-3 h-3 text-emerald-600" />
                   <span>Link API Endpoint Gemini (Base URL)</span>
                 </label>
                 <button
@@ -688,7 +688,7 @@ export function AdminAIConfigPage() {
                     updateConfig('apiEndpoint', 'https://generativelanguage.googleapis.com/v1beta');
                     toast.info('Đã khôi phục Link API Gemini mặc định!');
                   }}
-                  className="text-[10px] text-sky-600 hover:underline font-semibold cursor-pointer"
+                  className="text-[10px] text-emerald-600 hover:underline font-semibold cursor-pointer"
                   title="Khôi phục link chính thức của Google"
                 >
                   Khôi phục mặc định
@@ -701,7 +701,7 @@ export function AdminAIConfigPage() {
                     value={config.apiEndpoint || 'https://generativelanguage.googleapis.com/v1beta'}
                     onChange={(e) => updateConfig('apiEndpoint', e.target.value)}
                     placeholder="https://generativelanguage.googleapis.com/v1beta"
-                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-mono text-slate-700 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-mono text-slate-700 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                   />
                 </div>
                 <button
@@ -715,7 +715,7 @@ export function AdminAIConfigPage() {
                       toast.error(`Kết nối thất bại: ${res.error}`);
                     }
                   }}
-                  className="px-3.5 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold hover:bg-sky-700 transition-all shadow-xs cursor-pointer shrink-0"
+                  className="px-3.5 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-all shadow-xs cursor-pointer shrink-0"
                 >
                   Kiểm tra
                 </button>
@@ -725,7 +725,7 @@ export function AdminAIConfigPage() {
               </p>
             </div>
 
-            <p className="text-[11px] text-slate-500 flex items-center justify-between pt-1 border-t border-sky-100">
+            <p className="text-[11px] text-slate-500 flex items-center justify-between pt-1 border-t border-emerald-100">
               <span>Hạn mức tháng: $640.20 / $1,000.00 Credit limit</span>
               <span className="text-emerald-600 font-bold flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -756,13 +756,13 @@ export function AdminAIConfigPage() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                <Terminal className="w-4 h-4 text-sky-600" />
+                <Terminal className="w-4 h-4 text-emerald-600" />
                 <span>Master System Prompt (Định hình trí tuệ du lịch)</span>
               </label>
               <button
                 type="button"
                 onClick={() => setActiveModal('history')}
-                className="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 transition-colors"
+                className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
               >
                 <History className="w-3.5 h-3.5" />
                 <span>Lịch sử Prompt</span>
@@ -773,7 +773,7 @@ export function AdminAIConfigPage() {
               rows={8}
               value={config.systemPrompt}
               onChange={(e) => updateConfig('systemPrompt', e.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 font-mono text-xs text-slate-800 leading-relaxed outline-none transition focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 resize-y"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 font-mono text-xs text-slate-800 leading-relaxed outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 resize-y"
             ></textarea>
 
             <div className="flex items-center justify-between text-[11px] text-slate-400">
@@ -798,7 +798,7 @@ export function AdminAIConfigPage() {
                     onClick={() => updateConfig('tone', tone.id)}
                     className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-bold transition-all shadow-xs ${
                       isSelected
-                        ? 'bg-sky-600 text-white shadow-sky-500/20'
+                        ? 'bg-emerald-600 text-white shadow-emerald-500/20'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'
                     }`}
                   >
@@ -820,7 +820,7 @@ export function AdminAIConfigPage() {
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <span>Bộ lọc An toàn & Ngăn chặn Jailbreak</span>
               </label>
-              <span className="text-[10px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded">Standard Safety API</span>
+              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Standard Safety API</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -917,7 +917,7 @@ export function AdminAIConfigPage() {
               value={sandboxPrompt}
               onChange={(e) => setSandboxPrompt(e.target.value)}
               placeholder="Nhập yêu cầu tạo lịch trình thử nghiệm..."
-              className="w-full rounded-2xl border border-slate-200 bg-slate-50 pl-4 pr-10 py-3 text-xs sm:text-sm text-slate-800 outline-none transition focus:border-sky-500 focus:bg-white focus:ring-4 focus:ring-sky-500/10 font-medium"
+              className="w-full rounded-2xl border border-slate-200 bg-slate-50 pl-4 pr-10 py-3 text-xs sm:text-sm text-slate-800 outline-none transition focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10 font-medium"
             />
           </div>
 
@@ -925,7 +925,7 @@ export function AdminAIConfigPage() {
             type="button"
             onClick={handleRunSandbox}
             disabled={isRunningSandbox}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all shrink-0 disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all shrink-0 disabled:opacity-50"
           >
             {isRunningSandbox ? (
               <>
@@ -964,7 +964,7 @@ export function AdminAIConfigPage() {
                   type="button"
                   onClick={() => setSandboxTab('visual')}
                   className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
-                    sandboxTab === 'visual' ? 'bg-white text-sky-700 shadow-xs' : 'text-slate-500'
+                    sandboxTab === 'visual' ? 'bg-white text-emerald-700 shadow-xs' : 'text-slate-500'
                   }`}
                 >
                   Xem trực quan
@@ -973,7 +973,7 @@ export function AdminAIConfigPage() {
                   type="button"
                   onClick={() => setSandboxTab('json')}
                   className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
-                    sandboxTab === 'json' ? 'bg-white text-sky-700 shadow-xs' : 'text-slate-500'
+                    sandboxTab === 'json' ? 'bg-white text-emerald-700 shadow-xs' : 'text-slate-500'
                   }`}
                 >
                   JSON thô
@@ -983,7 +983,7 @@ export function AdminAIConfigPage() {
               <button
                 type="button"
                 onClick={() => handleCopyJson(currentItinerary)}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-sky-700 text-xs font-bold shadow-xs transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-emerald-700 text-xs font-bold shadow-xs transition-colors"
               >
                 <Copy className="w-3.5 h-3.5" />
                 <span>Sao chép JSON</span>
@@ -996,7 +996,7 @@ export function AdminAIConfigPage() {
             <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
                 <div>
-                  <h3 className="font-display text-base font-extrabold text-sky-800">
+                  <h3 className="font-display text-base font-extrabold text-emerald-800">
                     {currentItinerary.title}
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -1012,7 +1012,7 @@ export function AdminAIConfigPage() {
                 {currentItinerary.days.map((dayObj) => (
                   <div key={dayObj.day} className="p-4 rounded-xl bg-slate-50 border border-slate-200/60 space-y-3">
                     <h4 className="text-xs font-bold text-slate-800 flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-lg bg-sky-600 text-white flex items-center justify-center font-extrabold text-[11px]">
+                      <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-extrabold text-[11px]">
                         N{dayObj.day}
                       </span>
                       <span>{dayObj.title}</span>
@@ -1021,7 +1021,7 @@ export function AdminAIConfigPage() {
                     <div className="space-y-2.5 pt-1">
                       {dayObj.activities.map((act, i) => (
                         <div key={i} className="flex items-start gap-2.5 text-xs">
-                          <span className="font-mono font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded text-[11px] shrink-0">
+                          <span className="font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded text-[11px] shrink-0">
                             {act.time}
                           </span>
                           <div>
@@ -1036,7 +1036,7 @@ export function AdminAIConfigPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-slate-900 rounded-2xl p-4 overflow-x-auto text-sky-200 font-mono text-xs leading-relaxed max-h-96">
+            <div className="bg-slate-900 rounded-2xl p-4 overflow-x-auto text-emerald-200 font-mono text-xs leading-relaxed max-h-96">
               <pre>{JSON.stringify(currentItinerary, null, 2)}</pre>
             </div>
           )}
@@ -1073,7 +1073,7 @@ export function AdminAIConfigPage() {
                 setCurrentPage(1);
               }}
               placeholder="Tìm mã yêu cầu, tác vụ, người dùng..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3.5 py-2 text-xs text-slate-800 outline-none transition focus:border-sky-500 focus:bg-white"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-3.5 py-2 text-xs text-slate-800 outline-none transition focus:border-emerald-500 focus:bg-white"
             />
           </div>
 
@@ -1142,7 +1142,7 @@ export function AdminAIConfigPage() {
                 const statusMeta = STATUS[log.status] || STATUS.success;
                 return (
                   <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3.5 px-4 font-mono font-bold text-sky-700 whitespace-nowrap">
+                    <td className="py-3.5 px-4 font-mono font-bold text-emerald-700 whitespace-nowrap">
                       #{log.id}
                     </td>
                     <td className="py-3.5 px-4 font-semibold text-slate-800">
@@ -1150,7 +1150,7 @@ export function AdminAIConfigPage() {
                         {log.status === 'blocked' ? (
                           <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0" />
                         ) : (
-                          <MapPin className="w-4 h-4 text-sky-600 shrink-0" />
+                          <MapPin className="w-4 h-4 text-emerald-600 shrink-0" />
                         )}
                         <span>{log.task}</span>
                       </div>
@@ -1181,7 +1181,7 @@ export function AdminAIConfigPage() {
                           setSelectedLog(log);
                           setActiveModal('log-detail');
                         }}
-                        className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-sky-50 text-slate-600 hover:text-sky-700 font-bold text-[11px] transition-colors"
+                        className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 font-bold text-[11px] transition-colors"
                       >
                         JSON
                       </button>
@@ -1224,7 +1224,7 @@ export function AdminAIConfigPage() {
                 onClick={() => setCurrentPage(i + 1)}
                 className={`w-7 h-7 rounded-lg text-xs font-bold transition-colors ${
                   currentPage === i + 1
-                    ? 'bg-sky-600 text-white'
+                    ? 'bg-emerald-600 text-white'
                     : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
                 }`}
               >
@@ -1252,7 +1252,7 @@ export function AdminAIConfigPage() {
           <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 space-y-5 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                   <Wifi className="w-5 h-5" />
                 </div>
                 <h3 className="font-display font-extrabold text-base text-slate-900">Kiểm tra kết nối AI Gateway</h3>
@@ -1277,7 +1277,7 @@ export function AdminAIConfigPage() {
                   {testStep > item.step ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   ) : testStep === item.step ? (
-                    <RefreshCw className="w-4 h-4 text-sky-600 animate-spin shrink-0" />
+                    <RefreshCw className="w-4 h-4 text-emerald-600 animate-spin shrink-0" />
                   ) : (
                     <div className="w-4 h-4 rounded-full border border-slate-300 shrink-0"></div>
                   )}
@@ -1303,7 +1303,7 @@ export function AdminAIConfigPage() {
             <button
               type="button"
               onClick={() => setActiveModal(null)}
-              className="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs transition-colors shadow-sm"
+              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors shadow-sm"
             >
               Đóng cửa sổ
             </button>
@@ -1317,7 +1317,7 @@ export function AdminAIConfigPage() {
           <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <KeyRound className="w-5 h-5 text-sky-600" />
+                <KeyRound className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-display font-extrabold text-base text-slate-900">Cập nhật Gemini API Key</h3>
               </div>
               <button
@@ -1337,7 +1337,7 @@ export function AdminAIConfigPage() {
                   defaultValue={config.apiKey}
                   id="new-api-key-input"
                   placeholder="AIzaSy... hoặc AQ.Ab8..."
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-mono text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-mono text-slate-800 outline-none focus:border-emerald-500 focus:bg-white"
                 />
                 <p className="text-[11px] text-slate-400">
                   Khóa được bảo vệ trong Vault an toàn dùng cho toàn bộ hệ thống WanderAI.
@@ -1347,7 +1347,7 @@ export function AdminAIConfigPage() {
               <div className="space-y-1.5 pt-2 border-t border-slate-100">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                    <Globe className="w-3.5 h-3.5 text-sky-600" />
+                    <Globe className="w-3.5 h-3.5 text-emerald-600" />
                     <span>Link API Gemini (Base URL Endpoint)</span>
                   </label>
                   <button
@@ -1356,7 +1356,7 @@ export function AdminAIConfigPage() {
                       const input = document.getElementById('new-api-endpoint-input');
                       if (input) input.value = 'https://generativelanguage.googleapis.com/v1beta';
                     }}
-                    className="text-[10px] text-sky-600 hover:underline font-semibold cursor-pointer"
+                    className="text-[10px] text-emerald-600 hover:underline font-semibold cursor-pointer"
                   >
                     Điền link gốc
                   </button>
@@ -1366,7 +1366,7 @@ export function AdminAIConfigPage() {
                   defaultValue={config.apiEndpoint || 'https://generativelanguage.googleapis.com/v1beta'}
                   id="new-api-endpoint-input"
                   placeholder="https://generativelanguage.googleapis.com/v1beta"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-mono text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-mono text-slate-800 outline-none focus:border-emerald-500 focus:bg-white"
                 />
                 <p className="text-[11px] text-slate-400">
                   Hỗ trợ link API chính thức hoặc link Reverse Proxy / AI Gateway trung gian.
@@ -1396,7 +1396,7 @@ export function AdminAIConfigPage() {
                   toast.success('Đã cập nhật cấu hình API Key & Link Endpoint thành công!');
                   setActiveModal(null);
                 }}
-                className="px-5 py-2 rounded-xl bg-sky-600 text-white font-bold text-xs hover:bg-sky-700 shadow-sm"
+                className="px-5 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 shadow-sm"
               >
                 Xác nhận lưu
               </button>
@@ -1411,7 +1411,7 @@ export function AdminAIConfigPage() {
           <div className="bg-white rounded-3xl p-6 max-w-lg w-full shadow-2xl border border-slate-200 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <History className="w-5 h-5 text-sky-600" />
+                <History className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-display font-extrabold text-base text-slate-900">Lịch sử Phiên bản Master Prompt</h3>
               </div>
               <button
@@ -1427,7 +1427,7 @@ export function AdminAIConfigPage() {
               {PROMPT_HISTORY.map((hist, i) => (
                 <div key={i} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-sky-700 bg-sky-100 px-2 py-0.5 rounded">
+                    <span className="font-bold text-xs text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
                       {hist.version}
                     </span>
                     <span className="text-[10px] text-slate-400 font-mono">{hist.updatedAt}</span>
@@ -1442,7 +1442,7 @@ export function AdminAIConfigPage() {
                         setActiveModal(null);
                         toast.info(`Đã khôi phục prompt phiên bản ${hist.version}!`);
                       }}
-                      className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-sky-700 hover:bg-sky-50 text-xs font-bold shadow-xs"
+                      className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-emerald-700 hover:bg-emerald-50 text-xs font-bold shadow-xs"
                     >
                       Khôi phục bản này
                     </button>
@@ -1480,7 +1480,7 @@ export function AdminAIConfigPage() {
               <button
                 type="button"
                 onClick={handleRestoreDefaults}
-                className="px-5 py-2 rounded-xl bg-sky-600 text-white font-bold text-xs hover:bg-sky-700 shadow-sm"
+                className="px-5 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 shadow-sm"
               >
                 Xác nhận khôi phục
               </button>
@@ -1495,7 +1495,7 @@ export function AdminAIConfigPage() {
           <div className="bg-white rounded-3xl p-6 max-w-xl w-full shadow-2xl border border-slate-200 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FileJson className="w-5 h-5 text-sky-600" />
+                <FileJson className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-display font-extrabold text-base text-slate-900">
                   Chi tiết Request #{selectedLog.id}
                 </h3>
@@ -1530,7 +1530,7 @@ export function AdminAIConfigPage() {
 
             <div className="space-y-1.5">
               <span className="text-xs font-bold text-slate-700">JSON Payload & Metadata</span>
-              <div className="bg-slate-900 rounded-xl p-3.5 text-sky-200 font-mono text-[11px] leading-relaxed max-h-60 overflow-y-auto">
+              <div className="bg-slate-900 rounded-xl p-3.5 text-emerald-200 font-mono text-[11px] leading-relaxed max-h-60 overflow-y-auto">
                 <pre>{JSON.stringify(selectedLog, null, 2)}</pre>
               </div>
             </div>
@@ -1547,7 +1547,7 @@ export function AdminAIConfigPage() {
               <button
                 type="button"
                 onClick={() => setActiveModal(null)}
-                className="px-5 py-2 rounded-xl bg-sky-600 text-white font-bold text-xs hover:bg-sky-700"
+                className="px-5 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700"
               >
                 Đóng
               </button>
@@ -1583,7 +1583,7 @@ export function AdminAIConfigPage() {
                 step="0.05"
                 defaultValue={config.seasonMultiplier}
                 id="multiplier-input"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm font-bold text-slate-800 outline-none focus:border-emerald-500 focus:bg-white"
               />
               <p className="text-[11px] text-slate-400">
                 Ví dụ: 1.15x sẽ tự động cộng 15% vào giá vé và phòng nghỉ ước tính trong lịch trình.
@@ -1620,3 +1620,4 @@ export function AdminAIConfigPage() {
     </div>
   );
 }
+

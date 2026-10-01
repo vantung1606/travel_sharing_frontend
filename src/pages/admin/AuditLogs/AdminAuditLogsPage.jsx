@@ -138,7 +138,7 @@ export const AdminAuditLogsPage = () => {
     }
     if (act.includes('REGISTER')) {
       return {
-        bg: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800',
+        bg: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800',
         icon: UserPlus,
         label: 'Đăng ký'
       };
@@ -216,7 +216,7 @@ export const AdminAuditLogsPage = () => {
       case 'ACTIVITY':
       default:
         return {
-          bg: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800',
+          bg: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800',
           label: '🧭 ACTIVITY',
           title: 'Nhật ký Hoạt động Nghiệp vụ'
         };
@@ -309,7 +309,7 @@ export const AdminAuditLogsPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-2xl bg-sky-600/10 text-sky-600 flex items-center justify-center font-bold">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-600/10 text-emerald-600 flex items-center justify-center font-bold">
               <History className="w-5 h-5" />
             </div>
             <div>
@@ -329,7 +329,7 @@ export const AdminAuditLogsPage = () => {
             className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
             title="Tải lại nhật ký"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-sky-600' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-emerald-600' : ''}`} />
             <span>Làm mới</span>
           </button>
 
@@ -344,7 +344,7 @@ export const AdminAuditLogsPage = () => {
 
           <button
             onClick={handleExportCSV}
-            className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs hover:shadow-md cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs hover:shadow-md cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Xuất CSV</span>
@@ -355,7 +355,7 @@ export const AdminAuditLogsPage = () => {
       {/* 2. Top Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
+          <div className="w-11 h-11 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <Layers className="w-5 h-5" />
           </div>
           <div>
@@ -428,7 +428,7 @@ export const AdminAuditLogsPage = () => {
                 onClick={() => { setSelectedCategory(tab.id); setPage(0); }}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
                   active
-                    ? 'bg-slate-900 text-white shadow-xs dark:bg-sky-600'
+                    ? 'bg-slate-900 text-white shadow-xs dark:bg-emerald-600'
                     : 'bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
@@ -453,7 +453,7 @@ export const AdminAuditLogsPage = () => {
               value={keyword}
               onChange={(e) => { setKeyword(e.target.value); setPage(0); }}
               placeholder="Tìm hành động, nội dung, IP, tên hoặc email..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
             />
           </div>
 
@@ -464,7 +464,7 @@ export const AdminAuditLogsPage = () => {
               <select
                 value={selectedUserId}
                 onChange={(e) => { setSelectedUserId(e.target.value); setPage(0); }}
-                className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all appearance-none cursor-pointer"
+                className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all appearance-none cursor-pointer"
               >
                 <option value="">— Lọc theo tất cả người dùng —</option>
                 {usersList.map((u) => (
@@ -482,7 +482,7 @@ export const AdminAuditLogsPage = () => {
             <select
               value={selectedAction}
               onChange={(e) => { setSelectedAction(e.target.value); setPage(0); }}
-              className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
+              className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all cursor-pointer"
             >
               <option value="ALL">Tất cả loại hành động</option>
               {actionsList.map((act) => (
@@ -513,7 +513,7 @@ export const AdminAuditLogsPage = () => {
             )}
 
             {selectedUserObj && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-semibold">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold">
                 <User className="w-3 h-3" />
                 <span>Người dùng: {selectedUserObj.fullName}</span>
                 <button
@@ -580,7 +580,7 @@ export const AdminAuditLogsPage = () => {
                 <tr>
                   <td colSpan="8" className="py-12 text-center">
                     <div className="inline-flex flex-col items-center gap-2 text-slate-400">
-                      <RefreshCw className="w-6 h-6 animate-spin text-sky-600" />
+                      <RefreshCw className="w-6 h-6 animate-spin text-emerald-600" />
                       <span>Đang tải nhật ký hệ thống...</span>
                     </div>
                   </td>
@@ -647,8 +647,8 @@ export const AdminAuditLogsPage = () => {
                                   onClick={() => handleSelectUserFilter(logItem.userId)}
                                   className={`text-[9px] px-1.5 py-0.5 rounded font-semibold transition-colors cursor-pointer ${
                                     isCurrentFilterUser
-                                      ? 'bg-sky-600 text-white'
-                                      : 'bg-slate-100 dark:bg-slate-700 text-slate-500 hover:bg-sky-100 hover:text-sky-700'
+                                      ? 'bg-emerald-600 text-white'
+                                      : 'bg-slate-100 dark:bg-slate-700 text-slate-500 hover:bg-emerald-100 hover:text-emerald-700'
                                   }`}
                                   title="Lọc chỉ hiển thị nhật ký người dùng này"
                                 >
@@ -699,7 +699,7 @@ export const AdminAuditLogsPage = () => {
                       <td className="py-3 px-4 whitespace-nowrap">
                         <div className="space-y-1">
                           <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold">
-                            <Globe className="w-3 h-3 text-sky-500" />
+                            <Globe className="w-3 h-3 text-emerald-500" />
                             {logItem.ipAddress || '118.69.190.10'}
                           </span>
                           <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium" title={logItem.userAgent}>
@@ -713,7 +713,7 @@ export const AdminAuditLogsPage = () => {
                       <td className="py-3 px-4 text-center">
                         <button
                           onClick={() => setSelectedLog(logItem)}
-                          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-sky-600 transition-colors cursor-pointer"
+                          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-emerald-600 transition-colors cursor-pointer"
                           title="Xem chi tiết nhật ký"
                         >
                           <Eye className="w-4 h-4" />
@@ -772,7 +772,7 @@ export const AdminAuditLogsPage = () => {
           <div className="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 flex items-center justify-center font-bold">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div>
@@ -802,7 +802,7 @@ export const AdminAuditLogsPage = () => {
                     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
                   }
                   alt={selectedLog.userName}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-sky-500/20"
+                  className="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-500/20"
                 />
                 <div>
                   <p className="font-bold text-slate-900 dark:text-white text-sm">
@@ -811,7 +811,7 @@ export const AdminAuditLogsPage = () => {
                   <p className="text-slate-400 text-[11px]">
                     {selectedLog.userEmail} • {selectedLog.userHandle}
                   </p>
-                  <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-300">
+                  <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300">
                     Vai trò: {selectedLog.userRole || 'MEMBER'}
                   </span>
                 </div>
@@ -838,7 +838,7 @@ export const AdminAuditLogsPage = () => {
                   <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
                     Hành động (Action)
                   </label>
-                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 font-mono font-bold text-sky-600 dark:text-sky-400 flex items-center">
+                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 font-mono font-bold text-emerald-600 dark:text-emerald-400 flex items-center">
                     {selectedLog.action}
                   </div>
                 </div>
@@ -894,7 +894,7 @@ export const AdminAuditLogsPage = () => {
                     handleSelectUserFilter(selectedLog.userId);
                     setSelectedLog(null);
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-sky-50 text-sky-700 font-semibold text-xs hover:bg-sky-100 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 font-semibold text-xs hover:bg-emerald-100 transition-colors cursor-pointer"
                 >
                   Lọc tất cả hoạt động của user này
                 </button>
@@ -915,3 +915,4 @@ export const AdminAuditLogsPage = () => {
 };
 
 export default AdminAuditLogsPage;
+

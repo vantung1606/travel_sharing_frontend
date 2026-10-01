@@ -55,10 +55,10 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
         return <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />;
       case 'COMMENT':
       case 'COMMENT_REPLY':
-        return <MessageCircle className="w-3.5 h-3.5 text-sky-500" />;
+        return <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />;
       case 'SHARE':
       case 'COMMUNITY_SHARE':
-        return <Share2 className="w-3.5 h-3.5 text-sky-500" />;
+        return <Share2 className="w-3.5 h-3.5 text-emerald-600" />;
       case 'ITINERARY_SHARED':
         return <ExternalLink className="w-3.5 h-3.5 text-indigo-500" />;
       case 'CHAT_INVITE':
@@ -72,7 +72,7 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
       case 'POST_LOCKED':
         return <ShieldAlert className="w-3.5 h-3.5 text-rose-500" />;
       case 'REPORT_DISMISSED':
-        return <ShieldCheck className="w-3.5 h-3.5 text-sky-500" />;
+        return <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />;
       case 'POST_DELETED':
         return <Trash2 className="w-3.5 h-3.5 text-rose-500" />;
       case 'REPORT_ALERT':
@@ -157,7 +157,7 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
           <button
             type="button"
             onClick={markAllNotificationsAsRead}
-            className="inline-flex items-center gap-1 text-[11px] font-bold text-sky-600 hover:text-sky-700 transition-colors"
+            className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 hover:text-emerald-800 transition-colors"
           >
             <CheckCheck className="w-3.5 h-3.5" />
             <span>Đã đọc tất cả</span>
@@ -173,7 +173,7 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
               key={item.id}
               onClick={() => handleNotificationClick(item)}
               className={`p-3.5 flex items-start gap-3 hover:bg-slate-50 transition-colors cursor-pointer group relative ${
-                !item.isRead ? 'bg-sky-50/40' : ''
+                !item.isRead ? 'bg-emerald-50/40' : ''
               }`}
             >
               {/* Actor Avatar with Type Badge */}
@@ -213,7 +213,7 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
               {/* Unread indicator or Delete button */}
               <div className="shrink-0 flex items-center gap-1 self-center">
                 {!item.isRead ? (
-                  <span className="w-2.5 h-2.5 rounded-full bg-sky-600 block"></span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 block"></span>
                 ) : (
                   <button
                     type="button"
@@ -244,7 +244,7 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
         <button
           type="button"
           onClick={handleViewAll}
-          className="w-full py-2 rounded-xl bg-slate-50 hover:bg-sky-50 text-sky-700 font-extrabold text-xs flex items-center justify-center gap-1.5 transition-colors"
+          className="w-full py-2 rounded-xl bg-slate-50 hover:bg-emerald-50 text-emerald-800 font-extrabold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
         >
           <span>Xem tất cả thông báo</span>
           <ChevronRight className="w-4 h-4" />

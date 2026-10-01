@@ -58,10 +58,10 @@ export const AdminRevenuePage = () => {
       title: '2. Phí quảng cáo & Hiển thị ưu tiên cho Đối tác (Sponsored Listings)',
       type: 'Nguồn thu doanh nghiệp (B2B)',
       status: 'Đang thiết kế phân hệ Merchant Portal',
-      statusColor: 'bg-sky-100 text-sky-800 border-sky-200',
+      statusColor: 'bg-emerald-100 text-emerald-800 border-emerald-200',
       estimate: '499.000đ - 1.499.000đ / tháng',
       icon: Building2,
-      iconBg: 'bg-sky-500/10 text-sky-600',
+      iconBg: 'bg-emerald-500/10 text-emerald-600',
       description: 'Các chủ nhà hàng, cafe, homestay trả phí để xuất hiện ở vị trí đầu trang Khám phá hoặc được thuật toán AI ưu tiên gợi ý vào kế hoạch chuyến đi.',
       keyPoints: [
         'Vị trí hiển thị nổi bật với huy hiệu "Đối tác xác thực" hoặc "Được yêu thích".',
@@ -122,8 +122,8 @@ export const AdminRevenuePage = () => {
     <div className="space-y-6 animate-fadeIn pb-12">
       
       {/* Top Banner with In-Development Badge */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-sky-950 text-white rounded-2xl p-6 sm:p-8 shadow-lg border border-slate-700/60 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 text-white rounded-2xl p-6 sm:p-8 shadow-lg border border-slate-700/60 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-3 max-w-3xl">
@@ -143,7 +143,7 @@ export const AdminRevenuePage = () => {
 
           <button
             onClick={() => toast.info('Tính năng Thống kê Doanh Thu Real-time đang trong quá trình kết nối API!')}
-            className="px-5 py-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-extrabold text-xs shadow-lg shadow-sky-500/30 transition-all cursor-pointer shrink-0 flex items-center gap-2"
+            className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-500/30 transition-all cursor-pointer shrink-0 flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4 text-amber-200" />
             <span>Xem lộ trình triển khai</span>
@@ -176,13 +176,13 @@ export const AdminRevenuePage = () => {
         </div>
 
         <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold shrink-0">
             <Target className="w-6 h-6" />
           </div>
           <div>
             <span className="text-xs font-bold text-slate-400 block">Mục tiêu Doanh thu Năm 1</span>
             <span className="font-display font-extrabold text-lg text-slate-900">1.2 Tỷ VNĐ</span>
-            <span className="text-[10px] text-sky-600 font-semibold block">Kế hoạch thương mại hóa</span>
+            <span className="text-[10px] text-emerald-600 font-semibold block">Kế hoạch thương mại hóa</span>
           </div>
         </div>
 
@@ -201,7 +201,7 @@ export const AdminRevenuePage = () => {
       {/* Detailed Revenue Streams Grid */}
       <div className="space-y-4">
         <h2 className="font-display font-extrabold text-lg text-slate-900 flex items-center gap-2">
-          <BarChart3 className="w-5 h-5 text-sky-600" />
+          <BarChart3 className="w-5 h-5 text-emerald-600" />
           <span>Chi Tiết 5 Kênh Tạo Dòng Tiền (Monetization Channels)</span>
         </h2>
 
@@ -263,3 +263,4 @@ export const AdminRevenuePage = () => {
     </div>
   );
 };
+

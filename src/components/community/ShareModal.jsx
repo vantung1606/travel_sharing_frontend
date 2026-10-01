@@ -191,7 +191,7 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
                             }}
                             className={`w-full px-3 py-2 text-left text-xs flex items-center justify-between transition-colors cursor-pointer ${
                               isSelected
-                                ? 'bg-sky-50 text-sky-700 font-bold'
+                                ? 'bg-emerald-50 text-emerald-700 font-bold'
                                 : 'text-slate-700 hover:bg-slate-50'
                             }`}
                           >
@@ -199,7 +199,7 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
                               <Icon className="w-3.5 h-3.5" />
                               <span>{config.label}</span>
                             </span>
-                            {isSelected && <Check className="w-3.5 h-3.5 text-sky-600" />}
+                            {isSelected && <Check className="w-3.5 h-3.5 text-emerald-600" />}
                           </button>
                         );
                       })}
@@ -279,7 +279,7 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
               />
             )}
             <div className="min-w-0 flex-1">
-              <span className="text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md inline-block mb-1">
+              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md inline-block mb-1">
                 {post.category || 'Wayfare Community'}
               </span>
               <h5 className="font-extrabold text-xs sm:text-sm text-slate-900 truncate">
@@ -381,7 +381,7 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
                   )}
                 </div>
                 <div className="text-left">
-                  <div className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-sky-600 transition-colors">
+                  <div className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-emerald-600 transition-colors">
                     {copied ? 'Đã sao chép liên kết!' : 'Sao chép liên kết'}
                   </div>
                   <div className="text-[11px] text-slate-400 font-medium truncate max-w-[240px] sm:max-w-[320px]">
@@ -389,7 +389,7 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
                   </div>
                 </div>
               </div>
-              <span className="text-xs font-bold text-sky-600 group-hover:underline">
+              <span className="text-xs font-bold text-emerald-600 group-hover:underline">
                 {copied ? 'Đã chép' : 'Sao chép'}
               </span>
             </button>
@@ -401,3 +401,4 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
     </div>
   );
 };
+

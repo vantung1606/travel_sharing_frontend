@@ -53,14 +53,14 @@ export const AdminHeader = () => {
             <input
               type="text"
               placeholder="Tìm kiếm người dùng, địa điểm, bài viết, mã vé..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-100/80 text-slate-800 rounded-full text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:bg-white transition-all"
+              className="w-full pl-10 pr-4 py-2 bg-slate-100/80 text-slate-800 rounded-full text-xs placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white transition-all"
             />
           </div>
         </div>
 
         {/* Active Page Breadcrumb Indicator */}
         <div className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 shadow-2xs">
-          <Shield className="w-3.5 h-3.5 text-sky-600" />
+          <Shield className="w-3.5 h-3.5 text-emerald-600" />
           <span>{ADMIN_TAB_NAMES[adminTab] || 'Quản trị hệ thống'}</span>
         </div>
 
@@ -68,7 +68,7 @@ export const AdminHeader = () => {
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <button
             onClick={() => setAdminTab('places')}
-            className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
+            className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Thêm địa điểm</span>
@@ -105,7 +105,7 @@ export const AdminHeader = () => {
             className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
             title="Bấm để chuyển về Giao diện Người dùng"
           >
-            <div className="w-7 h-7 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center">
+            <div className="w-7 h-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center">
               MQ
             </div>
             <span className="text-xs font-bold text-slate-700 hidden sm:inline">User Mode</span>
@@ -125,3 +125,4 @@ export const AdminHeader = () => {
     </>
   );
 };
+

@@ -126,7 +126,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
       <div className="relative w-full max-w-6xl bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] border border-slate-200/80 my-auto">
         
         {/* Top Gradient Accent Bar */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-sky-600 via-teal-500 to-amber-500 shrink-0" />
+        <div className="h-1.5 w-full bg-gradient-to-r from-emerald-600 via-teal-500 to-amber-500 shrink-0" />
 
         {/* ─── 1. MODAL HEADER ─────────────────────────────────────────────────── */}
         <div className="px-6 py-5 bg-white border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
@@ -138,8 +138,8 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                 <span>{itinerary.countdown || 'Sắp khởi hành · Còn 4 ngày'}</span>
               </span>
 
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sky-50 border border-sky-200/60 text-sky-800 text-xs font-bold">
-                <Sparkles className="w-3.5 h-3.5 text-sky-600" />
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200/60 text-emerald-800 text-xs font-bold">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
                 <span>{itinerary.isAiGenerated ? '✨ Khởi tạo bởi WanderAI Pro' : '📌 Lịch trình tự lên kế hoạch'}</span>
               </span>
             </div>
@@ -152,7 +152,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
             {/* Meta row */}
             <div className="flex flex-wrap items-center gap-4 text-xs text-slate-600 pt-0.5">
               <span className="flex items-center gap-1.5 font-semibold">
-                <Calendar className="w-4 h-4 text-sky-600" />
+                <Calendar className="w-4 h-4 text-emerald-600" />
                 <span>{itinerary.departureDate || '15/11/2026 – 18/11/2026'}</span>
               </span>
               <span className="text-slate-300">•</span>
@@ -166,7 +166,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                     className="w-6 h-6 rounded-full ring-2 ring-white object-cover shadow-2xs"
                     src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
                   />
-                  <div className="w-6 h-6 rounded-full ring-2 ring-white bg-sky-100 text-sky-700 font-extrabold text-[10px] flex items-center justify-center shadow-2xs">
+                  <div className="w-6 h-6 rounded-full ring-2 ring-white bg-emerald-100 text-emerald-700 font-extrabold text-[10px] flex items-center justify-center shadow-2xs">
                     TN
                   </div>
                   <div className="w-6 h-6 rounded-full ring-2 ring-white bg-teal-100 text-teal-700 font-extrabold text-[10px] flex items-center justify-center shadow-2xs">
@@ -180,7 +180,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                 <button
                   type="button"
                   onClick={() => toast.info('Đã mở hộp thoại mời bạn bè tham gia nhóm hành trình!')}
-                  className="px-2 py-0.5 rounded-full bg-slate-100 text-sky-700 hover:bg-slate-200 text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                  className="px-2 py-0.5 rounded-full bg-slate-100 text-emerald-700 hover:bg-slate-200 text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
                 >
                   <UserPlus className="w-3 h-3" />
                   <span>+ Mời</span>
@@ -196,7 +196,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
               onClick={handleDownloadPDF}
               className="px-3.5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
             >
-              <Download className="w-4 h-4 text-sky-600" />
+              <Download className="w-4 h-4 text-emerald-600" />
               <span className="hidden sm:inline">Tải PDF</span>
             </button>
 
@@ -225,13 +225,13 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
           
           {/* Panel 1: Budget */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white text-sky-600 flex items-center justify-center flex-shrink-0 shadow-2xs border border-slate-200/60">
+            <div className="w-10 h-10 rounded-xl bg-white text-emerald-600 flex items-center justify-center flex-shrink-0 shadow-2xs border border-slate-200/60">
               <DollarSign className="w-5 h-5" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
                 <span className="text-slate-500 font-medium">Ngân sách ước tính</span>
-                <span className="font-extrabold text-sky-600">
+                <span className="font-extrabold text-emerald-600">
                   {Number(itinerary.totalBudget || 15400000).toLocaleString('vi-VN')}đ
                   <span className="text-[10px] font-normal text-slate-400 ml-1">
                     (~{(Number(itinerary.budgetPerPerson || 3850000) / 1000000).toFixed(2)}tr/người)
@@ -240,13 +240,13 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
               </div>
               {/* Segmented bar */}
               <div className="w-full h-2 rounded-full bg-slate-200 overflow-hidden flex mt-1.5">
-                <div className="bg-sky-600 h-full" style={{ width: '40%' }} title="Lưu trú 40%"></div>
+                <div className="bg-emerald-600 h-full" style={{ width: '40%' }} title="Lưu trú 40%"></div>
                 <div className="bg-teal-500 h-full" style={{ width: '30%' }} title="Ăn uống 30%"></div>
                 <div className="bg-amber-500 h-full" style={{ width: '20%' }} title="Vé tham quan 20%"></div>
                 <div className="bg-slate-400 h-full" style={{ width: '10%' }} title="Đi lại 10%"></div>
               </div>
               <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-1">
-                <span className="flex items-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-sky-600 inline-block"></span>Ở 40%</span>
+                <span className="flex items-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-emerald-600 inline-block"></span>Ở 40%</span>
                 <span className="flex items-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-teal-500 inline-block"></span>Ăn 30%</span>
                 <span className="flex items-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block"></span>Vé 20%</span>
                 <span className="flex items-center gap-0.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-400 inline-block"></span>Xe 10%</span>
@@ -304,11 +304,11 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                     onClick={() => setActiveDayIndex(index)}
                     className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap flex items-center gap-1.5 flex-shrink-0 transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-sky-600 text-white shadow-sm'
+                        ? 'bg-emerald-600 text-white shadow-sm'
                         : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200/80 hover:text-slate-900'
                     }`}
                   >
-                    <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-white' : 'bg-sky-500'}`}></span>
+                    <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-white' : 'bg-emerald-500'}`}></span>
                     <span>{d.title || `Ngày ${index + 1}`}</span>
                   </button>
                 );
@@ -320,7 +320,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
               
               {currentDay.activities && currentDay.activities.map((act, actIdx) => {
                 const colors = [
-                  { dot: 'bg-sky-600', badge: 'text-sky-700 bg-sky-50 border-sky-200' },
+                  { dot: 'bg-emerald-600', badge: 'text-emerald-700 bg-emerald-50 border-emerald-200' },
                   { dot: 'bg-teal-600', badge: 'text-teal-700 bg-teal-50 border-teal-200' },
                   { dot: 'bg-amber-500', badge: 'text-amber-800 bg-amber-50 border-amber-200' },
                   { dot: 'bg-purple-600', badge: 'text-purple-700 bg-purple-50 border-purple-200' }
@@ -387,7 +387,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                               href={mapQueryUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="px-2.5 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-[11px] font-bold flex items-center gap-1 shrink-0 transition-colors cursor-pointer border border-sky-200/60"
+                              className="px-2.5 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-bold flex items-center gap-1 shrink-0 transition-colors cursor-pointer border border-emerald-200/60"
                               title="Mở Google Maps chỉ đường"
                             >
                               <span>Google Maps</span>
@@ -415,7 +415,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                           {/* Footer details & micro-actions */}
                           <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100 text-xs">
                             <span className="text-[11px] text-slate-500">
-                              Chi phí dự kiến: <strong className="text-sky-700">{act.cost || 'Miễn phí vé'}</strong>
+                              Chi phí dự kiến: <strong className="text-emerald-700">{act.cost || 'Miễn phí vé'}</strong>
                             </span>
 
                             <div className="flex items-center gap-2">
@@ -427,7 +427,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                                     toast.success('Đã gợi ý điểm check-in thay thế lý tưởng!');
                                   }, 800);
                                 }}
-                                className="text-sky-600 hover:text-sky-700 font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
+                                className="text-emerald-600 hover:text-emerald-700 font-bold text-[11px] flex items-center gap-1 cursor-pointer transition-colors"
                               >
                                 <Sparkles className="w-3 h-3" />
                                 <span>Đổi điểm bằng AI</span>
@@ -463,7 +463,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
             <div className="bg-white rounded-2xl p-4 shadow-xs border border-slate-200/80 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 text-xs font-extrabold text-slate-800">
-                  <Navigation className="w-4 h-4 text-sky-600" />
+                  <Navigation className="w-4 h-4 text-emerald-600" />
                   <span>Bản đồ GPS & Lộ trình Ngày {activeDayIndex + 1}</span>
                 </div>
                 <span className="px-2 py-0.5 rounded-full bg-teal-50 border border-teal-200 text-teal-700 text-[10px] font-extrabold">
@@ -478,7 +478,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                   className="w-full h-full object-cover opacity-65 group-hover:scale-105 transition-transform duration-500"
                   src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=800&q=80"
                 />
-                <div className="absolute inset-0 bg-sky-950/20 backdrop-blur-[0.5px]"></div>
+                <div className="absolute inset-0 bg-emerald-950/20 backdrop-blur-[0.5px]"></div>
 
                 {/* Numbered Pins */}
                 {currentDay.activities && currentDay.activities.slice(0, 4).map((a, i) => {
@@ -489,7 +489,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                     'bottom-4 right-10'
                   ][i] || 'top-10 left-10';
 
-                  const colors = ['bg-sky-600', 'bg-teal-600', 'bg-amber-600', 'bg-purple-600'];
+                  const colors = ['bg-emerald-600', 'bg-teal-600', 'bg-amber-600', 'bg-purple-600'];
 
                   return (
                     <div
@@ -505,17 +505,17 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                 })}
 
                 {/* SVG Route Connector */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none stroke-sky-400 stroke-[3] fill-none stroke-dasharray-[4_4]">
+                <svg className="absolute inset-0 w-full h-full pointer-events-none stroke-emerald-400 stroke-[3] fill-none stroke-dasharray-[4_4]">
                   <path d="M 60 30 Q 140 80 180 100 T 110 170 T 260 210"></path>
                 </svg>
 
                 {/* Live Distance Footer Overlay */}
                 <div className="absolute bottom-2 left-2 right-2 px-3 py-1.5 rounded-lg bg-slate-950/80 backdrop-blur-md text-white flex items-center justify-between text-[11px]">
                   <span className="flex items-center gap-1">
-                    <Compass className="w-3.5 h-3.5 text-sky-400" />
+                    <Compass className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Lộ trình tối ưu vòng tròn</span>
                   </span>
-                  <span className="font-bold text-sky-300">Không đi lặp lại</span>
+                  <span className="font-bold text-emerald-300">Không đi lặp lại</span>
                 </div>
               </div>
 
@@ -540,7 +540,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
             </div>
 
             {/* 2. Trợ lý AI On-the-Go */}
-            <div className="bg-gradient-to-br from-slate-50 via-sky-50/40 to-teal-50/40 p-4 rounded-2xl shadow-xs border border-slate-200/80 space-y-2.5">
+            <div className="bg-gradient-to-br from-slate-50 via-emerald-50/40 to-teal-50/40 p-4 rounded-2xl shadow-xs border border-slate-200/80 space-y-2.5">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
                   <Sparkles className="w-4 h-4" />
@@ -557,10 +557,10 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                 <button
                   type="button"
                   onClick={handleWeatherOptimize}
-                  className="w-full px-3 py-2 rounded-xl bg-white hover:bg-sky-50/80 text-slate-800 text-xs font-semibold flex items-center justify-between transition-colors shadow-2xs border border-slate-200/60 cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-white hover:bg-emerald-50/80 text-slate-800 text-xs font-semibold flex items-center justify-between transition-colors shadow-2xs border border-slate-200/60 cursor-pointer"
                 >
                   <span className="flex items-center gap-2">
-                    <Sun className="w-4 h-4 text-sky-600" />
+                    <Sun className="w-4 h-4 text-emerald-600" />
                     <span>Tối ưu lại nếu có mưa rào</span>
                   </span>
                   <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
@@ -569,7 +569,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                 <button
                   type="button"
                   onClick={handleSuggestCafes}
-                  className="w-full px-3 py-2 rounded-xl bg-white hover:bg-sky-50/80 text-slate-800 text-xs font-semibold flex items-center justify-between transition-colors shadow-2xs border border-slate-200/60 cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-white hover:bg-emerald-50/80 text-slate-800 text-xs font-semibold flex items-center justify-between transition-colors shadow-2xs border border-slate-200/60 cursor-pointer"
                 >
                   <span className="flex items-center gap-2">
                     <Coffee className="w-4 h-4 text-amber-600" />
@@ -581,7 +581,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                 <button
                   type="button"
                   onClick={handleBillSplit}
-                  className="w-full px-3 py-2 rounded-xl bg-white hover:bg-sky-50/80 text-slate-800 text-xs font-semibold flex items-center justify-between transition-colors shadow-2xs border border-slate-200/60 cursor-pointer"
+                  className="w-full px-3 py-2 rounded-xl bg-white hover:bg-emerald-50/80 text-slate-800 text-xs font-semibold flex items-center justify-between transition-colors shadow-2xs border border-slate-200/60 cursor-pointer"
                 >
                   <span className="flex items-center gap-2">
                     <Receipt className="w-4 h-4 text-teal-600" />
@@ -599,7 +599,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                   <CheckCircle2 className="w-4 h-4 text-teal-600" />
                   <span>Checklist hành trang chuẩn bị</span>
                 </h4>
-                <span className="text-[11px] text-sky-600 font-extrabold">
+                <span className="text-[11px] text-emerald-600 font-extrabold">
                   {completedChecklistCount}/{checklist.length} sẵn sàng
                 </span>
               </div>
@@ -618,10 +618,10 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                   <div
                     key={item.id}
                     onClick={() => toggleChecklistItem(item.id)}
-                    className="flex items-center gap-2 cursor-pointer select-none py-1 hover:text-sky-600 transition-colors"
+                    className="flex items-center gap-2 cursor-pointer select-none py-1 hover:text-emerald-600 transition-colors"
                   >
                     {item.done ? (
-                      <CheckSquare className="w-4 h-4 text-sky-600 shrink-0" />
+                      <CheckSquare className="w-4 h-4 text-emerald-600 shrink-0" />
                     ) : (
                       <Square className="w-4 h-4 text-slate-300 shrink-0" />
                     )}
@@ -654,7 +654,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
               onClick={() => setIsExportModalOpen(true)}
               className="flex-1 sm:flex-initial px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <Send className="w-4 h-4 text-sky-600" />
+              <Send className="w-4 h-4 text-emerald-600" />
               <span>Gửi sang Zalo / Lịch Google</span>
             </button>
           </div>
@@ -662,7 +662,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
           <button
             type="button"
             onClick={handleStartOnTheGo}
-            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-sky-600 via-sky-700 to-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.01]"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-full bg-gradient-to-r from-emerald-600 via-emerald-700 to-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.01]"
           >
             <span>Bắt đầu Chế Độ Đi Đường (On-the-Go Mode) 🚀</span>
             <Navigation className="w-4 h-4" />
@@ -681,3 +681,4 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
     </div>
   );
 };
+

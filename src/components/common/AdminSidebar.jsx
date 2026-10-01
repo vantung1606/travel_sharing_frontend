@@ -36,14 +36,14 @@ export const AdminSidebar = ({ onNavigate }) => {
           onClick={() => setAdminTab('dashboard')}
           className="h-16 px-5 flex items-center gap-3 bg-[#283044] border-b border-slate-700/40 cursor-pointer hover:bg-slate-800/50 transition-colors"
         >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-cyan-400 flex items-center justify-center text-white shadow-md">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md">
             <Compass className="w-5 h-5 animate-spin-slow" />
           </div>
           <div className="flex flex-col">
             <span className="font-display font-extrabold text-base text-white tracking-tight leading-tight">
-              Way<span className="text-sky-400">fare</span>
+              Way<span className="text-emerald-400">fare</span>
             </span>
-            <span className="text-[10px] font-extrabold text-sky-300 uppercase tracking-widest">
+            <span className="text-[10px] font-extrabold text-emerald-300 uppercase tracking-widest">
               Admin Portal
             </span>
           </div>
@@ -72,7 +72,7 @@ export const AdminSidebar = ({ onNavigate }) => {
                 aria-current={active ? 'page' : undefined}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   active
-                    ? 'bg-sky-600 text-white shadow-md'
+                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-950/30'
                     : 'text-slate-300 hover:bg-white/10 hover:text-white'
                 }`}
               >
@@ -104,16 +104,16 @@ export const AdminSidebar = ({ onNavigate }) => {
               <img 
                 src={currentUser.avatar} 
                 alt={currentUser.name} 
-                className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-sky-500/30"
+                className="w-9 h-9 rounded-full object-cover shrink-0 ring-1 ring-emerald-500/30"
               />
             ) : (
-              <div className="w-9 h-9 rounded-full bg-sky-600 text-white flex items-center justify-center shrink-0 font-extrabold text-xs shadow-sm">
+              <div className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center shrink-0 font-extrabold text-xs shadow-sm">
                 {currentUser?.name?.charAt(0) || 'A'}
               </div>
             )}
             <div className="truncate">
               <p className="font-bold text-xs text-white truncate">{currentUser?.name || 'Quản Trị Viên'}</p>
-              <p className="text-[10px] text-sky-300 font-semibold truncate">Super Admin</p>
+              <p className="text-[10px] text-emerald-300 font-semibold truncate">Super Admin</p>
             </div>
           </div>
 

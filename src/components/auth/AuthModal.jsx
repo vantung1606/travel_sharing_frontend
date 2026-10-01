@@ -97,10 +97,10 @@ export const AuthModal = () => {
               backgroundImage: `url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1000&q=80')`
             }}
           ></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-sky-950/60"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-emerald-950/60"></div>
           
           {/* Glowing Ambient Light */}
-          <div className="absolute -bottom-10 -left-10 w-64 h-64 rounded-full bg-sky-500/25 blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-10 -left-10 w-64 h-64 rounded-full bg-emerald-500/25 blur-3xl pointer-events-none"></div>
 
           {/* Top Brand Branding */}
           <div className="relative z-10">
@@ -148,7 +148,7 @@ export const AuthModal = () => {
         {/* ========================================================= */}
         {/* DIAGONAL ANGLED SLANT NEON GLOW LINE (DESKTOP)            */}
         {/* ========================================================= */}
-        <div className="hidden lg:block absolute top-0 bottom-0 left-[45%] -ml-1 w-2 border-r-2 border-sky-400/80 shadow-[0_0_15px_rgba(56,189,248,0.7)] z-20 origin-top [clip-path:polygon(100%_0,100%_0,82%_100%,82%_100%)] pointer-events-none"></div>
+        <div className="hidden lg:block absolute top-0 bottom-0 left-[45%] -ml-1 w-2 border-r-2 border-emerald-400/80 shadow-[0_0_15px_rgba(16,185,129,0.7)] z-20 origin-top [clip-path:polygon(100%_0,100%_0,82%_100%,82%_100%)] pointer-events-none"></div>
 
         {/* ========================================================= */}
         {/* RIGHT COLUMN: AUTH01 FORM (STITCH AUTH01 SPECIFICATION)  */}
@@ -212,7 +212,7 @@ export const AuthModal = () => {
                       placeholder="Ví dụ: Nguyễn Văn A"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:bg-white focus:border-sky-500 transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white focus:border-emerald-500 transition-all"
                     />
                   </div>
                 </div>
@@ -231,7 +231,7 @@ export const AuthModal = () => {
                     placeholder="name@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:bg-white focus:border-sky-500 transition-all"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white focus:border-emerald-500 transition-all"
                   />
                 </div>
               </div>
@@ -243,7 +243,7 @@ export const AuthModal = () => {
                     Mật khẩu
                   </label>
                   {authMode === 'login' && (
-                    <a href="#" className="text-[11px] font-bold text-sky-600 hover:underline">
+                    <a href="#" className="text-[11px] font-bold text-emerald-700 hover:underline">
                       Quên mật khẩu?
                     </a>
                   )}
@@ -256,7 +256,7 @@ export const AuthModal = () => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:bg-white focus:border-sky-500 transition-all"
+                    className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:bg-white focus:border-emerald-500 transition-all"
                   />
                   <button
                     type="button"
@@ -276,7 +276,7 @@ export const AuthModal = () => {
                       type="checkbox"
                       checked={rememberMe}
                       onChange={(e) => setRememberMe(e.target.checked)}
-                      className="w-4 h-4 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                      className="w-4 h-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
                     />
                     <span>Ghi nhớ đăng nhập trên thiết bị này</span>
                   </label>
@@ -287,7 +287,7 @@ export const AuthModal = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 disabled:opacity-60 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-sky-500/25 transition-all transform active:scale-95 cursor-pointer mt-2"
+                className="w-full py-3 px-4 rounded-xl emerald-gradient disabled:opacity-60 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/25 transition-all transform active:scale-95 cursor-pointer mt-2"
               >
                 {isLoading ? (
                   <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
@@ -367,8 +367,8 @@ export const AuthModal = () => {
           <div className="mt-6 pt-4 border-t border-slate-100 text-center">
             <p className="text-[11px] text-slate-400">
               Bằng việc đăng nhập, bạn đồng ý với{' '}
-              <a href="#" className="text-sky-600 underline">Điều khoản dịch vụ</a> và{' '}
-              <a href="#" className="text-sky-600 underline">Chính sách bảo mật</a> của Wayfare.
+              <a href="#" className="text-emerald-700 underline font-semibold">Điều khoản dịch vụ</a> và{' '}
+              <a href="#" className="text-emerald-700 underline font-semibold">Chính sách bảo mật</a> của Wayfare.
             </p>
           </div>
 

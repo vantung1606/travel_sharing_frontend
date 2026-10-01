@@ -486,12 +486,12 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
       <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-100 my-auto">
         
         {/* Accent Top Bar */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-sky-500 via-teal-500 to-amber-500 shrink-0" />
+        <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-amber-500 shrink-0" />
 
         {/* Modal Header */}
         <div className="px-6 py-4.5 bg-white border-b border-slate-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center border border-sky-100">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
               <Download className="w-5 h-5" />
             </div>
             <div>
@@ -542,20 +542,20 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
                     onClick={() => setActiveTab(tab.id)}
                     className={`p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between h-22 ${
                       isSelected
-                        ? 'border-sky-500 bg-sky-50/70 shadow-xs ring-2 ring-sky-500/20'
+                        ? 'border-emerald-500 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-500/20'
                         : 'border-slate-200/80 bg-white hover:bg-slate-50'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <Icon className={`w-4 h-4 ${isSelected ? 'text-sky-600' : 'text-slate-400'}`} />
+                      <Icon className={`w-4 h-4 ${isSelected ? 'text-emerald-600' : 'text-slate-400'}`} />
                       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
-                        isSelected ? 'bg-sky-200 text-sky-800' : 'bg-slate-100 text-slate-500'
+                        isSelected ? 'bg-emerald-200 text-emerald-800' : 'bg-slate-100 text-slate-500'
                       }`}>
                         {tab.badge}
                       </span>
                     </div>
                     <div>
-                      <span className={`block font-bold text-xs ${isSelected ? 'text-sky-950' : 'text-slate-700'}`}>
+                      <span className={`block font-bold text-xs ${isSelected ? 'text-emerald-950' : 'text-slate-700'}`}>
                         {tab.label}
                       </span>
                     </div>
@@ -576,7 +576,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
                   type="checkbox"
                   checked={includeBudget}
                   onChange={(e) => setIncludeBudget(e.target.checked)}
-                  className="rounded text-sky-600 focus:ring-sky-500"
+                  className="rounded text-emerald-600 focus:ring-emerald-500"
                 />
                 <span>Đính kèm Bảng dự toán chi phí</span>
               </label>
@@ -586,7 +586,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
                   type="checkbox"
                   checked={includeTips}
                   onChange={(e) => setIncludeTips(e.target.checked)}
-                  className="rounded text-sky-600 focus:ring-sky-500"
+                  className="rounded text-emerald-600 focus:ring-emerald-500"
                 />
                 <span>Đính kèm Mẹo thông minh WanderAI</span>
               </label>
@@ -596,7 +596,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
                   type="checkbox"
                   checked={includeChecklist}
                   onChange={(e) => setIncludeChecklist(e.target.checked)}
-                  className="rounded text-sky-600 focus:ring-sky-500"
+                  className="rounded text-emerald-600 focus:ring-emerald-500"
                 />
                 <span>Đính kèm Checklist đồ dùng đi phượt</span>
               </label>
@@ -606,7 +606,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
                   type="checkbox"
                   checked={includeEmergency}
                   onChange={(e) => setIncludeEmergency(e.target.checked)}
-                  className="rounded text-sky-600 focus:ring-sky-500"
+                  className="rounded text-emerald-600 focus:ring-emerald-500"
                 />
                 <span>Đính kèm Số cứu hộ & Khẩn cấp</span>
               </label>
@@ -615,9 +615,9 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
 
           {/* Tab Specific Content Preview & Actions */}
           {activeTab === 'pdf' && (
-            <div className="p-4.5 rounded-2xl border border-sky-100 bg-sky-50/40 space-y-3">
+            <div className="p-4.5 rounded-2xl border border-emerald-100 bg-emerald-50/40 space-y-3">
               <div className="flex items-start gap-3">
-                <div className="w-9 h-9 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
                   <Printer className="w-5 h-5" />
                 </div>
                 <div>
@@ -635,7 +635,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
                   type="button"
                   onClick={handlePrintPDF}
                   disabled={isExporting}
-                  className="ocean-gradient text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md shadow-sky-500/20 hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
+                  className="ocean-gradient text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md shadow-emerald-500/20 hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <Printer className="w-4 h-4" />
                   <span>Mở Cửa Sổ In / Lưu PDF (A4)</span>
@@ -683,7 +683,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
                   <button
                     type="button"
                     onClick={handleCopyText}
-                    className="px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer border border-sky-200"
+                    className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer border border-emerald-200"
                   >
                     {copiedText ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedText ? 'Đã chép!' : 'Sao chép nhanh'}</span>
@@ -757,3 +757,4 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
     </div>
   );
 };
+

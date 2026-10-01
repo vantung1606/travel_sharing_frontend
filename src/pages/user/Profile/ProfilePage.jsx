@@ -106,7 +106,7 @@ export const ProfilePage = () => {
                   alt={currentUser.name}
                   className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover ring-4 ring-white shadow-xl bg-white"
                 />
-                <span className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs font-bold border-2 border-white" title="Tài khoản đã xác minh">
+                <span className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold border-2 border-white" title="Tài khoản đã xác minh">
                   ✓
                 </span>
               </div>
@@ -126,7 +126,7 @@ export const ProfilePage = () => {
                   <span>{currentUser.handle}</span>
                   <span>•</span>
                   <span className="flex items-center gap-1 text-slate-600 font-sans">
-                    <MapPin className="w-3.5 h-3.5 text-sky-600" /> Đà Nẵng, Việt Nam
+                    <MapPin className="w-3.5 h-3.5 text-emerald-600" /> Đà Nẵng, Việt Nam
                   </span>
                 </p>
 
@@ -134,16 +134,16 @@ export const ProfilePage = () => {
                 <div className="flex items-center gap-3 pt-1 text-xs">
                   <button
                     onClick={() => setFollowModalState({ isOpen: true, tab: 'followers' })}
-                    className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-sky-600 transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-emerald-700 transition-colors cursor-pointer"
                     title="Bấm để xem danh sách người theo dõi"
                   >
-                    <span className="font-black text-sky-600 text-sm">{followersCount}</span>
+                    <span className="font-black text-emerald-700 text-sm">{followersCount}</span>
                     <span className="font-medium text-slate-500">người theo dõi</span>
                   </button>
                   <span className="text-slate-300">•</span>
                   <button
                     onClick={() => setFollowModalState({ isOpen: true, tab: 'following' })}
-                    className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-sky-600 transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-emerald-700 transition-colors cursor-pointer"
                     title="Bấm để xem danh sách đang theo dõi"
                   >
                     <span className="font-black text-slate-900 text-sm">{followingCount}</span>
@@ -163,7 +163,7 @@ export const ProfilePage = () => {
                 <span>Chỉnh Sửa Hồ Sơ</span>
               </button>
 
-              <button className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors" title="Chia sẻ hồ sơ">
+              <button className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer" title="Chia sẻ hồ sơ">
                 <Share2 className="w-4 h-4" />
               </button>
 
@@ -188,14 +188,14 @@ export const ProfilePage = () => {
             <div className="p-2">
               <span className="text-slate-400 block text-[11px] font-semibold">Điểm Đến Đã Ghé</span>
               <span className="font-display font-extrabold text-xl text-slate-900 mt-0.5 block flex items-center gap-1">
-                {currentUser.destinationsCount} <MapPin className="w-4 h-4 text-sky-600" />
+                {currentUser.destinationsCount} <MapPin className="w-4 h-4 text-emerald-600" />
               </span>
               <span className="text-[10px] text-emerald-600 font-semibold">24 / 63 Tỉnh thành</span>
             </div>
 
             <div className="p-2 border-l border-slate-200/80">
               <span className="text-slate-400 block text-[11px] font-semibold">Lịch Trình AI Đã Tạo</span>
-              <span className="font-display font-extrabold text-xl text-sky-600 mt-0.5 block flex items-center gap-1">
+              <span className="font-display font-extrabold text-xl text-emerald-700 mt-0.5 block flex items-center gap-1">
                 {itineraries.length} <Sparkles className="w-4 h-4 text-amber-500" />
               </span>
               <span className="text-[10px] text-slate-400">Đã đồng bộ GPS</span>
@@ -211,14 +211,14 @@ export const ProfilePage = () => {
 
             <div
               onClick={() => setFollowModalState({ isOpen: true, tab: 'followers' })}
-              className="p-2 border-l border-slate-200/80 cursor-pointer hover:bg-sky-100/60 rounded-xl transition-colors group"
+              className="p-2 border-l border-slate-200/80 cursor-pointer hover:bg-emerald-100/60 rounded-xl transition-colors group"
               title="Bấm để xem danh sách người theo dõi"
             >
-              <span className="text-slate-400 block text-[11px] font-semibold group-hover:text-sky-700">Người Theo Dõi</span>
-              <span className="font-display font-extrabold text-xl text-sky-600 mt-0.5 block flex items-center gap-1 group-hover:scale-105 transition-transform">
-                {followersCount} <Users className="w-4 h-4 text-sky-500" />
+              <span className="text-slate-400 block text-[11px] font-semibold group-hover:text-emerald-800">Người Theo Dõi</span>
+              <span className="font-display font-extrabold text-xl text-emerald-700 mt-0.5 block flex items-center gap-1 group-hover:scale-105 transition-transform">
+                {followersCount} <Users className="w-4 h-4 text-emerald-600" />
               </span>
-              <span className="text-[10px] text-sky-600 font-semibold group-hover:underline">Xem kết nối</span>
+              <span className="text-[10px] text-emerald-700 font-semibold group-hover:underline">Xem kết nối</span>
             </div>
 
             <div
@@ -261,15 +261,15 @@ export const ProfilePage = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-3.5 px-4 text-xs font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                   active
-                    ? 'border-sky-600 text-sky-700 font-extrabold bg-white'
+                    ? 'border-emerald-600 text-emerald-800 font-extrabold bg-white'
                     : 'border-transparent text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <Icon className={`w-4 h-4 ${active ? 'text-sky-600' : 'text-slate-400'}`} />
+                <Icon className={`w-4 h-4 ${active ? 'text-emerald-600' : 'text-slate-400'}`} />
                 <span>{tab.label}</span>
                 {tab.count !== undefined && (
                   <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-                    active ? 'bg-sky-100 text-sky-800 font-extrabold' : 'bg-slate-200/70 text-slate-600'
+                    active ? 'bg-emerald-100 text-emerald-800 font-extrabold' : 'bg-slate-200/70 text-slate-600'
                   }`}>
                     {tab.count}
                   </span>
@@ -295,7 +295,7 @@ export const ProfilePage = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
-              <Route className="w-5 h-5 text-sky-600" />
+              <Route className="w-5 h-5 text-emerald-600" />
               <span>Danh Sách Lịch Trình Du Lịch AI</span>
             </h3>
             <button
@@ -315,13 +315,13 @@ export const ProfilePage = () => {
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-bold">
+                    <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold">
                       {itin.daysCount} Ngày • {itin.style}
                     </span>
                     <span className="text-xs font-bold text-emerald-600">{itin.budgetTotal}</span>
                   </div>
 
-                  <h4 className="font-bold text-base text-slate-900 group-hover:text-sky-600 transition-colors">
+                  <h4 className="font-bold text-base text-slate-900 group-hover:text-emerald-600 transition-colors">
                     {itin.title}
                   </h4>
 
@@ -335,7 +335,7 @@ export const ProfilePage = () => {
                     </span>
                     {itin.days[0]?.activities.slice(0, 2).map((act, i) => (
                       <div key={i} className="flex items-center gap-2 text-slate-700 font-medium">
-                        <span className="font-mono text-sky-600 font-bold">{act.time}</span>
+                        <span className="font-mono text-emerald-600 font-bold">{act.time}</span>
                         <span className="truncate">{act.title}</span>
                       </div>
                     ))}
@@ -345,7 +345,7 @@ export const ProfilePage = () => {
                 <div className="flex items-center gap-2 pt-3 border-t border-slate-100 text-xs">
                   <button
                     onClick={() => setUserTab('itineraries')}
-                    className="flex-1 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold transition-colors cursor-pointer text-center"
+                    className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-colors cursor-pointer text-center"
                   >
                     Xem Chi Tiết Lộ Trình
                   </button>
@@ -419,8 +419,8 @@ export const ProfilePage = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-            <div className="p-4 rounded-2xl bg-sky-50/60 border border-sky-100 space-y-1">
-              <span className="text-[11px] font-bold text-sky-700 uppercase tracking-wider block">Phong cách ưu tiên</span>
+            <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 space-y-1">
+              <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider block">Phong cách ưu tiên</span>
               <span className="font-bold text-slate-900 text-sm block">🏖️ Nghỉ dưỡng & Biển</span>
               <p className="text-[11px] text-slate-500">Thích đón bình minh, chụp ảnh check-in bãi biển đẹp</p>
             </div>
@@ -460,7 +460,7 @@ export const ProfilePage = () => {
       {activeTab === 'saved' && (
         <div className="space-y-4">
           <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
-            <Bookmark className="w-5 h-5 text-sky-600" />
+            <Bookmark className="w-5 h-5 text-emerald-600" />
             <span>Địa Điểm Yêu Thích Đã Lưu</span>
           </h3>
 
@@ -528,7 +528,7 @@ export const ProfilePage = () => {
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
-                <Edit className="w-4 h-4 text-sky-600" />
+                <Edit className="w-4 h-4 text-emerald-600" />
                 <span>Chỉnh Sửa Hồ Sơ Cá Nhân</span>
               </h3>
               <button
@@ -546,7 +546,7 @@ export const ProfilePage = () => {
                   type="text"
                   value={profileName}
                   onChange={(e) => setProfileName(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
 
@@ -556,7 +556,7 @@ export const ProfilePage = () => {
                   rows={3}
                   value={profileBio}
                   onChange={(e) => setProfileBio(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:ring-2 focus:ring-emerald-500"
                 ></textarea>
               </div>
             </div>
@@ -598,4 +598,5 @@ export const ProfilePage = () => {
     </div>
   );
 };
+
 

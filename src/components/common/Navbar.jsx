@@ -82,12 +82,12 @@ export const Navbar = () => {
                 onClick={() => { setPortalMode('user'); setUserTab('home'); }}
                 className="flex items-center gap-2.5 cursor-pointer group"
               >
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
                   <Compass className="w-5 h-5 animate-spin-slow" />
                 </div>
                 <div className="block leading-tight">
-                  <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 group-hover:text-sky-600 transition-colors">
-                    Way<span className="text-sky-600">fare</span>
+                  <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 group-hover:text-emerald-600 transition-colors">
+                    Way<span className="text-emerald-600">fare</span>
                   </span>
                 </div>
               </div>
@@ -106,7 +106,7 @@ export const Navbar = () => {
                       title={tab.label}
                       className={`flex items-center gap-1 xl:gap-1.5 px-2.5 py-1 xl:px-3 xl:py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap ${
                         active
-                          ? 'bg-sky-600 text-white font-bold shadow-xs'
+                          ? 'bg-emerald-600 text-white font-bold shadow-xs'
                           : 'text-slate-700 hover:text-slate-900 hover:bg-white'
                       }`}
                     >
@@ -124,7 +124,7 @@ export const Navbar = () => {
                       {tab.isAi && (
                         <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold hidden xl:inline-flex items-center gap-0.5 ${
                           active
-                            ? 'bg-sky-700/80 text-amber-200'
+                            ? 'bg-emerald-700/80 text-amber-200'
                             : 'bg-amber-100 text-amber-800'
                         }`}>
                           Smart
@@ -149,7 +149,7 @@ export const Navbar = () => {
             <div className="flex items-center gap-2 shrink-0">
               
               {/* Search Pill Input (Desktop >= 1536px) */}
-              <div className="hidden 2xl:flex items-center bg-slate-100/80 hover:bg-slate-100 focus-within:bg-white rounded-full px-3.5 py-1.5 border border-slate-200/60 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20 transition-all text-xs">
+              <div className="hidden 2xl:flex items-center bg-slate-100/80 hover:bg-slate-100 focus-within:bg-white rounded-full px-3.5 py-1.5 border border-slate-200/60 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all text-xs">
                 <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
                 <input
                   type="text"
@@ -188,7 +188,7 @@ export const Navbar = () => {
                   <button
                     type="button"
                     onClick={() => setIsAIGeneratorOpen(true)}
-                    className="hidden 2xl:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0"
+                    className="hidden 2xl:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-emerald-600/30 transition-all cursor-pointer shrink-0"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-200" />
                     <span>Tạo lịch trình</span>
@@ -200,7 +200,7 @@ export const Navbar = () => {
               {!isLoggedIn ? (
                 <button
                   onClick={() => { setAuthMode('login'); setIsAuthModalOpen(true); }}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs hover:shadow-md transition-all cursor-pointer shrink-0"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs hover:shadow-emerald-600/30 transition-all cursor-pointer shrink-0"
                 >
                   <User className="w-3.5 h-3.5 text-white" />
                   <span>Đăng nhập</span>
@@ -209,13 +209,13 @@ export const Navbar = () => {
                 <div ref={profileDropdownRef} className="relative group">
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                    className="relative flex items-center justify-center p-0.5 rounded-full hover:ring-2 hover:ring-sky-500/30 transition-all cursor-pointer shrink-0 focus:outline-hidden"
+                    className="relative flex items-center justify-center p-0.5 rounded-full hover:ring-2 hover:ring-emerald-500/30 transition-all cursor-pointer shrink-0 focus:outline-hidden"
                     aria-label={`Tài khoản: ${currentUser.name}`}
                   >
                     <img
                       src={currentUser.avatar}
                       alt={currentUser.name}
-                      className="w-9 h-9 rounded-full object-cover ring-2 ring-sky-500/20 hover:scale-105 active:scale-95 transition-transform"
+                      className="w-9 h-9 rounded-full object-cover ring-2 ring-emerald-500/20 hover:scale-105 active:scale-95 transition-transform"
                     />
                     <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" title="Trực tuyến"></span>
                   </button>
@@ -239,12 +239,12 @@ export const Navbar = () => {
                         <img
                           src={currentUser.avatar}
                           alt={currentUser.name}
-                          className="w-10 h-10 rounded-full object-cover ring-2 ring-sky-500/20 shrink-0"
+                          className="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-500/20 shrink-0"
                         />
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</p>
                           <p className="text-[11px] text-slate-400 truncate">{currentUser.handle || currentUser.email}</p>
-                          <span className="inline-block mt-0.5 px-2 py-0.5 text-[9px] font-bold rounded-full bg-sky-100 text-sky-800">
+                          <span className="inline-block mt-0.5 px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-100 text-emerald-800">
                             {portalMode === 'admin' ? 'Quản trị viên' : 'Thành viên Wayfare'}
                           </span>
                         </div>
@@ -255,7 +255,7 @@ export const Navbar = () => {
                         className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <div className="flex items-center gap-2">
-                          <Bell className="w-4 h-4 text-sky-600" />
+                          <Bell className="w-4 h-4 text-emerald-600" />
                           <span>Thông báo</span>
                         </div>
                         {unreadNotificationsCount > 0 && (
@@ -269,7 +269,7 @@ export const Navbar = () => {
                         onClick={() => { setPortalMode('user'); setUserTab('profile'); setIsProfileDropdownOpen(false); }}
                         className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
-                        <User className="w-4 h-4 text-sky-600" />
+                        <User className="w-4 h-4 text-emerald-600" />
                         <span>Trang cá nhân</span>
                       </button>
 
@@ -277,7 +277,7 @@ export const Navbar = () => {
                         onClick={() => { setPortalMode('user'); setUserTab('itineraries'); setIsProfileDropdownOpen(false); }}
                         className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
-                        <Calendar className="w-4 h-4 text-sky-600" />
+                        <Calendar className="w-4 h-4 text-emerald-600" />
                         <span>Lịch trình của tôi</span>
                       </button>
 
@@ -343,12 +343,12 @@ export const Navbar = () => {
               
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white font-bold shadow-md">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-600 flex items-center justify-center text-white font-bold shadow-md shadow-emerald-500/20">
                     <Compass className="w-5 h-5 animate-spin-slow" />
                   </div>
                   <div>
                     <span className="font-display font-extrabold text-lg text-slate-900">
-                      Way<span className="text-sky-600">fare</span>
+                      Way<span className="text-emerald-600">fare</span>
                     </span>
                     <span className="block text-[9px] uppercase tracking-wider font-semibold text-slate-400">
                       Điều hướng hệ thống
@@ -368,8 +368,8 @@ export const Navbar = () => {
               <div className="space-y-2">
                 {!isLoggedIn ? (
                   <button
-                    onClick={() => { setAuthMode('login'); setIsAuthModalOpen(true); setIsMobileMenuOpen(false); }}
-                    className="w-full py-3 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                    onClick={() => { setAuthMode('login'); setIsAuthModalOpen(true); }}
+                    className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                   >
                     <User className="w-4 h-4 text-white" />
                     <span>Đăng nhập / Đăng ký</span>
@@ -377,7 +377,7 @@ export const Navbar = () => {
                 ) : (
                   <button
                     onClick={() => { setIsAIGeneratorOpen(true); setIsMobileMenuOpen(false); }}
-                    className="w-full bg-sky-600 hover:bg-sky-700 text-white py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer"
                   >
                     <Sparkles className="w-4 h-4 text-amber-200" />
                     <span>Tạo Lịch Trình AI</span>
@@ -399,13 +399,13 @@ export const Navbar = () => {
                       onClick={() => handleNavClick(tab.id)}
                       className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs font-bold transition-all ${
                         active
-                          ? 'bg-sky-50 text-sky-700 shadow-xs border border-sky-100 font-extrabold'
+                          ? 'bg-emerald-50 text-emerald-800 shadow-xs border border-emerald-100 font-extrabold'
                           : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                          active ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-500'
+                          active ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-500'
                         }`}>
                           <Icon className="w-4 h-4" />
                         </div>
@@ -441,7 +441,7 @@ export const Navbar = () => {
                     <img
                       src={currentUser.avatar}
                       alt={currentUser.name}
-                      className="w-10 h-10 rounded-full object-cover ring-2 ring-sky-500/20"
+                      className="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-500/20"
                     />
                     <div>
                       <h4 className="font-bold text-xs text-slate-900">{currentUser.name}</h4>
