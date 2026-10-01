@@ -397,32 +397,8 @@ export const HomePage = () => {
               thời gian thực và cá nhân hóa theo gu riêng của bạn chỉ với một chạm.
             </p>
 
-            {/* Quick Inspiration Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs sm:text-sm">
-              <span className="text-slate-300 font-medium">Khởi tạo nhanh:</span>
-              {[
-                { label: '🌸 Đà Lạt 3N2Đ', dest: 'Đà Lạt' },
-                { label: '🏖️ Phú Quốc 4N3Đ', dest: 'Phú Quốc' },
-                { label: '🌾 Mù Cang Chải 3N2Đ', dest: 'Mù Cang Chải' },
-                { label: '🛶 Ninh Bình 2N1Đ', dest: 'Ninh Bình' }
-              ].map((chip, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => {
-                    setDockDest(chip.dest);
-                    const el = document.getElementById('ai-dock');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-medium border border-white/20 hover:border-sky-400 transition-all cursor-pointer hover:scale-105"
-                >
-                  {chip.label}
-                </button>
-              ))}
-            </div>
-
             {/* Action Buttons: VIBRANT ROYAL BLUE BUTTONS */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
               <a
                 href="#ai-dock"
                 className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-extrabold text-sm sm:text-base shadow-[0_10px_25px_rgba(37,99,235,0.45)] hover:scale-105 transition-all cursor-pointer ring-2 ring-blue-300/40 tracking-[0.015em]"
@@ -442,68 +418,6 @@ export const HomePage = () => {
                 <span>Khám Phá Điểm Đến Hot</span>
                 <ArrowDown className="w-4 h-4 text-sky-300" />
               </a>
-            </div>
-
-            {/* Balanced Wide Metric & Trust Strip: STRICT SINGLE ROW on Desktop */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8 pt-6 border-t border-white/15 w-full max-w-3xl text-sm tracking-[0.015em]">
-              {/* Avatars */}
-              <div className="flex items-center gap-3">
-                <div className="flex -space-x-2.5 overflow-hidden">
-                  <img
-                    className="inline-block h-9 w-9 rounded-full ring-2 ring-emerald-400 object-cover"
-                    alt="User"
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
-                  />
-                  <img
-                    className="inline-block h-9 w-9 rounded-full ring-2 ring-emerald-400 object-cover"
-                    alt="User"
-                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80"
-                  />
-                  <img
-                    className="inline-block h-9 w-9 rounded-full ring-2 ring-emerald-400 object-cover"
-                    alt="User"
-                    src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80"
-                  />
-                  <div className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-blue-600 text-white text-xs font-black ring-2 ring-white">
-                    +12k
-                  </div>
-                </div>
-                <div className="flex flex-col text-left">
-                  <div className="flex items-center gap-1 text-amber-400">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
-                    ))}
-                    <span className="text-white font-extrabold text-xs ml-1">4.9/5</span>
-                  </div>
-                  <span className="text-slate-300 text-xs font-medium">120,000+ du khách</span>
-                </div>
-              </div>
-
-              <div className="hidden sm:block w-px h-7 bg-white/20" />
-
-              {/* Fast Stat */}
-              <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15">
-                <Timer className="w-4 h-4 text-sky-300" />
-                <div className="text-left">
-                  <span className="text-white font-bold text-xs sm:text-sm leading-tight block">
-                    3.2 Giây
-                  </span>
-                  <span className="text-slate-300 text-xs block">Khởi tạo tức thì</span>
-                </div>
-              </div>
-
-              <div className="hidden sm:block w-px h-7 bg-white/20" />
-
-              {/* Savings Stat */}
-              <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15">
-                <Wallet className="w-4 h-4 text-emerald-300" />
-                <div className="text-left">
-                  <span className="text-white font-bold text-xs sm:text-sm leading-tight block">
-                    Tiết kiệm 22%
-                  </span>
-                  <span className="text-slate-300 text-xs block">Tối ưu chi phí</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>
