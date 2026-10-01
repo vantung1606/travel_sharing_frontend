@@ -41,7 +41,8 @@ import {
   Coffee,
   Sun,
   ShieldAlert,
-  Play
+  Play,
+  Share2
 } from 'lucide-react';
 
 export const HomePage = () => {
@@ -64,38 +65,151 @@ export const HomePage = () => {
   const [dockDuration, setDockDuration] = useState('3d2n');
   const [isDockGenerating, setIsDockGenerating] = useState(false);
 
-  // Sandbox Widget States
+  // Dynamic estimate calculations based on dock settings
+  const getDockEstimate = () => {
+    let budgetText = '3.500.000đ - 5.000.000đ/người';
+    let savings = 'Tiết kiệm ~850.000đ';
+    let spots = '8 điểm tham quan & ẩm thực';
+
+    if (dockBudget === 'budget') {
+      budgetText = '2.000.000đ - 3.200.000đ/người';
+      savings = 'Tiết kiệm ~600.000đ';
+    } else if (dockBudget === 'luxury') {
+      budgetText = '7.500.000đ - 12.000.000đ/người';
+      savings = 'Tối ưu dịch vụ 5 sao';
+    }
+
+    if (dockDuration === '2d1n') spots = '5 điểm tham quan đặc sắc';
+    else if (dockDuration === '4d3n') spots = '11 điểm check-in & trải nghiệm';
+    else if (dockDuration === '5d4n') spots = '15 điểm khám phá chuyên sâu';
+
+    return { budgetText, savings, spots };
+  };
+
+  const dockEstimate = getDockEstimate();
+
+  // Interactive Sandbox Day Tab
+  const [sandboxActiveDay, setSandboxActiveDay] = useState(1);
   const [sandboxPrompt, setSandboxPrompt] = useState(
-    'Tôi muốn đi Đà Lạt 3 ngày 2 đêm cùng bạn gái, ngân sách khoảng 4 triệu, thích quán cà phê view hoàng hôn đồi thông, thích ăn lẩu gà lá é và không thích chỗ quá đông đúc.'
+    'Tôi muốn đi Đà Lạt 3 ngày 2 đêm cùng bạn gái, ngân sách khoảng 4 triệu, thích quán cà phê view hoàng hôn đồi thông, ăn lẩu gà lá é và không thích chỗ quá đông đúc.'
   );
-  const [sandboxResult, setSandboxResult] = useState({
-    title: 'Đà Lạt • Hành Trình Lãng Mạn (3N2Đ)',
-    subtitle: 'Phù hợp: Cặp đôi • Dự toán chi tiết: 3.920.000đ',
-    badge: 'Tối ưu 98%',
-    items: [
-      {
-        time: '08:00',
-        title: 'Ăn sáng Bánh căn Lệ & Cà phê Tùng',
-        cost: '75.000đ',
-        desc: 'Không gian hoài niệm trung tâm, tránh khung giờ cao điểm 9h.',
-        tagColor: 'text-blue-800 bg-blue-50 border-blue-200'
-      },
-      {
-        time: '15:00',
-        title: 'Hoàng hôn tại Đồi Thông Cầu Đất',
-        cost: 'AI Hidden Gem ⭐',
-        desc: 'Gợi ý góc chụp vắng người và tuyến đường bê tông an toàn.',
-        tagColor: 'text-amber-800 bg-amber-50 border-amber-200'
-      },
-      {
-        time: '18:30',
-        title: 'Lẩu gà lá é Tao Ngộ & Kem bơ Thanh Thảo',
-        cost: '280.000đ/2 người',
-        desc: 'Hương vị trứ danh, nhận ưu đãi độc quyền thành viên Wayfare.',
-        tagColor: 'text-teal-800 bg-teal-50 border-teal-200'
-      }
-    ]
-  });
+
+  // Multi-day sandbox data for interactive experience
+  const sandboxMultiDayData = {
+    1: {
+      dayTitle: 'Ngày 1: Check-in Sương Mù & Thưởng Thức Ẩm Thực Ấm Cúng',
+      items: [
+        {
+          time: '08:30',
+          title: 'Ăn sáng Bánh căn Lệ & Cà phê Tùng',
+          cost: '75.000đ',
+          desc: 'Quán ăn hoài niệm góc dốc nhỏ, thưởng thức ly cà phê phin đậm đà giữa tiết trời se lạnh.',
+          tagColor: 'text-blue-800 bg-blue-50 border-blue-200'
+        },
+        {
+          time: '14:30',
+          title: 'Check-in Homestay Nhà Gỗ Thung Lũng & Nghỉ ngơi',
+          cost: 'Tối ưu 30%',
+          desc: 'Phòng view trọn vẹn đồi thông xanh mát, không khí trong lành yên tĩnh tuyệt đối.',
+          tagColor: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+        },
+        {
+          time: '18:30',
+          title: 'Lẩu gà lá é Tao Ngộ & Kem bơ Thanh Thảo',
+          cost: '280.000đ/2 người',
+          desc: 'Hương vị cay nồng lá é trứ danh, nhận ưu đãi độc quyền 10% thành viên Wayfare.',
+          tagColor: 'text-teal-800 bg-teal-50 border-teal-200'
+        }
+      ]
+    },
+    2: {
+      dayTitle: 'Ngày 2: Săn Mây Cầu Đất & Chiều Hoàng Hôn Đồi Thông',
+      items: [
+        {
+          time: '05:30',
+          title: 'Săn mây bình minh Đồi Chè Cầu Đất',
+          cost: 'Miễn phí vé',
+          desc: 'Thời điểm biển mây bồng bềnh đẹp nhất. AI định vị góc chụp vắng người và tuyến đường bê tông an toàn.',
+          tagColor: 'text-amber-800 bg-amber-50 border-amber-200'
+        },
+        {
+          time: '11:30',
+          title: 'Ăn trưa cơm niêu Như Ngọc & Thác Datanla',
+          cost: '160.000đ/người',
+          desc: 'Thử cảm giác trượt máng nước dài nhất Đông Nam Á xuyên qua cánh rừng thông nguyên sinh.',
+          tagColor: 'text-blue-800 bg-blue-50 border-blue-200'
+        },
+        {
+          time: '16:45',
+          title: 'Ngắm hoàng hôn & Acoustic Bar Thung Lũng Đèn',
+          cost: 'AI Hidden Gem ⭐',
+          desc: 'Ly cocktail thơm nồng cùng giai điệu mộc giữa biển ánh sáng nhà lồng rực rỡ.',
+          tagColor: 'text-purple-800 bg-purple-50 border-purple-200'
+        }
+      ]
+    },
+    3: {
+      dayTitle: 'Ngày 3: Dạo Chợ Đà Lạt Mua Đặc Sản & Tạm Biệt',
+      items: [
+        {
+          time: '08:00',
+          title: 'Bánh mì xíu mại Hoàng Diệu & Sữa đậu nành nóng',
+          cost: '45.000đ',
+          desc: 'Bát xíu mại thơm phức béo ngậy kèm bánh mì giòn rụm nạp năng lượng cho buổi sáng.',
+          tagColor: 'text-blue-800 bg-blue-50 border-blue-200'
+        },
+        {
+          time: '10:00',
+          title: 'Mua quà mứt dâu tây L’angfarm & Chợ đồ len',
+          cost: 'Được giảm giá AI',
+          desc: 'Gợi ý các quầy hàng uy tín có kiểm định nguồn gốc xuất xứ, tránh tình trạng ép giá.',
+          tagColor: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+        },
+        {
+          time: '13:00',
+          title: 'Check-out Homestay & Xe Limousine ra sân bay Liên Khương',
+          cost: '120.000đ/vé',
+          desc: 'Xe đón tận nơi đúng giờ, kết thúc chuyến đi thư giãn trọn vẹn không một chút mệt mỏi.',
+          tagColor: 'text-teal-800 bg-teal-50 border-teal-200'
+        }
+      ]
+    }
+  };
+
+  // Hidden Gems Interactive State
+  const [selectedGemId, setSelectedGemId] = useState('dalat');
+  const hiddenGems = {
+    dalat: {
+      title: 'Suối Tía - Hồ Tuyền Lâm (Đà Lạt)',
+      time: 'Khoảnh khắc sương bay: 05:15 - 06:00 sáng',
+      badge: 'Chấm xanh AI',
+      desc: 'Nơi khởi nguồn dòng nước đổ vào hồ Tuyền Lâm, chèo thuyền kayak qua làn sương mờ ảo như chốn bồng lai tiên cảnh.',
+      image:
+        'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=85',
+      temp: '17°C • Sương nhẹ',
+      crowd: 'Vắng người (95% yên tĩnh)'
+    },
+    sapa: {
+      title: 'Bản Sâu Chua - Sa Pa (Lào Cai)',
+      time: 'Mùa hoa lê & đào rừng: 06:30 - 10:00',
+      badge: 'Bản địa nguyên bản',
+      desc: 'Ngôi làng cổ người Mông nằm chênh vênh sườn núi đá, gần như chưa bị du lịch hóa, tràn ngập không khí bình dị.',
+      image:
+        'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1400&q=85',
+      temp: '15°C • Nắng sớm',
+      crowd: 'Chỉ người bản địa'
+    },
+    phuquoc: {
+      title: 'Hòn Dăm & Bãi Rạch Tràm (Phú Quốc)',
+      time: 'Ngắm hoàng hôn cô độc: 16:30 - 18:00',
+      badge: 'Đảo không sóng di động',
+      desc: 'Hòn đảo hoang sơ tách biệt hoàn toàn với thế giới hiện đại, làn nước trong vắt nhìn thấy từng rạn san hô tự nhiên.',
+      image:
+        'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?auto=format&fit=crop&w=1400&q=85',
+      temp: '28°C • Biển êm',
+      crowd: 'Tối đa 20 khách/ngày'
+    }
+  };
 
   // Showcase Filter Tab
   const [showcaseRegion, setShowcaseRegion] = useState('all'); // 'all' | 'bac' | 'trung' | 'nam'
@@ -207,96 +321,7 @@ export const HomePage = () => {
 
   // Run Sandbox Simulation
   const handleRunSandbox = () => {
-    const val = sandboxPrompt.toLowerCase();
-    if (val.includes('gia đình') || val.includes('đà nẵng')) {
-      setSandboxResult({
-        title: 'Đà Nẵng • Nghỉ Dưỡng Gia Đình (4N3Đ)',
-        subtitle: 'Phù hợp: Đa thế hệ • Dự toán chi tiết: 4.850.000đ/người',
-        badge: 'Tối ưu 99%',
-        items: [
-          {
-            time: '08:00',
-            title: 'Ăn sáng Bún chả cá Bà Lữ & Dạo biển Mỹ Khê',
-            cost: '55.000đ',
-            desc: 'Quán ăn lâu đời có điều hòa và bãi đỗ xe thoáng cho xe gia đình.',
-            tagColor: 'text-blue-800 bg-blue-50 border-blue-200'
-          },
-          {
-            time: '14:00',
-            title: 'Bà Nà Hills & Cầu Vàng (Lối đi ưu tiên xe đẩy)',
-            cost: 'Vé trọn gói',
-            desc: 'Thời tiết mát mẻ 20°C, khung cảnh châu Âu thích hợp cả ông bà và trẻ nhỏ.',
-            tagColor: 'text-amber-800 bg-amber-50 border-amber-200'
-          },
-          {
-            time: '18:30',
-            title: 'Du thuyền sông Hàn xem Cầu Rồng phun lửa',
-            cost: '150.000đ/vé',
-            desc: 'Không gian thoáng mát, gió biển êm dịu, ngắm trọn thành phố về đêm.',
-            tagColor: 'text-teal-800 bg-teal-50 border-teal-200'
-          }
-        ]
-      });
-    } else if (val.includes('hà giang') || val.includes('phượt') || val.includes('trekking')) {
-      setSandboxResult({
-        title: 'Hà Giang • Khám Phá Hùng Vĩ Mã Pí Lèng (3N2Đ)',
-        subtitle: 'Phù hợp: Phượt thủ & Bạn trẻ • Dự toán chi tiết: 2.750.000đ/người',
-        badge: 'An toàn 100%',
-        items: [
-          {
-            time: '07:00',
-            title: 'Dốc Thẩm Mã & Cổng trời Quản Bạ',
-            cost: 'Check-in tự do',
-            desc: 'Buổi sáng nắng dịu, đường vắng xe tải, dễ dàng chụp ảnh kỷ niệm.',
-            tagColor: 'text-blue-800 bg-blue-50 border-blue-200'
-          },
-          {
-            time: '13:00',
-            title: 'Chèo thuyền Kayak hẻm Tu Sản & Sông Nho Quế',
-            cost: '120.000đ/người',
-            desc: 'Làn nước xanh ngọc bích tuyệt đẹp, đã đặt trước vé thuyền không cần chờ đợi.',
-            tagColor: 'text-amber-800 bg-amber-50 border-amber-200'
-          },
-          {
-            time: '19:00',
-            title: 'Thịt trâu gác bếp & Rượu ngô bản Lô Lô Chải',
-            cost: '180.000đ',
-            desc: 'Giao lưu văn hóa người Lô Lô ấm áp bên bếp lửa rực hồng chân cột cờ Lũng Cú.',
-            tagColor: 'text-teal-800 bg-teal-50 border-teal-200'
-          }
-        ]
-      });
-    } else {
-      setSandboxResult({
-        title: 'Đà Lạt • Hành Trình Lãng Mạn (3N2Đ)',
-        subtitle: 'Phù hợp: Cặp đôi • Dự toán chi tiết: 3.920.000đ',
-        badge: 'Tối ưu 98%',
-        items: [
-          {
-            time: '08:00',
-            title: 'Ăn sáng Bánh căn Lệ & Cà phê Tùng',
-            cost: '75.000đ',
-            desc: 'Không gian hoài niệm trung tâm, tránh khung giờ cao điểm 9h.',
-            tagColor: 'text-blue-800 bg-blue-50 border-blue-200'
-          },
-          {
-            time: '15:00',
-            title: 'Hoàng hôn tại Đồi Thông Cầu Đất',
-            cost: 'AI Hidden Gem ⭐',
-            desc: 'Gợi ý góc chụp vắng người và tuyến đường bê tông an toàn.',
-            tagColor: 'text-amber-800 bg-amber-50 border-amber-200'
-          },
-          {
-            time: '18:30',
-            title: 'Lẩu gà lá é Tao Ngộ & Kem bơ Thanh Thảo',
-            cost: '280.000đ/2 người',
-            desc: 'Hương vị trứ danh, nhận ưu đãi độc quyền thành viên Wayfare.',
-            tagColor: 'text-teal-800 bg-teal-50 border-teal-200'
-          }
-        ]
-      });
-    }
-    toast.info('Trợ lý AI đã cập nhật gợi ý lộ trình tức thì! 💡');
+    toast.info('Trợ lý AI đã phân tích yêu cầu và tối ưu lại lộ trình 3 ngày! 💡');
   };
 
   // Copy Tour Action
@@ -328,14 +353,15 @@ export const HomePage = () => {
   return (
     <div className="min-h-screen bg-[#f8fbf9] text-slate-900 selection:bg-blue-600 selection:text-white pb-20">
       {/* ──────────────────────────────────────────────────────────────────────────
-          1. REDESIGNED HERO SECTION (WIDE EXPANSIVE CANVAS - 35PX EDGE PADDING)
-          - Removed right side card per user request
-          - Spacious, elegant, grand typography with subtle leaf green aura
-          - Vibrant Blue buttons with smooth transitions
-          - Font sizes normalized to 14px+ with relaxed line heights & letter spacing
+          1. ELEVATED HERO SECTION (EXPANSIVE CANVAS - 35PX EDGE PADDING)
+          - Centered, majestic layout without cluttered right card
+          - Royal Blue CTA buttons with subtle glow
+          - Floating ambient glassmorphic indicators
+          - Quick prompt pill carousel
+          - Typography 14px+ with relaxed tracking
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="relative w-full overflow-hidden -mt-6 pt-14 pb-20 lg:pb-32 bg-[#022c22] text-white">
-        {/* Cinematic Backdrop with Crisp Dark Forest Ambience */}
+      <section className="relative w-full overflow-hidden -mt-6 pt-16 pb-24 lg:pb-36 bg-[#022c22] text-white">
+        {/* Cinematic Backdrop with Deep Forest Green Ambience */}
         <div className="absolute inset-0 z-0">
           <div
             className="w-full h-full bg-cover bg-center transition-all duration-1000 scale-105"
@@ -343,27 +369,34 @@ export const HomePage = () => {
               backgroundImage: `url('https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=2400&q=90')`
             }}
           />
-          {/* Deep Scrim: Soft leaf-green tone with rich contrast */}
+          {/* Deep Scrim with Rich Tone Separation */}
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-[#064e3b]/85 to-slate-950/90" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#f8fbf9] via-transparent to-slate-950/70" />
 
-          {/* Radiant Glow Orbs */}
-          <div className="absolute -top-12 left-1/3 w-[550px] h-[550px] rounded-full bg-emerald-500/20 blur-[130px] pointer-events-none animate-pulse-glow" />
-          <div className="absolute top-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-blue-500/15 blur-[120px] pointer-events-none" />
+          {/* Radiant Subtle Ambient Light */}
+          <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-emerald-500/15 blur-[140px] pointer-events-none" />
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/15 blur-[130px] pointer-events-none" />
         </div>
 
-        {/* Full-width container with 35px side padding per user request */}
+        {/* Expansive Canvas with 35px Side Padding */}
         <div className="relative z-10 w-full max-w-[1920px] mx-auto px-[35px]">
           {/* Main Hero Header Stack */}
-          <div className="flex flex-col items-center text-center max-w-5xl mx-auto space-y-6">
-            {/* Announcement Badge */}
-            <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-emerald-950/80 backdrop-blur-xl text-emerald-300 font-bold text-[14px] shadow-lg border border-emerald-400/40 tracking-[0.015em]">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-              <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>Trí Tuệ Nhân Tạo Lập Lịch Trình Thế Hệ Mới • Wayfare AI 4.0</span>
+          <div className="flex flex-col items-center text-center max-w-5xl mx-auto space-y-7">
+            {/* Top Announcement Tag with Subtle Ambient Indicators */}
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-emerald-950/80 backdrop-blur-xl text-emerald-300 font-bold text-[14px] shadow-lg border border-emerald-400/40 tracking-[0.015em]">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>Trí Tuệ Nhân Tạo Lập Lịch Trình Thế Hệ Mới • Wayfare AI 4.0</span>
+              </div>
+
+              <div className="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-950/70 backdrop-blur-xl text-sky-200 font-semibold text-[13px] border border-blue-400/30">
+                <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse" />
+                <span>1.280+ lịch trình đã tạo hôm nay</span>
+              </div>
             </div>
 
-            {/* Expansive Headline */}
+            {/* Expansive Grand Headline */}
             <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] text-white">
               Kiến Tạo Chuyến Đi Mơ Ước <br className="hidden sm:inline" />
               <span className="bg-gradient-to-r from-emerald-300 via-teal-200 to-sky-300 bg-clip-text text-transparent drop-shadow-sm">
@@ -372,14 +405,38 @@ export const HomePage = () => {
               Cùng AI Wayfare
             </h1>
 
-            {/* Subtitle with standard 14px - 16px text and relaxed spacing */}
+            {/* Subtitle with Relaxed 14px-16px Text */}
             <p className="text-slate-200 text-[14px] sm:text-[16px] max-w-3xl leading-relaxed font-normal tracking-[0.015em]">
               Từ ý tưởng mơ hồ đến lịch trình chi tiết từng phút, dự toán ngân sách chính xác theo
               thời gian thực và cá nhân hóa theo gu riêng của bạn chỉ với một chạm.
             </p>
 
-            {/* Action Buttons: ROYAL BLUE BUTTONS per user request */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+            {/* Hero Interactive Quick Prompt Chips */}
+            <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1 text-[13px] sm:text-[14px]">
+              <span className="text-slate-300 font-medium mr-1">Khởi tạo nhanh:</span>
+              {[
+                { label: '🌸 Đà Lạt lãng mạn 3N2Đ', dest: 'Đà Lạt' },
+                { label: '🏖️ Phú Quốc ngắm hoàng hôn 4N3Đ', dest: 'Phú Quốc' },
+                { label: '🌾 Săn mây Mù Cang Chải 3N2Đ', dest: 'Mù Cang Chải' },
+                { label: '🛶 Ninh Bình Tràng An 2N1Đ', dest: 'Ninh Bình' }
+              ].map((chip, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => {
+                    setDockDest(chip.dest);
+                    const el = document.getElementById('ai-dock');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-medium border border-white/20 hover:border-sky-400 transition-all cursor-pointer hover:scale-105"
+                >
+                  {chip.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Action Buttons: VIBRANT ROYAL BLUE BUTTONS */}
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <a
                 href="#ai-dock"
                 className="inline-flex items-center justify-center gap-2.5 px-9 py-4 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-extrabold text-[14px] sm:text-[15px] shadow-[0_10px_30px_rgba(37,99,235,0.4)] hover:shadow-[0_15px_40px_rgba(37,99,235,0.55)] hover:scale-[1.03] transition-all cursor-pointer ring-2 ring-blue-300/40 tracking-[0.015em]"
@@ -401,7 +458,7 @@ export const HomePage = () => {
               </a>
             </div>
 
-            {/* Balanced Wide Metric & Trust Bar */}
+            {/* Balanced Wide Metric & Trust Strip */}
             <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 pt-6 border-t border-emerald-800/60 w-full max-w-4xl text-[14px] tracking-[0.015em]">
               <div className="flex items-center gap-3">
                 <div className="flex -space-x-2.5 overflow-hidden">
@@ -470,17 +527,18 @@ export const HomePage = () => {
       {/* ──────────────────────────────────────────────────────────────────────────
           2. SMART AI PLANNER DOCK (FULL-WIDTH, 35PX PADDING, SOFT LEAF GREEN TINT)
           - Card background: Soft, airy leaf-green tint (#f4fbf7)
-          - Active buttons: Royal Blue (#2563eb / #0284c7)
+          - Live Estimation Chip showing real-time cost & spot calculation
+          - Active buttons: Royal Blue (#2563eb)
           - Font size: Standard 14px with relaxed tracking
       ────────────────────────────────────────────────────────────────────────── */}
       <section
         className="relative z-20 w-full max-w-[1920px] mx-auto px-[35px] -mt-10 lg:-mt-16 mb-20"
         id="ai-dock"
       >
-        <div className="p-6 sm:p-9 rounded-3xl bg-[#f4fbf7] shadow-[0_20px_60px_-15px_rgba(2,44,34,0.14)] border border-emerald-200/70">
+        <div className="p-6 sm:p-9 rounded-3xl bg-[#f4fbf7] shadow-[0_20px_60px_-15px_rgba(2,44,34,0.15)] border-2 border-emerald-200/80">
           {/* Planner Modes Segmented Control */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-7 pb-5 border-b border-emerald-200/50">
-            <div className="flex items-center gap-2 p-1.5 rounded-full bg-white/90 border border-emerald-200/60 shadow-xs">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-7 pb-5 border-b border-emerald-200/60">
+            <div className="flex items-center gap-2 p-1.5 rounded-full bg-white/90 border border-emerald-200/70 shadow-xs">
               <button
                 type="button"
                 onClick={() => setActiveDockTab('ai')}
@@ -527,9 +585,19 @@ export const HomePage = () => {
               </button>
             </div>
 
-            <div className="flex items-center gap-2 text-slate-700 text-[14px] font-semibold tracking-[0.015em]">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Dữ liệu xác thực từ 1.200+ điểm đến Việt Nam 2026</span>
+            {/* Dynamic AI Estimate Pill */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="px-4 py-2 rounded-2xl bg-white border border-emerald-200/80 shadow-2xs flex items-center gap-3 text-[13px] sm:text-[14px]">
+                <div className="flex items-center gap-1.5 text-blue-700 font-bold">
+                  <Wallet className="w-4 h-4 text-blue-600" />
+                  <span>{dockEstimate.budgetText}</span>
+                </div>
+                <span className="w-1 h-1 rounded-full bg-slate-300" />
+                <div className="flex items-center gap-1 text-emerald-700 font-semibold">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>{dockEstimate.savings}</span>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -539,7 +607,7 @@ export const HomePage = () => {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-7"
           >
             {/* Field 1: Destination */}
-            <div className="p-4 rounded-2xl bg-white hover:bg-emerald-50/60 transition-all flex flex-col justify-center border-2 border-emerald-200/70 hover:border-blue-500 focus-within:border-blue-600 focus-within:bg-white shadow-xs">
+            <div className="p-4 rounded-2xl bg-white hover:bg-emerald-50/50 transition-all flex flex-col justify-center border-2 border-emerald-200/70 hover:border-blue-500 focus-within:border-blue-600 focus-within:bg-white shadow-xs">
               <label className="flex items-center gap-1.5 text-slate-700 text-xs font-extrabold uppercase tracking-wider mb-1.5">
                 <MapPin className="w-4 h-4 text-blue-600" />
                 <span>Điểm đến mong muốn</span>
@@ -554,7 +622,7 @@ export const HomePage = () => {
             </div>
 
             {/* Field 2: Budget */}
-            <div className="p-4 rounded-2xl bg-white hover:bg-emerald-50/60 transition-all flex flex-col justify-center border-2 border-emerald-200/70 hover:border-blue-500 focus-within:border-blue-600 focus-within:bg-white shadow-xs">
+            <div className="p-4 rounded-2xl bg-white hover:bg-emerald-50/50 transition-all flex flex-col justify-center border-2 border-emerald-200/70 hover:border-blue-500 focus-within:border-blue-600 focus-within:bg-white shadow-xs">
               <label className="flex items-center gap-1.5 text-slate-700 text-xs font-extrabold uppercase tracking-wider mb-1.5">
                 <DollarSign className="w-4 h-4 text-blue-600" />
                 <span>Ngân sách dự kiến</span>
@@ -571,7 +639,7 @@ export const HomePage = () => {
             </div>
 
             {/* Field 3: Travel Style */}
-            <div className="p-4 rounded-2xl bg-white hover:bg-emerald-50/60 transition-all flex flex-col justify-center border-2 border-emerald-200/70 hover:border-blue-500 focus-within:border-blue-600 focus-within:bg-white shadow-xs">
+            <div className="p-4 rounded-2xl bg-white hover:bg-emerald-50/50 transition-all flex flex-col justify-center border-2 border-emerald-200/70 hover:border-blue-500 focus-within:border-blue-600 focus-within:bg-white shadow-xs">
               <label className="flex items-center gap-1.5 text-slate-700 text-xs font-extrabold uppercase tracking-wider mb-1.5">
                 <Compass className="w-4 h-4 text-blue-600" />
                 <span>Gu trải nghiệm</span>
@@ -589,7 +657,7 @@ export const HomePage = () => {
             </div>
 
             {/* Field 4: Duration */}
-            <div className="p-4 rounded-2xl bg-white hover:bg-emerald-50/60 transition-all flex flex-col justify-center border-2 border-emerald-200/70 hover:border-blue-500 focus-within:border-blue-600 focus-within:bg-white shadow-xs">
+            <div className="p-4 rounded-2xl bg-white hover:bg-emerald-50/50 transition-all flex flex-col justify-center border-2 border-emerald-200/70 hover:border-blue-500 focus-within:border-blue-600 focus-within:bg-white shadow-xs">
               <label className="flex items-center gap-1.5 text-slate-700 text-xs font-extrabold uppercase tracking-wider mb-1.5">
                 <Calendar className="w-4 h-4 text-blue-600" />
                 <span>Thời lượng chuyến đi</span>
@@ -621,7 +689,11 @@ export const HomePage = () => {
                   key={chip.val}
                   type="button"
                   onClick={() => setDockDest(chip.val)}
-                  className="px-4 py-1.5 rounded-full bg-white hover:bg-blue-50 text-slate-800 hover:text-blue-700 text-[14px] font-bold transition-all border border-emerald-200 hover:border-blue-300 cursor-pointer shadow-2xs hover:scale-105"
+                  className={`px-4 py-1.5 rounded-full text-[14px] font-bold transition-all border cursor-pointer shadow-2xs hover:scale-105 ${
+                    dockDest === chip.val
+                      ? 'bg-blue-600 text-white border-blue-600'
+                      : 'bg-white hover:bg-blue-50 text-slate-800 hover:text-blue-700 border-emerald-200'
+                  }`}
                 >
                   {chip.label}
                 </button>
@@ -655,7 +727,7 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           3. 4 VALUE PILLARS (FULL-WIDTH 35PX PADDING, SOFT LEAF GREEN BOXES)
-          - Card backgrounds: Soft subtle leaf green tint (#f0fdf4 / #f4fbf7)
+          - Card backgrounds: Soft subtle leaf green tint (#f4fbf7)
           - Font size: Standard 14px with relaxed line height and tracking
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-16 bg-[#f8fbf9] border-t border-emerald-200/60">
@@ -677,10 +749,15 @@ export const HomePage = () => {
           {/* 4 Cards Bento Grid: Soft leaf green container backgrounds */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Pillar 1 */}
-            <div className="p-8 rounded-3xl bg-[#f4fbf7] hover:bg-white transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border-2 border-emerald-200/60 hover:border-blue-400">
+            <div className="p-8 rounded-3xl bg-[#f4fbf7] hover:bg-white transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border-2 border-emerald-200/70 hover:border-blue-400">
               <div>
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-sky-600 text-white flex items-center justify-center mb-6 shadow-md shadow-blue-500/25 group-hover:scale-110 transition-transform">
-                  <Zap className="w-7 h-7" />
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-sky-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-110 transition-transform">
+                    <Zap className="w-7 h-7" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-black text-xs">
+                    Tốc độ 3.2s
+                  </span>
                 </div>
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Lập Lịch Trình Siêu Tốc</h3>
                 <p className="text-slate-600 text-[14px] leading-relaxed font-medium tracking-[0.015em]">
@@ -695,10 +772,15 @@ export const HomePage = () => {
             </div>
 
             {/* Pillar 2 */}
-            <div className="p-8 rounded-3xl bg-[#f4fbf7] hover:bg-white transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border-2 border-emerald-200/60 hover:border-teal-400">
+            <div className="p-8 rounded-3xl bg-[#f4fbf7] hover:bg-white transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border-2 border-emerald-200/70 hover:border-teal-400">
               <div>
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center mb-6 shadow-md shadow-teal-500/25 group-hover:scale-110 transition-transform">
-                  <Wallet className="w-7 h-7" />
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center shadow-md shadow-teal-500/25 group-hover:scale-110 transition-transform">
+                    <Wallet className="w-7 h-7" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-teal-100 text-teal-800 font-black text-xs">
+                    Tiết kiệm 22%
+                  </span>
                 </div>
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Tối Ưu Ngân Sách Thực Tế</h3>
                 <p className="text-slate-600 text-[14px] leading-relaxed font-medium tracking-[0.015em]">
@@ -713,10 +795,15 @@ export const HomePage = () => {
             </div>
 
             {/* Pillar 3 */}
-            <div className="p-8 rounded-3xl bg-[#f4fbf7] hover:bg-white transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border-2 border-emerald-200/60 hover:border-blue-400">
+            <div className="p-8 rounded-3xl bg-[#f4fbf7] hover:bg-white transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border-2 border-emerald-200/70 hover:border-blue-400">
               <div>
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center mb-6 shadow-md shadow-blue-600/25 group-hover:scale-110 transition-transform">
-                  <NavigationIcon className="w-7 h-7" />
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-600/25 group-hover:scale-110 transition-transform">
+                    <NavigationIcon className="w-7 h-7" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-800 font-black text-xs">
+                    GPS 24/7
+                  </span>
                 </div>
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Trợ Lý Đi Đường On-The-Go</h3>
                 <p className="text-slate-600 text-[14px] leading-relaxed font-medium tracking-[0.015em]">
@@ -731,10 +818,15 @@ export const HomePage = () => {
             </div>
 
             {/* Pillar 4 */}
-            <div className="p-8 rounded-3xl bg-[#f4fbf7] hover:bg-white transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border-2 border-emerald-200/60 hover:border-amber-400">
+            <div className="p-8 rounded-3xl bg-[#f4fbf7] hover:bg-white transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border-2 border-emerald-200/70 hover:border-amber-400">
               <div>
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center mb-6 shadow-md shadow-amber-500/25 group-hover:scale-110 transition-transform">
-                  <Users className="w-7 h-7" />
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-hover:scale-110 transition-transform">
+                    <Users className="w-7 h-7" />
+                  </div>
+                  <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-800 font-black text-xs">
+                    50k+ Đánh giá
+                  </span>
                 </div>
                 <h3 className="font-bold text-lg text-slate-900 mb-2">Cộng Đồng Trải Nghiệm Thật</h3>
                 <p className="text-slate-600 text-[14px] leading-relaxed font-medium tracking-[0.015em]">
@@ -753,13 +845,14 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           4. LIVE INTERACTIVE AI SANDBOX STUDIO (FULL-WIDTH 35PX PADDING)
+          - Multi-day interactive timeline switcher (Ngày 1 / Ngày 2 / Ngày 3)
           - Action buttons: Royal Blue
           - Background: Soft leaf-green canvas (#f4fbf7)
           - Typography: 14px+ with relaxed tracking
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-16 bg-white border-y border-emerald-200/70">
         <div className="w-full max-w-[1920px] mx-auto px-[35px]">
-          <div className="rounded-3xl bg-[#064e3b] p-7 lg:p-12 shadow-2xl text-white border border-emerald-400/30">
+          <div className="rounded-3xl bg-gradient-to-br from-[#064e3b] via-[#022c22] to-slate-950 p-7 lg:p-12 shadow-2xl text-white border border-emerald-400/30">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Left Column: Interactive Prompt Lab (5 cols) */}
               <div className="lg:col-span-5 flex flex-col">
@@ -822,51 +915,73 @@ export const HomePage = () => {
                 </div>
               </div>
 
-              {/* Right Column: Real-time Output Interactive Canvas (7 cols) */}
-              <div className="lg:col-span-7 rounded-2xl bg-[#f4fbf7] p-6 sm:p-7 flex flex-col justify-between text-slate-900 shadow-xl border border-emerald-200">
-                <div className="flex items-center justify-between pb-4 border-b border-emerald-200/60">
+              {/* Right Column: Real-time Multi-Day Interactive Canvas (7 cols) */}
+              <div className="lg:col-span-7 rounded-2xl bg-[#f4fbf7] p-6 sm:p-7 flex flex-col justify-between text-slate-900 shadow-xl border-2 border-emerald-200">
+                {/* Header with Title and Day Switcher */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-emerald-200/70 gap-3">
                   <div className="flex items-center gap-3">
                     <div className="w-11 h-11 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black text-base shadow-sm">
                       AI
                     </div>
                     <div>
                       <h4 className="font-extrabold text-base sm:text-lg text-slate-900">
-                        {sandboxResult.title}
+                        Đà Lạt • Hành Trình Lãng Mạn (3N2Đ)
                       </h4>
-                      <p className="text-[14px] text-slate-500 font-medium">
-                        {sandboxResult.subtitle}
+                      <p className="text-[14px] text-slate-600 font-medium">
+                        Dự toán: 3.920.000đ • Tối ưu 98%
                       </p>
                     </div>
                   </div>
-                  <span className="px-3.5 py-1 rounded-full bg-blue-100 text-blue-800 font-black text-[13px] sm:text-[14px] border border-blue-200">
-                    {sandboxResult.badge}
-                  </span>
+
+                  {/* Multi-Day Tabs in Royal Blue */}
+                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white border border-emerald-200/80 shadow-2xs">
+                    {[1, 2, 3].map((dayNum) => (
+                      <button
+                        key={dayNum}
+                        type="button"
+                        onClick={() => setSandboxActiveDay(dayNum)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          sandboxActiveDay === dayNum
+                            ? 'bg-blue-600 text-white shadow-xs'
+                            : 'text-slate-600 hover:text-blue-700 hover:bg-blue-50'
+                        }`}
+                      >
+                        Ngày {dayNum}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Day Subtitle */}
+                <div className="py-2.5 text-[13px] font-bold text-emerald-800 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-600" />
+                  <span>{sandboxMultiDayData[sandboxActiveDay].dayTitle}</span>
                 </div>
 
                 {/* Dynamic Micro Timeline */}
-                <div className="space-y-4 my-5">
-                  {sandboxResult.items.map((item, idx) => (
+                <div className="space-y-3.5 my-3">
+                  {sandboxMultiDayData[sandboxActiveDay].items.map((item, idx) => (
                     <div key={idx} className="flex items-start gap-3.5">
                       <div className="flex flex-col items-center">
                         <div className="w-9 h-9 rounded-full bg-blue-600 text-white font-extrabold flex items-center justify-center text-xs shadow-xs">
                           {item.time}
                         </div>
-                        {idx < sandboxResult.items.length - 1 && (
-                          <div className="w-0.5 h-9 bg-emerald-300 mt-1" />
+                        {idx < sandboxMultiDayData[sandboxActiveDay].items.length - 1 && (
+                          <div className="w-0.5 h-8 bg-emerald-300 mt-1" />
                         )}
                       </div>
-                      <div className="bg-white p-4 rounded-2xl flex-1 shadow-2xs border border-emerald-200/70">
+                      <div className="bg-white p-3.5 rounded-2xl flex-1 shadow-2xs border border-emerald-200/70">
                         <div className="flex items-center justify-between gap-2">
                           <span className="font-bold text-[14px] sm:text-base text-slate-900">
                             {item.title}
                           </span>
                           <span
-                            className={`px-2.5 py-1 rounded-lg text-xs font-black border ${item.tagColor}`}
+                            className={`px-2.5 py-0.5 rounded-lg text-xs font-black border ${item.tagColor}`}
                           >
                             {item.cost}
                           </span>
                         </div>
-                        <p className="text-slate-600 text-[14px] mt-1.5 font-medium leading-relaxed tracking-[0.015em]">
+                        <p className="text-slate-600 text-[14px] mt-1 font-medium leading-relaxed tracking-[0.015em]">
                           {item.desc}
                         </p>
                       </div>
@@ -875,9 +990,9 @@ export const HomePage = () => {
                 </div>
 
                 {/* Footer Action within widget */}
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-emerald-200/60">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-emerald-200/70">
                   <span className="text-[13px] text-slate-500 font-semibold">
-                    Đã đồng bộ với Google Maps & Dự báo thời tiết thực tế
+                    Đã đồng bộ Google Maps & Thời tiết thực tế
                   </span>
                   <button
                     type="button"
@@ -1032,6 +1147,7 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           6. INTERACTIVE MAP & HIDDEN GEMS RADAR (FULL-WIDTH 35PX PADDING)
+          - Dynamic clickable gem selector
           - Action buttons: Royal Blue
           - Typography: 14px+ with relaxed tracking
       ────────────────────────────────────────────────────────────────────────── */}
@@ -1053,40 +1169,49 @@ export const HomePage = () => {
                 con thác nguyên sơ, quán cà phê ẩn mình và góc săn mây bình minh tuyệt đối riêng tư.
               </p>
 
+              {/* Clickable Hidden Gem Cards */}
               <div className="space-y-3.5 mb-7">
-                <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-between shadow-sm border border-emerald-500/30">
-                  <div className="flex items-center gap-3">
-                    <span className="w-3.5 h-3.5 rounded-full bg-sky-400 animate-ping" />
-                    <div>
-                      <h4 className="font-bold text-[14px] sm:text-base text-white">
-                        Suối Tía - Hồ Tuyền Lâm (Đà Lạt)
-                      </h4>
-                      <p className="text-[13px] text-slate-300 font-medium">
-                        Khoảnh khắc săn sương ma mị: 05:15 - 06:00 sáng
-                      </p>
+                {[
+                  { id: 'dalat', name: 'Suối Tía - Hồ Tuyền Lâm (Đà Lạt)', tag: 'Chấm xanh AI' },
+                  { id: 'sapa', name: 'Bản Sâu Chua - Sa Pa (Lào Cai)', tag: 'Bản địa nguyên bản' },
+                  { id: 'phuquoc', name: 'Hòn Dăm & Bãi Rạch Tràm (Phú Quốc)', tag: 'Hoang sơ 100%' }
+                ].map((gem) => (
+                  <button
+                    key={gem.id}
+                    type="button"
+                    onClick={() => setSelectedGemId(gem.id)}
+                    className={`w-full p-4 rounded-2xl flex items-center justify-between transition-all text-left cursor-pointer border ${
+                      selectedGemId === gem.id
+                        ? 'bg-blue-600/25 border-blue-400 shadow-md'
+                        : 'bg-white/10 hover:bg-white/15 border-emerald-500/30'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`w-3.5 h-3.5 rounded-full ${
+                          selectedGemId === gem.id ? 'bg-sky-400 animate-ping' : 'bg-emerald-400'
+                        }`}
+                      />
+                      <div>
+                        <h4 className="font-bold text-[14px] sm:text-base text-white">
+                          {gem.name}
+                        </h4>
+                        <p className="text-[13px] text-slate-300 font-medium">
+                          {hiddenGems[gem.id].time}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <span className="px-3 py-1 rounded-full bg-sky-500 text-slate-950 text-xs font-black uppercase">
-                    Chấm xanh AI
-                  </span>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-between shadow-sm border border-emerald-500/30">
-                  <div className="flex items-center gap-3">
-                    <span className="w-3.5 h-3.5 rounded-full bg-teal-400" />
-                    <div>
-                      <h4 className="font-bold text-[14px] sm:text-base text-white">
-                        Bản Sâu Chua - Sa Pa (Lào Cai)
-                      </h4>
-                      <p className="text-[13px] text-slate-300 font-medium">
-                        Làng cổ người Mông chưa bị thương mại hóa, hoa lê trắng nở rộ
-                      </p>
-                    </div>
-                  </div>
-                  <span className="px-3 py-1 rounded-full bg-teal-500/30 text-teal-300 text-xs font-black uppercase border border-teal-400/40">
-                    Bản địa
-                  </span>
-                </div>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
+                        selectedGemId === gem.id
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-white/20 text-slate-300'
+                      }`}
+                    >
+                      {gem.tag}
+                    </span>
+                  </button>
+                ))}
               </div>
 
               <a
@@ -1098,28 +1223,38 @@ export const HomePage = () => {
               </a>
             </div>
 
-            {/* Map View Container (7 cols) */}
+            {/* Dynamic Map & Scenic View Container (7 cols) */}
             <div className="lg:col-span-7">
-              <div className="relative w-full h-[460px] rounded-3xl overflow-hidden shadow-2xl bg-slate-900 border-2 border-emerald-500/40">
+              <div className="relative w-full h-[480px] rounded-3xl overflow-hidden shadow-2xl bg-slate-900 border-2 border-emerald-500/40">
                 <div
-                  className="w-full h-full bg-cover bg-center"
+                  className="w-full h-full bg-cover bg-center transition-all duration-700"
                   style={{
-                    backgroundImage: `url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=85')`
+                    backgroundImage: `url('${hiddenGems[selectedGemId].image}')`
                   }}
                 />
                 <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]" />
 
-                {/* Floating GPS Radar Card */}
+                {/* Top Badge: Weather & Crowd */}
+                <div className="absolute top-5 left-5 flex items-center gap-2.5">
+                  <span className="px-3.5 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-sky-300 text-xs font-bold border border-sky-400/40">
+                    🌤️ {hiddenGems[selectedGemId].temp}
+                  </span>
+                  <span className="px-3.5 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-emerald-300 text-xs font-bold border border-emerald-400/40">
+                    👥 {hiddenGems[selectedGemId].crowd}
+                  </span>
+                </div>
+
+                {/* Floating GPS Radar Card with Dynamic Selected Gem Details */}
                 <div className="absolute bottom-6 left-6 right-6 sm:right-auto sm:max-w-md p-5 rounded-2xl bg-slate-900/95 backdrop-blur-xl shadow-2xl flex items-center gap-4 text-white border border-emerald-400/50">
                   <div className="w-13 h-13 rounded-2xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/50">
                     <Radar className="w-7 h-7 animate-spin-slow" />
                   </div>
                   <div>
                     <h5 className="font-extrabold text-base text-white">
-                      Đang quét: 14 Hidden Gems vùng lân cận
+                      {hiddenGems[selectedGemId].title}
                     </h5>
-                    <p className="text-[13px] text-slate-300 font-medium mt-0.5">
-                      Cập nhật mật độ du khách và thời tiết chính xác theo thời gian thực.
+                    <p className="text-[13px] text-slate-300 font-medium mt-0.5 line-clamp-2">
+                      {hiddenGems[selectedGemId].desc}
                     </p>
                   </div>
                 </div>
@@ -1151,7 +1286,7 @@ export const HomePage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Review 1 */}
-            <div className="p-8 rounded-3xl bg-[#f4fbf7] shadow-sm hover:shadow-md transition-all flex flex-col justify-between border border-emerald-200/70">
+            <div className="p-8 rounded-3xl bg-[#f4fbf7] shadow-sm hover:shadow-md transition-all flex flex-col justify-between border-2 border-emerald-200/70">
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1164,7 +1299,7 @@ export const HomePage = () => {
                   chuẩn vị.”
                 </p>
               </div>
-              <div className="flex items-center gap-3.5 pt-4 border-t border-emerald-200/50">
+              <div className="flex items-center gap-3.5 pt-4 border-t border-emerald-200/60">
                 <img
                   className="w-12 h-12 rounded-full object-cover ring-2 ring-blue-500"
                   alt="Minh Trang"
@@ -1180,7 +1315,7 @@ export const HomePage = () => {
             </div>
 
             {/* Review 2 */}
-            <div className="p-8 rounded-3xl bg-[#f4fbf7] shadow-sm hover:shadow-md transition-all flex flex-col justify-between border border-emerald-200/70">
+            <div className="p-8 rounded-3xl bg-[#f4fbf7] shadow-sm hover:shadow-md transition-all flex flex-col justify-between border-2 border-emerald-200/70">
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1192,7 +1327,7 @@ export const HomePage = () => {
                   Pa đã cứu cánh cả chuyến đi! Chi phí dự tính sát nút chỉ lệch có 150k.”
                 </p>
               </div>
-              <div className="flex items-center gap-3.5 pt-4 border-t border-emerald-200/50">
+              <div className="flex items-center gap-3.5 pt-4 border-t border-emerald-200/60">
                 <img
                   className="w-12 h-12 rounded-full object-cover ring-2 ring-blue-500"
                   alt="Hoàng Nam"
@@ -1208,7 +1343,7 @@ export const HomePage = () => {
             </div>
 
             {/* Review 3 */}
-            <div className="p-8 rounded-3xl bg-[#f4fbf7] shadow-sm hover:shadow-md transition-all flex flex-col justify-between border border-emerald-200/70">
+            <div className="p-8 rounded-3xl bg-[#f4fbf7] shadow-sm hover:shadow-md transition-all flex flex-col justify-between border-2 border-emerald-200/70">
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1220,7 +1355,7 @@ export const HomePage = () => {
                   gợi ý không hề xô bồ như các tour đại trà, cực kỳ lãng mạn và tinh tế!”
                 </p>
               </div>
-              <div className="flex items-center gap-3.5 pt-4 border-t border-emerald-200/50">
+              <div className="flex items-center gap-3.5 pt-4 border-t border-emerald-200/60">
                 <img
                   className="w-12 h-12 rounded-full object-cover ring-2 ring-blue-500"
                   alt="Quang & Thảo"
