@@ -290,24 +290,24 @@ export const HomePage = () => {
           dockBudget === 'budget'
             ? '2.500.000đ'
             : dockBudget === 'luxury'
-            ? '8.000.000đ'
-            : '4.500.000đ',
+              ? '8.000.000đ'
+              : '4.500.000đ',
         style:
           dockStyle === 'photo'
             ? 'Sống ảo & Văn hóa'
             : dockStyle === 'nature'
-            ? 'Trekking thiên nhiên'
-            : dockStyle === 'family'
-            ? 'Gia đình & Trẻ nhỏ'
-            : 'Nghỉ dưỡng & Ẩm thực',
+              ? 'Trekking thiên nhiên'
+              : dockStyle === 'family'
+                ? 'Gia đình & Trẻ nhỏ'
+                : 'Nghỉ dưỡng & Ẩm thực',
         duration:
           dockDuration === '2d1n'
             ? '2 Ngày 1 Đêm'
             : dockDuration === '4d3n'
-            ? '4 Ngày 3 Đêm'
-            : dockDuration === '5d4n'
-            ? '5 Ngày 4 Đêm'
-            : '3 Ngày 2 Đêm'
+              ? '4 Ngày 3 Đêm'
+              : dockDuration === '5d4n'
+                ? '5 Ngày 4 Đêm'
+                : '3 Ngày 2 Đêm'
       });
       toast.success(`Đã khởi tạo lộ trình AI cho ${dockDest}! ✨`);
     }, 900);
@@ -353,7 +353,7 @@ export const HomePage = () => {
           - Royal Blue CTA buttons with energetic glow
           - Quick inspiration tags in unified row
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="relative w-full overflow-hidden -mt-6 pt-16 pb-24 lg:pb-32 bg-[#02231a] text-white">
+      <section className="relative w-full overflow-hidden -mt-6 pt-16 pb-24 lg:pb-32 bg-[#031726] text-white">
         {/* Cinematic Backdrop with Deep Photographic Contrast */}
         <div className="absolute inset-0 z-0">
           <div
@@ -363,32 +363,32 @@ export const HomePage = () => {
             }}
           />
           {/* Deep Scrim with Rich Tone Separation - Preserves Depth & Vibrancy */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-[#032e22]/90 to-slate-950/90" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#02231a]/40 to-[#02231a]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-[#082845]/90 to-slate-950/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#031726]/40 to-[#031726]" />
 
-          {/* Radiant Subtle Ambient Light */}
-          <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-sky-500/20 blur-[140px] pointer-events-none" />
-          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/15 blur-[130px] pointer-events-none" />
+          {/* Radiant Subtle Ambient Light with Pulse Animations */}
+          <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-sky-500/20 blur-[140px] pointer-events-none animate-pulse-slow" />
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/15 blur-[130px] pointer-events-none animate-pulse-slow [animation-delay:3.5s]" />
         </div>
 
         {/* Content Container Aligned with Navbar Width */}
         <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Main Hero Header Stack */}
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6">
-            {/* Top Announcement Tag */}
-            <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl text-sky-300 font-bold text-xs sm:text-sm shadow-lg border border-sky-400/40 tracking-[0.015em]">
+            {/* Top Announcement Tag with Floating Animation */}
+            <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl text-sky-300 font-bold text-xs sm:text-sm shadow-lg border border-sky-400/40 tracking-[0.015em] animate-float-slow hover:scale-105 transition-transform cursor-pointer">
               <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping" />
-              <Sparkles className="w-4 h-4 text-amber-300" />
+              <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
               <span>Trí Tuệ Nhân Tạo Lập Lịch Trình Thế Hệ Mới • Wayfare AI 4.0</span>
             </div>
 
-            {/* Expansive Grand Headline */}
+            {/* Expansive Grand Headline with Gradient Flow */}
             <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.18] text-white">
               Kiến Tạo Chuyến Đi Mơ Ước <br className="hidden sm:inline" />
-              <span className="bg-gradient-to-r from-sky-300 via-sky-200 to-sky-300 bg-clip-text text-transparent drop-shadow-sm">
+              <span className="bg-gradient-to-r from-sky-400 via-blue-300 to-indigo-300 bg-clip-text text-transparent animate-gradient-flow">
                 Chỉ Trong 3 Giây
               </span>{' '}
-              Cùng AI Wayfare
+              Cùng Wayfare AI
             </h1>
 
             {/* Subtitle with High Legibility & Relaxed 14px-16px Text */}
@@ -397,11 +397,11 @@ export const HomePage = () => {
               thời gian thực và cá nhân hóa theo gu riêng của bạn chỉ với một chạm.
             </p>
 
-            {/* Action Buttons: VIBRANT ROYAL BLUE BUTTONS */}
+            {/* Action Buttons: VIBRANT ROYAL BLUE BUTTONS WITH SHIMMER */}
             <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
               <a
                 href="#ai-dock"
-                className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-extrabold text-sm sm:text-base shadow-[0_10px_25px_rgba(37,99,235,0.45)] hover:scale-105 transition-all cursor-pointer ring-2 ring-blue-300/40 tracking-[0.015em]"
+                className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-extrabold text-sm sm:text-base shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-blue-300/40 tracking-[0.015em] shimmer-effect"
               >
                 <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
                 <span>Lập Lịch Trình AI Ngay</span>
@@ -412,11 +412,11 @@ export const HomePage = () => {
 
               <a
                 href="#kham-pha"
-                className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-sm sm:text-base transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer tracking-[0.015em]"
+                className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-sm sm:text-base transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer tracking-[0.015em] hover:scale-105 active:scale-95 group"
               >
-                <Compass className="w-5 h-5 text-sky-300" />
+                <Compass className="w-5 h-5 text-sky-300 group-hover:rotate-45 transition-transform duration-300" />
                 <span>Khám Phá Điểm Đến Hot</span>
-                <ArrowDown className="w-4 h-4 text-sky-300" />
+                <ArrowDown className="w-4 h-4 text-sky-300 group-hover:translate-y-1 transition-transform" />
               </a>
             </div>
           </div>
@@ -434,7 +434,7 @@ export const HomePage = () => {
         className="relative z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 -mt-12 lg:-mt-16 mb-20"
         id="ai-dock"
       >
-        <div className="p-6 sm:p-8 rounded-3xl bg-white/95 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(2,44,34,0.18)] border border-slate-200/90">
+        <div className="p-6 sm:p-8 rounded-3xl bg-white/95 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(2,132,199,0.16)] border border-slate-200/90 transition-all">
           {/* Planner Modes Segmented Control */}
           <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
             <div className="flex items-center gap-1.5 p-1 rounded-full bg-slate-100 border border-slate-200/60 shadow-2xs">
@@ -447,7 +447,7 @@ export const HomePage = () => {
                     : 'text-slate-700 hover:text-sky-700 hover:bg-white'
                 }`}
               >
-                <Sparkles className="w-4 h-4 text-amber-300" />
+                <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
                 <span>Lập lịch trình bằng AI</span>
               </button>
 
@@ -486,7 +486,7 @@ export const HomePage = () => {
 
             {/* Dynamic AI Estimate Pill */}
             <div className="flex items-center gap-3">
-              <div className="px-3.5 py-1.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200/80 shadow-2xs flex items-center gap-2.5 text-xs sm:text-sm font-semibold">
+              <div className="px-3.5 py-1.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200/80 shadow-2xs flex items-center gap-2.5 text-xs sm:text-sm font-semibold animate-float-slow">
                 <ShieldCheck className="w-4 h-4 text-sky-600" />
                 <span>Dự toán: ~{dockEstimate.budgetText}</span>
                 <span className="w-1 h-1 rounded-full bg-sky-400" />
@@ -495,13 +495,13 @@ export const HomePage = () => {
             </div>
           </div>
 
-          {/* Omni-Search 4 Fields: High Contrast Modern Cards */}
+          {/* Omni-Search 4 Fields: High Contrast Modern Cards with Micro-Hover */}
           <form
             onSubmit={handleDockGenerate}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
           >
             {/* Field 1: Destination */}
-            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs">
+            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs hover:-translate-y-0.5">
               <label className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider mb-1">
                 <MapPin className="w-4 h-4 text-blue-600" />
                 <span>Điểm đến mong muốn</span>
@@ -516,7 +516,7 @@ export const HomePage = () => {
             </div>
 
             {/* Field 2: Budget */}
-            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs">
+            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs hover:-translate-y-0.5">
               <label className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider mb-1">
                 <DollarSign className="w-4 h-4 text-blue-600" />
                 <span>Ngân sách dự kiến</span>
@@ -533,7 +533,7 @@ export const HomePage = () => {
             </div>
 
             {/* Field 3: Travel Style */}
-            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs">
+            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs hover:-translate-y-0.5">
               <label className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider mb-1">
                 <Compass className="w-4 h-4 text-blue-600" />
                 <span>Gu trải nghiệm</span>
@@ -551,7 +551,7 @@ export const HomePage = () => {
             </div>
 
             {/* Field 4: Duration */}
-            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs">
+            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs hover:-translate-y-0.5">
               <label className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider mb-1">
                 <Calendar className="w-4 h-4 text-blue-600" />
                 <span>Thời lượng chuyến đi</span>
@@ -583,7 +583,7 @@ export const HomePage = () => {
                   key={chip.val}
                   type="button"
                   onClick={() => setDockDest(chip.val)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer shadow-2xs hover:scale-105 ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer shadow-2xs hover:scale-105 active:scale-95 ${
                     dockDest === chip.val
                       ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
                       : 'bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 border-slate-200'
@@ -598,7 +598,7 @@ export const HomePage = () => {
               type="button"
               disabled={isDockGenerating}
               onClick={handleDockGenerate}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-cyan-600 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-sky-500/25 hover:shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 tracking-[0.015em]"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-blue-700 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-sky-500/25 hover:shadow-xl hover:scale-[1.03] active:scale-95 transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 tracking-[0.015em] shimmer-effect"
             >
               {isDockGenerating ? (
                 <>
@@ -644,17 +644,17 @@ export const HomePage = () => {
           {/* 4 Cards Bento Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Pillar 1 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400 cursor-pointer">
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-500 to-sky-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-110 transition-transform">
+                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-500 to-sky-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                     <Zap className="w-6 h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200/60">
+                  <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200/60 group-hover:scale-105 transition-transform">
                     Tốc độ 3.2s
                   </span>
                 </div>
-                <h3 className="font-bold text-lg text-slate-900 mb-2">Lập Lịch Trình Siêu Tốc</h3>
+                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-blue-700 transition-colors">Lập Lịch Trình Siêu Tốc</h3>
                 <p className="text-slate-600 text-sm leading-relaxed font-normal tracking-[0.015em]">
                   Xử lý dữ liệu phân luồng giao thông, giờ mở cửa và thứ tự ghé thăm hợp lý nhất
                   trong 3 giây, tránh hoàn toàn đi lòng vòng.
@@ -662,22 +662,22 @@ export const HomePage = () => {
               </div>
               <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-blue-600 font-bold text-sm">
                 <span>Tự động tối ưu 100%</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
             </div>
 
             {/* Pillar 2 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-sky-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-sky-400 cursor-pointer">
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-sky-500/25 group-hover:scale-110 transition-transform">
+                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-sky-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                     <Wallet className="w-6 h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-sky-50 text-sky-700 font-bold text-xs border border-sky-200/60">
+                  <span className="px-3 py-1 rounded-full bg-sky-50 text-sky-700 font-bold text-xs border border-sky-200/60 group-hover:scale-105 transition-transform">
                     Tiết kiệm 22%
                   </span>
                 </div>
-                <h3 className="font-bold text-lg text-slate-900 mb-2">Tối Ưu Ngân Sách Thực Tế</h3>
+                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-sky-700 transition-colors">Tối Ưu Ngân Sách Thực Tế</h3>
                 <p className="text-slate-600 text-sm leading-relaxed font-normal tracking-[0.015em]">
                   Dự toán chi tiết từng khoản chi: vé máy bay, phòng ốc, ăn uống địa phương và dự
                   phòng phát sinh chính xác đến 95%.
@@ -685,22 +685,22 @@ export const HomePage = () => {
               </div>
               <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-sky-700 font-bold text-sm">
                 <span>Cắt giảm chi phí thừa</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
             </div>
 
             {/* Pillar 3 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400 cursor-pointer">
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-600/25 group-hover:scale-110 transition-transform">
+                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-600/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                     <NavigationIcon className="w-6 h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200/60">
+                  <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200/60 group-hover:scale-105 transition-transform">
                     GPS 24/7
                   </span>
                 </div>
-                <h3 className="font-bold text-lg text-slate-900 mb-2">Trợ Lý Đi Đường On-The-Go</h3>
+                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-blue-700 transition-colors">Trợ Lý Đi Đường On-The-Go</h3>
                 <p className="text-slate-600 text-sm leading-relaxed font-normal tracking-[0.015em]">
                   Trời mưa bất ngờ? Điểm tham quan đóng cửa? AI chủ động đề xuất phương án B thay thế
                   ngay tức thì trong bán kính 1km.
@@ -708,22 +708,22 @@ export const HomePage = () => {
               </div>
               <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-blue-600 font-bold text-sm">
                 <span>Đồng hành theo GPS</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
             </div>
 
             {/* Pillar 4 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/20 transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1.5 group flex flex-col justify-between border border-slate-200/90 hover:border-amber-400">
+            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-amber-400 cursor-pointer">
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-hover:scale-110 transition-transform">
+                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
                     <Users className="w-6 h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 font-bold text-xs border border-amber-200/60">
+                  <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 font-bold text-xs border border-amber-200/60 group-hover:scale-105 transition-transform">
                     50k+ Đánh giá
                   </span>
                 </div>
-                <h3 className="font-bold text-lg text-slate-900 mb-2">Cộng Đồng Trải Nghiệm Thật</h3>
+                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-amber-700 transition-colors">Cộng Đồng Trải Nghiệm Thật</h3>
                 <p className="text-slate-600 text-sm leading-relaxed font-normal tracking-[0.015em]">
                   Khám phá và sao chép lịch trình thực chiến từ hàng ngàn travel blogger, hướng dẫn
                   viên bản địa đã được kiểm chứng.
@@ -731,7 +731,7 @@ export const HomePage = () => {
               </div>
               <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-amber-700 font-bold text-sm">
                 <span>Sao chép 1-click</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
             </div>
           </div>
@@ -775,9 +775,9 @@ export const HomePage = () => {
                   <button
                     type="button"
                     onClick={handleRunSandbox}
-                    className="absolute bottom-3 right-3 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105"
+                    className="absolute bottom-3 right-3 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95 shimmer-effect"
                   >
-                    <Sparkles className="w-4 h-4 text-amber-300" />
+                    <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
                     <span>Phân tích</span>
                   </button>
                 </div>
@@ -792,7 +792,7 @@ export const HomePage = () => {
                         'Gia đình 4 người đi Đà Nẵng 4N3Đ có người lớn tuổi, ưu tiên resort biển và ẩm thực nhẹ nhàng.'
                       );
                     }}
-                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs"
+                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
                   >
                     👨‍👩‍👧‍👦 Gia đình Đà Nẵng
                   </button>
@@ -803,7 +803,7 @@ export const HomePage = () => {
                         'Solo trekking Hà Giang 3N2Đ săn mây Mã Pí Lèng, ngân sách sinh viên tiết kiệm.'
                       );
                     }}
-                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs"
+                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
                   >
                     🏍️ Phượt Hà Giang
                   </button>
@@ -811,11 +811,11 @@ export const HomePage = () => {
               </div>
 
               {/* Right Column: Real-time Multi-Day Interactive Canvas (7 cols) */}
-              <div className="lg:col-span-7 rounded-3xl bg-slate-50/90 p-6 sm:p-7 flex flex-col justify-between text-slate-900 shadow-sm border border-slate-200/90">
+              <div className="lg:col-span-7 rounded-3xl bg-slate-50/90 p-6 sm:p-7 flex flex-col justify-between text-slate-900 shadow-sm border border-slate-200/90 hover:shadow-md transition-shadow">
                 {/* Header with Title and Day Switcher */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200/80 gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-sm shadow-sm">
+                    <div className="w-10 h-10 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-sm shadow-sm animate-pulse-slow">
                       AI
                     </div>
                     <div>
@@ -835,7 +835,7 @@ export const HomePage = () => {
                         key={dayNum}
                         type="button"
                         onClick={() => setSandboxActiveDay(dayNum)}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                        className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${
                           sandboxActiveDay === dayNum
                             ? 'bg-sky-600 text-white shadow-xs'
                             : 'text-slate-600 hover:text-sky-700 hover:bg-slate-100'
@@ -849,25 +849,25 @@ export const HomePage = () => {
 
                 {/* Day Subtitle */}
                 <div className="py-2.5 text-xs sm:text-sm font-bold text-sky-700 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
+                  <Sparkles className="w-4 h-4 text-amber-500 animate-spin-slow" />
                   <span>{sandboxMultiDayData[sandboxActiveDay].dayTitle}</span>
                 </div>
 
                 {/* Dynamic Micro Timeline */}
                 <div className="space-y-3.5 my-3">
                   {sandboxMultiDayData[sandboxActiveDay].items.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-3.5">
+                    <div key={idx} className="flex items-start gap-3.5 group">
                       <div className="flex flex-col items-center">
-                        <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-extrabold flex items-center justify-center text-xs shadow-xs">
+                        <div className="w-8 h-8 rounded-full bg-sky-600 text-white font-extrabold flex items-center justify-center text-xs shadow-xs group-hover:scale-110 transition-transform">
                           {item.time}
                         </div>
                         {idx < sandboxMultiDayData[sandboxActiveDay].items.length - 1 && (
                           <div className="w-0.5 h-8 bg-slate-300 mt-1" />
                         )}
                       </div>
-                      <div className="bg-white p-3.5 rounded-2xl flex-1 shadow-2xs border border-slate-200/90 hover:border-sky-300 transition-colors">
+                      <div className="bg-white p-3.5 rounded-2xl flex-1 shadow-2xs border border-slate-200/90 hover:border-sky-300 hover:shadow-sm hover:translate-x-1 transition-all">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-bold text-sm sm:text-base text-slate-900">
+                          <span className="font-bold text-sm sm:text-base text-slate-900 group-hover:text-sky-700 transition-colors">
                             {item.title}
                           </span>
                           <span
@@ -900,10 +900,10 @@ export const HomePage = () => {
                       });
                       toast.success('Đang mở chi tiết toàn bộ lộ trình 3 ngày! ✨');
                     }}
-                    className="px-6 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105"
+                    className="px-6 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95 shimmer-effect"
                   >
                     <span>Mở toàn bộ lộ trình 3 ngày</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1" />
                   </button>
                 </div>
               </div>
@@ -946,11 +946,10 @@ export const HomePage = () => {
                   key={tab.id}
                   type="button"
                   onClick={() => setShowcaseRegion(tab.id)}
-                  className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${
-                    showcaseRegion === tab.id
+                  className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${showcaseRegion === tab.id
                       ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
                       : 'bg-white hover:bg-sky-50 text-slate-700 border border-sky-200/80 shadow-2xs'
-                  }`}
+                    }`}
                 >
                   {tab.label}
                 </button>
@@ -963,19 +962,19 @@ export const HomePage = () => {
             {filteredTours.map((tour) => (
               <div
                 key={tour.id}
-                className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 flex flex-col group border border-sky-100 hover:border-sky-400"
+                className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-2xl hover-elevate transition-all duration-300 flex flex-col group border border-sky-100 hover:border-sky-400 cursor-pointer"
               >
                 <div className="relative h-56 w-full overflow-hidden">
                   <img
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
                     alt={tour.title}
                     src={tour.image}
                   />
-                  <div className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-xs font-black text-sky-900 shadow-md">
+                  <div className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-xs font-black text-sky-900 shadow-md group-hover:scale-105 transition-transform">
                     {tour.duration}
                   </div>
                   <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-sky-600 text-white text-xs font-bold flex items-center gap-1 shadow-md">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-spin-slow" />
                     <span>{tour.tag}</span>
                   </div>
                   <div className="absolute bottom-3.5 left-3.5 px-3.5 py-1 rounded-full bg-slate-950/75 backdrop-blur-md text-white text-xs font-bold">
@@ -1013,9 +1012,9 @@ export const HomePage = () => {
                     <button
                       type="button"
                       onClick={() => handleCopyTour(tour)}
-                      className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border flex items-center gap-1.5 cursor-pointer ${
+                      className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border flex items-center gap-1.5 cursor-pointer hover:scale-105 active:scale-95 ${
                         savedTours[tour.id]
-                          ? 'bg-sky-600 text-white border-sky-600'
+                          ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
                           : 'bg-sky-50 hover:bg-sky-600 hover:text-white text-sky-800 border-sky-200'
                       }`}
                     >
@@ -1074,7 +1073,7 @@ export const HomePage = () => {
                       key={gem.id}
                       type="button"
                       onClick={() => setSelectedGemId(gem.id)}
-                      className={`w-full p-4 rounded-2xl flex items-center justify-between transition-all text-left cursor-pointer border ${
+                      className={`w-full p-4 rounded-2xl flex items-center justify-between transition-all text-left cursor-pointer border hover:scale-[1.02] active:scale-[0.98] ${
                         selectedGemId === gem.id
                           ? 'bg-blue-600/35 border-blue-400 shadow-md ring-1 ring-blue-400/30'
                           : 'bg-white/10 hover:bg-white/15 border-white/15'
@@ -1094,7 +1093,7 @@ export const HomePage = () => {
                         </div>
                       </div>
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-black uppercase ${
+                        className={`px-3 py-1 rounded-full text-xs font-black uppercase transition-colors ${
                           selectedGemId === gem.id
                             ? 'bg-blue-500 text-white'
                             : 'bg-white/20 text-slate-300'
@@ -1108,10 +1107,10 @@ export const HomePage = () => {
 
                 <a
                   href="#ai-dock"
-                  className="inline-flex items-center gap-2 text-sky-400 font-bold text-sm sm:text-base hover:text-sky-300 hover:underline cursor-pointer"
+                  className="inline-flex items-center gap-2 text-sky-400 font-bold text-sm sm:text-base hover:text-sky-300 hover:underline cursor-pointer group"
                 >
                   <span>Bật radar quét điểm bí mật xung quanh bạn</span>
-                  <Radar className="w-5 h-5 animate-pulse" />
+                  <Radar className="w-5 h-5 animate-pulse group-hover:rotate-45 transition-transform" />
                 </a>
               </div>
 
@@ -1137,7 +1136,7 @@ export const HomePage = () => {
                   </div>
 
                   {/* Floating GPS Radar Card with Dynamic Selected Gem Details */}
-                  <div className="absolute bottom-6 left-6 right-6 sm:right-auto sm:max-w-md p-5 rounded-2xl bg-slate-900/95 backdrop-blur-xl shadow-2xl flex items-center gap-4 text-white border border-slate-700">
+                  <div className="absolute bottom-6 left-6 right-6 sm:right-auto sm:max-w-md p-5 rounded-2xl bg-slate-900/95 backdrop-blur-xl shadow-2xl flex items-center gap-4 text-white border border-slate-700 hover:scale-[1.02] transition-transform">
                     <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/50">
                       <Radar className="w-6 h-6 animate-spin-slow" />
                     </div>
@@ -1178,7 +1177,7 @@ export const HomePage = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Review 1 */}
-            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border-t-4 border-t-blue-600 border border-slate-200/90 hover:-translate-y-1">
+            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl hover-elevate transition-all flex flex-col justify-between border-t-4 border-t-blue-600 border border-slate-200/90 cursor-pointer">
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1205,7 +1204,7 @@ export const HomePage = () => {
             </div>
 
             {/* Review 2 */}
-            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border-t-4 border-t-sky-600 border border-slate-200/90 hover:-translate-y-1">
+            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl hover-elevate transition-all flex flex-col justify-between border-t-4 border-t-sky-600 border border-slate-200/90 cursor-pointer">
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1233,7 +1232,7 @@ export const HomePage = () => {
             </div>
 
             {/* Review 3 */}
-            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl transition-all flex flex-col justify-between border-t-4 border-t-amber-500 border border-slate-200/90 hover:-translate-y-1">
+            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl hover-elevate transition-all flex flex-col justify-between border-t-4 border-t-amber-500 border border-slate-200/90 cursor-pointer">
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1263,17 +1262,17 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           8. GRAND FINALE CTA BANNER
-          - Framed on a soft leaf pedestal with vibrant emerald gradient
+          - Framed on a soft sapphire ambient pedestal
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-16 bg-gradient-to-b from-[#eaf4ed] to-[#f4f9f6]">
+      <section className="w-full py-16 bg-gradient-to-b from-[#f0f9ff] to-[#f8fafc]">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 bg-gradient-to-r from-[#031726] via-[#082845] to-[#0c385f] text-white shadow-2xl">
-            {/* Subtle Glow Backdrop */}
-            <div className="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-blue-500/20 blur-3xl pointer-events-none" />
-            <div className="absolute top-0 right-1/3 w-64 h-64 rounded-full bg-sky-400/20 blur-2xl pointer-events-none" />
+            {/* Subtle Glow Backdrop with Pulse Animations */}
+            <div className="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-blue-500/20 blur-3xl pointer-events-none animate-pulse-slow" />
+            <div className="absolute top-0 right-1/3 w-64 h-64 rounded-full bg-sky-400/20 blur-2xl pointer-events-none animate-pulse-slow [animation-delay:3s]" />
 
             <div className="relative z-10 max-w-2xl flex flex-col items-start space-y-6">
-              <span className="px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white font-extrabold text-xs border border-white/30">
+              <span className="px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white font-extrabold text-xs border border-white/30 animate-float-slow">
                 🚀 Khởi đầu hành trình mới ngay hôm nay
               </span>
 
@@ -1289,9 +1288,9 @@ export const HomePage = () => {
               <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto pt-2">
                 <a
                   href="#ai-dock"
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm sm:text-base shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm sm:text-base shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 cursor-pointer shimmer-effect"
                 >
-                  <Sparkles className="w-5 h-5 text-amber-300" />
+                  <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
                   <span>Lập Lịch Trình Miễn Phí Ngay</span>
                 </a>
 
