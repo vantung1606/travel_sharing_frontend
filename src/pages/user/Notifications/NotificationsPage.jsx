@@ -295,7 +295,7 @@ export const NotificationsPage = () => {
   };
 
   return (
-    <div className="w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8 space-y-6 animate-fade-in">
+    <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8 space-y-6 animate-fade-in">
       
       {/* ─── 1. BREADCRUMB & PAGE HEADER ────────────────────────────────────────── */}
       <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">

@@ -209,7 +209,7 @@ export const AIPlannerPage = () => {
     <div className="w-full min-h-screen bg-slate-50/50 pb-20">
       
       {/* Background Subtle Ambient Glow Orbs */}
-      <div className="relative w-full max-w-[1620px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6 space-y-6 overflow-hidden">
+      <div className="relative w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6 space-y-6 overflow-hidden">
         <div className="absolute -top-32 right-12 w-96 h-96 bg-emerald-200/30 rounded-full blur-3xl pointer-events-none -z-10" />
         <div className="absolute top-48 left-10 w-80 h-80 bg-amber-200/20 rounded-full blur-3xl pointer-events-none -z-10" />
         <div className="absolute top-96 right-1/4 w-72 h-72 bg-emerald-200/20 rounded-full blur-3xl pointer-events-none -z-10" />
