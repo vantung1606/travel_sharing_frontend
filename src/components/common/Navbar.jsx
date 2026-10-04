@@ -10,7 +10,6 @@ import {
   MessageSquare,
   User,
   Shield,
-  Search,
   Bell,
   Menu,
   X,
@@ -192,64 +191,35 @@ export const Navbar = () => {
             )}
 
             {/* 3. Right Action Bar */}
-            <div className="flex items-center gap-2 shrink-0">
-              
-              {/* Search Pill Input (Desktop >= 1536px) */}
-              <div className={`hidden 2xl:flex items-center rounded-full px-3.5 py-1.5 border-0 transition-all text-xs ${
-                isDarkHero
-                  ? 'bg-white/10 hover:bg-white/15 focus-within:bg-white/20 focus-within:ring-2 focus-within:ring-sky-400/20 text-white'
-                  : 'bg-slate-200/50 hover:bg-slate-200/80 focus-within:bg-white focus-within:ring-2 focus-within:ring-sky-500/20 text-slate-800'
-              }`}>
-                <Search className={`w-3.5 h-3.5 mr-2 shrink-0 ${isDarkHero ? 'text-white/70' : 'text-slate-400'}`} />
-                <input
-                  type="text"
-                  placeholder="Tìm điểm đến, ẩm thực..."
-                  className={`bg-transparent border-0 outline-none text-xs w-32 2xl:w-40 font-medium ${
-                    isDarkHero ? 'text-white placeholder:text-white/60' : 'text-slate-800 placeholder:text-slate-400'
-                  }`}
-                />
-              </div>
-
+            <div className="flex items-center gap-2.5 shrink-0">
               {portalMode === 'user' && (
-                <>
-                  {/* Notification Bell */}
-                  <div className="relative shrink-0">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setIsNotificationOpen(!isNotificationOpen);
-                        setIsProfileDropdownOpen(false);
-                      }}
-                      className={`w-9 h-9 rounded-full flex items-center justify-center border-0 shadow-none transition-colors relative cursor-pointer ${
-                        isDarkHero
-                          ? 'bg-white/10 hover:bg-white/20 text-white'
-                          : 'bg-slate-200/50 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900'
-                      }`}
-                      title="Thông báo"
-                    >
-                      <Bell className="w-4 h-4" />
-                      {unreadNotificationsCount > 0 && (
-                        <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 bg-amber-600 text-white font-bold text-[10px] rounded-full flex items-center justify-center ring-2 ring-white shadow-2xs">
-                          {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
-                        </span>
-                      )}
-                    </button>
-                    <NotificationDropdown
-                      isOpen={isNotificationOpen}
-                      onClose={() => setIsNotificationOpen(false)}
-                    />
-                  </div>
-
-                  {/* Refined "Tạo lịch trình" Button (Shown on 2xl screens to avoid crowding) */}
+                /* Notification Bell */
+                <div className="relative shrink-0">
                   <button
                     type="button"
-                    onClick={() => setIsAIGeneratorOpen(true)}
-                    className="hidden 2xl:inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sky-600 hover:bg-sky-700 text-white rounded-full text-xs font-bold shadow-xs hover:shadow-sky-600/30 transition-all cursor-pointer shrink-0"
+                    onClick={() => {
+                      setIsNotificationOpen(!isNotificationOpen);
+                      setIsProfileDropdownOpen(false);
+                    }}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center border-0 shadow-none transition-colors relative cursor-pointer ${
+                      isDarkHero
+                        ? 'bg-white/10 hover:bg-white/20 text-white'
+                        : 'bg-slate-200/50 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900'
+                    }`}
+                    title="Thông báo"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-200" />
-                    <span>Tạo lịch trình</span>
+                    <Bell className="w-4 h-4" />
+                    {unreadNotificationsCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 min-w-[17px] h-[17px] px-1 bg-amber-600 text-white font-bold text-[10px] rounded-full flex items-center justify-center ring-2 ring-white shadow-2xs">
+                        {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
+                      </span>
+                    )}
                   </button>
-                </>
+                  <NotificationDropdown
+                    isOpen={isNotificationOpen}
+                    onClose={() => setIsNotificationOpen(false)}
+                  />
+                </div>
               )}
 
               {/* User Profile / Auth Toggle */}
