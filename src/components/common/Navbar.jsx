@@ -41,7 +41,8 @@ export const Navbar = () => {
     };
   }, []);
 
-  const isTransparent = isHomePage && !isScrolled;
+  // When on homepage and NOT scrolled, we are directly over the dark photo hero:
+  const isDarkHero = isHomePage && !isScrolled;
 
   const {
     portalMode,
@@ -96,11 +97,11 @@ export const Navbar = () => {
   return (
     <>
       <header
-        className={`sticky top-0 z-40 w-full select-none transition-all duration-300 ${
-          isTransparent
-            ? 'bg-slate-950/20 backdrop-blur-md border-b border-white/10 text-white shadow-none'
-            : 'bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-xs text-slate-900'
-        }`}
+        className={`sticky top-0 z-40 w-full select-none transition-all duration-300 border-0 border-b-0 ${
+          !isScrolled
+            ? 'bg-transparent shadow-none'
+            : 'bg-white/85 backdrop-blur-xl shadow-xs text-slate-900'
+        } ${isDarkHero ? 'text-white' : 'text-slate-900'}`}
       >
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="flex items-center justify-between h-16 gap-2 sm:gap-3">
@@ -111,29 +112,29 @@ export const Navbar = () => {
                 onClick={() => { setPortalMode('user'); setUserTab('home'); }}
                 className="flex items-center gap-2.5 cursor-pointer group"
               >
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105 ${
-                  isTransparent
-                    ? 'bg-gradient-to-tr from-sky-500 to-blue-600 shadow-sky-500/30 ring-1 ring-white/20'
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105 border-0 ${
+                  isDarkHero
+                    ? 'bg-gradient-to-tr from-sky-500 to-blue-600 shadow-sky-500/30'
                     : 'bg-gradient-to-tr from-sky-600 to-blue-600 shadow-sky-500/20'
                 }`}>
                   <Compass className="w-5 h-5 animate-spin-slow" />
                 </div>
                 <div className="block leading-tight">
                   <span className={`font-display font-extrabold text-lg sm:text-xl tracking-tight transition-colors ${
-                    isTransparent ? 'text-white group-hover:text-sky-300' : 'text-slate-900 group-hover:text-sky-600'
+                    isDarkHero ? 'text-white group-hover:text-sky-300' : 'text-slate-900 group-hover:text-sky-600'
                   }`}>
-                    Way<span className={isTransparent ? 'text-sky-400' : 'text-sky-600'}>fare</span>
+                    Way<span className={isDarkHero ? 'text-sky-400' : 'text-sky-600'}>fare</span>
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* 2. Sleek Rounded Navigation Bar (Compact & Glass pill on Transparent) */}
+            {/* 2. Sleek Rounded Navigation Bar (Border-free pill) */}
             {portalMode === 'user' && (
-              <nav className={`hidden lg:flex items-center gap-0.5 xl:gap-1 p-1 rounded-full transition-all shrink-0 ${
-                isTransparent
-                  ? 'bg-white/10 backdrop-blur-md border border-white/20 shadow-sm'
-                  : 'bg-slate-100/90 border border-slate-200/70 shadow-2xs'
+              <nav className={`hidden lg:flex items-center gap-0.5 xl:gap-1 p-1 rounded-full transition-all shrink-0 border-0 shadow-none ${
+                isDarkHero
+                  ? 'bg-white/10 backdrop-blur-md'
+                  : 'bg-slate-200/50 hover:bg-slate-200/70'
               }`}>
                 {navItems.map(tab => {
                   const active = userTab === tab.id;
@@ -143,18 +144,18 @@ export const Navbar = () => {
                       key={tab.id}
                       onClick={() => handleNavClick(tab.id)}
                       title={tab.label}
-                      className={`flex items-center gap-1 xl:gap-1.5 px-2.5 py-1 xl:px-3 xl:py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap ${
+                      className={`flex items-center gap-1 xl:gap-1.5 px-2.5 py-1 xl:px-3 xl:py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap border-0 ${
                         active
                           ? 'bg-sky-600 text-white font-bold shadow-xs'
-                          : isTransparent
+                          : isDarkHero
                             ? 'text-white/85 hover:text-white hover:bg-white/15'
-                            : 'text-slate-700 hover:text-slate-900 hover:bg-white'
+                            : 'text-slate-700 hover:text-slate-900 hover:bg-white/80'
                       }`}
                     >
                       {tab.isAi ? (
-                        <Sparkles className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-amber-200' : isTransparent ? 'text-amber-300' : 'text-amber-500'}`} />
+                        <Sparkles className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-amber-200' : isDarkHero ? 'text-amber-300' : 'text-amber-500'}`} />
                       ) : (
-                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-white' : isTransparent ? 'text-white/70' : 'text-slate-400'}`} />
+                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-white' : isDarkHero ? 'text-white/70' : 'text-slate-400'}`} />
                       )}
                       
                       {/* Responsive adaptive label */}
@@ -163,10 +164,10 @@ export const Navbar = () => {
 
                       {/* Smart Tag for AI Planner */}
                       {tab.isAi && (
-                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold hidden xl:inline-flex items-center gap-0.5 ${
+                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold hidden xl:inline-flex items-center gap-0.5 border-0 ${
                           active
                             ? 'bg-sky-700/80 text-amber-200'
-                            : isTransparent
+                            : isDarkHero
                               ? 'bg-white/20 text-sky-200'
                               : 'bg-amber-100 text-amber-800'
                         }`}>
@@ -176,9 +177,9 @@ export const Navbar = () => {
 
                       {/* Notification badge */}
                       {tab.badge && !active && (
-                        <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold ${
+                        <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold border-0 ${
                           tab.badge === 'HOT'
-                            ? isTransparent ? 'bg-amber-400/20 text-amber-200 border border-amber-300/30 hidden xl:inline-block' : 'bg-amber-100 text-amber-800 hidden xl:inline-block'
+                            ? isDarkHero ? 'bg-amber-400/20 text-amber-200 hidden xl:inline-block' : 'bg-amber-100 text-amber-800 hidden xl:inline-block'
                             : 'bg-rose-500 text-white'
                         }`}>
                           {tab.badge}
@@ -194,17 +195,17 @@ export const Navbar = () => {
             <div className="flex items-center gap-2 shrink-0">
               
               {/* Search Pill Input (Desktop >= 1536px) */}
-              <div className={`hidden 2xl:flex items-center rounded-full px-3.5 py-1.5 border transition-all text-xs ${
-                isTransparent
-                  ? 'bg-white/10 hover:bg-white/15 focus-within:bg-white/20 border-white/20 focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-400/20 text-white'
-                  : 'bg-slate-100/80 hover:bg-slate-100 focus-within:bg-white border-slate-200/60 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20'
+              <div className={`hidden 2xl:flex items-center rounded-full px-3.5 py-1.5 border-0 transition-all text-xs ${
+                isDarkHero
+                  ? 'bg-white/10 hover:bg-white/15 focus-within:bg-white/20 focus-within:ring-2 focus-within:ring-sky-400/20 text-white'
+                  : 'bg-slate-200/50 hover:bg-slate-200/80 focus-within:bg-white focus-within:ring-2 focus-within:ring-sky-500/20 text-slate-800'
               }`}>
-                <Search className={`w-3.5 h-3.5 mr-2 shrink-0 ${isTransparent ? 'text-white/70' : 'text-slate-400'}`} />
+                <Search className={`w-3.5 h-3.5 mr-2 shrink-0 ${isDarkHero ? 'text-white/70' : 'text-slate-400'}`} />
                 <input
                   type="text"
                   placeholder="Tìm điểm đến, ẩm thực..."
                   className={`bg-transparent border-0 outline-none text-xs w-32 2xl:w-40 font-medium ${
-                    isTransparent ? 'text-white placeholder:text-white/60' : 'text-slate-800 placeholder:text-slate-400'
+                    isDarkHero ? 'text-white placeholder:text-white/60' : 'text-slate-800 placeholder:text-slate-400'
                   }`}
                 />
               </div>
@@ -219,10 +220,10 @@ export const Navbar = () => {
                         setIsNotificationOpen(!isNotificationOpen);
                         setIsProfileDropdownOpen(false);
                       }}
-                      className={`w-9 h-9 rounded-full flex items-center justify-center border shadow-2xs transition-colors relative cursor-pointer ${
-                        isTransparent
-                          ? 'bg-white/10 hover:bg-white/20 text-white border-white/20'
-                          : 'bg-slate-100/90 hover:bg-slate-200/90 text-slate-700 hover:text-slate-900 border-slate-200/60'
+                      className={`w-9 h-9 rounded-full flex items-center justify-center border-0 shadow-none transition-colors relative cursor-pointer ${
+                        isDarkHero
+                          ? 'bg-white/10 hover:bg-white/20 text-white'
+                          : 'bg-slate-200/50 hover:bg-slate-200/80 text-slate-700 hover:text-slate-900'
                       }`}
                       title="Thông báo"
                     >
@@ -372,10 +373,10 @@ export const Navbar = () => {
               {/* Hamburger Button (< lg) */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={`p-2 rounded-xl lg:hidden transition-colors cursor-pointer shrink-0 border ${
-                  isTransparent
-                    ? 'bg-white/10 hover:bg-white/20 text-white border-white/20'
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                className={`p-2 rounded-xl lg:hidden transition-colors cursor-pointer shrink-0 border-0 ${
+                  isDarkHero
+                    ? 'bg-white/10 hover:bg-white/20 text-white'
+                    : 'bg-slate-200/50 hover:bg-slate-200/80 text-slate-700'
                 }`}
                 aria-label="Toggle navigation menu"
               >
