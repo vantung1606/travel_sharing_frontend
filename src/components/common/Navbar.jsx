@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
 import {
   Compass,
@@ -143,18 +144,43 @@ export const Navbar = () => {
                       key={tab.id}
                       onClick={() => handleNavClick(tab.id)}
                       title={tab.label}
-                      className={`flex items-center gap-1 xl:gap-1.5 px-2.5 py-1 xl:px-3 xl:py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap border-0 ${
+                      className={`relative flex items-center gap-1 xl:gap-1.5 px-3 py-1.5 xl:px-3.5 xl:py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap border-0 z-10 ${
                         active
-                          ? 'bg-sky-600 text-white font-bold shadow-xs'
+                          ? isDarkHero
+                            ? 'text-white font-bold drop-shadow-sm'
+                            : 'text-sky-700 font-bold'
                           : isDarkHero
-                            ? 'text-white/85 hover:text-white hover:bg-white/15'
-                            : 'text-slate-700 hover:text-slate-900 hover:bg-white/80'
+                            ? 'text-white/75 hover:text-white hover:bg-white/10'
+                            : 'text-slate-700 hover:text-slate-900 hover:bg-white/50'
                       }`}
                     >
+                      {/* Active Gliding Pill with Fluid Spring + Running Beam ("animation chạy chạy") */}
+                      {active && (
+                        <motion.div
+                          layoutId="activeNavPill"
+                          transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                          className={`absolute inset-0 rounded-full -z-10 overflow-hidden ${
+                            isDarkHero
+                              ? 'bg-white/15 backdrop-blur-md shadow-sm ring-1 ring-white/20'
+                              : 'bg-white shadow-sm ring-1 ring-sky-500/20'
+                          }`}
+                        >
+                          {/* Animated Running Light Beam running across the active tab */}
+                          <div className="absolute bottom-0 left-0 right-0 h-[2.5px] overflow-hidden">
+                            <div className="w-3/4 h-full mx-auto bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-running-beam" />
+                          </div>
+                        </motion.div>
+                      )}
+
                       {tab.isAi ? (
-                        <Sparkles className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-amber-200' : isDarkHero ? 'text-amber-300' : 'text-amber-500'}`} />
+                        <Sparkles className={`w-3.5 h-3.5 shrink-0 ${active ? (isDarkHero ? 'text-amber-200' : 'text-amber-500') : isDarkHero ? 'text-amber-300' : 'text-amber-500'}`} />
                       ) : (
-                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-white' : isDarkHero ? 'text-white/70' : 'text-slate-400'}`} />
+                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? (isDarkHero ? 'text-sky-300' : 'text-sky-600') : isDarkHero ? 'text-white/70' : 'text-slate-400'}`} />
+                      )}
+
+                      {/* Active Pulsing Indicator Dot */}
+                      {active && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping inline-block -mr-0.5" />
                       )}
                       
                       {/* Responsive adaptive label */}
@@ -165,7 +191,7 @@ export const Navbar = () => {
                       {tab.isAi && (
                         <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold hidden xl:inline-flex items-center gap-0.5 border-0 ${
                           active
-                            ? 'bg-sky-700/80 text-amber-200'
+                            ? 'bg-amber-400/20 text-amber-300'
                             : isDarkHero
                               ? 'bg-white/20 text-sky-200'
                               : 'bg-amber-100 text-amber-800'

@@ -76,8 +76,9 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['"Inter"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
-        display: ['"Inter"', 'sans-serif'],
+        sans: ['"Times New Roman"', 'Times', 'Georgia', 'serif'],
+        serif: ['"Times New Roman"', 'Times', 'Georgia', 'serif'],
+        display: ['"Times New Roman"', 'Times', 'Georgia', 'serif'],
       }
     },
   },
