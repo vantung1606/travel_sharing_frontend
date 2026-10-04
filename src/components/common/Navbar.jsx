@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import {
   Compass,
@@ -20,6 +21,28 @@ import {
 import { NotificationDropdown } from './NotificationDropdown';
 
 export const Navbar = () => {
+  const location = useLocation();
+  const isHomePage = location.pathname === '/' || location.pathname === '/home';
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPos = window.scrollY || document.documentElement?.scrollTop || document.body?.scrollTop || 0;
+      setIsScrolled(scrollPos > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('wheel', handleScroll, { passive: true });
+    document.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('wheel', handleScroll);
+      document.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  const isTransparent = isHomePage && !isScrolled;
+
   const {
     portalMode,
     setPortalMode,
@@ -72,8 +95,14 @@ export const Navbar = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-xs select-none transition-all">
-        <div className="w-full px-4 sm:px-6 lg:px-8 xl:px-8 2xl:px-12">
+      <header
+        className={`sticky top-0 z-40 w-full select-none transition-all duration-300 ${
+          isTransparent
+            ? 'bg-slate-950/20 backdrop-blur-md border-b border-white/10 text-white shadow-none'
+            : 'bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-xs text-slate-900'
+        }`}
+      >
+        <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="flex items-center justify-between h-16 gap-2 sm:gap-3">
             
             {/* 1. Brand Logo */}
@@ -82,20 +111,30 @@ export const Navbar = () => {
                 onClick={() => { setPortalMode('user'); setUserTab('home'); }}
                 className="flex items-center gap-2.5 cursor-pointer group"
               >
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-600 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105 ${
+                  isTransparent
+                    ? 'bg-gradient-to-tr from-sky-500 to-blue-600 shadow-sky-500/30 ring-1 ring-white/20'
+                    : 'bg-gradient-to-tr from-sky-600 to-blue-600 shadow-sky-500/20'
+                }`}>
                   <Compass className="w-5 h-5 animate-spin-slow" />
                 </div>
                 <div className="block leading-tight">
-                  <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 group-hover:text-sky-600 transition-colors">
-                    Way<span className="text-sky-600">fare</span>
+                  <span className={`font-display font-extrabold text-lg sm:text-xl tracking-tight transition-colors ${
+                    isTransparent ? 'text-white group-hover:text-sky-300' : 'text-slate-900 group-hover:text-sky-600'
+                  }`}>
+                    Way<span className={isTransparent ? 'text-sky-400' : 'text-sky-600'}>fare</span>
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* 2. Sleek Rounded Navigation Bar (Compact & Perfectly Fitting) */}
+            {/* 2. Sleek Rounded Navigation Bar (Compact & Glass pill on Transparent) */}
             {portalMode === 'user' && (
-              <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1 p-1 bg-slate-100/90 rounded-full border border-slate-200/70 shadow-2xs shrink-0">
+              <nav className={`hidden lg:flex items-center gap-0.5 xl:gap-1 p-1 rounded-full transition-all shrink-0 ${
+                isTransparent
+                  ? 'bg-white/10 backdrop-blur-md border border-white/20 shadow-sm'
+                  : 'bg-slate-100/90 border border-slate-200/70 shadow-2xs'
+              }`}>
                 {navItems.map(tab => {
                   const active = userTab === tab.id;
                   const Icon = tab.icon;
@@ -107,13 +146,15 @@ export const Navbar = () => {
                       className={`flex items-center gap-1 xl:gap-1.5 px-2.5 py-1 xl:px-3 xl:py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap ${
                         active
                           ? 'bg-sky-600 text-white font-bold shadow-xs'
-                          : 'text-slate-700 hover:text-slate-900 hover:bg-white'
+                          : isTransparent
+                            ? 'text-white/85 hover:text-white hover:bg-white/15'
+                            : 'text-slate-700 hover:text-slate-900 hover:bg-white'
                       }`}
                     >
                       {tab.isAi ? (
-                        <Sparkles className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-amber-200' : 'text-amber-500'}`} />
+                        <Sparkles className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-amber-200' : isTransparent ? 'text-amber-300' : 'text-amber-500'}`} />
                       ) : (
-                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-white' : 'text-slate-400'}`} />
+                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? 'text-white' : isTransparent ? 'text-white/70' : 'text-slate-400'}`} />
                       )}
                       
                       {/* Responsive adaptive label */}
@@ -125,7 +166,9 @@ export const Navbar = () => {
                         <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold hidden xl:inline-flex items-center gap-0.5 ${
                           active
                             ? 'bg-sky-700/80 text-amber-200'
-                            : 'bg-amber-100 text-amber-800'
+                            : isTransparent
+                              ? 'bg-white/20 text-sky-200'
+                              : 'bg-amber-100 text-amber-800'
                         }`}>
                           Smart
                         </span>
@@ -134,7 +177,9 @@ export const Navbar = () => {
                       {/* Notification badge */}
                       {tab.badge && !active && (
                         <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold ${
-                          tab.badge === 'HOT' ? 'bg-amber-100 text-amber-800 hidden xl:inline-block' : 'bg-rose-500 text-white'
+                          tab.badge === 'HOT'
+                            ? isTransparent ? 'bg-amber-400/20 text-amber-200 border border-amber-300/30 hidden xl:inline-block' : 'bg-amber-100 text-amber-800 hidden xl:inline-block'
+                            : 'bg-rose-500 text-white'
                         }`}>
                           {tab.badge}
                         </span>
@@ -149,12 +194,18 @@ export const Navbar = () => {
             <div className="flex items-center gap-2 shrink-0">
               
               {/* Search Pill Input (Desktop >= 1536px) */}
-              <div className="hidden 2xl:flex items-center bg-slate-100/80 hover:bg-slate-100 focus-within:bg-white rounded-full px-3.5 py-1.5 border border-slate-200/60 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20 transition-all text-xs">
-                <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
+              <div className={`hidden 2xl:flex items-center rounded-full px-3.5 py-1.5 border transition-all text-xs ${
+                isTransparent
+                  ? 'bg-white/10 hover:bg-white/15 focus-within:bg-white/20 border-white/20 focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-400/20 text-white'
+                  : 'bg-slate-100/80 hover:bg-slate-100 focus-within:bg-white border-slate-200/60 focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-500/20'
+              }`}>
+                <Search className={`w-3.5 h-3.5 mr-2 shrink-0 ${isTransparent ? 'text-white/70' : 'text-slate-400'}`} />
                 <input
                   type="text"
                   placeholder="Tìm điểm đến, ẩm thực..."
-                  className="bg-transparent border-0 outline-none text-xs text-slate-800 placeholder:text-slate-400 w-32 2xl:w-40 font-medium"
+                  className={`bg-transparent border-0 outline-none text-xs w-32 2xl:w-40 font-medium ${
+                    isTransparent ? 'text-white placeholder:text-white/60' : 'text-slate-800 placeholder:text-slate-400'
+                  }`}
                 />
               </div>
 
@@ -168,7 +219,11 @@ export const Navbar = () => {
                         setIsNotificationOpen(!isNotificationOpen);
                         setIsProfileDropdownOpen(false);
                       }}
-                      className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-100/90 hover:bg-slate-200/90 text-slate-700 hover:text-slate-900 border border-slate-200/60 shadow-2xs transition-colors relative cursor-pointer"
+                      className={`w-9 h-9 rounded-full flex items-center justify-center border shadow-2xs transition-colors relative cursor-pointer ${
+                        isTransparent
+                          ? 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                          : 'bg-slate-100/90 hover:bg-slate-200/90 text-slate-700 hover:text-slate-900 border-slate-200/60'
+                      }`}
                       title="Thông báo"
                     >
                       <Bell className="w-4 h-4" />
@@ -317,7 +372,11 @@ export const Navbar = () => {
               {/* Hamburger Button (< lg) */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 lg:hidden transition-colors cursor-pointer shrink-0"
+                className={`p-2 rounded-xl lg:hidden transition-colors cursor-pointer shrink-0 border ${
+                  isTransparent
+                    ? 'bg-white/10 hover:bg-white/20 text-white border-white/20'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+                }`}
                 aria-label="Toggle navigation menu"
               >
                 {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
