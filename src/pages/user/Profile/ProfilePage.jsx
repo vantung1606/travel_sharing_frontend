@@ -96,48 +96,50 @@ export const ProfilePage = () => {
 
         {/* Profile Info Bar */}
         <div className="p-6 sm:p-8 pt-0 relative">
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 -mt-14 sm:-mt-16 mb-6">
+          <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-5 mb-6 pt-2 sm:pt-3">
             
             {/* Avatar & Main Info */}
-            <div className="flex items-end gap-4">
-              <div className="relative">
+            <div className="flex flex-col sm:flex-row items-start sm:items-end gap-5">
+              {/* Avatar: only avatar is pulled up to overlap cover photo */}
+              <div className="relative -mt-16 sm:-mt-20 shrink-0">
                 <img
                   src={currentUser.avatar}
                   alt={currentUser.name}
-                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover ring-4 ring-white shadow-xl bg-white"
+                  className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover ring-4 ring-white shadow-xl bg-white"
                 />
-                <span className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs font-bold border-2 border-white" title="Tài khoản đã xác minh">
+                <span className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs font-bold border-2 border-white shadow-sm" title="Tài khoản đã xác minh">
                   ✓
                 </span>
               </div>
 
-              <div className="space-y-1 pb-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="font-display font-extrabold text-xl sm:text-2xl text-slate-900">
+              {/* User Details: starts comfortably on white background, 100% clear of cover photo */}
+              <div className="space-y-1.5 pb-1 pt-1 sm:pt-3">
+                <div className="flex items-center gap-2.5 flex-wrap">
+                  <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight leading-tight">
                     {profileName}
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[11px] font-bold flex items-center gap-1">
+                  <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[11px] font-bold flex items-center gap-1 border border-amber-200/80 shadow-xs">
                     <Award className="w-3.5 h-3.5 text-amber-600" />
                     Wanderer Gold
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-400 font-mono font-medium flex items-center gap-2">
-                  <span>{currentUser.handle}</span>
-                  <span>•</span>
+                <p className="text-xs sm:text-sm text-slate-500 font-mono font-medium flex items-center gap-2">
+                  <span className="text-slate-700 font-semibold">{currentUser.handle}</span>
+                  <span className="text-slate-300">•</span>
                   <span className="flex items-center gap-1 text-slate-600 font-sans">
                     <MapPin className="w-3.5 h-3.5 text-sky-600" /> Đà Nẵng, Việt Nam
                   </span>
                 </p>
 
                 {/* Follow Counts Quick Bar */}
-                <div className="flex items-center gap-3 pt-1 text-xs">
+                <div className="flex items-center gap-3 pt-0.5 text-xs sm:text-sm">
                   <button
                     onClick={() => setFollowModalState({ isOpen: true, tab: 'followers' })}
                     className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-sky-700 transition-colors cursor-pointer"
                     title="Bấm để xem danh sách người theo dõi"
                   >
-                    <span className="font-black text-sky-700 text-sm">{followersCount}</span>
+                    <span className="font-black text-sky-700 text-sm sm:text-base">{followersCount}</span>
                     <span className="font-medium text-slate-500">người theo dõi</span>
                   </button>
                   <span className="text-slate-300">•</span>
@@ -146,7 +148,7 @@ export const ProfilePage = () => {
                     className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-sky-700 transition-colors cursor-pointer"
                     title="Bấm để xem danh sách đang theo dõi"
                   >
-                    <span className="font-black text-slate-900 text-sm">{followingCount}</span>
+                    <span className="font-black text-slate-900 text-sm sm:text-base">{followingCount}</span>
                     <span className="font-medium text-slate-500">đang theo dõi</span>
                   </button>
                 </div>
@@ -154,16 +156,16 @@ export const ProfilePage = () => {
             </div>
 
             {/* Action Controls */}
-            <div className="flex items-center gap-2 self-stretch md:self-auto">
+            <div className="flex items-center gap-2 self-stretch lg:self-end pb-1">
               <button
                 onClick={() => setIsEditModalOpen(true)}
-                className="flex-1 md:flex-none px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                className="flex-1 sm:flex-none px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
               >
                 <Edit className="w-4 h-4 text-slate-600" />
                 <span>Chỉnh Sửa Hồ Sơ</span>
               </button>
 
-              <button className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer" title="Chia sẻ hồ sơ">
+              <button className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer shadow-xs" title="Chia sẻ hồ sơ">
                 <Share2 className="w-4 h-4" />
               </button>
 
