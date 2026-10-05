@@ -238,7 +238,7 @@ export const Navbar = () => {
                   <span>Đăng nhập</span>
                 </button>
               ) : (
-                <div ref={profileDropdownRef} className="relative group">
+                <div ref={profileDropdownRef} className="relative group ml-1">
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
                     className="relative flex items-center justify-center p-0.5 rounded-full hover:ring-2 hover:ring-sky-500/30 transition-all cursor-pointer shrink-0 focus:outline-hidden"
