@@ -722,18 +722,18 @@ export const HomePage = () => {
               type="button"
               disabled={isDockGenerating}
               onClick={handleDockGenerate}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-blue-700 text-white font-extrabold text-sm sm:text-base shadow-lg shadow-sky-500/25 hover:shadow-xl hover:scale-[1.03] active:scale-95 transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 tracking-[0.015em] shimmer-effect"
+              className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 tracking-tight whitespace-nowrap shrink-0"
             >
               {isDockGenerating ? (
                 <>
-                  <RefreshCw className="w-5 h-5 animate-spin text-white" />
-                  <span>Đang khởi tạo lịch trình...</span>
+                  <RefreshCw className="w-4 h-4 animate-spin text-white" />
+                  <span>Đang khởi tạo...</span>
                 </>
               ) : (
                 <>
-                  <Zap className="w-5 h-5 text-amber-300" />
-                  <span>Tạo Lộ Trình Thông Minh</span>
-                  <span className="px-2 py-0.5 rounded-full bg-black/20 text-xs font-black uppercase">
+                  <Sparkles className="w-4 h-4 text-amber-200" />
+                  <span>Tạo Lộ Trình AI</span>
+                  <span className="px-1.5 py-0.5 rounded-md bg-white/20 text-[10px] font-extrabold uppercase">
                     3s
                   </span>
                 </>
