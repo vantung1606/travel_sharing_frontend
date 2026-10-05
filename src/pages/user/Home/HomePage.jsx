@@ -314,12 +314,12 @@ export const HomePage = () => {
           label: d.includes('Đà Lạt')
             ? '🌸 ' + d
             : d.includes('Phú Quốc')
-            ? '🏖️ ' + d
-            : d.includes('Đà Nẵng')
-            ? '🌊 ' + d
-            : d.includes('Mù Cang')
-            ? '🌾 ' + d
-            : '✨ ' + d,
+              ? '🏖️ ' + d
+              : d.includes('Đà Nẵng')
+                ? '🌊 ' + d
+                : d.includes('Mù Cang')
+                  ? '🌾 ' + d
+                  : '✨ ' + d,
           val: d
         }));
         setTrendingDestinations(mapped);
@@ -516,16 +516,11 @@ export const HomePage = () => {
         <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Main Hero Header Stack */}
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6">
-            {/* Top Announcement Tag with Guest vs Member distinction */}
-            {isLoggedIn ? (
+            {/* Top Announcement Tag for Logged In Member */}
+            {isLoggedIn && (
               <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-sky-500/20 backdrop-blur-xl text-sky-200 border border-sky-400/30 text-xs sm:text-sm font-bold shadow-lg animate-float-slow">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
                 <span>👋 Chào mừng trở lại, {currentUser?.name || 'Lữ khách'}! Bạn đang có {homeStats.totalItineraries}+ chuyến đi cộng đồng chờ đón.</span>
-              </div>
-            ) : (
-              <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl text-sky-200 border border-white/20 text-xs sm:text-sm font-bold shadow-lg animate-float-slow">
-                <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
-                <span>Nền tảng Lập lịch trình AI & Cộng đồng Du lịch • Trải nghiệm miễn phí</span>
               </div>
             )}
 
@@ -766,9 +761,7 @@ export const HomePage = () => {
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header */}
           <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-14 space-y-3">
-            <span className="px-4 py-1.5 rounded-full bg-sky-100 text-sky-800 font-extrabold text-xs uppercase tracking-wider border border-sky-300 shadow-2xs">
-              ✨ Công Nghệ Du Lịch Đột Phá
-            </span>
+
             <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               Tại Sao Hơn {homeStats.totalUsers.toLocaleString()}+ Du Khách Chọn Wayfare?
             </h2>
@@ -1059,10 +1052,7 @@ export const HomePage = () => {
           {/* Section Header with Filter Tabs */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-sky-800 font-extrabold text-xs uppercase tracking-wider mb-2 px-3 py-1 rounded-full bg-sky-100 border border-sky-300">
-                <Compass className="w-4 h-4" />
-                <span>Hành trình được yêu thích nhất</span>
-              </div>
+
               <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
                 Bộ Sưu Tập Lộ Trình AI Nổi Bật
               </h2>
@@ -1184,10 +1174,7 @@ export const HomePage = () => {
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-blue-700 font-extrabold text-xs uppercase tracking-wider mb-2 px-3 py-1 rounded-full bg-blue-100 border border-blue-200">
-                <Users className="w-4 h-4" />
-                <span>Cộng Đồng Du Lịch Wayfare</span>
-              </div>
+
               <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
                 Nhịp Sống Du Lịch & Khoảnh Khắc Thực Tế
               </h2>
@@ -1278,9 +1265,8 @@ export const HomePage = () => {
                       <button
                         type="button"
                         onClick={() => handleLikePost(post.id)}
-                        className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
-                          likedPosts[post.id] || post.isLiked ? 'text-rose-600 font-bold' : 'hover:text-rose-600'
-                        }`}
+                        className={`flex items-center gap-1.5 transition-colors cursor-pointer ${likedPosts[post.id] || post.isLiked ? 'text-rose-600 font-bold' : 'hover:text-rose-600'
+                          }`}
                       >
                         <Heart className={`w-4 h-4 ${likedPosts[post.id] || post.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
                         <span>{(post.likes || 0) + (likedPosts[post.id] ? 1 : 0)}</span>
@@ -1298,9 +1284,8 @@ export const HomePage = () => {
                       <button
                         type="button"
                         onClick={() => handleBookmarkPost(post.id)}
-                        className={`transition-colors cursor-pointer ${
-                          bookmarkedPosts[post.id] ? 'text-amber-500' : 'hover:text-amber-500'
-                        }`}
+                        className={`transition-colors cursor-pointer ${bookmarkedPosts[post.id] ? 'text-amber-500' : 'hover:text-amber-500'
+                          }`}
                         title={bookmarkedPosts[post.id] ? 'Đã lưu' : 'Lưu bài viết'}
                       >
                         <Bookmark className={`w-4 h-4 ${bookmarkedPosts[post.id] ? 'fill-amber-500 text-amber-500' : ''}`} />
@@ -1402,9 +1387,8 @@ export const HomePage = () => {
                       <button
                         type="button"
                         onClick={() => handleLikePost(post.id)}
-                        className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
-                          likedPosts[post.id] ? 'text-rose-600 font-bold' : 'hover:text-rose-600'
-                        }`}
+                        className={`flex items-center gap-1.5 transition-colors cursor-pointer ${likedPosts[post.id] ? 'text-rose-600 font-bold' : 'hover:text-rose-600'
+                          }`}
                       >
                         <Heart className={`w-4 h-4 ${likedPosts[post.id] ? 'fill-rose-500 text-rose-500' : ''}`} />
                         <span>{post.likes + (likedPosts[post.id] ? 1 : 0)}</span>
@@ -1422,9 +1406,8 @@ export const HomePage = () => {
                       <button
                         type="button"
                         onClick={() => handleBookmarkPost(post.id)}
-                        className={`transition-colors cursor-pointer ${
-                          bookmarkedPosts[post.id] ? 'text-amber-500' : 'hover:text-amber-500'
-                        }`}
+                        className={`transition-colors cursor-pointer ${bookmarkedPosts[post.id] ? 'text-amber-500' : 'hover:text-amber-500'
+                          }`}
                       >
                         <Bookmark className={`w-4 h-4 ${bookmarkedPosts[post.id] ? 'fill-amber-500 text-amber-500' : ''}`} />
                       </button>
@@ -1448,9 +1431,7 @@ export const HomePage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Text & List Details (5 cols) */}
               <div className="lg:col-span-5 flex flex-col">
-                <span className="px-4 py-1.5 rounded-full bg-blue-500/20 text-sky-300 font-extrabold text-xs uppercase tracking-wider mb-3 w-fit border border-blue-400/40">
-                  Radar Vệ Tinh Độc Bản
-                </span>
+
 
                 <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-4 leading-tight">
                   Khám Phá Điểm Đến Bí Mật Không Có Trên Bản Đồ Thường
@@ -1559,9 +1540,7 @@ export const HomePage = () => {
       <section className="w-full py-20 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#eef2f6] border-b border-slate-200/90">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="text-center max-w-2xl mx-auto mb-12 space-y-2.5">
-            <span className="px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 font-extrabold text-xs uppercase tracking-wider border border-blue-200/80 shadow-2xs">
-              ❤️ Cộng Đồng Yêu Mến
-            </span>
+
             <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               Câu Chuyện Từ Những Người Đã Đi
             </h2>
@@ -1662,37 +1641,109 @@ export const HomePage = () => {
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-16 bg-gradient-to-b from-[#f0f9ff] to-[#f8fafc]">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="relative rounded-3xl overflow-hidden p-8 sm:p-14 lg:p-16 bg-gradient-to-r from-[#031726] via-[#082845] to-[#0c385f] text-white shadow-2xl">
-            {/* Subtle Glow Backdrop with Pulse Animations */}
+          <div className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 bg-gradient-to-r from-[#031726] via-[#082845] to-[#0c385f] text-white shadow-2xl border border-sky-900/40">
+            {/* Subtle Ambient Light Orbs with Pulse Animations */}
             <div className="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-blue-500/20 blur-3xl pointer-events-none animate-pulse-slow" />
             <div className="absolute top-0 right-1/3 w-64 h-64 rounded-full bg-sky-400/20 blur-2xl pointer-events-none animate-pulse-slow [animation-delay:3s]" />
 
-            <div className="relative z-10 max-w-2xl flex flex-col items-start space-y-6">
-              <span className="px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white font-extrabold text-xs border border-white/30 animate-float-slow">
-                🚀 Khởi đầu hành trình mới ngay hôm nay
-              </span>
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              {/* Left Column: Heading, Subtitle & Actions (7 cols) */}
+              <div className="lg:col-span-7 flex flex-col items-start space-y-6">
+                <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+                  Sẵn Sàng Cho Chuyến Phiêu Lưu Kế Tiếp?
+                </h2>
 
-              <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
-                Sẵn Sàng Cho Chuyến Phiêu Lưu Kế Tiếp?
-              </h2>
+                <p className="text-sky-100 text-sm sm:text-base leading-relaxed font-normal tracking-[0.015em] max-w-xl">
+                  Hãy để AI lo mọi khâu chuẩn bị, nghiên cứu và tối ưu chi phí. Bạn chỉ cần tận hưởng
+                  từng khoảnh khắc trọn vẹn bên người thân yêu.
+                </p>
 
-              <p className="text-sky-100 text-sm sm:text-base leading-relaxed font-normal tracking-[0.015em]">
-                Hãy để AI lo mọi khâu chuẩn bị, nghiên cứu và tối ưu chi phí. Bạn chỉ cần tận hưởng
-                từng khoảnh khắc trọn vẹn bên người thân yêu.
-              </p>
+                <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto pt-1">
+                  <a
+                    href="#ai-dock"
+                    className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-blue-700 text-white font-extrabold text-sm sm:text-base shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 cursor-pointer shimmer-effect"
+                  >
+                    <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
+                    <span>Lập Lịch Trình Miễn Phí Ngay</span>
+                  </a>
 
-              <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto pt-2">
-                <a
-                  href="#ai-dock"
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm sm:text-base shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 cursor-pointer shimmer-effect"
-                >
-                  <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
-                  <span>Lập Lịch Trình Miễn Phí Ngay</span>
-                </a>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/community')}
+                    className="w-full sm:w-auto px-7 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-sm sm:text-base transition-all border border-white/20 hover:border-white/40 shadow-sm cursor-pointer hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                  >
+                    <Users className="w-5 h-5 text-sky-300" />
+                    <span>Khám Phá Cộng Đồng</span>
+                  </button>
+                </div>
 
-                <div className="flex items-center gap-2 text-sky-100 text-xs sm:text-sm font-semibold">
-                  <CheckCircle2 className="w-4 h-4 text-sky-300" />
-                  <span>Không cần thẻ tín dụng • Trải nghiệm ngay 100% miễn phí</span>
+                <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4 text-xs sm:text-sm text-sky-100">
+                  <div className="flex items-center gap-2 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span>Không cần thẻ tín dụng • Trải nghiệm ngay 100% miễn phí</span>
+                  </div>
+                  <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-sky-400/50" />
+                  <div className="flex items-center gap-1.5 text-sky-200">
+                    <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    <span className="font-bold text-white">4.9/5</span>
+                    <span>từ 50.000+ du khách</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: High-tech Glassmorphism Trip Preview Card (5 cols - fills empty space) */}
+              <div className="lg:col-span-5 flex justify-center lg:justify-end">
+                <div className="w-full max-w-md rounded-3xl bg-slate-900/80 backdrop-blur-2xl p-6 border border-sky-400/30 shadow-2xl space-y-4 hover:border-sky-400/60 transition-all hover:scale-[1.02]">
+                  {/* Card Header Preview */}
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md">
+                        <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-sm sm:text-base text-white">Lộ Trình AI Tối Ưu</h4>
+                        <p className="text-xs text-sky-200">Đà Lạt • Sương Mù & Thung Lũng</p>
+                      </div>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold">
+                      Sẵn sàng
+                    </span>
+                  </div>
+
+                  {/* 3 Live Feature Chips */}
+                  <div className="space-y-2.5">
+                    <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs text-slate-200">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
+                        <span>Tự động phân luồng thứ tự ghé thăm</span>
+                      </span>
+                      <span className="font-bold text-sky-300">Tốc độ 3.2s</span>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs text-slate-200">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                        <span>Dự toán chi phí & cảnh báo phát sinh</span>
+                      </span>
+                      <span className="font-bold text-emerald-300">Chuẩn 98%</span>
+                    </div>
+
+                    <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs text-slate-200">
+                      <span className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-amber-400" />
+                        <span>Phương án B khi thời tiết xấu</span>
+                      </span>
+                      <span className="font-bold text-amber-300">Tự động 24/7</span>
+                    </div>
+                  </div>
+
+                  {/* Footer Stat Summary within Preview */}
+                  <div className="pt-2 flex items-center justify-between text-xs">
+                    <span className="text-slate-300">Tiết kiệm trung bình</span>
+                    <span className="font-black text-sm text-sky-300 bg-sky-500/10 px-3 py-1 rounded-lg border border-sky-500/20">
+                      ~850.000đ / chuyến
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
