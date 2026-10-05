@@ -516,14 +516,6 @@ export const HomePage = () => {
         <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Main Hero Header Stack */}
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6">
-            {/* Top Announcement Tag for Logged In Member */}
-            {isLoggedIn && (
-              <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-sky-500/20 backdrop-blur-xl text-sky-200 border border-sky-400/30 text-xs sm:text-sm font-bold shadow-lg animate-float-slow">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-                <span>👋 Chào mừng trở lại, {currentUser?.name || 'Lữ khách'}! Bạn đang có {homeStats.totalItineraries}+ chuyến đi cộng đồng chờ đón.</span>
-              </div>
-            )}
-
             {/* Expansive Grand Headline with Gradient Flow */}
             <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.18] text-white drop-shadow-md">
               Kiến Tạo Chuyến Đi Mơ Ước <br className="hidden sm:inline" />
