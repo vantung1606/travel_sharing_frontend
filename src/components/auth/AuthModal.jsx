@@ -274,32 +274,31 @@ export const AuthModal = () => {
         </div>
 
         {/* ========================================================= */}
-        {/* RIGHT COLUMN: BANNER WITH DIAGONAL SLANT                  */}
-        {/* Uses exact login_banner.jpg, pure clean diagonal cut      */}
+        {/* RIGHT COLUMN: BANNER (Matching CNPM .bg-img & img-50.png) */}
+        {/* Uses exact login_banner.jpg with img-50.png in the middle */}
         {/* ========================================================= */}
-        <div className="hidden lg:block lg:w-[50%] relative min-h-[580px]">
+        <div className="hidden lg:block lg:w-[50%] relative min-h-[580px] overflow-hidden">
           
-          {/* Angled Banner Container with Razor-sharp Slant */}
-          <div 
-            className="absolute inset-0 w-full h-full overflow-hidden"
+          {/* Background Banner Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center"
             style={{
-              clipPath: 'polygon(80px 0, 100% 0, 100% 100%, 0 100%)'
+              backgroundImage: `url('/images/login/login_banner.jpg')`
             }}
-          >
-            {/* The High-Resolution Banner Image from CNPM */}
-            <div
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-105"
-              style={{
-                backgroundImage: `url('/images/login/login_banner.jpg')`
-              }}
-            />
+          />
 
-            {/* Subtle soft dark gradient for depth */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
+          {/* img-50.png in the middle divider (from CNPM .bg-img::after) */}
+          <div
+            className="absolute -left-[1px] top-0 bottom-0 w-[276px] h-full z-10 pointer-events-none"
+            style={{
+              backgroundImage: `url('/images/login/img-50.png')`,
+              backgroundPosition: 'top left',
+              backgroundRepeat: 'repeat-y'
+            }}
+          />
 
-            {/* Information container as in original CNPM template */}
-            <div className="information" />
-          </div>
+          {/* Information container as in original CNPM template */}
+          <div className="information" />
 
         </div>
 
