@@ -315,7 +315,6 @@ export const PostDetailModal = ({
 
       setCommentInput('');
       setReplyingTo(null);
-      toast.showSuccess(replyingTo ? 'Đã gửi phản hồi của bạn! 💬' : 'Đã gửi bình luận của bạn! 💬');
 
       if (post) {
         setPost(prev => ({

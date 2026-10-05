@@ -718,8 +718,6 @@ export const CommunityPage = () => {
         prev.map(p => (p.id === activeCommentPost.id ? { ...p, commentCount: (p.commentCount || 0) + 1 } : p))
       );
 
-      if (toast?.showSuccess) toast.showSuccess(replyingTo ? 'Đã gửi câu trả lời của bạn! 💬' : 'Đã gửi bình luận của bạn thành công! 💬');
-      else if (toast?.success) toast.success(replyingTo ? 'Đã gửi câu trả lời của bạn! 💬' : 'Đã gửi bình luận của bạn thành công! 💬');
     } catch (err) {
       if (toast?.showError) toast.showError('Không thể gửi bình luận: ' + err.message);
       else if (toast?.error) toast.error('Không thể gửi bình luận: ' + err.message);
