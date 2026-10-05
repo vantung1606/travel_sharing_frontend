@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '../common/Toast';
 import { authApi } from '../../services/api';
@@ -22,6 +22,37 @@ export const AuthModal = () => {
   const [fullName, setFullName] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Auto-rotating 3-slide travel carousel (3.5 seconds per slide)
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const bannerSlides = [
+    {
+      id: 1,
+      url: '/images/login/travel_banner_1.jpg',
+      title: 'Sa Pa • Mù Cang Chải',
+      desc: 'Ruộng bậc thang xanh ngát ngút ngàn mây trời'
+    },
+    {
+      id: 2,
+      url: '/images/login/travel_banner_2.jpg',
+      title: 'Tràng An • Ninh Bình',
+      desc: 'Non nước hữu tình dòng sông ngọc bích'
+    },
+    {
+      id: 3,
+      url: '/images/login/travel_banner_3.jpg',
+      title: 'Phú Quốc • Thiên Đường Nhiệt Đới',
+      desc: 'Biển xanh ngọc bích rợp bóng dừa mát rượi'
+    }
+  ];
+
+  useEffect(() => {
+    if (!isAuthModalOpen) return;
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % bannerSlides.length);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [isAuthModalOpen, bannerSlides.length]);
 
   if (!isAuthModalOpen) return null;
 
@@ -278,13 +309,37 @@ export const AuthModal = () => {
         {/* ========================================================= */}
         <div className="hidden lg:block lg:w-[61%] relative min-h-[580px] overflow-hidden">
           
-          {/* Background Banner Image: Emerald Green Vietnam Travel Landscape */}
-          <div
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-105"
-            style={{
-              backgroundImage: `url('/images/login/travel_banner.jpg')`
-            }}
-          />
+          {/* 3 Auto-Rotating High-Definition Travel Slides with Smooth Crossfade */}
+          {bannerSlides.map((slide, idx) => (
+            <div
+              key={slide.id}
+              className={`absolute inset-0 bg-cover bg-center transition-all duration-1000 ease-in-out ${
+                idx === currentSlide
+                  ? 'opacity-100 scale-100'
+                  : 'opacity-0 scale-105 pointer-events-none'
+              }`}
+              style={{
+                backgroundImage: `url('${slide.url}')`
+              }}
+            />
+          ))}
+
+          {/* Slide Indicator Dots at Bottom Right */}
+          <div className="absolute bottom-5 right-6 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20">
+            {bannerSlides.map((slide, idx) => (
+              <button
+                key={slide.id}
+                type="button"
+                onClick={() => setCurrentSlide(idx)}
+                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  idx === currentSlide
+                    ? 'w-6 bg-white shadow-sm'
+                    : 'w-1.5 bg-white/40 hover:bg-white/80'
+                }`}
+                title={slide.title}
+              />
+            ))}
+          </div>
 
           {/* img-50.png shifted to hug right against the buttons */}
           <div
