@@ -116,13 +116,9 @@ export const Navbar = () => {
                 title="Wayfare - Trang chủ"
               >
                 <img
-                  src="/wayfare-logo.png"
+                  src={isDarkHero ? '/wayfare-logo-white.png' : '/wayfare-logo.png'}
                   alt="Wayfare"
-                  className={`h-9 sm:h-10 w-auto object-contain transition-all duration-300 group-hover:scale-105 ${
-                    isDarkHero
-                      ? 'brightness-0 invert drop-shadow-[0_2px_12px_rgba(255,255,255,0.45)]'
-                      : 'drop-shadow-xs'
-                  }`}
+                  className="h-9 sm:h-10 w-auto object-contain transition-all duration-300 group-hover:scale-105 drop-shadow-sm"
                 />
               </div>
             </div>

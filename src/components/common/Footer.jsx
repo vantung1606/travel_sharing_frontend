@@ -11,9 +11,9 @@ export const Footer = () => {
           <div>
             <div className="mb-4">
               <img
-                src="/wayfare-logo.png"
+                src="/wayfare-logo-white.png"
                 alt="Wayfare"
-                className="h-10 w-auto object-contain brightness-0 invert drop-shadow-sm"
+                className="h-10 w-auto object-contain drop-shadow-sm"
               />
             </div>
             <p className="text-slate-300 text-sm leading-relaxed mb-4 font-normal">

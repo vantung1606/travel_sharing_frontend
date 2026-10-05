@@ -38,9 +38,9 @@ export const AdminSidebar = ({ onNavigate }) => {
           className="h-16 px-5 flex items-center justify-between bg-[#283044] border-b border-slate-700/40 cursor-pointer hover:bg-slate-800/50 transition-colors"
         >
           <img
-            src="/wayfare-logo.png"
+            src="/wayfare-logo-white.png"
             alt="Wayfare"
-            className="h-8 w-auto object-contain brightness-0 invert"
+            className="h-8 w-auto object-contain"
           />
           <span className="text-[9px] font-extrabold text-sky-300 uppercase tracking-widest px-2 py-0.5 rounded-md bg-sky-900/60 border border-sky-500/30">
             Admin
