@@ -155,33 +155,23 @@ export const Navbar = () => {
                             : 'text-slate-700 hover:text-slate-900 hover:bg-white/50'
                       }`}
                     >
-                      {/* Active Gliding Pill with Fluid Spring + Running Beam ("animation chạy chạy") */}
+                      {/* Active Gliding Pill with Fluid Spring */}
                       {active && (
                         <motion.div
                           layoutId="activeNavPill"
                           transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-                          className={`absolute inset-0 rounded-full -z-10 overflow-hidden ${
+                          className={`absolute inset-0 rounded-full -z-10 ${
                             isDarkHero
-                              ? 'bg-white/15 backdrop-blur-md shadow-sm ring-1 ring-white/20'
-                              : 'bg-white shadow-sm ring-1 ring-sky-500/20'
+                              ? 'bg-white/20 backdrop-blur-md shadow-sm ring-1 ring-white/25'
+                              : 'bg-white shadow-sm ring-1 ring-slate-900/10'
                           }`}
-                        >
-                          {/* Animated Running Light Beam running across the active tab */}
-                          <div className="absolute bottom-0 left-0 right-0 h-[2.5px] overflow-hidden">
-                            <div className="w-3/4 h-full mx-auto bg-gradient-to-r from-transparent via-sky-400 to-transparent animate-running-beam" />
-                          </div>
-                        </motion.div>
+                        />
                       )}
 
                       {tab.isAi ? (
                         <Sparkles className={`w-3.5 h-3.5 shrink-0 ${active ? (isDarkHero ? 'text-amber-200' : 'text-amber-500') : isDarkHero ? 'text-amber-300' : 'text-amber-500'}`} />
                       ) : (
-                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? (isDarkHero ? 'text-sky-300' : 'text-sky-600') : isDarkHero ? 'text-white/70' : 'text-slate-400'}`} />
-                      )}
-
-                      {/* Active Pulsing Indicator Dot */}
-                      {active && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping inline-block -mr-0.5" />
+                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? (isDarkHero ? 'text-white' : 'text-sky-600') : isDarkHero ? 'text-white/70' : 'text-slate-500'}`} />
                       )}
                       
                       {/* Responsive adaptive label */}
