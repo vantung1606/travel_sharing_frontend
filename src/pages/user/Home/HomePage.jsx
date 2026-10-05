@@ -376,11 +376,7 @@ export const HomePage = () => {
           {/* Main Hero Header Stack */}
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6">
             {/* Top Announcement Tag with Floating Animation */}
-            <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl text-sky-300 font-bold text-xs sm:text-sm shadow-lg border border-sky-400/40 tracking-[0.015em] animate-float-slow hover:scale-105 transition-transform cursor-pointer">
-              <span className="w-2.5 h-2.5 rounded-full bg-sky-400 animate-ping" />
-              <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
-              <span>Trí Tuệ Nhân Tạo Lập Lịch Trình Thế Hệ Mới • Wayfare AI 4.0</span>
-            </div>
+           
 
             {/* Expansive Grand Headline with Gradient Flow */}
             <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.18] text-white drop-shadow-md">
