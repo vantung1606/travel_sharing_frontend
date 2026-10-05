@@ -100,6 +100,16 @@ export const ProfilePage = () => {
   useEffect(() => {
     loadFullProfile();
     loadFollowCounts();
+
+    const handleFollowChanged = () => {
+      loadFullProfile();
+      loadFollowCounts();
+    };
+
+    window.addEventListener('wayfare_follow_changed', handleFollowChanged);
+    return () => {
+      window.removeEventListener('wayfare_follow_changed', handleFollowChanged);
+    };
   }, [myUserId, currentUser?.email]);
 
   const handleCloneItinerary = async (itin) => {
@@ -200,20 +210,26 @@ export const ProfilePage = () => {
                 <div className="flex items-center gap-3 pt-0.5 text-xs sm:text-sm">
                   <button
                     onClick={() => setFollowModalState({ isOpen: true, tab: 'followers' })}
-                    className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-sky-700 transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-sky-700 transition-colors cursor-pointer group"
                     title="Bấm để xem danh sách người theo dõi"
                   >
-                    <span className="font-black text-sky-700 text-sm sm:text-base">{followersCount}</span>
-                    <span className="font-medium text-slate-500">người theo dõi</span>
+                    <span className="font-black text-sky-700 text-sm sm:text-base flex items-center gap-1">
+                      {followersCount}
+                      <Users className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                    </span>
+                    <span className="font-medium text-slate-500 group-hover:text-sky-800">người theo dõi</span>
                   </button>
                   <span className="text-slate-300">•</span>
                   <button
                     onClick={() => setFollowModalState({ isOpen: true, tab: 'following' })}
-                    className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-sky-700 transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 font-bold text-slate-800 hover:text-indigo-700 transition-colors cursor-pointer group"
                     title="Bấm để xem danh sách đang theo dõi"
                   >
-                    <span className="font-black text-slate-900 text-sm sm:text-base">{followingCount}</span>
-                    <span className="font-medium text-slate-500">đang theo dõi</span>
+                    <span className="font-black text-indigo-600 text-sm sm:text-base flex items-center gap-1">
+                      {followingCount}
+                      <UserCheck className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                    </span>
+                    <span className="font-medium text-slate-500 group-hover:text-indigo-700">đang theo dõi</span>
                   </button>
                 </div>
               </div>

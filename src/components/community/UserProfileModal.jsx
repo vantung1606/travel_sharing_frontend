@@ -91,6 +91,11 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
         followingCount: res.followingCount
       }));
 
+      // Broadcast follow status change to entire app (ProfilePage, Community, etc.)
+      window.dispatchEvent(new CustomEvent('wayfare_follow_changed', {
+        detail: { targetUserId: profile.id, isFollowing: res.isFollowing }
+      }));
+
       if (res.isFollowing) {
         toast.showSuccess(`Đã theo dõi ${profile.fullName}! ✨`);
       } else {
@@ -256,40 +261,67 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
               </div>
 
               {/* Stats Row */}
-              <div className="grid grid-cols-4 gap-2 sm:gap-3 py-3.5 px-3 sm:px-4 bg-slate-50/90 rounded-2xl border border-slate-200/70 text-center">
-                <div className="p-1 rounded-xl">
-                  <span className="block text-base sm:text-lg font-black text-slate-900">
+              <div className="grid grid-cols-4 gap-2 sm:gap-3 p-2.5 sm:p-3 bg-slate-50/90 rounded-2xl border border-slate-200/80 text-center">
+                <div
+                  onClick={() => setActiveTab('posts')}
+                  className={`cursor-pointer rounded-xl py-2 px-1 sm:py-2.5 sm:px-2 transition-all group border ${
+                    activeTab === 'posts'
+                      ? 'bg-white shadow-xs border-slate-200/80'
+                      : 'hover:bg-white/80 border-transparent hover:border-slate-200/50'
+                  }`}
+                  title="Bấm để xem danh sách bài viết đã chia sẻ"
+                >
+                  <span className="flex items-center justify-center gap-1 text-base sm:text-lg font-black text-slate-900 group-hover:text-sky-700 transition-colors">
                     {profile.postsCount || profile.posts?.length || 0}
+                    <Globe className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                   </span>
-                  <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold">Bài viết</span>
+                  <span className="block text-[11px] sm:text-xs text-slate-500 font-semibold group-hover:text-slate-800 leading-normal mt-0.5">
+                    Bài viết
+                  </span>
                 </div>
-                <div className="p-1 rounded-xl">
-                  <span className="block text-base sm:text-lg font-black text-slate-900">
+
+                <div
+                  onClick={() => setActiveTab('itineraries')}
+                  className={`cursor-pointer rounded-xl py-2 px-1 sm:py-2.5 sm:px-2 transition-all group border ${
+                    activeTab === 'itineraries'
+                      ? 'bg-white shadow-xs border-slate-200/80'
+                      : 'hover:bg-white/80 border-transparent hover:border-slate-200/50'
+                  }`}
+                  title="Bấm để xem danh sách lịch trình"
+                >
+                  <span className="flex items-center justify-center gap-1 text-base sm:text-lg font-black text-slate-900 group-hover:text-amber-600 transition-colors">
                     {profile.itinerariesCount || profile.itineraries?.length || 0}
+                    <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                   </span>
-                  <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold">Lịch trình</span>
+                  <span className="block text-[11px] sm:text-xs text-slate-500 font-semibold group-hover:text-slate-800 leading-normal mt-0.5">
+                    Lịch trình
+                  </span>
                 </div>
+
                 <div
                   onClick={() => setFollowModalState({ isOpen: true, tab: 'followers' })}
-                  className="cursor-pointer hover:bg-white hover:shadow-xs rounded-xl p-1 transition-all group border border-transparent hover:border-slate-200/60"
+                  className="cursor-pointer hover:bg-sky-50/70 hover:shadow-xs rounded-xl py-2 px-1 sm:py-2.5 sm:px-2 transition-all group border border-transparent hover:border-sky-200/70"
                   title="Bấm để xem danh sách người theo dõi"
                 >
-                  <span className="block text-base sm:text-lg font-black text-sky-600 group-hover:scale-105 transition-transform">
+                  <span className="flex items-center justify-center gap-1 text-base sm:text-lg font-black text-sky-700 group-hover:scale-105 transition-transform">
                     {profile.followersCount || 0}
+                    <Users className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                   </span>
-                  <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold group-hover:text-sky-700">
+                  <span className="block text-[11px] sm:text-xs text-slate-500 font-semibold group-hover:text-sky-800 leading-normal mt-0.5">
                     Người theo dõi
                   </span>
                 </div>
+
                 <div
                   onClick={() => setFollowModalState({ isOpen: true, tab: 'following' })}
-                  className="cursor-pointer hover:bg-white hover:shadow-xs rounded-xl p-1 transition-all group border border-transparent hover:border-slate-200/60"
+                  className="cursor-pointer hover:bg-indigo-50/70 hover:shadow-xs rounded-xl py-2 px-1 sm:py-2.5 sm:px-2 transition-all group border border-transparent hover:border-indigo-200/70"
                   title="Bấm để xem danh sách đang theo dõi"
                 >
-                  <span className="block text-base sm:text-lg font-black text-slate-900 group-hover:text-sky-600 group-hover:scale-105 transition-transform">
+                  <span className="flex items-center justify-center gap-1 text-base sm:text-lg font-black text-indigo-600 group-hover:scale-105 transition-transform">
                     {profile.followingCount || 0}
+                    <UserCheck className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                   </span>
-                  <span className="text-[10px] sm:text-[11px] text-slate-500 font-semibold group-hover:text-sky-700">
+                  <span className="block text-[11px] sm:text-xs text-slate-500 font-semibold group-hover:text-indigo-700 leading-normal mt-0.5">
                     Đang theo dõi
                   </span>
                 </div>
