@@ -278,11 +278,11 @@ export const AuthModal = () => {
         {/* ========================================================= */}
         <div className="hidden lg:block lg:w-[61%] relative min-h-[580px] overflow-hidden">
           
-          {/* Background Banner Image */}
+          {/* Background Banner Image: Emerald Green Vietnam Travel Landscape */}
           <div
-            className="absolute inset-0 bg-cover bg-center"
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-105"
             style={{
-              backgroundImage: `url('/images/login/login_banner.jpg')`
+              backgroundImage: `url('/images/login/travel_banner.jpg')`
             }}
           />
 
