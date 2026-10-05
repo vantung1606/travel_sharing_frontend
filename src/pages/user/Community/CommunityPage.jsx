@@ -1086,69 +1086,6 @@ export const CommunityPage = () => {
 
   return (
     <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8 space-y-8">
-      {/* ──────────────────────────────────────────────────────────────────────────
-          COMMUNITY HERO HEADER BANNER
-          - Elegant Deep Navy / Ocean gradient with glowing accents
-          - Community statistics & Quick CTA buttons
-      ────────────────────────────────────────────────────────────────────────── */}
-      <section className="relative rounded-3xl overflow-hidden p-6 sm:p-10 lg:p-12 bg-gradient-to-r from-[#031726] via-[#082845] to-[#0c385f] text-white shadow-xl border border-slate-700/60">
-        <div className="absolute -right-24 -top-24 w-96 h-96 rounded-full bg-blue-500/20 blur-3xl pointer-events-none" />
-        <div className="absolute right-1/3 -bottom-24 w-72 h-72 rounded-full bg-sky-400/15 blur-2xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-          <div className="max-w-2xl space-y-3.5">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-sky-200">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-              <span>Cộng Đồng Du Lịch & Phượt Thủ Wayfare</span>
-            </div>
-
-            <h1 className="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight">
-              Khám Phá Hành Trình • Chia Sẻ Trải Nghiệm Thực Tế
-            </h1>
-
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-normal tracking-[0.015em]">
-              Nơi hơn 120.000 tín đồ xê dịch trao đổi kinh nghiệm chân thực, đính kèm lộ trình AI độc bản
-              và sao chép kế hoạch du lịch 1-click hoàn toàn miễn phí.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-3 pt-2 text-xs sm:text-sm text-slate-300 font-semibold">
-              <span className="flex items-center gap-1.5 bg-white/10 px-3.5 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
-                <Users className="w-4 h-4 text-sky-300" />
-                <strong className="text-white">120k+</strong> Du khách
-              </span>
-              <span className="flex items-center gap-1.5 bg-white/10 px-3.5 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
-                <Route className="w-4 h-4 text-sky-300" />
-                <strong className="text-white">45k+</strong> Lịch trình AI
-              </span>
-              <span className="flex items-center gap-1.5 bg-white/10 px-3.5 py-1.5 rounded-full backdrop-blur-sm border border-white/10">
-                <ShieldCheck className="w-4 h-4 text-amber-300" />
-                Kiểm duyệt AI 24/7
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
-            <button
-              type="button"
-              onClick={() => setIsCreateModalOpen(true)}
-              className="px-6 py-3.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm shadow-lg shadow-sky-600/30 hover:shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Đăng Bài & Đính Kèm Tour</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsAIGeneratorOpen(true)}
-              className="px-6 py-3.5 rounded-full bg-white/15 hover:bg-white/25 text-white font-bold text-sm backdrop-blur-md border border-white/20 hover:scale-105 transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>Lập Kế Hoạch Với AI</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
       {/* 3-COLUMN DESKTOP GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
