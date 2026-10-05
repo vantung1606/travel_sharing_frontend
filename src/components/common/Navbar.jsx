@@ -112,22 +112,18 @@ export const Navbar = () => {
             <div className="flex items-center gap-3 shrink-0">
               <div
                 onClick={() => { setPortalMode('user'); setUserTab('home'); }}
-                className="flex items-center gap-2.5 cursor-pointer group"
+                className="flex items-center cursor-pointer group py-1"
+                title="Wayfare - Trang chủ"
               >
-                <div className={`w-9 h-9 rounded-xl flex items-center justify-center text-white shadow-md transition-transform group-hover:scale-105 border-0 ${
-                  isDarkHero
-                    ? 'bg-gradient-to-tr from-sky-500 to-blue-600 shadow-sky-500/30'
-                    : 'bg-gradient-to-tr from-sky-600 to-blue-600 shadow-sky-500/20'
-                }`}>
-                  <WayfarePlaneLogo className="w-5 h-5 text-white transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </div>
-                <div className="block leading-tight">
-                  <span className={`font-display font-extrabold text-lg sm:text-xl tracking-tight transition-colors ${
-                    isDarkHero ? 'text-white group-hover:text-sky-300' : 'text-slate-900 group-hover:text-sky-600'
-                  }`}>
-                    Way<span className={isDarkHero ? 'text-sky-400' : 'text-sky-600'}>fare</span>
-                  </span>
-                </div>
+                <img
+                  src="/wayfare-logo.png"
+                  alt="Wayfare"
+                  className={`h-9 sm:h-10 w-auto object-contain transition-all duration-300 group-hover:scale-105 ${
+                    isDarkHero
+                      ? 'brightness-0 invert drop-shadow-[0_2px_12px_rgba(255,255,255,0.45)]'
+                      : 'drop-shadow-xs'
+                  }`}
+                />
               </div>
             </div>
 
@@ -386,18 +382,18 @@ export const Navbar = () => {
             <div className="space-y-6">
               
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white font-bold shadow-md shadow-sky-500/20">
-                    <WayfarePlaneLogo className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <span className="font-display font-extrabold text-lg text-slate-900">
-                      Way<span className="text-sky-600">fare</span>
-                    </span>
-                    <span className="block text-[9px] uppercase tracking-wider font-semibold text-slate-400">
-                      Điều hướng hệ thống
-                    </span>
-                  </div>
+                <div
+                  onClick={() => { setPortalMode('user'); setUserTab('home'); setIsMobileMenuOpen(false); }}
+                  className="cursor-pointer"
+                >
+                  <img
+                    src="/wayfare-logo.png"
+                    alt="Wayfare"
+                    className="h-9 w-auto object-contain drop-shadow-xs"
+                  />
+                  <span className="block text-[9px] uppercase tracking-wider font-semibold text-slate-400 mt-1">
+                    Điều hướng hệ thống
+                  </span>
                 </div>
 
                 <button

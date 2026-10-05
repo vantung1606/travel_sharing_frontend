@@ -35,19 +35,16 @@ export const AdminSidebar = ({ onNavigate }) => {
         {/* Brand Header */}
         <div 
           onClick={() => setAdminTab('dashboard')}
-          className="h-16 px-5 flex items-center gap-3 bg-[#283044] border-b border-slate-700/40 cursor-pointer hover:bg-slate-800/50 transition-colors"
+          className="h-16 px-5 flex items-center justify-between bg-[#283044] border-b border-slate-700/40 cursor-pointer hover:bg-slate-800/50 transition-colors"
         >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-600 to-sky-500 flex items-center justify-center text-white shadow-md">
-            <WayfarePlaneLogo className="w-4 h-4 text-white" />
-          </div>
-          <div className="flex flex-col">
-            <span className="font-display font-extrabold text-base text-white tracking-tight leading-tight">
-              Way<span className="text-sky-400">fare</span>
-            </span>
-            <span className="text-[10px] font-extrabold text-sky-300 uppercase tracking-widest">
-              Admin Portal
-            </span>
-          </div>
+          <img
+            src="/wayfare-logo.png"
+            alt="Wayfare"
+            className="h-8 w-auto object-contain brightness-0 invert"
+          />
+          <span className="text-[9px] font-extrabold text-sky-300 uppercase tracking-widest px-2 py-0.5 rounded-md bg-sky-900/60 border border-sky-500/30">
+            Admin
+          </span>
         </div>
 
         {/* AI Engine Status Banner */}

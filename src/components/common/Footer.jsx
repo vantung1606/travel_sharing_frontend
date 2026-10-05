@@ -9,13 +9,12 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand & Intro */}
           <div>
-            <div className="flex items-center gap-2.5 mb-3.5">
-              <div className="w-9 h-9 rounded-xl sky-gradient flex items-center justify-center text-white shadow-md shadow-sky-950/30">
-                <WayfarePlaneLogo className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-display font-bold text-xl text-white tracking-tight">
-                Way<span className="text-sky-400">fare</span>
-              </span>
+            <div className="mb-4">
+              <img
+                src="/wayfare-logo.png"
+                alt="Wayfare"
+                className="h-10 w-auto object-contain brightness-0 invert drop-shadow-sm"
+              />
             </div>
             <p className="text-slate-300 text-sm leading-relaxed mb-4 font-normal">
               Nền tảng du lịch cá tính & chia sẻ trải nghiệm lữ hành thông minh hàng đầu Việt Nam.
