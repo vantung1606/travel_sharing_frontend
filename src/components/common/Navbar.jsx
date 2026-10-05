@@ -130,13 +130,9 @@ export const Navbar = () => {
               </div>
             </div>
 
-            {/* 2. Sleek Rounded Navigation Bar (Border-free pill) */}
+            {/* 2. Clean Borderless Navigation Bar */}
             {portalMode === 'user' && (
-              <nav className={`hidden lg:flex items-center gap-0.5 xl:gap-1 p-1 rounded-full transition-all shrink-0 border-0 shadow-none ${
-                isDarkHero
-                  ? 'bg-white/10 backdrop-blur-md'
-                  : 'bg-slate-200/50 hover:bg-slate-200/70'
-              }`}>
+              <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 shrink-0">
                 {navItems.map(tab => {
                   const active = userTab === tab.id;
                   const Icon = tab.icon;
@@ -145,14 +141,14 @@ export const Navbar = () => {
                       key={tab.id}
                       onClick={() => handleNavClick(tab.id)}
                       title={tab.label}
-                      className={`relative flex items-center gap-1 xl:gap-1.5 px-3 py-1.5 xl:px-3.5 xl:py-1.5 text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap border-0 z-10 ${
+                      className={`relative flex items-center gap-1.5 px-3.5 py-1.5 xl:px-4 xl:py-2 text-xs font-semibold rounded-full transition-all cursor-pointer whitespace-nowrap border-0 z-10 ${
                         active
                           ? isDarkHero
                             ? 'text-white font-bold drop-shadow-sm'
                             : 'text-sky-700 font-bold'
                           : isDarkHero
-                            ? 'text-white/75 hover:text-white hover:bg-white/10'
-                            : 'text-slate-700 hover:text-slate-900 hover:bg-white/50'
+                            ? 'text-white/80 hover:text-white hover:bg-white/10'
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
                       }`}
                     >
                       {/* Active Gliding Pill with Fluid Spring */}
