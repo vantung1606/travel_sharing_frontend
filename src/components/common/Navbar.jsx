@@ -102,7 +102,7 @@ export const Navbar = () => {
         className={`sticky top-0 z-40 w-full select-none transition-all duration-300 border-0 border-b-0 ${
           !isScrolled
             ? 'bg-transparent shadow-none'
-            : 'bg-white/85 backdrop-blur-xl shadow-xs text-slate-900'
+            : 'bg-white shadow-[0_1px_0_0_rgba(15,23,42,0.06),0_4px_16px_-6px_rgba(15,23,42,0.08)] text-slate-900'
         } ${isDarkHero ? 'text-white' : 'text-slate-900'}`}
       >
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
@@ -152,7 +152,9 @@ export const Navbar = () => {
                           className={`absolute inset-0 rounded-full -z-10 ${
                             isDarkHero
                               ? 'bg-white/20 backdrop-blur-md shadow-sm ring-1 ring-white/25'
-                              : 'bg-white shadow-sm ring-1 ring-slate-900/10'
+                              : isScrolled
+                                ? 'bg-sky-50 ring-1 ring-sky-100'
+                                : 'bg-white shadow-sm ring-1 ring-slate-900/10'
                           }`}
                         />
                       )}

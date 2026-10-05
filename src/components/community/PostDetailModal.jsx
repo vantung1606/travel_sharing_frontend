@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useCommunityRealtime } from '../../hooks/useCommunityRealtime';
 import {
   X,
   Heart,
@@ -183,6 +184,28 @@ export const PostDetailModal = ({
       isMounted = false;
     };
   }, [effectivePostId]);
+
+  // Realtime: sync comments & counters when other users interact with this post
+  useCommunityRealtime((event) => {
+    if (!effectivePostId || Number(event?.postId) !== Number(effectivePostId)) return;
+    const isMine = Boolean(currentUser?.email) && event.actorEmail === currentUser.email;
+
+    if (event.type === 'COMMENT_ADDED' || event.type === 'COMMENT_DELETED') {
+      if (typeof event.commentCount === 'number') {
+        setPost(prev => (prev ? { ...prev, commentCount: event.commentCount } : prev));
+      }
+      if (isMine) return; // own action already applied locally
+      postApi
+        .getComments(effectivePostId)
+        .then(data => {
+          setComments(data || []);
+          if (event.type === 'COMMENT_ADDED') toast.showInfo('💬 Có bình luận mới vừa được thêm');
+        })
+        .catch(err => console.warn('[Realtime] Lỗi đồng bộ bình luận:', err));
+    } else if (event.type === 'LIKE_CHANGED' && !isMine && event.likeCount !== undefined && event.likeCount !== null) {
+      setLikeCount(Number(event.likeCount));
+    }
+  });
 
   // Check bookmark status if not provided initially
   useEffect(() => {

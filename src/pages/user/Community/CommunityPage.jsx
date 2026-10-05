@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { postApi, uploadApi, userApi, itineraryApi } from '../../../services/api';
+import { useCommunityRealtime } from '../../../hooks/useCommunityRealtime';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { UserProfileModal } from '../../../components/community/UserProfileModal';
 import { EditPostModal } from '../../../components/community/EditPostModal';
@@ -371,6 +372,35 @@ export const CommunityPage = () => {
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
+
+  // Realtime community events (SSE): live comment & like counters + live comment drawer
+  useCommunityRealtime((event) => {
+    if (!event?.postId) return;
+    const eventPostId = Number(event.postId);
+    const isMine = Boolean(currentUser?.email) && event.actorEmail === currentUser.email;
+
+    if (event.type === 'COMMENT_ADDED' || event.type === 'COMMENT_DELETED') {
+      if (typeof event.commentCount === 'number') {
+        setPosts(prev =>
+          prev.map(p => (Number(p.id) === eventPostId ? { ...p, commentCount: event.commentCount } : p))
+        );
+      }
+      // Own actions are already applied optimistically; only sync others' changes into the open drawer
+      if (!isMine && activeCommentPost && Number(activeCommentPost.id) === eventPostId) {
+        postApi
+          .getComments(eventPostId)
+          .then(comments => {
+            setPostComments(comments || []);
+            if (event.type === 'COMMENT_ADDED') toast?.showInfo?.('💬 Có bình luận mới vừa được thêm');
+          })
+          .catch(err => console.warn('[Realtime] Failed to refresh comments:', err));
+      }
+    } else if (event.type === 'LIKE_CHANGED' && !isMine && event.likeCount !== undefined && event.likeCount !== null) {
+      setPosts(prev =>
+        prev.map(p => (Number(p.id) === eventPostId ? { ...p, likeCount: Number(event.likeCount) } : p))
+      );
+    }
+  });
 
   // Handle URL query ?postId=<id> or ?post=<id> to auto-open post detail modal from notification or share link
   useEffect(() => {
