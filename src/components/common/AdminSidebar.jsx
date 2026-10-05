@@ -13,6 +13,7 @@ import {
   DollarSign,
   History
 } from 'lucide-react';
+import { WayfarePlaneLogo } from './WayfarePlaneLogo';
 
 export const AdminSidebar = ({ onNavigate }) => {
   const { adminTab, setAdminTab, setPortalMode, stats, currentUser } = useApp();
@@ -37,7 +38,7 @@ export const AdminSidebar = ({ onNavigate }) => {
           className="h-16 px-5 flex items-center gap-3 bg-[#283044] border-b border-slate-700/40 cursor-pointer hover:bg-slate-800/50 transition-colors"
         >
           <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-600 to-sky-500 flex items-center justify-center text-white shadow-md">
-            <Compass className="w-5 h-5 animate-spin-slow" />
+            <WayfarePlaneLogo className="w-4 h-4 text-white" />
           </div>
           <div className="flex flex-col">
             <span className="font-display font-extrabold text-base text-white tracking-tight leading-tight">

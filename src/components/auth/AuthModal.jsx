@@ -8,9 +8,9 @@ import {
   Lock,
   Eye,
   EyeOff,
-  User,
-  Compass
+  User
 } from 'lucide-react';
+import { WayfarePlaneLogo } from '../common/WayfarePlaneLogo';
 
 export const AuthModal = () => {
   const { isAuthModalOpen, setIsAuthModalOpen, authMode, setAuthMode, login } = useApp();
@@ -121,7 +121,7 @@ export const AuthModal = () => {
             {/* Logo */}
             <div className="flex items-center justify-center gap-2.5 mb-2.5">
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-600 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25">
-                <Compass className="w-5 h-5 animate-spin-slow" />
+                <WayfarePlaneLogo className="w-5 h-5 text-white" />
               </div>
               <span className="font-display font-bold text-2xl tracking-tight text-[#3c4043]">
                 Wayfare

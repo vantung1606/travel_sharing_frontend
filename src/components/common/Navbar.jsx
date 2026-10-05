@@ -19,6 +19,7 @@ import {
   LogOut
 } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
+import { WayfarePlaneLogo } from './WayfarePlaneLogo';
 
 export const Navbar = () => {
   const location = useLocation();
@@ -118,7 +119,7 @@ export const Navbar = () => {
                     ? 'bg-gradient-to-tr from-sky-500 to-blue-600 shadow-sky-500/30'
                     : 'bg-gradient-to-tr from-sky-600 to-blue-600 shadow-sky-500/20'
                 }`}>
-                  <Compass className="w-5 h-5 animate-spin-slow" />
+                  <WayfarePlaneLogo className="w-5 h-5 text-white transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </div>
                 <div className="block leading-tight">
                   <span className={`font-display font-extrabold text-lg sm:text-xl tracking-tight transition-colors ${
@@ -387,7 +388,7 @@ export const Navbar = () => {
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
                   <div className="w-9 h-9 rounded-xl bg-sky-600 flex items-center justify-center text-white font-bold shadow-md shadow-sky-500/20">
-                    <Compass className="w-5 h-5 animate-spin-slow" />
+                    <WayfarePlaneLogo className="w-5 h-5 text-white" />
                   </div>
                   <div>
                     <span className="font-display font-extrabold text-lg text-slate-900">

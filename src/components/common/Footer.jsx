@@ -1,5 +1,6 @@
 import React from 'react';
-import { Compass, Sparkles, Heart } from 'lucide-react';
+import { Sparkles, Heart } from 'lucide-react';
+import { WayfarePlaneLogo } from './WayfarePlaneLogo';
 
 export const Footer = () => {
   return (
@@ -10,7 +11,7 @@ export const Footer = () => {
           <div>
             <div className="flex items-center gap-2.5 mb-3.5">
               <div className="w-9 h-9 rounded-xl sky-gradient flex items-center justify-center text-white shadow-md shadow-sky-950/30">
-                <Compass className="w-5 h-5 text-white" />
+                <WayfarePlaneLogo className="w-5 h-5 text-white" />
               </div>
               <span className="font-display font-bold text-xl text-white tracking-tight">
                 Way<span className="text-sky-400">fare</span>
