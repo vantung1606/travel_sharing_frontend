@@ -1,8 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { homeApi, itineraryApi, postApi } from '../../../services/api';
+
+const DOCK_BUDGET_OPTIONS = [
+  { val: 'budget', title: 'Tiết kiệm', sub: '2.0 - 3.5 triệu / người', icon: '💳', badge: 'Tiết kiệm' },
+  { val: 'standard', title: 'Tiêu chuẩn', sub: '3.5 - 6.0 triệu / người', icon: '⭐', badge: 'Phổ biến' },
+  { val: 'luxury', title: 'Nghỉ dưỡng VIP', sub: '7.0 triệu+ / 5 sao', icon: '💎', badge: 'Cao cấp' }
+];
+
+const DOCK_STYLE_OPTIONS = [
+  { val: 'chill', title: 'Nghỉ dưỡng & Ẩm thực', sub: 'Biển xanh, cafe chill & ẩm thực địa phương', icon: '🏖️', badge: 'Thư giãn' },
+  { val: 'photo', title: 'Sống ảo & Văn hóa', sub: 'Di sản, phố cổ, góc chụp triệu view', icon: '📸', badge: 'Hot' },
+  { val: 'nature', title: 'Thiên nhiên & Trekking', sub: 'Săn mây, cắm trại, leo núi hoang sơ', icon: '⛰️', badge: 'Khám phá' },
+  { val: 'family', title: 'Gia đình & Tiện nghi', sub: 'Lịch trình nhẹ nhàng, tiện nghi trẻ nhỏ', icon: '👨‍👩‍👧', badge: 'An tâm' }
+];
+
+const DOCK_DURATION_OPTIONS = [
+  { val: '2d1n', title: '2 Ngày 1 Đêm', sub: 'Cuối tuần chớp nhoáng, nạp năng lượng', icon: '⚡' },
+  { val: '3d2n', title: '3 Ngày 2 Đêm', sub: 'Lý tưởng nhất cho hầu hết chuyến đi', icon: '🌟', badge: 'Phổ biến' },
+  { val: '4d3n', title: '4 Ngày 3 Đêm', sub: 'Trọn vẹn, thảnh thơi khám phá sâu', icon: '🌿' },
+  { val: '5d4n', title: '5 Ngày 4 Đêm', sub: 'Hành trình xuyên suốt mọi ngóc ngách', icon: '🗺️', badge: 'Chuyên sâu' }
+];
 import {
   Sparkles,
   MapPin,
@@ -28,6 +49,7 @@ import {
   Check,
   ExternalLink,
   ChevronRight,
+  ChevronDown,
   TrendingUp,
   Map,
   Layers,
@@ -70,6 +92,22 @@ export const HomePage = () => {
   const [dockStyle, setDockStyle] = useState('chill');
   const [dockDuration, setDockDuration] = useState('3d2n');
   const [isDockGenerating, setIsDockGenerating] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null); // 'budget' | 'style' | 'duration' | null
+  const dockRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dockRef.current && !dockRef.current.contains(e.target)) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedBudget = DOCK_BUDGET_OPTIONS.find(o => o.val === dockBudget) || DOCK_BUDGET_OPTIONS[1];
+  const selectedStyle = DOCK_STYLE_OPTIONS.find(o => o.val === dockStyle) || DOCK_STYLE_OPTIONS[0];
+  const selectedDuration = DOCK_DURATION_OPTIONS.find(o => o.val === dockDuration) || DOCK_DURATION_OPTIONS[1];
 
   // Dynamic estimate calculations based on dock settings
   const getDockEstimate = () => {
@@ -625,8 +663,9 @@ export const HomePage = () => {
             </div>
           </div>
 
-          {/* Omni-Search 4 Fields: High Contrast Modern Cards with Micro-Hover */}
+          {/* Omni-Search 4 Fields: High Contrast Modern Cards with Custom Premium Dropdowns */}
           <form
+            ref={dockRef}
             onSubmit={handleDockGenerate}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
           >
@@ -645,57 +684,235 @@ export const HomePage = () => {
               />
             </div>
 
-            {/* Field 2: Budget */}
-            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs hover:-translate-y-0.5">
-              <label className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider mb-1">
-                <DollarSign className="w-4 h-4 text-blue-600" />
-                <span>Ngân sách dự kiến</span>
-              </label>
-              <select
-                value={dockBudget}
-                onChange={(e) => setDockBudget(e.target.value)}
-                className="w-full bg-transparent text-sm sm:text-[15px] font-bold text-slate-900 focus:outline-none cursor-pointer tracking-[0.015em]"
+            {/* Field 2: Budget (Custom Dropdown) */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setActiveDropdown(activeDropdown === 'budget' ? null : 'budget')}
+                className={`w-full text-left p-4 rounded-2xl transition-all flex flex-col justify-center border shadow-xs hover:-translate-y-0.5 cursor-pointer ${
+                  activeDropdown === 'budget'
+                    ? 'bg-white border-blue-600 ring-4 ring-blue-100/70 shadow-md'
+                    : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/80 hover:border-blue-400'
+                }`}
               >
-                <option value="budget">Tiết kiệm (2.0 - 3.5 triệu)</option>
-                <option value="standard">Tiêu chuẩn (3.5 - 6.0 triệu)</option>
-                <option value="luxury">Nghỉ dưỡng sang trọng (7.0 triệu+)</option>
-              </select>
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider">
+                    <DollarSign className="w-4 h-4 text-blue-600" />
+                    <span>Ngân sách dự kiến</span>
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                    activeDropdown === 'budget' ? 'rotate-180 text-blue-600' : ''
+                  }`} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm sm:text-[15px] font-bold text-slate-900 truncate">
+                    {selectedBudget.title} <span className="text-xs font-normal text-slate-500 hidden sm:inline">({selectedBudget.sub.split('/')[0]})</span>
+                  </span>
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {activeDropdown === 'budget' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                    className="absolute top-full left-0 right-0 mt-2 z-50 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-2 space-y-1 min-w-[260px]"
+                  >
+                    {DOCK_BUDGET_OPTIONS.map((opt) => {
+                      const isSelected = dockBudget === opt.val;
+                      return (
+                        <button
+                          key={opt.val}
+                          type="button"
+                          onClick={() => {
+                            setDockBudget(opt.val);
+                            setActiveDropdown(null);
+                          }}
+                          className={`w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between cursor-pointer group ${
+                            isSelected
+                              ? 'bg-sky-50 text-sky-900 font-bold border border-sky-200/60 shadow-xs'
+                              : 'hover:bg-slate-100 text-slate-700 hover:text-slate-900'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="text-base shrink-0 p-1.5 rounded-lg bg-slate-100 group-hover:scale-110 transition-transform">
+                              {opt.icon}
+                            </span>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs sm:text-sm font-bold truncate">{opt.title}</span>
+                                {opt.badge && (
+                                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-800">
+                                    {opt.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-500 truncate font-normal mt-0.5">{opt.sub}</p>
+                            </div>
+                          </div>
+                          {isSelected && <Check className="w-4 h-4 text-sky-600 shrink-0 ml-2" />}
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Field 3: Travel Style */}
-            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs hover:-translate-y-0.5">
-              <label className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider mb-1">
-                <Compass className="w-4 h-4 text-blue-600" />
-                <span>Gu trải nghiệm</span>
-              </label>
-              <select
-                value={dockStyle}
-                onChange={(e) => setDockStyle(e.target.value)}
-                className="w-full bg-transparent text-sm sm:text-[15px] font-bold text-slate-900 focus:outline-none cursor-pointer tracking-[0.015em]"
+            {/* Field 3: Travel Style (Custom Dropdown) */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setActiveDropdown(activeDropdown === 'style' ? null : 'style')}
+                className={`w-full text-left p-4 rounded-2xl transition-all flex flex-col justify-center border shadow-xs hover:-translate-y-0.5 cursor-pointer ${
+                  activeDropdown === 'style'
+                    ? 'bg-white border-blue-600 ring-4 ring-blue-100/70 shadow-md'
+                    : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/80 hover:border-blue-400'
+                }`}
               >
-                <option value="chill">Nghỉ dưỡng & Ẩm thực biển</option>
-                <option value="photo">Sống ảo & Di sản văn hóa</option>
-                <option value="nature">Thiên nhiên hoang sơ & Trekking</option>
-                <option value="family">Gia đình & Tiện nghi trẻ em</option>
-              </select>
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider">
+                    <SlidersHorizontal className="w-4 h-4 text-blue-600" />
+                    <span>Gu trải nghiệm</span>
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                    activeDropdown === 'style' ? 'rotate-180 text-blue-600' : ''
+                  }`} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm sm:text-[15px] font-bold text-slate-900 truncate">
+                    {selectedStyle.title}
+                  </span>
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {activeDropdown === 'style' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                    className="absolute top-full left-0 right-0 mt-2 z-50 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-2 space-y-1 min-w-[270px]"
+                  >
+                    {DOCK_STYLE_OPTIONS.map((opt) => {
+                      const isSelected = dockStyle === opt.val;
+                      return (
+                        <button
+                          key={opt.val}
+                          type="button"
+                          onClick={() => {
+                            setDockStyle(opt.val);
+                            setActiveDropdown(null);
+                          }}
+                          className={`w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between cursor-pointer group ${
+                            isSelected
+                              ? 'bg-sky-50 text-sky-900 font-bold border border-sky-200/60 shadow-xs'
+                              : 'hover:bg-slate-100 text-slate-700 hover:text-slate-900'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="text-base shrink-0 p-1.5 rounded-lg bg-slate-100 group-hover:scale-110 transition-transform">
+                              {opt.icon}
+                            </span>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs sm:text-sm font-bold truncate">{opt.title}</span>
+                                {opt.badge && (
+                                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-sky-100 text-sky-800">
+                                    {opt.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-500 truncate font-normal mt-0.5">{opt.sub}</p>
+                            </div>
+                          </div>
+                          {isSelected && <Check className="w-4 h-4 text-sky-600 shrink-0 ml-2" />}
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            {/* Field 4: Duration */}
-            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs hover:-translate-y-0.5">
-              <label className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider mb-1">
-                <Calendar className="w-4 h-4 text-blue-600" />
-                <span>Thời lượng chuyến đi</span>
-              </label>
-              <select
-                value={dockDuration}
-                onChange={(e) => setDockDuration(e.target.value)}
-                className="w-full bg-transparent text-sm sm:text-[15px] font-bold text-slate-900 focus:outline-none cursor-pointer tracking-[0.015em]"
+            {/* Field 4: Duration (Custom Dropdown) */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setActiveDropdown(activeDropdown === 'duration' ? null : 'duration')}
+                className={`w-full text-left p-4 rounded-2xl transition-all flex flex-col justify-center border shadow-xs hover:-translate-y-0.5 cursor-pointer ${
+                  activeDropdown === 'duration'
+                    ? 'bg-white border-blue-600 ring-4 ring-blue-100/70 shadow-md'
+                    : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/80 hover:border-blue-400'
+                }`}
               >
-                <option value="2d1n">2 Ngày 1 Đêm (Cuối tuần)</option>
-                <option value="3d2n">3 Ngày 2 Đêm (Lý tưởng)</option>
-                <option value="4d3n">4 Ngày 3 Đêm (Trọn vẹn)</option>
-                <option value="5d4n">5 Ngày 4 Đêm (Khám phá sâu)</option>
-              </select>
+                <div className="flex items-center justify-between w-full mb-1">
+                  <span className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider">
+                    <Calendar className="w-4 h-4 text-blue-600" />
+                    <span>Thời lượng chuyến đi</span>
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                    activeDropdown === 'duration' ? 'rotate-180 text-blue-600' : ''
+                  }`} />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm sm:text-[15px] font-bold text-slate-900 truncate">
+                    {selectedDuration.title} <span className="text-xs font-normal text-slate-500 hidden sm:inline">({selectedDuration.sub.split(',')[0]})</span>
+                  </span>
+                </div>
+              </button>
+
+              <AnimatePresence>
+                {activeDropdown === 'duration' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                    className="absolute top-full left-0 right-0 mt-2 z-50 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200/90 p-2 space-y-1 min-w-[280px]"
+                  >
+                    {DOCK_DURATION_OPTIONS.map((opt) => {
+                      const isSelected = dockDuration === opt.val;
+                      return (
+                        <button
+                          key={opt.val}
+                          type="button"
+                          onClick={() => {
+                            setDockDuration(opt.val);
+                            setActiveDropdown(null);
+                          }}
+                          className={`w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between cursor-pointer group ${
+                            isSelected
+                              ? 'bg-sky-50 text-sky-900 font-bold border border-sky-200/60 shadow-xs'
+                              : 'hover:bg-slate-100 text-slate-700 hover:text-slate-900'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="text-base shrink-0 p-1.5 rounded-lg bg-slate-100 group-hover:scale-110 transition-transform">
+                              {opt.icon}
+                            </span>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-xs sm:text-sm font-bold truncate">{opt.title}</span>
+                                {opt.badge && (
+                                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-800">
+                                    {opt.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-500 truncate font-normal mt-0.5">{opt.sub}</p>
+                            </div>
+                          </div>
+                          {isSelected && <Check className="w-4 h-4 text-sky-600 shrink-0 ml-2" />}
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </form>
 
