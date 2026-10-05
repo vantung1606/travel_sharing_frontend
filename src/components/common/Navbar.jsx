@@ -85,7 +85,7 @@ export const Navbar = () => {
     { id: 'community', label: 'Cộng đồng', shortLabel: 'Cộng đồng', icon: Users, badge: 'HOT' },
     ...(isLoggedIn ? [
       { id: 'itineraries', label: 'Lịch trình', shortLabel: 'Lịch trình', icon: Calendar },
-      { id: 'messages', label: 'Trò chuyện', shortLabel: 'Trò chuyện', icon: MessageSquare, badge: '2' }
+      { id: 'messages', label: 'Trò chuyện', shortLabel: 'Trò chuyện', icon: MessageSquare }
     ] : [])
   ];
 
