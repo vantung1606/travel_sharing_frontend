@@ -83,8 +83,10 @@ export const Navbar = () => {
     { id: 'home', label: 'Trang chủ', shortLabel: 'Trang chủ', icon: Compass },
     { id: 'explore', label: 'Khám phá', shortLabel: 'Khám phá', icon: MapPin },
     { id: 'community', label: 'Cộng đồng', shortLabel: 'Cộng đồng', icon: Users, badge: 'HOT' },
-    { id: 'itineraries', label: 'Lịch trình', shortLabel: 'Lịch trình', icon: Calendar },
-    ...(isLoggedIn ? [{ id: 'messages', label: 'Trò chuyện', shortLabel: 'Trò chuyện', icon: MessageSquare, badge: '2' }] : [])
+    ...(isLoggedIn ? [
+      { id: 'itineraries', label: 'Lịch trình', shortLabel: 'Lịch trình', icon: Calendar },
+      { id: 'messages', label: 'Trò chuyện', shortLabel: 'Trò chuyện', icon: MessageSquare, badge: '2' }
+    ] : [])
   ];
 
   const handleNavClick = (tabId) => {

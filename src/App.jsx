@@ -50,10 +50,17 @@ const AppContent = () => {
               <Route path="/home" element={<Navigate to="/" replace />} />
               <Route path="/explore" element={<ExplorePage />} />
               <Route path="/community" element={<CommunityPage />} />
-              <Route path="/itineraries" element={<ItineraryManagerPage />} />
               <Route path="/ai-planner" element={<Navigate to="/itineraries" replace />} />
               
               {/* Protected User Routes */}
+              <Route 
+                path="/itineraries" 
+                element={
+                  <UserAuthGuard title="Lịch trình của tôi">
+                    <ItineraryManagerPage />
+                  </UserAuthGuard>
+                } 
+              />
               <Route 
                 path="/messages" 
                 element={
