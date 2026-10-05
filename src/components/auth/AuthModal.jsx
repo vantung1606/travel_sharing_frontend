@@ -64,6 +64,7 @@ export const AuthModal = () => {
       if (authMode === 'login') {
         const res = await authApi.login(email, password);
         const userData = res.data?.user || {
+          id: res.data?.id,
           name: res.data?.fullName || email.split('@')[0],
           fullName: res.data?.fullName,
           email: res.data?.email || email,
@@ -77,6 +78,7 @@ export const AuthModal = () => {
       } else {
         const res = await authApi.register(fullName, email, password);
         const userData = res.data?.user || {
+          id: res.data?.id,
           name: res.data?.fullName || fullName || email.split('@')[0],
           fullName: res.data?.fullName || fullName,
           email: res.data?.email || email,

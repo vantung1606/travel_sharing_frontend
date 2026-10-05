@@ -138,6 +138,7 @@ export const AppProvider = ({ children }) => {
     if (userData) {
       const normalized = {
         ...userData,
+        id: userData.id || currentUser.id,
         name: userData.fullName || userData.name || currentUser.name,
         handle: userData.handle || currentUser.handle,
         email: userData.email || currentUser.email,

@@ -19,7 +19,8 @@ import {
   Loader2,
   Lock,
   Globe,
-  ArrowRight
+  ArrowRight,
+  Award
 } from 'lucide-react';
 import { userApi, postApi } from '../../services/api';
 import { useToast } from '../common/Toast';
@@ -144,49 +145,60 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
           </div>
         ) : profile ? (
           <div className="flex-1 overflow-y-auto no-scrollbar">
-            {/* Cover Banner with Ambient Mesh Glow */}
-            <div className="relative h-32 sm:h-40 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-700 shrink-0 overflow-hidden">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/20 via-transparent to-black/25"></div>
-              <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-              <div className="absolute top-2 left-6 w-24 h-24 bg-sky-300/20 rounded-full blur-xl"></div>
+            {/* Cover Banner: Displays real cover image with subtle dark overlay */}
+            <div
+              className="relative h-36 sm:h-48 bg-cover bg-center shrink-0 overflow-hidden"
+              style={{
+                backgroundImage: `url('${profile.coverImageUrl || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80"}')`
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
             </div>
 
             <div className="px-5 sm:px-7 pb-6 space-y-5">
               {/* Header info: Avatar, Names, Follow button */}
               <div className="relative flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 pt-1 sm:pt-2">
                 <div className="flex items-end gap-3.5">
-                  <div className="relative shrink-0 -mt-12 sm:-mt-16">
+                  <div className="relative shrink-0 -mt-14 sm:-mt-18">
                     <img
                       src={profile.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
                       alt={profile.fullName}
-                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl sm:rounded-3xl object-cover ring-4 ring-white shadow-xl bg-white shrink-0"
+                      className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover ring-4 ring-white shadow-xl bg-white shrink-0"
                     />
                     {profile.isVerified && (
-                      <span className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-blue-600 ring-2 ring-white text-white flex items-center justify-center text-xs font-black shadow-sm" title="Tài khoản đã xác minh">
+                      <span className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs font-bold border-2 border-white shadow-sm" title="Tài khoản đã xác minh">
                         ✓
                       </span>
                     )}
                   </div>
                   <div className="pb-0.5 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2.5 flex-wrap">
                       <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug tracking-tight truncate">
                         {profile.fullName}
                       </h3>
-                      {profile.role && (
-                        <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[11px] font-extrabold border border-sky-200/70 shadow-2xs">
-                          {profile.role}
-                        </span>
-                      )}
+                      <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[11px] font-bold flex items-center gap-1 border border-amber-200/80 shadow-xs">
+                        <Award className="w-3.5 h-3.5 text-amber-600" />
+                        {profile.role || profile.rank || 'Wanderer Gold'}
+                      </span>
                     </div>
-                    <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5 truncate">
-                      {profile.handle || '@wayfarer'}
+                    <p className="text-xs sm:text-sm text-slate-500 font-mono font-medium flex items-center gap-2 mt-1 truncate">
+                      <span className="text-slate-700 font-semibold">{profile.handle || '@wayfarer'}</span>
+                      <span className="text-slate-300">•</span>
+                      <span className="flex items-center gap-1 text-slate-600 font-sans">
+                        <MapPin className="w-3.5 h-3.5 text-sky-600" /> {profile.location || 'Đà Nẵng, Việt Nam'}
+                      </span>
                     </p>
                   </div>
                 </div>
 
                 {/* Follow / Unfollow Action */}
                 <div className="sm:pb-1 flex items-center gap-2">
-                  {currentUser && (currentUser.email === profile.email || currentUser.name === profile.fullName) ? (
+                  {Boolean(
+                    (currentUser?.id && profile?.id && Number(currentUser.id) === Number(profile.id)) ||
+                    (currentUser?.email && profile?.email && currentUser.email.toLowerCase() === profile.email.toLowerCase()) ||
+                    (currentUser?.handle && profile?.handle && currentUser.handle.toLowerCase() === profile.handle.toLowerCase()) ||
+                    (currentUser?.name && profile?.fullName && currentUser.name.trim().toLowerCase() === profile.fullName.trim().toLowerCase())
+                  ) ? (
                     <span className="px-4 py-2 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold border border-slate-200 shadow-2xs">
                       Tài khoản của bạn
                     </span>
