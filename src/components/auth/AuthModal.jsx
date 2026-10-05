@@ -81,15 +81,15 @@ export const AuthModal = () => {
         </button>
 
         {/* ========================================================= */}
-        {/* LEFT COLUMN: FORM SECTION (Matching CNPM login.scss)       */}
-        {/* Background: #eef1f6, White 55px Pill Inputs, 55px Button  */}
+        {/* LEFT COLUMN: FORM SECTION (46% width for ideal balance)   */}
+        {/* Background: #eef1f6, White 50px Pill Inputs, 50px Button  */}
         {/* ========================================================= */}
-        <div className="w-full lg:w-[50%] p-6 sm:p-8 md:p-10 lg:p-12 flex flex-col justify-center items-center overflow-y-auto z-10 bg-[#eef1f6]">
+        <div className="w-full lg:w-[46%] p-6 sm:p-8 md:p-10 flex flex-col justify-center items-center overflow-y-auto z-10 bg-[#eef1f6]">
           
-          <div className="w-full max-w-[420px] text-center">
+          <div className="w-full max-w-[380px] sm:max-w-[390px] text-center">
             
             {/* Logo */}
-            <div className="flex items-center justify-center gap-2.5 mb-3">
+            <div className="flex items-center justify-center gap-2.5 mb-2.5">
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-600 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/25">
                 <Compass className="w-5 h-5 animate-spin-slow" />
               </div>
@@ -99,12 +99,12 @@ export const AuthModal = () => {
             </div>
 
             {/* Heading */}
-            <h3 className="text-2xl sm:text-[25px] font-semibold text-[#3c4043] mb-4">
+            <h3 className="text-2xl font-semibold text-[#3c4043] mb-3">
               {authMode === 'login' ? 'Đăng Nhập Tài Khoản' : 'Đăng Ký Tài Khoản'}
             </h3>
 
             {/* Mode Switcher Tabs */}
-            <div className="flex bg-slate-200/80 p-1 rounded-full mb-6 max-w-[260px] mx-auto">
+            <div className="flex bg-slate-200/80 p-1 rounded-full mb-5 max-w-[260px] mx-auto">
               <button
                 type="button"
                 onClick={() => setAuthMode('login')}
@@ -130,7 +130,7 @@ export const AuthModal = () => {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4 text-left">
+            <form onSubmit={handleSubmit} className="space-y-3.5 text-left">
               
               {/* Full Name (when Register) */}
               {authMode === 'register' && (
@@ -142,7 +142,7 @@ export const AuthModal = () => {
                     placeholder="Họ và tên của bạn"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full h-[52px] pl-12 pr-5 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
+                    className="w-full h-[50px] pl-12 pr-5 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
                   />
                 </div>
               )}
@@ -277,7 +277,7 @@ export const AuthModal = () => {
         {/* RIGHT COLUMN: BANNER (Matching CNPM .bg-img & img-50.png) */}
         {/* Uses exact login_banner.jpg with img-50.png in the middle */}
         {/* ========================================================= */}
-        <div className="hidden lg:block lg:w-[50%] relative min-h-[580px] overflow-hidden">
+        <div className="hidden lg:block lg:w-[54%] relative min-h-[580px] overflow-hidden">
           
           {/* Background Banner Image */}
           <div
