@@ -217,7 +217,7 @@ export const Navbar = () => {
 
             {/* 3. Right Action Bar */}
             <div className="flex items-center gap-2.5 shrink-0">
-              {portalMode === 'user' && (
+              {portalMode === 'user' && isLoggedIn && (
                 /* Notification Bell */
                 <div className="relative shrink-0">
                   <button

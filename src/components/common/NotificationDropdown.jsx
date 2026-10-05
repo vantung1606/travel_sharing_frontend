@@ -23,6 +23,7 @@ import {
 export const NotificationDropdown = ({ isOpen, onClose }) => {
   const dropdownRef = useRef(null);
   const {
+    isLoggedIn,
     notifications,
     unreadNotificationsCount,
     markNotificationAsRead,
@@ -45,7 +46,7 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !isLoggedIn) return null;
 
   const getNotificationIcon = (type) => {
     switch (type) {

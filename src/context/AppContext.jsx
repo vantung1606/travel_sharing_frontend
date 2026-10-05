@@ -174,10 +174,14 @@ export const AppProvider = ({ children }) => {
   };
 
   // Notification State - Synced with currentUser
-  const [notifications, setNotifications] = useState(INITIAL_MOCK_NOTIFICATIONS);
+  const [notifications, setNotifications] = useState([]);
   const [isNotificationLiveBackend, setIsNotificationLiveBackend] = useState(false);
 
   const fetchNotifications = useCallback(async (targetEmail) => {
+    if (!isLoggedIn) {
+      setNotifications([]);
+      return;
+    }
     const emailToUse = targetEmail || currentUser?.email || 'admin@gmail.com';
     try {
       const res = await notificationApi.getNotifications(emailToUse);
@@ -188,20 +192,25 @@ export const AppProvider = ({ children }) => {
     } catch (err) {
       console.error('Error fetching notifications:', err);
     }
-  }, [currentUser?.email]);
+  }, [currentUser?.email, isLoggedIn]);
 
   // Sync notifications on mount and whenever user email changes
   useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
+    if (isLoggedIn) {
+      fetchNotifications();
+    } else {
+      setNotifications([]);
+    }
+  }, [fetchNotifications, isLoggedIn]);
 
   // Polling every 30 seconds for live notification updates & badge counts
   useEffect(() => {
+    if (!isLoggedIn) return;
     const timer = setInterval(() => {
       fetchNotifications();
     }, 30000);
     return () => clearInterval(timer);
-  }, [fetchNotifications]);
+  }, [fetchNotifications, isLoggedIn]);
 
   const unreadNotificationsCount = notifications.filter(n => !n.isRead).length;
 
