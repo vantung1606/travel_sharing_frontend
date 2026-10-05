@@ -41,8 +41,8 @@ export const AuthModal = () => {
     {
       id: 3,
       url: '/images/login/travel_banner_3.jpg',
-      title: 'Phú Quốc • Thiên Đường Nhiệt Đới',
-      desc: 'Biển xanh ngọc bích rợp bóng dừa mát rượi'
+      title: 'Hà Giang • Hẻm Tu Sản',
+      desc: 'Dòng sông Nho Quế xanh ngọc bích giữa đại ngàn hùng vĩ'
     }
   ];
 
