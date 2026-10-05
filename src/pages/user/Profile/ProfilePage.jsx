@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { userApi } from '../../../services/api';
 import { FollowListModal } from '../../../components/community/FollowListModal';
+import { PostDetailModal } from '../../../components/community/PostDetailModal';
+import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
+import { useToast } from '../../../components/common/Toast';
 import {
   User,
   MapPin,
@@ -29,16 +32,32 @@ import {
   MoreHorizontal,
   X,
   Users,
-  UserCheck
+  UserCheck,
+  Loader2,
+  Copy,
+  Eye,
+  ArrowRight,
+  Lock,
+  DollarSign
 } from 'lucide-react';
 
 export const ProfilePage = () => {
-  const { currentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab } = useApp();
+  const { currentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab, setItineraries } = useApp();
+  const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('itineraries'); // 'itineraries' | 'posts' | 'ai-dna' | 'saved' | 'badges'
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [profileName, setProfileName] = useState(currentUser.name);
   const [profileBio, setProfileBio] = useState(currentUser.bio);
+
+  // Full Profile data from Backend API
+  const [profileData, setProfileData] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  // Modals & cloning state
+  const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
+  const [selectedItineraryForModal, setSelectedItineraryForModal] = useState(null);
+  const [cloningItinId, setCloningItinId] = useState(null);
 
   // Follow State & Modal
   const [followModalState, setFollowModalState] = useState({ isOpen: false, tab: 'following' });
@@ -46,6 +65,24 @@ export const ProfilePage = () => {
   const [followersCount, setFollowersCount] = useState(0);
 
   const myUserId = currentUser.id || 1;
+
+  const loadFullProfile = async () => {
+    try {
+      setLoadingProfile(true);
+      const data = await userApi.getProfile(myUserId, currentUser?.email);
+      if (data) {
+        setProfileData(data);
+        if (data.fullName) setProfileName(data.fullName);
+        if (data.bio) setProfileBio(data.bio);
+        if (data.followersCount !== undefined) setFollowersCount(data.followersCount);
+        if (data.followingCount !== undefined) setFollowingCount(data.followingCount);
+      }
+    } catch (err) {
+      console.warn('Lỗi khi tải thông tin hồ sơ người dùng:', err);
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
 
   const loadFollowCounts = async () => {
     try {
@@ -61,8 +98,35 @@ export const ProfilePage = () => {
   };
 
   useEffect(() => {
+    loadFullProfile();
     loadFollowCounts();
-  }, [myUserId]);
+  }, [myUserId, currentUser?.email]);
+
+  const handleCloneItinerary = async (itin) => {
+    try {
+      setCloningItinId(itin.id);
+      const newItinerary = {
+        id: Date.now(),
+        title: 'Bản sao: ' + itin.title,
+        destination: itin.destination || 'Việt Nam',
+        budgetTotal: itin.budgetTotal || 5000000,
+        coverImageUrl: itin.coverImageUrl || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
+        isAiGenerated: itin.isAiGenerated ?? true,
+        status: 'ACTIVE',
+        createdAt: new Date().toISOString()
+      };
+      setItineraries(prev => [newItinerary, ...prev]);
+      toast.showSuccess(`Đã sao chép lịch trình "${itin.title}" vào kho của bạn! 🎉`);
+    } catch (err) {
+      toast.showError('Không thể sao chép: ' + err.message);
+    } finally {
+      setCloningItinId(null);
+    }
+  };
+
+  // Derive real database lists with fallback to initial data
+  const displayPosts = profileData?.posts && profileData.posts.length > 0 ? profileData.posts : posts;
+  const displayItineraries = profileData?.itineraries && profileData.itineraries.length > 0 ? profileData.itineraries : itineraries;
 
   // Mock Achievements
   const achievements = [
@@ -198,7 +262,7 @@ export const ProfilePage = () => {
             <div className="p-2 border-l border-slate-200/80">
               <span className="text-slate-400 block text-[11px] font-semibold">Lịch Trình AI Đã Tạo</span>
               <span className="font-display font-extrabold text-xl text-sky-700 mt-0.5 block flex items-center gap-1">
-                {itineraries.length} <Sparkles className="w-4 h-4 text-amber-500" />
+                {displayItineraries.length} <Sparkles className="w-4 h-4 text-amber-500" />
               </span>
               <span className="text-[10px] text-slate-400">Đã đồng bộ GPS</span>
             </div>
@@ -206,9 +270,9 @@ export const ProfilePage = () => {
             <div className="p-2 border-l border-slate-200/80">
               <span className="text-slate-400 block text-[11px] font-semibold">Bài Đăng Cộng Đồng</span>
               <span className="font-display font-extrabold text-xl text-sky-600 mt-0.5 block flex items-center gap-1">
-                {posts.length} <Globe className="w-4 h-4 text-sky-600" />
+                {displayPosts.length} <Globe className="w-4 h-4 text-sky-600" />
               </span>
-              <span className="text-[10px] text-slate-400">3.4k lượt thích</span>
+              <span className="text-[10px] text-slate-400">Đã đăng công khai</span>
             </div>
 
             <div
@@ -249,8 +313,8 @@ export const ProfilePage = () => {
         {/* PROFILE TAB NAVIGATION */}
         <div className="flex items-center gap-2 px-6 overflow-x-auto border-t border-slate-200/80 bg-slate-50/50 no-scrollbar">
           {[
-            { id: 'itineraries', label: 'Lịch Trình AI Của Tôi', count: itineraries.length, icon: Route },
-            { id: 'posts', label: 'Bài Viết & Review', count: posts.length, icon: Globe },
+            { id: 'itineraries', label: 'Lịch Trình AI Của Tôi', count: displayItineraries.length, icon: Route },
+            { id: 'posts', label: 'Bài Viết & Review', count: displayPosts.length, icon: Globe },
             { id: 'ai-dna', label: 'Gu Du Lịch & AI DNA', badge: 'WanderAI', icon: Sparkles },
             { id: 'saved', label: 'Địa Điểm Đã Lưu', count: destinations.length, icon: Bookmark },
             { id: 'badges', label: 'Huy Hiệu & Thành Tích', count: achievements.length, icon: Award }
@@ -294,116 +358,329 @@ export const ProfilePage = () => {
       
       {/* TAB 1: MY AI ITINERARIES */}
       {activeTab === 'itineraries' && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
               <Route className="w-5 h-5 text-sky-600" />
-              <span>Danh Sách Lịch Trình Du Lịch AI</span>
+              <span>Danh Sách Lịch Trình Du Lịch ({displayItineraries.length})</span>
             </h3>
             <button
               onClick={() => setIsAIGeneratorOpen(true)}
-              className="sparkle-btn text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5"
+              className="sparkle-btn text-white px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-md hover:scale-102 active:scale-98 transition-all"
             >
               <PlusCircle className="w-4 h-4" />
               <span>Tạo Tour Mới</span>
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {itineraries.map(itin => (
-              <div
-                key={itin.id}
-                className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm space-y-4 hover:shadow-md transition-shadow group flex flex-col justify-between"
+          {displayItineraries.length === 0 ? (
+            <div className="text-center py-16 px-4 text-slate-400 text-sm bg-white rounded-3xl border border-dashed border-slate-200 space-y-3">
+              <Route className="w-10 h-10 text-slate-300 mx-auto" />
+              <p className="font-semibold text-slate-600">Bạn chưa có lịch trình du lịch nào trong kho.</p>
+              <button
+                onClick={() => setIsAIGeneratorOpen(true)}
+                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-all shadow-xs"
               >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="px-3 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-bold">
-                      {itin.daysCount} Ngày • {itin.style}
-                    </span>
-                    <span className="text-xs font-bold text-sky-600">{itin.budgetTotal}</span>
+                Tạo Tour Cùng Trợ Lý AI
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {displayItineraries.map(itin => (
+                <div
+                  key={itin.id}
+                  className="bg-white rounded-3xl border border-slate-200/80 shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden group hover:-translate-y-1"
+                >
+                  {/* Cover Image & Badges */}
+                  <div className="relative h-48 w-full overflow-hidden bg-slate-100">
+                    <img
+                      src={itin.coverImageUrl || itin.coverImage || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80'}
+                      alt={itin.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+
+                    {/* Top Badges */}
+                    <div className="absolute top-3.5 left-3.5 right-3.5 flex items-center justify-between gap-1.5 flex-wrap">
+                      {itin.isAiGenerated ? (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-600/90 text-white text-[10px] font-bold backdrop-blur-md shadow-xs">
+                          <Sparkles className="w-3 h-3 text-amber-300" />
+                          <span>Tạo bởi AI</span>
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-900/70 text-white text-[10px] font-bold backdrop-blur-md shadow-xs">
+                          <Route className="w-3 h-3 text-sky-400" />
+                          <span>Lộ trình phượt</span>
+                        </span>
+                      )}
+                      <span className="px-2.5 py-0.5 rounded-full bg-white/90 backdrop-blur-md text-sky-800 text-[10px] font-extrabold shadow-2xs">
+                        {itin.startDate && itin.endDate
+                          ? `${Math.max(1, Math.round((new Date(itin.endDate) - new Date(itin.startDate)) / (1000 * 60 * 60 * 24)) + 1)}N${Math.max(1, Math.round((new Date(itin.endDate) - new Date(itin.startDate)) / (1000 * 60 * 60 * 24)))}Đ`
+                          : (itin.daysCount ? `${itin.daysCount}N${itin.daysCount - 1}Đ` : '3N2Đ')}
+                      </span>
+                    </div>
+
+                    {/* Destination Bottom Overlay */}
+                    <div className="absolute bottom-3 left-3.5 right-3.5 flex items-center gap-1.5 text-white">
+                      <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <span className="text-xs font-bold truncate">{itin.destination || 'Việt Nam'}</span>
+                    </div>
                   </div>
 
-                  <h4 className="font-bold text-base text-slate-900 group-hover:text-sky-600 transition-colors">
-                    {itin.title}
-                  </h4>
-
-                  <p className="text-xs text-slate-500 line-clamp-2">
-                    Điểm đến chính: {itin.destination}. Phù hợp nhóm phượt hoặc nghỉ dưỡng gia đình.
-                  </p>
-
-                  <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1.5 text-xs">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
-                      Hoạt động nổi bật ngày 1
-                    </span>
-                    {itin.days[0]?.activities.slice(0, 2).map((act, i) => (
-                      <div key={i} className="flex items-center gap-2 text-slate-700 font-medium">
-                        <span className="font-mono text-sky-600 font-bold">{act.time}</span>
-                        <span className="truncate">{act.title}</span>
+                  {/* Body */}
+                  <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+                    <div className="space-y-1.5">
+                      <h4
+                        onClick={() => setSelectedItineraryForModal(itin)}
+                        className="font-bold text-base text-slate-900 group-hover:text-sky-600 transition-colors line-clamp-2 leading-snug cursor-pointer"
+                        title={itin.title}
+                      >
+                        {itin.title}
+                      </h4>
+                      <div className="flex items-center justify-between text-xs pt-1">
+                        <span className="text-slate-400 font-medium">Chi phí dự kiến:</span>
+                        <span className="font-extrabold text-sky-600 font-sans text-sm">
+                          {typeof itin.budgetTotal === 'number'
+                            ? `${itin.budgetTotal.toLocaleString('vi-VN')} đ`
+                            : (itin.budgetTotal || '5.000.000 đ')}
+                        </span>
                       </div>
-                    ))}
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-2 pt-3 border-t border-slate-100 text-xs">
+                      <button
+                        onClick={() => setSelectedItineraryForModal(itin)}
+                        className="flex-1 py-2 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>Xem chi tiết</span>
+                      </button>
+                      <button
+                        onClick={() => handleCloneItinerary(itin)}
+                        disabled={cloningItinId === itin.id}
+                        className="py-2 px-3 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
+                        title="Sao chép lịch trình"
+                      >
+                        {cloningItinId === itin.id ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
+                        <span className="hidden sm:inline">Sao chép</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2 pt-3 border-t border-slate-100 text-xs">
-                  <button
-                    onClick={() => setUserTab('itineraries')}
-                    className="flex-1 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold transition-colors cursor-pointer text-center"
-                  >
-                    Xem Chi Tiết Lộ Trình
-                  </button>
-                  <button className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600">
-                    <Share2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
       {/* TAB 2: COMMUNITY POSTS & REVIEWS */}
       {activeTab === 'posts' && (
-        <div className="space-y-4">
-          <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
-            <Globe className="w-5 h-5 text-sky-600" />
-            <span>Bài Đăng & Review Đã Chia Sẻ</span>
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {posts.map(post => (
-              <article key={post.id} className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <img src={post.author.avatar} alt={post.author.name} className="w-10 h-10 rounded-full object-cover" />
-                    <div>
-                      <h4 className="font-bold text-xs sm:text-sm text-slate-900">{post.author.name}</h4>
-                      <p className="text-[11px] text-slate-400">{post.location} • {post.timeAgo}</p>
-                    </div>
-                  </div>
-                  <button className="text-slate-400 hover:text-slate-600">
-                    <MoreHorizontal className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">{post.content}</p>
-
-                {post.images && post.images.length > 0 && (
-                  <div className="rounded-2xl overflow-hidden h-52">
-                    <img src={post.images[0]} alt="Post image" className="w-full h-full object-cover" />
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs text-slate-600">
-                  <span className="flex items-center gap-1 text-rose-500 font-bold">
-                    <Heart className="w-4 h-4 fill-rose-500" /> {post.likes} Lượt thích
-                  </span>
-                  <span className="flex items-center gap-1 font-semibold">
-                    <MessageCircle className="w-4 h-4 text-slate-400" /> {post.commentsCount} Bình luận
-                  </span>
-                </div>
-              </article>
-            ))}
+        <div className="space-y-5">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+              <Globe className="w-5 h-5 text-sky-600" />
+              <span>Bài Đăng & Review Đã Chia Sẻ ({displayPosts.length})</span>
+            </h3>
+            <button
+              onClick={() => setUserTab('community')}
+              className="px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <Globe className="w-4 h-4" />
+              <span>Vào Cộng Đồng Chia Sẻ</span>
+            </button>
           </div>
+
+          {displayPosts.length === 0 ? (
+            <div className="text-center py-16 px-4 text-slate-400 text-sm bg-white rounded-3xl border border-dashed border-slate-200 space-y-3">
+              <Globe className="w-10 h-10 text-slate-300 mx-auto" />
+              <p className="font-semibold text-slate-600">Bạn chưa có bài viết nào trên cộng đồng.</p>
+              <button
+                onClick={() => setUserTab('community')}
+                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-all shadow-xs"
+              >
+                Chia Sẻ Trải Nghiệm Đầu Tiên
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {displayPosts.map(post => {
+                const authorName = post.authorName || post.author?.name || profileName || currentUser.name;
+                const authorAvatar = post.authorAvatar || post.author?.avatar || currentUser.avatar;
+                const authorRole = post.authorRole || 'Wanderer Gold';
+                const timeDisplay = post.formattedDate || post.timeAgo || 'Vừa xong';
+                const locationText = post.locationTag || post.location || 'Việt Nam';
+                const likeCount = post.likeCount ?? post.likes ?? 0;
+                const commentCount = post.commentCount ?? post.commentsCount ?? 0;
+
+                return (
+                  <article
+                    key={post.id}
+                    className="p-5 sm:p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all space-y-3.5 group flex flex-col justify-between"
+                  >
+                    <div className="space-y-3.5">
+                      {/* Author Header */}
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <img
+                            src={authorAvatar}
+                            alt={authorName}
+                            className="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-xs shrink-0"
+                          />
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-bold text-xs sm:text-sm text-slate-900 truncate">
+                                {authorName}
+                              </span>
+                              <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[10px] font-bold border border-amber-200/80">
+                                {authorRole}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                              <span>{timeDisplay}</span>
+                              {locationText && (
+                                <>
+                                  <span>•</span>
+                                  <span className="flex items-center gap-0.5 text-slate-600 font-medium truncate">
+                                    <MapPin className="w-3 h-3 text-sky-600 shrink-0" />
+                                    {locationText}
+                                  </span>
+                                </>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        {post.visibility === 'PRIVATE' ? (
+                          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-600 font-bold text-[10px] shrink-0">
+                            <Lock className="w-3 h-3" /> Chỉ mình tôi
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-50 text-sky-600 font-bold text-[10px] shrink-0">
+                            <Globe className="w-3 h-3" /> Công khai
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Title & Content */}
+                      <div className="space-y-1.5">
+                        {post.title && (
+                          <h4
+                            onClick={() => setSelectedPostForDetail(post)}
+                            className="font-display font-extrabold text-base sm:text-lg text-slate-900 group-hover:text-sky-600 transition-colors leading-snug cursor-pointer"
+                          >
+                            {post.title}
+                          </h4>
+                        )}
+                        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line font-normal">
+                          {post.content}
+                        </p>
+                      </div>
+
+                      {/* Image Gallery */}
+                      {post.images && post.images.length > 0 && (
+                        <div
+                          onClick={() => setSelectedPostForDetail(post)}
+                          className="cursor-pointer overflow-hidden rounded-2xl"
+                        >
+                          {post.images.length === 1 ? (
+                            <img
+                              src={post.images[0]}
+                              alt="Post photo"
+                              className="w-full max-h-72 sm:max-h-80 object-cover rounded-2xl hover:scale-[1.01] transition-transform duration-300"
+                            />
+                          ) : post.images.length === 2 ? (
+                            <div className="grid grid-cols-2 gap-2 h-48 sm:h-56 rounded-2xl overflow-hidden">
+                              {post.images.slice(0, 2).map((img, idx) => (
+                                <img
+                                  key={idx}
+                                  src={img}
+                                  alt={`Photo ${idx}`}
+                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                />
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-3 gap-2 h-40 sm:h-48 rounded-2xl overflow-hidden">
+                              {post.images.slice(0, 3).map((img, idx) => (
+                                <img
+                                  key={idx}
+                                  src={img}
+                                  alt={`Photo ${idx}`}
+                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Attached Itinerary Preview */}
+                      {(post.itineraryId || post.itineraryTitle) && (
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedItineraryForModal({
+                              id: post.itineraryId,
+                              title: post.itineraryTitle,
+                              destination: post.itineraryDestination || locationText,
+                              budgetTotal: post.itineraryBudget || 3500000,
+                              isAiGenerated: post.itineraryIsAi ?? true
+                            });
+                          }}
+                          className="p-3 sm:p-3.5 bg-sky-50/70 hover:bg-sky-50 rounded-2xl border border-sky-100 flex items-center justify-between gap-3 transition-colors cursor-pointer"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-9 h-9 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                              <Route className="w-4 h-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <span className="text-[10px] font-bold text-sky-700 uppercase tracking-wider block">
+                                Lịch trình đính kèm
+                              </span>
+                              <span className="font-bold text-xs sm:text-sm text-slate-900 truncate block">
+                                {post.itineraryTitle}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-xs font-bold text-sky-600 hover:text-sky-700 shrink-0 flex items-center gap-1">
+                            <span>Xem tour</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Engagement Footer */}
+                    <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs text-slate-500">
+                      <div className="flex items-center gap-4">
+                        <span className="flex items-center gap-1.5 font-bold text-rose-500">
+                          <Heart className="w-4 h-4 fill-rose-500/20 text-rose-500" />
+                          <span>{likeCount}</span>
+                        </span>
+                        <span className="flex items-center gap-1.5 font-semibold text-sky-600">
+                          <MessageCircle className="w-4 h-4" />
+                          <span>{commentCount}</span>
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={() => setSelectedPostForDetail(post)}
+                        className="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <span>Xem chi tiết & bình luận</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 
@@ -593,6 +870,26 @@ export const ProfilePage = () => {
           }}
           onFollowChange={() => {
             loadFollowCounts();
+          }}
+        />
+      )}
+
+      {/* Itinerary Detail Modal */}
+      {selectedItineraryForModal && (
+        <ItineraryDetailModal
+          itinerary={selectedItineraryForModal}
+          onClose={() => setSelectedItineraryForModal(null)}
+        />
+      )}
+
+      {/* Post Detail Modal */}
+      {selectedPostForDetail && (
+        <PostDetailModal
+          post={selectedPostForDetail}
+          onClose={() => setSelectedPostForDetail(null)}
+          onSelectItinerary={(itin) => {
+            setSelectedPostForDetail(null);
+            setSelectedItineraryForModal(itin);
           }}
         />
       )}
