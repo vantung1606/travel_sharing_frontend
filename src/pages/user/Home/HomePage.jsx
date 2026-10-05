@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
+import { homeApi, itineraryApi, postApi } from '../../../services/api';
 import {
   Sparkles,
   MapPin,
@@ -41,7 +42,9 @@ import {
   Coffee,
   Sun,
   ShieldAlert,
-  Play
+  Play,
+  MessageSquare,
+  Share2
 } from 'lucide-react';
 
 export const HomePage = () => {
@@ -53,7 +56,11 @@ export const HomePage = () => {
     setIsAIGeneratorOpen,
     setUserTab,
     generateAITrip,
-    addItinerary
+    addItinerary,
+    isLoggedIn,
+    currentUser,
+    setIsAuthModalOpen,
+    setAuthMode
   } = useApp();
 
   // Dock States
@@ -273,17 +280,106 @@ export const HomePage = () => {
     }
   ];
 
-  const filteredTours =
-    showcaseRegion === 'all'
-      ? curatedTours
-      : curatedTours.filter((t) => t.region === showcaseRegion);
+  // Dynamic Backend Data States
+  const [homeStats, setHomeStats] = useState({
+    totalItineraries: 128,
+    totalPlaces: 84,
+    totalPosts: 320,
+    totalUsers: 1450,
+    totalLikes: 5240,
+    totalComments: 1890
+  });
+  const [featuredTours, setFeaturedTours] = useState(curatedTours);
+  const [communityPosts, setCommunityPosts] = useState([]);
+  const [isLoadingCommunity, setIsLoadingCommunity] = useState(false);
+  const [trendingDestinations, setTrendingDestinations] = useState([
+    { label: '🌸 Đà Lạt sương mù', val: 'Đà Lạt' },
+    { label: '🏖️ Phú Quốc đảo ngọc', val: 'Phú Quốc' },
+    { label: '🌾 Mù Cang Chải', val: 'Mù Cang Chải' },
+    { label: '🛶 Ninh Bình non nước', val: 'Ninh Bình' },
+    { label: '🌊 Đà Nẵng & Hội An', val: 'Đà Nẵng & Hội An' }
+  ]);
+  const [likedPosts, setLikedPosts] = useState({});
+  const [bookmarkedPosts, setBookmarkedPosts] = useState({});
 
-  // Trigger AI Generator from Dock
-  const handleDockGenerate = (e) => {
+  // 1. Fetch live platform stats & destinations on mount
+  useEffect(() => {
+    homeApi.getStats().then((data) => {
+      if (data) setHomeStats(data);
+    });
+
+    homeApi.getTrendingDestinations().then((dests) => {
+      if (Array.isArray(dests) && dests.length > 0) {
+        const mapped = dests.map((d) => ({
+          label: d.includes('Đà Lạt')
+            ? '🌸 ' + d
+            : d.includes('Phú Quốc')
+            ? '🏖️ ' + d
+            : d.includes('Đà Nẵng')
+            ? '🌊 ' + d
+            : d.includes('Mù Cang')
+            ? '🌾 ' + d
+            : '✨ ' + d,
+          val: d
+        }));
+        setTrendingDestinations(mapped);
+      }
+    });
+
+    // Fetch community highlights
+    setIsLoadingCommunity(true);
+    homeApi.getCommunityHighlights()
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setCommunityPosts(data);
+        }
+      })
+      .finally(() => setIsLoadingCommunity(false));
+  }, []);
+
+  // 2. Fetch featured itineraries on region tab change
+  useEffect(() => {
+    homeApi.getFeaturedItineraries(showcaseRegion).then((data) => {
+      if (Array.isArray(data) && data.length > 0) {
+        setFeaturedTours(data);
+      }
+    });
+  }, [showcaseRegion]);
+
+  // Guest Authentication Guard Helper
+  const requireAuth = (actionDescription, callback) => {
+    if (!isLoggedIn) {
+      toast.info(`Vui lòng đăng nhập để ${actionDescription}! 🔐`);
+      setIsAuthModalOpen(true);
+      return false;
+    }
+    if (callback) callback();
+    return true;
+  };
+
+  // Trigger AI Generator from Dock (Lưu trực tiếp vào CSDL)
+  const handleDockGenerate = async (e) => {
     e?.preventDefault();
+    if (!isLoggedIn) {
+      requireAuth('khởi tạo và lưu lịch trình vào tài khoản cá nhân của bạn');
+      return;
+    }
+
     setIsDockGenerating(true);
-    setTimeout(() => {
-      setIsDockGenerating(false);
+    try {
+      await itineraryApi.aiQuickGenerate(
+        {
+          destination: dockDest,
+          budget: dockBudget,
+          style: dockStyle,
+          duration: dockDuration
+        },
+        currentUser?.email
+      );
+      toast.success(`Đã khởi tạo lộ trình AI thành công cho ${dockDest}! ✨`);
+      navigate('/itineraries');
+    } catch (err) {
+      console.warn('Backend quick generate warning, using local fallback:', err);
       generateAITrip({
         destination: dockDest,
         budget:
@@ -309,8 +405,11 @@ export const HomePage = () => {
                 ? '5 Ngày 4 Đêm'
                 : '3 Ngày 2 Đêm'
       });
-      toast.success(`Đã khởi tạo lộ trình AI cho ${dockDest}! ✨`);
-    }, 900);
+      toast.success(`Đã khởi tạo lộ trình cho ${dockDest}! ✨`);
+      navigate('/itineraries');
+    } finally {
+      setIsDockGenerating(false);
+    }
   };
 
   // Run Sandbox Simulation
@@ -318,30 +417,72 @@ export const HomePage = () => {
     toast.info('Trợ lý AI đã phân tích yêu cầu và tối ưu lại lộ trình 3 ngày! 💡');
   };
 
-  // Copy Tour Action
-  const handleCopyTour = (tour) => {
-    if (addItinerary) {
-      addItinerary({
-        title: tour.title,
-        destination: tour.location,
-        duration: tour.duration,
-        budget: tour.price,
-        coverImage: tour.image,
-        days: [
-          {
-            dayNumber: 1,
-            title: 'Khởi hành & Check-in',
-            activities: [
-              { time: '09:00', title: 'Đến nơi, nhận phòng & nghỉ ngơi' },
-              { time: '14:30', title: 'Khám phá các danh thắng nổi bật' },
-              { time: '19:00', title: 'Thưởng thức ẩm thực đêm bản địa' }
-            ]
-          }
-        ]
-      });
+  // Copy Tour Action (Đồng bộ vào CSDL MySQL)
+  const handleCopyTour = async (tour) => {
+    if (!isLoggedIn) {
+      requireAuth('sao chép lịch trình này vào bộ sưu tập cá nhân của bạn');
+      return;
     }
-    setSavedTours((prev) => ({ ...prev, [tour.id]: true }));
-    toast.success(`Đã sao chép lịch trình "${tour.title}" vào Quản lý Tour! 📋`);
+
+    try {
+      if (tour.id && typeof tour.id === 'number') {
+        await itineraryApi.cloneItinerary(tour.id, currentUser?.email);
+      } else {
+        if (addItinerary) {
+          addItinerary({
+            title: '[Sao chép] ' + tour.title,
+            destination: tour.location || tour.destination,
+            duration: tour.duration,
+            budget: tour.price,
+            coverImage: tour.image,
+            days: [
+              {
+                dayNumber: 1,
+                title: 'Khởi hành & Check-in',
+                activities: [
+                  { time: '09:00', title: 'Đến nơi, nhận phòng & nghỉ ngơi' },
+                  { time: '14:30', title: 'Khám phá các danh thắng nổi bật' },
+                  { time: '19:00', title: 'Thưởng thức ẩm thực đêm bản địa' }
+                ]
+              }
+            ]
+          });
+        }
+      }
+      setSavedTours((prev) => ({ ...prev, [tour.id]: true }));
+      toast.success(`Đã sao chép lịch trình "${tour.title}" vào Quản lý Tour của bạn! 📋`);
+    } catch (err) {
+      toast.error('Sao chép lịch trình thất bại: ' + err.message);
+    }
+  };
+
+  // Community Interactions from Home Page
+  const handleLikePost = async (postId) => {
+    if (!isLoggedIn) {
+      requireAuth('thích bài viết từ cộng đồng Wayfare');
+      return;
+    }
+    setLikedPosts((prev) => ({ ...prev, [postId]: !prev[postId] }));
+    try {
+      await postApi.toggleLike(postId, currentUser?.email);
+    } catch (e) {
+      console.warn('Like post warning:', e);
+    }
+  };
+
+  const handleBookmarkPost = async (postId) => {
+    if (!isLoggedIn) {
+      requireAuth('lưu bài viết này vào danh mục yêu thích');
+      return;
+    }
+    const isCurrentlySaved = bookmarkedPosts[postId];
+    setBookmarkedPosts((prev) => ({ ...prev, [postId]: !isCurrentlySaved }));
+    try {
+      await postApi.toggleBookmark(postId, currentUser?.email);
+      toast.success(isCurrentlySaved ? 'Đã bỏ lưu bài viết' : 'Đã lưu bài viết vào mục yêu thích! 🔖');
+    } catch (e) {
+      console.warn('Bookmark post warning:', e);
+    }
   };
 
   return (
@@ -375,8 +516,18 @@ export const HomePage = () => {
         <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Main Hero Header Stack */}
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6">
-            {/* Top Announcement Tag with Floating Animation */}
-           
+            {/* Top Announcement Tag with Guest vs Member distinction */}
+            {isLoggedIn ? (
+              <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-sky-500/20 backdrop-blur-xl text-sky-200 border border-sky-400/30 text-xs sm:text-sm font-bold shadow-lg animate-float-slow">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                <span>👋 Chào mừng trở lại, {currentUser?.name || 'Lữ khách'}! Bạn đang có {homeStats.totalItineraries}+ chuyến đi cộng đồng chờ đón.</span>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl text-sky-200 border border-white/20 text-xs sm:text-sm font-bold shadow-lg animate-float-slow">
+                <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
+                <span>Nền tảng Lập lịch trình AI & Cộng đồng Du lịch • Trải nghiệm miễn phí</span>
+              </div>
+            )}
 
             {/* Expansive Grand Headline with Gradient Flow */}
             <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.18] text-white drop-shadow-md">
@@ -565,12 +716,7 @@ export const HomePage = () => {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
             <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
               <span className="text-slate-600 font-semibold">Gợi ý nhanh:</span>
-              {[
-                { label: '🌸 Đà Lạt sương mù', val: 'Đà Lạt' },
-                { label: '🏖️ Phú Quốc đảo ngọc', val: 'Phú Quốc' },
-                { label: '🌾 Mù Cang Chải', val: 'Mù Cang Chải' },
-                { label: '🛶 Ninh Bình non nước', val: 'Ninh Bình' }
-              ].map((chip) => (
+              {trendingDestinations.map((chip) => (
                 <button
                   key={chip.val}
                   type="button"
@@ -624,7 +770,7 @@ export const HomePage = () => {
               ✨ Công Nghệ Du Lịch Đột Phá
             </span>
             <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Tại Sao Hơn 120.000 Du Khách Chọn Wayfare?
+              Tại Sao Hơn {homeStats.totalUsers.toLocaleString()}+ Du Khách Chọn Wayfare?
             </h2>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-normal tracking-[0.015em]">
               Không còn nỗi lo lập bảng tính excel phức tạp, lúng túng khi thời tiết xấu hay chi tiêu
@@ -711,7 +857,7 @@ export const HomePage = () => {
                     <Users className="w-6 h-6" />
                   </div>
                   <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 font-bold text-xs border border-amber-200/60 group-hover:scale-105 transition-transform">
-                    50k+ Đánh giá
+                    {homeStats.totalPosts.toLocaleString()}+ Bài Viết
                   </span>
                 </div>
                 <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-amber-700 transition-colors">Cộng Đồng Trải Nghiệm Thật</h3>
@@ -949,7 +1095,7 @@ export const HomePage = () => {
 
           {/* 4 Cards Grid Showcase */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredTours.map((tour) => (
+            {featuredTours.map((tour) => (
               <div
                 key={tour.id}
                 className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-2xl hover-elevate transition-all duration-300 flex flex-col group border border-sky-100 hover:border-sky-400 cursor-pointer"
@@ -1023,6 +1169,270 @@ export const HomePage = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ──────────────────────────────────────────────────────────────────────────
+          5B. COMMUNITY HIGHLIGHTS & LIVE TRAVEL PULSE
+          - Connected to real backend MySQL post repository
+          - Shows top community travel stories with likes, comments, author badges
+          - Guest vs Member actions (Like/Bookmark/Create prompt login if guest)
+      ────────────────────────────────────────────────────────────────────────── */}
+      <section className="w-full py-20 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#edf2f7] border-b border-slate-200">
+        <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-blue-700 font-extrabold text-xs uppercase tracking-wider mb-2 px-3 py-1 rounded-full bg-blue-100 border border-blue-200">
+                <Users className="w-4 h-4" />
+                <span>Cộng Đồng Du Lịch Wayfare</span>
+              </div>
+              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+                Nhịp Sống Du Lịch & Khoảnh Khắc Thực Tế
+              </h2>
+              <p className="text-slate-600 text-sm sm:text-base mt-1 font-normal tracking-[0.015em]">
+                Khám phá những trải nghiệm check-in, ẩm thực và kinh nghiệm đắt giá được chia sẻ trực tiếp từ cộng đồng.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  if (!isLoggedIn) {
+                    requireAuth('đăng bài viết chia sẻ chuyến đi');
+                  } else {
+                    navigate('/community');
+                  }
+                }}
+                className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95"
+              >
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>Chia sẻ chuyến đi của bạn</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/community')}
+                className="px-5 py-2.5 rounded-full bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-300 text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer hover:scale-105"
+              >
+                <span>Xem tất cả ({homeStats.totalPosts}+ bài viết)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {communityPosts.length > 0 ? (
+              communityPosts.slice(0, 4).map((post) => (
+                <div
+                  key={post.id}
+                  className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-xl hover-elevate transition-all duration-300 flex flex-col group border border-slate-200/90 hover:border-blue-400"
+                >
+                  {/* Photo */}
+                  <div className="relative h-48 w-full overflow-hidden bg-slate-100">
+                    <img
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      src={post.image || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80'}
+                      alt={post.title}
+                    />
+                    {post.locationTag && (
+                      <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold flex items-center gap-1">
+                        <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                        <span className="truncate max-w-[120px]">{post.locationTag}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Body */}
+                  <div className="p-5 flex flex-col flex-1 justify-between">
+                    <div>
+                      {/* Author */}
+                      <div className="flex items-center gap-2.5 mb-3">
+                        <img
+                          src={post.author?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
+                          alt={post.author?.name}
+                          className="w-8 h-8 rounded-full object-cover ring-1 ring-blue-400"
+                        />
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-slate-900 truncate">
+                            {post.author?.name || 'Thành viên Wayfare'}
+                          </p>
+                          <p className="text-[11px] text-slate-400">{post.timeAgo || 'Gần đây'}</p>
+                        </div>
+                      </div>
+
+                      <h3
+                        onClick={() => navigate('/community')}
+                        className="font-bold text-sm sm:text-base text-slate-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors cursor-pointer"
+                      >
+                        {post.title}
+                      </h3>
+                      <p className="text-slate-600 text-xs sm:text-sm line-clamp-2 leading-relaxed mb-4">
+                        {post.content}
+                      </p>
+                    </div>
+
+                    {/* Footer Interactions */}
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-semibold">
+                      <button
+                        type="button"
+                        onClick={() => handleLikePost(post.id)}
+                        className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                          likedPosts[post.id] || post.isLiked ? 'text-rose-600 font-bold' : 'hover:text-rose-600'
+                        }`}
+                      >
+                        <Heart className={`w-4 h-4 ${likedPosts[post.id] || post.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
+                        <span>{(post.likes || 0) + (likedPosts[post.id] ? 1 : 0)}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => navigate('/community')}
+                        className="flex items-center gap-1.5 hover:text-blue-600 transition-colors cursor-pointer"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        <span>{post.commentsCount || 0} phản hồi</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleBookmarkPost(post.id)}
+                        className={`transition-colors cursor-pointer ${
+                          bookmarkedPosts[post.id] ? 'text-amber-500' : 'hover:text-amber-500'
+                        }`}
+                        title={bookmarkedPosts[post.id] ? 'Đã lưu' : 'Lưu bài viết'}
+                      >
+                        <Bookmark className={`w-4 h-4 ${bookmarkedPosts[post.id] ? 'fill-amber-500 text-amber-500' : ''}`} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              // Fallback curated community posts if database empty
+              [
+                {
+                  id: 101,
+                  title: 'Bí kíp săn mây Tà Xùa 2N1Đ chi phí dưới 1.5 triệu',
+                  content: 'Kinh nghiệm vượt đèo trong sương sớm, chọn homestay view thung lũng đẹp nhất và những lưu ý an toàn.',
+                  location: 'Tà Xùa, Sơn La',
+                  author: 'Hoàng Nam',
+                  avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80',
+                  likes: 245,
+                  comments: 38,
+                  image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80'
+                },
+                {
+                  id: 102,
+                  title: 'Food tour Hải Phòng 1 ngày ăn sập 10 món trứ danh',
+                  content: 'Bánh đa cua bể Bà Cụ, dừa dầm Lạch Tray, pate Cột Đèn thơm nức mũi chuẩn vị người bản địa.',
+                  location: 'Hải Phòng',
+                  author: 'Linh Hoàng',
+                  avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
+                  likes: 312,
+                  comments: 54,
+                  image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80'
+                },
+                {
+                  id: 103,
+                  title: 'Trải nghiệm lặn san hô đảo Hòn Mây Rút Phú Quốc',
+                  content: 'Nước biển trong vắt nhìn tận đáy, san hô ngũ sắc bạt ngàn và bữa tiệc hải sản tươi sống trên bè.',
+                  location: 'Phú Quốc',
+                  author: 'Quang & Thảo',
+                  avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80',
+                  likes: 189,
+                  comments: 26,
+                  image: 'https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?auto=format&fit=crop&w=800&q=80'
+                },
+                {
+                  id: 104,
+                  title: 'Hành trình xuyên Việt 15 ngày một mình bằng xe máy',
+                  content: 'Từ Hà Nội đến Mũi Cà Mau, ngắm nhìn vẻ đẹp non sông hùng vĩ và sự hiếu khách ấm áp của con người Việt Nam.',
+                  location: 'Xuyên Việt',
+                  author: 'Trần Bách',
+                  avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80',
+                  likes: 420,
+                  comments: 72,
+                  image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'
+                }
+              ].map((post) => (
+                <div
+                  key={post.id}
+                  className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-xl hover-elevate transition-all duration-300 flex flex-col group border border-slate-200/90 hover:border-blue-400"
+                >
+                  <div className="relative h-48 w-full overflow-hidden bg-slate-100">
+                    <img
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      src={post.image}
+                      alt={post.title}
+                    />
+                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5 text-rose-400" />
+                      <span>{post.location}</span>
+                    </div>
+                  </div>
+
+                  <div className="p-5 flex flex-col flex-1 justify-between">
+                    <div>
+                      <div className="flex items-center gap-2.5 mb-3">
+                        <img
+                          src={post.avatar}
+                          alt={post.author}
+                          className="w-8 h-8 rounded-full object-cover ring-1 ring-blue-400"
+                        />
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold text-slate-900 truncate">{post.author}</p>
+                          <p className="text-[11px] text-slate-400">1 ngày trước</p>
+                        </div>
+                      </div>
+
+                      <h3
+                        onClick={() => navigate('/community')}
+                        className="font-bold text-sm sm:text-base text-slate-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors cursor-pointer"
+                      >
+                        {post.title}
+                      </h3>
+                      <p className="text-slate-600 text-xs sm:text-sm line-clamp-2 leading-relaxed mb-4">
+                        {post.content}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-semibold">
+                      <button
+                        type="button"
+                        onClick={() => handleLikePost(post.id)}
+                        className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                          likedPosts[post.id] ? 'text-rose-600 font-bold' : 'hover:text-rose-600'
+                        }`}
+                      >
+                        <Heart className={`w-4 h-4 ${likedPosts[post.id] ? 'fill-rose-500 text-rose-500' : ''}`} />
+                        <span>{post.likes + (likedPosts[post.id] ? 1 : 0)}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => navigate('/community')}
+                        className="flex items-center gap-1.5 hover:text-blue-600 transition-colors cursor-pointer"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        <span>{post.comments}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleBookmarkPost(post.id)}
+                        className={`transition-colors cursor-pointer ${
+                          bookmarkedPosts[post.id] ? 'text-amber-500' : 'hover:text-amber-500'
+                        }`}
+                      >
+                        <Bookmark className={`w-4 h-4 ${bookmarkedPosts[post.id] ? 'fill-amber-500 text-amber-500' : ''}`} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </section>

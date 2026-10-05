@@ -177,6 +177,100 @@ export const itineraryApi = {
       console.warn('getMyItineraries API warning:', err.message);
       return [];
     }
+  },
+
+  async cloneItinerary(id, email) {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || 'tung@gmail.com';
+    const response = await fetch(`${BASE_URL}/itineraries/${id}/clone?email=${encodeURIComponent(userEmail)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    const res = await response.json();
+    return res.data;
+  },
+
+  async aiQuickGenerate(payload, email) {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || 'tung@gmail.com';
+    const response = await fetch(`${BASE_URL}/itineraries/ai-quick-generate?email=${encodeURIComponent(userEmail)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    const res = await response.json();
+    return res.data;
+  }
+};
+
+// ─── Home Page API ───────────────────────────────────────────────────────────
+export const homeApi = {
+  async getStats() {
+    try {
+      const res = await fetch(`${BASE_URL}/home/stats`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.warn('Home stats API warning:', err.message);
+      return {
+        totalItineraries: 128,
+        totalPlaces: 84,
+        totalPosts: 320,
+        totalUsers: 1450,
+        totalLikes: 5240,
+        totalComments: 1890
+      };
+    }
+  },
+
+  async getFeaturedItineraries(region = 'all') {
+    try {
+      const res = await fetch(`${BASE_URL}/home/featured-itineraries?region=${encodeURIComponent(region)}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('Featured itineraries API warning:', err.message);
+      return [];
+    }
+  },
+
+  async getCommunityHighlights() {
+    try {
+      const res = await fetch(`${BASE_URL}/home/community-highlights`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('Community highlights API warning:', err.message);
+      return [];
+    }
+  },
+
+  async getTrendingDestinations() {
+    try {
+      const res = await fetch(`${BASE_URL}/home/trending-destinations`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      return ['Đà Lạt', 'Phú Quốc', 'Sa Pa', 'Đà Nẵng & Hội An', 'Mù Cang Chải', 'Ninh Bình'];
+    }
   }
 };
 
