@@ -151,8 +151,29 @@ const preFlightCheckContentSafety = (title, content, location) => {
 };
 
 export const CommunityPage = () => {
-  const { currentUser, itineraries, setItineraries, setIsAIGeneratorOpen, fetchNotifications } = useApp();
+  const {
+    currentUser,
+    isLoggedIn,
+    setIsAuthModalOpen,
+    setAuthMode,
+    itineraries,
+    setItineraries,
+    setIsAIGeneratorOpen,
+    fetchNotifications
+  } = useApp();
   const toast = useToast();
+
+  // Guard helper for guest actions (require login)
+  const requireAuth = (actionName = 'thực hiện thao tác này') => {
+    if (!isLoggedIn) {
+      if (toast?.showInfo) toast.showInfo(`Vui lòng đăng nhập để ${actionName}!`);
+      else if (toast?.info) toast.info(`Vui lòng đăng nhập để ${actionName}!`);
+      setAuthMode('login');
+      setIsAuthModalOpen(true);
+      return false;
+    }
+    return true;
+  };
 
   // Feed State
   const [posts, setPosts] = useState([]);
@@ -240,8 +261,12 @@ export const CommunityPage = () => {
     userName: ''
   });
 
-  // Fetch Following IDs on mount
+  // Fetch Following IDs on mount (only for logged-in users)
   useEffect(() => {
+    if (!isLoggedIn) {
+      setFollowingIds(new Set());
+      return;
+    }
     userApi
       .getFollowingIds()
       .then(ids => {
@@ -250,11 +275,15 @@ export const CommunityPage = () => {
         }
       })
       .catch(err => console.warn('Lỗi khi tải danh sách theo dõi:', err));
-  }, []);
+  }, [isLoggedIn]);
 
-  // Fetch Bookmarked Post IDs on mount & user change
+  // Fetch Bookmarked Post IDs on mount & user change (only for logged-in users)
   useEffect(() => {
     let isMounted = true;
+    if (!isLoggedIn || !currentUser?.email) {
+      setBookmarkedPostIds(new Set());
+      return;
+    }
     postApi
       .getBookmarkedPostIds(currentUser?.email)
       .then(ids => {
@@ -266,10 +295,11 @@ export const CommunityPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [currentUser?.email]);
+  }, [isLoggedIn, currentUser?.email]);
 
   const handleToggleFollowAuthor = async (authorId, authorName) => {
     if (!authorId) return;
+    if (!requireAuth('theo dõi tác giả')) return;
     try {
       setFollowingLoadingIds(prev => new Set(prev).add(authorId));
       const res = await userApi.toggleFollow(authorId);
@@ -480,6 +510,7 @@ export const CommunityPage = () => {
 
   // Handle Like Post
   const handleToggleLike = async (postId) => {
+    if (!requireAuth('thích bài viết')) return;
     // Optimistic Update
     setPosts(prev =>
       prev.map(p => {
@@ -521,6 +552,7 @@ export const CommunityPage = () => {
   // Handle Bookmark Post with persistent backend API & optimistic UI
   const handleToggleBookmark = async (postId) => {
     if (!postId) return;
+    if (!requireAuth('lưu bài viết vào bộ sưu tập')) return;
     const numericId = Number(postId);
     const wasBookmarked = bookmarkedPostIds.has(numericId);
 
@@ -619,6 +651,7 @@ export const CommunityPage = () => {
   // Submit New Comment or Reply
   const handleAddComment = async (e) => {
     e.preventDefault();
+    if (!requireAuth('bình luận')) return;
     if (!commentInput.trim() || !activeCommentPost || submittingComment) return;
 
     try {
@@ -714,6 +747,7 @@ export const CommunityPage = () => {
 
   // Handle 1-Click Clone Itinerary from Community Post
   const handleCloneItinerary = async (post) => {
+    if (!requireAuth('sao chép lịch trình')) return;
     if (!post.itineraryId) {
       toast.showWarning('Bài viết này không có lịch trình đính kèm.');
       return;
@@ -1095,72 +1129,97 @@ export const CommunityPage = () => {
         {/* ========================================================= */}
         <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-[5rem] h-[calc(100vh-6rem)] overflow-y-auto overscroll-contain sidebar-scrollbar pr-1.5 pb-12 select-none">
           
-          {/* User Profile Card */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm space-y-4">
-            <div className="flex items-center gap-3.5">
-              <div className="relative">
-                <img
-                  src={currentUser.avatar}
-                  alt={currentUser.name}
-                  className="w-14 h-14 rounded-full object-cover ring-2 ring-sky-500/30 shadow-xs"
-                />
-                <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-sky-600 text-white flex items-center justify-center text-[10px] ring-2 ring-white font-bold">
-                  ✓
-                </span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <h3 className="font-extrabold text-sm text-slate-900 truncate">{currentUser.name}</h3>
-                <p className="text-xs text-slate-500 truncate">{currentUser.handle || '@wanderer'}</p>
-                <div className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] font-bold">
-                  <Award className="w-3 h-3 text-amber-600" />
-                  <span>Wanderer Diamond</span>
+          {/* User Profile Card or Guest Login Prompt */}
+          {isLoggedIn ? (
+            <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm space-y-4">
+              <div className="flex items-center gap-3.5">
+                <div className="relative">
+                  <img
+                    src={currentUser?.avatar}
+                    alt={currentUser?.name}
+                    className="w-14 h-14 rounded-full object-cover ring-2 ring-sky-500/30 shadow-xs"
+                  />
+                  <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-sky-600 text-white flex items-center justify-center text-[10px] ring-2 ring-white font-bold">
+                    ✓
+                  </span>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-extrabold text-sm text-slate-900 truncate">{currentUser?.name}</h3>
+                  <p className="text-xs text-slate-500 truncate">{currentUser?.handle || '@wanderer'}</p>
+                  <div className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] font-bold">
+                    <Award className="w-3 h-3 text-amber-600" />
+                    <span>Wanderer Diamond</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* User Stats Grid */}
-            <div className="grid grid-cols-4 gap-1.5 p-2.5 bg-slate-50 rounded-2xl text-center border border-slate-200/70">
-              <div className="p-1 rounded-xl bg-white border border-slate-100">
-                <span className="font-extrabold text-sm text-sky-600 block">{itineraries.length}</span>
-                <span className="text-[10px] text-slate-500 font-semibold">Chuyến đi</span>
+              {/* User Stats Grid */}
+              <div className="grid grid-cols-4 gap-1.5 p-2.5 bg-slate-50 rounded-2xl text-center border border-slate-200/70">
+                <div className="p-1 rounded-xl bg-white border border-slate-100">
+                  <span className="font-extrabold text-sm text-sky-600 block">{itineraries.length}</span>
+                  <span className="text-[10px] text-slate-500 font-semibold">Chuyến đi</span>
+                </div>
+                <div className="p-1 rounded-xl bg-white border border-slate-100">
+                  <span className="font-extrabold text-sm text-amber-600 block">
+                    {posts.filter(p => p.author?.email === currentUser?.email).length}
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-semibold">Bài viết</span>
+                </div>
+                <div
+                  onClick={() => setFollowListModalState({ isOpen: true, tab: 'following', userId: currentUser?.id, userName: currentUser?.name })}
+                  className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-sky-50 transition-colors group"
+                  title="Bấm để xem danh sách đang theo dõi"
+                >
+                  <span className="font-extrabold text-sm text-sky-700 group-hover:scale-105 transition-transform block">
+                    {followingIds.size}
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-semibold group-hover:text-sky-800">Đang follow</span>
+                </div>
+                <div
+                  onClick={() => setActiveCategory(activeCategory === 'Đã lưu' ? 'Tất cả' : 'Đã lưu')}
+                  className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-sky-50 transition-colors group"
+                  title="Bấm để lọc danh sách bài viết đã lưu"
+                >
+                  <span className="font-extrabold text-sm text-sky-600 group-hover:scale-105 transition-transform block">
+                    {bookmarkedPostIds.size}
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-semibold group-hover:text-sky-700">Đã lưu</span>
+                </div>
               </div>
-              <div className="p-1 rounded-xl bg-white border border-slate-100">
-                <span className="font-extrabold text-sm text-amber-600 block">
-                  {posts.filter(p => p.author?.email === currentUser.email).length}
-                </span>
-                <span className="text-[10px] text-slate-500 font-semibold">Bài viết</span>
-              </div>
-              <div
-                onClick={() => setFollowListModalState({ isOpen: true, tab: 'following', userId: currentUser.id, userName: currentUser.name })}
-                className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-sky-50 transition-colors group"
-                title="Bấm để xem danh sách đang theo dõi"
-              >
-                <span className="font-extrabold text-sm text-sky-700 group-hover:scale-105 transition-transform block">
-                  {followingIds.size}
-                </span>
-                <span className="text-[10px] text-slate-500 font-semibold group-hover:text-sky-800">Đang follow</span>
-              </div>
-              <div
-                onClick={() => setActiveCategory(activeCategory === 'Đã lưu' ? 'Tất cả' : 'Đã lưu')}
-                className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-sky-50 transition-colors group"
-                title="Bấm để lọc danh sách bài viết đã lưu"
-              >
-                <span className="font-extrabold text-sm text-sky-600 group-hover:scale-105 transition-transform block">
-                  {bookmarkedPostIds.size}
-                </span>
-                <span className="text-[10px] text-slate-500 font-semibold group-hover:text-sky-700">Đã lưu</span>
-              </div>
-            </div>
 
-            {/* Quick Action Button */}
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-md shadow-sky-600/25 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Đăng Bài & Đính Kèm Tour</span>
-            </button>
-          </div>
+              {/* Quick Action Button */}
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-md shadow-sky-600/25 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Đăng Bài & Đính Kèm Tour</span>
+              </button>
+            </div>
+          ) : (
+            <div className="bg-gradient-to-br from-white via-sky-50/50 to-indigo-50/30 rounded-3xl p-5 border border-sky-100 shadow-sm text-center space-y-4">
+              <div className="w-14 h-14 rounded-2xl bg-sky-600/10 text-sky-600 flex items-center justify-center mx-auto shadow-inner">
+                <Sparkles className="w-7 h-7" />
+              </div>
+              <div className="space-y-1.5">
+                <h3 className="font-extrabold text-base text-slate-900">Cộng đồng Wayfare</h3>
+                <p className="text-xs text-slate-500 leading-relaxed px-1">
+                  Đăng nhập để đăng bài viết, bình luận, lưu hành trình yêu thích và kết nối với các thành viên.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode('login');
+                  setIsAuthModalOpen(true);
+                }}
+                className="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-md shadow-sky-600/25 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+              >
+                <span>Đăng nhập ngay</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
 
           {/* Quick Navigation Links */}
           <div className="bg-white rounded-3xl p-4 border border-slate-200/90 shadow-sm space-y-1">
@@ -1178,7 +1237,10 @@ export const CommunityPage = () => {
                 label: `Đang theo dõi (${followingIds.size})`,
                 icon: UserCheck,
                 active: activeCategory === 'Đang theo dõi',
-                action: () => setActiveCategory('Đang theo dõi'),
+                action: () => {
+                  if (!requireAuth('xem bài viết của người đang theo dõi')) return;
+                  setActiveCategory('Đang theo dõi');
+                },
                 badge: followingIds.size > 0 ? `${followingIds.size}` : null
               },
               {
@@ -1198,7 +1260,10 @@ export const CommunityPage = () => {
                 label: `Bài viết đã lưu (${bookmarkedPostIds.size})`,
                 icon: Bookmark,
                 active: activeCategory === 'Đã lưu',
-                action: () => setActiveCategory(activeCategory === 'Đã lưu' ? 'Tất cả' : 'Đã lưu'),
+                action: () => {
+                  if (!requireAuth('xem bài viết đã lưu')) return;
+                  setActiveCategory('Đã lưu');
+                },
                 badge: bookmarkedPostIds.size > 0 ? `${bookmarkedPostIds.size}` : null
               }
             ].map((item, idx) => (
@@ -1286,54 +1351,80 @@ export const CommunityPage = () => {
         {/* ========================================================= */}
         <main className="col-span-1 lg:col-span-6 space-y-6">
           
-          {/* Quick Create Post Bar */}
-          <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-sm space-y-4">
-            <div className="flex items-center gap-3.5">
-              <img
-                src={currentUser.avatar}
-                alt="Avatar"
-                className="w-12 h-12 rounded-full object-cover flex-shrink-0 ring-2 ring-blue-500/30"
-              />
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="w-full text-left bg-slate-50 hover:bg-blue-50/50 text-slate-400 hover:text-slate-600 px-5 py-3 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer flex items-center justify-between border border-slate-200/80 shadow-2xs"
-              >
-                <span>Chia sẻ review, ảnh đẹp hoặc đính kèm lịch trình của bạn...</span>
-                <Sparkles className="w-4 h-4 text-sky-600" />
-              </button>
-            </div>
+          {/* Quick Create Post Bar or Guest Invitation */}
+          {isLoggedIn ? (
+            <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-sm space-y-4">
+              <div className="flex items-center gap-3.5">
+                <img
+                  src={currentUser?.avatar}
+                  alt="Avatar"
+                  className="w-12 h-12 rounded-full object-cover flex-shrink-0 ring-2 ring-blue-500/30"
+                />
+                <button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="w-full text-left bg-slate-50 hover:bg-blue-50/50 text-slate-400 hover:text-slate-600 px-5 py-3 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer flex items-center justify-between border border-slate-200/80 shadow-2xs"
+                >
+                  <span>Chia sẻ review, ảnh đẹp hoặc đính kèm lịch trình của bạn...</span>
+                  <Sparkles className="w-4 h-4 text-sky-600" />
+                </button>
+              </div>
 
-            <div className="flex items-center justify-between gap-1 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-700">
+              <div className="flex items-center justify-between gap-1 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-700">
+                <button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors cursor-pointer"
+                >
+                  <ImageIcon className="w-4 h-4 text-sky-600" />
+                  <span className="hidden sm:inline">Ảnh/Video</span>
+                </button>
+                <button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors cursor-pointer"
+                >
+                  <MapPin className="w-4 h-4 text-sky-600" />
+                  <span className="hidden sm:inline">Gắn địa điểm</span>
+                </button>
+                <button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-sky-50 text-sky-800 hover:bg-sky-100 rounded-xl font-bold transition-colors cursor-pointer border border-sky-200/60"
+                >
+                  <Route className="w-4 h-4 text-sky-600" />
+                  <span className="hidden sm:inline">Đính kèm Tour</span>
+                </button>
+                <button
+                  onClick={() => setIsAIGeneratorOpen(true)}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-sky-50 text-sky-800 hover:bg-sky-100 rounded-xl font-bold transition-colors cursor-pointer border border-sky-200/60"
+                >
+                  <Sparkles className="w-4 h-4 text-sky-600" />
+                  <span className="hidden sm:inline">Tạo Tour AI</span>
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-gradient-to-r from-sky-50 via-white to-blue-50/70 rounded-3xl p-5 sm:p-6 border border-sky-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-sky-600/10 text-sky-600 flex items-center justify-center shrink-0 shadow-inner">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-extrabold text-slate-900">Chia sẻ câu chuyện du lịch của bạn</h4>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Đăng nhập để đăng bài viết, tương tác thả tim, bình luận và lưu lại các hành trình yêu thích.
+                  </p>
+                </div>
+              </div>
               <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors cursor-pointer"
+                type="button"
+                onClick={() => {
+                  setAuthMode('login');
+                  setIsAuthModalOpen(true);
+                }}
+                className="shrink-0 px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer whitespace-nowrap active:scale-95"
               >
-                <ImageIcon className="w-4 h-4 text-sky-600" />
-                <span className="hidden sm:inline">Ảnh/Video</span>
-              </button>
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors cursor-pointer"
-              >
-                <MapPin className="w-4 h-4 text-sky-600" />
-                <span className="hidden sm:inline">Gắn địa điểm</span>
-              </button>
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-sky-50 text-sky-800 hover:bg-sky-100 rounded-xl font-bold transition-colors cursor-pointer border border-sky-200/60"
-              >
-                <Route className="w-4 h-4 text-sky-600" />
-                <span className="hidden sm:inline">Đính kèm Tour</span>
-              </button>
-              <button
-                onClick={() => setIsAIGeneratorOpen(true)}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-sky-50 text-sky-800 hover:bg-sky-100 rounded-xl font-bold transition-colors cursor-pointer border border-sky-200/60"
-              >
-                <Sparkles className="w-4 h-4 text-sky-600" />
-                <span className="hidden sm:inline">Tạo Tour AI</span>
+                Đăng nhập ngay
               </button>
             </div>
-          </div>
+          )}
 
           {/* Search, Sort & Category Tabs */}
           <div className="space-y-3">
@@ -1382,7 +1473,13 @@ export const CommunityPage = () => {
                 return (
                   <button
                     key={cat.id}
-                    onClick={() => setActiveCategory(cat.id)}
+                    onClick={() => {
+                      if ((cat.id === 'Đang theo dõi' || cat.id === 'Đã lưu') && !isLoggedIn) {
+                        requireAuth(`xem mục "${cat.label}"`);
+                        return;
+                      }
+                      setActiveCategory(cat.id);
+                    }}
                     className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs transition-all cursor-pointer ${
                       isActive
                         ? 'bg-sky-600 text-white shadow-md shadow-sky-600/25 font-extrabold'
@@ -1748,6 +1845,7 @@ export const CommunityPage = () => {
                                   type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
+                                    if (!requireAuth('báo cáo bài viết')) return;
                                     setPostToReport(post);
                                     setOpenMenuPostId(null);
                                   }}
@@ -2093,7 +2191,10 @@ export const CommunityPage = () => {
 
                       {/* Share Button */}
                       <button
-                        onClick={() => setSharingPost(post)}
+                        onClick={() => {
+                          if (!requireAuth('chia sẻ bài viết')) return;
+                          setSharingPost(post);
+                        }}
                         className="flex items-center gap-1.5 font-semibold hover:text-blue-700 transition-colors cursor-pointer"
                         title="Chia sẻ bài viết"
                       >
@@ -2790,6 +2891,7 @@ export const CommunityPage = () => {
                             <button
                               type="button"
                               onClick={() => {
+                                if (!requireAuth('trả lời bình luận')) return;
                                 setReplyingTo({
                                   commentId: cmt.id,
                                   authorId: cmt.authorId || cmt.userId,
@@ -2917,28 +3019,44 @@ export const CommunityPage = () => {
               </div>
             )}
 
-            {/* Comment Input Box */}
-            <form onSubmit={handleAddComment} className="pt-2 border-t border-slate-100 flex items-center gap-2">
-              <input
-                ref={commentInputRef}
-                type="text"
-                placeholder={replyingTo ? `Trả lời @${replyingTo.authorName}...` : "Viết bình luận hoặc đặt câu hỏi về chuyến đi..."}
-                value={commentInput}
-                onChange={e => setCommentInput(e.target.value)}
-                className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-              />
-              <button
-                type="submit"
-                disabled={submittingComment || !commentInput.trim()}
-                className="bg-sky-600 hover:bg-sky-700 text-white p-2.5 rounded-full hover:shadow-md transition-all disabled:opacity-50 cursor-pointer shadow-sm shadow-sky-500/20"
-              >
-                {submittingComment ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Send className="w-4 h-4" />
-                )}
-              </button>
-            </form>
+            {/* Comment Input Box or Guest Login Prompt */}
+            {isLoggedIn ? (
+              <form onSubmit={handleAddComment} className="pt-2 border-t border-slate-100 flex items-center gap-2">
+                <input
+                  ref={commentInputRef}
+                  type="text"
+                  placeholder={replyingTo ? `Trả lời @${replyingTo.authorName}...` : "Viết bình luận hoặc đặt câu hỏi về chuyến đi..."}
+                  value={commentInput}
+                  onChange={e => setCommentInput(e.target.value)}
+                  className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                />
+                <button
+                  type="submit"
+                  disabled={submittingComment || !commentInput.trim()}
+                  className="bg-sky-600 hover:bg-sky-700 text-white p-2.5 rounded-full hover:shadow-md transition-all disabled:opacity-50 cursor-pointer shadow-sm shadow-sky-500/20"
+                >
+                  {submittingComment ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </button>
+              </form>
+            ) : (
+              <div className="pt-3 border-t border-slate-100 p-3 bg-gradient-to-r from-sky-50 via-white to-blue-50/70 rounded-2xl flex items-center justify-between gap-3 text-xs">
+                <span className="text-slate-600 font-medium">Đăng nhập để tham gia bình luận thảo luận</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('login');
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold cursor-pointer whitespace-nowrap active:scale-95 shadow-xs"
+                >
+                  Đăng nhập ngay
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

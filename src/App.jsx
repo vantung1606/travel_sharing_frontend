@@ -16,7 +16,6 @@ import { HomePage } from './pages/user/Home/HomePage';
 import { ExplorePage } from './pages/user/Explore/ExplorePage';
 import { CommunityPage } from './pages/user/Community/CommunityPage';
 import { ItineraryManagerPage } from './pages/user/Itineraries/ItineraryManagerPage';
-import { AIPlannerPage } from './pages/user/AIPlanner/AIPlannerPage';
 import { MessagesPage } from './pages/user/Messages/MessagesPage';
 import { ProfilePage } from './pages/user/Profile/ProfilePage';
 import { NotificationsPage } from './pages/user/Notifications/NotificationsPage';
@@ -52,7 +51,7 @@ const AppContent = () => {
               <Route path="/explore" element={<ExplorePage />} />
               <Route path="/community" element={<CommunityPage />} />
               <Route path="/itineraries" element={<ItineraryManagerPage />} />
-              <Route path="/ai-planner" element={<AIPlannerPage />} />
+              <Route path="/ai-planner" element={<Navigate to="/itineraries" replace />} />
               
               {/* Protected User Routes */}
               <Route 

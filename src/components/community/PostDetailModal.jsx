@@ -66,7 +66,18 @@ export const PostDetailModal = ({
   const postMenuRef = useRef(null);
 
   const toast = useToast();
-  const { currentUser } = useApp();
+  const { currentUser, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
+
+  // Require auth guard helper for guests
+  const requireAuth = (actionName = 'thực hiện thao tác này') => {
+    if (!isLoggedIn) {
+      toast.showInfo(`Vui lòng đăng nhập để ${actionName}!`);
+      setAuthMode('login');
+      setIsAuthModalOpen(true);
+      return false;
+    }
+    return true;
+  };
 
   const effectivePostId = post?.id || postId;
   const effectiveAuthorId = post?.authorId || post?.author?.id;
@@ -87,7 +98,7 @@ export const PostDetailModal = ({
   // Check follow status for author
   useEffect(() => {
     let isMounted = true;
-    if (effectiveAuthorId) {
+    if (effectiveAuthorId && isLoggedIn) {
       userApi
         .getFollowingIds()
         .then(ids => {
@@ -100,9 +111,10 @@ export const PostDetailModal = ({
     return () => {
       isMounted = false;
     };
-  }, [effectiveAuthorId]);
+  }, [effectiveAuthorId, isLoggedIn]);
 
   const handleToggleFollowAuthor = async () => {
+    if (!requireAuth('theo dõi tác giả')) return;
     if (!effectiveAuthorId || followLoading) return;
     try {
       setFollowLoading(true);
@@ -191,6 +203,7 @@ export const PostDetailModal = ({
   }, [effectivePostId, initialPost?.isBookmarked]);
 
   const handleToggleBookmark = async () => {
+    if (!requireAuth('lưu bài viết')) return;
     if (!effectivePostId || bookmarkLoading) return;
     try {
       setBookmarkLoading(true);
@@ -217,6 +230,7 @@ export const PostDetailModal = ({
 
   // Toggle Like
   const handleToggleLike = async () => {
+    if (!requireAuth('thích bài viết')) return;
     if (!effectivePostId || likeLoading) return;
     try {
       setLikeLoading(true);
@@ -247,6 +261,7 @@ export const PostDetailModal = ({
   // Add Comment or Reply
   const handleAddComment = async e => {
     e.preventDefault();
+    if (!requireAuth('bình luận bài viết')) return;
     if (!commentInput.trim() || submittingComment || !effectivePostId) return;
 
     try {
@@ -298,6 +313,7 @@ export const PostDetailModal = ({
 
   // Share post
   const handleShare = () => {
+    if (!requireAuth('chia sẻ bài viết')) return;
     setIsShareModalOpen(true);
   };
 
@@ -909,39 +925,55 @@ export const PostDetailModal = ({
                 </div>
               )}
 
-              {/* Add Comment Box */}
-              <form onSubmit={handleAddComment} className="flex gap-2.5 items-start">
-                <img
-                  src={
-                    currentUser?.avatar ||
-                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
-                  }
-                  alt="My avatar"
-                  className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 mt-0.5"
-                />
-                <div className="flex-1 flex gap-2">
-                  <input
-                    ref={commentInputRef}
-                    type="text"
-                    value={commentInput}
-                    onChange={e => setCommentInput(e.target.value)}
-                    placeholder={replyingTo ? `Trả lời @${replyingTo.authorName}...` : "Viết cảm nghĩ hoặc lời khuyên của bạn..."}
-                    className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+              {/* Add Comment Box or Guest Login Prompt */}
+              {isLoggedIn ? (
+                <form onSubmit={handleAddComment} className="flex gap-2.5 items-start">
+                  <img
+                    src={
+                      currentUser?.avatar ||
+                      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
+                    }
+                    alt="My avatar"
+                    className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 mt-0.5"
                   />
+                  <div className="flex-1 flex gap-2">
+                    <input
+                      ref={commentInputRef}
+                      type="text"
+                      value={commentInput}
+                      onChange={e => setCommentInput(e.target.value)}
+                      placeholder={replyingTo ? `Trả lời @${replyingTo.authorName}...` : "Viết cảm nghĩ hoặc lời khuyên của bạn..."}
+                      className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!commentInput.trim() || submittingComment}
+                      className="px-4 py-2 rounded-xl ocean-gradient text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:opacity-95 cursor-pointer disabled:opacity-50"
+                    >
+                      {submittingComment ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
+                      <span className="hidden sm:inline">Gửi</span>
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="p-3.5 bg-gradient-to-r from-sky-50 via-white to-blue-50/70 border border-sky-100 rounded-2xl flex items-center justify-between gap-3 text-xs">
+                  <span className="text-slate-600 font-medium">Đăng nhập để tham gia bình luận thảo luận</span>
                   <button
-                    type="submit"
-                    disabled={!commentInput.trim() || submittingComment}
-                    className="px-4 py-2 rounded-xl ocean-gradient text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:opacity-95 cursor-pointer disabled:opacity-50"
+                    type="button"
+                    onClick={() => {
+                      setAuthMode('login');
+                      setIsAuthModalOpen(true);
+                    }}
+                    className="px-4 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold cursor-pointer whitespace-nowrap active:scale-95 shadow-xs"
                   >
-                    {submittingComment ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <Send className="w-4 h-4" />
-                    )}
-                    <span className="hidden sm:inline">Gửi</span>
+                    Đăng nhập
                   </button>
                 </div>
-              </form>
+              )}
 
               {/* Comment Thread */}
               {loadingComments ? (
@@ -1004,6 +1036,7 @@ export const PostDetailModal = ({
                             <button
                               type="button"
                               onClick={() => {
+                                if (!requireAuth('trả lời bình luận')) return;
                                 setReplyingTo({
                                   commentId: c.id,
                                   authorId: c.userId || c.authorId,
@@ -1075,6 +1108,7 @@ export const PostDetailModal = ({
                                     <button
                                       type="button"
                                       onClick={() => {
+                                        if (!requireAuth('trả lời bình luận')) return;
                                         setReplyingTo({
                                           commentId: c.id,
                                           authorId: reply.userId || reply.authorId,

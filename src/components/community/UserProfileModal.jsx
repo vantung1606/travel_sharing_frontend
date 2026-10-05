@@ -37,7 +37,18 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   const [followModalState, setFollowModalState] = useState({ isOpen: false, tab: 'following' });
 
   const toast = useToast();
-  const { currentUser, setItineraries } = useApp();
+  const { currentUser, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
+
+  // Require auth guard helper for guests
+  const requireAuth = (actionName = 'thực hiện thao tác này') => {
+    if (!isLoggedIn) {
+      toast.showInfo(`Vui lòng đăng nhập để ${actionName}!`);
+      setAuthMode('login');
+      setIsAuthModalOpen(true);
+      return false;
+    }
+    return true;
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -66,6 +77,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
 
   const handleToggleFollow = async () => {
     if (!profile) return;
+    if (!requireAuth('theo dõi người dùng')) return;
     try {
       setFollowLoading(true);
       const res = await userApi.toggleFollow(profile.id);
@@ -89,6 +101,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   };
 
   const handleCloneItinerary = async (itin) => {
+    if (!requireAuth('sao chép lịch trình')) return;
     try {
       setCloningItinId(itin.id);
       const newItinerary = {

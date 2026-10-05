@@ -41,8 +41,26 @@ import {
 } from 'lucide-react';
 
 export const ItineraryManagerPage = () => {
-  const { itineraries, setItineraries, setIsAIGeneratorOpen } = useApp();
+  const {
+    itineraries,
+    setItineraries,
+    setIsAIGeneratorOpen,
+    isLoggedIn,
+    setIsAuthModalOpen,
+    setAuthMode
+  } = useApp();
   const toast = useToast();
+
+  // Guard helper for unauthenticated guest actions
+  const requireAuth = (actionName = 'thực hiện thao tác này') => {
+    if (!isLoggedIn) {
+      toast.showInfo(`Vui lòng đăng nhập để ${actionName}!`);
+      setAuthMode('login');
+      setIsAuthModalOpen(true);
+      return false;
+    }
+    return true;
+  };
 
   // Navigation & Filter States
   const [activeTab, setActiveTab] = useState('upcoming'); // 'upcoming' | 'completed' | 'drafts' | 'cancelled'
@@ -125,6 +143,7 @@ export const ItineraryManagerPage = () => {
   // Handle Share
   const handleShareItinerary = (itin, e) => {
     e.stopPropagation();
+    if (!requireAuth('chia sẻ lịch trình')) return;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.origin + `/itineraries?id=${itin.id}`);
       toast.success(`Đã sao chép liên kết chia sẻ cho chuyến đi: ${itin.title}`);
@@ -136,6 +155,7 @@ export const ItineraryManagerPage = () => {
   // Handle Manual Trip Creation
   const handleCreateManualTrip = (e) => {
     e.preventDefault();
+    if (!requireAuth('tạo chuyến đi mới')) return;
     if (!manualTitle.trim() || !manualDest.trim()) {
       toast.warn('Vui lòng nhập tên chuyến đi và điểm đến chính!');
       return;
@@ -228,7 +248,10 @@ export const ItineraryManagerPage = () => {
             {/* AI Generator Button with Glowing Badge */}
             <button
               type="button"
-              onClick={() => setIsAIGeneratorOpen(true)}
+              onClick={() => {
+                if (!requireAuth('lập lịch trình bằng AI')) return;
+                setIsAIGeneratorOpen(true);
+              }}
               className="group relative inline-flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
             >
               <Sparkles className="w-4 h-4 text-amber-200 group-hover:rotate-12 transition-transform" />
@@ -242,7 +265,10 @@ export const ItineraryManagerPage = () => {
             {/* Manual New Trip */}
             <button
               type="button"
-              onClick={() => setIsManualCreateOpen(true)}
+              onClick={() => {
+                if (!requireAuth('tạo chuyến đi mới')) return;
+                setIsManualCreateOpen(true);
+              }}
               className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
@@ -251,6 +277,35 @@ export const ItineraryManagerPage = () => {
           </div>
         </div>
       </div>
+
+      {/* ─── GUEST RESTRICTION NOTICE BANNER ───────────────────────────────────── */}
+      {!isLoggedIn && (
+        <div className="bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-50 border border-sky-200/90 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in duration-200">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-600/20">
+              <Calendar className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-sm sm:text-base text-slate-900">
+                Chế độ xem Khách: Lập & Quản lý lịch trình
+              </h3>
+              <p className="text-xs text-slate-600 leading-relaxed mt-0.5">
+                Khách vãng lai chỉ có thể xem các lịch trình du lịch mẫu. Đăng nhập để sử dụng AI lập tour riêng, tùy chỉnh điểm đến và đồng bộ hành trình cá nhân.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setAuthMode('login');
+              setIsAuthModalOpen(true);
+            }}
+            className="shrink-0 px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer whitespace-nowrap active:scale-95"
+          >
+            Đăng nhập ngay
+          </button>
+        </div>
+      )}
 
       {/* ─── 2. SUMMARY STATS STRIP (4 KPI CARDS) ──────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -447,8 +502,11 @@ export const ItineraryManagerPage = () => {
           </div>
           <button
             type="button"
-            onClick={() => setIsManualCreateOpen(true)}
-            className="px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-sm transition-all"
+            onClick={() => {
+              if (!requireAuth('tạo lịch trình bằng AI')) return;
+              setIsManualCreateOpen(true);
+            }}
+            className="px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
           >
             Tạo Lịch Trình AI Ngay ✨
           </button>

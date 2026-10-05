@@ -83,9 +83,8 @@ export const Navbar = () => {
     { id: 'home', label: 'Trang chủ', shortLabel: 'Trang chủ', icon: Compass },
     { id: 'explore', label: 'Khám phá', shortLabel: 'Khám phá', icon: MapPin },
     { id: 'community', label: 'Cộng đồng', shortLabel: 'Cộng đồng', icon: Users, badge: 'HOT' },
-    { id: 'itineraries', label: 'Lịch trình của tôi', shortLabel: 'Lịch trình', icon: Calendar },
-    { id: 'ai-planner', label: 'AI Travel Planner', shortLabel: 'AI Planner', icon: Sparkles, isAi: true },
-    { id: 'messages', label: 'Trò chuyện', shortLabel: 'Trò chuyện', icon: MessageSquare, badge: '2' }
+    { id: 'itineraries', label: 'Lịch trình', shortLabel: 'Lịch trình', icon: Calendar },
+    ...(isLoggedIn ? [{ id: 'messages', label: 'Trò chuyện', shortLabel: 'Trò chuyện', icon: MessageSquare, badge: '2' }] : [])
   ];
 
   const handleNavClick = (tabId) => {
@@ -334,11 +333,11 @@ export const Navbar = () => {
                       </button>
 
                       <button
-                        onClick={() => { setPortalMode('user'); setUserTab('ai-planner'); setIsProfileDropdownOpen(false); }}
+                        onClick={() => { setIsAIGeneratorOpen(true); setIsProfileDropdownOpen(false); }}
                         className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <Sparkles className="w-4 h-4 text-amber-500" />
-                        <span>AI Travel Planner</span>
+                        <span>Trợ lý AI Lập Lịch Trình</span>
                       </button>
 
                       {/* Admin Portal Toggle - Protected: Only visible for ROLE_ADMIN */}
