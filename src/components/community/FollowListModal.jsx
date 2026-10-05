@@ -60,6 +60,12 @@ export const FollowListModal = ({
     };
   }, [userId]);
 
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
+
   // Handle toggle follow on any user in the list
   const handleToggleFollow = async (targetUser) => {
     if (!targetUser?.id) return;
@@ -77,6 +83,11 @@ export const FollowListModal = ({
       setFollowersList(prev =>
         prev.map(u => (u.id === targetUser.id ? { ...u, isFollowing: isNowFollowing } : u))
       );
+
+      // Broadcast follow change to sync everywhere in real time
+      window.dispatchEvent(new CustomEvent('wayfare_follow_changed', {
+        detail: { targetUserId: targetUser.id, isFollowing: isNowFollowing }
+      }));
 
       if (isNowFollowing) {
         toast.showSuccess(`Đã theo dõi ${targetUser.fullName}! ✨`);
