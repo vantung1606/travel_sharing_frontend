@@ -81,12 +81,11 @@ export const AuthModal = () => {
         </button>
 
         {/* ========================================================= */}
-        {/* LEFT COLUMN: FORM SECTION (46% width for ideal balance)   */}
-        {/* Background: #eef1f6, White 50px Pill Inputs, 50px Button  */}
+        {/* LEFT COLUMN: FORM SECTION (42% width, tight right padding) */}
         {/* ========================================================= */}
-        <div className="w-full lg:w-[46%] p-6 sm:p-8 md:p-10 flex flex-col justify-center items-center overflow-y-auto z-10 bg-[#eef1f6]">
+        <div className="w-full lg:w-[42%] p-6 sm:p-8 lg:py-10 lg:pl-10 lg:pr-3 flex flex-col justify-center items-center overflow-y-auto z-10 bg-[#eef1f6]">
           
-          <div className="w-full max-w-[380px] sm:max-w-[390px] text-center">
+          <div className="w-full max-w-[380px] text-center">
             
             {/* Logo */}
             <div className="flex items-center justify-center gap-2.5 mb-2.5">
@@ -277,7 +276,7 @@ export const AuthModal = () => {
         {/* RIGHT COLUMN: BANNER (Matching CNPM .bg-img & img-50.png) */}
         {/* Uses exact login_banner.jpg with img-50.png in the middle */}
         {/* ========================================================= */}
-        <div className="hidden lg:block lg:w-[54%] relative min-h-[580px] overflow-hidden">
+        <div className="hidden lg:block lg:w-[58%] relative min-h-[580px] overflow-hidden">
           
           {/* Background Banner Image */}
           <div
@@ -287,9 +286,9 @@ export const AuthModal = () => {
             }}
           />
 
-          {/* img-50.png in the middle divider (from CNPM .bg-img::after) */}
+          {/* img-50.png in the middle divider, shifted to hug the form seamlessly */}
           <div
-            className="absolute -left-[1px] top-0 bottom-0 w-[276px] h-full z-10 pointer-events-none"
+            className="absolute -left-[32px] top-0 bottom-0 w-[276px] h-full z-10 pointer-events-none"
             style={{
               backgroundImage: `url('/images/login/img-50.png')`,
               backgroundPosition: 'top left',
