@@ -112,33 +112,65 @@ export const RealMapView = ({
   setActiveItem = () => {},
   setDetailModalItem = () => {},
   userCoords = null,
-  mapStyle = 'voyager', // 'voyager' | 'satellite' | 'dark'
+  mapStyle = 'osm', // 'osm' | 'hot' | 'osmfr'
   setMapStyle = () => {},
   className = ''
 }) => {
-  // Tile Layer URL Map
+  // Bản đồ chuẩn quốc tế OpenStreetMap - 100% Sạch, Không đường lưỡi bò phi pháp, Không watermark
   const tileLayers = {
-    voyager: {
-      url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap'
+    osm: {
+      url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors • Khẳng định chủ quyền Việt Nam 🇻🇳'
     },
-    satellite: {
-      url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      attribution: '&copy; Esri &copy; OpenStreetMap'
+    hot: {
+      url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
+      attribution: '&copy; OpenStreetMap France & HOT • Bản đồ Du lịch Sạch'
     },
-    dark: {
-      url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-      attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap'
+    osmfr: {
+      url: 'https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png',
+      attribution: '&copy; OpenStreetMap France • Khẳng định chủ quyền Việt Nam'
     }
   };
 
-  // Center of Vietnam as default
+  // Vị trí trung tâm Việt Nam
   const defaultCenter = useMemo(() => {
     if (activeItem?.latitude && activeItem?.longitude) {
       return [parseFloat(activeItem.latitude), parseFloat(activeItem.longitude)];
     }
-    return [16.0544, 108.0717]; // Da Nang / Central Vietnam
+    return [16.0544, 108.0717]; // Đà Nẵng / Miền Trung Việt Nam
   }, [activeItem]);
+
+  // Ghim khẳng định chủ quyền biển đảo thiêng liêng
+  const hoangSaPosition = [16.5367, 111.6067];
+  const truongSaPosition = [8.6433, 111.9194];
+
+  const hoangSaIcon = useMemo(() => L.divIcon({
+    className: 'vn-sovereignty-marker',
+    html: `
+      <div class="cursor-pointer hover:scale-110 transition-transform">
+        <div class="px-2.5 py-1 rounded-xl bg-red-600/95 text-white font-extrabold text-[11px] border-2 border-amber-400 shadow-2xl flex items-center gap-1.5 whitespace-nowrap">
+          <span>🇻🇳</span>
+          <span class="tracking-tight">Quần đảo Hoàng Sa (Việt Nam)</span>
+        </div>
+      </div>
+    `,
+    iconSize: [180, 32],
+    iconAnchor: [90, 16]
+  }), []);
+
+  const truongSaIcon = useMemo(() => L.divIcon({
+    className: 'vn-sovereignty-marker',
+    html: `
+      <div class="cursor-pointer hover:scale-110 transition-transform">
+        <div class="px-2.5 py-1 rounded-xl bg-red-600/95 text-white font-extrabold text-[11px] border-2 border-amber-400 shadow-2xl flex items-center gap-1.5 whitespace-nowrap">
+          <span>🇻🇳</span>
+          <span class="tracking-tight">Quần đảo Trường Sa (Việt Nam)</span>
+        </div>
+      </div>
+    `,
+    iconSize: [180, 32],
+    iconAnchor: [90, 16]
+  }), []);
 
   return (
     <div className={`relative w-full h-full rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-900 ${className}`}>
@@ -146,46 +178,46 @@ export const RealMapView = ({
       {/* Top Map Toolbar Overlay */}
       <div className="absolute top-3 left-3 right-3 z-[1000] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
         
-        {/* Live Status Pill */}
-        <div className="pointer-events-auto bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-slate-700/80 shadow-lg flex items-center gap-2 text-xs font-bold text-sky-300">
-          <Navigation className="w-4 h-4 text-sky-400 animate-pulse" />
-          <span>Bản Đồ Tọa Độ Sống ({items.length} Điểm Ghim)</span>
+        {/* Live Status Pill & Vietnam Flag */}
+        <div className="pointer-events-auto bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-slate-700/80 shadow-lg flex items-center gap-2 text-xs font-bold text-white">
+          <span className="text-base">🇻🇳</span>
+          <span className="text-sky-300">Bản Đồ Du Lịch Việt Nam ({items.length} Điểm Ghim)</span>
         </div>
 
         {/* Map Style Selector */}
         <div className="pointer-events-auto flex items-center gap-1 bg-slate-900/90 backdrop-blur-md p-1 rounded-2xl border border-slate-700/80 shadow-lg text-[11px] font-bold">
           <button
             type="button"
-            onClick={() => setMapStyle('voyager')}
-            className={`px-2.5 py-1 rounded-xl transition-all ${
-              mapStyle === 'voyager'
+            onClick={() => setMapStyle('osm')}
+            className={`px-3 py-1 rounded-xl transition-all ${
+              mapStyle === 'osm'
                 ? 'bg-sky-600 text-white shadow-xs'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Đường Phố
+            Đường Phố Chuẩn
           </button>
           <button
             type="button"
-            onClick={() => setMapStyle('satellite')}
-            className={`px-2.5 py-1 rounded-xl transition-all ${
-              mapStyle === 'satellite'
+            onClick={() => setMapStyle('hot')}
+            className={`px-3 py-1 rounded-xl transition-all ${
+              mapStyle === 'hot'
                 ? 'bg-sky-600 text-white shadow-xs'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Vệ Tinh
+            Màu Du Lịch
           </button>
           <button
             type="button"
-            onClick={() => setMapStyle('dark')}
-            className={`px-2.5 py-1 rounded-xl transition-all ${
-              mapStyle === 'dark'
+            onClick={() => setMapStyle('osmfr')}
+            className={`px-3 py-1 rounded-xl transition-all ${
+              mapStyle === 'osmfr'
                 ? 'bg-sky-600 text-white shadow-xs'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Đêm Dark
+            Độ Chi Tiết Cao
           </button>
         </div>
 
@@ -199,13 +231,34 @@ export const RealMapView = ({
         className="w-full h-full min-h-[520px] z-0"
       >
         <TileLayer
-          url={tileLayers[mapStyle]?.url || tileLayers.voyager.url}
-          attribution={tileLayers[mapStyle]?.attribution || tileLayers.voyager.attribution}
+          url={tileLayers[mapStyle]?.url || tileLayers.osm.url}
+          attribution={tileLayers[mapStyle]?.attribution || tileLayers.osm.attribution}
           maxZoom={19}
         />
 
         {/* Map Controller for dynamic flyTo */}
         <MapFlyController activeItem={activeItem} userCoords={userCoords} />
+
+        {/* Ghim Khẳng Định Chủ Quyền Quần Đảo Hoàng Sa & Trường Sa Của Việt Nam */}
+        <Marker position={hoangSaPosition} icon={hoangSaIcon}>
+          <Popup>
+            <div className="p-1 text-xs font-sans space-y-1">
+              <strong className="text-red-700 font-bold block text-sm">🇻🇳 Quần đảo Hoàng Sa</strong>
+              <p className="text-slate-600 text-[11px]">Thuộc Huyện Hoàng Sa, Thành phố Đà Nẵng, Việt Nam.</p>
+              <p className="text-slate-500 italic text-[10px]">Chủ quyền thiêng liêng bất khả xâm phạm của Tổ quốc Việt Nam.</p>
+            </div>
+          </Popup>
+        </Marker>
+
+        <Marker position={truongSaPosition} icon={truongSaIcon}>
+          <Popup>
+            <div className="p-1 text-xs font-sans space-y-1">
+              <strong className="text-red-700 font-bold block text-sm">🇻🇳 Quần đảo Trường Sa</strong>
+              <p className="text-slate-600 text-[11px]">Thuộc Huyện Trường Sa, Tỉnh Khánh Hòa, Việt Nam.</p>
+              <p className="text-slate-500 italic text-[10px]">Chủ quyền thiêng liêng bất khả xâm phạm của Tổ quốc Việt Nam.</p>
+            </div>
+          </Popup>
+        </Marker>
 
         {/* User GPS Location Marker & Radar Circle */}
         {userCoords?.lat && userCoords?.lng && (

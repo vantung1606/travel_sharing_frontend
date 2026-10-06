@@ -61,7 +61,7 @@ export const ExplorePage = () => {
 
   // View Mode: 'split' (Cards + Map) | 'grid' (All Cards Grid) | 'map' (Full Map)
   const [viewMode, setViewMode] = useState('split');
-  const [mapLayer, setMapLayer] = useState('terrain'); // 'terrain' | 'satellite'
+  const [mapLayer, setMapLayer] = useState('osm'); // 'osm' | 'hot' | 'osmfr'
 
   // User GPS coordinates for Distance Radar
   const [userCoords, setUserCoords] = useState(null);
@@ -850,8 +850,8 @@ export const ExplorePage = () => {
               setActiveItem={setActiveItem}
               setDetailModalItem={setDetailModalItem}
               userCoords={userCoords}
-              mapStyle={mapLayer === 'satellite' ? 'satellite' : mapLayer === 'terrain' ? 'voyager' : 'dark'}
-              setMapStyle={(style) => setMapLayer(style === 'voyager' ? 'terrain' : style)}
+              mapStyle={mapLayer}
+              setMapStyle={setMapLayer}
               className="h-full"
             />
           </div>
@@ -944,8 +944,8 @@ export const ExplorePage = () => {
             setActiveItem={setActiveItem}
             setDetailModalItem={setDetailModalItem}
             userCoords={userCoords}
-            mapStyle={mapLayer === 'satellite' ? 'satellite' : mapLayer === 'terrain' ? 'voyager' : 'dark'}
-            setMapStyle={(style) => setMapLayer(style === 'voyager' ? 'terrain' : style)}
+            mapStyle={mapLayer}
+            setMapStyle={setMapLayer}
             className="h-full"
           />
         </div>
