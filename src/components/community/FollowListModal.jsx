@@ -35,12 +35,14 @@ export const FollowListModal = ({
   useEffect(() => {
     let isMounted = true;
     const loadData = async () => {
-      if (!userId) return;
+      const targetUserId = userId || currentUser?.id;
+      const targetEmail = currentUser?.email;
+      if (!targetUserId && !targetEmail) return;
       try {
         setLoading(true);
         const [following, followers] = await Promise.all([
-          userApi.getFollowing(userId),
-          userApi.getFollowers(userId)
+          userApi.getFollowing(targetUserId, targetEmail),
+          userApi.getFollowers(targetUserId, targetEmail)
         ]);
         if (isMounted) {
           setFollowingList(Array.isArray(following) ? following : []);

@@ -9,7 +9,7 @@ import {
   INITIAL_USER_LIST,
   INITIAL_REPORTS
 } from '../mock/data';
-import { notificationApi, INITIAL_MOCK_NOTIFICATIONS } from '../services/api';
+import { notificationApi, userApi, INITIAL_MOCK_NOTIFICATIONS } from '../services/api';
 
 const AppContext = createContext();
 
@@ -173,6 +173,34 @@ export const AppProvider = ({ children }) => {
       console.error('Failed to clear auth from localStorage', e);
     }
   };
+
+  // Auto-sync profile ID and details with backend if missing or on reload
+  useEffect(() => {
+    if (!isLoggedIn || !currentUser?.email) return;
+    userApi
+      .getMyProfile(currentUser.email)
+      .then(profile => {
+        if (profile && profile.id) {
+          setCurrentUser(prev => {
+            if (prev.id === profile.id) return prev;
+            const updated = {
+              ...prev,
+              id: profile.id,
+              name: profile.fullName || prev.name,
+              avatar: profile.avatarUrl || prev.avatar,
+              handle: profile.handle || prev.handle
+            };
+            try {
+              localStorage.setItem('wayfare_user', JSON.stringify(updated));
+            } catch (e) {
+              console.error(e);
+            }
+            return updated;
+          });
+        }
+      })
+      .catch(err => console.warn('Could not sync user profile with backend:', err));
+  }, [isLoggedIn, currentUser?.email]);
 
   // Notification State - Synced with currentUser
   const [notifications, setNotifications] = useState([]);

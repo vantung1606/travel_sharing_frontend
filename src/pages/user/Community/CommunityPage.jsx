@@ -263,14 +263,14 @@ export const CommunityPage = () => {
 
   // Fetch full following user objects (only people current user follows can be tagged)
   const fetchFollowingUsers = useCallback(async () => {
-    if (!isLoggedIn || !currentUser) {
+    if (!isLoggedIn) {
       setFollowingUsers([]);
       return;
     }
-    const myUserId = currentUser.id || currentUser.userId;
-    if (!myUserId) return;
+    const myUserId = currentUser?.id || currentUser?.userId;
+    const myEmail = currentUser?.email;
     try {
-      const list = await userApi.getFollowing(myUserId, currentUser.email);
+      const list = await userApi.getFollowing(myUserId, myEmail);
       if (Array.isArray(list)) {
         setFollowingUsers(list);
       }

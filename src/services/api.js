@@ -1271,11 +1271,34 @@ export const userApi = {
     }
   },
 
+  async getMyProfile(email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || '';
+      const res = await fetch(`${BASE_URL}/users/me?email=${encodeURIComponent(userEmail)}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.warn('API error fetching my profile:', err.message);
+      return null;
+    }
+  },
+
   async getFollowing(userId, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
-      const res = await fetch(`${BASE_URL}/users/${userId}/following?email=${encodeURIComponent(userEmail)}`, {
+      const userEmail = email || user.email || '';
+      const hasNumericId = userId && !isNaN(Number(userId)) && Number(userId) > 0;
+      const url = hasNumericId
+        ? `${BASE_URL}/users/${userId}/following?email=${encodeURIComponent(userEmail)}`
+        : `${BASE_URL}/users/following?email=${encodeURIComponent(userEmail)}`;
+      const res = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeader()
@@ -1293,8 +1316,12 @@ export const userApi = {
   async getFollowers(userId, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
-      const res = await fetch(`${BASE_URL}/users/${userId}/followers?email=${encodeURIComponent(userEmail)}`, {
+      const userEmail = email || user.email || '';
+      const hasNumericId = userId && !isNaN(Number(userId)) && Number(userId) > 0;
+      const url = hasNumericId
+        ? `${BASE_URL}/users/${userId}/followers?email=${encodeURIComponent(userEmail)}`
+        : `${BASE_URL}/users/followers?email=${encodeURIComponent(userEmail)}`;
+      const res = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeader()

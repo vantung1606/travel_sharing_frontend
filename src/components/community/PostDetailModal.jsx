@@ -140,15 +140,15 @@ export const PostDetailModal = ({
 
   // Load following users (only people current user follows can be tagged)
   useEffect(() => {
-    if (!isLoggedIn || !currentUser) {
+    if (!isLoggedIn) {
       setFollowingUsers([]);
       return;
     }
-    const myUserId = currentUser.id || currentUser.userId;
-    if (!myUserId) return;
+    const myUserId = currentUser?.id || currentUser?.userId;
+    const myEmail = currentUser?.email;
     const loadFollowing = () => {
       userApi
-        .getFollowing(myUserId, currentUser.email)
+        .getFollowing(myUserId, myEmail)
         .then(list => {
           if (Array.isArray(list)) setFollowingUsers(list);
         })
