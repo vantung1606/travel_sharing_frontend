@@ -552,7 +552,7 @@ export const ExplorePage = () => {
             <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
             <input
               type="text"
-              placeholder="Tìm theo tên quán, homestay, món đặc sản, tỉnh thành..."
+              placeholder="Tìm địa danh du lịch Việt Nam: Đà Lạt, Hà Giang, Phú Quốc, Hội An, Sa Pa..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-slate-100/80 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-sky-500 text-xs font-semibold text-slate-900 outline-none transition-all placeholder:text-slate-400"

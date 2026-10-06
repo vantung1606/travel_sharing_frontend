@@ -172,6 +172,21 @@ export const RealMapView = ({
     iconAnchor: [90, 16]
   }), []);
 
+  // Khóa cứng phạm vi bản đồ trong phạm vi lãnh thổ & hải phận Việt Nam
+  const vietnamBounds = [
+    [7.5, 101.5],  // Tây Nam (Mũi Cà Mau & Vùng biển phía Nam)
+    [24.0, 118.0]  // Đông Bắc (Hà Giang, Móng Cái & Quần đảo Hoàng Sa, Trường Sa)
+  ];
+
+  const quickVnCities = [
+    { label: 'Hà Giang', lat: 23.2428, lng: 105.4192 },
+    { label: 'Sa Pa', lat: 22.3364, lng: 103.8438 },
+    { label: 'Đà Nẵng', lat: 16.0544, lng: 108.2022 },
+    { label: 'Hội An', lat: 15.8801, lng: 108.3380 },
+    { label: 'Đà Lạt', lat: 11.9404, lng: 108.4583 },
+    { label: 'Phú Quốc', lat: 10.2899, lng: 103.9840 }
+  ];
+
   return (
     <div className={`relative w-full h-full rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-900 ${className}`}>
       
@@ -182,6 +197,21 @@ export const RealMapView = ({
         <div className="pointer-events-auto bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-slate-700/80 shadow-lg flex items-center gap-2 text-xs font-bold text-white">
           <span className="text-base">🇻🇳</span>
           <span className="text-sky-300">Bản Đồ Du Lịch Việt Nam ({items.length} Điểm Ghim)</span>
+        </div>
+
+        {/* Quick VN Cities Jump Toolbar */}
+        <div className="pointer-events-auto hidden xl:flex items-center gap-1 bg-slate-900/90 backdrop-blur-md px-2 py-1 rounded-2xl border border-slate-700/80 text-[11px] font-bold text-slate-300">
+          <span className="text-slate-400 mr-1 text-[10px]">Tới nhanh:</span>
+          {quickVnCities.map(city => (
+            <button
+              key={city.label}
+              type="button"
+              onClick={() => setActiveItem({ latitude: city.lat, longitude: city.lng, name: city.label, isJumpPoint: true })}
+              className="px-2 py-0.5 rounded-lg hover:bg-sky-600 hover:text-white transition-colors cursor-pointer"
+            >
+              {city.label}
+            </button>
+          ))}
         </div>
 
         {/* Map Style Selector */}
@@ -195,7 +225,7 @@ export const RealMapView = ({
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            Đường Phố Chuẩn
+            Đường Phố
           </button>
           <button
             type="button"
@@ -208,25 +238,18 @@ export const RealMapView = ({
           >
             Màu Du Lịch
           </button>
-          <button
-            type="button"
-            onClick={() => setMapStyle('osmfr')}
-            className={`px-3 py-1 rounded-xl transition-all ${
-              mapStyle === 'osmfr'
-                ? 'bg-sky-600 text-white shadow-xs'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Độ Chi Tiết Cao
-          </button>
         </div>
 
       </div>
 
-      {/* Real Interactive Leaflet Map */}
+      {/* Real Interactive Leaflet Map - Locked Strictly Within Vietnam Territory */}
       <MapContainer
         center={defaultCenter}
         zoom={6}
+        minZoom={5.8}
+        maxZoom={18}
+        maxBounds={vietnamBounds}
+        maxBoundsViscosity={1.0}
         scrollWheelZoom={true}
         className="w-full h-full min-h-[520px] z-0"
       >
