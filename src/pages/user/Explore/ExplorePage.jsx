@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import {
   Search,
@@ -27,13 +27,27 @@ import {
   Flame,
   Umbrella,
   Camera,
-  Utensils
+  Utensils,
+  Phone,
+  ExternalLink,
+  PlusCircle,
+  Store,
+  Coffee,
+  Home,
+  Award,
+  Radio,
+  Check,
+  Building2,
+  Send
 } from 'lucide-react';
 import { useToast } from '../../../components/common/Toast';
 
 export const ExplorePage = () => {
-  const { destinations, setIsAIGeneratorOpen } = useApp();
+  const { destinations, places, addNewPlace, setIsAIGeneratorOpen, currentUser } = useApp();
   const toast = useToast();
+
+  // Explore Layer: 'all' | 'spots' (Local Businesses / Spots) | 'destinations' (Regions & Cities)
+  const [exploreLayer, setExploreLayer] = useState('spots');
 
   // Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,219 +55,495 @@ export const ExplorePage = () => {
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [selectedBudget, setSelectedBudget] = useState('all'); // 'all' | 'under3m' | '3m-6m' | 'above6m'
   const [selectedDuration, setSelectedDuration] = useState('all'); // 'all' | '2d' | '3d' | '4d+'
-  const [sortBy, setSortBy] = useState('popular'); // 'popular' | 'rating' | 'priceAsc' | 'priceDesc'
+  const [sortBy, setSortBy] = useState('popular'); // 'popular' | 'rating' | 'nearest'
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   // View Mode: 'split' (Cards + Map) | 'grid' (All Cards Grid) | 'map' (Full Map)
   const [viewMode, setViewMode] = useState('split');
-  const [mapLayer, setMapLayer] = useState('terrain'); // 'terrain' | 'satellite' | 'weather'
+  const [mapLayer, setMapLayer] = useState('terrain'); // 'terrain' | 'satellite'
 
-  // Active Destination for Map & Detail Modal
-  const [activePlace, setActivePlace] = useState(destinations[0] || null);
-  const [detailModalPlace, setDetailModalPlace] = useState(null);
-  const [activeGalleryIdx, setActiveGalleryIdx] = useState(0);
+  // User GPS coordinates for Distance Radar
+  const [userCoords, setUserCoords] = useState(null);
+  const [isLocating, setIsLocating] = useState(false);
 
   // Saved / Wishlist
-  const [savedDestinations, setSavedDestinations] = useState({});
+  const [savedItems, setSavedItems] = useState({});
+
+  // Active Item for Map & Detail Modal
+  const [activeItem, setActiveItem] = useState(null);
+  const [detailModalItem, setDetailModalItem] = useState(null);
+
+  // Add Place Modal State
+  const [isAddPlaceModalOpen, setIsAddPlaceModalOpen] = useState(false);
+  const [isSubmittingPlace, setIsSubmittingPlace] = useState(false);
+  const [newPlaceForm, setNewPlaceForm] = useState({
+    name: '',
+    categoryName: 'Quán Cafe & Săn Mây',
+    city: 'Đà Lạt',
+    address: '',
+    latitude: '',
+    longitude: '',
+    phoneNumber: '',
+    openHours: '07:00 - 22:00',
+    priceRange: '35.000đ - 85.000đ',
+    ticketPrice: '',
+    amenities: ['Wifi tốc độ cao', 'Bãi đỗ xe ô tô'],
+    coverImageUrl: '',
+    description: ''
+  });
+
+  const availableAmenityOptions = [
+    'Wifi tốc độ cao',
+    'Bãi đỗ xe ô tô',
+    'View săn mây',
+    'Bàn ngoài trời thoáng đãng',
+    'Đốt lửa trại',
+    'Thanh toán thẻ / Quét QR',
+    'Thân thiện thú cưng',
+    'Phục vụ đồ ăn đêm',
+    'Phù hợp làm việc từ xa',
+    'Nhạc Acoustic cuối tuần'
+  ];
+
+  const suggestedCoverImages = [
+    { label: 'Cafe Săn Mây', url: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80' },
+    { label: 'Homestay Bản Địa', url: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80' },
+    { label: 'Ẩm Thực Quán Ăn', url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80' },
+    { label: 'Nghỉ Dưỡng View Biển', url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80' }
+  ];
+
+  const spotCategories = [
+    'Tất cả',
+    'Quán Cafe & Săn Mây',
+    'Homestay & Nghỉ Dưỡng',
+    'Ẩm Thực & Đặc Sản',
+    'Trải Nghiệm & Hoạt Động',
+    'Danh Lam & Thắng Cảnh'
+  ];
 
   const regions = ['Tất cả', 'Miền Bắc', 'Miền Trung', 'Miền Nam', 'Tây Nguyên'];
-  const categories = ['Tất cả', 'Biển & Văn Hoá', 'Nghỉ Dưỡng Sang Trọng', 'Mạo Hiểm & Khám Phá', 'Núi & Sinh Thái'];
 
-  // Toggle Save Destination
-  const handleToggleSave = (dest, e) => {
-    e.stopPropagation();
-    const isCurrentlySaved = !!savedDestinations[dest.id];
-    setSavedDestinations(prev => ({
-      ...prev,
-      [dest.id]: !isCurrentlySaved
-    }));
-
-    if (!isCurrentlySaved) {
-      toast.success(`Đã thêm "${dest.name}" vào danh sách Yêu thích! ❤️`);
-    } else {
-      toast.info(`Đã gỡ "${dest.name}" khỏi danh sách Yêu thích.`);
-    }
+  // Calculate distance between 2 coordinates (Haversine formula in km)
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+    const R = 6371; // Radius of Earth in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return (R * c).toFixed(1);
   };
 
-  // Copy Coordinates
-  const handleCopyGPS = (dest, e) => {
+  // Live Location Locator
+  const handleGetLiveLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error('Trình duyệt của bạn không hỗ trợ định vị GPS');
+      return;
+    }
+    setIsLocating(true);
+    toast.info('Đang bật radar định vị GPS quanh bạn... 🛰️');
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserCoords({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        });
+        setIsLocating(false);
+        setSortBy('nearest');
+        toast.success(`Đã xác định vị trí! Tìm các địa điểm gần bạn nhất 📍`);
+      },
+      (err) => {
+        setIsLocating(false);
+        toast.error('Không thể lấy vị trí: ' + err.message);
+      },
+      { timeout: 10000 }
+    );
+  };
+
+  // Copy GPS
+  const handleCopyGPS = (item, e) => {
     e?.stopPropagation();
-    const coordString = `${dest.coordinates.lat.toFixed(4)}, ${dest.coordinates.lng.toFixed(4)}`;
+    const lat = item.latitude || item.coordinates?.lat;
+    const lng = item.longitude || item.coordinates?.lng;
+    if (!lat || !lng) {
+      toast.info('Tọa độ chưa được cập nhật chính xác');
+      return;
+    }
+    const coordString = `${Number(lat).toFixed(4)}, ${Number(lng).toFixed(4)}`;
     navigator.clipboard?.writeText(coordString);
     toast.success(`Đã sao chép tọa độ GPS: ${coordString} 📍`);
   };
 
-  // Launch AI Planner with prefilled destination
-  const handlePlanWithAI = (dest, e) => {
+  // Google Maps Direction
+  const handleOpenGoogleMaps = (item, e) => {
     e?.stopPropagation();
-    setIsAIGeneratorOpen(true);
-    toast.info(`Khởi tạo AI Travel Planner cho "${dest.name}"... ✨`);
+    const lat = item.latitude || item.coordinates?.lat;
+    const lng = item.longitude || item.coordinates?.lng;
+    if (lat && lng) {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+    } else {
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name + ' ' + (item.city || ''))}`, '_blank');
+    }
   };
 
-  // Filter & Sort Destinations
-  const filteredDestinations = useMemo(() => {
-    return destinations
+  // Launch AI Planner
+  const handlePlanWithAI = (item, e) => {
+    e?.stopPropagation();
+    setIsAIGeneratorOpen(true);
+    toast.info(`Khởi tạo AI Travel Planner cho "${item.name}"... ✨`);
+  };
+
+  // Toggle Save
+  const handleToggleSave = (item, e) => {
+    e.stopPropagation();
+    const idKey = item.id;
+    const isCurrentlySaved = !!savedItems[idKey];
+    setSavedItems(prev => ({ ...prev, [idKey]: !isCurrentlySaved }));
+    if (!isCurrentlySaved) {
+      toast.success(`Đã thêm "${item.name}" vào danh sách yêu thích! ❤️`);
+    } else {
+      toast.info(`Đã gỡ "${item.name}" khỏi danh sách yêu thích.`);
+    }
+  };
+
+  // Fill GPS in Modal Form
+  const handleGetLocationForForm = () => {
+    if (!navigator.geolocation) {
+      toast.error('Trình duyệt không hỗ trợ GPS');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setNewPlaceForm(prev => ({
+          ...prev,
+          latitude: pos.coords.latitude.toFixed(6),
+          longitude: pos.coords.longitude.toFixed(6)
+        }));
+        toast.success('Đã tự động lấy tọa độ GPS của bạn! 📍');
+      },
+      (err) => {
+        toast.error('Không thể lấy tọa độ: ' + err.message);
+      }
+    );
+  };
+
+  // Toggle Amenity in Form
+  const toggleAmenity = (amenity) => {
+    setNewPlaceForm(prev => {
+      const exists = prev.amenities.includes(amenity);
+      return {
+        ...prev,
+        amenities: exists
+          ? prev.amenities.filter(a => a !== amenity)
+          : [...prev.amenities, amenity]
+      };
+    });
+  };
+
+  // Submit Add Place Form
+  const handleAddPlaceSubmit = async (e) => {
+    e.preventDefault();
+    if (!newPlaceForm.name.trim()) {
+      toast.error('Vui lòng nhập tên địa điểm hoặc cơ sở kinh doanh');
+      return;
+    }
+    setIsSubmittingPlace(true);
+    try {
+      const payload = {
+        name: newPlaceForm.name.trim(),
+        categoryName: newPlaceForm.categoryName,
+        city: newPlaceForm.city || 'Đà Lạt',
+        address: newPlaceForm.address,
+        latitude: newPlaceForm.latitude ? parseFloat(newPlaceForm.latitude) : null,
+        longitude: newPlaceForm.longitude ? parseFloat(newPlaceForm.longitude) : null,
+        phoneNumber: newPlaceForm.phoneNumber,
+        openHours: newPlaceForm.openHours || '07:00 - 22:00',
+        priceRange: newPlaceForm.priceRange || '35.000đ - 85.000đ',
+        ticketPrice: newPlaceForm.ticketPrice ? parseFloat(newPlaceForm.ticketPrice) : 0,
+        amenities: newPlaceForm.amenities.join(', '),
+        coverImageUrl: newPlaceForm.coverImageUrl || 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
+        description: newPlaceForm.description
+      };
+
+      const created = await addNewPlace(payload);
+      toast.success(`Chúc mừng! "${created.name}" đã được đăng tải thành công lên Wayfare 🎉`);
+      setIsAddPlaceModalOpen(false);
+      setNewPlaceForm({
+        name: '',
+        categoryName: 'Quán Cafe & Săn Mây',
+        city: 'Đà Lạt',
+        address: '',
+        latitude: '',
+        longitude: '',
+        phoneNumber: '',
+        openHours: '07:00 - 22:00',
+        priceRange: '35.000đ - 85.000đ',
+        ticketPrice: '',
+        amenities: ['Wifi tốc độ cao', 'Bãi đỗ xe ô tô'],
+        coverImageUrl: '',
+        description: ''
+      });
+      setExploreLayer('spots');
+      setActiveItem(created);
+    } catch (err) {
+      toast.error('Lỗi khi đăng địa điểm: ' + err.message);
+    } finally {
+      setIsSubmittingPlace(false);
+    }
+  };
+
+  // Format Items depending on exploreLayer
+  const unifiedItems = useMemo(() => {
+    let list = [];
+
+    // Local Spots (from Backend / State)
+    if (exploreLayer === 'spots' || exploreLayer === 'all') {
+      const formattedSpots = (places || []).map(p => ({
+        id: `spot-${p.id}`,
+        rawId: p.id,
+        isLocalSpot: true,
+        name: p.name,
+        category: p.categoryName || 'Tọa độ bản địa',
+        city: p.city || 'Việt Nam',
+        region: p.city?.includes('Đà Lạt') || p.city?.includes('Hà Giang') ? 'Miền Bắc / Tây Nguyên' : 'Việt Nam',
+        address: p.address,
+        image: p.coverImageUrl || 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
+        latitude: p.latitude,
+        longitude: p.longitude,
+        rating: p.averageRating ? Number(p.averageRating).toFixed(1) : '5.0',
+        reviewsCount: p.reviewCount || 1,
+        phoneNumber: p.phoneNumber,
+        openHours: p.openHours || '07:00 - 22:00',
+        priceEstimate: p.priceRange || (p.ticketPrice ? `${Number(p.ticketPrice).toLocaleString()}đ` : 'Miễn phí'),
+        amenities: p.amenities ? p.amenities.split(',').map(s => s.trim()) : [],
+        isVerifiedHost: p.isVerifiedHost,
+        ownerName: p.ownerName,
+        ownerHandle: p.ownerHandle,
+        ownerAvatar: p.ownerAvatar,
+        tagline: p.description || 'Tọa độ check-in & trải nghiệm do người dùng và cơ sở bản địa chia sẻ.',
+        weather: 'Mát mẻ 22°C'
+      }));
+      list.push(...formattedSpots);
+    }
+
+    // Destinations (Broad province / regions)
+    if (exploreLayer === 'destinations' || exploreLayer === 'all') {
+      const formattedDestinations = (destinations || []).map(d => ({
+        ...d,
+        isLocalSpot: false,
+        rawId: d.id,
+        latitude: d.coordinates?.lat,
+        longitude: d.coordinates?.lng,
+        amenities: d.specialties || []
+      }));
+      list.push(...formattedDestinations);
+    }
+
+    return list;
+  }, [exploreLayer, places, destinations]);
+
+  // Filter & Sort
+  const filteredItems = useMemo(() => {
+    return unifiedItems
       .filter(item => {
         // Search
         const q = searchQuery.toLowerCase().trim();
         const matchesSearch =
           !q ||
           item.name.toLowerCase().includes(q) ||
+          item.city?.toLowerCase().includes(q) ||
           item.tagline?.toLowerCase().includes(q) ||
-          item.tags?.some(t => t.toLowerCase().includes(q)) ||
-          item.region?.toLowerCase().includes(q) ||
-          item.specialties?.some(s => s.toLowerCase().includes(q));
+          item.category?.toLowerCase().includes(q) ||
+          item.address?.toLowerCase().includes(q);
 
-        // Region
-        const matchesRegion = selectedRegion === 'Tất cả' || item.region === selectedRegion;
+        // Region / City
+        const matchesRegion =
+          selectedRegion === 'Tất cả' ||
+          item.region === selectedRegion ||
+          item.city?.toLowerCase().includes(selectedRegion.toLowerCase());
 
         // Category
-        const matchesCategory = selectedCategory === 'Tất cả' || item.category === selectedCategory;
+        const matchesCategory =
+          selectedCategory === 'Tất cả' ||
+          item.category?.toLowerCase().includes(selectedCategory.toLowerCase());
 
-        // Budget
-        let matchesBudget = true;
-        if (selectedBudget === 'under3m') {
-          matchesBudget = (item.budgetMin || 0) < 3000000;
-        } else if (selectedBudget === '3m-6m') {
-          matchesBudget = (item.budgetMin || 0) <= 6000000 && (item.budgetMax || 0) >= 3000000;
-        } else if (selectedBudget === 'above6m') {
-          matchesBudget = (item.budgetMax || 0) > 6000000;
+        return matchesSearch && matchesRegion && matchesCategory;
+      })
+      .map(item => {
+        // Attach dynamic distance
+        if (userCoords && item.latitude && item.longitude) {
+          const dist = calculateDistance(userCoords.lat, userCoords.lng, item.latitude, item.longitude);
+          return { ...item, distanceKm: dist };
         }
-
-        // Duration
-        let matchesDuration = true;
-        if (selectedDuration === '2d') {
-          matchesDuration = item.durationDays === 2;
-        } else if (selectedDuration === '3d') {
-          matchesDuration = item.durationDays === 3;
-        } else if (selectedDuration === '4d+') {
-          matchesDuration = (item.durationDays || 0) >= 4;
-        }
-
-        return matchesSearch && matchesRegion && matchesCategory && matchesBudget && matchesDuration;
+        return item;
       })
       .sort((a, b) => {
-        if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
-        if (sortBy === 'popular') return (b.reviewsCount || 0) - (a.reviewsCount || 0);
-        if (sortBy === 'priceAsc') return (a.budgetMin || 0) - (b.budgetMin || 0);
-        if (sortBy === 'priceDesc') return (b.budgetMax || 0) - (a.budgetMax || 0);
+        if (sortBy === 'nearest' && a.distanceKm && b.distanceKm) {
+          return parseFloat(a.distanceKm) - parseFloat(b.distanceKm);
+        }
+        if (sortBy === 'rating') {
+          return (parseFloat(b.rating) || 0) - (parseFloat(a.rating) || 0);
+        }
+        if (sortBy === 'popular') {
+          return (b.reviewsCount || 0) - (a.reviewsCount || 0);
+        }
         return 0;
       });
-  }, [destinations, searchQuery, selectedRegion, selectedCategory, selectedBudget, selectedDuration, sortBy]);
+  }, [unifiedItems, searchQuery, selectedRegion, selectedCategory, sortBy, userCoords]);
 
-  // Featured Collections Data
-  const curatedThemes = [
-    {
-      id: 'theme-1',
-      title: 'Thiên Đường Biển Đảo',
-      count: '4 Điểm đến',
-      icon: Umbrella,
-      gradient: 'from-sky-600 via-blue-600 to-indigo-700',
-      description: 'Phú Quốc, Quy Nhơn, Mũi Né, Vịnh Hạ Long',
-      filterAction: () => { setSelectedCategory('Biển & Văn Hoá'); setSelectedRegion('Tất cả'); }
-    },
-    {
-      id: 'theme-2',
-      title: 'Săn Mây & Mùa Lúa Vàng',
-      count: '3 Cung đường',
-      icon: Camera,
-      gradient: 'from-amber-600 via-orange-600 to-rose-700',
-      description: 'Hà Giang, Sapa, Cao nguyên Măng Đen',
-      filterAction: () => { setSelectedCategory('Núi & Sinh Thái'); setSelectedRegion('Miền Bắc'); }
-    },
-    {
-      id: 'theme-3',
-      title: 'Hành Trình Di Sản Cố Đô',
-      count: '3 Tọa độ',
-      icon: Compass,
-      gradient: 'from-teal-600 via-emerald-600 to-cyan-800',
-      description: 'Cố đô Huế, Phố cổ Hội An, Tràng An Ninh Bình',
-      filterAction: () => { setSelectedRegion('Miền Trung'); setSelectedCategory('Tất cả'); }
-    },
-    {
-      id: 'theme-4',
-      title: 'Mạo Hiểm & Phượt Địa Hình',
-      count: '3 Trải nghiệm',
-      icon: Flame,
-      gradient: 'from-indigo-600 via-purple-600 to-pink-700',
-      description: 'Đèo Mã Pí Lèng, Sa mạc Bàu Trắng, Đỉnh Fansipan',
-      filterAction: () => { setSelectedCategory('Mạo Hiểm & Khám Phá'); setSelectedRegion('Tất cả'); }
+  // Set default activeItem
+  useEffect(() => {
+    if (!activeItem && filteredItems.length > 0) {
+      setActiveItem(filteredItems[0]);
     }
-  ];
+  }, [filteredItems, activeItem]);
 
   return (
     <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 space-y-8">
       
       {/* ──────────────────────────────────────────────────────────────────────────
-          1. BREADCRUMB & HERO DISCOVERY BANNER
+          1. BREADCRUMB & HERO DISCOVERY BANNER (WITH HOST ACTION)
       ────────────────────────────────────────────────────────────────────────── */}
       <div className="space-y-4">
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
           <a href="/" className="hover:text-sky-600 transition-colors">Trang chủ</a>
           <span>/</span>
-          <span className="text-slate-900 font-bold">Khám phá Điểm đến HOT</span>
+          <span className="text-slate-900 font-bold">Khám phá & Tọa độ Bản địa</span>
         </div>
 
         {/* Hero Title & Live Metrics */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-gradient-to-r from-sky-900 via-[#031726] to-slate-900 rounded-3xl p-6 sm:p-8 lg:p-10 text-white relative overflow-hidden shadow-xl border border-sky-500/20">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-gradient-to-r from-sky-950 via-[#071f38] to-slate-950 rounded-3xl p-6 sm:p-8 lg:p-10 text-white relative overflow-hidden shadow-2xl border border-sky-500/20">
           {/* Subtle Ambient Orbs */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-sky-500/20 rounded-full blur-[90px] pointer-events-none" />
-          <div className="absolute -bottom-10 left-1/3 w-64 h-64 bg-blue-600/15 rounded-full blur-[80px] pointer-events-none" />
+          <div className="absolute top-0 right-0 w-80 h-80 bg-sky-500/15 rounded-full blur-[90px] pointer-events-none" />
+          <div className="absolute -bottom-10 left-1/3 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px] pointer-events-none" />
 
           <div className="relative z-10 max-w-3xl space-y-3">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-sky-300 text-xs font-bold border border-white/20">
               <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-spin-slow" />
-              <span>Wayfare Discovery Engine 4.0 • 12+ Tọa Độ Check-in Đỉnh Cao</span>
+              <span>Wayfare Local Host Network • Mạng Lưới Điểm Dừng Chân Bản Địa</span>
             </div>
 
             <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              Bản Đồ Điểm Đến & Tọa Độ Du Lịch
+              Bản Đồ Tọa Độ & Cơ Sở Bản Địa
             </h1>
 
             <p className="text-slate-200 text-sm sm:text-base font-normal leading-relaxed opacity-95">
-              Khám phá danh lam thắng cảnh khắp dải đất hình chữ S, tra cứu thời tiết live, bảng giá ước tính
-              và gợi ý ẩm thực đặc sản cho từng vùng miền.
+              Khám phá các homestay mộc mạc, quán cà phê săn mây view triệu đô, và ẩm thực bí truyền do chính 
+              người bản địa và chủ quán đăng tải. Kết nối trực tiếp, đặt bàn & lên lịch trình thông minh!
             </p>
 
             {/* Quick Metrics Bar */}
             <div className="flex flex-wrap items-center gap-4 sm:gap-6 pt-2 text-xs sm:text-sm font-semibold text-sky-200">
               <div className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>12 Tọa độ GPS chuẩn xác</span>
+                <Store className="w-4 h-4 text-emerald-400" />
+                <span>{places.length || 8}+ Cơ sở bản địa đang hoạt động</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                <span>4.85★ Đánh giá thực tế</span>
+                <span>4.9★ Đánh giá từ phượt thủ</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <Sun className="w-4 h-4 text-amber-300" />
-                <span>Cập nhật thời tiết theo mùa</span>
+                <Radio className="w-4 h-4 text-sky-400 animate-pulse" />
+                <span>Hỗ trợ định vị radar quanh bạn</span>
               </div>
             </div>
           </div>
 
-          {/* Action Trigger */}
+          {/* Action Trigger Group: Post Place & AI Planner */}
           <div className="relative z-10 shrink-0 flex flex-col sm:flex-row lg:flex-col gap-3">
+            {/* Host Register Button */}
+            <button
+              onClick={() => setIsAddPlaceModalOpen(true)}
+              className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-orange-500/30 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            >
+              <PlusCircle className="w-4 h-4 text-white" />
+              <span>+ Đăng Địa Điểm Của Bạn</span>
+            </button>
+
+            {/* AI Generator Button */}
             <button
               onClick={() => setIsAIGeneratorOpen(true)}
-              className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-extrabold text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-sky-500/30 hover:scale-105 active:scale-95 transition-all cursor-pointer shimmer-effect"
+              className="px-6 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs flex items-center justify-center gap-2 backdrop-blur-md transition-all cursor-pointer"
             >
-              <Sparkles className="w-4 h-4 text-amber-200" />
-              <span>Lập Tour AI Điểm Này</span>
+              <Sparkles className="w-4 h-4 text-sky-300" />
+              <span>Lập Tour AI Tự Động</span>
             </button>
             <span className="text-[11px] text-sky-200/80 text-center lg:text-right">
-              Miễn phí • Tối ưu theo ngân sách
+              Chủ quán & Người bản địa đăng tải miễn phí 🚀
             </span>
           </div>
         </div>
       </div>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          2. MULTI-CRITERIA FILTER & VIEW TOOLBAR
+          2. DUAL-LEVEL EXPLORE TABS (BẢN ĐỊA VS TOÀN CẢNH VS RADAR GPS)
+      ────────────────────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80">
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
+          <button
+            onClick={() => setExploreLayer('spots')}
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
+              exploreLayer === 'spots'
+                ? 'bg-white text-sky-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Store className="w-4 h-4 text-orange-500" />
+            <span>Tọa Độ Bản Địa & Cơ Sở ({places.length || 8})</span>
+            <span className="px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[10px]">Mới</span>
+          </button>
+
+          <button
+            onClick={() => setExploreLayer('destinations')}
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
+              exploreLayer === 'destinations'
+                ? 'bg-white text-sky-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Compass className="w-4 h-4 text-sky-500" />
+            <span>Tỉnh Thành & Danh Lam ({destinations.length})</span>
+          </button>
+
+          <button
+            onClick={() => setExploreLayer('all')}
+            className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
+              exploreLayer === 'all'
+                ? 'bg-white text-sky-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Layers className="w-4 h-4 text-indigo-500" />
+            <span>Tất Cả ({unifiedItems.length})</span>
+          </button>
+        </div>
+
+        {/* Radar GPS Trigger */}
+        <button
+          onClick={handleGetLiveLocation}
+          disabled={isLocating}
+          className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer border ${
+            userCoords
+              ? 'bg-emerald-50 text-emerald-800 border-emerald-300 shadow-xs'
+              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin text-sky-600' : 'text-emerald-600'}`} />
+          <span>{userCoords ? '📍 Đang dùng vị trí GPS của bạn' : 'Bật Radar GPS Quanh Tôi'}</span>
+        </button>
+      </div>
+
+      {/* ──────────────────────────────────────────────────────────────────────────
+          3. MULTI-CRITERIA FILTER & VIEW TOOLBAR
       ────────────────────────────────────────────────────────────────────────── */}
       <div className="bg-white p-4 sm:p-5 rounded-3xl shadow-sm border border-slate-200/80 space-y-4">
-        {/* Top Filter Row: Search Input + Region Pills + View Controls */}
+        {/* Top Filter Row: Search Input + Category Chips + View Mode */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           
           {/* Search Input Box */}
@@ -261,7 +551,7 @@ export const ExplorePage = () => {
             <Search className="w-4 h-4 absolute left-3.5 top-3.5 text-slate-400" />
             <input
               type="text"
-              placeholder="Tìm theo tên điểm, tỉnh thành, món ngon..."
+              placeholder="Tìm theo tên quán, homestay, món đặc sản, tỉnh thành..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-slate-100/80 hover:bg-slate-100 focus:bg-white border border-slate-200 focus:border-sky-500 text-xs font-semibold text-slate-900 outline-none transition-all placeholder:text-slate-400"
@@ -276,27 +566,27 @@ export const ExplorePage = () => {
             )}
           </div>
 
-          {/* Region Tabs (Vùng Miền) */}
+          {/* Quick Category Chips */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
-            {regions.map(reg => {
-              const active = selectedRegion === reg;
+            {spotCategories.map(cat => {
+              const active = selectedCategory === cat;
               return (
                 <button
-                  key={reg}
-                  onClick={() => setSelectedRegion(reg)}
-                  className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
+                  key={cat}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                     active
                       ? 'bg-sky-600 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
                   }`}
                 >
-                  {reg}
+                  {cat}
                 </button>
               );
             })}
           </div>
 
-          {/* View Mode Switcher (Split | Grid | Map) */}
+          {/* View Mode Switcher */}
           <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-2xl shrink-0 self-end lg:self-auto border border-slate-200/60">
             <button
               onClick={() => setViewMode('split')}
@@ -326,87 +616,54 @@ export const ExplorePage = () => {
               }`}
             >
               <MapIcon className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Bản đồ Live</span>
+              <span className="hidden sm:inline">Bản đồ</span>
             </button>
           </div>
         </div>
 
-        {/* Secondary Filter Row: Categories + Budget + Duration + Sort */}
+        {/* Secondary Filter Row: Region + Sort */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100 text-xs">
-          
-          {/* Categories Pills */}
-          <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 sm:pb-0 no-scrollbar">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
             <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1 hidden sm:inline">
-              Chủ đề:
+              Vùng miền:
             </span>
-            {categories.map(cat => {
-              const active = selectedCategory === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
-                    active
-                      ? 'bg-sky-100 text-sky-900 font-bold border border-sky-300'
-                      : 'bg-white text-slate-600 border border-slate-200/80 hover:border-slate-300 hover:bg-slate-50'
-                  }`}
-                >
-                  {cat}
-                </button>
-              );
-            })}
+            {regions.map(reg => (
+              <button
+                key={reg}
+                onClick={() => setSelectedRegion(reg)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
+                  selectedRegion === reg
+                    ? 'bg-sky-100 text-sky-900 font-bold border border-sky-300'
+                    : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
+                }`}
+              >
+                {reg}
+              </button>
+            ))}
           </div>
 
-          {/* Quick Selectors: Budget + Duration + Sort */}
-          <div className="flex flex-wrap items-center gap-2.5">
-            {/* Budget Selector */}
-            <select
-              value={selectedBudget}
-              onChange={(e) => setSelectedBudget(e.target.value)}
-              className="bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-700 font-semibold px-2.5 py-1.5 rounded-xl outline-none cursor-pointer"
-            >
-              <option value="all">Ngân sách: Tất cả</option>
-              <option value="under3m">Dưới 3 triệu (Tiết kiệm)</option>
-              <option value="3m-6m">3 - 6 triệu (Tiêu chuẩn)</option>
-              <option value="above6m">Trên 6 triệu (Nghỉ dưỡng)</option>
-            </select>
-
-            {/* Duration Selector */}
-            <select
-              value={selectedDuration}
-              onChange={(e) => setSelectedDuration(e.target.value)}
-              className="bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-700 font-semibold px-2.5 py-1.5 rounded-xl outline-none cursor-pointer"
-            >
-              <option value="all">Thời lượng: Tất cả</option>
-              <option value="2d">2 Ngày 1 Đêm</option>
-              <option value="3d">3 Ngày 2 Đêm</option>
-              <option value="4d+">4 Ngày 3 Đêm+</option>
-            </select>
-
-            {/* Sort Selector */}
+          <div className="flex items-center gap-2">
+            <span className="text-slate-500 font-medium">Sắp xếp:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-700 font-semibold px-2.5 py-1.5 rounded-xl outline-none cursor-pointer"
+              className="bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-700 font-semibold px-2.5 py-1.5 rounded-xl outline-none cursor-pointer text-xs"
             >
-              <option value="popular">Sắp xếp: Phổ biến nhất</option>
+              <option value="popular">Phổ biến nhất</option>
               <option value="rating">Đánh giá cao nhất</option>
-              <option value="priceAsc">Giá: Thấp đến Cao</option>
-              <option value="priceDesc">Giá: Cao đến Thấp</option>
+              {userCoords && <option value="nearest">Gần tôi nhất (Radar GPS)</option>}
             </select>
           </div>
-
         </div>
       </div>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          3. MAIN CONTENT: BASED ON VIEW MODE (SPLIT | GRID | FULL MAP)
+          4. MAIN CONTENT: BASED ON VIEW MODE (SPLIT | GRID | FULL MAP)
       ────────────────────────────────────────────────────────────────────────── */}
-
-      {/* Count Indicator */}
       <div className="flex items-center justify-between text-xs text-slate-500 font-medium px-1">
         <span>
-          Hiển thị <strong className="text-slate-900 font-bold">{filteredDestinations.length}</strong> điểm đến phù hợp
+          Hiển thị <strong className="text-slate-900 font-bold">{filteredItems.length}</strong> tọa độ phù hợp
+          {exploreLayer === 'spots' && ' (Cơ sở do người dùng & chủ quán đăng tải)'}
         </span>
         {searchQuery && (
           <button
@@ -422,46 +679,57 @@ export const ExplorePage = () => {
       {viewMode === 'split' && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[650px]">
           
-          {/* Left: Scrollable Destination Cards */}
+          {/* Left: Scrollable Destination / Spot Cards */}
           <div className="lg:col-span-6 space-y-4 max-h-[820px] overflow-y-auto pr-2 sidebar-scrollbar">
-            {filteredDestinations.length === 0 ? (
+            {filteredItems.length === 0 ? (
               <div className="bg-white p-12 rounded-3xl text-center space-y-3 border border-slate-200 shadow-sm">
                 <Compass className="w-12 h-12 text-slate-300 mx-auto" />
                 <h3 className="font-bold text-base text-slate-900">Không tìm thấy địa điểm phù hợp</h3>
-                <p className="text-xs text-slate-500">Hãy thử đổi từ khoá hoặc điều chỉnh lại bộ lọc ngân sách, vùng miền.</p>
+                <p className="text-xs text-slate-500">Hãy thử đổi từ khoá hoặc nhấn "+ Đăng Địa Điểm Của Bạn" để chia sẻ tọa độ mới nhé!</p>
                 <button
-                  onClick={() => { setSearchQuery(''); setSelectedRegion('Tất cả'); setSelectedCategory('Tất cả'); }}
-                  className="px-4 py-2 bg-sky-600 text-white rounded-xl text-xs font-bold hover:bg-sky-700 transition-colors"
+                  onClick={() => setIsAddPlaceModalOpen(true)}
+                  className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer"
                 >
-                  Xem lại tất cả
+                  + Đăng Địa Điểm Mới Ngay
                 </button>
               </div>
             ) : (
-              filteredDestinations.map(item => {
-                const isActive = activePlace?.id === item.id;
-                const isSaved = !!savedDestinations[item.id];
+              filteredItems.map(item => {
+                const isActive = activeItem?.id === item.id;
+                const isSaved = !!savedItems[item.id];
                 return (
                   <div
                     key={item.id}
-                    onClick={() => setActivePlace(item)}
+                    onClick={() => setActiveItem(item)}
                     className={`bg-white rounded-3xl p-4 transition-all cursor-pointer flex flex-col sm:flex-row gap-4 border ${
                       isActive
                         ? 'border-sky-500 ring-2 ring-sky-500/20 shadow-lg scale-[1.01]'
                         : 'border-slate-200/80 hover:border-slate-300 hover:shadow-md'
                     }`}
                   >
-                    {/* Image Thumbnail */}
-                    <div className="relative w-full sm:w-44 h-44 sm:h-auto rounded-2xl overflow-hidden shrink-0">
+                    {/* Thumbnail */}
+                    <div className="relative w-full sm:w-48 h-48 sm:h-auto rounded-2xl overflow-hidden shrink-0">
                       <img
                         src={item.image}
                         alt={item.name}
                         className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                       />
-                      {/* Weather Tag */}
-                      <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-lg bg-black/60 backdrop-blur-md text-[10px] font-semibold text-white flex items-center gap-1">
-                        <Sun className="w-3 h-3 text-amber-300" />
-                        {item.weather}
-                      </span>
+                      {/* Host Verified Badge */}
+                      {item.isLocalSpot && (
+                        <span className="absolute top-2 left-2 px-2 py-0.5 rounded-lg bg-orange-600/90 backdrop-blur-md text-[10px] font-bold text-white flex items-center gap-1 shadow-sm">
+                          <Store className="w-3 h-3 text-amber-200" />
+                          <span>Chủ cơ sở</span>
+                        </span>
+                      )}
+
+                      {/* Distance Tag (if GPS available) */}
+                      {item.distanceKm && (
+                        <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded-lg bg-black/70 backdrop-blur-md text-[10px] font-semibold text-emerald-300 flex items-center gap-1">
+                          <Navigation className="w-3 h-3" />
+                          {item.distanceKm} km
+                        </span>
+                      )}
+
                       {/* Wishlist Heart */}
                       <button
                         onClick={(e) => handleToggleSave(item, e)}
@@ -476,10 +744,10 @@ export const ExplorePage = () => {
                     {/* Details Content */}
                     <div className="flex-1 flex flex-col justify-between space-y-2">
                       <div>
-                        {/* Top Badges */}
+                        {/* Top Category & Rating */}
                         <div className="flex items-center justify-between gap-2">
                           <span className="px-2.5 py-0.5 rounded-md bg-sky-50 text-sky-800 text-[10px] font-bold">
-                            {item.category} • {item.region}
+                            {item.category} • {item.city}
                           </span>
                           <div className="flex items-center gap-1 text-xs font-black text-amber-500">
                             <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
@@ -487,39 +755,75 @@ export const ExplorePage = () => {
                           </div>
                         </div>
 
-                        {/* Title & Tagline */}
-                        <h3 className="font-display font-bold text-base sm:text-lg text-slate-900 mt-1">
+                        {/* Title */}
+                        <h3 className="font-display font-bold text-base sm:text-lg text-slate-900 mt-1 line-clamp-1">
                           {item.name}
                         </h3>
+
+                        {/* Tagline / Address */}
                         <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                          {item.address ? `📍 ${item.address} • ` : ''}
                           {item.tagline}
                         </p>
 
-                        {/* Hash Tags */}
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {item.tags?.slice(0, 3).map((tag, idx) => (
-                            <span key={idx} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
-                              #{tag}
-                            </span>
-                          ))}
-                        </div>
+                        {/* Host owner badge if available */}
+                        {item.ownerName && (
+                          <div className="flex items-center gap-1.5 mt-2 text-[11px] text-slate-600 font-medium">
+                            {item.ownerAvatar ? (
+                              <img src={item.ownerAvatar} alt="" className="w-4 h-4 rounded-full object-cover" />
+                            ) : (
+                              <Store className="w-3.5 h-3.5 text-orange-500" />
+                            )}
+                            <span>Đăng bởi: <strong className="text-slate-800 font-bold">{item.ownerName}</strong></span>
+                            {item.isVerifiedHost && (
+                              <CheckCircle2 className="w-3.5 h-3.5 text-sky-600 shrink-0" title="Đã xác thực" />
+                            )}
+                          </div>
+                        )}
+
+                        {/* Amenities Chips */}
+                        {item.amenities && item.amenities.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {item.amenities.slice(0, 3).map((a, idx) => (
+                              <span key={idx} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
+                                ✓ {a}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
-                      {/* Pricing & Actions */}
-                      <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+                      {/* Pricing, Hotline & Actions */}
+                      <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
                         <div>
-                          <span className="block text-[10px] text-slate-400 font-semibold">{item.duration}</span>
-                          <span className="font-bold text-sm text-sky-700">{item.priceEstimate}</span>
+                          <span className="block text-[10px] text-slate-400 font-semibold">
+                            {item.openHours ? `🕒 ${item.openHours}` : 'Giá dự kiến'}
+                          </span>
+                          <span className="font-bold text-xs sm:text-sm text-sky-700">{item.priceEstimate}</span>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
+                          {/* Call Hotline button if present */}
+                          {item.phoneNumber && (
+                            <a
+                              href={`tel:${item.phoneNumber}`}
+                              onClick={(e) => e.stopPropagation()}
+                              title={`Gọi hotline: ${item.phoneNumber}`}
+                              className="px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center gap-1 transition-colors"
+                            >
+                              <Phone className="w-3 h-3 text-emerald-600" />
+                              <span className="hidden sm:inline">Gọi quán</span>
+                            </a>
+                          )}
+
                           <button
-                            onClick={(e) => { e.stopPropagation(); setDetailModalPlace(item); }}
+                            onClick={(e) => { e.stopPropagation(); setDetailModalItem(item); }}
                             className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1 transition-colors cursor-pointer"
                           >
                             <Eye className="w-3.5 h-3.5" />
                             <span>Chi tiết</span>
                           </button>
+
                           <button
                             onClick={(e) => handlePlanWithAI(item, e)}
                             className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center gap-1 transition-colors shadow-xs cursor-pointer"
@@ -569,229 +873,156 @@ export const ExplorePage = () => {
                     mapLayer === 'satellite' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  Vệ Tinh Night Mode
+                  Vệ Tinh
                 </button>
               </div>
             </div>
 
-            {/* Vietnam Coordinate Graphic Stage */}
-            <div className="relative z-10 my-auto py-8 text-center">
-              {/* Vietnam S-Shape Visual Cluster */}
-              <div className="relative max-w-sm mx-auto h-72 border border-slate-700/60 rounded-3xl bg-slate-800/40 backdrop-blur-xs p-4 flex flex-col justify-between">
-                
-                {/* Visual Radar Rings in Center */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-sky-500/20 pointer-events-none animate-ping" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 rounded-full border border-sky-400/30 pointer-events-none" />
+            {/* Interactive Spotlight Card on Map */}
+            <div className="relative z-10 my-auto py-6">
+              {activeItem ? (
+                <div className="max-w-md mx-auto bg-slate-800/90 backdrop-blur-md p-5 rounded-3xl border border-slate-700 shadow-2xl space-y-3">
+                  <div className="flex items-start gap-3">
+                    <img
+                      src={activeItem.image}
+                      alt={activeItem.name}
+                      className="w-20 h-20 rounded-2xl object-cover shrink-0 border border-slate-700"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1 text-[11px] font-bold text-sky-400">
+                        <MapPin className="w-3.5 h-3.5" />
+                        <span>{activeItem.city} • {activeItem.category}</span>
+                      </div>
+                      <h4 className="font-bold text-sm text-white truncate mt-0.5">{activeItem.name}</h4>
+                      <p className="text-[11px] text-slate-300 line-clamp-2 mt-1">{activeItem.tagline}</p>
+                    </div>
+                  </div>
 
-                {/* North Pin (Hà Giang / Sapa / Hạ Long) */}
-                <div className="flex items-center justify-around">
-                  <button
-                    onClick={() => setActivePlace(destinations.find(d => d.id === 'dest-3') || destinations[0])}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                      activePlace?.id === 'dest-3'
-                        ? 'bg-sky-500 text-white shadow-lg ring-2 ring-sky-300'
-                        : 'bg-slate-700/80 text-slate-300 hover:bg-slate-600'
-                    }`}
-                  >
-                    <MapPin className="w-3.5 h-3.5" />
-                    <span>Hà Giang</span>
-                  </button>
-                  <button
-                    onClick={() => setActivePlace(destinations.find(d => d.id === 'dest-5') || destinations[0])}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                      activePlace?.id === 'dest-5'
-                        ? 'bg-sky-500 text-white shadow-lg ring-2 ring-sky-300'
-                        : 'bg-slate-700/80 text-slate-300 hover:bg-slate-600'
-                    }`}
-                  >
-                    <MapPin className="w-3.5 h-3.5" />
-                    <span>Hạ Long</span>
-                  </button>
-                </div>
-
-                {/* Central Pin (Đà Nẵng / Huế / Quy Nhơn) */}
-                <div className="flex items-center justify-center gap-3">
-                  <button
-                    onClick={() => setActivePlace(destinations.find(d => d.id === 'dest-1') || destinations[0])}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                      activePlace?.id === 'dest-1'
-                        ? 'bg-amber-500 text-white shadow-lg ring-2 ring-amber-300'
-                        : 'bg-slate-700/80 text-slate-300 hover:bg-slate-600'
-                    }`}
-                  >
-                    <MapPin className="w-4 h-4 fill-current" />
-                    <span>Đà Nẵng - Hội An</span>
-                  </button>
-                </div>
-
-                {/* South Pin (Phú Quốc / Mũi Né / Cần Thơ) */}
-                <div className="flex items-center justify-around">
-                  <button
-                    onClick={() => setActivePlace(destinations.find(d => d.id === 'dest-2') || destinations[0])}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                      activePlace?.id === 'dest-2'
-                        ? 'bg-sky-500 text-white shadow-lg ring-2 ring-sky-300'
-                        : 'bg-slate-700/80 text-slate-300 hover:bg-slate-600'
-                    }`}
-                  >
-                    <MapPin className="w-3.5 h-3.5" />
-                    <span>Phú Quốc</span>
-                  </button>
-                  <button
-                    onClick={() => setActivePlace(destinations.find(d => d.id === 'dest-8') || destinations[0])}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${
-                      activePlace?.id === 'dest-8'
-                        ? 'bg-sky-500 text-white shadow-lg ring-2 ring-sky-300'
-                        : 'bg-slate-700/80 text-slate-300 hover:bg-slate-600'
-                    }`}
-                  >
-                    <MapPin className="w-3.5 h-3.5" />
-                    <span>Đà Lạt</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Floating Active Details Popover */}
-              {activePlace && (
-                <div className="mt-4 max-w-md mx-auto bg-slate-800/95 backdrop-blur-xl p-4 rounded-2xl border border-slate-700 text-left space-y-2 shadow-2xl">
-                  <div className="flex items-center justify-between">
+                  {/* Coordinates & Phone */}
+                  <div className="grid grid-cols-2 gap-2 text-xs bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/60 font-semibold text-slate-300">
                     <div>
-                      <h4 className="font-bold text-sm text-white">{activePlace.name}</h4>
-                      <p className="text-[11px] text-slate-400 font-mono">
-                        GPS: {activePlace.coordinates.lat.toFixed(4)}, {activePlace.coordinates.lng.toFixed(4)}
-                      </p>
+                      <span className="block text-[10px] text-slate-400 font-medium">Khoảng giá / Giờ</span>
+                      <span className="text-amber-300">{activeItem.priceEstimate}</span>
                     </div>
-                    <span className="text-xs font-bold text-sky-400">{activePlace.priceEstimate}</span>
+                    <div>
+                      <span className="block text-[10px] text-slate-400 font-medium">Hotline liên hệ</span>
+                      <span className="text-emerald-400">{activeItem.phoneNumber || 'Cập nhật sau'}</span>
+                    </div>
                   </div>
 
-                  <p className="text-xs text-slate-300 line-clamp-2">{activePlace.aiHighlights}</p>
-
-                  <div className="pt-2 flex items-center justify-between text-xs border-t border-slate-700/60">
+                  {/* Actions on Active Item */}
+                  <div className="flex items-center justify-between gap-2 pt-1">
                     <button
-                      onClick={(e) => handleCopyGPS(activePlace, e)}
-                      className="text-slate-400 hover:text-white flex items-center gap-1 text-[11px] cursor-pointer"
+                      onClick={(e) => handleOpenGoogleMaps(activeItem, e)}
+                      className="flex-1 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                     >
-                      <Copy className="w-3 h-3" />
-                      Sao chép GPS
+                      <ExternalLink className="w-3.5 h-3.5 text-sky-300" />
+                      <span>Chỉ đường Maps</span>
                     </button>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setDetailModalPlace(activePlace)}
-                        className="px-2.5 py-1 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-[11px] font-semibold cursor-pointer"
-                      >
-                        Xem Chi Tiết
-                      </button>
-                      <button
-                        onClick={(e) => handlePlanWithAI(activePlace, e)}
-                        className="px-3 py-1 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-[11px] font-bold flex items-center gap-1 cursor-pointer"
-                      >
-                        <Sparkles className="w-3 h-3 text-amber-200" />
-                        Tạo Tour
-                      </button>
-                    </div>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setDetailModalItem(activeItem); }}
+                      className="flex-1 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Xem đầy đủ</span>
+                    </button>
                   </div>
+                </div>
+              ) : (
+                <div className="text-center text-slate-400 text-xs">
+                  Chọn một thẻ địa điểm bên trái để định vị GPS trên bản đồ
                 </div>
               )}
             </div>
 
-            {/* Bottom Status Bar */}
-            <div className="relative z-10 flex items-center justify-between text-[11px] text-slate-400 bg-slate-800/80 p-3 rounded-xl border border-slate-700/50">
+            {/* Bottom Status Ribbon */}
+            <div className="relative z-10 flex items-center justify-between text-[11px] text-slate-400 bg-slate-800/80 backdrop-blur-md p-3 rounded-2xl border border-slate-700/80">
               <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                Vệ tinh định vị thời gian thực
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Tọa độ đã đối soát CSDL Wayfare System</span>
               </span>
-              <span className="text-amber-400 font-bold">★ AI Routing Enabled</span>
+              <button
+                onClick={(e) => handleCopyGPS(activeItem, e)}
+                className="text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1"
+              >
+                <Copy className="w-3 h-3" />
+                <span>Sao chép GPS</span>
+              </button>
             </div>
           </div>
 
         </div>
       )}
 
-      {/* ─────────────────── B. GRID CARDS VIEW ─────────────────── */}
+      {/* ─────────────────── B. GRID VIEW ─────────────────── */}
       {viewMode === 'grid' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredDestinations.map(item => {
-            const isSaved = !!savedDestinations[item.id];
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredItems.map(item => {
+            const isSaved = !!savedItems[item.id];
             return (
               <div
                 key={item.id}
-                onClick={() => setDetailModalPlace(item)}
-                className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between cursor-pointer group"
+                onClick={() => setDetailModalItem(item)}
+                className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-xs hover:shadow-xl hover:border-sky-300 transition-all duration-300 flex flex-col justify-between cursor-pointer group"
               >
-                <div>
-                  {/* Card Image */}
-                  <div className="relative w-full h-56 overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  {item.isLocalSpot && (
+                    <span className="absolute top-3 left-3 px-2.5 py-1 rounded-xl bg-orange-600/95 backdrop-blur-md text-[10px] font-extrabold text-white flex items-center gap-1 shadow-md">
+                      <Store className="w-3 h-3 text-amber-200" />
+                      <span>Cơ sở bản địa</span>
+                    </span>
+                  )}
+                  <button
+                    onClick={(e) => handleToggleSave(item, e)}
+                    className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${
+                      isSaved ? 'bg-rose-500 text-white shadow-md' : 'bg-black/35 text-white hover:bg-black/60'
+                    }`}
+                  >
+                    <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+                  </button>
+                  <span className="absolute bottom-2 left-3 px-2.5 py-0.5 rounded-lg bg-black/60 backdrop-blur-md text-[10px] font-semibold text-white">
+                    📍 {item.city}
+                  </span>
+                </div>
 
-                    {/* Top Floating Badges */}
-                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between">
-                      <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-[11px] font-extrabold text-slate-900 shadow-sm">
-                        {item.region}
+                <div className="p-4 space-y-2 flex-1 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between text-xs mb-1">
+                      <span className="text-[11px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md">
+                        {item.category}
                       </span>
-                      <button
-                        onClick={(e) => handleToggleSave(item, e)}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all ${
-                          isSaved ? 'bg-rose-500 text-white shadow-md' : 'bg-black/35 text-white hover:bg-black/60'
-                        }`}
-                      >
-                        <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
-                      </button>
-                    </div>
-
-                    {/* Bottom Floating Info */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
-                      <span className="flex items-center gap-1 font-semibold">
-                        <Sun className="w-3.5 h-3.5 text-amber-300" />
-                        {item.weather}
-                      </span>
-                      <span className="flex items-center gap-1 font-black text-amber-400">
-                        <Star className="w-3.5 h-3.5 fill-current" />
+                      <span className="flex items-center gap-1 font-bold text-amber-500">
+                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
                         {item.rating}
                       </span>
                     </div>
-                  </div>
 
-                  {/* Body Content */}
-                  <div className="p-5 space-y-2.5">
-                    <span className="text-[10px] uppercase font-bold text-sky-600 tracking-wider">
-                      {item.category}
-                    </span>
-                    <h3 className="font-display font-bold text-lg text-slate-900 group-hover:text-sky-600 transition-colors">
+                    <h3 className="font-bold text-base text-slate-900 group-hover:text-sky-700 transition-colors line-clamp-1">
                       {item.name}
                     </h3>
-                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-slate-500 line-clamp-2 mt-1">
                       {item.tagline}
                     </p>
+                  </div>
 
-                    <div className="flex flex-wrap gap-1 pt-1">
-                      {item.tags?.slice(0, 3).map((tag, idx) => (
-                        <span key={idx} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-medium">
-                          #{tag}
-                        </span>
-                      ))}
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <div>
+                      <span className="block text-[10px] text-slate-400 font-semibold">Khoảng giá</span>
+                      <span className="font-bold text-xs text-slate-900">{item.priceEstimate}</span>
                     </div>
+                    <button
+                      onClick={(e) => handlePlanWithAI(item, e)}
+                      className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center gap-1 shadow-xs"
+                    >
+                      <Sparkles className="w-3 h-3 text-amber-200" />
+                      <span>Tour AI</span>
+                    </button>
                   </div>
-                </div>
-
-                {/* Card Footer */}
-                <div className="p-5 pt-3 border-t border-slate-100 flex items-center justify-between">
-                  <div>
-                    <span className="block text-[10px] text-slate-400 font-semibold">{item.duration}</span>
-                    <span className="font-bold text-sm text-sky-700">{item.priceEstimate}</span>
-                  </div>
-
-                  <button
-                    onClick={(e) => handlePlanWithAI(item, e)}
-                    className="px-3 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold flex items-center gap-1 transition-all shadow-xs cursor-pointer"
-                  >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-200" />
-                    <span>Lập Tour</span>
-                  </button>
                 </div>
               </div>
             );
@@ -801,283 +1032,457 @@ export const ExplorePage = () => {
 
       {/* ─────────────────── C. FULL MAP VIEW ─────────────────── */}
       {viewMode === 'map' && (
-        <div className="bg-slate-950 rounded-3xl p-6 relative overflow-hidden border border-slate-800 text-white shadow-2xl min-h-[650px] flex flex-col justify-between">
-          <div className="relative z-10 flex items-center justify-between bg-slate-900/90 backdrop-blur-md p-4 rounded-2xl border border-slate-800">
-            <div>
-              <h3 className="font-bold text-base text-white">Toàn Cảnh Bản Đồ Check-In Việt Nam</h3>
-              <p className="text-xs text-slate-400">Bấm vào các điểm ghim để xem chi tiết và tạo lịch trình AI tức thì.</p>
+        <div className="bg-slate-950 rounded-3xl p-6 relative overflow-hidden min-h-[600px] border border-slate-800 text-white shadow-2xl flex flex-col justify-between">
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 p-4 rounded-2xl border border-slate-800">
+            <div className="flex items-center gap-2">
+              <Navigation className="w-5 h-5 text-sky-400 animate-pulse" />
+              <div>
+                <h3 className="font-bold text-sm text-white">Bản Đồ Toàn Cảnh Tọa Độ GPS Việt Nam</h3>
+                <p className="text-[11px] text-slate-400">Hiển thị {filteredItems.length} địa điểm trên mạng lưới Wayfare</p>
+              </div>
             </div>
             <button
               onClick={() => setViewMode('split')}
-              className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-all"
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-white transition-colors"
             >
-              Chuyển về danh sách
+              Quay lại danh sách
             </button>
           </div>
 
-          {/* Interactive Grid Map representation */}
-          <div className="relative z-10 my-auto py-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredDestinations.map(item => (
+          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 my-8">
+            {filteredItems.slice(0, 8).map(spot => (
               <div
-                key={item.id}
-                onClick={() => setDetailModalPlace(item)}
-                className="bg-slate-900/80 hover:bg-slate-800/90 p-4 rounded-2xl border border-slate-700/80 hover:border-sky-500/80 transition-all cursor-pointer group space-y-2"
+                key={spot.id}
+                onClick={() => setDetailModalItem(spot)}
+                className="bg-slate-900/80 backdrop-blur-md p-3.5 rounded-2xl border border-slate-700/80 hover:border-sky-400 transition-all cursor-pointer space-y-2 hover:scale-105"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-sky-400 group-hover:scale-125 transition-transform" />
-                    <h4 className="font-bold text-sm text-white group-hover:text-sky-300 transition-colors">{item.name}</h4>
+                <div className="flex items-center gap-2">
+                  <img src={spot.image} alt="" className="w-10 h-10 rounded-xl object-cover" />
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-xs font-bold text-white truncate">{spot.name}</h4>
+                    <span className="text-[10px] text-sky-300">📍 {spot.city}</span>
                   </div>
-                  <span className="text-xs font-bold text-amber-400">{item.rating}★</span>
                 </div>
-                <p className="text-[11px] text-slate-400 line-clamp-1">{item.region} • {item.duration}</p>
-                <span className="block text-xs font-bold text-sky-400">{item.priceEstimate}</span>
+                <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-slate-800">
+                  <span>{spot.priceEstimate}</span>
+                  <span className="text-amber-400 font-bold">★ {spot.rating}</span>
+                </div>
               </div>
             ))}
           </div>
 
           <div className="relative z-10 text-center text-xs text-slate-400">
-            Hệ thống GPS AI tự động kết nối và đo khoảng cách di chuyển giữa các điểm đến.
+            Chạm vào bất kỳ tọa độ nào để xem thông tin chi tiết, hotline đặt phòng/bàn và chỉ đường trực tiếp!
           </div>
         </div>
       )}
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          4. CURATED SEASONAL COLLECTIONS (CHỦ ĐỀ DU LỊCH ĐỘT PHÁ)
+          5. MODAL: "+ ĐĂNG ĐỊA ĐIỂM / CƠ SỞ KINH DOANH MỚI" (FOR HOSTS & USERS)
       ────────────────────────────────────────────────────────────────────────── */}
-      <div className="space-y-4 pt-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-display text-xl sm:text-2xl font-bold text-slate-900">
-              Bộ Sưu Tập Du Lịch Theo Mùa
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-500">
-              Tuyển tập hành trình được các travel blogger và AI đề xuất nhiều nhất
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {curatedThemes.map(theme => {
-            const Icon = theme.icon;
-            return (
-              <div
-                key={theme.id}
-                onClick={theme.filterAction}
-                className={`rounded-3xl p-6 text-white bg-gradient-to-br ${theme.gradient} shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col justify-between min-h-[190px] relative overflow-hidden group`}
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform" />
-                
-                <div className="relative z-10 space-y-2">
-                  <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-md">
-                    <Icon className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="font-display font-bold text-base sm:text-lg text-white pt-2">
-                    {theme.title}
-                  </h3>
-                  <p className="text-xs text-white/80 line-clamp-2">
-                    {theme.description}
-                  </p>
-                </div>
-
-                <div className="relative z-10 pt-4 flex items-center justify-between text-xs font-bold border-t border-white/20">
-                  <span className="text-white/90">{theme.count}</span>
-                  <span className="flex items-center gap-1 text-white group-hover:translate-x-1 transition-transform">
-                    Khám phá ngay <ChevronRight className="w-4 h-4" />
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* ──────────────────────────────────────────────────────────────────────────
-          5. DESTINATION DETAIL MODAL (MODAL CHI TIẾT SIÊU ĐẦY ĐỦ)
-      ────────────────────────────────────────────────────────────────────────── */}
-      {detailModalPlace && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-          {/* Backdrop */}
-          <div
-            onClick={() => setDetailModalPlace(null)}
-            className="fixed inset-0 bg-slate-950/75 backdrop-blur-md transition-opacity"
-          />
-
-          {/* Modal Container */}
-          <div className="relative z-10 w-full max-w-4xl bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200 my-auto animate-in zoom-in-95 duration-200 max-h-[90vh] flex flex-col">
+      {isAddPlaceModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-8 max-h-[90vh] flex flex-col">
             
-            {/* Modal Header Gallery */}
-            <div className="relative h-64 sm:h-80 w-full shrink-0 overflow-hidden bg-slate-900">
-              <img
-                src={detailModalPlace.gallery?.[activeGalleryIdx] || detailModalPlace.image}
-                alt={detailModalPlace.name}
-                className="w-full h-full object-cover transition-all duration-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-
-              {/* Close Button */}
+            {/* Modal Header */}
+            <div className="p-6 bg-gradient-to-r from-orange-600 via-amber-600 to-amber-700 text-white flex items-center justify-between shrink-0">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/20 text-white text-[10px] font-bold">
+                  <Store className="w-3 h-3 text-amber-200" />
+                  <span>Dành Cho Doanh Nghiệp & Người Bản Địa</span>
+                </div>
+                <h3 className="font-display font-extrabold text-lg sm:text-xl text-white">
+                  Đăng Tải Tọa Độ / Điểm Dừng Chân Của Bạn
+                </h3>
+                <p className="text-xs text-amber-100">
+                  Thu hút hàng ngàn du khách và phượt thủ đến với cơ sở của bạn hoàn toàn miễn phí.
+                </p>
+              </div>
               <button
-                onClick={() => setDetailModalPlace(null)}
-                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/50 hover:bg-black/80 text-white flex items-center justify-center backdrop-blur-md transition-all cursor-pointer"
+                onClick={() => setIsAddPlaceModalOpen(false)}
+                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
-
-              {/* Gallery Thumbnails */}
-              {detailModalPlace.gallery && detailModalPlace.gallery.length > 1 && (
-                <div className="absolute bottom-4 right-4 flex items-center gap-2">
-                  {detailModalPlace.gallery.map((img, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setActiveGalleryIdx(idx)}
-                      className={`w-12 h-12 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
-                        activeGalleryIdx === idx ? 'border-sky-400 scale-105' : 'border-white/50 opacity-70'
-                      }`}
-                    >
-                      <img src={img} alt="thumb" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Title Overlay */}
-              <div className="absolute bottom-4 left-6 right-28 text-white space-y-1">
-                <span className="px-3 py-1 rounded-full bg-sky-500/90 text-white font-extrabold text-[10px] uppercase tracking-wider">
-                  {detailModalPlace.category} • {detailModalPlace.region}
-                </span>
-                <h2 className="font-display text-xl sm:text-3xl font-extrabold text-white">
-                  {detailModalPlace.name}
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-200 line-clamp-1">{detailModalPlace.tagline}</p>
-              </div>
             </div>
 
-            {/* Modal Body (Scrollable) */}
-            <div className="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1">
+            {/* Modal Form Body */}
+            <form onSubmit={handleAddPlaceSubmit} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs">
               
-              {/* Quick Specs Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80 text-xs">
-                <div>
-                  <span className="block text-[10px] text-slate-400 font-semibold uppercase">Đánh giá</span>
-                  <span className="font-extrabold text-slate-900 flex items-center gap-1 text-sm mt-0.5">
-                    <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                    {detailModalPlace.rating} ({detailModalPlace.reviewsCount})
-                  </span>
+              {/* Name */}
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">Tên cơ sở / Địa điểm <span className="text-rose-500">*</span></label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ví dụ: Homestay Hoàng Hôn Bản Lô Lô, Tiệm Cafe Mây..."
+                  value={newPlaceForm.name}
+                  onChange={(e) => setNewPlaceForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none text-slate-900 font-semibold"
+                />
+              </div>
+
+              {/* Category & City */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Phân loại cơ sở</label>
+                  <select
+                    value={newPlaceForm.categoryName}
+                    onChange={(e) => setNewPlaceForm(prev => ({ ...prev, categoryName: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-semibold text-slate-800 bg-white"
+                  >
+                    <option value="Quán Cafe & Săn Mây">Quán Cafe & Săn Mây</option>
+                    <option value="Homestay & Nghỉ Dưỡng">Homestay & Nghỉ Dưỡng</option>
+                    <option value="Ẩm Thực & Đặc Sản">Ẩm Thực & Đặc Sản</option>
+                    <option value="Trải Nghiệm & Hoạt Động">Trải Nghiệm & Hoạt Động</option>
+                    <option value="Danh Lam & Thắng Cảnh">Danh Lam & Thắng Cảnh</option>
+                  </select>
                 </div>
-                <div>
-                  <span className="block text-[10px] text-slate-400 font-semibold uppercase">Thời lượng lý tưởng</span>
-                  <span className="font-extrabold text-slate-900 text-sm mt-0.5 block">{detailModalPlace.duration}</span>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Tỉnh / Thành phố</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Ví dụ: Đà Lạt, Hà Giang, Đà Nẵng..."
+                    value={newPlaceForm.city}
+                    onChange={(e) => setNewPlaceForm(prev => ({ ...prev, city: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-semibold text-slate-800"
+                  />
                 </div>
-                <div>
-                  <span className="block text-[10px] text-slate-400 font-semibold uppercase">Mùa đẹp nhất</span>
-                  <span className="font-extrabold text-sky-700 text-xs mt-0.5 block">{detailModalPlace.bestSeason}</span>
+              </div>
+
+              {/* Address */}
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">Địa chỉ cụ thể</label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Số 31 Hẻm Sào Nam, Phường 11 hoặc Bản Lô Lô Chải..."
+                  value={newPlaceForm.address}
+                  onChange={(e) => setNewPlaceForm(prev => ({ ...prev, address: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-semibold text-slate-800"
+                />
+              </div>
+
+              {/* GPS Coordinates with Quick Fetch */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="font-bold text-slate-700">Tọa độ Vĩ độ (Latitude)</label>
+                    <button
+                      type="button"
+                      onClick={handleGetLocationForForm}
+                      className="text-[11px] text-sky-600 font-bold hover:underline flex items-center gap-1"
+                    >
+                      <MapPin className="w-3 h-3" />
+                      Lấy GPS tự động
+                    </button>
+                  </div>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="Ví dụ: 11.9404"
+                    value={newPlaceForm.latitude}
+                    onChange={(e) => setNewPlaceForm(prev => ({ ...prev, latitude: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-semibold text-slate-800"
+                  />
                 </div>
-                <div>
-                  <span className="block text-[10px] text-slate-400 font-semibold uppercase">Chi phí dự kiến</span>
-                  <span className="font-extrabold text-emerald-700 text-sm mt-0.5 block">{detailModalPlace.priceEstimate}</span>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Tọa độ Kinh độ (Longitude)</label>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="Ví dụ: 108.4583"
+                    value={newPlaceForm.longitude}
+                    onChange={(e) => setNewPlaceForm(prev => ({ ...prev, longitude: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-semibold text-slate-800"
+                  />
+                </div>
+              </div>
+
+              {/* Phone, Open Hours, Price Range */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Hotline / Zalo đặt chỗ</label>
+                  <input
+                    type="tel"
+                    placeholder="09xx xxx xxx"
+                    value={newPlaceForm.phoneNumber}
+                    onChange={(e) => setNewPlaceForm(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-semibold text-slate-800"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Giờ mở cửa</label>
+                  <input
+                    type="text"
+                    placeholder="07:00 - 22:30"
+                    value={newPlaceForm.openHours}
+                    onChange={(e) => setNewPlaceForm(prev => ({ ...prev, openHours: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-semibold text-slate-800"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-slate-700">Khoảng giá</label>
+                  <input
+                    type="text"
+                    placeholder="45.000đ - 85.000đ"
+                    value={newPlaceForm.priceRange}
+                    onChange={(e) => setNewPlaceForm(prev => ({ ...prev, priceRange: e.target.value }))}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-semibold text-slate-800"
+                  />
+                </div>
+              </div>
+
+              {/* Amenities Selector */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700">Tiện ích nổi bật tại cơ sở</label>
+                <div className="flex flex-wrap gap-2">
+                  {availableAmenityOptions.map(amenity => {
+                    const selected = newPlaceForm.amenities.includes(amenity);
+                    return (
+                      <button
+                        type="button"
+                        key={amenity}
+                        onClick={() => toggleAmenity(amenity)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer border ${
+                          selected
+                            ? 'bg-orange-50 text-orange-800 border-orange-300 font-bold'
+                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                        }`}
+                      >
+                        {selected ? '✓ ' : '+ '} {amenity}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Image URL & Quick Suggestions */}
+              <div className="space-y-1.5">
+                <label className="font-bold text-slate-700">Link ảnh bìa cơ sở</label>
+                <input
+                  type="url"
+                  placeholder="https://images.unsplash.com/photo-..."
+                  value={newPlaceForm.coverImageUrl}
+                  onChange={(e) => setNewPlaceForm(prev => ({ ...prev, coverImageUrl: e.target.value }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-semibold text-slate-800"
+                />
+                <div className="flex items-center gap-2 pt-1 text-[11px] text-slate-500">
+                  <span>Hoặc chọn ảnh mẫu nhanh:</span>
+                  {suggestedCoverImages.map((s, idx) => (
+                    <button
+                      type="button"
+                      key={idx}
+                      onClick={() => setNewPlaceForm(prev => ({ ...prev, coverImageUrl: s.url }))}
+                      className="px-2 py-0.5 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold"
+                    >
+                      {s.label}
+                    </button>
+                  ))}
                 </div>
               </div>
 
               {/* Description */}
-              <div className="space-y-2">
-                <h4 className="font-display font-bold text-base text-slate-900">Giới thiệu & Trải nghiệm tổng quan</h4>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal">
-                  {detailModalPlace.description}
-                </p>
+              <div className="space-y-1">
+                <label className="font-bold text-slate-700">Mô tả & Điểm đặc sắc thu hút du khách</label>
+                <textarea
+                  rows={3}
+                  placeholder="Kể về view mây, đồ uống đặc trưng, không gian chụp ảnh hoặc câu chuyện của cơ sở..."
+                  value={newPlaceForm.description}
+                  onChange={(e) => setNewPlaceForm(prev => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:border-orange-500 outline-none font-normal text-slate-800 leading-relaxed"
+                />
               </div>
 
-              {/* Top Attractions Checklist */}
-              {detailModalPlace.topAttractions && (
-                <div className="space-y-3">
-                  <h4 className="font-display font-bold text-base text-slate-900 flex items-center gap-2">
-                    <Camera className="w-4 h-4 text-sky-600" />
-                    Địa Điểm Check-In & Hoạt Động Nổi Bật
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {detailModalPlace.topAttractions.map((act, i) => (
-                      <div key={i} className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-1">
-                        <div className="flex items-center justify-between text-xs font-bold text-slate-900">
-                          <span>{act.name}</span>
-                          <span className="text-[10px] font-normal text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md">{act.time}</span>
-                        </div>
-                        <p className="text-[11px] text-slate-500 italic">💡 {act.tip}</p>
-                      </div>
-                    ))}
+              {/* Submit Buttons */}
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsAddPlaceModalOpen(false)}
+                  className="px-5 py-2.5 rounded-xl text-slate-600 font-bold hover:bg-slate-100 transition-colors"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingPlace}
+                  className="px-6 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-extrabold flex items-center gap-2 shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
+                >
+                  {isSubmittingPlace ? (
+                    <span>Đang tải lên...</span>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Xác nhận & Đăng Tải Ngay</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      )}
+
+      {/* ──────────────────────────────────────────────────────────────────────────
+          6. MODAL: CHI TIẾT ĐỊA ĐIỂM (DETAIL MODAL)
+      ────────────────────────────────────────────────────────────────────────── */}
+      {detailModalItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fade-in overflow-y-auto">
+          <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-8 max-h-[90vh] flex flex-col">
+            
+            {/* Modal Image Header */}
+            <div className="relative h-64 sm:h-72 w-full overflow-hidden shrink-0">
+              <img
+                src={detailModalItem.image}
+                alt={detailModalItem.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              
+              <button
+                onClick={() => setDetailModalItem(null)}
+                className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-md transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="absolute bottom-4 left-6 right-6 text-white space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-md bg-white/20 backdrop-blur-md text-xs font-bold">
+                    {detailModalItem.category} • {detailModalItem.city}
+                  </span>
+                  <div className="flex items-center gap-1 text-amber-300 font-bold text-xs">
+                    <Star className="w-3.5 h-3.5 fill-current" />
+                    <span>{detailModalItem.rating}</span>
                   </div>
+                </div>
+                <h3 className="font-display font-bold text-xl sm:text-2xl text-white">
+                  {detailModalItem.name}
+                </h3>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-5 flex-1 text-xs">
+              
+              {/* Host & Merchant Profile Banner if available */}
+              {detailModalItem.ownerName && (
+                <div className="p-3.5 rounded-2xl bg-orange-50 border border-orange-200/80 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={detailModalItem.ownerAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
+                      alt=""
+                      className="w-10 h-10 rounded-full object-cover border-2 border-orange-300"
+                    />
+                    <div>
+                      <div className="flex items-center gap-1 font-bold text-slate-900 text-sm">
+                        <span>{detailModalItem.ownerName}</span>
+                        {detailModalItem.isVerifiedHost && (
+                          <CheckCircle2 className="w-4 h-4 text-sky-600" title="Chủ cơ sở uy tín đã xác thực" />
+                        )}
+                      </div>
+                      <span className="text-slate-500 text-[11px]">{detailModalItem.ownerHandle || '@local_host'} • Chủ cơ sở bản địa</span>
+                    </div>
+                  </div>
+
+                  {detailModalItem.phoneNumber && (
+                    <a
+                      href={`tel:${detailModalItem.phoneNumber}`}
+                      className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center gap-1.5 shadow-sm"
+                    >
+                      <Phone className="w-3.5 h-3.5" />
+                      <span>Gọi đặt chỗ</span>
+                    </a>
+                  )}
                 </div>
               )}
 
-              {/* Specialties & Food */}
-              {detailModalPlace.specialties && (
-                <div className="space-y-2.5">
-                  <h4 className="font-display font-bold text-base text-slate-900 flex items-center gap-2">
-                    <Utensils className="w-4 h-4 text-amber-500" />
-                    Ẩm Thực Đặc Sản Nhất Định Phải Thử
-                  </h4>
+              {/* Quick Info Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <div>
+                  <span className="block text-[10px] text-slate-400 font-semibold">Giờ mở cửa</span>
+                  <span className="font-bold text-slate-800 text-xs">{detailModalItem.openHours || '07:00 - 22:00'}</span>
+                </div>
+                <div>
+                  <span className="block text-[10px] text-slate-400 font-semibold">Khoảng giá dự kiến</span>
+                  <span className="font-bold text-sky-700 text-xs">{detailModalItem.priceEstimate}</span>
+                </div>
+                <div>
+                  <span className="block text-[10px] text-slate-400 font-semibold">Hotline liên hệ</span>
+                  <span className="font-bold text-slate-800 text-xs">{detailModalItem.phoneNumber || 'Đang cập nhật'}</span>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1.5">
+                <h4 className="font-bold text-sm text-slate-900">Giới thiệu & Điểm đặc sắc</h4>
+                <p className="text-slate-600 leading-relaxed text-xs">
+                  {detailModalItem.tagline || detailModalItem.description}
+                </p>
+                {detailModalItem.address && (
+                  <p className="text-slate-500 italic text-[11px] pt-1">
+                    📍 Địa chỉ: {detailModalItem.address}
+                  </p>
+                )}
+              </div>
+
+              {/* Amenities */}
+              {detailModalItem.amenities && detailModalItem.amenities.length > 0 && (
+                <div className="space-y-2">
+                  <h4 className="font-bold text-sm text-slate-900">Tiện ích & Điểm nổi bật</h4>
                   <div className="flex flex-wrap gap-2">
-                    {detailModalPlace.specialties.map((food, i) => (
-                      <span key={i} className="px-3 py-1.5 rounded-xl bg-amber-50 text-amber-900 text-xs font-bold border border-amber-200/80">
-                        🥢 {food}
+                    {detailModalItem.amenities.map((a, i) => (
+                      <span key={i} className="px-3 py-1 rounded-xl bg-sky-50 text-sky-800 font-semibold border border-sky-200/80">
+                        ✓ {a}
                       </span>
                     ))}
                   </div>
                 </div>
               )}
 
-              {/* Expert Advice */}
-              {detailModalPlace.expertTips && (
-                <div className="p-4 rounded-2xl bg-sky-50 border border-sky-100 text-xs space-y-1">
-                  <span className="font-bold text-sky-900 flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-sky-600" />
-                    Lời khuyên & Lưu ý từ Chuyên gia du lịch Wayfare:
-                  </span>
-                  <p className="text-sky-800 leading-relaxed">
-                    {detailModalPlace.expertTips}
-                  </p>
-                </div>
-              )}
-
             </div>
 
             {/* Modal Footer Controls */}
-            <div className="p-5 sm:p-6 border-t border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-3 shrink-0">
-              <div className="flex items-center gap-2 text-xs">
+            <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50 flex flex-wrap items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={(e) => handleCopyGPS(detailModalPlace, e)}
+                  onClick={(e) => handleOpenGoogleMaps(detailModalItem, e)}
+                  className="px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold hover:bg-slate-100 flex items-center gap-1.5 transition-colors cursor-pointer"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-sky-600" />
+                  <span>Google Maps</span>
+                </button>
+                <button
+                  onClick={(e) => handleCopyGPS(detailModalItem, e)}
                   className="px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-700 font-semibold hover:bg-slate-100 flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <Copy className="w-3.5 h-3.5" />
-                  Sao chép tọa độ
-                </button>
-                <button
-                  onClick={(e) => handleToggleSave(detailModalPlace, e)}
-                  className={`px-3 py-2 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer ${
-                    savedDestinations[detailModalPlace.id]
-                      ? 'bg-rose-50 border-rose-200 text-rose-600 font-bold'
-                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  <Heart className={`w-3.5 h-3.5 ${savedDestinations[detailModalPlace.id] ? 'fill-current' : ''}`} />
-                  {savedDestinations[detailModalPlace.id] ? 'Đã lưu' : 'Lưu lại'}
+                  <span>Copy GPS</span>
                 </button>
               </div>
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setDetailModalPlace(null)}
+                  onClick={() => setDetailModalItem(null)}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
                 >
                   Đóng
                 </button>
                 <button
                   onClick={(e) => {
-                    handlePlanWithAI(detailModalPlace, e);
-                    setDetailModalPlace(null);
+                    handlePlanWithAI(detailModalItem, e);
+                    setDetailModalItem(null);
                   }}
-                  className="px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs flex items-center gap-2 shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer shimmer-effect"
+                  className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs flex items-center gap-2 shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 text-amber-200" />
-                  <span>Lập Tour AI Với Điểm Này</span>
+                  <span>Lập Tour AI Điểm Này</span>
                 </button>
               </div>
             </div>

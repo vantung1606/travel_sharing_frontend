@@ -9,7 +9,7 @@ import {
   INITIAL_USER_LIST,
   INITIAL_REPORTS
 } from '../mock/data';
-import { notificationApi, userApi, INITIAL_MOCK_NOTIFICATIONS } from '../services/api';
+import { notificationApi, userApi, placeApi, INITIAL_MOCK_NOTIFICATIONS } from '../services/api';
 
 const AppContext = createContext();
 
@@ -94,9 +94,56 @@ export const AppProvider = ({ children }) => {
   const [posts, setPosts] = useState(INITIAL_POSTS);
   const [itineraries, setItineraries] = useState(INITIAL_ITINERARIES);
   const [pendingPlaces, setPendingPlaces] = useState(INITIAL_PENDING_PLACES);
+  const [places, setPlaces] = useState([]);
   const [users, setUsers] = useState(INITIAL_USER_LIST);
   const [reports, setReports] = useState(INITIAL_REPORTS);
   const [stats, setStats] = useState(ADMIN_STATS);
+
+  // Fetch places from backend on mount
+  const fetchPlaces = useCallback(async (filters = {}) => {
+    try {
+      const data = await placeApi.getPlaces(filters);
+      if (data && data.length > 0) {
+        setPlaces(data);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch places:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPlaces();
+  }, [fetchPlaces]);
+
+  // Host / User adds new place
+  const addNewPlace = async (placeData) => {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const email = user.email || (currentUser && currentUser.email) || 'tung@gmail.com';
+      const created = await placeApi.createPlace(placeData, email);
+      if (created) {
+        setPlaces(prev => [created, ...prev]);
+        return created;
+      }
+    } catch (err) {
+      console.warn('Backend place create failed, using local place state:', err.message);
+      const fallback = {
+        id: 'place-' + Date.now(),
+        ...placeData,
+        ownerId: (currentUser && currentUser.id) || 1,
+        ownerName: currentUser ? currentUser.name : 'Người dùng bản địa',
+        ownerHandle: currentUser ? currentUser.handle : '@local_host',
+        ownerAvatar: currentUser ? currentUser.avatar : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+        status: 'ACTIVE',
+        isVerifiedHost: false,
+        averageRating: 5.0,
+        reviewCount: 0,
+        createdAt: new Date().toISOString()
+      };
+      setPlaces(prev => [fallback, ...prev]);
+      return fallback;
+    }
+  };
 
   const DEFAULT_USER = {
     name: 'Nguyễn Thanh Tùng',
@@ -399,6 +446,10 @@ export const AppProvider = ({ children }) => {
         authMode,
         setAuthMode,
         destinations,
+        places,
+        setPlaces,
+        fetchPlaces,
+        addNewPlace,
         posts,
         itineraries,
         pendingPlaces,

@@ -1337,4 +1337,128 @@ export const userApi = {
   }
 };
 
+export const placeApi = {
+  async getPlaces({ city, category, status, keyword } = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (city && city !== 'Tất cả') params.append('city', city);
+      if (category && category !== 'Tất cả') params.append('category', category);
+      if (status && status !== 'Tất cả') params.append('status', status);
+      if (keyword) params.append('keyword', keyword);
+
+      const qs = params.toString() ? `?${params.toString()}` : '';
+      const res = await fetch(`${BASE_URL}/places${qs}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching places:', err.message);
+      return [];
+    }
+  },
+
+  async getPlaceById(id) {
+    try {
+      const res = await fetch(`${BASE_URL}/places/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.warn(`API error fetching place #${id}:`, err.message);
+      return null;
+    }
+  },
+
+  async createPlace(placeData, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/places?email=${encodeURIComponent(userEmail)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        },
+        body: JSON.stringify(placeData)
+      });
+      if (!res.ok) {
+        const errorJson = await res.json().catch(() => ({}));
+        throw new Error(errorJson.message || `HTTP error ${res.status}`);
+      }
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error('API error creating place:', err.message);
+      throw err;
+    }
+  },
+
+  async getMyPlaces(email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/places/my-places?email=${encodeURIComponent(userEmail)}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching my places:', err.message);
+      return [];
+    }
+  },
+
+  async updatePlaceStatus(id, status) {
+    try {
+      const res = await fetch(`${BASE_URL}/places/${id}/status?status=${encodeURIComponent(status)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error(`API error updating place #${id} status:`, err.message);
+      throw err;
+    }
+  },
+
+  async deletePlace(id, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/places/${id}?email=${encodeURIComponent(userEmail)}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json;
+    } catch (err) {
+      console.error(`API error deleting place #${id}:`, err.message);
+      throw err;
+    }
+  }
+};
+
 
