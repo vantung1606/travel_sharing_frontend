@@ -10,7 +10,9 @@ import { PostDetailModal } from '../../../components/community/PostDetailModal';
 import { FollowListModal } from '../../../components/community/FollowListModal';
 import { ShareModal } from '../../../components/community/ShareModal';
 import { ReportPostModal } from '../../../components/community/ReportPostModal';
+import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../components/community/MentionSuggestions';
 import {
+  AtSign,
   Heart,
   MessageCircle,
   Share2,
@@ -198,6 +200,9 @@ export const CommunityPage = () => {
   const [attachedItineraryId, setAttachedItineraryId] = useState('');
   const [submittingPost, setSubmittingPost] = useState(false);
   const createFileInputRef = useRef(null);
+  const postTextareaRef = useRef(null);
+  const [postMentionState, setPostMentionState] = useState({ isOpen: false, query: '', cursorIndex: -1 });
+  const [taggedUsersInPost, setTaggedUsersInPost] = useState([]);
 
   // User Profile Modal State
   const [selectedUserIdForModal, setSelectedUserIdForModal] = useState(null);
@@ -246,13 +251,40 @@ export const CommunityPage = () => {
   const [replyingTo, setReplyingTo] = useState(null); // { commentId, authorId, authorName }
   const [submittingComment, setSubmittingComment] = useState(false);
   const commentInputRef = useRef(null);
+  const [commentMentionState, setCommentMentionState] = useState({ isOpen: false, query: '', cursorIndex: -1 });
 
   // Copying Tour Action State
   const [cloningPostId, setCloningPostId] = useState(null);
 
   // Following Authors State
   const [followingIds, setFollowingIds] = useState(new Set());
+  const [followingUsers, setFollowingUsers] = useState([]);
   const [followingLoadingIds, setFollowingLoadingIds] = useState(new Set());
+
+  // Fetch full following user objects (only people current user follows can be tagged)
+  const fetchFollowingUsers = useCallback(async () => {
+    if (!isLoggedIn || !currentUser) {
+      setFollowingUsers([]);
+      return;
+    }
+    const myUserId = currentUser.id || currentUser.userId;
+    if (!myUserId) return;
+    try {
+      const list = await userApi.getFollowing(myUserId, currentUser.email);
+      if (Array.isArray(list)) {
+        setFollowingUsers(list);
+      }
+    } catch (err) {
+      console.warn('Lỗi khi tải danh sách người theo dõi để gắn thẻ:', err);
+    }
+  }, [isLoggedIn, currentUser]);
+
+  useEffect(() => {
+    fetchFollowingUsers();
+    const handleFollowSync = () => fetchFollowingUsers();
+    window.addEventListener('wayfare_follow_changed', handleFollowSync);
+    return () => window.removeEventListener('wayfare_follow_changed', handleFollowSync);
+  }, [fetchFollowingUsers]);
 
   // Follow List Modal State (Followers & Following)
   const [followListModalState, setFollowListModalState] = useState({
@@ -316,6 +348,8 @@ export const CommunityPage = () => {
         }
         return next;
       });
+      window.dispatchEvent(new CustomEvent('wayfare_follow_changed'));
+      fetchFollowingUsers();
     } catch (err) {
       toast.showError('Thao tác theo dõi thất bại: ' + err.message);
     } finally {
@@ -325,6 +359,82 @@ export const CommunityPage = () => {
         return next;
       });
     }
+  };
+
+  // Handle @mention typing in Create Post Content
+  const handlePostContentChange = (e) => {
+    const val = e.target.value;
+    const cursor = e.target.selectionStart;
+    setPostContent(val);
+    const textBefore = val.slice(0, cursor);
+    const match = textBefore.match(/@([^\s@]*)$/);
+    if (match) {
+      setPostMentionState({
+        isOpen: true,
+        query: match[1],
+        cursorIndex: match.index
+      });
+    } else {
+      setPostMentionState({ isOpen: false, query: '', cursorIndex: -1 });
+    }
+  };
+
+  const handleSelectPostMention = (user) => {
+    const userName = user.fullName || user.name || 'user';
+    const tag = `@${userName} `;
+    let newText = '';
+    if (postMentionState.cursorIndex >= 0) {
+      const before = postContent.slice(0, postMentionState.cursorIndex);
+      const after = postContent.slice(postMentionState.cursorIndex + 1 + postMentionState.query.length);
+      newText = `${before}${tag}${after}`;
+    } else {
+      newText = postContent ? `${postContent} ${tag}` : tag;
+    }
+    setPostContent(newText);
+    setPostMentionState({ isOpen: false, query: '', cursorIndex: -1 });
+    setTaggedUsersInPost(prev => {
+      if (prev.some(u => u.id === user.id)) return prev;
+      return [...prev, user];
+    });
+    setTimeout(() => postTextareaRef.current?.focus(), 50);
+  };
+
+  const handleRemoveTaggedUser = (userId) => {
+    setTaggedUsersInPost(prev => prev.filter(u => u.id !== userId));
+  };
+
+  // Handle @mention typing in Comments Drawer
+  const handleCommentInputChange = (e) => {
+    const val = e.target.value;
+    const cursor = e.target.selectionStart;
+    setCommentInput(val);
+    const textBefore = val.slice(0, cursor);
+    const match = textBefore.match(/@([^\s@]*)$/);
+    if (match) {
+      setCommentMentionState({
+        isOpen: true,
+        query: match[1],
+        cursorIndex: match.index
+      });
+    } else {
+      setCommentMentionState({ isOpen: false, query: '', cursorIndex: -1 });
+    }
+  };
+
+  const handleSelectCommentMention = (user) => {
+    const userName = user.fullName || user.name || 'user';
+    const tag = `@${userName} `;
+    let newText = '';
+    if (commentMentionState.cursorIndex >= 0) {
+      const before = commentInput.slice(0, commentMentionState.cursorIndex);
+      const after = commentInput.slice(commentMentionState.cursorIndex + 1 + commentMentionState.query.length);
+      newText = `${before}${tag}${after}`;
+    } else {
+      newText = commentInput ? `${commentInput} ${tag}` : tag;
+    }
+    setCommentInput(newText);
+    setCommentMentionState({ isOpen: false, query: '', cursorIndex: -1 });
+    setTimeout(() => commentInputRef.current?.focus(), 50);
   };
 
   // Fetch Posts from Backend
@@ -1030,6 +1140,8 @@ export const CommunityPage = () => {
       setPostVideoUrl('');
       setCustomImageUrl('');
       setAttachedItineraryId('');
+      setTaggedUsersInPost([]);
+      setPostMentionState({ isOpen: false, query: '', cursorIndex: -1 });
 
       // Evaluate Moderation Result for Feedback Display
       if (result && result.status === 'PENDING_REVIEW') {
@@ -1833,7 +1945,7 @@ export const CommunityPage = () => {
                       {/* Sharing User's Caption/Quote */}
                       {post.content && (
                         <p className="text-sm sm:text-base text-slate-800 leading-relaxed whitespace-pre-line font-normal tracking-[0.015em]">
-                          {post.content}
+                          {renderTextWithMentions(post.content, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
                         </p>
                       )}
 
@@ -1897,7 +2009,7 @@ export const CommunityPage = () => {
                           )}
                           {post.sharedPost.content && (
                             <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line line-clamp-4">
-                              {post.sharedPost.content}
+                              {renderTextWithMentions(post.sharedPost.content, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
                             </p>
                           )}
                         </div>
@@ -1980,7 +2092,7 @@ export const CommunityPage = () => {
                           </h3>
                         )}
                         <p className="text-sm sm:text-[15px] text-slate-700 leading-relaxed whitespace-pre-line font-normal tracking-[0.015em]">
-                          {post.content}
+                          {renderTextWithMentions(post.content, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
                         </p>
                       </div>
 
@@ -2498,17 +2610,76 @@ export const CommunityPage = () => {
                 </div>
               </div>
 
-              {/* Content textarea */}
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Nội dung chia sẻ *</label>
+              {/* Content textarea with @mention */}
+              <div className="relative">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-bold text-slate-700">Nội dung chia sẻ *</label>
+                  <button
+                    type="button"
+                    onClick={() => setPostMentionState(prev => ({ ...prev, isOpen: !prev.isOpen, query: '' }))}
+                    className="text-[11px] font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 px-2 py-0.5 rounded-lg hover:bg-sky-50 transition-colors cursor-pointer"
+                    title="Gắn thẻ người bạn đang theo dõi"
+                  >
+                    <AtSign className="w-3.5 h-3.5" />
+                    <span>Gắn thẻ bạn bè ({followingUsers.length})</span>
+                  </button>
+                </div>
                 <textarea
+                  ref={postTextareaRef}
                   rows={4}
-                  placeholder="Chia sẻ kinh nghiệm, lưu ý quan trọng, các điểm ăn uống check-in không thể bỏ lỡ..."
+                  placeholder="Chia sẻ kinh nghiệm, lưu ý quan trọng... (Gõ @ để gắn thẻ người bạn đang theo dõi)"
                   value={postContent}
-                  onChange={e => setPostContent(e.target.value)}
+                  onChange={handlePostContentChange}
                   className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 resize-none"
                   required
                 />
+
+                {/* Floating Mention Suggestions for Post */}
+                {postMentionState.isOpen && (
+                  <MentionSuggestionsDropdown
+                    followingUsers={followingUsers}
+                    query={postMentionState.query}
+                    onSelect={handleSelectPostMention}
+                    onClose={() => setPostMentionState({ isOpen: false, query: '', cursorIndex: -1 })}
+                    positionClass="top-full mt-1.5"
+                    title="Gắn thẻ người bạn đang theo dõi vào bài viết"
+                  />
+                )}
+
+                {/* Tagged Users Chips Bar */}
+                {taggedUsersInPost.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2 p-2 bg-sky-50/70 border border-sky-100 rounded-xl">
+                    <span className="text-[10px] font-bold text-sky-800 flex items-center gap-1">
+                      <AtSign className="w-3 h-3 text-sky-600" />
+                      <span>Đang gắn thẻ:</span>
+                    </span>
+                    {taggedUsersInPost.map(u => (
+                      <span
+                        key={u.id}
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white text-sky-700 text-[11px] font-bold border border-sky-200 shadow-2xs"
+                      >
+                        <img
+                          src={
+                            u.avatarUrl ||
+                            u.avatar ||
+                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
+                          }
+                          alt={u.fullName || u.name}
+                          className="w-3.5 h-3.5 rounded-full object-cover"
+                        />
+                        <span>{u.fullName || u.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTaggedUser(u.id)}
+                          className="text-slate-400 hover:text-rose-500 transition-colors ml-0.5 cursor-pointer"
+                          title="Bỏ gắn thẻ"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* ATTACH MY ITINERARY SELECTOR */}
@@ -2851,7 +3022,9 @@ export const CommunityPage = () => {
                             </span>
                             <span className="text-[10px] text-slate-400">{cmt.timeAgo || cmt.formattedDate || 'Vừa xong'}</span>
                           </div>
-                          <p className="text-xs text-slate-700 mt-1 leading-relaxed">{cmt.content}</p>
+                          <p className="text-xs text-slate-700 mt-1 leading-relaxed">
+                            {renderTextWithMentions(cmt.content, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
+                          </p>
                           <div className="mt-1.5 flex items-center justify-between">
                             <button
                               type="button"
@@ -2928,7 +3101,9 @@ export const CommunityPage = () => {
                                       @{reply.replyToUserName}
                                     </div>
                                   )}
-                                  <p className="text-xs text-slate-700 leading-relaxed">{reply.content}</p>
+                                  <p className="text-xs text-slate-700 leading-relaxed">
+                                    {renderTextWithMentions(reply.content, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
+                                  </p>
                                   <div className="mt-1 flex items-center justify-between">
                                     <button
                                       type="button"
@@ -2986,27 +3161,53 @@ export const CommunityPage = () => {
 
             {/* Comment Input Box or Guest Login Prompt */}
             {isLoggedIn ? (
-              <form onSubmit={handleAddComment} className="pt-2 border-t border-slate-100 flex items-center gap-2">
-                <input
-                  ref={commentInputRef}
-                  type="text"
-                  placeholder={replyingTo ? `Trả lời @${replyingTo.authorName}...` : "Viết bình luận hoặc đặt câu hỏi về chuyến đi..."}
-                  value={commentInput}
-                  onChange={e => setCommentInput(e.target.value)}
-                  className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-                />
-                <button
-                  type="submit"
-                  disabled={submittingComment || !commentInput.trim()}
-                  className="bg-sky-600 hover:bg-sky-700 text-white p-2.5 rounded-full hover:shadow-md transition-all disabled:opacity-50 cursor-pointer shadow-sm shadow-sky-500/20"
-                >
-                  {submittingComment ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Send className="w-4 h-4" />
-                  )}
-                </button>
-              </form>
+              <div className="pt-2 border-t border-slate-100 relative">
+                {commentMentionState.isOpen && (
+                  <MentionSuggestionsDropdown
+                    followingUsers={followingUsers}
+                    query={commentMentionState.query}
+                    onSelect={handleSelectCommentMention}
+                    onClose={() => setCommentMentionState({ isOpen: false, query: '', cursorIndex: -1 })}
+                    positionClass="bottom-full mb-2 left-0"
+                    title="Gắn thẻ người bạn đang theo dõi"
+                  />
+                )}
+                <form onSubmit={handleAddComment} className="flex items-center gap-2">
+                  <div className="flex-1 relative flex items-center">
+                    <input
+                      ref={commentInputRef}
+                      type="text"
+                      placeholder={
+                        replyingTo
+                          ? `Trả lời @${replyingTo.authorName}... (Gõ @ để gắn thẻ)`
+                          : "Viết bình luận hoặc đặt câu hỏi... (Gõ @ để gắn thẻ)"
+                      }
+                      value={commentInput}
+                      onChange={handleCommentInputChange}
+                      className="w-full pl-4 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setCommentMentionState(prev => ({ ...prev, isOpen: !prev.isOpen, query: '' }))}
+                      className="absolute right-2.5 p-1 rounded-full text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-colors cursor-pointer"
+                      title="Gắn thẻ người bạn đang theo dõi (@)"
+                    >
+                      <AtSign className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={submittingComment || !commentInput.trim()}
+                    className="bg-sky-600 hover:bg-sky-700 text-white p-2.5 rounded-full hover:shadow-md transition-all disabled:opacity-50 cursor-pointer shadow-sm shadow-sky-500/20"
+                  >
+                    {submittingComment ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Send className="w-4 h-4" />
+                    )}
+                  </button>
+                </form>
+              </div>
             ) : (
               <div className="pt-3 border-t border-slate-100 p-3 bg-gradient-to-r from-sky-50 via-white to-blue-50/70 rounded-2xl flex items-center justify-between gap-3 text-xs">
                 <span className="text-slate-600 font-medium">Đăng nhập để tham gia bình luận thảo luận</span>

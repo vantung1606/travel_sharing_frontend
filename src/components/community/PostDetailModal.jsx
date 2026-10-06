@@ -27,13 +27,15 @@ import {
   MoreHorizontal,
   Copy,
   Flag,
-  Trash2
+  Trash2,
+  AtSign
 } from 'lucide-react';
 import { postApi, userApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';
 import { ShareModal } from './ShareModal';
 import { ReportPostModal } from './ReportPostModal';
+import { MentionSuggestionsDropdown, renderTextWithMentions } from './MentionSuggestions';
 
 export const PostDetailModal = ({
   postId,
@@ -58,6 +60,8 @@ export const PostDetailModal = ({
   const [submittingComment, setSubmittingComment] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
   const commentInputRef = useRef(null);
+  const [followingUsers, setFollowingUsers] = useState([]);
+  const [commentMentionState, setCommentMentionState] = useState({ isOpen: false, query: '', cursorIndex: -1 });
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isFollowingAuthor, setIsFollowingAuthor] = useState(false);
@@ -126,11 +130,67 @@ export const PostDetailModal = ({
       } else {
         toast.showInfo(`Đã hủy theo dõi ${authorName}`);
       }
+      window.dispatchEvent(new CustomEvent('wayfare_follow_changed'));
     } catch (err) {
       toast.showError('Thao tác theo dõi thất bại: ' + err.message);
     } finally {
       setFollowLoading(false);
     }
+  };
+
+  // Load following users (only people current user follows can be tagged)
+  useEffect(() => {
+    if (!isLoggedIn || !currentUser) {
+      setFollowingUsers([]);
+      return;
+    }
+    const myUserId = currentUser.id || currentUser.userId;
+    if (!myUserId) return;
+    const loadFollowing = () => {
+      userApi
+        .getFollowing(myUserId, currentUser.email)
+        .then(list => {
+          if (Array.isArray(list)) setFollowingUsers(list);
+        })
+        .catch(err => console.warn('Lỗi khi tải danh sách người theo dõi để gắn thẻ:', err));
+    };
+    loadFollowing();
+    window.addEventListener('wayfare_follow_changed', loadFollowing);
+    return () => window.removeEventListener('wayfare_follow_changed', loadFollowing);
+  }, [isLoggedIn, currentUser]);
+
+  // Handle @mention typing in Comments
+  const handleCommentInputChange = (e) => {
+    const val = e.target.value;
+    const cursor = e.target.selectionStart;
+    setCommentInput(val);
+    const textBefore = val.slice(0, cursor);
+    const match = textBefore.match(/@([^\s@]*)$/);
+    if (match) {
+      setCommentMentionState({
+        isOpen: true,
+        query: match[1],
+        cursorIndex: match.index
+      });
+    } else {
+      setCommentMentionState({ isOpen: false, query: '', cursorIndex: -1 });
+    }
+  };
+
+  const handleSelectCommentMention = (user) => {
+    const userName = user.fullName || user.name || 'user';
+    const tag = `@${userName} `;
+    let newText = '';
+    if (commentMentionState.cursorIndex >= 0) {
+      const before = commentInput.slice(0, commentMentionState.cursorIndex);
+      const after = commentInput.slice(commentMentionState.cursorIndex + 1 + commentMentionState.query.length);
+      newText = `${before}${tag}${after}`;
+    } else {
+      newText = commentInput ? `${commentInput} ${tag}` : tag;
+    }
+    setCommentInput(newText);
+    setCommentMentionState({ isOpen: false, query: '', cursorIndex: -1 });
+    setTimeout(() => commentInputRef.current?.focus(), 50);
   };
 
   // Load post details if only postId is provided
@@ -604,7 +664,7 @@ export const PostDetailModal = ({
                 {/* Sharing User's Caption */}
                 {post.content && (
                   <div className="text-slate-800 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
-                    {post.content}
+                    {renderTextWithMentions(post.content, followingUsers, onAuthorClick)}
                   </div>
                 )}
 
@@ -665,7 +725,7 @@ export const PostDetailModal = ({
                     )}
                     {post.sharedPost.content && (
                       <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-                        {post.sharedPost.content}
+                        {renderTextWithMentions(post.sharedPost.content, followingUsers, onAuthorClick)}
                       </p>
                     )}
                   </div>
@@ -735,7 +795,7 @@ export const PostDetailModal = ({
 
                 {/* Post Content */}
                 <div className="text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
-                  {post.content}
+                  {renderTextWithMentions(post.content, followingUsers, onAuthorClick)}
                 </div>
 
                 {/* Multimedia: Video Player */}
@@ -949,7 +1009,17 @@ export const PostDetailModal = ({
 
               {/* Add Comment Box or Guest Login Prompt */}
               {isLoggedIn ? (
-                <form onSubmit={handleAddComment} className="flex gap-2.5 items-start">
+                <form onSubmit={handleAddComment} className="flex gap-2.5 items-start relative">
+                  {commentMentionState.isOpen && (
+                    <MentionSuggestionsDropdown
+                      followingUsers={followingUsers}
+                      query={commentMentionState.query}
+                      onSelect={handleSelectCommentMention}
+                      onClose={() => setCommentMentionState({ isOpen: false, query: '', cursorIndex: -1 })}
+                      positionClass="bottom-full mb-2 left-10"
+                      title="Gắn thẻ người bạn đang theo dõi"
+                    />
+                  )}
                   <img
                     src={
                       currentUser?.avatar ||
@@ -959,14 +1029,28 @@ export const PostDetailModal = ({
                     className="w-9 h-9 rounded-xl object-cover ring-1 ring-slate-200 shrink-0 mt-0.5"
                   />
                   <div className="flex-1 flex gap-2">
-                    <input
-                      ref={commentInputRef}
-                      type="text"
-                      value={commentInput}
-                      onChange={e => setCommentInput(e.target.value)}
-                      placeholder={replyingTo ? `Trả lời @${replyingTo.authorName}...` : "Viết cảm nghĩ hoặc lời khuyên của bạn..."}
-                      className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
-                    />
+                    <div className="flex-1 relative flex items-center">
+                      <input
+                        ref={commentInputRef}
+                        type="text"
+                        value={commentInput}
+                        onChange={handleCommentInputChange}
+                        placeholder={
+                          replyingTo
+                            ? `Trả lời @${replyingTo.authorName}... (Gõ @ để gắn thẻ)`
+                            : "Viết cảm nghĩ hoặc lời khuyên của bạn... (Gõ @ để gắn thẻ)"
+                        }
+                        className="w-full pl-3.5 pr-8 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setCommentMentionState(prev => ({ ...prev, isOpen: !prev.isOpen, query: '' }))}
+                        className="absolute right-2 p-1 rounded-lg text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-colors cursor-pointer"
+                        title="Gắn thẻ người bạn theo dõi (@)"
+                      >
+                        <AtSign className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                     <button
                       type="submit"
                       disabled={!commentInput.trim() || submittingComment}
@@ -1053,7 +1137,7 @@ export const PostDetailModal = ({
                               </div>
                             </div>
                             <p className="text-xs text-slate-700 mt-1 leading-relaxed">
-                              {c.content}
+                              {renderTextWithMentions(c.content, followingUsers, onAuthorClick)}
                             </p>
                             <button
                               type="button"
@@ -1125,7 +1209,7 @@ export const PostDetailModal = ({
                                       </div>
                                     )}
                                     <p className="text-xs text-slate-700 leading-relaxed">
-                                      {reply.content}
+                                      {renderTextWithMentions(reply.content, followingUsers, onAuthorClick)}
                                     </p>
                                     <button
                                       type="button"
