@@ -41,6 +41,7 @@ import {
   Send
 } from 'lucide-react';
 import { useToast } from '../../../components/common/Toast';
+import { RealMapView } from '../../../components/map/RealMapView';
 
 export const ExplorePage = () => {
   const { destinations, places, addNewPlace, setIsAIGeneratorOpen, currentUser } = useApp();
@@ -841,114 +842,18 @@ export const ExplorePage = () => {
             )}
           </div>
 
-          {/* Right: Interactive GPS Map Viewport */}
-          <div className="lg:col-span-6 bg-slate-900 rounded-3xl p-5 relative overflow-hidden flex flex-col justify-between border border-slate-800 text-white shadow-2xl min-h-[520px]">
-            {/* Map Canvas Background Grid */}
-            <div className={`absolute inset-0 transition-opacity duration-700 ${
-              mapLayer === 'satellite'
-                ? 'bg-gradient-to-b from-slate-950 via-[#041624] to-slate-950 opacity-95'
-                : 'bg-[radial-gradient(#0284c7_1px,transparent_1px)] [background-size:20px_20px] opacity-25'
-            }`} />
-
-            {/* Top Map Layer Controls */}
-            <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 bg-slate-800/90 backdrop-blur-md p-3 rounded-2xl border border-slate-700/80">
-              <div className="flex items-center gap-2 text-xs font-bold text-sky-300">
-                <Navigation className="w-4 h-4 text-sky-400 animate-pulse" />
-                <span>Bản Đồ Tọa Độ Live Radar</span>
-              </div>
-
-              {/* Layer Toggles */}
-              <div className="flex items-center gap-1 text-[10px] font-bold">
-                <button
-                  onClick={() => setMapLayer('terrain')}
-                  className={`px-2.5 py-1 rounded-lg transition-colors ${
-                    mapLayer === 'terrain' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Tọa độ Du Lịch
-                </button>
-                <button
-                  onClick={() => setMapLayer('satellite')}
-                  className={`px-2.5 py-1 rounded-lg transition-colors ${
-                    mapLayer === 'satellite' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Vệ Tinh
-                </button>
-              </div>
-            </div>
-
-            {/* Interactive Spotlight Card on Map */}
-            <div className="relative z-10 my-auto py-6">
-              {activeItem ? (
-                <div className="max-w-md mx-auto bg-slate-800/90 backdrop-blur-md p-5 rounded-3xl border border-slate-700 shadow-2xl space-y-3">
-                  <div className="flex items-start gap-3">
-                    <img
-                      src={activeItem.image}
-                      alt={activeItem.name}
-                      className="w-20 h-20 rounded-2xl object-cover shrink-0 border border-slate-700"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1 text-[11px] font-bold text-sky-400">
-                        <MapPin className="w-3.5 h-3.5" />
-                        <span>{activeItem.city} • {activeItem.category}</span>
-                      </div>
-                      <h4 className="font-bold text-sm text-white truncate mt-0.5">{activeItem.name}</h4>
-                      <p className="text-[11px] text-slate-300 line-clamp-2 mt-1">{activeItem.tagline}</p>
-                    </div>
-                  </div>
-
-                  {/* Coordinates & Phone */}
-                  <div className="grid grid-cols-2 gap-2 text-xs bg-slate-900/60 p-2.5 rounded-xl border border-slate-700/60 font-semibold text-slate-300">
-                    <div>
-                      <span className="block text-[10px] text-slate-400 font-medium">Khoảng giá / Giờ</span>
-                      <span className="text-amber-300">{activeItem.priceEstimate}</span>
-                    </div>
-                    <div>
-                      <span className="block text-[10px] text-slate-400 font-medium">Hotline liên hệ</span>
-                      <span className="text-emerald-400">{activeItem.phoneNumber || 'Cập nhật sau'}</span>
-                    </div>
-                  </div>
-
-                  {/* Actions on Active Item */}
-                  <div className="flex items-center justify-between gap-2 pt-1">
-                    <button
-                      onClick={(e) => handleOpenGoogleMaps(activeItem, e)}
-                      className="flex-1 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5 text-sky-300" />
-                      <span>Chỉ đường Maps</span>
-                    </button>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); setDetailModalItem(activeItem); }}
-                      className="flex-1 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>Xem đầy đủ</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center text-slate-400 text-xs">
-                  Chọn một thẻ địa điểm bên trái để định vị GPS trên bản đồ
-                </div>
-              )}
-            </div>
-
-            {/* Bottom Status Ribbon */}
-            <div className="relative z-10 flex items-center justify-between text-[11px] text-slate-400 bg-slate-800/80 backdrop-blur-md p-3 rounded-2xl border border-slate-700/80">
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Tọa độ đã đối soát CSDL Wayfare System</span>
-              </span>
-              <button
-                onClick={(e) => handleCopyGPS(activeItem, e)}
-                className="text-sky-400 hover:text-sky-300 font-bold flex items-center gap-1"
-              >
-                <Copy className="w-3 h-3" />
-                <span>Sao chép GPS</span>
-              </button>
-            </div>
+          {/* Right: Interactive Real Leaflet Map Viewport */}
+          <div className="lg:col-span-6 h-[720px] lg:h-[820px] sticky top-24">
+            <RealMapView
+              items={filteredItems}
+              activeItem={activeItem}
+              setActiveItem={setActiveItem}
+              setDetailModalItem={setDetailModalItem}
+              userCoords={userCoords}
+              mapStyle={mapLayer === 'satellite' ? 'satellite' : mapLayer === 'terrain' ? 'voyager' : 'dark'}
+              setMapStyle={(style) => setMapLayer(style === 'voyager' ? 'terrain' : style)}
+              className="h-full"
+            />
           </div>
 
         </div>
@@ -1032,48 +937,17 @@ export const ExplorePage = () => {
 
       {/* ─────────────────── C. FULL MAP VIEW ─────────────────── */}
       {viewMode === 'map' && (
-        <div className="bg-slate-950 rounded-3xl p-6 relative overflow-hidden min-h-[600px] border border-slate-800 text-white shadow-2xl flex flex-col justify-between">
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 p-4 rounded-2xl border border-slate-800">
-            <div className="flex items-center gap-2">
-              <Navigation className="w-5 h-5 text-sky-400 animate-pulse" />
-              <div>
-                <h3 className="font-bold text-sm text-white">Bản Đồ Toàn Cảnh Tọa Độ GPS Việt Nam</h3>
-                <p className="text-[11px] text-slate-400">Hiển thị {filteredItems.length} địa điểm trên mạng lưới Wayfare</p>
-              </div>
-            </div>
-            <button
-              onClick={() => setViewMode('split')}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs font-bold text-white transition-colors"
-            >
-              Quay lại danh sách
-            </button>
-          </div>
-
-          <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 my-8">
-            {filteredItems.slice(0, 8).map(spot => (
-              <div
-                key={spot.id}
-                onClick={() => setDetailModalItem(spot)}
-                className="bg-slate-900/80 backdrop-blur-md p-3.5 rounded-2xl border border-slate-700/80 hover:border-sky-400 transition-all cursor-pointer space-y-2 hover:scale-105"
-              >
-                <div className="flex items-center gap-2">
-                  <img src={spot.image} alt="" className="w-10 h-10 rounded-xl object-cover" />
-                  <div className="min-w-0 flex-1">
-                    <h4 className="text-xs font-bold text-white truncate">{spot.name}</h4>
-                    <span className="text-[10px] text-sky-300">📍 {spot.city}</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between text-[11px] text-slate-300 pt-1 border-t border-slate-800">
-                  <span>{spot.priceEstimate}</span>
-                  <span className="text-amber-400 font-bold">★ {spot.rating}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="relative z-10 text-center text-xs text-slate-400">
-            Chạm vào bất kỳ tọa độ nào để xem thông tin chi tiết, hotline đặt phòng/bàn và chỉ đường trực tiếp!
-          </div>
+        <div className="h-[750px] w-full rounded-3xl overflow-hidden shadow-2xl">
+          <RealMapView
+            items={filteredItems}
+            activeItem={activeItem}
+            setActiveItem={setActiveItem}
+            setDetailModalItem={setDetailModalItem}
+            userCoords={userCoords}
+            mapStyle={mapLayer === 'satellite' ? 'satellite' : mapLayer === 'terrain' ? 'voyager' : 'dark'}
+            setMapStyle={(style) => setMapLayer(style === 'voyager' ? 'terrain' : style)}
+            className="h-full"
+          />
         </div>
       )}
 
