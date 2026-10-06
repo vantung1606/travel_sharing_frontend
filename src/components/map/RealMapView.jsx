@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import {
@@ -7,10 +7,14 @@ import {
   Phone,
   Eye,
   Star,
-  Layers,
   Sparkles,
   MapPin,
-  Compass
+  Clock,
+  ChevronUp,
+  X,
+  Compass,
+  CheckCircle2,
+  Share2
 } from 'lucide-react';
 
 // Custom Map Controller to smoothly fly to active item or user location
@@ -116,6 +120,20 @@ export const RealMapView = ({
   setMapStyle = () => {},
   className = ''
 }) => {
+  // Trạng thái ô thông tin nổi (Floating Info Box) - Tối ưu cho Mobile
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  // Khi activeItem thay đổi từ bên ngoài (click thẻ danh sách, chọn điểm)
+  useEffect(() => {
+    if (activeItem && activeItem.id && !activeItem.isJumpPoint) {
+      setSelectedPlace(activeItem);
+      setIsDismissed(false);
+      setIsExpanded(false); // Bắt đầu bằng thông tin nhẹ
+    }
+  }, [activeItem]);
+
   // Bản đồ chuẩn quốc tế OpenStreetMap - 100% Sạch, Không đường lưỡi bò phi pháp, Không watermark
   const tileLayers = {
     osm: {
@@ -187,6 +205,14 @@ export const RealMapView = ({
     { label: 'Phú Quốc', lat: 10.2899, lng: 103.9840 }
   ];
 
+  // Xử lý click Marker: mở thông tin nhẹ và kích hoạt flyTo
+  const handleMarkerClick = (item) => {
+    setSelectedPlace(item);
+    setActiveItem(item);
+    setIsDismissed(false);
+    setIsExpanded(false); // Khi click vào vị trí -> ban đầu ra thông tin nhẹ
+  };
+
   return (
     <div className={`relative w-full h-full rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-900 ${className}`}>
       
@@ -219,7 +245,7 @@ export const RealMapView = ({
           <button
             type="button"
             onClick={() => setMapStyle('osm')}
-            className={`px-3 py-1 rounded-xl transition-all ${
+            className={`px-3 py-1 rounded-xl transition-all cursor-pointer ${
               mapStyle === 'osm'
                 ? 'bg-sky-600 text-white shadow-xs'
                 : 'text-slate-400 hover:text-white'
@@ -230,7 +256,7 @@ export const RealMapView = ({
           <button
             type="button"
             onClick={() => setMapStyle('hot')}
-            className={`px-3 py-1 rounded-xl transition-all ${
+            className={`px-3 py-1 rounded-xl transition-all cursor-pointer ${
               mapStyle === 'hot'
                 ? 'bg-sky-600 text-white shadow-xs'
                 : 'text-slate-400 hover:text-white'
@@ -307,13 +333,13 @@ export const RealMapView = ({
           </>
         )}
 
-        {/* Real Item Markers */}
+        {/* Real Item Markers - Không dùng Popup Leaflet cồng kềnh, chuyển sang ô thông tin nổi tiện lợi */}
         {items.map(item => {
           const lat = parseFloat(item.latitude);
           const lng = parseFloat(item.longitude);
           if (isNaN(lat) || isNaN(lng)) return null;
 
-          const isActive = activeItem?.id === item.id;
+          const isActive = (selectedPlace?.id === item.id) || (activeItem?.id === item.id);
           const icon = createCustomMarkerIcon(item, isActive);
 
           return (
@@ -322,92 +348,214 @@ export const RealMapView = ({
               position={[lat, lng]}
               icon={icon}
               eventHandlers={{
-                click: () => setActiveItem(item)
+                click: () => handleMarkerClick(item)
               }}
-            >
-              <Popup className="custom-leaflet-popup">
-                <div className="w-56 p-1 text-xs space-y-2 font-sans">
-                  {/* Thumbnail */}
-                  <div className="relative h-28 w-full rounded-xl overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                    <span className="absolute bottom-1.5 left-1.5 px-2 py-0.5 rounded-md bg-black/70 text-[10px] text-white font-bold backdrop-blur-xs">
-                      {item.city}
-                    </span>
-                  </div>
-
-                  {/* Title & Category */}
-                  <div>
-                    <span className="text-[10px] font-bold text-sky-700 bg-sky-50 px-1.5 py-0.5 rounded">
-                      {item.category}
-                    </span>
-                    <h4 className="font-bold text-sm text-slate-900 mt-1 line-clamp-1">
-                      {item.name}
-                    </h4>
-                    <p className="text-[11px] text-slate-500 line-clamp-2 mt-0.5">
-                      {item.tagline}
-                    </p>
-                  </div>
-
-                  {/* Price & Rating */}
-                  <div className="flex items-center justify-between text-[11px] font-semibold pt-1 border-t border-slate-100">
-                    <span className="text-amber-600 font-bold">
-                      {item.priceEstimate}
-                    </span>
-                    <span className="flex items-center gap-0.5 text-amber-500 font-bold">
-                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                      {item.rating}
-                    </span>
-                  </div>
-
-                  {/* Quick Action Buttons */}
-                  <div className="flex items-center gap-1.5 pt-1">
-                    <button
-                      type="button"
-                      onClick={() => setDetailModalItem(item)}
-                      className="flex-1 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-[11px] font-bold flex items-center justify-center gap-1 transition-colors"
-                    >
-                      <Eye className="w-3 h-3" />
-                      <span>Chi tiết</span>
-                    </button>
-                    {item.phoneNumber && (
-                      <a
-                        href={`tel:${item.phoneNumber}`}
-                        className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold transition-colors"
-                        title="Gọi hotline"
-                      >
-                        <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                      </a>
-                    )}
-                    <a
-                      href={`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors"
-                      title="Chỉ đường Maps"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5 text-slate-600" />
-                    </a>
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
+            />
           );
         })}
       </MapContainer>
 
-      {/* Bottom Map Info Tag */}
-      <div className="absolute bottom-3 left-3 z-[1000] pointer-events-none">
-        <div className="bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-xl text-[10px] text-slate-400 border border-slate-800">
-          Click vào ghim để xem nhanh • Bấm thẻ bên trái để bay camera đến tọa độ 📍
+      {/* ────────────────────────────────────────────────────────────────────────
+          Ô THÔNG TIN NỔI TRÊN BẢN ĐỒ (FLOATING CARD / MOBILE BOTTOM SHEET)
+          - Chế độ 1: Bấm vào ra "thông tin nhẹ"
+          - Chế độ 2: Bấm mũi tên mở rộng ra "thông tin chi tiết hơn nữa"
+          - Tối ưu tuyệt đối cho điện thoại di động (không che map, thumb-friendly)
+         ──────────────────────────────────────────────────────────────────────── */}
+      {selectedPlace && !isDismissed ? (
+        <div className="absolute bottom-3 left-3 right-3 sm:left-4 sm:right-auto sm:max-w-md z-[1000] pointer-events-auto transition-all duration-300">
+          <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-700/80 shadow-[0_20px_50px_rgba(0,0,0,0.35)] overflow-hidden transition-all duration-300">
+            
+            {/* TẦNG 1: THÔNG TIN NHẸ (COMPACT BAR) */}
+            <div className="p-3 sm:p-3.5 flex items-center justify-between gap-3">
+              
+              {/* Thumbnail & Thông tin cơ bản */}
+              <div
+                className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl overflow-hidden shrink-0 border border-slate-200/80 dark:border-slate-700 shadow-sm">
+                  <img
+                    src={selectedPlace.image}
+                    alt={selectedPlace.name}
+                    className="w-full h-full object-cover"
+                  />
+                  <span className="absolute bottom-0 inset-x-0 bg-black/60 backdrop-blur-xs text-[9px] text-white text-center font-bold py-0.5 truncate px-1">
+                    {selectedPlace.city}
+                  </span>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-1.5 mb-0.5">
+                    <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-2 py-0.5 rounded-md border border-sky-200/50 dark:border-sky-800/50">
+                      {selectedPlace.category}
+                    </span>
+                    <span className="flex items-center gap-0.5 text-[11px] font-extrabold text-amber-500">
+                      <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+                      {selectedPlace.rating || '5.0'}
+                    </span>
+                  </div>
+
+                  <h4 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white truncate">
+                    {selectedPlace.name}
+                  </h4>
+
+                  <p className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 truncate mt-0.5">
+                    {selectedPlace.priceEstimate || 'Đang cập nhật giá'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Nút Mũi Tên Mở Rộng / Thu Gọn & Nút Đóng */}
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                    isExpanded
+                      ? 'bg-sky-50 dark:bg-sky-950/70 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800 shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-700 hover:text-sky-600'
+                  }`}
+                  title={isExpanded ? 'Thu gọn thông tin' : 'Bấm để xem thêm chi tiết'}
+                >
+                  <span className="hidden xs:inline text-[11px]">
+                    {isExpanded ? 'Thu gọn' : 'Chi tiết'}
+                  </span>
+                  <ChevronUp
+                    className={`w-4 h-4 transition-transform duration-300 ${
+                      isExpanded ? 'rotate-180 text-sky-600 dark:text-sky-400' : 'text-slate-500 dark:text-slate-400'
+                    }`}
+                  />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setIsDismissed(true)}
+                  className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  title="Đóng ô thông tin"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+            </div>
+
+            {/* TẦNG 2: THÔNG TIN CHI TIẾT HƠN NỮA (EXPANDED DRAWER) */}
+            {isExpanded && (
+              <div className="px-3.5 pb-3.5 pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-3 max-h-[60vh] sm:max-h-[380px] overflow-y-auto custom-scrollbar animate-in fade-in slide-in-from-bottom-2 duration-200">
+                
+                {/* Tagline / Mô tả giới thiệu */}
+                {selectedPlace.tagline && (
+                  <p className="text-xs text-slate-600 dark:text-slate-300 italic line-clamp-2 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-xl border border-slate-100 dark:border-slate-800">
+                    "{selectedPlace.tagline}"
+                  </p>
+                )}
+
+                {/* Danh sách thông tin chi tiết */}
+                <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-400">
+                  
+                  {/* Địa chỉ cụ thể */}
+                  {(selectedPlace.address || selectedPlace.city) && (
+                    <div className="flex items-start gap-2">
+                      <MapPin className="w-3.5 h-3.5 text-rose-500 shrink-0 mt-0.5" />
+                      <span className="line-clamp-2">
+                        {selectedPlace.address ? `${selectedPlace.address}, ${selectedPlace.city}` : selectedPlace.city}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Giờ mở cửa */}
+                  {selectedPlace.openingHours && (
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      <span>{selectedPlace.openingHours}</span>
+                    </div>
+                  )}
+
+                  {/* Hotline hỗ trợ */}
+                  {selectedPlace.phoneNumber && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                      <span>Hotline: </span>
+                      <a
+                        href={`tel:${selectedPlace.phoneNumber}`}
+                        className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline"
+                      >
+                        {selectedPlace.phoneNumber}
+                      </a>
+                    </div>
+                  )}
+
+                  {/* Chủ cơ sở / Đăng bởi */}
+                  {selectedPlace.hostName && (
+                    <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+                      <span>Cơ sở đối tác: <strong className="text-slate-700 dark:text-slate-200">{selectedPlace.hostName}</strong></span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tiện ích nổi bật (Chips) */}
+                {selectedPlace.amenities && (
+                  <div>
+                    <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-amber-500" /> Tiện ích nổi bật
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {(Array.isArray(selectedPlace.amenities)
+                        ? selectedPlace.amenities
+                        : selectedPlace.amenities.split(',').map(s => s.trim())
+                      ).map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-[11px] font-medium text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700/60"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="pt-2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setDetailModalItem(selectedPlace)}
+                    className="flex-1 py-2 px-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-md shadow-sky-500/25 transition-all cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>Xem Toàn Bộ Chi Tiết</span>
+                  </button>
+                  
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${selectedPlace.latitude},${selectedPlace.longitude}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                    title="Chỉ đường trên Google Maps"
+                  >
+                    <Navigation className="w-3.5 h-3.5 text-sky-500" />
+                    <span className="hidden xs:inline">Chỉ đường</span>
+                  </a>
+                </div>
+
+              </div>
+            )}
+
+          </div>
         </div>
-      </div>
+      ) : (
+        /* Hướng dẫn nhẹ nhàng khi chưa chọn điểm */
+        <div className="absolute bottom-3 left-3 z-[1000] pointer-events-none">
+          <div className="bg-slate-950/80 backdrop-blur-md px-3 py-1 rounded-xl text-[10px] text-slate-400 border border-slate-800">
+            Click vào ghim để xem thông tin • Bấm thẻ bên trái để bay camera 📍
+          </div>
+        </div>
+      )}
 
     </div>
   );
 };
 
 export default RealMapView;
+
