@@ -253,7 +253,7 @@ export const ItineraryManagerPage = () => {
             
             {/* Left Content Column with High-Contrast Changed Text Color */}
             <div className="max-w-3xl space-y-3">
-              {/* Breadcrumb & Pill */}
+              {/* Breadcrumb */}
               <div className="flex flex-wrap items-center gap-2.5 text-xs">
                 <span className="flex items-center gap-1.5 text-sky-300 hover:text-white transition-colors cursor-pointer font-semibold drop-shadow-md">
                   <Compass className="w-3.5 h-3.5 text-sky-400" />
@@ -261,13 +261,6 @@ export const ItineraryManagerPage = () => {
                 </span>
                 <ChevronRight className="w-3 h-3 text-slate-300 drop-shadow-md" />
                 <span className="text-white font-bold drop-shadow-md">Kế Hoạch & Lịch Trình</span>
-
-                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300"></span>
-
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-amber-300 border border-amber-400/40 text-[11px] font-bold shadow-md">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-                  <span>WanderAI Trip Engine • Tối ưu 63 tỉnh thành</span>
-                </span>
               </div>
 
               {/* Main Headline with Deep Shadow & Vivid Contrast */}

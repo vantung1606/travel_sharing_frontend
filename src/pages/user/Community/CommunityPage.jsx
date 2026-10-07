@@ -26,6 +26,7 @@ import {
   Copy,
   Calendar,
   DollarSign,
+  Camera,
   Image as ImageIcon,
   Smile,
   CheckCircle2,
@@ -72,6 +73,16 @@ const CATEGORIES = [
   { id: 'Phượt & Khám phá', label: 'Phượt & Khám phá', icon: Flame },
   { id: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Sparkles },
   { id: 'Có Lịch trình đính kèm', label: 'Tour có Lịch trình AI', icon: Route }
+];
+
+const COMMUNITY_STORIES = [
+  { id: 'dalat', location: 'Đà Lạt', tag: 'Đà Lạt', badge: '🌸', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=300&q=80' },
+  { id: 'danang', location: 'Đà Nẵng', tag: 'Đà Nẵng', badge: '🌊', image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=300&q=80' },
+  { id: 'phuquoc', location: 'Phú Quốc', tag: 'Phú Quốc', badge: '🏖️', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=300&q=80' },
+  { id: 'hagiang', location: 'Hà Giang', tag: 'Hà Giang', badge: '🏍️', image: 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=300&q=80' },
+  { id: 'sapa', location: 'Sa Pa', tag: 'Sa Pa', badge: '🌾', image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=300&q=80' },
+  { id: 'ninhbinh', location: 'Ninh Bình', tag: 'Ninh Bình', badge: '🛶', image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=300&q=80' },
+  { id: 'hoian', location: 'Hội An', tag: 'Hội An', badge: '🏮', image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=300&q=80' }
 ];
 
 // Pre-flight AI Content Moderation Helper (Runs BEFORE sending to API)
@@ -1197,239 +1208,385 @@ export const CommunityPage = () => {
   }, [attachedItineraryId, itineraries]);
 
   return (
-    <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8 space-y-8">
-      {/* 3-COLUMN DESKTOP GRID */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* ========================================================= */}
-        {/* LEFT COLUMN: User Mini-Profile, Quick Nav, Trending Tags */}
-        {/* ========================================================= */}
-        <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-[5rem] h-[calc(100vh-6rem)] overflow-y-auto overscroll-contain sidebar-scrollbar pr-1.5 pb-12 select-none">
-          
-          {/* User Profile Card or Guest Login Prompt */}
-          {isLoggedIn ? (
-            <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm space-y-4">
-              <div className="flex items-center gap-3.5">
-                <div className="relative">
-                  <img
-                    src={currentUser?.avatar}
-                    alt={currentUser?.name}
-                    className="w-14 h-14 rounded-full object-cover ring-2 ring-sky-500/30 shadow-xs"
-                  />
-                  <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-sky-600 text-white flex items-center justify-center text-[10px] ring-2 ring-white font-bold">
-                    ✓
-                  </span>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-extrabold text-sm text-slate-900 truncate">{currentUser?.name}</h3>
-                  <p className="text-xs text-slate-500 truncate">{currentUser?.handle || '@wanderer'}</p>
-                  <div className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] font-bold">
-                    <Award className="w-3 h-3 text-amber-600" />
-                    <span>Wanderer Diamond</span>
-                  </div>
-                </div>
+    <div className="w-full min-h-screen bg-[#f8fafc] text-slate-900 pb-20">
+      {/* ─── 1. FULL-WIDTH CINEMATIC COMMUNITY HERO (ĐỒNG BỘ TRANG CHỦ & LỊCH TRÌNH) ─── */}
+      <section className="relative w-full overflow-hidden -mt-16 pt-24 pb-20 sm:pt-28 sm:pb-24 lg:pt-30 lg:pb-28 bg-[#031726] text-white">
+        {/* Cinematic Backdrop with Vibrant Landscape & Seamless Bottom Blend */}
+        <div className="absolute inset-0 z-0 pointer-events-none select-none">
+          <div
+            className="w-full h-full bg-cover bg-center transition-all duration-1000 scale-105"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=2400&q=90')`
+            }}
+          />
+          {/* Refined Photographic Scrim - Đều màu toàn cảnh, bảo toàn độ rõ nét rực rỡ */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-[#031726]/40 to-slate-950/60" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/20 to-[#031726]/85" />
+
+          {/* DẢI LOANG CHÂN DƯỚI CÙNG XUỐNG MÀU #f8fafc (CHỈ Ở CHÂN ĐÁY, KHÔNG ĐÈ LÊN CHỮ) */}
+          <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/50 to-transparent pointer-events-none" />
+
+          {/* Radiant Subtle Ambient Light with Pulse Animations */}
+          <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-sky-500/20 blur-[140px] pointer-events-none animate-pulse-slow" />
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/15 blur-[130px] pointer-events-none animate-pulse-slow [animation-delay:3.5s]" />
+        </div>
+
+        {/* Hero Content Container Aligned Exactly with Navbar Spacing */}
+        <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            
+            {/* Left Content Column */}
+            <div className="max-w-3xl space-y-3">
+              {/* Breadcrumb */}
+              <div className="flex flex-wrap items-center gap-2.5 text-xs">
+                <span className="flex items-center gap-1.5 text-sky-300 hover:text-white transition-colors cursor-pointer font-semibold drop-shadow-md">
+                  <Compass className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Wayfare</span>
+                </span>
+                <ChevronRight className="w-3 h-3 text-slate-300 drop-shadow-md" />
+                <span className="text-white font-bold drop-shadow-md">Cộng Đồng Du Khách</span>
+                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300"></span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-amber-300 border border-amber-400/40 text-[11px] font-bold shadow-md">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                  <span>Nhịp Đập Du Lịch Thực Tế • 63 Tỉnh Thành</span>
+                </span>
               </div>
 
-              {/* User Stats Grid */}
-              <div className="grid grid-cols-4 gap-1.5 p-2.5 bg-slate-50 rounded-2xl text-center border border-slate-200/70">
-                <div className="p-1 rounded-xl bg-white border border-slate-100">
-                  <span className="font-extrabold text-sm text-sky-600 block">{itineraries.length}</span>
-                  <span className="text-[10px] text-slate-500 font-semibold">Chuyến đi</span>
+              {/* Main Headline */}
+              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-[0_3px_12px_rgba(0,0,0,0.95)]">
+                Cộng Đồng Khám Phá{' '}
+                <span className="bg-gradient-to-r from-sky-300 via-cyan-200 to-blue-300 bg-clip-text text-transparent filter drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)]">
+                  Wayfare
+                </span>
+              </h1>
+
+              {/* Subtitle - Chữ màu vàng kem ấm áp tương phản cao */}
+              <p className="text-amber-100/95 text-sm sm:text-base max-w-2xl leading-relaxed font-medium tracking-[0.015em] drop-shadow-[0_2px_8px_rgba(0,0,0,1)]">
+                Nơi hàng ngàn lữ khách chia sẻ khoảnh khắc check-in sống ảo, review ẩm thực bản địa chân thực và sao chép lịch trình thực chiến chỉ với một chạm.
+              </p>
+
+              {/* Live Pulse Ticker */}
+              <div className="flex flex-wrap items-center gap-3 pt-2 text-xs text-slate-200">
+                <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                  <span className="font-bold text-white">1.450+</span>
+                  <span className="text-slate-300">lữ khách trực tuyến</span>
                 </div>
-                <div className="p-1 rounded-xl bg-white border border-slate-100">
-                  <span className="font-extrabold text-sm text-amber-600 block">
-                    {posts.filter(p => p.author?.email === currentUser?.email).length}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-semibold">Bài viết</span>
+                <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-sm">
+                  <Camera className="w-3.5 h-3.5 text-sky-400" />
+                  <span className="font-bold text-white">{posts.length}+</span>
+                  <span className="text-slate-300">bài viết review</span>
                 </div>
-                <div
-                  onClick={() => setFollowListModalState({ isOpen: true, tab: 'following', userId: currentUser?.id, userName: currentUser?.name })}
-                  className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-sky-50 transition-colors group"
-                  title="Bấm để xem danh sách đang theo dõi"
-                >
-                  <span className="font-extrabold text-sm text-sky-700 group-hover:scale-105 transition-transform block">
-                    {followingIds.size}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-semibold group-hover:text-sky-800">Đang follow</span>
-                </div>
-                <div
-                  onClick={() => setActiveCategory(activeCategory === 'Đã lưu' ? 'Tất cả' : 'Đã lưu')}
-                  className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-sky-50 transition-colors group"
-                  title="Bấm để lọc danh sách bài viết đã lưu"
-                >
-                  <span className="font-extrabold text-sm text-sky-600 group-hover:scale-105 transition-transform block">
-                    {bookmarkedPostIds.size}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-semibold group-hover:text-sky-700">Đã lưu</span>
+                <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-sm">
+                  <Copy className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="font-bold text-white">850+</span>
+                  <span className="text-slate-300">tour đã sao chép</span>
                 </div>
               </div>
-
-              {/* Quick Action Button */}
-              <button
-                onClick={() => setIsCreateModalOpen(true)}
-                className="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-md shadow-sky-600/25 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Đăng Bài & Đính Kèm Tour</span>
-              </button>
             </div>
-          ) : (
-            <div className="bg-gradient-to-br from-white via-sky-50/50 to-indigo-50/30 rounded-3xl p-5 border border-sky-100 shadow-sm text-center space-y-4">
-              <div className="w-14 h-14 rounded-2xl bg-sky-600/10 text-sky-600 flex items-center justify-center mx-auto shadow-inner">
-                <Sparkles className="w-7 h-7" />
-              </div>
-              <div className="space-y-1.5">
-                <h3 className="font-extrabold text-base text-slate-900">Cộng đồng Wayfare</h3>
-                <p className="text-xs text-slate-500 leading-relaxed px-1">
-                  Đăng nhập để đăng bài viết, bình luận, lưu hành trình yêu thích và kết nối với các thành viên.
-                </p>
-              </div>
+
+            {/* Action CTA Cluster */}
+            <div className="flex flex-wrap items-center gap-3.5 shrink-0 pt-2 lg:pt-0">
               <button
                 type="button"
                 onClick={() => {
-                  setAuthMode('login');
-                  setIsAuthModalOpen(true);
+                  if (!requireAuth('đăng bài viết mới')) return;
+                  setIsCreateModalOpen(true);
                 }}
-                className="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-md shadow-sky-600/25 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                className="group relative inline-flex items-center gap-2.5 px-7 py-4 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white text-sm sm:text-base font-extrabold shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer ring-2 ring-blue-300/40"
               >
-                <span>Đăng nhập ngay</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <Plus className="w-5 h-5 text-amber-300" />
+                <span>Chia Sẻ Khoảnh Khắc ✨</span>
               </button>
-            </div>
-          )}
 
-          {/* Quick Navigation Links */}
-          <div className="bg-white rounded-3xl p-4 border border-slate-200/90 shadow-sm space-y-1">
-            <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider px-3 pb-2">
-              Khám Phá Cộng Đồng
-            </h4>
-            {[
-              {
-                label: 'Tất cả bài viết',
-                icon: Compass,
-                active: activeCategory === 'Tất cả',
-                action: () => setActiveCategory('Tất cả')
-              },
-              {
-                label: `Đang theo dõi (${followingIds.size})`,
-                icon: UserCheck,
-                active: activeCategory === 'Đang theo dõi',
-                action: () => {
-                  if (!requireAuth('xem bài viết của người đang theo dõi')) return;
-                  setActiveCategory('Đang theo dõi');
-                },
-                badge: followingIds.size > 0 ? `${followingIds.size}` : null
-              },
-              {
-                label: 'Tour có Lịch trình AI',
-                icon: Route,
-                active: activeCategory === 'Có Lịch trình đính kèm',
-                action: () => setActiveCategory('Có Lịch trình đính kèm'),
-                badge: 'Hot'
-              },
-              {
-                label: 'Xu hướng (Nhiều Like)',
-                icon: Flame,
-                active: activeSort === 'popular',
-                action: () => setActiveSort(activeSort === 'popular' ? 'newest' : 'popular')
-              },
-              {
-                label: `Bài viết đã lưu (${bookmarkedPostIds.size})`,
-                icon: Bookmark,
-                active: activeCategory === 'Đã lưu',
-                action: () => {
-                  if (!requireAuth('xem bài viết đã lưu')) return;
-                  setActiveCategory('Đã lưu');
-                },
-                badge: bookmarkedPostIds.size > 0 ? `${bookmarkedPostIds.size}` : null
-              }
-            ].map((item, idx) => (
               <button
-                key={idx}
-                onClick={item.action}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
-                  item.active
-                    ? 'bg-sky-50 text-sky-700 border border-sky-200/80 shadow-xs'
-                    : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
-                }`}
+                type="button"
+                onClick={() => setActiveCategory('Có Lịch trình đính kèm')}
+                className="inline-flex items-center gap-2 px-6 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-sm sm:text-base transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer hover:scale-105 active:scale-95"
               >
-                <div className="flex items-center gap-2.5">
-                  <item.icon className={`w-4 h-4 ${item.active ? 'text-sky-600' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
-                </div>
-                {item.badge && (
-                  <span className={`px-2 py-0.5 rounded-full font-extrabold text-[10px] ${
-                    item.badge === 'Hot' ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'
-                  }`}>
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            ))}
-
-            <div className="pt-2 border-t border-slate-100">
-              <button
-                onClick={() => setFollowListModalState({ isOpen: true, tab: 'following', userId: currentUser.id, userName: currentUser.name })}
-                className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition-all cursor-pointer"
-                title="Xem danh sách người bạn đang theo dõi và người theo dõi bạn"
-              >
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-sky-600" />
-                  <span>Mạng lưới đang theo dõi</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-400" />
+                <Route className="w-5 h-5 text-sky-300" />
+                <span>Tour Có Lịch Trình</span>
               </button>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Trending Topics & Hashtags */}
-          <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm space-y-3">
-            <div className="flex items-center justify-between">
-              <h4 className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
-                <TrendingUp className="w-4 h-4 text-sky-600" />
-                <span>Chủ đề nổi bật</span>
+      {/* ─── 2. ELEVATED 3-COLUMN COMMUNITY WORKSPACE ─── */}
+      <div className="relative -mt-8 sm:-mt-10 z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        {/* 3-COLUMN DESKTOP GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* ========================================================= */}
+          {/* LEFT COLUMN: User Mini-Profile, Quick Nav, Trending Tags */}
+          {/* ========================================================= */}
+          <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-[5rem] h-[calc(100vh-6rem)] overflow-y-auto overscroll-contain sidebar-scrollbar pr-1.5 pb-12 select-none">
+            
+            {/* User Profile Card or Guest Login Prompt */}
+            {isLoggedIn ? (
+              <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm space-y-4">
+                <div className="flex items-center gap-3.5">
+                  <div className="relative">
+                    <img
+                      src={currentUser?.avatar}
+                      alt={currentUser?.name}
+                      className="w-14 h-14 rounded-full object-cover ring-2 ring-sky-500/30 shadow-xs"
+                    />
+                    <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-sky-600 text-white flex items-center justify-center text-[10px] ring-2 ring-white font-bold">
+                      ✓
+                    </span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="font-extrabold text-sm text-slate-900 truncate">{currentUser?.name}</h3>
+                    <p className="text-xs text-slate-500 truncate">{currentUser?.handle || '@wanderer'}</p>
+                    <div className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] font-bold">
+                      <Award className="w-3 h-3 text-amber-600" />
+                      <span>Wanderer Diamond</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* User Stats Grid */}
+                <div className="grid grid-cols-4 gap-1.5 p-2.5 bg-slate-50 rounded-2xl text-center border border-slate-200/70">
+                  <div className="p-1 rounded-xl bg-white border border-slate-100">
+                    <span className="font-extrabold text-sm text-sky-600 block">{itineraries.length}</span>
+                    <span className="text-[10px] text-slate-500 font-semibold">Chuyến đi</span>
+                  </div>
+                  <div className="p-1 rounded-xl bg-white border border-slate-100">
+                    <span className="font-extrabold text-sm text-amber-600 block">
+                      {posts.filter(p => p.author?.email === currentUser?.email).length}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold">Bài viết</span>
+                  </div>
+                  <div
+                    onClick={() => setFollowListModalState({ isOpen: true, tab: 'following', userId: currentUser?.id, userName: currentUser?.name })}
+                    className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-sky-50 transition-colors group"
+                    title="Bấm để xem danh sách đang theo dõi"
+                  >
+                    <span className="font-extrabold text-sm text-sky-700 group-hover:scale-105 transition-transform block">
+                      {followingIds.size}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold group-hover:text-sky-800">Đang follow</span>
+                  </div>
+                  <div
+                    onClick={() => setActiveCategory(activeCategory === 'Đã lưu' ? 'Tất cả' : 'Đã lưu')}
+                    className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-sky-50 transition-colors group"
+                    title="Bấm để lọc danh sách bài viết đã lưu"
+                  >
+                    <span className="font-extrabold text-sm text-sky-600 group-hover:scale-105 transition-transform block">
+                      {bookmarkedPostIds.size}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-semibold group-hover:text-sky-700">Đã lưu</span>
+                  </div>
+                </div>
+
+                {/* Quick Action Button */}
+                <button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-md shadow-sky-600/25 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Đăng Bài & Đính Kèm Tour</span>
+                </button>
+              </div>
+            ) : (
+              <div className="bg-gradient-to-br from-white via-sky-50/50 to-indigo-50/30 rounded-3xl p-5 border border-sky-100 shadow-sm text-center space-y-4">
+                <div className="w-14 h-14 rounded-2xl bg-sky-600/10 text-sky-600 flex items-center justify-center mx-auto shadow-inner">
+                  <Sparkles className="w-7 h-7" />
+                </div>
+                <div className="space-y-1.5">
+                  <h3 className="font-extrabold text-base text-slate-900">Cộng đồng Wayfare</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed px-1">
+                    Đăng nhập để đăng bài viết, bình luận, lưu hành trình yêu thích và kết nối với các thành viên.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('login');
+                    setIsAuthModalOpen(true);
+                  }}
+                  className="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-md shadow-sky-600/25 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                >
+                  <span>Đăng nhập ngay</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {/* Quick Navigation Links */}
+            <div className="bg-white rounded-3xl p-4 border border-slate-200/90 shadow-sm space-y-1">
+              <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider px-3 pb-2">
+                Khám Phá Cộng Đồng
               </h4>
-            </div>
-            <div className="flex flex-wrap gap-2 pt-1">
               {[
-                { tag: '#DaNangReview', count: '2.8k' },
-                { tag: '#SanMayDaLat', count: '1.9k' },
-                { tag: '#HaGiangPhuot', count: '1.4k' },
-                { tag: '#PhuQuocGiaRe', count: '980' },
-                { tag: '#CheckInVietnam', count: '5.1k' }
+                {
+                  label: 'Tất cả bài viết',
+                  icon: Compass,
+                  active: activeCategory === 'Tất cả',
+                  action: () => setActiveCategory('Tất cả')
+                },
+                {
+                  label: `Đang theo dõi (${followingIds.size})`,
+                  icon: UserCheck,
+                  active: activeCategory === 'Đang theo dõi',
+                  action: () => {
+                    if (!requireAuth('xem bài viết của người đang theo dõi')) return;
+                    setActiveCategory('Đang theo dõi');
+                  },
+                  badge: followingIds.size > 0 ? `${followingIds.size}` : null
+                },
+                {
+                  label: 'Tour có Lịch trình AI',
+                  icon: Route,
+                  active: activeCategory === 'Có Lịch trình đính kèm',
+                  action: () => setActiveCategory('Có Lịch trình đính kèm'),
+                  badge: 'Hot'
+                },
+                {
+                  label: 'Xu hướng (Nhiều Like)',
+                  icon: Flame,
+                  active: activeSort === 'popular',
+                  action: () => setActiveSort(activeSort === 'popular' ? 'newest' : 'popular')
+                },
+                {
+                  label: `Bài viết đã lưu (${bookmarkedPostIds.size})`,
+                  icon: Bookmark,
+                  active: activeCategory === 'Đã lưu',
+                  action: () => {
+                    if (!requireAuth('xem bài viết đã lưu')) return;
+                    setActiveCategory('Đã lưu');
+                  },
+                  badge: bookmarkedPostIds.size > 0 ? `${bookmarkedPostIds.size}` : null
+                }
               ].map((item, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setSearchQuery(item.tag.replace('#', ''))}
-                  className="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 border border-transparent text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer"
+                  onClick={item.action}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all text-left cursor-pointer ${
+                    item.active
+                      ? 'bg-sky-50 text-sky-700 border border-sky-200/80 shadow-xs'
+                      : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'
+                  }`}
                 >
-                  <span>{item.tag}</span>
-                  <span className="text-[10px] text-slate-400">{item.count}</span>
+                  <div className="flex items-center gap-2.5">
+                    <item.icon className={`w-4 h-4 ${item.active ? 'text-sky-600' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </div>
+                  {item.badge && (
+                    <span className={`px-2 py-0.5 rounded-full font-extrabold text-[10px] ${
+                      item.badge === 'Hot' ? 'bg-amber-100 text-amber-800' : 'bg-sky-100 text-sky-800'
+                    }`}>
+                      {item.badge}
+                    </span>
+                  )}
                 </button>
               ))}
+
+              <div className="pt-2 border-t border-slate-100">
+                <button
+                  onClick={() => setFollowListModalState({ isOpen: true, tab: 'following', userId: currentUser.id, userName: currentUser.name })}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-slate-700 hover:text-sky-700 hover:bg-sky-50 transition-all cursor-pointer"
+                  title="Xem danh sách người bạn đang theo dõi và người theo dõi bạn"
+                >
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-sky-600" />
+                    <span>Mạng lưới đang theo dõi</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400" />
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* WanderAI Community Insight */}
-          <div className="bg-gradient-to-br from-sky-50/70 via-white to-blue-50/50 p-5 rounded-3xl border border-sky-200/70 shadow-sm space-y-2">
-            <div className="flex items-center gap-1.5 text-sky-800 text-xs font-extrabold uppercase tracking-wider">
-              <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>Gợi ý du lịch thông minh</span>
+            {/* Trending Topics & Hashtags */}
+            <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5">
+                  <TrendingUp className="w-4 h-4 text-sky-600" />
+                  <span>Chủ đề nổi bật</span>
+                </h4>
+              </div>
+              <div className="flex flex-wrap gap-2 pt-1">
+                {[
+                  { tag: '#DaNangReview', count: '2.8k' },
+                  { tag: '#SanMayDaLat', count: '1.9k' },
+                  { tag: '#HaGiangPhuot', count: '1.4k' },
+                  { tag: '#PhuQuocGiaRe', count: '980' },
+                  { tag: '#CheckInVietnam', count: '5.1k' }
+                ].map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSearchQuery(item.tag.replace('#', ''))}
+                    className="px-3 py-1.5 rounded-full bg-slate-100 text-slate-700 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 border border-transparent text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>{item.tag}</span>
+                    <span className="text-[10px] text-slate-400">{item.count}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-            <p className="text-xs text-slate-600 leading-relaxed font-normal">
-              Bạn có thể bấm <strong className="text-sky-700">"Sao chép Tour 1-Click"</strong> ở bất kỳ bài viết nào để tự động thêm toàn bộ lộ trình chi tiết vào kho cá nhân của bạn!
-            </p>
-          </div>
 
-        </aside>
+            {/* WanderAI Community Insight */}
+            <div className="bg-gradient-to-br from-sky-50/70 via-white to-blue-50/50 p-5 rounded-3xl border border-sky-200/70 shadow-sm space-y-2">
+              <div className="flex items-center gap-1.5 text-sky-800 text-xs font-extrabold uppercase tracking-wider">
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>Gợi ý du lịch thông minh</span>
+              </div>
+              <p className="text-xs text-slate-600 leading-relaxed font-normal">
+                Bạn có thể bấm <strong className="text-sky-700">"Sao chép Tour 1-Click"</strong> ở bất kỳ bài viết nào để tự động thêm toàn bộ lộ trình chi tiết vào kho cá nhân của bạn!
+              </p>
+            </div>
 
-        {/* ========================================================= */}
-        {/* CENTER COLUMN: Social Feed & Post Creator (6 cols) */}
-        {/* ========================================================= */}
-        <main className="col-span-1 lg:col-span-6 space-y-6">
-          
-          {/* Quick Create Post Bar or Guest Invitation */}
-          {isLoggedIn ? (
+          </aside>
+
+          {/* ========================================================= */}
+          {/* CENTER COLUMN: Social Feed & Post Creator (6 cols) */}
+          {/* ========================================================= */}
+          <main className="col-span-1 lg:col-span-6 space-y-6">
+
+            {/* ─── 24H COMMUNITY MOMENTS & STORIES CAROUSEL ─── */}
+            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
+              <div className="flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></div>
+                  <h3 className="font-extrabold text-sm text-slate-900 tracking-tight">Khoảnh Khắc 24h • Trải Nghiệm Thực Tế</h3>
+                </div>
+                <span className="text-xs text-slate-400 font-semibold">Cập nhật liên tục</span>
+              </div>
+
+              {/* Horizontal Scroll Story Circles */}
+              <div className="flex items-center gap-3.5 overflow-x-auto pb-2 scrollbar-none select-none">
+                {COMMUNITY_STORIES.map(story => (
+                  <div
+                    key={story.id}
+                    onClick={() => setSearchQuery(story.tag)}
+                    className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group"
+                    title={`Bấm để xem các bài viết về ${story.location}`}
+                  >
+                    <div className="relative p-0.5 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-sky-500 group-hover:scale-105 transition-transform shadow-xs">
+                      <div className="p-0.5 rounded-full bg-white">
+                        <img
+                          src={story.image}
+                          alt={story.location}
+                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover"
+                        />
+                      </div>
+                      {story.badge && (
+                        <span className="absolute -bottom-1 -right-1 text-[10px] bg-slate-900 text-white px-1.5 py-0.2 rounded-full border border-white font-bold">
+                          {story.badge}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[11px] font-bold text-slate-700 group-hover:text-sky-600 transition-colors truncate max-w-[72px] text-center">
+                      {story.location}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Quick Create Post Bar or Guest Invitation */}
+            {isLoggedIn ? (
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-sm space-y-4">
               <div className="flex items-center gap-3.5">
                 <img
@@ -2464,6 +2621,7 @@ export const CommunityPage = () => {
 
         </aside>
 
+        </div>
       </div>
 
       {/* ========================================================= */}
