@@ -45,37 +45,43 @@ function MapFlyController({ activeItem, userCoords }) {
   return null;
 }
 
-// Custom Marker Icon Generator - Thiết kế chuẩn Google Maps / Apple Maps thanh mảnh & tinh tế
+// 1. Tourist Destination Pin Generator (Cây ghim giọt nước cắm vào địa danh du lịch)
 const createCustomMarkerIcon = (item, isActive) => {
-  const isCafe = item.category?.includes('Cafe');
-  const isHome = item.category?.includes('Homestay');
-  const isFood = item.category?.includes('Ẩm Thực');
-  const isActivity = item.category?.includes('Trải Nghiệm');
+  const cat = (item.category || item.name || '').toLowerCase();
 
-  let pinColor = '#0284c7'; // Sky-600
-  let emoji = '📍';
+  let pinColor = '#ef4444'; // Đỏ du lịch thương hiệu (Google Maps Tourist Destination Red)
+  let emoji = '📸'; // Check-in / Điểm du lịch chung
 
-  if (isCafe) {
-    pinColor = '#d97706'; // Amber-600
+  if (cat.includes('cafe') || cat.includes('cà phê') || cat.includes('trà') || cat.includes('săn mây')) {
+    pinColor = '#d97706'; // Hổ phách Amber-600
     emoji = '☕';
-  } else if (isHome) {
-    pinColor = '#e11d48'; // Rose-600
+  } else if (cat.includes('homestay') || cat.includes('khách sạn') || cat.includes('resort') || cat.includes('nghỉ dưỡng') || cat.includes('villa')) {
+    pinColor = '#e11d48'; // Hồng Rose-600
     emoji = '🏡';
-  } else if (isFood) {
-    pinColor = '#059669'; // Emerald-600
+  } else if (cat.includes('ẩm thực') || cat.includes('ăn uống') || cat.includes('nhà hàng') || cat.includes('quán ăn') || cat.includes('đặc sản')) {
+    pinColor = '#ea580c'; // Cam Orange-600
     emoji = '🍜';
-  } else if (isActivity) {
-    pinColor = '#4f46e5'; // Indigo-600
+  } else if (cat.includes('trải nghiệm') || cat.includes('vui chơi') || cat.includes('trekking') || cat.includes('leo núi') || cat.includes('tour')) {
+    pinColor = '#7c3aed'; // Tím Violet-600
     emoji = '🧗';
+  } else if (cat.includes('biển') || cat.includes('đảo') || cat.includes('vịnh') || cat.includes('bãi tắm')) {
+    pinColor = '#0891b2'; // Xanh ngọc biển Cyan-600
+    emoji = '🏖️';
+  } else if (cat.includes('di tích') || cat.includes('chùa') || cat.includes('tháp') || cat.includes('lăng') || cat.includes('bảo tàng') || cat.includes('phố cổ') || cat.includes('lịch sử')) {
+    pinColor = '#b91c1c'; // Đỏ gạch di tích Red-700
+    emoji = '🏛️';
+  } else if (cat.includes('thác') || cat.includes('núi') || cat.includes('rừng') || cat.includes('đèo') || cat.includes('hồ') || cat.includes('thung lũng') || cat.includes('thiên nhiên')) {
+    pinColor = '#16a34a'; // Xanh lá rừng Green-600
+    emoji = '🏔️';
   }
 
   // Khi active: Chỉ phóng to nhẹ, tạo bóng đổ dịu mắt, KHÔNG dùng viền vuông hay chấm cam thô kệch
   const scaleClass = isActive ? 'scale-115 z-50' : 'hover:scale-110 z-10';
-  const shadowFilter = isActive ? 'drop-shadow(0 6px 8px rgba(0,0,0,0.45))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.25))';
+  const shadowFilter = isActive ? 'drop-shadow(0 6px 10px rgba(0,0,0,0.5))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.28))';
   const strokeColor = isActive ? '#fef08a' : '#ffffff'; // Viền vàng nhẹ tinh tế khi active hoặc trắng thanh lịch
 
   return L.divIcon({
-    className: 'sleek-map-marker-pin',
+    className: 'sleek-tourist-marker-pin',
     html: `
       <div class="relative cursor-pointer transition-all duration-200 ${scaleClass} flex flex-col items-center" style="filter: ${shadowFilter};">
         <svg width="28" height="36" viewBox="0 0 28 36" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -95,20 +101,32 @@ const createCustomMarkerIcon = (item, isActive) => {
   });
 };
 
-// User GPS marker icon
+// 2. User GPS Marker Icon - Chuẩn Radar Pulsing Beacon Google Maps (Hoàn toàn khác biệt với ghim du lịch)
 const createUserGpsIcon = () => {
   return L.divIcon({
-    className: 'user-gps-marker',
+    className: 'user-gps-radar-beacon',
     html: `
-      <div class="relative flex items-center justify-center">
-        <span class="animate-ping absolute inline-flex h-8 w-8 rounded-full bg-sky-400 opacity-60"></span>
-        <div class="relative w-5 h-5 rounded-full bg-sky-600 border-2 border-white shadow-xl flex items-center justify-center">
-          <div class="w-2 h-2 rounded-full bg-white"></div>
+      <div class="relative flex flex-col items-center justify-center select-none cursor-pointer">
+        <!-- Floating Pill: "Vị trí của bạn" -->
+        <div class="absolute -top-7 px-2.5 py-0.5 rounded-full bg-blue-600/95 text-white text-[10px] font-bold shadow-lg border border-white/90 flex items-center gap-1.5 whitespace-nowrap pointer-events-none backdrop-blur-sm">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>Vị trí của bạn</span>
+        </div>
+
+        <!-- High-tech Pulsing GPS Beacon Dot -->
+        <div class="relative flex items-center justify-center w-8 h-8">
+          <span class="animate-ping absolute inline-flex h-8 w-8 rounded-full bg-blue-400 opacity-60"></span>
+          <span class="absolute inline-flex h-6 w-6 rounded-full bg-blue-500/25"></span>
+          <!-- Core GPS Blue Circle with White Border -->
+          <div class="relative w-5 h-5 rounded-full bg-blue-600 border-2 border-white shadow-xl flex items-center justify-center">
+            <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+          </div>
         </div>
       </div>
     `,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16]
+    iconSize: [100, 48],
+    iconAnchor: [50, 32],
+    popupAnchor: [0, -36]
   });
 };
 
