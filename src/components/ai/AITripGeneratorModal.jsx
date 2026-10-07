@@ -48,14 +48,14 @@ const DESTINATION_COVERS = {
 };
 
 const INTEREST_OPTIONS = [
-  { id: 'checkin', label: 'Check-in sống ảo & Cafe chill', icon: Camera },
-  { id: 'food', label: 'Ẩm thực bản địa & Street food', icon: Utensils },
-  { id: 'beach', label: 'Nghỉ dưỡng biển & Resort', icon: Sun },
-  { id: 'culture', label: 'Văn hóa - Di sản & Phố cổ', icon: Landmark },
-  { id: 'trekking', label: 'Trekking & Mạo hiểm', icon: Compass },
-  { id: 'nightlife', label: 'Nightlife & Phố đi bộ', icon: Music },
-  { id: 'healing', label: 'Chữa lành & Slow Travel', icon: Heart },
-  { id: 'shopping', label: 'Mua sắm & Chợ đêm', icon: ShoppingBag }
+  { id: 'checkin', label: 'Check-in sống ảo', icon: Camera },
+  { id: 'food', label: 'Ẩm thực bản địa', icon: Utensils },
+  { id: 'beach', label: 'Nghỉ dưỡng & Biển', icon: Sun },
+  { id: 'culture', label: 'Văn hóa & Di sản', icon: Landmark },
+  { id: 'trekking', label: 'Trekking & Phượt', icon: Compass },
+  { id: 'nightlife', label: 'Phố đêm & Vui chơi', icon: Music },
+  { id: 'healing', label: 'Chữa lành & Thư giãn', icon: Heart },
+  { id: 'shopping', label: 'Mua sắm & Chợ', icon: ShoppingBag }
 ];
 
 export const AITripGeneratorModal = () => {
@@ -462,528 +462,293 @@ QUY TẮC BẮT BUỘC (CRITICAL):
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-md overflow-y-auto animate-fade-in">
-      {/* MAIN MODAL CARD (Max-w: 980px matching Stitch Screen M09) */}
-      <div className="relative w-full max-w-[980px] bg-white text-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh] border border-slate-200/80">
+      {/* COMPACT MODAL CARD (Max-w: 640px, thoáng đãng, gọn gàng, không chằng chịt) */}
+      <div className="relative w-full max-w-[640px] bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh] border border-slate-200">
         
-        {/* Top Ambient Accent Bar */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-sky-600 via-sky-500 to-amber-500 shrink-0" />
+        {/* Top Accent Gradient Bar */}
+        <div className="h-1.5 w-full bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 shrink-0" />
 
-        {/* MODAL HEADER */}
-        <div className="px-5 sm:px-8 pt-5 sm:pt-6 pb-4 bg-white flex items-start justify-between gap-4 shrink-0 border-b border-slate-100">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2.5">
-              <span className="p-2 rounded-xl bg-gradient-to-tr from-sky-500 to-sky-500 text-white flex items-center justify-center shadow-md">
-                <Sparkles className="w-5 h-5 text-amber-200 animate-pulse" />
-              </span>
-              <h1 className="font-display text-lg sm:text-xl font-extrabold text-slate-900 flex items-center gap-2 tracking-tight">
-                Tạo Lịch Trình Du Lịch Thông Minh Cùng WanderAI
-                <span className="text-[10px] text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-extrabold border border-amber-200">
-                  PRO
-                </span>
-              </h1>
+        {/* MODAL HEADER - Gọn gàng, sạch sẽ */}
+        <div className="px-5 sm:px-6 py-4 bg-white flex items-center justify-between border-b border-slate-100 shrink-0">
+          <div className="flex items-center gap-2.5">
+            <span className="p-2 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-sky-600" />
+            </span>
+            <div>
+              <h2 className="font-display text-base sm:text-lg font-extrabold text-slate-900 tracking-tight">
+                Lập Lịch Trình AI Thông Minh
+              </h2>
+              <p className="text-xs text-slate-500 font-normal">
+                Điền nhanh mong muốn, AI sẽ thiết kế tour thực tế cho bạn.
+              </p>
             </div>
-            <p className="text-xs sm:text-sm text-slate-600 pl-11 max-w-2xl leading-relaxed">
-              Điền một vài mong muốn của bạn, AI sẽ tự động phân tích không gian địa lý, tối ưu thời gian di chuyển, thời tiết và tính toán chi phí thực tế.
-            </p>
           </div>
 
-          <div className="flex items-center gap-2.5 shrink-0">
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 border border-sky-200/60 text-sky-800 text-[11px] font-bold">
-              <span className="w-2 h-2 rounded-full bg-sky-500 animate-ping"></span>
-              <span>Gemini 3.6 Flash · GPS Grounding</span>
+          <button
+            type="button"
+            onClick={() => setIsAIGeneratorOpen(false)}
+            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer"
+            title="Đóng popup"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* MODAL BODY - Form gọn gàng, thoáng đãng, dễ điền */}
+        <div className="px-5 sm:px-6 py-4 overflow-y-auto flex-1 space-y-4">
+
+          {/* 1. Điểm đến du lịch */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-sky-600" />
+              <span>Điểm đến du lịch</span>
+            </label>
+            <div className="relative">
+              <Navigation className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
+              <input
+                type="text"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                placeholder="Nhập tỉnh, thành phố (ví dụ: Đà Lạt, Phú Quốc, Ninh Bình...)"
+                className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-slate-50 text-slate-900 text-xs font-semibold border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+              />
+              {destination && (
+                <button
+                  type="button"
+                  onClick={() => setDestination('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
+
+            {/* Quick destination tags */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+              <span className="text-[11px] font-bold text-slate-400">Gợi ý:</span>
+              {HOT_DESTINATIONS.map(tag => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => setDestination(tag)}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                    destination === tag
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 2. Thời gian chuyến đi & Ngày khởi hành */}
+          <div className="space-y-2 pt-2 border-t border-slate-100">
+            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-sky-600" />
+              <span>Thời lượng & Ngày khởi hành</span>
+            </label>
+
+            {/* Duration Pills */}
+            <div className="grid grid-cols-4 gap-2">
+              {['2N1Đ', '3N2Đ', '4N3Đ', '5N4Đ'].map(pill => (
+                <button
+                  key={pill}
+                  type="button"
+                  onClick={() => handleSelectDuration(pill)}
+                  className={`py-2 rounded-xl text-center text-xs font-bold transition-all cursor-pointer ${
+                    durationPill === pill
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  {pill}
+                </button>
+              ))}
+            </div>
+
+            {/* Start Date & End Date auto-calc */}
+            <div className="grid grid-cols-2 gap-3 pt-1">
+              <div>
+                <span className="text-[11px] font-semibold text-slate-500 block mb-1">Ngày bắt đầu</span>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                />
+              </div>
+              <div>
+                <span className="text-[11px] font-semibold text-slate-500 block mb-1">Ngày kết thúc</span>
+                <div className="px-3 py-2 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold flex items-center justify-between border border-slate-200/60">
+                  <span>{endDateDisplay}</span>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Đối tượng & Ngân sách */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+            {/* Companions */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5 text-indigo-600" />
+                <span>Đi cùng ai?</span>
+              </label>
+              <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  { id: 'solo', label: '1 mình', icon: User },
+                  { id: 'couple', label: 'Cặp đôi', icon: Heart },
+                  { id: 'friends', label: 'Nhóm bạn', icon: Users },
+                  { id: 'family', label: 'Gia đình', icon: Home }
+                ].map(item => {
+                  const isSelected = companion === item.id;
+                  const Icon = item.icon;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setCompanion(item.id)}
+                      className={`py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-sky-50 text-sky-700 border-2 border-sky-500'
+                          : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Budget */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <DollarSign className="w-3.5 h-3.5 text-amber-600" />
+                <span>Ngân sách mỗi người</span>
+              </label>
+              <div className="grid grid-cols-2 gap-1.5">
+                {[
+                  { tier: 1, label: 'Tiết kiệm', sub: '2 - 4 tr' },
+                  { tier: 2, label: 'Tiêu chuẩn', sub: '4 - 7 tr' },
+                  { tier: 3, label: 'Thoải mái', sub: '7 - 12 tr' },
+                  { tier: 4, label: 'Cao cấp', sub: '> 15 tr' }
+                ].map(item => {
+                  const isSelected = budgetTier === item.tier;
+                  return (
+                    <button
+                      key={item.tier}
+                      type="button"
+                      onClick={() => setBudgetTier(item.tier)}
+                      className={`py-1.5 px-2 rounded-xl text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
+                        isSelected
+                          ? 'bg-amber-50 text-amber-900 border-2 border-amber-500'
+                          : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span className="text-xs font-bold">{item.label}</span>
+                      <span className="text-[10px] text-slate-500 font-medium">{item.sub}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* 4. Gu trải nghiệm du lịch (Interests Chips) */}
+          <div className="space-y-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                <span>Gu du lịch & Trải nghiệm</span>
+              </label>
+              <span className="text-[11px] font-semibold text-slate-400">Chọn 1 hoặc nhiều</span>
+            </div>
+
+            <div className="flex flex-wrap gap-1.5">
+              {INTEREST_OPTIONS.map(opt => {
+                const isSelected = selectedInterests.includes(opt.id);
+                const Icon = opt.icon;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => toggleInterest(opt.id)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    <span>{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 5. Ghi chú thêm cho AI */}
+          <div className="space-y-1.5 pt-2 border-t border-slate-100">
+            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <Info className="w-3.5 h-3.5 text-slate-500" />
+              <span>Yêu cầu đặc biệt cho AI (Tùy chọn)</span>
+            </label>
+            <input
+              type="text"
+              value={customPrompt}
+              onChange={(e) => setCustomPrompt(e.target.value)}
+              placeholder="Ví dụ: Không dậy sớm trước 8h, thích ăn hải sản vỉa hè, muốn ghé Chùa Hương Tích..."
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 text-slate-900 text-xs font-medium border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+            />
+          </div>
+
+        </div>
+
+        {/* MODAL FOOTER - Gọn gàng, nút bấm rõ ràng */}
+        <div className="px-5 sm:px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={handleReset}
+            disabled={isGenerating}
+            className="text-xs text-slate-500 hover:text-slate-800 font-semibold cursor-pointer transition-colors"
+          >
+            Làm mới
+          </button>
+
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={() => setIsAIGeneratorOpen(false)}
-              className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-colors cursor-pointer"
-              title="Đóng popup"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* MODAL BODY: 2-COLUMN SCROLLABLE WORKSPACE */}
-        <div className="px-5 sm:px-8 py-5 overflow-y-auto flex-1 space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-            
-            {/* ─── CỘT TRÁI: THÔNG TIN CƠ BẢN & HÀNH TRÌNH CỐT LÕI (6 Cols) ─── */}
-            <div className="lg:col-span-6 flex flex-col gap-4">
-              
-              {/* 1. Destination Search & Quick Tags */}
-              <div className="bg-slate-50/90 p-4 rounded-2xl flex flex-col gap-2.5 border border-slate-200/70 shadow-2xs">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-sky-600" />
-                    <span>Điểm đến mong muốn</span>
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const seasonal = ['Đà Lạt Săn Mây', 'Phú Quốc Mùa Biển Êm', 'Hà Giang Mùa Lúa'];
-                      const randomPick = seasonal[Math.floor(Math.random() * seasonal.length)];
-                      setDestination(randomPick);
-                      toast.info(`Đã áp dụng gợi ý theo mùa: ${randomPick}`);
-                    }}
-                    className="text-[11px] text-sky-600 font-bold hover:underline cursor-pointer flex items-center gap-1"
-                  >
-                    <span>Gợi ý theo mùa ✨</span>
-                  </button>
-                </div>
-
-                <div className="relative">
-                  <Navigation className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-                  <input
-                    type="text"
-                    value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
-                    placeholder="Nhập tỉnh, thành phố hoặc vùng vịnh..."
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white text-slate-900 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 shadow-2xs"
-                  />
-                  {destination && (
-                    <button
-                      type="button"
-                      onClick={() => setDestination('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Quick Select Badges */}
-                <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  <span className="text-[11px] font-bold text-slate-400 mr-1">Hot:</span>
-                  {HOT_DESTINATIONS.map(tag => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => setDestination(tag)}
-                      className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
-                        destination === tag
-                          ? 'bg-sky-600 text-white shadow-2xs'
-                          : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'
-                      }`}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* 2. Duration & Departure Date */}
-              <div className="bg-slate-50/90 p-4 rounded-2xl flex flex-col gap-2.5 border border-slate-200/70 shadow-2xs">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <Calendar className="w-4 h-4 text-sky-600" />
-                    <span>Thời gian & Ngày khởi hành</span>
-                  </label>
-                  <span className="text-[11px] text-slate-500 font-medium">Lý tưởng: 3 - 5 ngày</span>
-                </div>
-
-                {/* Duration Selector Pills */}
-                <div className="grid grid-cols-4 gap-1.5">
-                  {['2N1Đ', '3N2Đ', '4N3Đ', '5N4Đ'].map(pill => (
-                    <button
-                      key={pill}
-                      type="button"
-                      onClick={() => handleSelectDuration(pill)}
-                      className={`py-2 px-2 rounded-xl text-center text-xs font-bold transition-all cursor-pointer ${
-                        durationPill === pill
-                          ? 'bg-sky-600 text-white shadow-2xs'
-                          : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
-                      }`}
-                    >
-                      {pill}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Start & Auto Calculated End Date */}
-                <div className="grid grid-cols-2 gap-3 mt-1">
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[11px] font-bold text-slate-500">Ngày bắt đầu</span>
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-white text-slate-800 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <span className="text-[11px] font-bold text-slate-500">Ngày kết thúc (tự tính)</span>
-                    <div className="px-3 py-2 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold flex items-center justify-between border border-slate-200/60">
-                      <span>{endDateDisplay}</span>
-                      <CheckCircle2 className="w-4 h-4 text-sky-600" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. Companions (Thành viên chuyến đi) */}
-              <div className="bg-slate-50/90 p-4 rounded-2xl flex flex-col gap-2.5 border border-slate-200/70 shadow-2xs">
-                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-indigo-600" />
-                  <span>Đối tượng tham gia chuyến đi</span>
-                </label>
-
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { id: 'solo', title: 'Đi một mình', desc: 'Solo backpacker & tự do', icon: User },
-                    { id: 'couple', title: 'Cặp đôi / Trăng mật', desc: 'Lãng mạn, riêng tư & view đẹp', icon: Heart },
-                    { id: 'friends', title: 'Nhóm bạn thân', desc: 'Năng động, chill & ảnh đẹp', icon: Users },
-                    { id: 'family', title: 'Gia đình nhiều thế hệ', desc: 'Có trẻ nhỏ / người cao tuổi', icon: Home }
-                  ].map(item => {
-                    const isSelected = companion === item.id;
-                    const Icon = item.icon;
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={() => setCompanion(item.id)}
-                        className={`p-2.5 rounded-xl border transition-all flex items-start gap-2.5 cursor-pointer ${
-                          isSelected
-                            ? 'bg-sky-50/80 border-sky-400 shadow-2xs text-sky-900'
-                            : 'bg-white border-slate-200 hover:bg-slate-100/80 text-slate-700'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="companion"
-                          checked={isSelected}
-                          onChange={() => setCompanion(item.id)}
-                          className="accent-sky-600 w-3.5 h-3.5 mt-0.5"
-                        />
-                        <div className="flex flex-col">
-                          <span className="text-xs font-bold flex items-center gap-1">
-                            <Icon className="w-3.5 h-3.5 opacity-70" />
-                            {item.title}
-                          </span>
-                          <span className="text-[10px] text-slate-500 leading-tight mt-0.5">{item.desc}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 4. Preferred Transit (Phương tiện di chuyển) */}
-              <div className="bg-slate-50/90 p-4 rounded-2xl flex flex-col gap-2.5 border border-slate-200/70 shadow-2xs">
-                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Car className="w-4 h-4 text-sky-600" />
-                  <span>Phương tiện ưu tiên tại điểm đến</span>
-                </label>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-                  {[
-                    { id: 'bike', label: 'Xe máy phượt', icon: Bike },
-                    { id: 'car', label: 'Thuê ô tô tự lái', icon: Car },
-                    { id: 'taxi', label: 'Taxi & Grab', icon: Car },
-                    { id: 'bus', label: 'Xe khách / Tour', icon: Bus }
-                  ].map(item => {
-                    const isSelected = transit === item.id;
-                    const Icon = item.icon;
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => setTransit(item.id)}
-                        className={`flex flex-col items-center justify-center p-2.5 rounded-xl gap-1 text-center transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-sky-600 text-white shadow-2xs'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100'
-                        }`}
-                      >
-                        <Icon className="w-4 h-4" />
-                        <span className="text-[11px] font-bold">{item.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 5. Budget Level Slider */}
-              <div className="bg-slate-50/90 p-4 rounded-2xl flex flex-col gap-2.5 border border-slate-200/70 shadow-2xs">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <DollarSign className="w-4 h-4 text-amber-600" />
-                    <span>Ngân sách ước tính mỗi người</span>
-                  </label>
-                  <span className="text-xs font-extrabold text-amber-800 bg-amber-100 border border-amber-200 px-2.5 py-0.5 rounded-full">
-                    {getBudgetLabel()}
-                  </span>
-                </div>
-
-                <div className="relative pt-2 pb-1">
-                  <input
-                    type="range"
-                    min="1"
-                    max="4"
-                    value={budgetTier}
-                    onChange={(e) => setBudgetTier(Number(e.target.value))}
-                    className="w-full accent-sky-600 cursor-pointer"
-                  />
-                  <div className="flex justify-between text-[10px] text-slate-500 font-bold mt-1">
-                    <span className={budgetTier === 1 ? 'text-sky-600 font-black' : ''}>Tiết kiệm (2-4tr)</span>
-                    <span className={budgetTier === 2 ? 'text-sky-600 font-black' : ''}>Tiêu chuẩn (4-7tr)</span>
-                    <span className={budgetTier === 3 ? 'text-sky-600 font-black' : ''}>Thoải mái (7-12tr)</span>
-                    <span className={budgetTier === 4 ? 'text-sky-600 font-black' : ''}>Cao cấp (&gt;15tr)</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 pt-1 border-t border-slate-200/60">
-                  <input
-                    type="checkbox"
-                    id="includeFlight"
-                    checked={includeFlight}
-                    onChange={(e) => setIncludeFlight(e.target.checked)}
-                    className="accent-sky-600 w-3.5 h-3.5 rounded cursor-pointer"
-                  />
-                  <label htmlFor="includeFlight" className="text-[11px] text-slate-600 cursor-pointer select-none font-medium">
-                    Bao gồm chi phí vé máy bay khứ hồi hoặc vé xe liên tỉnh
-                  </label>
-                </div>
-              </div>
-
-            </div>
-
-            {/* ─── CỘT PHẢI: CÁ NHÂN HÓA CHUYÊN SÂU & AI TUNING (6 Cols) ─── */}
-            <div className="lg:col-span-6 flex flex-col gap-4">
-              
-              {/* 1. Travel Interests Multi-Select Chips */}
-              <div className="bg-slate-50/90 p-4 rounded-2xl flex flex-col gap-2.5 border border-slate-200/70 shadow-2xs">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-purple-600" />
-                    <span>Gu du lịch & Trải nghiệm mong muốn</span>
-                  </label>
-                  <span className="text-[11px] text-sky-600 font-bold">
-                    {selectedInterests.length} đã chọn
-                  </span>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {INTEREST_OPTIONS.map(opt => {
-                    const isSelected = selectedInterests.includes(opt.id);
-                    const Icon = opt.icon;
-                    return (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => toggleInterest(opt.id)}
-                        className={`px-3 py-1.5 rounded-full text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                          isSelected
-                            ? 'bg-sky-600 text-white shadow-2xs'
-                            : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 hover:text-slate-900'
-                        }`}
-                      >
-                        <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white' : 'text-sky-600'}`} />
-                        <span>{opt.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 2. Travel Pace (Pacing Engine) */}
-              <div className="bg-slate-50/90 p-4 rounded-2xl flex flex-col gap-2.5 border border-slate-200/70 shadow-2xs">
-                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Zap className="w-4 h-4 text-amber-500" />
-                  <span>Nhịp độ lịch trình (Pacing Engine)</span>
-                </label>
-
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { id: 'relaxed', title: 'Thong thả', desc: '2-3 điểm/ngày, thư giãn, không vội vã' },
-                    { id: 'balanced', title: 'Cân bằng ✨', desc: '3-4 điểm/ngày, chuẩn tối ưu WanderAI' },
-                    { id: 'max', title: 'Khám phá tối đa', desc: '5-6 điểm/ngày, tận dụng từng khoảnh khắc' }
-                  ].map(item => {
-                    const isSelected = pacing === item.id;
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={() => setPacing(item.id)}
-                        className={`p-2.5 rounded-xl flex flex-col gap-1 cursor-pointer transition-all text-center border ${
-                          isSelected
-                            ? 'bg-sky-600 text-white border-sky-600 shadow-2xs'
-                            : 'bg-white border-slate-200 hover:bg-slate-100 text-slate-800'
-                        }`}
-                      >
-                        <span className="text-xs font-bold">{item.title}</span>
-                        <span className={`text-[10px] leading-tight ${isSelected ? 'text-sky-100' : 'text-slate-500'}`}>
-                          {item.desc}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* 3. Accommodation & Dining Preferences */}
-              <div className="bg-slate-50/90 p-4 rounded-2xl flex flex-col gap-2.5 border border-slate-200/70 shadow-2xs">
-                <div className="grid grid-cols-2 gap-3">
-                  {/* Stay Style */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                      <Home className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Loại lưu trú</span>
-                    </label>
-                    <select
-                      value={accommodation}
-                      onChange={(e) => setAccommodation(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-white text-slate-800 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-                    >
-                      <option>Khách sạn 3 sao tiện nghi, trung tâm</option>
-                      <option>Khách sạn 4-5 sao sang trọng</option>
-                      <option>Homestay phong cách bản địa</option>
-                      <option>Glamping / Cắm trại view đồi</option>
-                      <option>Resort ven biển biệt lập</option>
-                    </select>
-                  </div>
-
-                  {/* Food Style */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                      <Utensils className="w-3.5 h-3.5 text-amber-600" />
-                      <span>Phong cách ẩm thực</span>
-                    </label>
-                    <select
-                      value={diningStyle}
-                      onChange={(e) => setDiningStyle(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-white text-slate-800 text-xs font-semibold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-                    >
-                      <option>Quán ăn bản địa chuẩn vị & nổi tiếng</option>
-                      <option>Nhà hàng cao cấp, không gian đẹp</option>
-                      <option>Hải sản tươi sống, bình dân</option>
-                      <option>Ăn chay / Thuần Organic & Healthy</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. Free AI Prompt Box (Custom Instructions) */}
-              <div className="bg-slate-50/90 p-4 rounded-2xl flex flex-col gap-1.5 border border-slate-200/70 shadow-2xs">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                    <span>Yêu cầu đặc biệt cho AI (Tự do mô tả)</span>
-                  </label>
-                  <span className="text-[10px] text-slate-400 font-medium">Ngôn ngữ tự nhiên</span>
-                </div>
-                <textarea
-                  value={customPrompt}
-                  onChange={(e) => setCustomPrompt(e.target.value)}
-                  placeholder="Ví dụ: Muốn ngắm hoàng hôn ở bán đảo Sơn Trà ngày thứ hai, thích ăn mì Quảng chuẩn vị người bản xứ, đoàn không dậy sớm trước 8h sáng..."
-                  rows="3"
-                  className="w-full p-3 rounded-xl bg-white text-slate-900 text-xs font-medium border border-slate-200 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 placeholder:text-slate-400 resize-none shadow-2xs"
-                />
-              </div>
-
-              {/* 5. Advanced AI Tuning Toggles */}
-              <div className="bg-slate-50/90 px-4 py-3 rounded-2xl flex flex-col gap-2 border border-slate-200/70 shadow-2xs">
-                <span className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
-                  <Sliders className="w-3.5 h-3.5 text-sky-600" />
-                  <span>Thuật toán thông minh tích hợp</span>
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={smartAvoidTraffic}
-                      onChange={(e) => setSmartAvoidTraffic(e.target.checked)}
-                      className="accent-sky-600 w-3.5 h-3.5 rounded"
-                    />
-                    <span className="text-[11px] text-slate-600 font-medium">Tránh tắc đường cao điểm</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={smartLoopRoute}
-                      onChange={(e) => setSmartLoopRoute(e.target.checked)}
-                      className="accent-sky-600 w-3.5 h-3.5 rounded"
-                    />
-                    <span className="text-[11px] text-slate-600 font-medium">Lộ trình vòng tròn không lặp</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={smartWeather}
-                      onChange={(e) => setSmartWeather(e.target.checked)}
-                      className="accent-sky-600 w-3.5 h-3.5 rounded"
-                    />
-                    <span className="text-[11px] text-slate-600 font-medium">Dự báo thời tiết & nắng râm</span>
-                  </label>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-        </div>
-
-        {/* MODAL FOOTER & ACTION BAR (Stitch Screen M09 Footer) */}
-        <div className="px-5 sm:px-8 py-3.5 bg-slate-100/90 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
-          
-          {/* Live AI Performance Predictor Indicator */}
-          <div className="flex items-center gap-3 text-slate-500 text-[11px]">
-            <div className="flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-500 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-600"></span>
-              </span>
-              <span className="text-slate-700 font-bold">Thời gian tạo: ~2.8s</span>
-            </div>
-            <span>•</span>
-            <span className="hidden md:inline font-semibold">Độ khớp nhu cầu 98.6%</span>
-            <span className="hidden md:inline">•</span>
-            <span className="hidden md:inline font-semibold">Tối ưu GPS thời gian thực</span>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <button
-              type="button"
-              onClick={handleReset}
               disabled={isGenerating}
-              className="px-4 py-2.5 rounded-full bg-white hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-colors cursor-pointer disabled:opacity-50"
+              className="px-4 py-2 rounded-full text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
             >
-              Làm mới
+              Hủy
             </button>
 
-            <button
-              type="button"
-              onClick={() => handleGenerate(true)}
-              disabled={isGenerating}
-              className="px-4 py-2.5 rounded-full bg-white hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-            >
-              <Bookmark className="w-3.5 h-3.5 text-slate-500" />
-              <span>Lưu nháp</span>
-            </button>
-
-            {/* AI MAGIC GENERATE BUTTON WITH GLOW */}
             <button
               type="button"
               onClick={() => handleGenerate(false)}
               disabled={isGenerating}
-              className="relative group px-5 sm:px-6 py-2.5 rounded-full bg-gradient-to-r from-sky-600 via-sky-700 to-indigo-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg hover:scale-[1.01] transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              className="relative px-6 py-2.5 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
             >
               {isGenerating ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-amber-300" />
-                  <span>Đang kết nối Gemini...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  <span>Đang kết nối AI...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-amber-300 group-hover:rotate-12 transition-transform" />
-                  <span>Khởi Tạo Lịch Trình Bằng AI</span>
-                  <span className="bg-white/20 text-white text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full">
-                    Miễn phí
-                  </span>
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <span>Khởi Tạo Lịch Trình ✨</span>
                 </>
               )}
             </button>
           </div>
-
         </div>
 
       </div>
