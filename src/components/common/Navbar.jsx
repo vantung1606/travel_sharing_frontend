@@ -44,8 +44,8 @@ export const Navbar = () => {
     };
   }, []);
 
-  // When on homepage or itinerary hero and NOT scrolled, navbar is transparent over dark photo hero:
-  const isDarkHero = (isHomePage || isItineraryPage) && !isScrolled;
+  // When on homepage, itinerary, or community hero and NOT scrolled, navbar is transparent over dark photo hero:
+  const isDarkHero = (isHomePage || isItineraryPage || isCommunityPage) && !isScrolled;
 
   const {
     portalMode,
