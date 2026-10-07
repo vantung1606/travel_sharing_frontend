@@ -1,9 +1,24 @@
 export const BASE_URL = 'http://localhost:8081/api';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const getAuthHeader = () => {
-  const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-  return user.token ? { 'Authorization': `Bearer ${user.token}` } : {};
+export const getStoredUser = () => {
+  try {
+    const raw = localStorage.getItem('wayfare_user');
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    console.warn('Error reading wayfare_user from localStorage', e);
+    return null;
+  }
+};
+
+export const getAuthToken = () => {
+  const user = getStoredUser();
+  return user?.token || null;
+};
+
+export const getAuthHeader = () => {
+  const token = getAuthToken();
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
 };
 
 export const authApi = {
@@ -1204,7 +1219,7 @@ export const uploadApi = {
     for (let i = 0; i < fileList.length; i++) {
       formData.append('files', fileList[i]);
     }
-    const token = localStorage.getItem('token');
+    const token = getAuthToken();
     const headers = {};
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
@@ -1224,9 +1239,10 @@ export const uploadApi = {
 // ─── User Profile & Follow API ────────────────────────────────────────────────
 export const userApi = {
   async getProfile(userId, email) {
-    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-    const userEmail = email || user.email || 'tung@gmail.com';
-    const res = await fetch(`${BASE_URL}/users/${userId}/profile?email=${encodeURIComponent(userEmail)}`, {
+    const user = getStoredUser() || {};
+    const userEmail = email || user.email || '';
+    const qs = userEmail ? `?email=${encodeURIComponent(userEmail)}` : '';
+    const res = await fetch(`${BASE_URL}/users/${userId}/profile${qs}`, {
       headers: {
         'Content-Type': 'application/json',
         ...getAuthHeader()
@@ -1238,9 +1254,10 @@ export const userApi = {
   },
 
   async toggleFollow(userId, email) {
-    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-    const userEmail = email || user.email || 'tung@gmail.com';
-    const res = await fetch(`${BASE_URL}/users/${userId}/follow?email=${encodeURIComponent(userEmail)}`, {
+    const user = getStoredUser() || {};
+    const userEmail = email || user.email || '';
+    const qs = userEmail ? `?email=${encodeURIComponent(userEmail)}` : '';
+    const res = await fetch(`${BASE_URL}/users/${userId}/follow${qs}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -1254,9 +1271,10 @@ export const userApi = {
 
   async getFollowingIds(email) {
     try {
-      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
-      const res = await fetch(`${BASE_URL}/users/following/ids?email=${encodeURIComponent(userEmail)}`, {
+      const user = getStoredUser() || {};
+      const userEmail = email || user.email || '';
+      const qs = userEmail ? `?email=${encodeURIComponent(userEmail)}` : '';
+      const res = await fetch(`${BASE_URL}/users/following/ids${qs}`, {
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeader()
@@ -1273,9 +1291,10 @@ export const userApi = {
 
   async getMyProfile(email) {
     try {
-      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const user = getStoredUser() || {};
       const userEmail = email || user.email || '';
-      const res = await fetch(`${BASE_URL}/users/me?email=${encodeURIComponent(userEmail)}`, {
+      const qs = userEmail ? `?email=${encodeURIComponent(userEmail)}` : '';
+      const res = await fetch(`${BASE_URL}/users/me${qs}`, {
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeader()
@@ -1292,12 +1311,13 @@ export const userApi = {
 
   async getFollowing(userId, email) {
     try {
-      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const user = getStoredUser() || {};
       const userEmail = email || user.email || '';
+      const qs = userEmail ? `?email=${encodeURIComponent(userEmail)}` : '';
       const hasNumericId = userId && !isNaN(Number(userId)) && Number(userId) > 0;
       const url = hasNumericId
-        ? `${BASE_URL}/users/${userId}/following?email=${encodeURIComponent(userEmail)}`
-        : `${BASE_URL}/users/following?email=${encodeURIComponent(userEmail)}`;
+        ? `${BASE_URL}/users/${userId}/following${qs}`
+        : `${BASE_URL}/users/following${qs}`;
       const res = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
@@ -1315,12 +1335,13 @@ export const userApi = {
 
   async getFollowers(userId, email) {
     try {
-      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const user = getStoredUser() || {};
       const userEmail = email || user.email || '';
+      const qs = userEmail ? `?email=${encodeURIComponent(userEmail)}` : '';
       const hasNumericId = userId && !isNaN(Number(userId)) && Number(userId) > 0;
       const url = hasNumericId
-        ? `${BASE_URL}/users/${userId}/followers?email=${encodeURIComponent(userEmail)}`
-        : `${BASE_URL}/users/followers?email=${encodeURIComponent(userEmail)}`;
+        ? `${BASE_URL}/users/${userId}/followers${qs}`
+        : `${BASE_URL}/users/followers${qs}`;
       const res = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',

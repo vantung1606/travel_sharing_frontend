@@ -42,13 +42,19 @@ import {
 } from 'lucide-react';
 
 export const ProfilePage = () => {
-  const { currentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab, setItineraries } = useApp();
+  const { currentUser, updateCurrentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab, setItineraries } = useApp();
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('itineraries'); // 'itineraries' | 'posts' | 'ai-dna' | 'saved' | 'badges'
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [profileName, setProfileName] = useState(currentUser.name);
-  const [profileBio, setProfileBio] = useState(currentUser.bio);
+  const [profileName, setProfileName] = useState(currentUser?.name || '');
+  const [profileBio, setProfileBio] = useState(currentUser?.bio || '');
+
+  // Keep form fields synced with current active user
+  useEffect(() => {
+    if (currentUser?.name) setProfileName(currentUser.name);
+    if (currentUser?.bio !== undefined) setProfileBio(currentUser.bio || '');
+  }, [currentUser?.name, currentUser?.bio]);
 
   // Full Profile data from Backend API
   const [profileData, setProfileData] = useState(null);
@@ -864,8 +870,21 @@ export const ProfilePage = () => {
                 Hủy
               </button>
               <button
-                onClick={() => setIsEditModalOpen(false)}
-                className="sparkle-btn text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md"
+                onClick={() => {
+                  if (!profileName.trim()) {
+                    toast.error('Họ và tên không được để trống!');
+                    return;
+                  }
+                  updateCurrentUser({
+                    name: profileName.trim(),
+                    fullName: profileName.trim(),
+                    bio: profileBio.trim()
+                  });
+                  setProfileData(prev => prev ? { ...prev, fullName: profileName.trim(), bio: profileBio.trim() } : prev);
+                  setIsEditModalOpen(false);
+                  toast.success('Đã cập nhật thông tin hồ sơ của bạn thành công! 🎉');
+                }}
+                className="sparkle-btn text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md cursor-pointer"
               >
                 Lưu Thay Đổi
               </button>

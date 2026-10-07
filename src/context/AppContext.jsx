@@ -118,9 +118,8 @@ export const AppProvider = ({ children }) => {
   // Host / User adds new place
   const addNewPlace = async (placeData) => {
     try {
-      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const email = user.email || (currentUser && currentUser.email) || 'tung@gmail.com';
-      const created = await placeApi.createPlace(placeData, email);
+      const activeEmail = (currentUser?.email) || '';
+      const created = await placeApi.createPlace(placeData, activeEmail);
       if (created) {
         setPlaces(prev => [created, ...prev]);
         return created;
@@ -130,10 +129,10 @@ export const AppProvider = ({ children }) => {
       const fallback = {
         id: 'place-' + Date.now(),
         ...placeData,
-        ownerId: (currentUser && currentUser.id) || 1,
-        ownerName: currentUser ? currentUser.name : 'Người dùng bản địa',
-        ownerHandle: currentUser ? currentUser.handle : '@local_host',
-        ownerAvatar: currentUser ? currentUser.avatar : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+        ownerId: currentUser?.id || null,
+        ownerName: (currentUser?.id ? currentUser.name : 'Người dùng bản địa'),
+        ownerHandle: (currentUser?.id ? currentUser.handle : '@local_host'),
+        ownerAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
         status: 'ACTIVE',
         isVerifiedHost: false,
         averageRating: 5.0,
@@ -145,80 +144,124 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const DEFAULT_USER = {
-    name: 'Nguyễn Thanh Tùng',
-    handle: '@tung_wanderlust',
-    email: 'tung@gmail.com',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-    bio: 'Đam mê khám phá thiên nhiên & trải nghiệm ẩm thực du lịch độc lạ cùng AI 🌍✈️',
-    destinationsCount: 18,
-    tripsCount: 6,
-    savedItinerariesCount: 4,
-    roles: ['ROLE_USER']
+  // Safe Fallback Guest User when NOT logged in (No leaked data from previous users)
+  const GUEST_USER = {
+    id: null,
+    name: 'Khách',
+    fullName: 'Khách vãng lai',
+    handle: '@guest',
+    email: '',
+    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
+    bio: '',
+    destinationsCount: 0,
+    tripsCount: 0,
+    savedItinerariesCount: 0,
+    roles: []
   };
 
-  // Auth State (Restores from localStorage on page reload)
+  // Auth State (Strict Single-Source Verification from localStorage)
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     try {
-      return localStorage.getItem('wayfare_auth') === 'true';
+      const stored = localStorage.getItem('wayfare_user');
+      const auth = localStorage.getItem('wayfare_auth');
+      return auth === 'true' && Boolean(stored);
     } catch {
       return false;
     }
   });
 
-  // User Profile (Restores from localStorage on page reload)
+  // User Profile (Restores active session or cleanly defaults to GUEST_USER)
   const [currentUser, setCurrentUser] = useState(() => {
     try {
+      const auth = localStorage.getItem('wayfare_auth');
       const stored = localStorage.getItem('wayfare_user');
-      if (stored) {
-        return { ...DEFAULT_USER, ...JSON.parse(stored) };
+      if (auth === 'true' && stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed && (parsed.id || parsed.email || parsed.token)) {
+          return parsed;
+        }
       }
-    } catch {
-      // fallback
+    } catch (e) {
+      console.warn('Failed to parse wayfare_user from localStorage', e);
     }
-    return DEFAULT_USER;
+    return GUEST_USER;
   });
 
+  // Clean Login: ĐẢM BẢO CÁCH LY TUYỆT ĐỐI GIỮA CÁC USER, KHÔNG ĐÈ DỮ LIỆU CŨ SANG USER MỚI
   const login = (userData) => {
-    setIsLoggedIn(true);
-    let updatedUser = { ...DEFAULT_USER, ...currentUser };
-    if (userData) {
-      const normalized = {
-        ...userData,
-        id: userData.id || currentUser.id,
-        name: userData.fullName || userData.name || currentUser.name,
-        handle: userData.handle || currentUser.handle,
-        email: userData.email || currentUser.email,
-        avatar: userData.avatar || currentUser.avatar,
-        roles: userData.roles || (userData.email?.toLowerCase().includes('admin') ? ['ROLE_ADMIN', 'ROLE_USER'] : ['ROLE_USER'])
-      };
-      updatedUser = { ...updatedUser, ...normalized };
-      setCurrentUser(updatedUser);
-      try {
-        localStorage.setItem('wayfare_user', JSON.stringify(updatedUser));
-      } catch (e) {
-        console.error('Failed to save wayfare_user to localStorage', e);
-      }
-    }
+    if (!userData) return;
+
+    // 1. DỌN SẠCH DỮ LIỆU PHIÊN CŨ TRƯỚC KHI LƯU USER MỚI (Tránh ô nhiễm state & storage)
     try {
+      localStorage.removeItem('wayfare_user');
+      localStorage.removeItem('wayfare_auth');
+      localStorage.removeItem('wayfare_portal_mode');
+      localStorage.removeItem('token');
+    } catch (e) {
+      console.warn('Could not clean old storage:', e);
+    }
+
+    // 2. KHỞI TẠO USER MỚI HOÀN TOÀN ĐỘC LẬP (Tuyệt đối KHÔNG merge với currentUser cũ)
+    const rawEmail = userData.email ? String(userData.email).trim() : '';
+    const emailPrefix = rawEmail ? rawEmail.split('@')[0] : 'user';
+    const isAdmin = rawEmail.toLowerCase().includes('admin');
+
+    const freshUser = {
+      id: userData.id || null,
+      name: userData.fullName || userData.name || emailPrefix,
+      fullName: userData.fullName || userData.name || emailPrefix,
+      handle: userData.handle || (rawEmail ? `@${emailPrefix.toLowerCase().replace(/[^a-z0-9_]/g, '')}` : '@user'),
+      email: rawEmail,
+      avatar: userData.avatar || userData.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
+      bio: userData.bio || '',
+      token: userData.token || ('mock-token-' + Date.now()),
+      destinationsCount: typeof userData.destinationsCount === 'number' ? userData.destinationsCount : 0,
+      tripsCount: typeof userData.tripsCount === 'number' ? userData.tripsCount : 0,
+      savedItinerariesCount: typeof userData.savedItinerariesCount === 'number' ? userData.savedItinerariesCount : 0,
+      roles: Array.isArray(userData.roles) && userData.roles.length > 0
+        ? userData.roles
+        : (isAdmin ? ['ROLE_ADMIN', 'ROLE_USER'] : ['ROLE_USER'])
+    };
+
+    setIsLoggedIn(true);
+    setCurrentUser(freshUser);
+
+    try {
+      localStorage.setItem('wayfare_user', JSON.stringify(freshUser));
       localStorage.setItem('wayfare_auth', 'true');
     } catch (e) {
-      console.error('Failed to save wayfare_auth to localStorage', e);
+      console.error('Failed to save fresh user to localStorage:', e);
     }
   };
 
+  // Safe Logout: Reset sạch sẽ về Guest
   const logout = () => {
     setIsLoggedIn(false);
-    setCurrentUser(DEFAULT_USER);
+    setCurrentUser(GUEST_USER);
     setPortalMode('user');
     setUserTab('home');
     try {
       localStorage.removeItem('wayfare_auth');
       localStorage.removeItem('wayfare_user');
       localStorage.removeItem('wayfare_portal_mode');
+      localStorage.removeItem('token');
     } catch (e) {
       console.error('Failed to clear auth from localStorage', e);
     }
+  };
+
+  // Cập nhật profile của CHÍNH user đang đăng nhập (đồng bộ cả State và localStorage)
+  const updateCurrentUser = (updates) => {
+    if (!updates) return;
+    setCurrentUser(prev => {
+      const updated = { ...prev, ...updates };
+      try {
+        localStorage.setItem('wayfare_user', JSON.stringify(updated));
+      } catch (e) {
+        console.error('Failed to update wayfare_user in localStorage:', e);
+      }
+      return updated;
+    });
   };
 
   // Auto-sync profile ID and details with backend if missing or on reload
@@ -229,13 +272,19 @@ export const AppProvider = ({ children }) => {
       .then(profile => {
         if (profile && profile.id) {
           setCurrentUser(prev => {
-            if (prev.id === profile.id) return prev;
+            // Đảm bảo không đồng bộ nhầm nếu email không trùng khớp
+            if (profile.email && prev.email && profile.email.toLowerCase() !== prev.email.toLowerCase()) {
+              return prev;
+            }
+            if (prev.id === profile.id && prev.name === (profile.fullName || prev.name)) return prev;
             const updated = {
               ...prev,
               id: profile.id,
               name: profile.fullName || prev.name,
+              fullName: profile.fullName || prev.fullName,
               avatar: profile.avatarUrl || prev.avatar,
-              handle: profile.handle || prev.handle
+              handle: profile.handle || prev.handle,
+              bio: profile.bio !== undefined ? profile.bio : prev.bio
             };
             try {
               localStorage.setItem('wayfare_user', JSON.stringify(updated));
@@ -461,6 +510,7 @@ export const AppProvider = ({ children }) => {
         setIsLoggedIn,
         login,
         logout,
+        updateCurrentUser,
         toggleLikePost,
         addCommunityPost,
         generateAITrip,
