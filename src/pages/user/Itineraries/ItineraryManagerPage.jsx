@@ -94,27 +94,6 @@ export const ItineraryManagerPage = () => {
     { label: 'Sa Pa Ruộng Bậc Thang', url: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=1200&q=80' }
   ];
 
-  // 4K Scenic Landscape Presets for Hero Backdrop
-  const HERO_SCENERY_PRESETS = [
-    { id: 'danang', label: '🌉 Cầu Vàng', url: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=2400&q=90' },
-    { id: 'ninhbinh', label: '🛶 Ninh Bình', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2400&q=90' },
-    { id: 'sapa', label: '🌾 Sa Pa', url: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=2400&q=90' },
-    { id: 'phuquoc', label: '🏖️ Phú Quốc', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=2400&q=90' }
-  ];
-
-  const [heroBgUrl, setHeroBgUrl] = useState(() => {
-    return localStorage.getItem('wayfare_itinerary_hero_bg') || HERO_SCENERY_PRESETS[0].url;
-  });
-
-  const handleSelectHeroBg = (url) => {
-    setHeroBgUrl(url);
-    try {
-      localStorage.setItem('wayfare_itinerary_hero_bg', url);
-    } catch (e) {
-      // Ignore localStorage errors
-    }
-  };
-
   // Filter and Sort Logic
   const filteredItineraries = useMemo(() => {
     return (itineraries || []).filter(itin => {
@@ -253,7 +232,7 @@ export const ItineraryManagerPage = () => {
           <div
             className="w-full h-full bg-cover bg-center transition-all duration-700 scale-105"
             style={{
-              backgroundImage: `url('${heroBgUrl}')`
+              backgroundImage: `url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2400&q=90')`
             }}
           />
           {/* Refined Photographic Scrim - Đều màu toàn cảnh, bảo toàn độ rõ nét rực rỡ giống trang chủ */}
@@ -305,58 +284,36 @@ export const ItineraryManagerPage = () => {
               </p>
             </div>
 
-            {/* Right Column: Scenery Theme Switcher & Action CTA Cluster */}
-            <div className="flex flex-col items-start lg:items-end gap-3.5 shrink-0 pt-2 lg:pt-0">
-              {/* Interactive Scenery Selector Pills */}
-              <div className="flex items-center gap-1 p-1 rounded-full bg-slate-950/60 backdrop-blur-md border border-white/20 text-xs shadow-md">
-                <span className="text-slate-300 font-semibold px-2.5 text-[11px] hidden sm:inline">Cảnh nền:</span>
-                {HERO_SCENERY_PRESETS.map(preset => (
-                  <button
-                    key={preset.id}
-                    type="button"
-                    onClick={() => handleSelectHeroBg(preset.url)}
-                    className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                      heroBgUrl === preset.url
-                        ? 'bg-sky-500 text-white shadow-sm ring-1 ring-sky-300'
-                        : 'text-slate-200 hover:text-white hover:bg-white/20'
-                    }`}
-                  >
-                    {preset.label}
-                  </button>
-                ))}
-              </div>
+            {/* Action CTA Cluster */}
+            <div className="flex flex-wrap items-center gap-3.5 shrink-0 pt-2 lg:pt-0">
+              {/* AI CTA Button with Shimmer & Glow */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!requireAuth('lập lịch trình bằng AI')) return;
+                  setIsAIGeneratorOpen(true);
+                }}
+                className="group relative inline-flex items-center gap-2.5 px-7 py-4 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white text-sm sm:text-base font-extrabold shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer ring-2 ring-blue-300/40"
+              >
+                <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
+                <span>Lập Tour Bằng AI (30s) ✨</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-black/25 text-xs font-black uppercase tracking-wider">
+                  Miễn phí
+                </span>
+              </button>
 
-              {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-3.5">
-                {/* AI CTA Button with Shimmer & Glow */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!requireAuth('lập lịch trình bằng AI')) return;
-                    setIsAIGeneratorOpen(true);
-                  }}
-                  className="group relative inline-flex items-center gap-2.5 px-7 py-4 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white text-sm sm:text-base font-extrabold shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer ring-2 ring-blue-300/40"
-                >
-                  <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
-                  <span>Lập Tour Bằng AI (30s) ✨</span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-black/25 text-xs font-black uppercase tracking-wider">
-                    Miễn phí
-                  </span>
-                </button>
-
-                {/* Manual Trip CTA (Frosted Glassmorphism Button) */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!requireAuth('tạo chuyến đi mới')) return;
-                    setIsManualCreateOpen(true);
-                  }}
-                  className="inline-flex items-center gap-2 px-6 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-sm sm:text-base transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer hover:scale-105 active:scale-95"
-                >
-                  <Plus className="w-5 h-5 text-sky-300" />
-                  <span>+ Tạo Thủ Công</span>
-                </button>
-              </div>
+              {/* Manual Trip CTA (Frosted Glassmorphism Button) */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!requireAuth('tạo chuyến đi mới')) return;
+                  setIsManualCreateOpen(true);
+                }}
+                className="inline-flex items-center gap-2 px-6 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-sm sm:text-base transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer hover:scale-105 active:scale-95"
+              >
+                <Plus className="w-5 h-5 text-sky-300" />
+                <span>+ Tạo Thủ Công</span>
+              </button>
             </div>
           </div>
         </div>
