@@ -45,51 +45,53 @@ function MapFlyController({ activeItem, userCoords }) {
   return null;
 }
 
-// Custom Marker Icon Generator using Tailwind CSS
+// Custom Marker Icon Generator - Thiết kế chuẩn Google Maps / Apple Maps thanh mảnh & tinh tế
 const createCustomMarkerIcon = (item, isActive) => {
   const isCafe = item.category?.includes('Cafe');
   const isHome = item.category?.includes('Homestay');
   const isFood = item.category?.includes('Ẩm Thực');
   const isActivity = item.category?.includes('Trải Nghiệm');
 
-  let bgClass = 'bg-gradient-to-tr from-sky-600 to-blue-500';
+  let pinColor = '#0284c7'; // Sky-600
   let emoji = '📍';
 
   if (isCafe) {
-    bgClass = 'bg-gradient-to-tr from-amber-500 to-orange-500';
+    pinColor = '#d97706'; // Amber-600
     emoji = '☕';
   } else if (isHome) {
-    bgClass = 'bg-gradient-to-tr from-orange-600 to-rose-500';
+    pinColor = '#e11d48'; // Rose-600
     emoji = '🏡';
   } else if (isFood) {
-    bgClass = 'bg-gradient-to-tr from-emerald-600 to-teal-500';
+    pinColor = '#059669'; // Emerald-600
     emoji = '🍜';
   } else if (isActivity) {
-    bgClass = 'bg-gradient-to-tr from-indigo-600 to-purple-500';
+    pinColor = '#4f46e5'; // Indigo-600
     emoji = '🧗';
   }
 
-  const activeRing = isActive
-    ? 'ring-4 ring-amber-400 ring-offset-2 ring-offset-slate-900 scale-125 z-50 shadow-2xl'
-    : 'scale-100 shadow-lg hover:scale-110';
-
-  const pulseBadge = isActive
-    ? '<span class="absolute -top-1 -right-1 flex h-3.5 w-3.5"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-500 border border-white"></span></span>'
-    : '';
+  // Khi active: Chỉ phóng to nhẹ, tạo bóng đổ dịu mắt, KHÔNG dùng viền vuông hay chấm cam thô kệch
+  const scaleClass = isActive ? 'scale-115 z-50' : 'hover:scale-110 z-10';
+  const shadowFilter = isActive ? 'drop-shadow(0 6px 8px rgba(0,0,0,0.45))' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.25))';
+  const strokeColor = isActive ? '#fef08a' : '#ffffff'; // Viền vàng nhẹ tinh tế khi active hoặc trắng thanh lịch
 
   return L.divIcon({
-    className: 'custom-leaflet-marker-wrapper',
+    className: 'sleek-map-marker-pin',
     html: `
-      <div class="relative cursor-pointer transition-all duration-300 ${activeRing}">
-        <div class="w-9 h-9 rounded-2xl ${bgClass} text-white flex items-center justify-center border-2 border-white text-sm shadow-md">
-          <span>${emoji}</span>
-        </div>
-        ${pulseBadge}
+      <div class="relative cursor-pointer transition-all duration-200 ${scaleClass} flex flex-col items-center" style="filter: ${shadowFilter};">
+        <svg width="28" height="36" viewBox="0 0 28 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Pin Teardrop Body -->
+          <path d="M14 0C6.268 0 0 6.268 0 14C0 22.8 14 36 14 36C14 36 28 22.8 28 14C28 6.268 21.732 0 14 0Z" fill="${pinColor}"/>
+          <!-- Crisp White/Active Accent Outline -->
+          <path d="M14 1C6.82 1 1 6.82 1 14C1 22.1 13.5 34.5 14 35C14.5 34.5 27 22.1 27 14C27 6.82 21.18 1 14 1Z" stroke="${strokeColor}" stroke-width="${isActive ? '2' : '1.5'}"/>
+          <!-- Inner Circular Plaque -->
+          <circle cx="14" cy="14" r="9" fill="white"/>
+        </svg>
+        <span class="absolute top-[6px] text-[12px] leading-none select-none pointer-events-none">${emoji}</span>
       </div>
     `,
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-    popupAnchor: [0, -20]
+    iconSize: [28, 36],
+    iconAnchor: [14, 36],
+    popupAnchor: [0, -36]
   });
 };
 
