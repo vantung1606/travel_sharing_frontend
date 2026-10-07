@@ -225,72 +225,71 @@ export const ItineraryManagerPage = () => {
 
   return (
     <div className="w-full min-h-screen bg-[#f8fafc] text-slate-900 pb-24">
-      {/* ─── 1. TOP AMBIENT HERO BANNER (UI/UX CONSISTENCY: px-4 sm:px-6 lg:px-8 xl:px-12) ─── */}
+      {/* ─── 1. TOP SEAMLESS MODERN HEADER (CLEAN & MINIMALIST) ─── */}
       <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6 sm:pt-8">
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 text-white p-7 sm:p-10 lg:p-12 shadow-xl shadow-sky-950/20 border border-slate-800/80">
-          {/* Ambient Glow Orbs */}
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-slate-200/70">
+          
+          {/* Left Title & Description */}
+          <div className="max-w-3xl space-y-2.5">
+            {/* Breadcrumb & Pill */}
+            <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-500">
+              <span className="flex items-center gap-1.5 hover:text-sky-600 transition-colors cursor-pointer font-medium">
+                <Compass className="w-3.5 h-3.5 text-sky-500" />
+                <span>Trang chủ</span>
+              </span>
+              <ChevronRight className="w-3 h-3 text-slate-300" />
+              <span className="text-sky-600 font-bold">Lịch trình chuyến đi</span>
 
-          {/* Breadcrumb Header */}
-          <div className="relative z-10 flex items-center gap-2 text-xs font-semibold text-slate-400 mb-4">
-            <span className="flex items-center gap-1.5 hover:text-sky-300 transition-colors cursor-pointer">
-              <Compass className="w-3.5 h-3.5 text-sky-400" />
-              <span>Wayfare</span>
-            </span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-            <span className="text-sky-400 font-bold">Kế Hoạch & Lịch Trình</span>
+              <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300"></span>
+
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-100 text-[11px] font-bold">
+                <Sparkles className="w-3 h-3 text-amber-500" />
+                <span>WanderAI Engine</span>
+              </span>
+            </div>
+
+            {/* Main Title */}
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Lịch Trình Du Lịch
+            </h1>
+            
+            {/* Subtitle */}
+            <p className="text-xs sm:text-sm text-slate-500 leading-relaxed font-normal max-w-2xl">
+              Theo dõi kế hoạch du lịch sắp tới, đồng bộ điểm dừng chân từ Khám phá, kiểm soát ngân sách và tạo hành trình từng giờ cùng AI.
+            </p>
           </div>
 
-          {/* Hero Content & CTA Buttons */}
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-            <div className="max-w-3xl space-y-3">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 text-xs font-bold shadow-inner">
-                <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
-                <span>Trợ lý WanderAI Trip Engine • Tối ưu 63 tỉnh thành</span>
-              </div>
+          {/* Right Action CTA Cluster */}
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            {/* AI Generator CTA */}
+            <button
+              type="button"
+              onClick={() => {
+                if (!requireAuth('lập lịch trình bằng AI')) return;
+                setIsAIGeneratorOpen(true);
+              }}
+              className="group relative inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-xs sm:text-sm font-bold shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 hover:scale-[1.02] active:scale-95 transition-all duration-200 cursor-pointer"
+            >
+              <Sparkles className="w-4 h-4 text-amber-200 group-hover:rotate-12 transition-transform duration-300" />
+              <span>Lập Tour Bằng AI (30s) ✨</span>
+              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+              </span>
+            </button>
 
-              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                Lịch Trình Của Bạn
-              </h1>
-              
-              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl font-normal">
-                Quản lý các chuyến đi sắp tới, đồng bộ điểm dừng chân từ Khám phá, kiểm soát ngân sách chi tiêu và kiến tạo hành trình trọn vẹn trong tích tắc cùng AI.
-              </p>
-            </div>
-
-            {/* Action CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-3.5">
-              {/* AI Generator CTA */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (!requireAuth('lập lịch trình bằng AI')) return;
-                  setIsAIGeneratorOpen(true);
-                }}
-                className="group relative inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-sm font-bold shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-[1.02] active:scale-95 transition-all duration-300 cursor-pointer"
-              >
-                <Sparkles className="w-4 h-4 text-amber-200 group-hover:rotate-12 transition-transform duration-300" />
-                <span>Lập Tour Bằng AI (30s) ✨</span>
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
-                </span>
-              </button>
-
-              {/* Manual Trip CTA */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (!requireAuth('tạo chuyến đi mới')) return;
-                  setIsManualCreateOpen(true);
-                }}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 text-white border border-white/15 backdrop-blur-md text-sm font-bold shadow-sm hover:border-white/30 active:scale-95 transition-all duration-200 cursor-pointer"
-              >
-                <Plus className="w-4 h-4 text-sky-400" />
-                <span>Tạo Thủ Công</span>
-              </button>
-            </div>
+            {/* Manual Trip CTA */}
+            <button
+              type="button"
+              onClick={() => {
+                if (!requireAuth('tạo chuyến đi mới')) return;
+                setIsManualCreateOpen(true);
+              }}
+              className="inline-flex items-center gap-2 px-4.5 py-3 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-sky-600 border border-slate-200/90 text-xs sm:text-sm font-bold shadow-xs hover:border-sky-300 active:scale-95 transition-all duration-200 cursor-pointer"
+            >
+              <Plus className="w-4 h-4 text-sky-600" />
+              <span>Tạo Thủ Công</span>
+            </button>
           </div>
         </div>
       </div>
