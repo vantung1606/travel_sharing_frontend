@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '../common/Toast';
+import { aiService } from '../../services/aiService';
 import { generateCustomVietnamItinerary, VIETNAM_PROVINCES_DATA } from '../../utils/vietnamTravelDatabase';
 import {
   Sparkles,
@@ -242,7 +243,7 @@ export const AITripGeneratorModal = () => {
     }
   };
 
-  // Build Itinerary helper với 100% địa danh thật và lịch trình riêng biệt từng ngày
+  // Build Itinerary helper với dữ liệu AI hoặc fallback CSDL địa phương
   const createItineraryObject = (aiResponseText, isDraft = false) => {
     // 1. Tìm ảnh bìa từ database hoặc presets
     let cover = DESTINATION_COVERS['default'];
@@ -270,24 +271,57 @@ export const AITripGeneratorModal = () => {
       .filter(Boolean)
       .join(', ');
 
-    // 2. Lấy dữ liệu 100% địa danh thật, mỗi ngày có lịch riêng biệt từ CSDL Việt Nam
-    const finalDays = generateCustomVietnamItinerary(destination, daysCount);
+    // 2. Thử parse JSON trả về từ Google Gemini AI
+    let aiParsedDays = null;
+    let aiSummaryTip = null;
+    let aiPlacesList = null;
+
+    if (aiResponseText) {
+      try {
+        const cleaned = typeof aiResponseText === 'string'
+          ? aiResponseText.replace(/```json/gi, '').replace(/```/g, '').trim()
+          : '';
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.days && Array.isArray(parsed.days) && parsed.days.length > 0) {
+            aiParsedDays = parsed.days;
+          }
+          if (parsed.summaryTip) aiSummaryTip = parsed.summaryTip;
+          if (parsed.placesList && Array.isArray(parsed.placesList)) aiPlacesList = parsed.placesList;
+        }
+      } catch (e) {
+        console.warn('Could not parse Gemini JSON, falling back to smart realistic generator:', e);
+      }
+    }
+
+    // Ưu tiên dữ liệu do AI Google Gemini suy luận, nếu không có thì dùng CSDL địa phương
+    const finalDays = (aiParsedDays && aiParsedDays.length >= daysCount)
+      ? aiParsedDays.slice(0, daysCount)
+      : (aiParsedDays && aiParsedDays.length > 0)
+        ? aiParsedDays
+        : generateCustomVietnamItinerary(destination, daysCount);
 
     // 3. Rút trích danh sách địa điểm nổi bật thực tế
-    const extractedPlaces = [];
-    finalDays.forEach(d => {
-      (d.activities || []).forEach(a => {
-        const cleanName = a.title
-          .replace(/^Thưởng thức |^Khám phá |^Chiêm bái |^Thăm |^Check-in |^Chinh phục |^Trải nghiệm |^Dạo bước |^Tắm biển /g, '')
-          .split(' tại ')[0]
-          .split(' – ')[0]
-          .trim();
-        if (cleanName && cleanName.length > 3 && !extractedPlaces.includes(cleanName)) {
-          extractedPlaces.push(cleanName);
-        }
+    let finalPlacesList = [];
+    if (aiPlacesList && aiPlacesList.length > 0) {
+      finalPlacesList = aiPlacesList.slice(0, 6);
+    } else {
+      const extractedPlaces = [];
+      finalDays.forEach(d => {
+        (d.activities || []).forEach(a => {
+          const cleanName = (a.title || '')
+            .replace(/^Thưởng thức |^Khám phá |^Chiêm bái |^Thăm |^Check-in |^Chinh phục |^Trải nghiệm |^Dạo bước |^Tắm biển |^Ăn trưa |^Ăn tối /g, '')
+            .split(' tại ')[0]
+            .split(' – ')[0]
+            .trim();
+          if (cleanName && cleanName.length > 3 && !extractedPlaces.includes(cleanName)) {
+            extractedPlaces.push(cleanName);
+          }
+        });
       });
-    });
-    const finalPlacesList = extractedPlaces.slice(0, 6);
+      finalPlacesList = extractedPlaces.slice(0, 6);
+    }
 
     // Xác định phân vùng địa lý
     let region = 'Điểm đến du lịch Việt Nam';
@@ -319,19 +353,19 @@ export const AITripGeneratorModal = () => {
       budgetNote: `Ngân sách: ${getBudgetLabel()} • ${includeFlight ? 'Đã gồm vé khứ hồi' : 'Chưa gồm vé máy bay'}`,
       pace: pacingText,
       style: styleText || 'Trải nghiệm du lịch toàn diện',
-      aiTipNote: `Gợi ý độc quyền WanderAI: Lịch trình ${destination} đã được tối ưu theo vị trí địa lý từng ngày, ưu tiên ẩm thực bản địa chuẩn vị ${diningStyle} và các danh thắng nổi tiếng nhất.`,
+      aiTipNote: aiSummaryTip || `Gợi ý độc quyền WanderAI: Lịch trình ${destination} đã được tối ưu tọa độ GPS, ưu tiên các món ngon chuẩn vị ${diningStyle} và danh lam thắng cảnh tiêu biểu tại ${destination}.`,
       days: finalDays
     };
   };
 
-  // Submit AI Generation (Hỗ trợ ẩn form ngay lập tức và tạo ngầm trong nền)
+  // Submit AI Generation (Ưu tiên gọi Google Gemini AI trực tiếp với fallback dự phòng)
   const handleGenerate = async (isDraft = false) => {
     if (!destination.trim()) {
       toast.showInfo('Vui lòng nhập điểm đến du lịch bạn mong muốn!');
       return;
     }
 
-    // NGAY LẬP TỨC ẨN FORM ĐANG TẠO LỊCH ĐỂ MÀN HÌNH KHÔNG BỊ TREO / CHO PHÉP ẨN
+    // 1. NGAY LẬP TỨC ẨN FORM ĐỂ GIẢI PHÓNG MÀN HÌNH
     setIsAIGeneratorOpen(false);
     setIsGenerating(false);
 
@@ -339,23 +373,69 @@ export const AITripGeneratorModal = () => {
       isGenerating: true,
       destination: destination,
       daysCount: daysCount,
-      progress: 20
+      progress: 25
     });
 
-    toast.showInfo(`✨ WanderAI đang tra cứu địa danh thật & lên lịch trình ${daysCount} ngày cho ${destination}... (Form đã ẩn để bạn tiếp tục thao tác)`);
+    toast.showInfo(`✨ WanderAI đang gọi Google Gemini tra cứu địa danh thật & lên lịch trình cho ${destination}... (Form đã ẩn để bạn tiếp tục thao tác)`);
 
     try {
-      // 1. Sinh lịch trình với địa danh cụ thể rõ ràng 100% từng ngày từ CSDL địa phương chuẩn xác
-      const fullItinerary = createItineraryObject(null, isDraft);
+      // 2. XÂY DỰNG PROMPT CHUYÊN SÂU CHO GOOGLE GEMINI AI
+      const prompt = `Bạn là chuyên gia cố vấn du lịch bản địa hàng đầu tại Việt Nam.
+Nhiệm vụ: Lập kế hoạch lịch trình du lịch chi tiết cho ${daysCount} ngày tại "${destination}" (hỗ trợ toàn diện bất kỳ địa phương, tỉnh thành, huyện, đảo nào trên khắp 63 tỉnh thành Việt Nam).
+Thông tin chuyến đi:
+- Điểm đến: ${destination}
+- Thời lượng: ${daysCount} ngày (${daysCount}N${Math.max(1, daysCount - 1)}Đ)
+- Đối tượng: ${getCompanionLabel()}
+- Phương tiện: ${getTransitLabel()}
+- Ngân sách: ${getBudgetLabel()}
+- Gu trải nghiệm: ${selectedInterests.join(', ')}
+- Nhịp độ: ${getPacingLabel()}
+- Lưu trú: ${accommodation}
+- Ẩm thực: ${diningStyle}
+${customPrompt ? `- Yêu cầu thêm: ${customPrompt}` : ''}
 
-      // Chờ 1.2s mô phỏng AI tổng hợp và sắp xếp tọa độ
-      await new Promise(resolve => setTimeout(resolve, 1200));
+QUY TẮC BẮT BUỘC (CRITICAL):
+1. TẤT CẢ các địa điểm tham quan, danh lam thắng cảnh, bãi biển, di tích lịch sử, quán ăn đặc sản PHẢI LÀ ĐỊA DANH / QUÁN ĂN CỤ THỂ CÓ THẬT 100% tại "${destination}". Tuyệt đối không dùng từ chung chung như "ngắm hoàng hôn", "đi dạo", "quán ăn bản địa".
+2. Mỗi ngày có 3-4 hoạt động sắp xếp từ sáng đến tối theo lộ trình địa lý hợp lý.
+3. Trả về DUY NHẤT một chuỗi JSON hợp lệ theo mẫu:
+{
+  "summaryTip": "Mẹo di chuyển và lưu ý ăn uống hữu ích nhất...",
+  "placesList": ["Tên điểm thật 1", "Tên điểm thật 2", "Tên điểm thật 3", "Tên điểm thật 4"],
+  "days": [
+    {
+      "dayNumber": 1,
+      "title": "Chủ đề ngày 1 kèm địa danh tiêu biểu",
+      "activities": [
+        {
+          "time": "08:00 – 09:30",
+          "category": "Ẩm thực buổi sáng",
+          "title": "Tên món và tên quán ăn cụ thể",
+          "address": "Địa chỉ hoặc khu vực cụ thể tại ${destination}",
+          "note": "Gợi ý món nên thử hoặc trải nghiệm thú vị",
+          "cost": "50.000đ/người",
+          "transit": "Di chuyển 15 phút"
+        }
+      ]
+    }
+  ]
+}`;
+
+      // 3. GỌI API GEMINI TRỰC TIẾP
+      let aiResponse = null;
+      try {
+        aiResponse = await aiService.generateText({ prompt, model: 'gemini-3.5-flash' });
+      } catch (aiErr) {
+        console.warn('Gemini API call failed, switching to local database fallback:', aiErr);
+      }
+
+      // 4. ĐÓNG GÓI LỊCH TRÌNH
+      const fullItinerary = createItineraryObject(aiResponse, isDraft);
 
       generateAITrip({ fullItinerary });
       setAiGeneratingStatus({ isGenerating: false, destination: '', daysCount: 3, progress: 0 });
 
       if (isDraft) {
-        toast.showSuccess(`Đã lưu nháp lịch trình địa danh thật cho ${destination}!`);
+        toast.showSuccess(`Đã lưu nháp lịch trình cho ${destination}!`);
       } else {
         toast.showSuccess(`WanderAI đã hoàn tất lịch trình ${daysCount} ngày tại ${destination}! Đang mở chi tiết... 🎉`);
       }

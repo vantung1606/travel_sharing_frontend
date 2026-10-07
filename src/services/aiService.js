@@ -3,7 +3,7 @@
  */
 const GEMINI_API_KEY = import.meta.env?.VITE_GEMINI_API_KEY || '';
 const GEMINI_API_URL = import.meta.env?.VITE_GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta';
-const DEFAULT_MODEL = 'gemini-3.6-flash';
+const DEFAULT_MODEL = 'gemini-3.5-flash';
 
 export const aiService = {
   getApiKey() {
@@ -54,7 +54,7 @@ export const aiService = {
   /**
    * Ask Gemini to generate content
    */
-  async generateText({ prompt, systemPrompt, model = DEFAULT_MODEL, temperature = 0.4, maxTokens = 2048 }) {
+  async generateText({ prompt, systemPrompt, model = DEFAULT_MODEL, temperature = 0.3, maxTokens = 8192, responseMimeType = 'application/json' }) {
     const key = this.getApiKey();
     const endpoint = this.getApiEndpoint();
     const targetModel = model.includes('gemini') ? model : DEFAULT_MODEL;
@@ -63,8 +63,9 @@ export const aiService = {
     const payload = {
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
-        temperature: Number(temperature) || 0.4,
-        maxOutputTokens: Number(maxTokens) || 2048
+        temperature: Number(temperature) || 0.3,
+        maxOutputTokens: Number(maxTokens) || 8192,
+        ...(responseMimeType ? { responseMimeType } : {})
       }
     };
 
