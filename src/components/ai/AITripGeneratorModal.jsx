@@ -64,7 +64,6 @@ export const AITripGeneratorModal = () => {
 
   // Core Trip Parameters
   const [destination, setDestination] = useState('Đà Nẵng - Hội An, Việt Nam');
-  const [durationPill, setDurationPill] = useState('3N2Đ');
   const [daysCount, setDaysCount] = useState(3);
 
   // Sync initial destination when triggered from specific spot or place
@@ -135,18 +134,13 @@ export const AITripGeneratorModal = () => {
   };
 
   // Handle Duration Change
-  const handleSelectDuration = (pill) => {
-    setDurationPill(pill);
-    if (pill === '2N1Đ') setDaysCount(2);
-    else if (pill === '3N2Đ') setDaysCount(3);
-    else if (pill === '4N3Đ') setDaysCount(4);
-    else if (pill === '5N4Đ') setDaysCount(5);
+  const handleSelectDuration = (count) => {
+    setDaysCount(count);
   };
 
   // Reset Form
   const handleReset = () => {
     setDestination('Đà Nẵng - Hội An, Việt Nam');
-    setDurationPill('3N2Đ');
     setDaysCount(3);
     setStartDate(defaultStartDate);
     setCompanion('couple');
@@ -209,89 +203,109 @@ export const AITripGeneratorModal = () => {
     const dLower = dest.toLowerCase();
 
     // 1. Hà Tĩnh
-    if (dLower.includes('hà tĩnh') || dLower.includes('ha tinh') || dLower.includes('thiên cầm')) {
-      const haTinhDays = [
-        {
-          dayNumber: 1,
-          title: 'Ngày 1: Lịch sử hào hùng & Biển Thiên Cầm xanh ngát',
-          activities: [
-            { time: '07:30 – 08:30', title: 'Thưởng thức Bánh mướt ram giò nóng giòn Quán Bà Hà', address: '74 Hà Huy Tập, TP. Hà Tĩnh', note: 'Đặc sản trứ danh xứ Nghệ, cuốn bánh mướt mềm mượt với ram giòn rụm.', cost: '40.000đ/người', transit: 'Di chuyển 25km ~ 30 phút' },
-            { time: '09:00 – 11:30', title: 'Thăm Khu di tích Lịch sử Quốc gia Ngã ba Đồng Lộc', address: 'Thị trấn Đồng Lộc, Can Lộc, Hà Tĩnh', note: 'Kính cẩn dâng hương tưởng niệm 10 cô gái thanh niên xung phong quả cảm.', cost: 'Miễn phí vé', transit: 'Di chuyển 35km ~ 45 phút' },
-            { time: '12:00 – 13:30', title: 'Ăn trưa Hải sản Mực nhảy tươi sống tại Bãi biển Thiên Cầm', address: 'Bãi biển Thiên Cầm, Cẩm Xuyên, Hà Tĩnh', note: 'Mực nhảy nháy luộc nguyên con ngọt lịm chấm muối tiêu chanh ớt xanh.', cost: '220.000đ/người', transit: 'Tại chỗ' },
-            { time: '15:00 – 17:30', title: 'Tắm biển Thiên Cầm & Check-in Núi Thiên Cầm', address: 'Thị trấn Thiên Cầm, Hà Tĩnh', note: 'Bãi biển được mệnh danh là cung đàn trời với bờ cát thoai thoải và nước trong vắt.', cost: 'Miễn phí', transit: 'Di chuyển 18km về TP' },
-            { time: '19:00 – 21:00', title: 'Thưởng thức Kẹo Cu đơ Cầu Phủ & Trà xanh đêm', address: 'Khu Cu đơ Cầu Phủ, TP. Hà Tĩnh', note: 'Thưởng thức kẹo lạc mật mía bánh tráng giòn rụm bên chén chè xanh nóng hổi.', cost: '35.000đ' }
-          ]
-        },
-        {
-          dayNumber: 2,
-          title: 'Ngày 2: Chiêm bái Đệ nhất danh lam Chùa Hương Tích & Hồ Kẻ Gỗ',
-          activities: [
-            { time: '07:30 – 08:30', title: 'Điểm tâm Súp lươn & Bánh mướt cay nồng Hà Tĩnh', address: 'Phố Phan Đình Phùng, TP. Hà Tĩnh', note: 'Lươn đồng xào nghệ cay đậm đà ăn kèm bánh mì hoặc bánh mướt mềm.', cost: '50.000đ/người', transit: 'Di chuyển 20km' },
-            { time: '09:00 – 12:00', title: 'Hành hương Chùa Hương Tích trên Đỉnh Ngàn Hống', address: 'Xã Thiên Lộc, Can Lộc, Hà Tĩnh', note: 'Đi cáp treo hoặc đi thuyền qua lòng hồ ngắm phong cảnh tiên cảnh mây phủ.', cost: '140.000đ vé cáp treo', transit: 'Di chuyển 30km' },
-            { time: '12:30 – 14:00', title: 'Thưởng thức Dê núi Can Lộc & Cơm lam nướng than', address: 'Khu du lịch sinh thái Can Lộc, Hà Tĩnh', note: 'Thịt dê ngọt mềm tái chanh, xào lăn và cháo dê bồi bổ năng lượng.', cost: '180.000đ/người' },
-            { time: '14:30 – 17:00', title: 'Du ngoạn Khu bảo tồn thiên nhiên Hồ Kẻ Gỗ', address: 'Xã Cẩm Mỹ, Cẩm Xuyên, Hà Tĩnh', note: 'Ngắm hồ nước nhân tạo mênh mông gắn liền với bài ca "Người đi xây hồ Kẻ Gỗ".', cost: '20.000đ vé vào cổng' }
-          ]
-        },
-        {
-          dayNumber: 3,
-          title: 'Ngày 3: Khám phá Đền Chợ Củi, Đèo Ngang & Mua sắm đặc sản',
-          activities: [
-            { time: '08:00 – 10:00', title: 'Chiêm bái Đền Chợ Củi (Đền Quan Hoàng Mười linh thiêng)', address: 'Xã Xuân Hồng, Nghi Xuân, Hà Tĩnh', note: 'Ngôi đền cổ kính tựa lưng vào núi Hồng Lĩnh bên dòng sông Lam thơ mộng.', cost: 'Công đức tùy tâm' },
-            { time: '10:30 – 12:00', title: 'Thăm Khu lưu niệm Đại thi hào Nguyễn Du', address: 'Làng Tiên Điền, Nghi Xuân, Hà Tĩnh', note: 'Tìm hiểu cuộc đời và tác phẩm Truyện Kiều bất hủ của danh nhân văn hóa thế giới.', cost: '30.000đ/vé' },
-            { time: '12:30 – 14:00', title: 'Bữa trưa Cá luộc sông La & Bánh đa Đô Lương', address: 'Bến Tam Soa, Đức Thọ, Hà Tĩnh', note: 'Món ăn dân dã thấm đượm tình quê xứ Nghệ.', cost: '120.000đ/người' }
-          ]
-        }
-      ];
-      return haTinhDays.slice(0, days);
-    }
+    const haTinhDays = [
+      {
+        dayNumber: 1,
+        title: 'Ngày 1: Lịch sử hào hùng & Biển Thiên Cầm xanh ngát',
+        activities: [
+          { time: '07:30 – 08:30', title: 'Thưởng thức Bánh mướt ram giò nóng giòn Quán Bà Hà', address: '74 Hà Huy Tập, TP. Hà Tĩnh', note: 'Đặc sản trứ danh xứ Nghệ, cuốn bánh mướt mềm mượt với ram giòn rụm.', cost: '40.000đ/người', transit: 'Di chuyển 25km ~ 30 phút' },
+          { time: '09:00 – 11:30', title: 'Thăm Khu di tích Lịch sử Quốc gia Ngã ba Đồng Lộc', address: 'Thị trấn Đồng Lộc, Can Lộc, Hà Tĩnh', note: 'Kính cẩn dâng hương tưởng niệm 10 cô gái thanh niên xung phong quả cảm.', cost: 'Miễn phí vé', transit: 'Di chuyển 35km ~ 45 phút' },
+          { time: '12:00 – 13:30', title: 'Ăn trưa Hải sản Mực nhảy tươi sống tại Bãi biển Thiên Cầm', address: 'Bãi biển Thiên Cầm, Cẩm Xuyên, Hà Tĩnh', note: 'Mực nhảy nháy luộc nguyên con ngọt lịm chấm muối tiêu chanh ớt xanh.', cost: '220.000đ/người', transit: 'Tại chỗ' },
+          { time: '15:00 – 17:30', title: 'Tắm biển Thiên Cầm & Check-in Núi Thiên Cầm', address: 'Thị trấn Thiên Cầm, Hà Tĩnh', note: 'Bãi biển được mệnh danh là cung đàn trời với bờ cát thoai thoải và nước trong vắt.', cost: 'Miễn phí', transit: 'Di chuyển 18km về TP' },
+          { time: '19:00 – 21:00', title: 'Thưởng thức Kẹo Cu đơ Cầu Phủ & Trà xanh đêm', address: 'Khu Cu đơ Cầu Phủ, TP. Hà Tĩnh', note: 'Thưởng thức kẹo lạc mật mía bánh tráng giòn rụm bên chén chè xanh nóng hổi.', cost: '35.000đ' }
+        ]
+      },
+      {
+        dayNumber: 2,
+        title: 'Ngày 2: Chiêm bái Đệ nhất danh lam Chùa Hương Tích & Hồ Kẻ Gỗ',
+        activities: [
+          { time: '07:30 – 08:30', title: 'Điểm tâm Súp lươn & Bánh mướt cay nồng Hà Tĩnh', address: 'Phố Phan Đình Phùng, TP. Hà Tĩnh', note: 'Lươn đồng xào nghệ cay đậm đà ăn kèm bánh mì hoặc bánh mướt mềm.', cost: '50.000đ/người', transit: 'Di chuyển 20km' },
+          { time: '09:00 – 12:00', title: 'Hành hương Chùa Hương Tích trên Đỉnh Ngàn Hống', address: 'Xã Thiên Lộc, Can Lộc, Hà Tĩnh', note: 'Đi cáp treo hoặc đi thuyền qua lòng hồ ngắm phong cảnh tiên cảnh mây phủ.', cost: '140.000đ vé cáp treo', transit: 'Di chuyển 30km' },
+          { time: '12:30 – 14:00', title: 'Thưởng thức Dê núi Can Lộc & Cơm lam nướng than', address: 'Khu du lịch sinh thái Can Lộc, Hà Tĩnh', note: 'Thịt dê ngọt mềm tái chanh, xào lăn và cháo dê bồi bổ năng lượng.', cost: '180.000đ/người' },
+          { time: '14:30 – 17:00', title: 'Du ngoạn Khu bảo tồn thiên nhiên Hồ Kẻ Gỗ', address: 'Xã Cẩm Mỹ, Cẩm Xuyên, Hà Tĩnh', note: 'Ngắm hồ nước nhân tạo mênh mông gắn liền với bài ca "Người đi xây hồ Kẻ Gỗ".', cost: '20.000đ vé vào cổng' }
+        ]
+      },
+      {
+        dayNumber: 3,
+        title: 'Ngày 3: Khám phá Đền Chợ Củi, Đèo Ngang & Mua sắm đặc sản',
+        activities: [
+          { time: '08:00 – 10:00', title: 'Chiêm bái Đền Chợ Củi (Đền Quan Hoàng Mười linh thiêng)', address: 'Xã Xuân Hồng, Nghi Xuân, Hà Tĩnh', note: 'Ngôi đền cổ kính tựa lưng vào núi Hồng Lĩnh bên dòng sông Lam thơ mộng.', cost: 'Công đức tùy tâm' },
+          { time: '10:30 – 12:00', title: 'Thăm Khu lưu niệm Đại thi hào Nguyễn Du', address: 'Làng Tiên Điền, Nghi Xuân, Hà Tĩnh', note: 'Tìm hiểu cuộc đời và tác phẩm Truyện Kiều bất hủ của danh nhân văn hóa thế giới.', cost: '30.000đ/vé' },
+          { time: '12:30 – 14:00', title: 'Bữa trưa Cá luộc sông La & Bánh đa Đô Lương', address: 'Bến Tam Soa, Đức Thọ, Hà Tĩnh', note: 'Món ăn dân dã thấm đượm tình quê xứ Nghệ.', cost: '120.000đ/người' }
+        ]
+      }
+    ];
 
     // 2. Hà Giang
-    if (dLower.includes('hà giang') || dLower.includes('ha giang') || dLower.includes('đồng văn')) {
-      return [
-        {
-          dayNumber: 1,
-          title: 'Ngày 1: Chinh phục Dốc Bắc Sum, Cổng trời Quản Bạ & Rừng thông Yên Minh',
-          activities: [
-            { time: '07:30 – 08:30', title: 'Thưởng thức Phở chua gia truyền hoặc Phở Tráng Kìm', address: 'Xã Tráng Kìm, Quyết Tiến, Quản Bạ', note: 'Sợi phở tươi cán tay với nước sốt chua ngọt đậm vị vùng cao.', cost: '45.000đ' },
-            { time: '09:00 – 11:30', title: 'Check-in Cổng Trời Quản Bạ & Núi Đôi Cô Tiên', address: 'Thị trấn Tam Sơn, Quản Bạ, Hà Giang', note: 'Tận mắt ngắm kỳ quan núi đôi tròn trịa giữa thung lũng lúa xanh.', cost: 'Miễn phí' },
-            { time: '13:30 – 17:00', title: 'Dạo bước Rừng thông Yên Minh & Bản Phó Bảng cổ kính', address: 'Huyện Yên Minh & Phó Bảng, Đồng Văn', note: 'Check-in rừng thông ngút ngàn và những ngôi nhà trình tường mái âm dương cổ kính.', cost: 'Miễn phí' }
-          ]
-        },
-        {
-          dayNumber: 2,
-          title: 'Ngày 2: Chinh phục Đèo Mã Pí Lèng, Du thuyền Sông Nho Quế & Cột cờ Lũng Cú',
-          activities: [
-            { time: '08:00 – 10:30', title: 'Chinh phục Cột cờ Quốc gia Lũng Cú – Cực Bắc Tổ quốc', address: 'Xã Lũng Cú, Đồng Văn, Hà Giang', note: 'Chạm tay vào lá cờ đỏ sao vàng 54m2 tung bay kiêu hãnh trên đỉnh núi Rồng.', cost: '40.000đ vé' },
-            { time: '11:00 – 12:30', title: 'Khám phá Dinh thự Vua Mèo Vương Chính Đức', address: 'Xã Sà Phìn, Đồng Văn', note: 'Kiến trúc đá xanh và gỗ sa mộc kết hợp Hoa – Mông – Pháp độc nhất vô nhị.', cost: '30.000đ' },
-            { time: '14:00 – 17:00', title: 'Đi thuyền vượt Hẻm Tu Sản trên dòng Sông Nho Quế xanh ngọc', address: 'Đèo Mã Pí Lèng, Mèo Vạc', note: 'Trải nghiệm đỉnh cao của chuyến đi Hà Giang: hẻm vực sâu nhất Đông Nam Á.', cost: '120.000đ vé thuyền' }
-          ]
-        }
-      ].slice(0, days);
-    }
+    const haGiangDays = [
+      {
+        dayNumber: 1,
+        title: 'Ngày 1: Chinh phục Dốc Bắc Sum, Cổng trời Quản Bạ & Rừng thông Yên Minh',
+        activities: [
+          { time: '07:30 – 08:30', title: 'Thưởng thức Phở chua gia truyền hoặc Phở Tráng Kìm', address: 'Xã Tráng Kìm, Quyết Tiến, Quản Bạ', note: 'Sợi phở tươi cán tay với nước sốt chua ngọt đậm vị vùng cao.', cost: '45.000đ' },
+          { time: '09:00 – 11:30', title: 'Check-in Cổng Trời Quản Bạ & Núi Đôi Cô Tiên', address: 'Thị trấn Tam Sơn, Quản Bạ, Hà Giang', note: 'Tận mắt ngắm kỳ quan núi đôi tròn trịa giữa thung lũng lúa xanh.', cost: 'Miễn phí' },
+          { time: '13:30 – 17:00', title: 'Dạo bước Rừng thông Yên Minh & Bản Phó Bảng cổ kính', address: 'Huyện Yên Minh & Phó Bảng, Đồng Văn', note: 'Check-in rừng thông ngút ngàn và những ngôi nhà trình tường mái âm dương cổ kính.', cost: 'Miễn phí' }
+        ]
+      },
+      {
+        dayNumber: 2,
+        title: 'Ngày 2: Chinh phục Đèo Mã Pí Lèng, Du thuyền Sông Nho Quế & Cột cờ Lũng Cú',
+        activities: [
+          { time: '08:00 – 10:30', title: 'Chinh phục Cột cờ Quốc gia Lũng Cú – Cực Bắc Tổ quốc', address: 'Xã Lũng Cú, Đồng Văn, Hà Giang', note: 'Chạm tay vào lá cờ đỏ sao vàng 54m2 tung bay kiêu hãnh trên đỉnh núi Rồng.', cost: '40.000đ vé' },
+          { time: '11:00 – 12:30', title: 'Khám phá Dinh thự Vua Mèo Vương Chính Đức', address: 'Xã Sà Phìn, Đồng Văn', note: 'Kiến trúc đá xanh và gỗ sa mộc kết hợp Hoa – Mông – Pháp độc nhất vô nhị.', cost: '30.000đ' },
+          { time: '14:00 – 17:00', title: 'Đi thuyền vượt Hẻm Tu Sản trên dòng Sông Nho Quế xanh ngọc', address: 'Đèo Mã Pí Lèng, Mèo Vạc', note: 'Trải nghiệm đỉnh cao của chuyến đi Hà Giang: hẻm vực sâu nhất Đông Nam Á.', cost: '120.000đ vé thuyền' }
+        ]
+      }
+    ];
 
     // 3. Đà Nẵng - Hội An
-    if (dLower.includes('đà nẵng') || dLower.includes('da nang') || dLower.includes('hội an')) {
-      return [
-        {
-          dayNumber: 1,
-          title: 'Ngày 1: Bán đảo Sơn Trà, Bãi biển Mỹ Khê & Cầu Rồng phun lửa',
+    const daNangDays = [
+      {
+        dayNumber: 1,
+        title: 'Ngày 1: Bán đảo Sơn Trà, Bãi biển Mỹ Khê & Cầu Rồng phun lửa',
+        activities: [
+          { time: '07:30 – 08:30', title: 'Ăn sáng Mì Quảng Ếch Bếp Trang hoặc Mì Quảng Bà Mua', address: '19 Đống Đa, Hải Châu, Đà Nẵng', note: 'Mì Quảng sợi vàng óng, nước nhưn ếch đậm đà kèm bánh tráng mè nướng.', cost: '55.000đ' },
+          { time: '09:00 – 11:30', title: 'Chiêm bái Chùa Linh Ứng & Tượng Phật Bà cao 67m tại Sơn Trà', address: 'Bán đảo Sơn Trà, Đà Nẵng', note: 'Ngắm toàn cảnh vịnh Đà Nẵng tuyệt đẹp từ trên cao.', cost: 'Miễn phí' },
+          { time: '15:00 – 17:30', title: 'Tắm biển Mỹ Khê & Thưởng thức dừa xiêm mát lạnh', address: 'Đường Võ Nguyên Giáp, Đà Nẵng', note: 'Bãi biển lọt top hành tinh với bờ cát trắng mịn và sóng vỗ êm đềm.', cost: '40.000đ' },
+          { time: '19:00 – 21:30', title: 'Ăn tối Bánh tráng cuốn thịt heo Quán Trần & Ngắm Cầu Rồng', address: 'Lê Duẩn & Cầu Rồng, Đà Nẵng', note: 'Thịt heo hai đầu da chấm mắm nêm đậm đà chuẩn vị miền Trung.', cost: '160.000đ' }
+        ]
+      },
+      {
+        dayNumber: 2,
+        title: 'Ngày 2: Phố cổ Hội An di sản, Thuyền thả hoa đăng & Rừng dừa Bảy Mẫu',
+        activities: [
+          { time: '08:30 – 11:30', title: 'Trải nghiệm chèo Thuyền thúng Rừng dừa Bảy Mẫu Cẩm Thanh', address: 'Xã Cẩm Thanh, TP. Hội An', note: 'Múa thúng quăng chài điệu nghệ và nghe câu hò xứ Quảng.', cost: '150.000đ/thúng' },
+          { time: '12:00 – 13:30', title: 'Thưởng thức Cơm gà Bà Buội hoặc Bánh mì Phượng Hội An', address: '22 Phan Chu Trinh, Hội An', note: 'Hạt cơm vàng thơm nấu nước luộc gà, thịt gà xé trộn hành tây giòn ngọt.', cost: '60.000đ' },
+          { time: '15:30 – 21:00', title: 'Dạo bộ Phố Cổ Hội An, Chùa Cầu & Thả đèn hoa đăng sông Hoài', address: 'Phố cổ Hội An, Quảng Nam', note: 'Check-in giàn hoa giấy rực rỡ, uống trà Mót sả chanh và ngắm đèn lồng lung linh.', cost: '120.000đ' }
+        ]
+      }
+    ];
+
+    let baseDays = null;
+    if (dLower.includes('hà tĩnh') || dLower.includes('ha tinh') || dLower.includes('thiên cầm')) {
+      baseDays = haTinhDays;
+    } else if (dLower.includes('hà giang') || dLower.includes('ha giang') || dLower.includes('đồng văn')) {
+      baseDays = haGiangDays;
+    } else if (dLower.includes('đà nẵng') || dLower.includes('da nang') || dLower.includes('hội an')) {
+      baseDays = daNangDays;
+    }
+
+    if (baseDays) {
+      const fullDays = [...baseDays];
+      while (fullDays.length < days) {
+        const nextNum = fullDays.length + 1;
+        fullDays.push({
+          dayNumber: nextNum,
+          title: `Ngày ${nextNum}: Trải nghiệm danh thắng & Ẩm thực bản địa ${dest}`,
           activities: [
-            { time: '07:30 – 08:30', title: 'Ăn sáng Mì Quảng Ếch Bếp Trang hoặc Mì Quảng Bà Mua', address: '19 Đống Đa, Hải Châu, Đà Nẵng', note: 'Mì Quảng sợi vàng óng, nước nhưn ếch đậm đà kèm bánh tráng mè nướng.', cost: '55.000đ' },
-            { time: '09:00 – 11:30', title: 'Chiêm bái Chùa Linh Ứng & Tượng Phật Bà cao 67m tại Sơn Trà', address: 'Bán đảo Sơn Trà, Đà Nẵng', note: 'Ngắm toàn cảnh vịnh Đà Nẵng tuyệt đẹp từ trên cao.', cost: 'Miễn phí' },
-            { time: '15:00 – 17:30', title: 'Tắm biển Mỹ Khê & Thưởng thức dừa xiêm mát lạnh', address: 'Đường Võ Nguyên Giáp, Đà Nẵng', note: 'Bãi biển lọt top hành tinh với bờ cát trắng mịn và sóng vỗ êm đềm.', cost: '40.000đ' },
-            { time: '19:00 – 21:30', title: 'Ăn tối Bánh tráng cuốn thịt heo Quán Trần & Ngắm Cầu Rồng', address: 'Lê Duẩn & Cầu Rồng, Đà Nẵng', note: 'Thịt heo hai đầu da chấm mắm nêm đậm đà chuẩn vị miền Trung.', cost: '160.000đ' }
+            { time: '08:00 – 09:30', title: `Điểm tâm đặc sản & Cà phê sáng tại ${dest}`, address: `Khu trung tâm ${dest}`, note: 'Khởi đầu ngày mới thong thả thưởng thức hương vị bản địa.', cost: '50.000đ' },
+            { time: '10:00 – 12:30', title: `Khám phá Danh lam thắng cảnh nổi tiếng & Trải nghiệm sinh thái`, address: `Khu du lịch sinh thái ${dest}`, note: 'Chiêm ngưỡng cảnh quan thiên nhiên và tìm hiểu văn hóa bản địa.', cost: '80.000đ' },
+            { time: '14:30 – 17:00', title: `Check-in Điểm ngắm cảnh đẹp & Thư giãn`, address: `Điểm ngắm cảnh ${dest}`, note: 'Thời điểm chụp ảnh kỷ niệm lý tưởng nhất.', cost: '60.000đ' },
+            { time: '18:30 – 21:00', title: `Ăn tối Đặc sản địa phương & Dạo phố đêm`, address: `Khu ẩm thực đêm ${dest}`, note: 'Thưởng thức các món ngon truyền thống và đi dạo phố.', cost: '150.000đ' }
           ]
-        },
-        {
-          dayNumber: 2,
-          title: 'Ngày 2: Phố cổ Hội An di sản, Thuyền thả hoa đăng & Rừng dừa Bảy Mẫu',
-          activities: [
-            { time: '08:30 – 11:30', title: 'Trải nghiệm chèo Thuyền thúng Rừng dừa Bảy Mẫu Cẩm Thanh', address: 'Xã Cẩm Thanh, TP. Hội An', note: 'Múa thúng quăng chài điệu nghệ và nghe câu hò xứ Quảng.', cost: '150.000đ/thúng' },
-            { time: '12:00 – 13:30', title: 'Thưởng thức Cơm gà Bà Buội hoặc Bánh mì Phượng Hội An', address: '22 Phan Chu Trinh, Hội An', note: 'Hạt cơm vàng thơm nấu nước luộc gà, thịt gà xé trộn hành tây giòn ngọt.', cost: '60.000đ' },
-            { time: '15:30 – 21:00', title: 'Dạo bộ Phố Cổ Hội An, Chùa Cầu & Thả đèn hoa đăng sông Hoài', address: 'Phố cổ Hội An, Quảng Nam', note: 'Check-in giàn hoa giấy rực rỡ, uống trà Mót sả chanh và ngắm đèn lồng lung linh.', cost: '120.000đ' }
-          ]
-        }
-      ].slice(0, days);
+        });
+      }
+      return fullDays.slice(0, days);
     }
 
     // Default Dynamic Realistic Generator cho các tỉnh khác (Ninh Bình, Đà Lạt, Sa Pa, Phú Quốc, v.v.)
@@ -544,26 +558,68 @@ QUY TẮC BẮT BUỘC (CRITICAL):
           </div>
 
           {/* 2. Thời gian chuyến đi & Ngày khởi hành */}
-          <div className="space-y-2 pt-2 border-t border-slate-100">
-            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-sky-600" />
-              <span>Thời lượng & Ngày khởi hành</span>
-            </label>
+          <div className="space-y-2.5 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-sky-600" />
+                <span>Thời lượng chuyến đi</span>
+              </label>
+              <span className="text-xs font-bold text-sky-600">
+                {daysCount} ngày {daysCount > 1 ? `(${daysCount}N${daysCount - 1}Đ)` : '(Trong ngày)'}
+              </span>
+            </div>
 
-            {/* Duration Pills */}
-            <div className="grid grid-cols-4 gap-2">
-              {['2N1Đ', '3N2Đ', '4N3Đ', '5N4Đ'].map(pill => (
+            {/* Stepper + Flexible Days Control */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setDaysCount(prev => Math.max(1, prev - 1))}
+                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-base flex items-center justify-center transition-colors cursor-pointer select-none active:scale-95 shrink-0"
+                title="Giảm 1 ngày"
+              >
+                -
+              </button>
+
+              <div className="flex-1 flex items-center justify-center gap-2 py-1.5 px-3 rounded-xl bg-sky-50 border border-sky-200 text-sky-900 font-extrabold text-xs sm:text-sm">
+                <span>{daysCount} Ngày</span>
+                <span className="text-[11px] sm:text-xs text-sky-600 font-semibold">
+                  {daysCount > 1 ? `• ${daysCount}N${daysCount - 1}Đ` : '• Đi về trong ngày'}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setDaysCount(prev => Math.min(30, prev + 1))}
+                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-base flex items-center justify-center transition-colors cursor-pointer select-none active:scale-95 shrink-0"
+                title="Tăng 1 ngày"
+              >
+                +
+              </button>
+            </div>
+
+            {/* Quick Presets (Từ 2 ngày đến 14 ngày & 1 tháng) */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-bold text-slate-400 mr-0.5">Chọn nhanh:</span>
+              {[
+                { days: 2, label: '2N1Đ' },
+                { days: 3, label: '3N2Đ' },
+                { days: 4, label: '4N3Đ' },
+                { days: 5, label: '5N4Đ' },
+                { days: 7, label: '7N6Đ (1 tuần)' },
+                { days: 10, label: '10 Ngày' },
+                { days: 14, label: '14 Ngày (2 tuần)' }
+              ].map(item => (
                 <button
-                  key={pill}
+                  key={item.days}
                   type="button"
-                  onClick={() => handleSelectDuration(pill)}
-                  className={`py-2 rounded-xl text-center text-xs font-bold transition-all cursor-pointer ${
-                    durationPill === pill
+                  onClick={() => handleSelectDuration(item.days)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                    daysCount === item.days
                       ? 'bg-sky-600 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
                   }`}
                 >
-                  {pill}
+                  {item.label}
                 </button>
               ))}
             </div>
