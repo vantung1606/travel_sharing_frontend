@@ -8,8 +8,13 @@ import {
   MapPin,
   Calendar,
   DollarSign,
+  Bike,
+  Car,
+  Bus,
   Loader2,
+  Check,
   CheckCircle2,
+  ShieldCheck,
   Camera,
   Utensils,
   Sun,
@@ -21,16 +26,20 @@ import {
   Users,
   User,
   Home,
+  Sliders,
+  RotateCcw,
+  Bookmark,
+  Zap,
   Info,
   Navigation,
   Minimize2,
   Maximize2,
   Activity,
   Terminal,
-  RotateCcw
+  ChevronDown
 } from 'lucide-react';
 
-const HOT_DESTINATIONS = ['Đà Lạt', 'Hà Giang', 'Phú Quốc', 'Ninh Bình', 'Sa Pa', 'Đà Nẵng', 'Quy Nhơn', 'Huế'];
+const HOT_DESTINATIONS = ['Đà Lạt', 'Hà Giang', 'Phú Quốc', 'Ninh Bình', 'Sa Pa', 'Đà Nẵng - Hội An', 'Quy Nhơn'];
 
 const DESTINATION_COVERS = {
   'Đà Lạt': 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
@@ -38,7 +47,7 @@ const DESTINATION_COVERS = {
   'Phú Quốc': 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80',
   'Ninh Bình': 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
   'Sa Pa': 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=1200&q=80',
-  'Đà Nẵng': 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
+  'Đà Nẵng - Hội An': 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
   'Quy Nhơn': 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80',
   'Hà Nội': 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80',
   'Huế': 'https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=1200&q=80',
@@ -49,11 +58,11 @@ const INTEREST_OPTIONS = [
   { id: 'checkin', label: 'Check-in sống ảo', icon: Camera },
   { id: 'food', label: 'Ẩm thực bản địa', icon: Utensils },
   { id: 'beach', label: 'Nghỉ dưỡng & Biển', icon: Sun },
-  { id: 'culture', label: 'Văn hóa di sản', icon: Landmark },
-  { id: 'trekking', label: 'Trekking khám phá', icon: Compass },
-  { id: 'nightlife', label: 'Phố đêm nhộn nhịp', icon: Music },
-  { id: 'healing', label: 'Chữa lành thư giãn', icon: Heart },
-  { id: 'shopping', label: 'Mua sắm đặc sản', icon: ShoppingBag }
+  { id: 'culture', label: 'Văn hóa & Di sản', icon: Landmark },
+  { id: 'trekking', label: 'Trekking & Phượt', icon: Compass },
+  { id: 'nightlife', label: 'Phố đêm & Vui chơi', icon: Music },
+  { id: 'healing', label: 'Chữa lành & Thư giãn', icon: Heart },
+  { id: 'shopping', label: 'Mua sắm & Chợ', icon: ShoppingBag }
 ];
 
 const AI_RESEARCH_MILESTONES = [
@@ -74,30 +83,30 @@ export const AITripGeneratorModal = () => {
   } = useApp();
   const toast = useToast();
 
-  // 1. CORE PARAMETERS: Không điền sẵn dữ liệu giả! Trống để người dùng tự nhập
-  const [destination, setDestination] = useState('');
+  // Core Trip Parameters
+  const [destination, setDestination] = useState('Đà Nẵng - Hội An, Việt Nam');
   const [daysCount, setDaysCount] = useState(3);
 
-  // Sync initial destination CHỈ KHI được truyền từ một địa điểm cụ thể ở trang khác
+  // Sync initial destination when triggered from specific spot or place
   useEffect(() => {
     if (isAIGeneratorOpen && aiGeneratorInitialData?.destination) {
       setDestination(aiGeneratorInitialData.destination);
       if (aiGeneratorInitialData.item?.name) {
-        setCustomPrompt(`Lịch trình cần có điểm dừng chân trải nghiệm tại: ${aiGeneratorInitialData.item.name}.`);
+        setCustomPrompt(`Lịch trình cần có điểm dừng chân trải nghiệm tại: ${aiGeneratorInitialData.item.name} (${aiGeneratorInitialData.item.category || ''}).`);
       }
     }
   }, [isAIGeneratorOpen, aiGeneratorInitialData]);
 
-  // Ngày bắt đầu: Mặc định là hôm nay + 3 ngày
+  // Default start date: today + 5 days
   const defaultStartDate = useMemo(() => {
     const d = new Date();
-    d.setDate(d.getDate() + 3);
+    d.setDate(d.getDate() + 5);
     return d.toISOString().split('T')[0];
   }, []);
 
   const [startDate, setStartDate] = useState(defaultStartDate);
 
-  // Ngày kết thúc tự động tính
+  // Calculated End Date
   const endDateDisplay = useMemo(() => {
     try {
       const parts = startDate.split('-');
@@ -108,20 +117,25 @@ export const AITripGeneratorModal = () => {
       const yyyy = d.getFullYear();
       return `${dd}/${mm}/${yyyy}`;
     } catch {
-      return '';
+      return '20/05/2026';
     }
   }, [startDate, daysCount]);
 
-  // Bạn đồng hành
+  // Companions
   const [companion, setCompanion] = useState('couple');
 
-  // Hạn mức ngân sách
+  // Transit
+  const [transit, setTransit] = useState('taxi');
+
+  // Budget Tier
   const [budgetTier, setBudgetTier] = useState(2);
+  const [includeFlight, setIncludeFlight] = useState(true);
 
-  // Gu trải nghiệm: Mặc định để người dùng tự chọn
-  const [selectedInterests, setSelectedInterests] = useState(['checkin', 'food']);
-
-  // Ghi chú riêng
+  // Personalization & AI Tuning
+  const [selectedInterests, setSelectedInterests] = useState(['checkin', 'food', 'culture']);
+  const [pacing, setPacing] = useState('balanced');
+  const [accommodation, setAccommodation] = useState('Khách sạn 3 sao tiện nghi, trung tâm');
+  const [diningStyle, setDiningStyle] = useState('Quán ăn bản địa chuẩn vị & nổi tiếng');
   const [customPrompt, setCustomPrompt] = useState('');
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -129,7 +143,7 @@ export const AITripGeneratorModal = () => {
   // ─────────────────────────────────────────────────────────────────────────────
   if (!isAIGeneratorOpen) {
     if (aiGeneratingStatus?.isGenerating) {
-      // CHẾ ĐỘ THU NHỎ Ở GÓC MÀN HÌNH
+      // 1. CHẾ ĐỘ THU NHỎ Ở GÓC MÀN HÌNH (Mini Corner Pill)
       if (!aiGeneratingStatus.isExpanded) {
         return (
           <div
@@ -202,9 +216,10 @@ export const AITripGeneratorModal = () => {
         );
       }
 
-      // CHẾ ĐỘ MỞ RỘNG (Expanded Live Inspector)
+      // 2. CHẾ ĐỘ MỞ RỘNG (Expanded Live Inspector - Hiển thị chi tiết từ 0 đến 100%)
       return (
         <div className="fixed bottom-6 right-6 z-50 w-[94vw] sm:w-[480px] bg-slate-900/98 text-white rounded-3xl shadow-2xl border border-sky-500/40 backdrop-blur-2xl animate-fade-in p-5 ring-1 ring-sky-500/20 flex flex-col gap-4">
+          {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-800">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-xl bg-sky-500/20 text-sky-400">
@@ -287,7 +302,7 @@ export const AITripGeneratorModal = () => {
             })}
           </div>
 
-          {/* Nhật ký xử lý thời gian thực */}
+          {/* Nhật ký xử lý thời gian thực (Live Thought Stream) */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-[11px] text-slate-400">
               <span className="font-bold uppercase tracking-wider flex items-center gap-1.5">
@@ -306,6 +321,7 @@ export const AITripGeneratorModal = () => {
             </div>
           </div>
 
+          {/* Footer nút bấm */}
           <div className="flex items-center justify-between pt-1">
             <span className="text-[11px] text-slate-400 italic">
               Khi đạt 100%, kết quả sẽ tự động bung mở
@@ -331,42 +347,71 @@ export const AITripGeneratorModal = () => {
     );
   };
 
+  // Handle Duration Change
+  const handleSelectDuration = (count) => {
+    setDaysCount(count);
+  };
+
   // Reset Form
   const handleReset = () => {
-    setDestination('');
+    setDestination('Đà Nẵng - Hội An, Việt Nam');
     setDaysCount(3);
     setStartDate(defaultStartDate);
     setCompanion('couple');
+    setTransit('taxi');
     setBudgetTier(2);
-    setSelectedInterests([]);
+    setIncludeFlight(true);
+    setSelectedInterests(['checkin', 'food', 'culture']);
+    setPacing('balanced');
+    setAccommodation('Khách sạn 3 sao tiện nghi, trung tâm');
+    setDiningStyle('Quán ăn bản địa chuẩn vị & nổi tiếng');
     setCustomPrompt('');
-    toast.showInfo('Đã làm mới form!');
+    toast.showInfo('Đã khôi phục các tùy chọn mặc định của WanderAI!');
   };
 
-  // Helper Labels
+  // Budget label helper
   const getBudgetLabel = () => {
     switch (budgetTier) {
-      case 1: return 'Tiết kiệm (2 - 4 tr)';
-      case 2: return 'Tiêu chuẩn (4 - 7 tr)';
-      case 3: return 'Thoải mái (7 - 12 tr)';
-      case 4: return 'Cao cấp (> 15 tr)';
-      default: return 'Tiêu chuẩn (4 - 7 tr)';
+      case 1: return '2.5 - 4.0 Triệu VNĐ';
+      case 2: return '4.0 - 7.0 Triệu VNĐ';
+      case 3: return '7.0 - 12.0 Triệu VNĐ';
+      case 4: return '15.0+ Triệu VNĐ (Cao cấp)';
+      default: return '4.0 - 7.0 Triệu VNĐ';
     }
   };
 
   const getCompanionLabel = () => {
     switch (companion) {
       case 'solo': return 'Đi một mình (Solo)';
-      case 'couple': return 'Cặp đôi';
-      case 'friends': return 'Nhóm bạn';
-      case 'family': return 'Gia đình';
+      case 'couple': return 'Cặp đôi / Trăng mật';
+      case 'friends': return 'Nhóm bạn thân';
+      case 'family': return 'Gia đình nhiều thế hệ';
       default: return 'Cặp đôi';
     }
   };
 
-  // Helper ảnh bìa
+  const getTransitLabel = () => {
+    switch (transit) {
+      case 'bike': return 'Xe máy phượt';
+      case 'car': return 'Thuê ô tô tự lái';
+      case 'taxi': return 'Taxi & Grab';
+      case 'bus': return 'Xe khách / Tour ghép';
+      default: return 'Taxi & Grab';
+    }
+  };
+
+  const getPacingLabel = () => {
+    switch (pacing) {
+      case 'relaxed': return 'Thong thả (2-3 điểm/ngày)';
+      case 'balanced': return 'Cân bằng ✨ (3-4 điểm/ngày)';
+      case 'max': return 'Khám phá tối đa (5-6 điểm/ngày)';
+      default: return 'Cân bằng';
+    }
+  };
+
+  // Helper lấy ảnh bìa theo điểm đến
   const getDestinationCover = (dest) => {
-    const dLower = (dest || '').toLowerCase();
+    const dLower = dest.toLowerCase();
     for (const key of Object.keys(DESTINATION_COVERS)) {
       if (dLower.includes(key.toLowerCase())) {
         return DESTINATION_COVERS[key];
@@ -378,6 +423,7 @@ export const AITripGeneratorModal = () => {
   // Helper tạo đối tượng Lịch Trình từ kết quả phân tích AI thực tế
   const buildItineraryFromAI = (parsedAI, isDraft = false) => {
     const companionText = getCompanionLabel();
+    const pacingText = getPacingLabel();
     const budgetVal = budgetTier === 1 ? 3000000 : budgetTier === 2 ? 5500000 : budgetTier === 3 ? 9000000 : 16000000;
     const styleText = selectedInterests
       .map(id => INTEREST_OPTIONS.find(o => o.id === id)?.label)
@@ -387,17 +433,17 @@ export const AITripGeneratorModal = () => {
     const finalDays = parsedAI.days && Array.isArray(parsedAI.days) && parsedAI.days.length > 0
       ? parsedAI.days
       : [
-          {
-            dayNumber: 1,
-            title: `Ngày 1: Khám phá điểm nhấn văn hóa & danh lam tại ${destination}`,
-            activities: [
-              { time: '08:00 – 09:30', category: 'Ẩm thực buổi sáng', title: `Thưởng thức điểm tâm đặc sản tại ${destination}`, address: `Khu trung tâm ${destination}`, note: 'Hương vị truyền thống địa phương', cost: '50.000đ' },
-              { time: '10:00 – 12:00', category: 'Tham quan danh thắng', title: `Khám phá danh thắng nổi tiếng tại ${destination}`, address: `Trung tâm ${destination}`, note: 'Điểm check-in biểu tượng', cost: '80.000đ' },
-              { time: '14:30 – 17:00', category: 'Trải nghiệm sinh thái', title: `Tham quan cảnh quan thiên nhiên & thư giãn`, address: `Khu sinh thái ${destination}`, note: 'Ngắm cảnh và chụp ảnh', cost: '60.000đ' },
-              { time: '19:00 – 21:30', category: 'Phố đêm & Ẩm thực', title: `Khám phá chợ đêm & ẩm thực đường phố`, address: `Phố đi bộ ${destination}`, note: 'Thưởng thức món ăn vặt về đêm', cost: '120.000đ' }
-            ]
-          }
-        ];
+        {
+          dayNumber: 1,
+          title: `Ngày 1: Khám phá điểm nhấn văn hóa & danh lam tại ${destination}`,
+          activities: [
+            { time: '08:00 – 09:30', category: 'Ẩm thực buổi sáng', title: `Thưởng thức điểm tâm đặc sản tại trung tâm ${destination}`, address: `Khu phố ẩm thực ${destination}`, note: 'Hương vị truyền thống địa phương', cost: '50.000đ' },
+            { time: '10:00 – 12:00', category: 'Tham quan danh thắng', title: `Khám phá danh thắng nổi tiếng tại ${destination}`, address: `Trung tâm ${destination}`, note: 'Điểm check-in biểu tượng', cost: '80.000đ' },
+            { time: '14:30 – 17:00', category: 'Trải nghiệm sinh thái', title: `Tham quan cảnh quan thiên nhiên & thư giãn`, address: `Khu sinh thái ${destination}`, note: 'Ngắm cảnh và chụp ảnh', cost: '60.000đ' },
+            { time: '19:00 – 21:30', category: 'Phố đêm & Ẩm thực', title: `Khám phá chợ đêm & ẩm thực đường phố`, address: `Phố đi bộ ${destination}`, note: 'Thưởng thức món ăn vặt về đêm', cost: '120.000đ' }
+          ]
+        }
+      ];
 
     let finalPlacesList = [];
     if (parsedAI.placesList && Array.isArray(parsedAI.placesList) && parsedAI.placesList.length > 0) {
@@ -432,32 +478,34 @@ export const AITripGeneratorModal = () => {
       budgetPerPerson: budgetVal,
       totalBudget: budgetVal * (companion === 'solo' ? 1 : companion === 'couple' ? 2 : companion === 'friends' ? 4 : 5),
       budgetProgress: isDraft ? 15 : 45,
-      budgetNote: `Ngân sách: ${getBudgetLabel()}`,
-      pace: 'Cân bằng',
+      budgetNote: `Ngân sách: ${getBudgetLabel()} • ${includeFlight ? 'Đã gồm vé khứ hồi' : 'Chưa gồm vé máy bay'}`,
+      pace: pacingText,
       style: styleText || 'Trải nghiệm du lịch toàn diện',
-      aiTipNote: parsedAI.summaryTip || `Lời khuyên WanderAI: Lịch trình ${destination} đã được AI phân tích tọa độ địa lý, ưu tiên danh lam thắng cảnh tiêu biểu và các món ăn đặc sản bản địa.`,
+      aiTipNote: parsedAI.summaryTip || `Lời khuyên WanderAI: Lịch trình ${destination} đã được AI phân tích tọa độ địa lý, ưu tiên các món ngon chuẩn vị ${diningStyle} và danh lam thắng cảnh tiêu biểu.`,
       days: finalDays
     };
   };
 
+  // Helper format giờ hiện tại: HH:mm:ss
   const getTimeString = () => {
     const now = new Date();
     return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // SUBMIT GENERATION: AI NGHIÊN CỨU TỪ ĐỊA ĐIỂM NGƯỜI DÙNG NHẬP
+  // SUBMIT GENERATION: AI NGHIÊN CỨU TỪ ĐỊA ĐIỂM NGƯỜI DÙNG NHẬP (KHÔNG DÙNG DỮ LIỆU CỐ ĐỊNH)
+  // TIẾN TRÌNH TỪ 0 ĐẾN 100% HIỂN THỊ TRỰC TIẾP TẠI GÓC MÀN HÌNH
   // ─────────────────────────────────────────────────────────────────────────────
   const handleGenerate = async (isDraft = false) => {
     if (!destination.trim()) {
-      toast.showInfo('Vui lòng nhập điểm đến bạn mong muốn du lịch!');
+      toast.showInfo('Vui lòng nhập điểm đến du lịch bạn mong muốn!');
       return;
     }
 
-    // 1. TỰ ĐỘNG ẨN FORM NGAY ĐỂ GIẢI PHÓNG MÀN HÌNH
+    // 1. NGAY LẬP TỨC ẨN MODAL NHẬP LIỆU ĐỂ GIẢI PHÓNG MÀN HÌNH
     setIsAIGeneratorOpen(false);
 
-    // 2. BẬT TIẾN TRÌNH 0% - 100% Ở GÓC MÀN HÌNH
+    // 2. KHỞI TẠO TIẾN TRÌNH Ở GÓC MÀN HÌNH (0% -> 100%)
     setAiGeneratingStatus({
       isGenerating: true,
       isExpanded: false,
@@ -466,13 +514,14 @@ export const AITripGeneratorModal = () => {
       progress: 10,
       currentStep: `Đang kết nối Google Gemini & Định vị địa lý "${destination}"...`,
       logs: [
-        { time: getTimeString(), message: `Bắt đầu phiên phân tích thực tế cho: "${destination}" (${daysCount} ngày)` },
+        { time: getTimeString(), message: `Bắt đầu phiên phân tích WanderAI cho điểm đến: "${destination}" (${daysCount} ngày)` },
         { time: getTimeString(), message: `Kết nối mô hình Google Gemini 3.5 Flash...` }
       ]
     });
 
-    toast.showInfo(`✨ WanderAI đang phân tích thực tế cho "${destination}"... Bấm vào góc nhỏ màn hình để xem tiến trình từ 0 - 100%!`);
+    toast.showInfo(`✨ WanderAI đang phân tích thực tế cho ${destination}... Bấm vào góc nhỏ màn hình để xem tiến trình từ 0 - 100%!`);
 
+    // Ticker mô phỏng nhịp phân tích mượt mà từ 10% đến 88% trong khi AI đang xử lý
     let currentP = 15;
     const progressTimer = setInterval(() => {
       currentP = Math.min(88, currentP + Math.floor(Math.random() * 8) + 4);
@@ -500,6 +549,8 @@ export const AITripGeneratorModal = () => {
     }, 700);
 
     try {
+      // 3. BUILD PROMPT CÔ ĐỌNG, YÊU CẦU AI NGHIÊN CỨU TRỰC TIẾP ĐỊA ĐIỂM NGƯỜI DÙNG NHẬP
+      // Tối ưu để không bao giờ vượt quá token limit
       const prompt = `Bạn là chuyên gia cố vấn du lịch bản địa hàng đầu tại Việt Nam.
 Hãy nghiên cứu và phân tích điểm đến: "${destination}".
 Lập lịch trình du lịch ${daysCount} ngày với các danh lam thắng cảnh, di tích lịch sử và quán ăn đặc sản có thật 100% tại "${destination}".
@@ -507,8 +558,12 @@ Thông tin chuyến đi:
 - Điểm đến: ${destination}
 - Thời lượng: ${daysCount} ngày (${daysCount}N${Math.max(1, daysCount - 1)}Đ)
 - Đối tượng: ${getCompanionLabel()}
+- Phương tiện: ${getTransitLabel()}
 - Ngân sách: ${getBudgetLabel()}
-- Gu trải nghiệm: ${selectedInterests.join(', ') || 'Du lịch toàn diện'}
+- Gu trải nghiệm: ${selectedInterests.join(', ')}
+- Nhịp độ: ${getPacingLabel()}
+- Lưu trú: ${accommodation}
+- Ẩm thực: ${diningStyle}
 ${customPrompt ? `- Yêu cầu thêm: ${customPrompt}` : ''}
 
 QUY TẮC BẮT BUỘC:
@@ -538,6 +593,7 @@ QUY TẮC BẮT BUỘC:
   ]
 }`;
 
+      // 4. GỌI TRỰC TIẾP GEMINI 3.5 FLASH (MAX TOKENS 8192)
       const aiResponse = await aiService.generateText({
         prompt,
         model: 'gemini-3.5-flash',
@@ -547,6 +603,7 @@ QUY TẮC BẮT BUỘC:
 
       clearInterval(progressTimer);
 
+      // Cập nhật tiến trình lên 95%
       setAiGeneratingStatus(prev => ({
         ...prev,
         progress: 95,
@@ -554,6 +611,7 @@ QUY TẮC BẮT BUỘC:
         logs: [...(prev.logs || []), { time: getTimeString(), message: `Google Gemini đã phản hồi thành công. Đang đóng gói dữ liệu...` }]
       }));
 
+      // Parse JSON an toàn
       let parsedData = {};
       try {
         const cleaned = typeof aiResponse === 'string'
@@ -567,8 +625,10 @@ QUY TẮC BẮT BUỘC:
         console.warn('Could not parse JSON from Gemini:', e);
       }
 
+      // Xây dựng đối tượng hành trình từ kết quả AI
       const fullItinerary = buildItineraryFromAI(parsedData, isDraft);
 
+      // Chạm mốc 100%
       setAiGeneratingStatus(prev => ({
         ...prev,
         progress: 100,
@@ -576,10 +636,12 @@ QUY TẮC BẮT BUỘC:
         logs: [...(prev.logs || []), { time: getTimeString(), message: `Hoàn tất 100%! Khởi tạo giao diện chi tiết hành trình.` }]
       }));
 
+      // Chờ 600ms để người dùng thấy con số 100%
       await new Promise(resolve => setTimeout(resolve, 600));
 
       generateAITrip({ fullItinerary });
 
+      // Đóng thanh tiến trình
       setAiGeneratingStatus({
         isGenerating: false,
         isExpanded: false,
@@ -593,12 +655,13 @@ QUY TẮC BẮT BUỘC:
       if (isDraft) {
         toast.showSuccess(`Đã lưu nháp lịch trình AI cho ${destination}!`);
       } else {
-        toast.showSuccess(`WanderAI đã hoàn tất lịch trình ${daysCount} ngày tại ${destination}! Đang mở chi tiết... 🎉`);
+        toast.showSuccess(`WanderAI đã hoàn tất nghiên cứu lịch trình ${daysCount} ngày tại ${destination}! Đang mở chi tiết... 🎉`);
       }
     } catch (err) {
       clearInterval(progressTimer);
       console.error('AI Generation error:', err);
 
+      // Khi có lỗi, vẫn xây dựng lịch trình theo đúng địa điểm người dùng nhập
       const fallbackAI = {
         summaryTip: `Kinh nghiệm khám phá ${destination}: Hãy chuẩn bị trang phục phù hợp thời tiết và thưởng thức các món ăn đặc sản địa phương.`,
         placesList: [`Trung tâm ${destination}`, `Khu danh thắng ${destination}`, `Phố ẩm thực ${destination}`],
@@ -632,104 +695,83 @@ QUY TẮC BẮT BUỘC:
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto animate-fade-in font-['Inter',sans-serif]">
-      {/* CARD MODAL CAO CẤP & GỌN GÀNG (Max-width: 620px) */}
-      <div className="relative w-full max-w-[620px] bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh] border border-slate-200/80 font-['Inter',sans-serif]">
-        
-        {/* Top Accent Gradient Bar */}
-        <div className="h-1 bg-gradient-to-r from-sky-400 via-indigo-500 to-purple-500 shrink-0" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 py-8 sm:py-12 bg-slate-950/70 backdrop-blur-md overflow-y-auto animate-fade-in">
+      {/* COMPACT MODAL CARD (Max-w: 620px, thoáng đãng, lề trên rộng rãi) */}
+      <div className="relative w-full max-w-[620px] bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[90vh] border border-slate-200">
 
-        {/* 1. HEADER CHUYÊN NGHIỆP - SẮC NÉT, TINH TẾ */}
-        <div className="px-6 py-4.5 bg-gradient-to-b from-slate-50/70 via-white to-white flex items-start justify-between gap-4 border-b border-slate-100/90 shrink-0">
-          <div className="flex items-start gap-3.5 min-w-0">
-            {/* Glowing AI Icon Squircle */}
-            <div className="relative shrink-0 mt-0.5">
-              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 via-sky-500 to-cyan-400 p-0.5 shadow-md shadow-sky-500/20">
-                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-sky-300 animate-pulse" />
-                </div>
-              </div>
-              <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center" title="AI Trực tuyến">
-                <span className="w-1.5 h-1.5 rounded-full bg-white" />
-              </span>
-            </div>
-
-            {/* Typography Content */}
-            <div className="min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200/70 shadow-2xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping" />
-                  WanderAI Engine 3.5
-                </span>
-                <span className="text-[11px] font-medium text-slate-400 hidden sm:inline">
-                  • Phân tích thực địa trực tiếp
-                </span>
-              </div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-snug">
-                Kiến Tạo Lịch Trình Thực Địa
+        {/* MODAL HEADER - THOÁNG ĐÃNG, LỀ TRÊN RỘNG RÃI, KHÔNG SÁT MÉP */}
+        <div className="px-7 sm:px-8 pt-7 sm:pt-8 pb-5 bg-gradient-to-b from-sky-50/50 via-white to-white flex items-start justify-between gap-4 border-b border-slate-100 shrink-0">
+          <div className="flex items-start gap-3.5">
+            <span className="w-11 h-11 rounded-2xl bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
+              <Sparkles className="w-5 h-5 text-sky-600" />
+            </span>
+            <div>
+              <h2 className="font-display text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight leading-snug">
+                Lập Lịch Trình AI Thông Minh
               </h2>
-              <p className="text-xs text-slate-500 leading-relaxed mt-0.5 font-normal">
-                Tự động tra cứu địa danh, quán ăn có thật & tối ưu hóa lộ trình từng ngày.
+              <p className="text-xs sm:text-sm text-slate-500 font-normal mt-1 leading-relaxed">
+                AI nghiên cứu thực tế theo điểm đến bạn nhập (toàn quốc & quốc tế).
               </p>
             </div>
           </div>
 
-          {/* Nút đóng X thanh lịch */}
+          {/* Duy nhất 1 nút X thanh lịch để đóng popup */}
           <button
             type="button"
             onClick={() => setIsAIGeneratorOpen(false)}
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200/80 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-all cursor-pointer hover:rotate-90 active:scale-95 shrink-0 mt-0.5"
-            title="Đóng (Esc)"
+            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-all cursor-pointer shrink-0 mt-0.5"
+            title="Đóng popup"
           >
             <X className="w-4 h-4 stroke-[2.5]" />
           </button>
         </div>
 
-        {/* 2. BODY - THIẾT KẾ THÔNG THOÁNG, KHÔNG ĐIỀN SẴN DỮ LIỆU */}
-        <div className="px-6 py-5 overflow-y-auto flex-1 space-y-5">
+        {/* MODAL BODY - Form gọn gàng, thoáng đãng, dễ điền */}
+        <div className="px-7 sm:px-8 py-5 overflow-y-auto flex-1 space-y-5">
 
-          {/* MỤC 1: ĐIỂM ĐẾN (Search Input Nổi Bật) */}
+          {/* 1. Điểm đến du lịch */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider">
-              <MapPin className="w-4 h-4 text-sky-600" />
-              <span>Bạn muốn du lịch ở đâu?</span>
-              <span className="text-rose-500 font-bold">*</span>
-            </label>
-
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-sky-600" />
+                <span>Điểm đến du lịch</span>
+              </label>
+              <span className="text-[11px] font-semibold text-slate-400">
+                Nhập bất kỳ tỉnh thành / huyện / đảo
+              </span>
+            </div>
             <div className="relative">
-              <Navigation className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sky-600 w-4 h-4" />
+              <Navigation className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
               <input
                 type="text"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                placeholder="Nhập địa điểm (ví dụ: Thạch Hà - Hà Tĩnh, Ninh Bình, Sa Pa, Côn Đảo...)"
-                className="w-full pl-10 pr-9 py-3 rounded-2xl bg-slate-50 text-slate-900 text-xs sm:text-sm font-semibold border border-slate-200 placeholder:text-slate-400 placeholder:font-normal focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all shadow-xs"
-                autoFocus
+                placeholder="Nhập bất kỳ điểm đến nào (ví dụ: Bảo Lộc, Côn Đảo, Phú Yên, Hà Giang, Cà Mau, Sa Pa...)"
+                className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-slate-50 text-slate-900 text-xs font-semibold border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
               />
               {destination && (
                 <button
                   type="button"
                   onClick={() => setDestination('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
 
-            {/* Quick chips gợi ý nhanh */}
+            {/* Quick destination tags */}
             <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-              <span className="text-[11px] font-semibold text-slate-400">Gợi ý nhanh:</span>
+              <span className="text-[11px] font-bold text-slate-400">Gợi ý nhanh:</span>
               {HOT_DESTINATIONS.map(tag => (
                 <button
                   key={tag}
                   type="button"
                   onClick={() => setDestination(tag)}
-                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
-                    destination === tag
-                      ? 'bg-sky-600 text-white shadow-xs font-bold'
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${destination === tag
+                      ? 'bg-sky-600 text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700'
-                  }`}
+                    }`}
                 >
                   {tag}
                 </button>
@@ -737,66 +779,73 @@ QUY TẮC BẮT BUỘC:
             </div>
           </div>
 
-          {/* MỤC 2: THỜI GIAN CHUYẾN ĐI (Card Tích Hợp Gọn Gàng) */}
-          <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-3.5">
+          {/* 2. Thời gian chuyến đi & Ngày khởi hành */}
+          <div className="space-y-2.5 pt-2 border-t border-slate-100">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider">
-                <Calendar className="w-4 h-4 text-indigo-600" />
-                <span>Thời gian hành trình</span>
-              </span>
-              <span className="text-xs font-extrabold text-indigo-600 font-mono">
-                {daysCount} ngày {daysCount > 1 ? `(${daysCount}N${daysCount - 1}Đ)` : '(Đi trong ngày)'}
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-sky-600" />
+                <span>Thời lượng chuyến đi</span>
+              </label>
+              <span className="text-xs font-bold text-sky-600">
+                {daysCount} ngày {daysCount > 1 ? `(${daysCount}N${daysCount - 1}Đ)` : '(Trong ngày)'}
               </span>
             </div>
 
-            {/* Stepper + Presets trên cùng 1 hàng trực quan */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="flex items-center bg-white rounded-xl border border-slate-200 p-1 shadow-2xs">
-                <button
-                  type="button"
-                  onClick={() => setDaysCount(prev => Math.max(1, prev - 1))}
-                  className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-700 font-extrabold flex items-center justify-center transition-colors cursor-pointer select-none active:scale-95"
-                >
-                  -
-                </button>
-                <span className="px-3 text-xs font-extrabold text-slate-900 font-mono">
-                  {daysCount} Ngày
+            {/* Stepper + Flexible Days Control */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setDaysCount(prev => Math.max(1, prev - 1))}
+                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-base flex items-center justify-center transition-colors cursor-pointer select-none active:scale-95 shrink-0"
+                title="Giảm 1 ngày"
+              >
+                -
+              </button>
+
+              <div className="flex-1 flex items-center justify-center gap-2 py-1.5 px-3 rounded-xl bg-sky-50 border border-sky-200 text-sky-900 font-extrabold text-xs sm:text-sm">
+                <span>{daysCount} Ngày</span>
+                <span className="text-[11px] sm:text-xs text-sky-600 font-semibold">
+                  {daysCount > 1 ? `• ${daysCount}N${daysCount - 1}Đ` : '• Đi về trong ngày'}
                 </span>
-                <button
-                  type="button"
-                  onClick={() => setDaysCount(prev => Math.min(30, prev + 1))}
-                  className="w-8 h-8 rounded-lg hover:bg-slate-100 text-slate-700 font-extrabold flex items-center justify-center transition-colors cursor-pointer select-none active:scale-95"
-                >
-                  +
-                </button>
               </div>
 
-              {/* Các nút preset gọn gàng */}
-              <div className="flex items-center gap-1 flex-wrap">
-                {[
-                  { days: 2, label: '2N1Đ' },
-                  { days: 3, label: '3N2Đ' },
-                  { days: 4, label: '4N3Đ' },
-                  { days: 5, label: '5N4Đ' },
-                  { days: 7, label: '7N6Đ' }
-                ].map(item => (
-                  <button
-                    key={item.days}
-                    type="button"
-                    onClick={() => setDaysCount(item.days)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                      daysCount === item.days
-                        ? 'bg-indigo-600 text-white shadow-xs'
-                        : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-100'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
+              <button
+                type="button"
+                onClick={() => setDaysCount(prev => Math.min(30, prev + 1))}
+                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-base flex items-center justify-center transition-colors cursor-pointer select-none active:scale-95 shrink-0"
+                title="Tăng 1 ngày"
+              >
+                +
+              </button>
             </div>
 
-            {/* Chọn ngày khởi hành & Xem ngày kết thúc */}
+            {/* Quick Presets (Từ 2 ngày đến 14 ngày & 1 tháng) */}
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-bold text-slate-400 mr-0.5">Chọn nhanh:</span>
+              {[
+                { days: 2, label: '2N1Đ' },
+                { days: 3, label: '3N2Đ' },
+                { days: 4, label: '4N3Đ' },
+                { days: 5, label: '5N4Đ' },
+                { days: 7, label: '7N6Đ (1 tuần)' },
+                { days: 10, label: '10 Ngày' },
+                { days: 14, label: '14 Ngày (2 tuần)' }
+              ].map(item => (
+                <button
+                  key={item.days}
+                  type="button"
+                  onClick={() => handleSelectDuration(item.days)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${daysCount === item.days
+                      ? 'bg-sky-600 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                    }`}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Start Date & End Date auto-calc */}
             <div className="grid grid-cols-2 gap-3 pt-1">
               <div>
                 <span className="text-[11px] font-semibold text-slate-500 block mb-1">Ngày bắt đầu</span>
@@ -804,28 +853,28 @@ QUY TẮC BẮT BUỘC:
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-white text-slate-800 text-xs font-bold border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                 />
               </div>
               <div>
                 <span className="text-[11px] font-semibold text-slate-500 block mb-1">Ngày kết thúc</span>
-                <div className="px-3 py-2 rounded-xl bg-white text-slate-800 text-xs font-bold flex items-center justify-between border border-slate-200">
-                  <span className="font-mono">{endDateDisplay}</span>
+                <div className="px-3 py-2 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold flex items-center justify-between border border-slate-200/60">
+                  <span>{endDateDisplay}</span>
                   <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* MỤC 3: ĐỒNG HÀNH & NGÂN SÁCH (Dạng Thẻ Ngang Gọn Gàng, Tiết Kiệm Chiều Cao) */}
-          <div className="space-y-3.5">
-            {/* Bạn đồng hành */}
+          {/* 3. Đối tượng & Ngân sách */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+            {/* Companions */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider">
-                <Users className="w-4 h-4 text-sky-600" />
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5 text-indigo-600" />
                 <span>Đi cùng ai?</span>
               </label>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 gap-1.5">
                 {[
                   { id: 'solo', label: '1 mình', icon: User },
                   { id: 'couple', label: 'Cặp đôi', icon: Heart },
@@ -839,27 +888,26 @@ QUY TẮC BẮT BUỘC:
                       key={item.id}
                       type="button"
                       onClick={() => setCompanion(item.id)}
-                      className={`py-2 px-1 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                        isSelected
-                          ? 'bg-sky-50 text-sky-700 border-2 border-sky-500 shadow-2xs'
-                          : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
-                      }`}
+                      className={`py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${isSelected
+                          ? 'bg-sky-50 text-sky-700 border-2 border-sky-500'
+                          : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100'
+                        }`}
                     >
-                      <Icon className="w-3.5 h-3.5 shrink-0" />
-                      <span className="truncate">{item.label}</span>
+                      <Icon className="w-3.5 h-3.5" />
+                      <span>{item.label}</span>
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            {/* Ngân sách */}
+            {/* Budget */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider">
-                <DollarSign className="w-4 h-4 text-amber-600" />
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <DollarSign className="w-3.5 h-3.5 text-amber-600" />
                 <span>Ngân sách mỗi người</span>
               </label>
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 gap-1.5">
                 {[
                   { tier: 1, label: 'Tiết kiệm', sub: '2 - 4 tr' },
                   { tier: 2, label: 'Tiêu chuẩn', sub: '4 - 7 tr' },
@@ -872,11 +920,10 @@ QUY TẮC BẮT BUỘC:
                       key={item.tier}
                       type="button"
                       onClick={() => setBudgetTier(item.tier)}
-                      className={`py-1.5 px-1 rounded-xl text-center transition-all cursor-pointer flex flex-col items-center justify-center ${
-                        isSelected
-                          ? 'bg-amber-50 text-amber-900 border-2 border-amber-500 shadow-2xs'
-                          : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100'
-                      }`}
+                      className={`py-1.5 px-2 rounded-xl text-center transition-all cursor-pointer flex flex-col items-center justify-center ${isSelected
+                          ? 'bg-amber-50 text-amber-900 border-2 border-amber-500'
+                          : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100'
+                        }`}
                     >
                       <span className="text-xs font-bold">{item.label}</span>
                       <span className="text-[10px] text-slate-500 font-medium">{item.sub}</span>
@@ -887,14 +934,14 @@ QUY TẮC BẮT BUỘC:
             </div>
           </div>
 
-          {/* MỤC 4: GU TRẢI NGHIỆM (Chips Thon Gọn) */}
-          <div className="space-y-2">
+          {/* 4. Gu trải nghiệm du lịch (Interests Chips) */}
+          <div className="space-y-2 pt-2 border-t border-slate-100">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5 uppercase tracking-wider">
-                <Sparkles className="w-4 h-4 text-purple-600" />
-                <span>Gu trải nghiệm du lịch</span>
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                <span>Gu du lịch & Trải nghiệm</span>
               </label>
-              <span className="text-[11px] font-semibold text-slate-400">Chọn tùy ý</span>
+              <span className="text-[11px] font-semibold text-slate-400">Chọn 1 hoặc nhiều</span>
             </div>
 
             <div className="flex flex-wrap gap-1.5">
@@ -906,11 +953,10 @@ QUY TẮC BẮT BUỘC:
                     key={opt.id}
                     type="button"
                     onClick={() => toggleInterest(opt.id)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-purple-600 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
+                    className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${isSelected
+                        ? 'bg-sky-600 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
                     <span>{opt.label}</span>
@@ -920,32 +966,31 @@ QUY TẮC BẮT BUỘC:
             </div>
           </div>
 
-          {/* MỤC 5: GHI CHÚ RIÊNG CHO AI */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-              <Info className="w-3.5 h-3.5 text-slate-400" />
-              <span>Ghi chú riêng cho AI (Tùy chọn)</span>
+          {/* 5. Ghi chú thêm cho AI */}
+          <div className="space-y-1.5 pt-2 border-t border-slate-100">
+            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <Info className="w-3.5 h-3.5 text-slate-500" />
+              <span>Yêu cầu đặc biệt cho AI (Tùy chọn)</span>
             </label>
             <input
               type="text"
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
-              placeholder="Ví dụ: Không dậy sớm, thích ăn hải sản vỉa hè, muốn ghé chùa cổ..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 text-slate-800 text-xs font-medium border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+              placeholder="Ví dụ: Không dậy sớm trước 8h, thích ăn hải sản vỉa hè, muốn ghé chùa..."
+              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 text-slate-900 text-xs font-medium border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
             />
           </div>
 
         </div>
 
-        {/* 3. FOOTER TINH GỌN - Không còn nút thừa thãi */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between gap-3 shrink-0">
+        {/* MODAL FOOTER - Gọn gàng, nút bấm rõ ràng */}
+        <div className="px-5 sm:px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
           <button
             type="button"
             onClick={handleReset}
-            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 font-semibold cursor-pointer transition-colors"
+            className="text-xs text-slate-500 hover:text-slate-800 font-semibold cursor-pointer transition-colors"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Làm mới</span>
+            Làm mới
           </button>
 
           <div className="flex items-center gap-3">
@@ -972,3 +1017,4 @@ QUY TẮC BẮT BUỘC:
     </div>
   );
 };
+
