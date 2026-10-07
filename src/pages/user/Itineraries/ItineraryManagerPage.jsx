@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
-import { aiService } from '../../../services/aiService';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import {
   Sparkles,
@@ -14,15 +14,10 @@ import {
   SlidersHorizontal,
   ChevronRight,
   Share2,
-  Edit3,
-  MoreVertical,
   Plus,
   Compass,
   CheckCircle2,
   Heart,
-  Car,
-  Utensils,
-  Camera,
   X,
   ArrowRight,
   TrendingDown,
@@ -37,7 +32,11 @@ import {
   Send,
   Loader2,
   Smile,
-  AlertCircle
+  AlertCircle,
+  Filter,
+  Navigation,
+  Bookmark,
+  ChevronDown
 } from 'lucide-react';
 
 export const ItineraryManagerPage = () => {
@@ -97,7 +96,7 @@ export const ItineraryManagerPage = () => {
 
   // Filter and Sort Logic
   const filteredItineraries = useMemo(() => {
-    return itineraries.filter(itin => {
+    return (itineraries || []).filter(itin => {
       // Tab matching
       if (activeTab === 'upcoming' && itin.status !== 'upcoming') return false;
       if (activeTab === 'completed' && itin.status !== 'completed') return false;
@@ -132,11 +131,12 @@ export const ItineraryManagerPage = () => {
 
   // Tab counts
   const tabCounts = useMemo(() => {
+    const list = itineraries || [];
     return {
-      upcoming: itineraries.filter(i => i.status === 'upcoming').length,
-      completed: itineraries.filter(i => i.status === 'completed').length,
-      drafts: itineraries.filter(i => i.status === 'drafts').length,
-      cancelled: itineraries.filter(i => i.status === 'cancelled').length
+      upcoming: list.filter(i => i.status === 'upcoming').length,
+      completed: list.filter(i => i.status === 'completed').length,
+      drafts: list.filter(i => i.status === 'drafts').length,
+      cancelled: list.filter(i => i.status === 'cancelled').length
     };
   }, [itineraries]);
 
@@ -146,9 +146,19 @@ export const ItineraryManagerPage = () => {
     if (!requireAuth('chia sẻ lịch trình')) return;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.origin + `/itineraries?id=${itin.id}`);
-      toast.success(`Đã sao chép liên kết chia sẻ cho chuyến đi: ${itin.title}`);
+      toast.showSuccess(`Đã sao chép liên kết chia sẻ: "${itin.title}"`);
     } else {
-      toast.info('Đã tạo liên kết chia sẻ nhóm thành công!');
+      toast.showInfo('Đã tạo liên kết chia sẻ nhóm thành công!');
+    }
+  };
+
+  // Handle Delete Trip
+  const handleDeleteItinerary = (itinId, itinTitle, e) => {
+    e.stopPropagation();
+    if (!requireAuth('xóa lịch trình')) return;
+    if (window.confirm(`Bạn có chắc chắn muốn xóa lịch trình "${itinTitle}" không?`)) {
+      setItineraries(prev => prev.filter(item => item.id !== itinId));
+      toast.showSuccess(`Đã xóa chuyến đi "${itinTitle}" thành công.`);
     }
   };
 
@@ -157,7 +167,7 @@ export const ItineraryManagerPage = () => {
     e.preventDefault();
     if (!requireAuth('tạo chuyến đi mới')) return;
     if (!manualTitle.trim() || !manualDest.trim()) {
-      toast.warn('Vui lòng nhập tên chuyến đi và điểm đến chính!');
+      toast.showWarning('Vui lòng nhập tên chuyến đi và điểm đến chính!');
       return;
     }
 
@@ -185,17 +195,19 @@ export const ItineraryManagerPage = () => {
       placesList: places,
       budgetPerPerson: Math.round(Number(manualBudget) / (manualGroup.includes('Nhóm') ? 4 : manualGroup.includes('Cặp đôi') ? 2 : 1)),
       totalBudget: Number(manualBudget),
-      budgetProgress: 20,
+      budgetProgress: 25,
       budgetNote: `Ngân sách tự lập: ${Number(manualBudget).toLocaleString('vi-VN')}đ`,
       pace: 'Tự do',
       style: 'Lịch trình tự thiết kế',
-      aiTipNote: manualNote || 'Lịch trình thủ công do bạn tự tạo và quản lý trên WanderAI.',
+      aiTipNote: manualNote || 'Lịch trình thủ công do bạn tự tạo và quản lý trên Wayfare.',
       days: Array.from({ length: calculatedDays }).map((_, i) => ({
         dayNumber: i + 1,
         title: `Ngày ${i + 1}: Kế hoạch khám phá ${manualDest}`,
         activities: [
           { time: '08:30', title: `Bắt đầu hoạt động ngày ${i + 1}`, note: 'Điểm dừng chân tự do', cost: 'Tùy chi tiêu' },
-          { time: '14:00', title: `Khám phá & tham quan tự do`, note: 'Tự do trải nghiệm và chụp ảnh', cost: 'Tùy chi tiêu' }
+          { time: '11:30', title: `Ăn trưa & Thưởng thức ẩm thực địa phương`, note: 'Ghé quán ngon gần điểm đến', cost: '150.000đ' },
+          { time: '14:30', title: `Khám phá & tham quan trải nghiệm`, note: 'Tự do trải nghiệm và chụp ảnh', cost: 'Tùy chi tiêu' },
+          { time: '18:30', title: `Ăn tối và dạo phố đêm`, note: 'Thư giãn ngắm cảnh về đêm', cost: 'Tùy chi tiêu' }
         ]
       }))
     };
@@ -203,7 +215,7 @@ export const ItineraryManagerPage = () => {
     setItineraries(prev => [newTrip, ...prev]);
     setIsManualCreateOpen(false);
     setSelectedItinerary(newTrip);
-    toast.success(`Đã tạo thành công chuyến đi mới: ${newTrip.title}! 🎉`);
+    toast.showSuccess(`Đã tạo thành công chuyến đi mới: ${newTrip.title}! 🎉`);
 
     setManualTitle('');
     setManualDest('');
@@ -212,556 +224,560 @@ export const ItineraryManagerPage = () => {
   };
 
   return (
-    <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 space-y-8 pb-20">
-      {/* ─── 1. TOP AMBIENT GLOW & HEADER (M04 STITCH CANVAS) ──────────────────── */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-sky-600/10 via-cyan-500/10 to-amber-500/10 p-6 sm:p-8 border border-sky-100 shadow-sm">
-        <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-[1000px] h-[300px] bg-gradient-to-r from-sky-400/20 via-cyan-300/20 to-amber-300/15 blur-3xl pointer-events-none -z-10"></div>
-        
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 mb-3">
-          <span className="flex items-center gap-1 hover:text-sky-600 transition-colors cursor-pointer">
-            <Compass className="w-3.5 h-3.5" />
-            Trang chủ
-          </span>
-          <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-          <span className="text-sky-600 font-bold">Lịch trình của tôi</span>
-        </div>
+    <div className="w-full min-h-screen bg-[#f8fafc] text-slate-900 pb-24">
+      {/* ─── 1. TOP AMBIENT HERO BANNER (UI/UX CONSISTENCY: px-4 sm:px-6 lg:px-8 xl:px-12) ─── */}
+      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6 sm:pt-8">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 text-white p-7 sm:p-10 lg:p-12 shadow-xl shadow-sky-950/20 border border-slate-800/80">
+          {/* Ambient Glow Orbs */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none"></div>
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
 
-        {/* Title & Action Cluster */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-          <div className="max-w-3xl space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-100/80 text-sky-800 text-xs font-bold shadow-xs">
-              <Sparkles className="w-3.5 h-3.5 text-sky-600" />
-              <span>Trung tâm quản lý hành trình cá nhân</span>
-            </div>
-
-            <h1 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Lịch trình của tôi
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed max-w-2xl">
-              Quản lý toàn bộ chuyến đi sắp tới, kế hoạch đã hoàn thành và các đề xuất hành trình do AI thông minh tối ưu riêng cho bạn.
-            </p>
+          {/* Breadcrumb Header */}
+          <div className="relative z-10 flex items-center gap-2 text-xs font-semibold text-slate-400 mb-4">
+            <span className="flex items-center gap-1.5 hover:text-sky-300 transition-colors cursor-pointer">
+              <Compass className="w-3.5 h-3.5 text-sky-400" />
+              <span>Wayfare</span>
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
+            <span className="text-sky-400 font-bold">Kế Hoạch & Lịch Trình</span>
           </div>
 
-          {/* Action CTA Cluster */}
-          <div className="flex flex-wrap items-center gap-3">
-            {/* AI Generator Button with Glowing Badge */}
-            <button
-              type="button"
-              onClick={() => {
-                if (!requireAuth('lập lịch trình bằng AI')) return;
-                setIsAIGeneratorOpen(true);
-              }}
-              className="group relative inline-flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-xs sm:text-sm font-bold shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 hover:scale-[1.02] transition-all duration-300 cursor-pointer"
-            >
-              <Sparkles className="w-4 h-4 text-amber-200 group-hover:rotate-12 transition-transform" />
-              <span>Tạo bằng AI ✨</span>
-              <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
-              </span>
-            </button>
+          {/* Hero Content & CTA Buttons */}
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+            <div className="max-w-3xl space-y-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-sky-500/15 text-sky-300 border border-sky-500/30 text-xs font-bold shadow-inner">
+                <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
+                <span>Trợ lý WanderAI Trip Engine • Tối ưu 63 tỉnh thành</span>
+              </div>
 
-            {/* Manual New Trip */}
-            <button
-              type="button"
-              onClick={() => {
-                if (!requireAuth('tạo chuyến đi mới')) return;
-                setIsManualCreateOpen(true);
-              }}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>+ Tạo chuyến đi mới</span>
-            </button>
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                Lịch Trình Của Bạn
+              </h1>
+              
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-2xl font-normal">
+                Quản lý các chuyến đi sắp tới, đồng bộ điểm dừng chân từ Khám phá, kiểm soát ngân sách chi tiêu và kiến tạo hành trình trọn vẹn trong tích tắc cùng AI.
+              </p>
+            </div>
+
+            {/* Action CTA Buttons */}
+            <div className="flex flex-wrap items-center gap-3.5">
+              {/* AI Generator CTA */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!requireAuth('lập lịch trình bằng AI')) return;
+                  setIsAIGeneratorOpen(true);
+                }}
+                className="group relative inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-sm font-bold shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-[1.02] active:scale-95 transition-all duration-300 cursor-pointer"
+              >
+                <Sparkles className="w-4 h-4 text-amber-200 group-hover:rotate-12 transition-transform duration-300" />
+                <span>Lập Tour Bằng AI (30s) ✨</span>
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                </span>
+              </button>
+
+              {/* Manual Trip CTA */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!requireAuth('tạo chuyến đi mới')) return;
+                  setIsManualCreateOpen(true);
+                }}
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 text-white border border-white/15 backdrop-blur-md text-sm font-bold shadow-sm hover:border-white/30 active:scale-95 transition-all duration-200 cursor-pointer"
+              >
+                <Plus className="w-4 h-4 text-sky-400" />
+                <span>Tạo Thủ Công</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ─── GUEST RESTRICTION NOTICE BANNER ───────────────────────────────────── */}
+      {/* ─── 2. GUEST RESTRICTION BANNER (NẾU CHƯA ĐĂNG NHẬP) ────────────────────── */}
       {!isLoggedIn && (
-        <div className="bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-50 border border-sky-200/90 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-in fade-in duration-200">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-600/20">
-              <Calendar className="w-6 h-6" />
+        <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6">
+          <div className="bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-50 border border-sky-200 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-600/20">
+                <Calendar className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-base text-slate-900">
+                  Chế độ khách: Xem lịch trình mẫu
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mt-0.5">
+                  Đăng nhập tài khoản để tự do chỉnh sửa lịch trình, liên kết điểm tham quan và đồng bộ kế hoạch du lịch trên mọi thiết bị.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-extrabold text-sm sm:text-base text-slate-900">
-                Chế độ xem Khách: Lập & Quản lý lịch trình
-              </h3>
-              <p className="text-xs text-slate-600 leading-relaxed mt-0.5">
-                Khách vãng lai chỉ có thể xem các lịch trình du lịch mẫu. Đăng nhập để sử dụng AI lập tour riêng, tùy chỉnh điểm đến và đồng bộ hành trình cá nhân.
-              </p>
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setAuthMode('login');
+                setIsAuthModalOpen(true);
+              }}
+              className="shrink-0 px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-extrabold shadow-sm transition-all cursor-pointer whitespace-nowrap active:scale-95"
+            >
+              Đăng nhập ngay
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              setAuthMode('login');
-              setIsAuthModalOpen(true);
-            }}
-            className="shrink-0 px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-sm transition-all cursor-pointer whitespace-nowrap active:scale-95"
-          >
-            Đăng nhập ngay
-          </button>
         </div>
       )}
 
-      {/* ─── 2. SUMMARY STATS STRIP (4 KPI CARDS) ──────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* KPI 1 */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0">
-            <Compass className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tổng số chuyến đi</p>
-            <div className="flex items-baseline gap-1.5 mt-0.5">
-              <span className="font-display text-2xl font-extrabold text-slate-900">{itineraries.length + 8}</span>
-              <span className="text-xs text-slate-500">chuyến</span>
+      {/* ─── 3. STATS KPI DASHBOARD (4 METRIC CARDS) ─────────────────────────── */}
+      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {/* Card 1: Tổng số chuyến */}
+          <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 transition-all flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+              <Compass className="w-7 h-7" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng Chuyến Đi</p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                  {(itineraries || []).length}
+                </span>
+                <span className="text-xs text-slate-500 font-medium">chuyến đã tạo</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* KPI 2 */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0">
-            <MapPin className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Điểm đến đã qua</p>
-            <div className="flex items-baseline gap-1.5 mt-0.5">
-              <span className="font-display text-2xl font-extrabold text-slate-900">18</span>
-              <span className="text-xs text-slate-500">thành phố</span>
+          {/* Card 2: Điểm đến đã lên kế hoạch */}
+          <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 transition-all flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+              <MapPin className="w-7 h-7" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Điểm Dừng Chân</p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+                  {(itineraries || []).reduce((acc, curr) => acc + (curr.placesCount || (curr.placesList ? curr.placesList.length : 3)), 0)}
+                </span>
+                <span className="text-xs text-slate-500 font-medium">địa danh kết nối</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* KPI 3 */}
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 transition-all flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center flex-shrink-0">
-            <DollarSign className="w-6 h-6" />
-          </div>
-          <div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Ngân sách tối ưu</p>
-            <div className="flex items-baseline gap-1.5 mt-0.5 flex-wrap">
-              <span className="font-display text-lg sm:text-xl font-extrabold text-slate-900 text-sky-700">42.500.000đ</span>
-              <span className="inline-flex items-center text-[10px] font-bold px-1.5 py-0.5 rounded bg-sky-50 text-sky-700">
-                -15% AI
-              </span>
+          {/* Card 3: Ngân sách ước tính */}
+          <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 transition-all flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+              <DollarSign className="w-7 h-7" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Ngân Sách Tích Lũy</p>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-xl sm:text-2xl font-extrabold text-sky-700">
+                  {((itineraries || []).reduce((acc, curr) => acc + (curr.totalBudget || (curr.budgetPerPerson ? curr.budgetPerPerson * 2 : 4000000)), 0) / 1000000).toFixed(1)}M
+                </span>
+                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-sky-50 text-sky-700">
+                  Tối ưu chi phí
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* KPI 4 */}
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50/50 rounded-2xl p-5 border border-amber-200/80 shadow-xs hover:shadow-md transition-all flex items-center gap-4 relative overflow-hidden">
-          <div className="w-12 h-12 rounded-xl bg-amber-500 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
-            <Clock className="w-6 h-6" />
-          </div>
-          <div className="min-w-0">
-            <p className="text-[11px] font-bold text-amber-700 uppercase tracking-wider">Hành trình kế tiếp</p>
-            <p className="font-display text-base font-extrabold text-slate-900 truncate">Còn 4 ngày</p>
-            <p className="text-xs text-slate-500 truncate">Đà Nẵng – Hội An</p>
+          {/* Card 4: Hành trình gần nhất */}
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50/60 rounded-2xl p-5 sm:p-6 border border-amber-200 shadow-xs hover:shadow-md transition-all flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <Clock className="w-7 h-7" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Kế Hoạch Sắp Tới</p>
+              <p className="text-base sm:text-lg font-extrabold text-slate-900 truncate mt-0.5">
+                {(itineraries && itineraries[0]) ? itineraries[0].destination : 'Sắp khởi hành'}
+              </p>
+              <p className="text-xs text-slate-500 truncate">
+                {(itineraries && itineraries[0]) ? (itineraries[0].duration || '3N2Đ') : 'Chưa có lịch'}
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ─── 3. NAV TABS & FILTER WORKSPACE (M04 FILTER MATRIX) ──────────────────── */}
-      <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-sm space-y-4">
-        {/* Row 1: Segmented Tabs & Layout Switcher */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-            {[
-              { id: 'upcoming', label: 'Chuyến đi sắp tới', count: tabCounts.upcoming },
-              { id: 'completed', label: 'Đã hoàn thành', count: tabCounts.completed },
-              { id: 'drafts', label: 'Bản nháp & Đề xuất AI', count: tabCounts.drafts, isAi: true },
-              { id: 'cancelled', label: 'Đã hủy', count: tabCounts.cancelled }
-            ].map(tab => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 sm:px-5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
-                    isActive
-                      ? 'bg-sky-600 text-white shadow-sm'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
-                  }`}
-                >
-                  {tab.isAi && <Sparkles className="w-3.5 h-3.5 text-amber-400" />}
-                  <span>{tab.label}</span>
-                  <span
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+      {/* ─── 4. FILTER WORKSPACE & TABS TOOLBAR ─────────────────────────────────── */}
+      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6">
+        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/80 shadow-sm space-y-4">
+          
+          {/* Row 1: Segmented Tabs & Grid/List switcher */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+              {[
+                { id: 'upcoming', label: 'Chuyến đi sắp tới', count: tabCounts.upcoming },
+                { id: 'completed', label: 'Đã hoàn thành', count: tabCounts.completed },
+                { id: 'drafts', label: 'Bản nháp & Đề xuất AI', count: tabCounts.drafts, isAi: true },
+                { id: 'cancelled', label: 'Đã hủy', count: tabCounts.cancelled }
+              ].map(tab => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-4 sm:px-5 py-2.5 rounded-full text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+                      isActive
+                        ? 'bg-sky-600 text-white shadow-md shadow-sky-600/20'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 hover:text-slate-900'
                     }`}
                   >
-                    {tab.count}
-                  </span>
-                </button>
-              );
-            })}
+                    {tab.isAi && <Sparkles className="w-3.5 h-3.5 text-amber-400" />}
+                    <span>{tab.label}</span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
+                        isActive ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Layout Mode Switcher */}
+            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-end sm:self-auto shrink-0">
+              <button
+                type="button"
+                onClick={() => setLayoutMode('grid')}
+                className={`p-2 rounded-lg transition-all cursor-pointer ${
+                  layoutMode === 'grid' ? 'bg-white text-sky-600 shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                }`}
+                title="Dạng lưới thẻ"
+              >
+                <Layers className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setLayoutMode('list')}
+                className={`p-2 rounded-lg transition-all cursor-pointer ${
+                  layoutMode === 'list' ? 'bg-white text-sky-600 shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                }`}
+                title="Dạng danh sách"
+              >
+                <SlidersHorizontal className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          {/* Grid / List Switcher */}
-          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl self-end sm:self-auto">
-            <button
-              type="button"
-              onClick={() => setLayoutMode('grid')}
-              className={`p-2 rounded-lg transition-all cursor-pointer ${
-                layoutMode === 'grid' ? 'bg-white text-sky-600 shadow-xs' : 'text-slate-400 hover:text-slate-600'
-              }`}
-              title="Dạng lưới thẻ"
-            >
-              <Layers className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setLayoutMode('list')}
-              className={`p-2 rounded-lg transition-all cursor-pointer ${
-                layoutMode === 'list' ? 'bg-white text-sky-600 shadow-xs' : 'text-slate-400 hover:text-slate-600'
-              }`}
-              title="Dạng danh sách"
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+          {/* Row 2: Search Input, Sorting & Filter Chips */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 items-center">
+            {/* Search Box */}
+            <div className="md:col-span-5 relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm chuyến đi theo tên, thành phố, điểm check-in..."
+                className="w-full pl-11 pr-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm text-slate-800 outline-none focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-500/10 transition-all font-medium"
+              />
+            </div>
 
-        {/* Row 2: Search, Sort & Tag Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-          {/* Search Box */}
-          <div className="md:col-span-6 lg:col-span-5 relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Tìm chuyến đi theo tên, điểm đến, thẻ..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-800 outline-none focus:border-sky-500 focus:bg-white focus:ring-2 focus:ring-sky-500/10 transition-all"
-            />
-          </div>
+            {/* Sort Select */}
+            <div className="md:col-span-3">
+              <select
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-semibold text-slate-700 outline-none focus:border-sky-500 focus:bg-white cursor-pointer"
+              >
+                <option value="nearest">Sắp xếp: Khởi hành gần nhất</option>
+                <option value="newest">Sắp xếp: Mới tạo gần đây</option>
+                <option value="budget_low">Sắp xếp: Ngân sách tiết kiệm</option>
+                <option value="duration">Sắp xếp: Số ngày dài nhất</option>
+              </select>
+            </div>
 
-          {/* Sort Select */}
-          <div className="md:col-span-6 lg:col-span-3">
-            <select
-              value={sortOption}
-              onChange={(e) => setSortOption(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-xs font-medium text-slate-700 outline-none focus:border-sky-500 focus:bg-white cursor-pointer"
-            >
-              <option value="nearest">Sắp xếp: Khởi hành gần nhất</option>
-              <option value="newest">Sắp xếp: Mới tạo gần đây</option>
-              <option value="budget_low">Sắp xếp: Ngân sách tiết kiệm</option>
-              <option value="duration">Sắp xếp: Số ngày dài nhất</option>
-            </select>
-          </div>
-
-          {/* Filter Chips */}
-          <div className="md:col-span-12 lg:col-span-4 flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 lg:justify-end">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 hidden xl:inline">
-              Lọc:
-            </span>
-            {[
-              { id: 'all', label: 'Tất cả' },
-              { id: 'ai', label: 'Tạo bởi AI', isAi: true },
-              { id: 'group', label: 'Chuyến đi nhóm' },
-              { id: 'family', label: 'Gia đình' }
-            ].map(tag => {
-              const isSelected = activeFilterTag === tag.id;
-              return (
-                <button
-                  key={tag.id}
-                  type="button"
-                  onClick={() => setActiveFilterTag(tag.id)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
-                    isSelected
-                      ? 'bg-slate-800 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'
-                  }`}
-                >
-                  {tag.isAi && <Sparkles className="w-3 h-3 text-amber-400" />}
-                  <span>{tag.label}</span>
-                </button>
-              );
-            })}
+            {/* Filter Tags */}
+            <div className="md:col-span-4 flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 md:justify-end">
+              {[
+                { id: 'all', label: 'Tất cả' },
+                { id: 'ai', label: 'Tạo bởi AI', isAi: true },
+                { id: 'group', label: 'Chuyến đi nhóm' },
+                { id: 'family', label: 'Gia đình' }
+              ].map(tag => {
+                const isSelected = activeFilterTag === tag.id;
+                return (
+                  <button
+                    key={tag.id}
+                    type="button"
+                    onClick={() => setActiveFilterTag(tag.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
+                      isSelected
+                        ? 'bg-slate-900 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80'
+                    }`}
+                  >
+                    {tag.isAi && <Sparkles className="w-3 h-3 text-amber-400" />}
+                    <span>{tag.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* ─── 4. MAIN ITINERARIES GRID / LIST ────────────────────────────────────── */}
-      {filteredItineraries.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 shadow-sm space-y-4">
-          <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
-            <Compass className="w-8 h-8" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="font-display font-bold text-base text-slate-800">Không tìm thấy lịch trình phù hợp</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              Thử thay đổi bộ lọc hoặc dùng tính năng Tạo bằng AI để lên ngay một kế hoạch du lịch mới.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              if (!requireAuth('tạo lịch trình bằng AI')) return;
-              setIsManualCreateOpen(true);
-            }}
-            className="px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-sm transition-all cursor-pointer"
-          >
-            Tạo Lịch Trình AI Ngay ✨
-          </button>
-        </div>
-      ) : (
-        <div className={`grid gap-6 ${layoutMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-          {filteredItineraries.map((itin) => {
-            return (
-              <div
-                key={itin.id}
-                onClick={() => setSelectedItinerary(itin)}
-                className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col hover:-translate-y-1 relative cursor-pointer"
+      {/* ─── 5. ITINERARIES GRID / LIST CONTAINER ──────────────────────────────── */}
+      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6">
+        {filteredItineraries.length === 0 ? (
+          /* Empty State */
+          <div className="bg-white rounded-3xl p-12 sm:p-16 text-center border border-slate-200/80 shadow-sm space-y-5">
+            <div className="w-20 h-20 rounded-3xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto shadow-inner">
+              <Compass className="w-10 h-10 animate-spin-slow" />
+            </div>
+            <div className="space-y-1.5 max-w-md mx-auto">
+              <h3 className="text-xl font-bold text-slate-900">
+                Chưa có chuyến đi nào phù hợp
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                Bạn chưa có lịch trình nào trong mục này. Hãy thử thay đổi bộ lọc hoặc để WanderAI tự động lập kế hoạch hoàn hảo chỉ trong 30 giây!
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (!requireAuth('tạo lịch trình bằng AI')) return;
+                  setIsAIGeneratorOpen(true);
+                }}
+                className="px-6 py-3 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-sky-600/20 transition-all cursor-pointer flex items-center gap-2"
               >
-                {/* Image Cover Section */}
-                <div className="relative h-56 w-full overflow-hidden bg-slate-100">
-                  <img
-                    src={itin.coverImage || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80'}
-                    alt={itin.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>Khởi Tạo Bằng AI ✨</span>
+              </button>
 
-                  {/* Top Badges */}
-                  <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 flex-wrap">
-                    {itin.countdown && (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/90 text-white text-[11px] font-bold shadow-sm backdrop-blur-md">
-                        <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                        {itin.countdown}
-                      </span>
-                    )}
+              <button
+                type="button"
+                onClick={() => {
+                  if (!requireAuth('tạo chuyến đi thủ công')) return;
+                  setIsManualCreateOpen(true);
+                }}
+                className="px-5 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold transition-all cursor-pointer"
+              >
+                + Tự Lập Lịch Trình
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Grid / List Cards */
+          <div className={`grid gap-6 sm:gap-7 ${layoutMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+            {filteredItineraries.map((itin) => {
+              return (
+                <div
+                  key={itin.id}
+                  onClick={() => setSelectedItinerary(itin)}
+                  className="group bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-xl hover:border-sky-300 transition-all duration-300 flex flex-col hover:-translate-y-1.5 cursor-pointer relative"
+                >
+                  {/* Photo Cover Header */}
+                  <div className="relative h-60 w-full overflow-hidden bg-slate-100">
+                    <img
+                      src={itin.coverImage || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80'}
+                      alt={itin.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-transparent"></div>
 
-                    {itin.isAiGenerated && (
-                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-sky-600/90 text-white text-[11px] font-bold backdrop-blur-md shadow-sm">
-                        <Sparkles className="w-3 h-3 text-amber-300" />
-                        Tạo bởi AI
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Destination & Duration Bottom Overlay */}
-                  <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between text-white">
-                    <div>
-                      <p className="text-[10px] font-bold text-sky-200 uppercase tracking-wider">
-                        {itin.region || 'Điểm đến du lịch'}
-                      </p>
-                      <div className="flex items-center gap-1 font-bold text-xs sm:text-sm">
-                        <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                        <span className="truncate">{itin.destination}</span>
-                      </div>
-                    </div>
-                    <span className="px-2.5 py-1 rounded-lg bg-white/90 backdrop-blur-md text-sky-800 text-xs font-extrabold">
-                      {itin.duration || `${itin.daysCount || 3}N${(itin.daysCount || 3) - 1}Đ`}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Card Body */}
-                <div className="p-5 flex flex-col flex-1 space-y-3">
-                  <h3 className="font-display font-extrabold text-sm sm:text-base text-slate-900 group-hover:text-sky-700 transition-colors line-clamp-2">
-                    {itin.title}
-                  </h3>
-
-                  {/* Metadata List */}
-                  <div className="space-y-1.5 text-xs text-slate-500">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                      <span className="font-medium text-slate-700">{itin.departureDate || 'Ngày khởi hành linh hoạt'}</span>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Users className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                        <span>{itin.groupType || 'Cá nhân'}</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-sky-700 font-bold text-[11px]">
-                        <MapPin className="w-3 h-3" />
-                        <span>{itin.placesCount || 8} địa điểm</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Places Chips Preview */}
-                  {itin.placesList && (
-                    <div className="flex flex-wrap gap-1.5 pt-1">
-                      {itin.placesList.slice(0, 3).map((place, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-medium text-slate-600">
-                          {place}
+                    {/* Top Badges */}
+                    <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 flex-wrap">
+                      {itin.countdown && (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/80 text-white text-[11px] font-bold shadow-sm backdrop-blur-md border border-white/10">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                          {itin.countdown}
                         </span>
-                      ))}
-                      {itin.placesList.length > 3 && (
-                        <span className="px-2 py-0.5 rounded-md bg-sky-50 text-[10px] font-bold text-sky-800">
-                          +{itin.placesList.length - 3} điểm
+                      )}
+
+                      {itin.isAiGenerated && (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/90 to-orange-500/90 text-white text-[11px] font-bold backdrop-blur-md shadow-sm border border-amber-300/30">
+                          <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                          <span>WanderAI ✨</span>
                         </span>
                       )}
                     </div>
-                  )}
 
-                  {/* Mini Photo Reel if completed */}
-                  {itin.photoReel && (
-                    <div className="grid grid-cols-3 gap-1.5 pt-1">
-                      {itin.photoReel.slice(0, 2).map((img, idx) => (
-                        <div key={idx} className="h-16 rounded-xl overflow-hidden bg-slate-100">
-                          <img src={img} alt="Memory" className="w-full h-full object-cover" />
+                    {/* Destination & Days Floating on Image Bottom */}
+                    <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between text-white">
+                      <div className="min-w-0 pr-2">
+                        <p className="text-[10px] font-extrabold text-sky-300 uppercase tracking-wider">
+                          {itin.region || 'Điểm Đến Việt Nam'}
+                        </p>
+                        <div className="flex items-center gap-1.5 font-extrabold text-sm sm:text-base drop-shadow-sm truncate">
+                          <MapPin className="w-4 h-4 text-rose-400 shrink-0" />
+                          <span className="truncate">{itin.destination}</span>
                         </div>
-                      ))}
-                      <div className="h-16 rounded-xl bg-sky-50 flex items-center justify-center text-sky-800 font-bold text-xs">
-                        +{itin.photosCount || 24} ảnh
+                      </div>
+                      
+                      <div className="shrink-0 px-3 py-1 rounded-xl bg-white/95 backdrop-blur-md text-sky-900 text-xs font-extrabold shadow-sm">
+                        {itin.duration || `${itin.daysCount || 3}N${Math.max(1, (itin.daysCount || 3) - 1)}Đ`}
                       </div>
                     </div>
-                  )}
-
-                  {/* Budget Estimate & Progress Bar */}
-                  <div className="mt-auto pt-3 border-t border-slate-100">
-                    <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="text-slate-400">Dự toán cá nhân:</span>
-                      <span className="font-extrabold text-sky-700">
-                        {itin.budgetPerPerson ? `${itin.budgetPerPerson.toLocaleString('vi-VN')}đ` : itin.budgetTotal}{' '}
-                        <span className="font-normal text-[10px] text-slate-400">/người</span>
-                      </span>
-                    </div>
-
-                    <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
-                      <div
-                        className="h-full bg-gradient-to-r from-sky-500 to-sky-500 rounded-full"
-                        style={{ width: `${itin.budgetProgress || 70}%` }}
-                      ></div>
-                    </div>
-                    {itin.budgetNote && (
-                      <p className="text-[10px] text-slate-400 mt-1 text-right truncate">{itin.budgetNote}</p>
-                    )}
                   </div>
 
-                  {/* Action Controls */}
-                  <div className="flex items-center gap-2 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedItinerary(itin)}
-                      className="flex-1 py-2 px-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <span>Xem chi tiết</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
+                  {/* Card Content Body */}
+                  <div className="p-5 sm:p-6 flex flex-col flex-1 space-y-4">
+                    {/* Title */}
+                    <h3 className="font-display font-extrabold text-base sm:text-lg text-slate-900 group-hover:text-sky-600 transition-colors line-clamp-2 leading-snug">
+                      {itin.title}
+                    </h3>
 
-                    <button
-                      type="button"
-                      onClick={(e) => handleShareItinerary(itin, e)}
-                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
-                      title="Chia sẻ nhóm"
-                    >
-                      <Share2 className="w-3.5 h-3.5" />
-                    </button>
+                    {/* Schedule Metadata */}
+                    <div className="space-y-2 text-xs text-slate-500">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-sky-600 shrink-0" />
+                        <span className="font-semibold text-slate-700">{itin.departureDate || 'Ngày khởi hành linh hoạt'}</span>
+                      </div>
 
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toast.info(`Đã lưu trữ hành trình "${itin.title}".`);
-                      }}
-                      className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
-                      title="Tùy chọn khác"
-                    >
-                      <MoreVertical className="w-3.5 h-3.5" />
-                    </button>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Users className="w-4 h-4 text-slate-400 shrink-0" />
+                          <span>{itin.groupType || 'Cặp đôi / Bạn bè'}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-sky-700 font-bold text-xs">
+                          <MapPin className="w-3.5 h-3.5" />
+                          <span>{itin.placesCount || (itin.placesList ? itin.placesList.length : 3)} điểm dừng chân</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Places Chips Preview */}
+                    {itin.placesList && itin.placesList.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {itin.placesList.slice(0, 3).map((place, idx) => (
+                          <span key={idx} className="px-2.5 py-1 rounded-lg bg-slate-100 text-[11px] font-semibold text-slate-600 border border-slate-200/50">
+                            {place}
+                          </span>
+                        ))}
+                        {itin.placesList.length > 3 && (
+                          <span className="px-2 py-1 rounded-lg bg-sky-50 text-[11px] font-extrabold text-sky-700 border border-sky-100">
+                            +{itin.placesList.length - 3} điểm nữa
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Budget Progress Bar */}
+                    <div className="mt-auto pt-4 border-t border-slate-100 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-slate-400 font-medium">Ngân sách dự kiến:</span>
+                        <span className="font-extrabold text-sky-700 text-sm">
+                          {itin.budgetPerPerson ? `${itin.budgetPerPerson.toLocaleString('vi-VN')}đ` : '3.500.000đ'}
+                          <span className="font-normal text-[11px] text-slate-400 ml-1">/người</span>
+                        </span>
+                      </div>
+
+                      <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-sky-500 to-indigo-500 rounded-full"
+                          style={{ width: `${itin.budgetProgress || 45}%` }}
+                        ></div>
+                      </div>
+
+                      {itin.budgetNote && (
+                        <p className="text-[10px] text-slate-400 text-right truncate">{itin.budgetNote}</p>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedItinerary(itin)}
+                        className="flex-1 py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                      >
+                        <span>Mở Lịch Trình</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => handleShareItinerary(itin, e)}
+                        className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer active:scale-90"
+                        title="Chia sẻ chuyến đi"
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => handleDeleteItinerary(itin.id, itin.title, e)}
+                        className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-colors cursor-pointer active:scale-90"
+                        title="Xóa lịch trình"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
+              );
+            })}
+
+            {/* AI Prompter Inspiration Card */}
+            <div className="bg-gradient-to-br from-slate-900 via-sky-950 to-slate-900 text-white rounded-3xl p-6 sm:p-7 border border-slate-800 flex flex-col justify-between shadow-md relative overflow-hidden group">
+              <div className="absolute -top-12 -right-12 w-40 h-40 bg-amber-500/20 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform duration-700"></div>
+
+              <div className="space-y-4 relative z-10">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 shadow-inner">
+                  <Sparkles className="w-6 h-6 animate-pulse" />
+                </div>
+
+                <div className="inline-block px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-bold">
+                  Khám phá AI 1 chạm
+                </div>
+
+                <h3 className="font-display font-extrabold text-lg text-white leading-snug">
+                  Chưa biết đi đâu? Hãy để WanderAI lên lịch giúp bạn!
+                </h3>
+
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  Trí tuệ nhân tạo tra cứu thực tế các địa danh, quán ăn bản địa của 63 tỉnh thành để tạo hành trình từng giờ tối ưu ngân sách.
+                </p>
+
+                {/* Quick Suggestion Pills */}
+                <div className="space-y-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!requireAuth('lập lịch trình bằng AI')) return;
+                      setIsAIGeneratorOpen(true);
+                    }}
+                    className="w-full text-left px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-semibold text-slate-200 flex items-center justify-between transition-colors cursor-pointer backdrop-blur-sm"
+                  >
+                    <span>🏖️ Đà Nẵng - Hội An 3N2Đ &lt; 4.5M</span>
+                    <ChevronRight className="w-4 h-4 text-amber-400" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!requireAuth('lập lịch trình bằng AI')) return;
+                      setIsAIGeneratorOpen(true);
+                    }}
+                    className="w-full text-left px-4 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-xs font-semibold text-slate-200 flex items-center justify-between transition-colors cursor-pointer backdrop-blur-sm"
+                  >
+                    <span>🏔️ Phượt Hà Giang Mùa Tam Giác Mạch</span>
+                    <ChevronRight className="w-4 h-4 text-amber-400" />
+                  </button>
+                </div>
               </div>
-            );
-          })}
 
-          {/* Special Inline Card: AI Discovery Prompt (Stitch M04 Component) */}
-          <div className="bg-gradient-to-br from-sky-50 via-sky-50/70 to-amber-50/50 rounded-3xl p-6 border border-sky-200/80 flex flex-col justify-between shadow-xs relative overflow-hidden group">
-            <div className="absolute -top-10 -right-10 w-32 h-32 rounded-full bg-sky-400/10 blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500"></div>
-
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-2xl bg-white shadow-xs flex items-center justify-center text-amber-500 mb-2">
-                <Sparkles className="w-6 h-6 animate-pulse" />
-              </div>
-
-              <div className="inline-block px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                Chỉ mất 30 giây
-              </div>
-
-              <h3 className="font-display font-extrabold text-base text-slate-900 leading-snug">
-                Lên ý tưởng chuyến đi tiếp theo cùng WanderAI
-              </h3>
-
-              <p className="text-xs text-slate-500 leading-relaxed">
-                Bạn chưa quyết định đi đâu? Chỉ cần chọn sở thích và ngân sách, trí tuệ nhân tạo sẽ tự động gợi ý lịch trình từng giờ kèm địa điểm ăn uống ngon nhất.
-              </p>
-
-              {/* Quick Click Prompts */}
-              <div className="space-y-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setIsAIGeneratorOpen(true)}
-                  className="w-full text-left px-3.5 py-2.5 rounded-xl bg-white hover:bg-sky-50 border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors shadow-xs cursor-pointer"
-                >
-                  <span>🏖️ Nghỉ dưỡng biển 3N2Đ &lt; 4 triệu</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-sky-600" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setIsAIGeneratorOpen(true)}
-                  className="w-full text-left px-3.5 py-2.5 rounded-xl bg-white hover:bg-sky-50 border border-slate-200/60 text-xs font-semibold text-slate-700 flex items-center justify-between transition-colors shadow-xs cursor-pointer"
-                >
-                  <span>☕ Săn mây Cafe Đà Lạt 2N1Đ</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-sky-600" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!requireAuth('lập lịch trình bằng AI')) return;
+                  setIsAIGeneratorOpen(true);
+                }}
+                className="mt-6 w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-extrabold shadow-md shadow-orange-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 relative z-10"
+              >
+                <Sparkles className="w-4 h-4 text-amber-200" />
+                <span>Khởi Tạo Lịch Trình Ngay</span>
+              </button>
             </div>
-
-            <button
-              type="button"
-              onClick={() => setIsAIGeneratorOpen(true)}
-              className="mt-5 w-full py-2.5 px-4 rounded-full bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Khởi tạo chuyến đi cùng WanderAI</span>
-            </button>
           </div>
-        </div>
-      )}
-
-      {/* ─── 5. STATUS COUNTER BAR ──────────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="text-xs text-slate-500 flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-sky-600"></span>
-          <span>
-            Hiển thị <strong>{filteredItineraries.length}</strong> trong tổng số <strong>{itineraries.length + 8}</strong> lịch trình du lịch của bạn
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => toast.info('Đang tải danh sách lưu trữ cũ từ hệ sinh thái WanderAI...')}
-            className="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
-          >
-            <Clock className="w-3.5 h-3.5 text-slate-500" />
-            <span>Xem lịch trình lưu trữ cũ (8)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => toast.success('Đã làm mới dữ liệu lịch trình!')}
-            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
-            title="Tải lại"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
-        </div>
+        )}
       </div>
 
-      {/* ─── 6. INTERACTIVE ITINERARY DETAIL MODAL (STITCH M10) ─────────────────── */}
+      {/* ─── 6. INTERACTIVE ITINERARY DETAIL MODAL (M10 MODAL) ───────────────────── */}
       {selectedItinerary && (
         <ItineraryDetailModal
           itinerary={selectedItinerary}
@@ -769,36 +785,36 @@ export const ItineraryManagerPage = () => {
         />
       )}
 
-      {/* ─── 7. MODAL TẠO CHUYẾN ĐI THỦ CÔNG (MANUAL TRIP CREATOR) ────────────────── */}
+      {/* ─── 7. MODAL TẠO CHUYẾN ĐI THỦ CÔNG (LUXURY POPUP) ─────────────────────── */}
       {isManualCreateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden my-auto max-h-[92vh] flex flex-col">
             
-            {/* Header */}
-            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-sky-600 text-white flex items-center justify-center shadow-sm">
+            {/* Modal Header */}
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/80">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-2xl bg-sky-600 text-white flex items-center justify-center shadow-md shadow-sky-600/20">
                   <Plus className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-display font-extrabold text-base sm:text-lg text-slate-900">
-                    Tạo Chuyến Đi Mới (Thủ Công)
+                  <h3 className="font-display font-extrabold text-lg text-slate-900">
+                    Tạo Chuyến Đi Mới
                   </h3>
-                  <p className="text-xs text-slate-500">Tự do lên kế hoạch, điểm đến và quản lý ngân sách theo ý bạn</p>
+                  <p className="text-xs text-slate-500">Tự do lên kế hoạch, điểm dừng chân và dự toán ngân sách</p>
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsManualCreateOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center cursor-pointer transition-colors"
+                className="w-9 h-9 rounded-full bg-slate-200/80 hover:bg-slate-300 text-slate-600 flex items-center justify-center cursor-pointer transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Form Body */}
-            <form onSubmit={handleCreateManualTrip} className="p-6 overflow-y-auto flex-1 space-y-4 text-xs">
+            {/* Modal Form Body */}
+            <form onSubmit={handleCreateManualTrip} className="p-6 overflow-y-auto flex-1 space-y-4 text-xs sm:text-sm">
               
               {/* Trip Title */}
               <div className="space-y-1.5">
@@ -811,16 +827,16 @@ export const ItineraryManagerPage = () => {
                   required
                   value={manualTitle}
                   onChange={(e) => setManualTitle(e.target.value)}
-                  placeholder="Ví dụ: Phượt săn mây Đà Lạt cùng hội bạn, Nghỉ dưỡng Phú Quốc 4N3Đ..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-sky-500"
+                  placeholder="Ví dụ: Nghỉ dưỡng biển Mỹ Khê 3N2Đ, Phượt săn mây Đà Lạt..."
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-medium outline-none focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 transition-all"
                 />
               </div>
 
               {/* Destination & Region */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="space-y-1.5">
                   <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-sky-600" />
+                    <MapPin className="w-4 h-4 text-sky-600" />
                     <span>Điểm đến chính</span>
                     <span className="text-rose-500">*</span>
                   </label>
@@ -829,203 +845,155 @@ export const ItineraryManagerPage = () => {
                     required
                     value={manualDest}
                     onChange={(e) => setManualDest(e.target.value)}
-                    placeholder="Ví dụ: Đà Lạt, Phú Quốc, Ninh Bình..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-sky-500"
+                    placeholder="Ví dụ: Đà Nẵng, Hà Giang, Phú Quốc..."
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-medium outline-none focus:bg-white focus:border-sky-500"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <Compass className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Khu vực / Vùng miền</span>
+                    <Compass className="w-4 h-4 text-indigo-600" />
+                    <span>Khu vực</span>
                   </label>
                   <select
                     value={manualRegion}
                     onChange={(e) => setManualRegion(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-semibold outline-none focus:bg-white focus:border-sky-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-medium outline-none focus:bg-white focus:border-sky-500 cursor-pointer"
                   >
-                    <option value="Tây Nguyên">Tây Nguyên</option>
                     <option value="Miền Trung">Miền Trung di sản</option>
-                    <option value="Miền Bắc">Miền Bắc</option>
-                    <option value="Miền Nam">Miền Nam</option>
-                    <option value="Hải Đảo">Hải Đảo</option>
-                    <option value="Quốc tế">Quốc tế</option>
+                    <option value="Tây Nguyên">Tây Nguyên đại ngàn</option>
+                    <option value="Miền Bắc">Miền Bắc & Vòng cung Tây Bắc</option>
+                    <option value="Miền Nam">Miền Nam & Đảo ngọc</option>
                   </select>
                 </div>
               </div>
 
-              {/* Duration & Dates */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* Dates & Number of Days */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                 <div className="space-y-1.5">
-                  <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Ngày bắt đầu</span>
-                  </label>
+                  <label className="font-bold text-slate-700">Ngày khởi hành</label>
                   <input
                     type="date"
                     value={manualStartDate}
-                    onChange={(e) => {
-                      setManualStartDate(e.target.value);
-                      if (e.target.value && manualEndDate) {
-                        const diffTime = Math.abs(new Date(manualEndDate) - new Date(e.target.value));
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                        if (diffDays > 0) setManualDays(diffDays);
-                      }
-                    }}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
+                    onChange={(e) => setManualStartDate(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 font-medium outline-none focus:bg-white focus:border-sky-500 text-xs"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Ngày kết thúc</span>
-                  </label>
+                  <label className="font-bold text-slate-700">Ngày kết thúc</label>
                   <input
                     type="date"
                     value={manualEndDate}
-                    onChange={(e) => {
-                      setManualEndDate(e.target.value);
-                      if (manualStartDate && e.target.value) {
-                        const diffTime = Math.abs(new Date(e.target.value) - new Date(manualStartDate));
-                        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-                        if (diffDays > 0) setManualDays(diffDays);
-                      }
-                    }}
-                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
+                    onChange={(e) => setManualEndDate(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 font-medium outline-none focus:bg-white focus:border-sky-500 text-xs"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-amber-600" />
-                    <span>Số ngày ({manualDays}N{Math.max(1, manualDays - 1)}Đ)</span>
-                  </label>
-                  <select
+                  <label className="font-bold text-slate-700">Số ngày đi</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="14"
                     value={manualDays}
-                    onChange={(e) => setManualDays(Number(e.target.value))}
-                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
-                  >
-                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(d => (
-                      <option key={d} value={d}>{d} Ngày {Math.max(1, d - 1)} Đêm</option>
-                    ))}
-                  </select>
+                    onChange={(e) => setManualDays(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 font-medium outline-none focus:bg-white focus:border-sky-500 text-xs"
+                  />
                 </div>
               </div>
 
-              {/* Group & Budget */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Group Type & Budget */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="space-y-1.5">
                   <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5 text-indigo-600" />
-                    <span>Đối tượng tham gia</span>
+                    <Users className="w-4 h-4 text-emerald-600" />
+                    <span>Hình thức nhóm</span>
                   </label>
                   <select
                     value={manualGroup}
                     onChange={(e) => setManualGroup(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-medium outline-none focus:bg-white focus:border-sky-500 cursor-pointer"
                   >
-                    <option value="Đi một mình (Solo)">Đi một mình (Solo)</option>
+                    <option value="Cá nhân (Solo traveler)">Cá nhân (Solo traveler)</option>
                     <option value="Cặp đôi (2 người)">Cặp đôi (2 người)</option>
                     <option value="Nhóm bạn (3-5 người)">Nhóm bạn (3-5 người)</option>
-                    <option value="Gia đình nhiều thế hệ">Gia đình nhiều thế hệ</option>
-                    <option value="Đoàn đông người (>10 người)">Đoàn đông người (&gt;10 người)</option>
+                    <option value="Gia đình có trẻ em">Gia đình có trẻ em</option>
                   </select>
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="font-bold text-slate-700 flex items-center gap-1">
-                    <DollarSign className="w-3.5 h-3.5 text-sky-600" />
-                    <span>Dự trù tổng ngân sách (VNĐ)</span>
+                    <DollarSign className="w-4 h-4 text-sky-600" />
+                    <span>Dự toán ngân sách (VNĐ)</span>
                   </label>
                   <input
                     type="number"
-                    step={500000}
+                    step="500000"
                     value={manualBudget}
-                    onChange={(e) => setManualBudget(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 font-bold outline-none focus:bg-white focus:border-sky-500"
+                    onChange={(e) => setManualBudget(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-semibold outline-none focus:bg-white focus:border-sky-500"
                   />
                 </div>
               </div>
 
-              {/* Preset Cover Selection */}
-              <div className="space-y-2">
-                <label className="font-bold text-slate-700 flex items-center justify-between">
-                  <span>Chọn ảnh bìa chuyến đi</span>
-                  <span className="text-[10px] text-slate-400 font-normal">Nhấp để chọn ảnh mẫu</span>
-                </label>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                  {COVER_PRESETS.map((p, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => setManualCover(p.url)}
-                      className={`relative rounded-xl overflow-hidden aspect-video border-2 transition-all cursor-pointer group ${
-                        manualCover === p.url ? 'border-sky-600 ring-2 ring-sky-500/20 shadow-xs' : 'border-slate-200 hover:border-slate-300'
-                      }`}
-                    >
-                      <img src={p.url} alt={p.label} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-1">
-                        <span className="text-[9px] font-bold text-white truncate">{p.label}</span>
-                      </div>
-                      {manualCover === p.url && (
-                        <div className="absolute top-1 right-1 w-4 h-4 rounded-full bg-sky-600 text-white flex items-center justify-center">
-                          <Check className="w-2.5 h-2.5" />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Places list */}
+              {/* Waypoint Places (Danh sách điểm dừng chân) */}
               <div className="space-y-1.5">
-                <label className="font-bold text-slate-700">Các điểm dừng dự kiến (ngăn cách bằng dấu phẩy)</label>
+                <label className="font-bold text-slate-700 flex items-center gap-1">
+                  <MapPin className="w-4 h-4 text-rose-500" />
+                  <span>Điểm dừng chân dự kiến (ngăn cách bằng dấu phẩy)</span>
+                </label>
                 <input
                   type="text"
                   value={manualPlaces}
                   onChange={(e) => setManualPlaces(e.target.value)}
-                  placeholder="Ví dụ: Cầu Rồng, Bán đảo Sơn Trà, Biển Mỹ Khê, Chùa Cầu Hội An..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500"
+                  placeholder="Ví dụ: Bãi biển Mỹ Khê, Chùa Linh Ứng, Phố cổ Hội An, Bán đảo Sơn Trà..."
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-medium outline-none focus:bg-white focus:border-sky-500"
                 />
               </div>
 
-              {/* Note */}
-              <div className="space-y-1.5">
-                <label className="font-bold text-slate-700">Ghi chú chuyến đi</label>
-                <textarea
-                  rows={2}
-                  value={manualNote}
-                  onChange={(e) => setManualNote(e.target.value)}
-                  placeholder="Ghi chú đồ dùng cần chuẩn bị, liên hệ thuê xe, danh sách địa điểm cần đặt vé trước..."
-                  className="w-full p-3 rounded-xl border border-slate-200 bg-slate-50/60 text-slate-900 outline-none focus:bg-white focus:border-sky-500 resize-none"
-                />
+              {/* Cover Photo Presets */}
+              <div className="space-y-2">
+                <label className="font-bold text-slate-700 block">Chọn ảnh bìa đại diện</label>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {COVER_PRESETS.map((preset, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setManualCover(preset.url)}
+                      className={`relative h-16 rounded-xl overflow-hidden border-2 transition-all cursor-pointer ${
+                        manualCover === preset.url ? 'border-sky-600 ring-2 ring-sky-600/20 scale-95' : 'border-transparent opacity-75 hover:opacity-100'
+                      }`}
+                    >
+                      <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-slate-950/40 flex items-end p-1">
+                        <span className="text-[9px] text-white font-bold truncate leading-tight">{preset.label}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {/* Footer */}
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              {/* Modal Footer Controls */}
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsManualCreateOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs sm:text-sm transition-colors cursor-pointer"
                 >
                   Hủy bỏ
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold transition-all flex items-center gap-2 cursor-pointer shadow-sm hover:shadow-md"
+                  className="px-6 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs sm:text-sm shadow-md shadow-sky-600/20 transition-all cursor-pointer active:scale-95"
                 >
-                  <Plus className="w-4 h-4" />
-                  <span>Tạo chuyến đi ngay</span>
+                  Tạo Chuyến Đi Ngay 🎉
                 </button>
               </div>
-
             </form>
-
           </div>
         </div>
       )}
-
     </div>
   );
 };
-
