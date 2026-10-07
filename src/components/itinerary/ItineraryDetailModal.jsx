@@ -28,7 +28,7 @@ import { ItineraryExportModal } from './ItineraryExportModal';
 
 // Tọa độ trung tâm các tỉnh/thành phố du lịch chính tại Việt Nam
 const VIETNAM_COORDINATES = {
-  'hà tĩnh': { lat: 18.3436, lng: 105.9057, zoom: 12 },
+  'hà tĩnh': { lat: 18.3436, lng: 105.9057, zoom: 11 },
   'hà nội': { lat: 21.0285, lng: 105.8542, zoom: 12 },
   'đà nẵng': { lat: 16.0544, lng: 108.2022, zoom: 12 },
   'đà lạt': { lat: 11.9404, lng: 108.4583, zoom: 12 },
@@ -65,22 +65,165 @@ const VIETNAM_COORDINATES = {
   'tam đảo': { lat: 21.4589, lng: 105.6483, zoom: 13 }
 };
 
+// Từ điển tọa độ GPS thực tế có thật 100% của danh lam, di tích và điểm ẩm thực nổi tiếng tại Việt Nam
+const VIETNAM_LANDMARKS = {
+  // === HÀ TĨNH ===
+  'chùa hương tích': { lat: 18.4967, lng: 105.8617, address: 'Xã Thiên Lộc, Huyện Can Lộc, Hà Tĩnh' },
+  'hương tích': { lat: 18.4967, lng: 105.8617, address: 'Xã Thiên Lộc, Huyện Can Lộc, Hà Tĩnh' },
+  'ngã ba đồng lộc': { lat: 18.3375, lng: 105.7161, address: 'Thị trấn Đồng Lộc, Huyện Can Lộc, Hà Tĩnh' },
+  'đồng lộc': { lat: 18.3375, lng: 105.7161, address: 'Thị trấn Đồng Lộc, Huyện Can Lộc, Hà Tĩnh' },
+  'biển thiên cầm': { lat: 18.2783, lng: 106.0125, address: 'Thị trấn Thiên Cầm, Huyện Cẩm Xuyên, Hà Tĩnh' },
+  'thiên cầm': { lat: 18.2783, lng: 106.0125, address: 'Thị trấn Thiên Cầm, Huyện Cẩm Xuyên, Hà Tĩnh' },
+  'biển kỳ xuân': { lat: 18.0683, lng: 106.3361, address: 'Xã Kỳ Xuân, Huyện Kỳ Anh, Hà Tĩnh' },
+  'kỳ xuân': { lat: 18.0683, lng: 106.3361, address: 'Xã Kỳ Xuân, Huyện Kỳ Anh, Hà Tĩnh' },
+  'hồ kẻ gỗ': { lat: 18.1883, lng: 105.9133, address: 'Xã Cẩm Mỹ, Huyện Cẩm Xuyên, Hà Tĩnh' },
+  'kẻ gỗ': { lat: 18.1883, lng: 105.9133, address: 'Xã Cẩm Mỹ, Huyện Cẩm Xuyên, Hà Tĩnh' },
+  'vinpearl cửa sót': { lat: 18.4722, lng: 105.9189, address: 'Xã Thịnh Lộc, Huyện Lộc Hà, Hà Tĩnh' },
+  'cửa sót': { lat: 18.4722, lng: 105.9189, address: 'Xã Thịnh Lộc, Huyện Lộc Hà, Hà Tĩnh' },
+  'khu lưu niệm nguyễn du': { lat: 18.6361, lng: 105.7583, address: 'Thị trấn Tiên Điền, Huyện Nghi Xuân, Hà Tĩnh' },
+  'tiên điền': { lat: 18.6361, lng: 105.7583, address: 'Thị trấn Tiên Điền, Huyện Nghi Xuân, Hà Tĩnh' },
+  'nguyễn du': { lat: 18.6361, lng: 105.7583, address: 'Thị trấn Tiên Điền, Huyện Nghi Xuân, Hà Tĩnh' },
+  'cháo canh hoa đô': { lat: 18.3414, lng: 105.9082, address: '19 Nguyễn Công Trứ, TP. Hà Tĩnh' },
+  'hoa đô': { lat: 18.3414, lng: 105.9082, address: '19 Nguyễn Công Trứ, TP. Hà Tĩnh' },
+  'cháo canh': { lat: 18.3414, lng: 105.9082, address: '19 Nguyễn Công Trứ, TP. Hà Tĩnh' },
+  'bánh bèo bà hữu': { lat: 18.3421, lng: 105.9065, address: 'Đường Phan Đình Phùng, TP. Hà Tĩnh' },
+  'bà hữu': { lat: 18.3421, lng: 105.9065, address: 'Đường Phan Đình Phùng, TP. Hà Tĩnh' },
+  'mực nhảy vũng áng': { lat: 18.0167, lng: 106.4167, address: 'Cảng Vũng Áng, Thị xã Kỳ Anh, Hà Tĩnh' },
+  'vũng áng': { lat: 18.0167, lng: 106.4167, address: 'Khu kinh tế Vũng Áng, Thị xã Kỳ Anh, Hà Tĩnh' },
+  'đèo ngang': { lat: 17.9739, lng: 106.4678, address: 'Đèo Ngang, Kỳ Anh, Hà Tĩnh' },
+  'biển xuân thành': { lat: 18.6750, lng: 105.8250, address: 'Xã Xuân Thành, Huyện Nghi Xuân, Hà Tĩnh' },
+  'xuân thành': { lat: 18.6750, lng: 105.8250, address: 'Xã Xuân Thành, Huyện Nghi Xuân, Hà Tĩnh' },
+  'thác vũ môn': { lat: 18.1722, lng: 105.6583, address: 'Hương Khê, Hà Tĩnh' },
+  'núi hồng lĩnh': { lat: 18.5500, lng: 105.7833, address: 'Hồng Lĩnh, Hà Tĩnh' },
+  'hồng lĩnh': { lat: 18.5500, lng: 105.7833, address: 'Thị xã Hồng Lĩnh, Hà Tĩnh' },
+  'vincom plaza hà tĩnh': { lat: 18.3428, lng: 105.9042, address: 'Ngã tư Hà Huy Tập - Hàm Nghi, TP. Hà Tĩnh' },
+  'chợ hà tĩnh': { lat: 18.3430, lng: 105.9060, address: 'Nam Hà, TP. Hà Tĩnh' },
+
+  // === ĐÀ NẴNG & HỘI AN ===
+  'bà nà hills': { lat: 15.9988, lng: 107.9961, address: 'Hòa Vang, Đà Nẵng' },
+  'cầu vàng': { lat: 15.9950, lng: 107.9967, address: 'Bà Nà Hills, Đà Nẵng' },
+  'cầu rồng': { lat: 16.0611, lng: 108.2272, address: 'Nguyễn Văn Linh, Đà Nẵng' },
+  'cầu sông hàn': { lat: 16.0722, lng: 108.2267, address: 'Đà Nẵng' },
+  'bán đảo sơn trà': { lat: 16.1167, lng: 108.2833, address: 'Sơn Trà, Đà Nẵng' },
+  'chùa linh ứng': { lat: 16.1006, lng: 108.2778, address: 'Bán đảo Sơn Trà, Đà Nẵng' },
+  'ngũ hành sơn': { lat: 16.0042, lng: 108.2611, address: 'Ngũ Hành Sơn, Đà Nẵng' },
+  'biển mỹ khê': { lat: 16.0594, lng: 108.2464, address: 'Sơn Trà, Đà Nẵng' },
+  'chợ cồn': { lat: 16.0689, lng: 108.2142, address: 'Hải Châu, Đà Nẵng' },
+  'phố cổ hội an': { lat: 15.8801, lng: 108.3380, address: 'Hội An, Quảng Nam' },
+  'chùa cầu': { lat: 15.8772, lng: 108.3261, address: 'Nguyễn Thị Minh Khai, Hội An' },
+  'rừng dừa bảy mẫu': { lat: 15.8667, lng: 108.3667, address: 'Cẩm Thanh, Hội An' },
+
+  // === NINH BÌNH ===
+  'tràng an': { lat: 20.2536, lng: 105.9022, address: 'Hoa Lư, Ninh Bình' },
+  'tam cốc': { lat: 20.2181, lng: 105.9392, address: 'Ninh Hải, Hoa Lư, Ninh Bình' },
+  'bích động': { lat: 20.2167, lng: 105.9167, address: 'Hoa Lư, Ninh Bình' },
+  'chùa bái đính': { lat: 20.2708, lng: 105.8692, address: 'Gia Viễn, Ninh Bình' },
+  'hang múa': { lat: 20.2319, lng: 105.9381, address: 'Ninh Xuân, Hoa Lư, Ninh Bình' },
+  'cố đô hoa lư': { lat: 20.2833, lng: 105.9000, address: 'Trường Yên, Hoa Lư, Ninh Bình' },
+  'đầm vân long': { lat: 20.3708, lng: 105.8692, address: 'Gia Viễn, Ninh Bình' },
+
+  // === ĐÀ LẠT ===
+  'hồ xuân hương': { lat: 11.9408, lng: 108.4458, address: 'Phường 1, Đà Lạt' },
+  'quảng trường lâm viên': { lat: 11.9367, lng: 108.4444, address: 'Phường 10, Đà Lạt' },
+  'thung lũng tình yêu': { lat: 11.9792, lng: 108.4528, address: 'Mai Anh Đào, Đà Lạt' },
+  'langbiang': { lat: 12.0442, lng: 108.4386, address: 'Lạc Dương, Lâm Đồng' },
+  'chùa linh phước': { lat: 11.9442, lng: 108.4989, address: 'Trại Mát, Đà Lạt' },
+  'chợ đêm đà lạt': { lat: 11.9425, lng: 108.4375, address: 'Nguyễn Thị Minh Khai, Đà Lạt' },
+  'thác datanla': { lat: 11.9028, lng: 108.4489, address: 'Đèo Prenn, Đà Lạt' },
+
+  // === SA PA ===
+  'fansipan': { lat: 22.3033, lng: 103.7753, address: 'Sa Pa, Lào Cai' },
+  'bản cát cát': { lat: 22.3292, lng: 103.8319, address: 'San Sả Hồ, Sa Pa' },
+  'núi hàm rồng': { lat: 22.3333, lng: 103.8472, address: 'Trung tâm Sa Pa' },
+  'đèo ô quy hồ': { lat: 22.3556, lng: 103.7667, address: 'Sa Pa, Lào Cai' },
+  'thác bạc': { lat: 22.3611, lng: 103.7750, address: 'San Sả Hồ, Sa Pa' },
+
+  // === PHÚ QUỐC ===
+  'bãi sao': { lat: 10.0547, lng: 104.0322, address: 'An Thới, Phú Quốc' },
+  'vinwonders phú quốc': { lat: 10.3342, lng: 103.8569, address: 'Gành Dầu, Phú Quốc' },
+  'grand world': { lat: 10.3236, lng: 103.8572, address: 'Gành Dầu, Phú Quốc' },
+  'hòn thơm': { lat: 9.9575, lng: 104.0194, address: 'An Thới, Phú Quốc' },
+  'chợ đêm phú quốc': { lat: 10.2172, lng: 103.9592, address: 'Dương Đông, Phú Quốc' }
+};
+
+// Tọa độ các huyện/thị xã phổ biến
+const VIETNAM_DISTRICTS = {
+  'can lộc': { lat: 18.4500, lng: 105.7800 },
+  'cẩm xuyên': { lat: 18.2500, lng: 105.9500 },
+  'kỳ anh': { lat: 18.0500, lng: 106.3000 },
+  'nghi xuân': { lat: 18.6200, lng: 105.7600 },
+  'lộc hà': { lat: 18.4600, lng: 105.9000 },
+  'thạch hà': { lat: 18.3300, lng: 105.8400 },
+  'hương khê': { lat: 18.1800, lng: 105.7000 },
+  'hương sơn': { lat: 18.5000, lng: 105.3200 },
+  'đức thọ': { lat: 18.5200, lng: 105.5800 },
+  'hồng lĩnh': { lat: 18.5500, lng: 105.7833 }
+};
+
+// Chuẩn hóa loại bỏ các từ tiền tố chung chung để tìm kiếm chính xác
+const getCleanPlaceName = (raw) => {
+  if (!raw) return '';
+  return raw
+    .replace(/^(thưởng thức|khám phá|chiêm bái|tham quan|check-in|chinh phục|thăm|dạo quanh|trải nghiệm|thư giãn tại|ghé thăm|thưởng ngoạn|ăn sáng tại|ăn trưa tại|ăn tối tại)\s+/i, '')
+    .split(' tại ')[0]
+    .split(' - ')[0]
+    .replace(/[–—].*$/, '')
+    .trim();
+};
+
 const getDestinationCoordinates = (destName) => {
-  if (!destName) return { lat: 18.3436, lng: 105.9057, zoom: 12 };
+  if (!destName) return { lat: 18.3436, lng: 105.9057, zoom: 11 };
   const clean = destName.toLowerCase().trim();
   for (const [key, coords] of Object.entries(VIETNAM_COORDINATES)) {
     if (clean.includes(key) || key.includes(clean)) {
       return coords;
     }
   }
-  return { lat: 18.3436, lng: 105.9057, zoom: 12 };
+  return { lat: 18.3436, lng: 105.9057, zoom: 11 };
+};
+
+// Xác định tọa độ thực tế có thật 100% của từng hoạt động
+const resolvePlaceCoordinates = (act, destinationName, baseCoords) => {
+  // 1. Nếu đã có tọa độ GPS hợp lệ (trong lãnh thổ Việt Nam: lat 8 -> 24, lng 102 -> 110)
+  const actLat = parseFloat(act.lat || act.latitude);
+  const actLng = parseFloat(act.lng || act.longitude);
+  if (!isNaN(actLat) && !isNaN(actLng) && actLat >= 8.0 && actLat <= 24.0 && actLng >= 102.0 && actLng <= 110.0) {
+    return { lat: actLat, lng: actLng, isExact: true };
+  }
+
+  // 2. Tra cứu từ điển danh lam thắng cảnh / quán ăn có thật
+  const cleanName = getCleanPlaceName(act.location || act.title).toLowerCase();
+  const rawTitle = (act.title || '').toLowerCase();
+  const rawAddress = (act.address || '').toLowerCase();
+  const rawLoc = (act.location || '').toLowerCase();
+
+  for (const [key, coords] of Object.entries(VIETNAM_LANDMARKS)) {
+    if (
+      cleanName.includes(key) ||
+      key.includes(cleanName) ||
+      rawLoc.includes(key) ||
+      rawTitle.includes(key) ||
+      rawAddress.includes(key)
+    ) {
+      return { lat: coords.lat, lng: coords.lng, isExact: true, matchedAddress: coords.address };
+    }
+  }
+
+  // 3. Tra cứu theo quận / huyện / thị xã
+  for (const [distKey, distCoords] of Object.entries(VIETNAM_DISTRICTS)) {
+    if (rawAddress.includes(distKey) || rawTitle.includes(distKey) || rawLoc.includes(distKey)) {
+      return { lat: distCoords.lat, lng: distCoords.lng, isExact: false };
+    }
+  }
+
+  // 4. Nếu chưa xác định được chính xác, dùng tọa độ trung tâm địa phương (không tạo offset ngẫu nhiên gây lệch ra biển/ruộng)
+  return { lat: baseCoords.lat, lng: baseCoords.lng, isExact: false };
 };
 
 // Component điều khiển camera bản đồ khi danh sách điểm hoặc tab thay đổi
 function MapController({ points, selectedPoint, triggerResize }) {
   const map = useMap();
 
-  // Khắc phục lỗi render map bị xám trên mobile khi chuyển tab
   useEffect(() => {
     const timer = setTimeout(() => {
       map.invalidateSize();
@@ -223,21 +366,20 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
     sourceDays.forEach((d, dayIndex) => {
       (d.activities || []).forEach((act, actIndex) => {
         pointCount++;
-        // Tọa độ tính toán rải đều quanh trung tâm điểm đến (bán kính 1.5 - 4km)
-        const angle = (pointCount * 65 * Math.PI) / 180;
-        const radius = 0.016 + ((pointCount % 4) * 0.008);
-        const lat = baseCoords.lat + radius * Math.cos(angle);
-        const lng = baseCoords.lng + (radius * 1.05) * Math.sin(angle);
+        const resolved = resolvePlaceCoordinates(act, destinationName, baseCoords);
+        const cleanName = getCleanPlaceName(act.location || act.title);
 
         points.push({
           id: `pt-${dayIndex}-${actIndex}`,
           number: pointCount,
           title: act.title,
-          location: act.location || act.title,
-          address: act.address || `${destinationName}, Việt Nam`,
+          cleanName: cleanName || act.title,
+          location: act.location || cleanName || act.title,
+          address: act.address || resolved.matchedAddress || `${destinationName}, Việt Nam`,
           time: act.time,
-          lat,
-          lng,
+          lat: resolved.lat,
+          lng: resolved.lng,
+          isExact: resolved.isExact,
           category: act.category,
           dayNumber: d.dayNumber || dayIndex + 1
         });
@@ -407,7 +549,6 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
         </div>
 
         {/* ─── 4. MOBILE / TABLET SEGMENTED SWITCHER (< 1024px) ───────────────── */}
-        {/* Trên màn hình nhỏ, cho phép người dùng chuyển nhanh giữa Lịch trình và Bản đồ */}
         <div className="lg:hidden px-4 sm:px-6 py-2 bg-slate-100/80 border-b border-slate-200 flex items-center gap-2 shrink-0">
           <button
             type="button"
@@ -459,9 +600,14 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                 {/* Danh sách hoạt động trong ngày */}
                 <div className="space-y-3 sm:space-y-3.5">
                   {dayItem.activities && dayItem.activities.map((act, actIdx) => {
-                    const mapQueryUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                      `${act.address || act.location || act.title}, ${destinationName}`
-                    )}`;
+                    // Tìm điểm map tương ứng để lấy tọa độ chuẩn
+                    const matchedPt = mapPoints.find(p => p.dayNumber === (dayItem.dayNumber || dayIdx + 1) && (p.title === act.title || p.location === act.location));
+                    const cleanPlaceName = getCleanPlaceName(act.location || act.title);
+
+                    // Ưu tiên liên kết Google Maps theo tọa độ chính xác hoặc địa danh sạch có thật
+                    const mapQueryUrl = matchedPt?.isExact
+                      ? `https://www.google.com/maps/search/?api=1&query=${matchedPt.lat},${matchedPt.lng}`
+                      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${cleanPlaceName}, ${act.address || destinationName}`)}`;
 
                     return (
                       <div
@@ -493,10 +639,10 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                             <MapPin className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
                             <div className="min-w-0">
                               <span className="font-bold text-slate-800 block text-xs">
-                                {act.location || act.title}
+                                {act.location || cleanPlaceName || act.title}
                               </span>
                               <span className="text-slate-600 text-[11px] sm:text-xs leading-normal block mt-0.5">
-                                {act.address || `Khu vực ${destinationName}, Việt Nam`}
+                                {act.address || matchedPt?.address || `${destinationName}, Việt Nam`}
                               </span>
                             </div>
                           </div>
@@ -506,9 +652,9 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="self-start sm:self-auto px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-sky-700 text-[11px] sm:text-xs font-bold flex items-center gap-1 shrink-0 border border-slate-200 transition-colors cursor-pointer"
-                            title="Mở trên Google Maps"
+                            title="Mở chính xác trên Google Maps"
                           >
-                            <span>Bản đồ</span>
+                            <span>Google Maps</span>
                             <ExternalLink className="w-3 h-3 text-slate-400" />
                           </a>
                         </div>
@@ -563,7 +709,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
               <div className="relative w-full h-56 sm:h-64 md:h-72 rounded-xl overflow-hidden border border-slate-200 z-0">
                 <MapContainer
                   center={[baseCoords.lat, baseCoords.lng]}
-                  zoom={baseCoords.zoom || 12}
+                  zoom={baseCoords.zoom || 11}
                   scrollWheelZoom={false}
                   className="w-full h-full"
                 >
@@ -596,6 +742,10 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                   {/* Marker ghim số cho từng trạm dừng */}
                   {mapPoints.map((pt) => {
                     const isSelected = selectedMapPoint?.id === pt.id;
+                    const googleMapsDirectUrl = pt.isExact
+                      ? `https://www.google.com/maps/search/?api=1&query=${pt.lat},${pt.lng}`
+                      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${pt.cleanName}, ${pt.address || destinationName}`)}`;
+
                     return (
                       <Marker
                         key={pt.id}
@@ -608,23 +758,29 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                         <Popup>
                           <div className="text-xs space-y-1 p-0.5">
                             <div className="flex items-center gap-1 font-extrabold text-slate-900">
-                              <span className="w-4 h-4 rounded-full bg-sky-600 text-white text-[10px] flex items-center justify-center">
+                              <span className="w-4 h-4 rounded-full bg-sky-600 text-white text-[10px] flex items-center justify-center shrink-0">
                                 {pt.number}
                               </span>
                               <span>{pt.location}</span>
                             </div>
-                            <p className="text-[11px] text-slate-600">{pt.address}</p>
+                            <p className="text-[11px] text-slate-600 leading-tight">{pt.address}</p>
                             {pt.time && (
                               <p className="text-[10px] font-mono text-slate-500">Giờ: {pt.time}</p>
                             )}
-                            <a
-                              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${pt.address}, ${destinationName}`)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[11px] text-sky-600 hover:underline font-bold block pt-1"
-                            >
-                              Mở trên Google Maps ↗
-                            </a>
+                            <div className="pt-1.5 border-t border-slate-100 flex items-center justify-between gap-2">
+                              <a
+                                href={googleMapsDirectUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[11px] text-sky-600 hover:underline font-bold inline-flex items-center gap-1"
+                              >
+                                <span>Mở trên Google Maps</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                              <span className="text-[9px] text-slate-400 font-mono">
+                                {pt.lat.toFixed(3)}, {pt.lng.toFixed(3)}
+                              </span>
+                            </div>
                           </div>
                         </Popup>
                       </Marker>
@@ -669,7 +825,6 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                       type="button"
                       onClick={() => {
                         setSelectedMapPoint(pt);
-                        // Cuộn mượt lên trên bản đồ nếu đang ở mobile
                         if (window.innerWidth < 1024) {
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }

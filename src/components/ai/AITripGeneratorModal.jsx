@@ -567,9 +567,9 @@ Thông tin chuyến đi:
 ${customPrompt ? `- Yêu cầu thêm: ${customPrompt}` : ''}
 
 QUY TẮC BẮT BUỘC:
-1. Nghiên cứu chính xác các địa điểm, quán ăn có thật tại "${destination}". Tuyệt đối không dùng văn mẫu chung chung.
+1. Nghiên cứu chính xác các địa điểm, quán ăn có thật 100% tại "${destination}". Tuyệt đối không dùng văn mẫu chung chung.
 2. Mỗi ngày có 3-4 hoạt động sắp xếp từ sáng đến tối.
-3. Nội dung cô đọng, súc tích (1-2 câu ngắn mỗi hoạt động) để tối ưu độ dài.
+3. BẮT BUỘC cung cấp "location" (tên ngắn gọn của địa danh/quán ăn), "address" (địa chỉ cụ thể), và "lat", "lng" (tọa độ GPS thực tế có thật của địa điểm đó tại Việt Nam) để đồng bộ chính xác trên bản đồ và Google Maps.
 4. Trả về DUY NHẤT một chuỗi JSON hợp lệ theo định dạng:
 {
   "summaryTip": "Mẹo du lịch bản địa ngắn gọn...",
@@ -582,8 +582,11 @@ QUY TẮC BẮT BUỘC:
         {
           "time": "08:00 – 09:30",
           "category": "Ẩm thực buổi sáng",
+          "location": "Tên địa danh hoặc quán ăn cụ thể",
           "title": "Tên món và tên quán ăn cụ thể",
-          "address": "Địa chỉ hoặc khu vực cụ thể tại ${destination}",
+          "address": "Địa chỉ cụ thể tại ${destination}",
+          "lat": 18.3414,
+          "lng": 105.9082,
           "note": "Kinh nghiệm ngắn gọn",
           "cost": "45.000đ/người",
           "transit": "15 phút"
