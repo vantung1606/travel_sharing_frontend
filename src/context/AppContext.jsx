@@ -60,7 +60,7 @@ const DEFAULT_APP_STATE = {
   generateAITrip: () => {},
   activeViewingItinerary: null,
   setActiveViewingItinerary: () => {},
-  aiGeneratingStatus: { isGenerating: false, destination: '', daysCount: 3, progress: 0 },
+  aiGeneratingStatus: { isGenerating: false, isExpanded: false, destination: '', daysCount: 3, progress: 0, currentStep: '', logs: [] },
   setAiGeneratingStatus: () => {},
   approvePlace: () => {},
   rejectPlace: () => {},
@@ -158,9 +158,12 @@ export const AppProvider = ({ children }) => {
   const [activeViewingItinerary, setActiveViewingItinerary] = useState(null);
   const [aiGeneratingStatus, setAiGeneratingStatus] = useState({
     isGenerating: false,
+    isExpanded: false,
     destination: '',
     daysCount: 3,
-    progress: 0
+    progress: 0,
+    currentStep: '',
+    logs: []
   });
 
   const openAIGeneratorWithItem = (item) => {
