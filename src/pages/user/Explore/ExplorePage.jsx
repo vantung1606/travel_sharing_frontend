@@ -44,10 +44,10 @@ import { useToast } from '../../../components/common/Toast';
 import { RealMapView } from '../../../components/map/RealMapView';
 
 export const ExplorePage = () => {
-  const { destinations, places, addNewPlace, setIsAIGeneratorOpen, currentUser } = useApp();
+  const { destinations, places, addNewPlace, setIsAIGeneratorOpen, openAIGeneratorWithItem, currentUser } = useApp();
   const toast = useToast();
 
-  // Explore Layer: 'all' | 'spots' (Local Businesses / Spots) | 'destinations' (Regions & Cities)
+  // Explore Layer: 'spots' (Tọa độ bản địa & Cơ sở) | 'destinations' (Tỉnh thành & Điểm đến) | 'all' (Tất cả)
   const [exploreLayer, setExploreLayer] = useState('spots');
 
   // Filter States
@@ -77,6 +77,7 @@ export const ExplorePage = () => {
   // Add Place Modal State
   const [isAddPlaceModalOpen, setIsAddPlaceModalOpen] = useState(false);
   const [isSubmittingPlace, setIsSubmittingPlace] = useState(false);
+  const [placeTypeTab, setPlaceTypeTab] = useState('spot'); // 'spot' (Điểm check-in phượt thủ) | 'business' (Cơ sở kinh doanh)
   const [newPlaceForm, setNewPlaceForm] = useState({
     name: '',
     categoryName: 'Quán Cafe & Săn Mây',
@@ -113,16 +114,104 @@ export const ExplorePage = () => {
     { label: 'Nghỉ Dưỡng View Biển', url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80' }
   ];
 
-  const spotCategories = [
-    'Tất cả',
-    'Quán Cafe & Săn Mây',
-    'Homestay & Nghỉ Dưỡng',
-    'Ẩm Thực & Đặc Sản',
-    'Trải Nghiệm & Hoạt Động',
-    'Danh Lam & Thắng Cảnh'
-  ];
+  // Danh mục thích ứng thông minh theo Tab khám phá
+  const currentCategoryList = useMemo(() => {
+    if (exploreLayer === 'spots') {
+      return [
+        'Tất cả',
+        'Quán Cafe & Săn Mây',
+        'Homestay & Nghỉ Dưỡng',
+        'Ẩm Thực & Đặc Sản',
+        'Trải Nghiệm & Hoạt Động',
+        'Danh Lam & Thắng Cảnh'
+      ];
+    }
+    if (exploreLayer === 'destinations') {
+      return [
+        'Tất cả',
+        'Núi Rừng & Mây Ngàn',
+        'Biển Đảo & Nghỉ Dưỡng',
+        'Di Sản & Phố Cổ',
+        'Thành Thị & Văn Hóa'
+      ];
+    }
+    return [
+      'Tất cả',
+      'Quán Cafe & Săn Mây',
+      'Homestay & Nghỉ Dưỡng',
+      'Ẩm Thực & Đặc Sản',
+      'Biển Đảo & Nghỉ Dưỡng',
+      'Núi Rừng & Mây Ngàn'
+    ];
+  }, [exploreLayer]);
 
   const regions = ['Tất cả', 'Miền Bắc', 'Miền Trung', 'Miền Nam', 'Tây Nguyên'];
+
+  // Hàm chuẩn hóa phân loại Vùng miền chính xác theo địa danh du lịch Việt Nam
+  const getRegionByCity = (cityName = '') => {
+    const c = String(cityName).toLowerCase().trim();
+    if (!c) return 'Khác';
+
+    // Miền Bắc
+    if (
+      c.includes('hà giang') || c.includes('sa pa') || c.includes('sapa') ||
+      c.includes('lào cai') || c.includes('hà nội') || c.includes('ninh bình') ||
+      c.includes('hạ long') || c.includes('quảng ninh') || c.includes('cao bằng') ||
+      c.includes('mộc châu') || c.includes('sơn la') || c.includes('mai châu') ||
+      c.includes('bắc kạn') || c.includes('lạng sơn') || c.includes('yên bái') ||
+      c.includes('tam đảo') || c.includes('vĩnh phúc') || c.includes('hải phòng') ||
+      c.includes('cát bà') || c.includes('điện biên') || c.includes('lai châu') ||
+      c.includes('bắc giang') || c.includes('bắc ninh') || c.includes('thái nguyên')
+    ) {
+      return 'Miền Bắc';
+    }
+
+    // Tây Nguyên
+    if (
+      c.includes('đà lạt') || c.includes('lâm đồng') || c.includes('buôn ma thuột') ||
+      c.includes('đắk lắk') || c.includes('dak lak') || c.includes('pleiku') ||
+      c.includes('gia lai') || c.includes('măng đen') || c.includes('kon tum') ||
+      c.includes('đắk nông') || c.includes('bảo lộc')
+    ) {
+      return 'Tây Nguyên';
+    }
+
+    // Miền Trung
+    if (
+      c.includes('đà nẵng') || c.includes('hội an') || c.includes('quảng nam') ||
+      c.includes('huế') || c.includes('thừa thiên') || c.includes('nha trang') ||
+      c.includes('khánh hòa') || c.includes('quy nhơn') || c.includes('bình định') ||
+      c.includes('phú yên') || c.includes('tuy hòa') || c.includes('quảng bình') ||
+      c.includes('phong nha') || c.includes('quảng trị') || c.includes('quảng ngãi') ||
+      c.includes('lý sơn') || c.includes('phan thiết') || c.includes('bình thuận') ||
+      c.includes('mũi né') || c.includes('ninh thuận') || c.includes('phan rang') ||
+      c.includes('thanh hóa') || c.includes('nghệ an') || c.includes('hà tĩnh')
+    ) {
+      return 'Miền Trung';
+    }
+
+    // Miền Nam
+    if (
+      c.includes('hồ chí minh') || c.includes('sài gòn') || c.includes('tphcm') ||
+      c.includes('phú quốc') || c.includes('kiên giang') || c.includes('vũng tàu') ||
+      c.includes('bà rịa') || c.includes('cần thơ') || c.includes('tây ninh') ||
+      c.includes('bến tre') || c.includes('an giang') || c.includes('châu đốc') ||
+      c.includes('đồng tháp') || c.includes('cà mau') || c.includes('bạc liêu') ||
+      c.includes('đồng nai') || c.includes('bình dương') || c.includes('long an') ||
+      c.includes('tiền giang') || c.includes('vĩnh long') || c.includes('trà vinh') ||
+      c.includes('sóc trăng') || c.includes('hậu giang')
+    ) {
+      return 'Miền Nam';
+    }
+
+    return 'Miền Trung';
+  };
+
+  // Chuyển Tab thông minh (tự động reset danh mục để không kẹt bộ lọc)
+  const handleLayerChange = (layer) => {
+    setExploreLayer(layer);
+    setSelectedCategory('Tất cả');
+  };
 
   // Calculate distance between 2 coordinates (Haversine formula in km)
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -192,11 +281,15 @@ export const ExplorePage = () => {
     }
   };
 
-  // Launch AI Planner
+  // Launch AI Planner - KẾT NỐI DỮ LIỆU THỰC TẾ VÀO AI
   const handlePlanWithAI = (item, e) => {
     e?.stopPropagation();
-    setIsAIGeneratorOpen(true);
-    toast.info(`Khởi tạo AI Travel Planner cho "${item.name}"... ✨`);
+    if (openAIGeneratorWithItem) {
+      openAIGeneratorWithItem(item);
+    } else {
+      setIsAIGeneratorOpen(true);
+    }
+    toast.success(`Đã kết nối AI Travel Planner với "${item.name}"! ✨`);
   };
 
   // Toggle Save
@@ -311,7 +404,7 @@ export const ExplorePage = () => {
         name: p.name,
         category: p.categoryName || 'Tọa độ bản địa',
         city: p.city || 'Việt Nam',
-        region: p.city?.includes('Đà Lạt') || p.city?.includes('Hà Giang') ? 'Miền Bắc / Tây Nguyên' : 'Việt Nam',
+        region: getRegionByCity(p.city),
         address: p.address,
         image: p.coverImageUrl || 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
         latitude: p.latitude,
@@ -338,6 +431,7 @@ export const ExplorePage = () => {
         ...d,
         isLocalSpot: false,
         rawId: d.id,
+        region: d.region || getRegionByCity(d.name || d.city),
         latitude: d.coordinates?.lat,
         longitude: d.coordinates?.lng,
         amenities: d.specialties || []
@@ -403,6 +497,16 @@ export const ExplorePage = () => {
       setActiveItem(filteredItems[0]);
     }
   }, [filteredItems, activeItem]);
+
+  // Auto-scroll active card into view smoothly when marker is clicked on map
+  useEffect(() => {
+    if (activeItem?.id && viewMode === 'split') {
+      const cardEl = document.getElementById(`explore-card-${activeItem.id}`);
+      if (cardEl) {
+        cardEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }, [activeItem?.id, viewMode]);
 
   return (
     <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 space-y-8">
@@ -488,7 +592,7 @@ export const ExplorePage = () => {
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80">
         <div className="flex items-center gap-1 overflow-x-auto no-scrollbar">
           <button
-            onClick={() => setExploreLayer('spots')}
+            onClick={() => handleLayerChange('spots')}
             className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
               exploreLayer === 'spots'
                 ? 'bg-white text-sky-700 shadow-sm'
@@ -501,7 +605,7 @@ export const ExplorePage = () => {
           </button>
 
           <button
-            onClick={() => setExploreLayer('destinations')}
+            onClick={() => handleLayerChange('destinations')}
             className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
               exploreLayer === 'destinations'
                 ? 'bg-white text-sky-700 shadow-sm'
@@ -513,7 +617,7 @@ export const ExplorePage = () => {
           </button>
 
           <button
-            onClick={() => setExploreLayer('all')}
+            onClick={() => handleLayerChange('all')}
             className={`px-4 py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer whitespace-nowrap ${
               exploreLayer === 'all'
                 ? 'bg-white text-sky-700 shadow-sm'
@@ -567,9 +671,9 @@ export const ExplorePage = () => {
             )}
           </div>
 
-          {/* Quick Category Chips */}
+          {/* Quick Category Chips - Linh hoạt theo Tab Khám Phá */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
-            {spotCategories.map(cat => {
+            {currentCategoryList.map(cat => {
               const active = selectedCategory === cat;
               return (
                 <button
@@ -701,6 +805,7 @@ export const ExplorePage = () => {
                 return (
                   <div
                     key={item.id}
+                    id={`explore-card-${item.id}`}
                     onClick={() => setActiveItem(item)}
                     className={`bg-white rounded-3xl p-4 transition-all cursor-pointer flex flex-col sm:flex-row gap-4 border ${
                       isActive
@@ -983,13 +1088,49 @@ export const ExplorePage = () => {
             {/* Modal Form Body */}
             <form onSubmit={handleAddPlaceSubmit} className="p-6 overflow-y-auto space-y-4 flex-1 text-xs">
               
+              {/* Type Switcher: Spot vs Business */}
+              <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-2xl border border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPlaceTypeTab('spot');
+                    setNewPlaceForm(prev => ({ ...prev, categoryName: 'Danh Lam & Thắng Cảnh', priceRange: 'Miễn phí' }));
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    placeTypeTab === 'spot'
+                      ? 'bg-white text-orange-600 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>Điểm Check-in / Sống Ảo Phượt Thủ</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPlaceTypeTab('business');
+                    setNewPlaceForm(prev => ({ ...prev, categoryName: 'Quán Cafe & Săn Mây', priceRange: '35.000đ - 85.000đ' }));
+                  }}
+                  className={`flex-1 py-2 px-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    placeTypeTab === 'business'
+                      ? 'bg-white text-orange-600 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Store className="w-3.5 h-3.5" />
+                  <span>Cơ Sở Kinh Doanh / Lưu Trú</span>
+                </button>
+              </div>
+
               {/* Name */}
               <div className="space-y-1">
-                <label className="font-bold text-slate-700">Tên cơ sở / Địa điểm <span className="text-rose-500">*</span></label>
+                <label className="font-bold text-slate-700">
+                  {placeTypeTab === 'spot' ? 'Tên tọa độ check-in / Điểm ngắm cảnh' : 'Tên cơ sở kinh doanh / Quán xá'} <span className="text-rose-500">*</span>
+                </label>
                 <input
                   type="text"
                   required
-                  placeholder="Ví dụ: Homestay Hoàng Hôn Bản Lô Lô, Tiệm Cafe Mây..."
+                  placeholder={placeTypeTab === 'spot' ? 'Ví dụ: Đồi chè Cầu Đất, Cây cô đơn Suối Vàng, Bãi đá đen...' : 'Ví dụ: Homestay Hoàng Hôn, Tiệm Cafe Mây...'}
                   value={newPlaceForm.name}
                   onChange={(e) => setNewPlaceForm(prev => ({ ...prev, name: e.target.value }))}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-orange-500 outline-none text-slate-900 font-semibold"

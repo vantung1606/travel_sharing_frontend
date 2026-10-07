@@ -86,8 +86,24 @@ export const AppProvider = ({ children }) => {
 
   // AI & Auth Modal State
   const [isAIGeneratorOpen, setIsAIGeneratorOpen] = useState(false);
+  const [aiGeneratorInitialData, setAiGeneratorInitialData] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
+
+  const openAIGeneratorWithItem = (item) => {
+    if (item) {
+      const destText = item.city && !item.name.includes(item.city)
+        ? `${item.name}, ${item.city}`
+        : item.name;
+      setAiGeneratorInitialData({
+        destination: destText,
+        item: item
+      });
+    } else {
+      setAiGeneratorInitialData(null);
+    }
+    setIsAIGeneratorOpen(true);
+  };
 
   // Data States
   const [destinations, setDestinations] = useState(INITIAL_DESTINATIONS);
@@ -490,6 +506,8 @@ export const AppProvider = ({ children }) => {
         setAdminTab,
         isAIGeneratorOpen,
         setIsAIGeneratorOpen,
+        aiGeneratorInitialData,
+        openAIGeneratorWithItem,
         isAuthModalOpen,
         setIsAuthModalOpen,
         authMode,

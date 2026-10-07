@@ -59,13 +59,23 @@ const INTEREST_OPTIONS = [
 ];
 
 export const AITripGeneratorModal = () => {
-  const { isAIGeneratorOpen, setIsAIGeneratorOpen, generateAITrip } = useApp();
+  const { isAIGeneratorOpen, setIsAIGeneratorOpen, generateAITrip, aiGeneratorInitialData } = useApp();
   const toast = useToast();
 
   // Core Trip Parameters
   const [destination, setDestination] = useState('Đà Nẵng - Hội An, Việt Nam');
   const [durationPill, setDurationPill] = useState('3N2Đ');
   const [daysCount, setDaysCount] = useState(3);
+
+  // Sync initial destination when triggered from specific spot or place
+  useEffect(() => {
+    if (isAIGeneratorOpen && aiGeneratorInitialData?.destination) {
+      setDestination(aiGeneratorInitialData.destination);
+      if (aiGeneratorInitialData.item?.name) {
+        setCustomPrompt(`Lịch trình cần có điểm dừng chân trải nghiệm tại: ${aiGeneratorInitialData.item.name} (${aiGeneratorInitialData.item.category || ''}).`);
+      }
+    }
+  }, [isAIGeneratorOpen, aiGeneratorInitialData]);
 
   // Default start date: today + 5 days
   const defaultStartDate = useMemo(() => {
