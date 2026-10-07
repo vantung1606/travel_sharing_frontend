@@ -225,8 +225,8 @@ export const ItineraryManagerPage = () => {
 
   return (
     <div className="w-full min-h-screen bg-[#f8fafc] text-slate-900 pb-24">
-      {/* ─── 1. FULL-WIDTH CINEMATIC HERO (LOANG NỀN TRÀN VIỀN GIỐNG TRANG CHỦ) ─── */}
-      <section className="relative w-full overflow-hidden -mt-16 pt-24 pb-28 sm:pt-28 sm:pb-32 lg:pt-32 lg:pb-36 bg-[#031726] text-white">
+      {/* ─── 1. FULL-WIDTH CINEMATIC HERO (NỀN ĐỀU RÕ NÉT GIỐNG TRANG CHỦ, MÀU CHỮ NỔI BẬT) ─── */}
+      <section className="relative w-full overflow-hidden -mt-16 pt-24 pb-24 sm:pt-28 sm:pb-30 lg:pt-32 lg:pb-34 bg-[#031726] text-white">
         {/* Cinematic Backdrop with Vibrant Landscape & Seamless Bottom Blend */}
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
           <div
@@ -235,15 +235,12 @@ export const ItineraryManagerPage = () => {
               backgroundImage: `url('https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=2400&q=90')`
             }}
           />
-          {/* Base Scrim Layers: Tối dịu toàn cảnh, giữ chiều sâu bức ảnh */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-[#031726]/45 to-slate-950/40" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/25 to-[#031726]/80" />
+          {/* Refined Photographic Scrim - Đều màu toàn cảnh, bảo toàn độ rõ nét rực rỡ giống trang chủ */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/65 via-[#031726]/35 to-slate-950/55" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/15 to-[#031726]/85" />
 
-          {/* VÙNG SCRIM TẬP TRUNG BÊN TRÁI ĐẢM BẢO CHỮ HIỂN THỊ CỰC KỲ SẮC NÉT & RÕ RÀNG */}
-          <div className="absolute inset-y-0 left-0 w-full lg:w-2/3 bg-gradient-to-r from-slate-950/90 via-slate-950/60 to-transparent pointer-events-none" />
-
-          {/* LOANG CHÂN DƯỚI CÙNG XUỐNG MÀU #f8fafc (CHỈ Ở MÉP ĐÁY, KHÔNG ĂN VÀO CHỮ) */}
-          <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-28 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/70 to-transparent pointer-events-none" />
+          {/* DẢI LOANG CHÂN DƯỚI CÙNG XUỐNG MÀU #f8fafc (CHỈ Ở CHÂN ĐÁY, KHÔNG ĐÈ LÊN CHỮ) */}
+          <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/50 to-transparent pointer-events-none" />
 
           {/* Radiant Subtle Ambient Light with Pulse Animations */}
           <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-sky-500/20 blur-[140px] pointer-events-none animate-pulse-slow" />
@@ -254,35 +251,35 @@ export const ItineraryManagerPage = () => {
         <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             
-            {/* Left Content Column with High-Contrast Typography */}
+            {/* Left Content Column with High-Contrast Changed Text Color */}
             <div className="max-w-3xl space-y-3">
               {/* Breadcrumb & Pill */}
-              <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-200">
-                <span className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer font-medium drop-shadow-sm">
+              <div className="flex flex-wrap items-center gap-2.5 text-xs">
+                <span className="flex items-center gap-1.5 text-sky-300 hover:text-white transition-colors cursor-pointer font-semibold drop-shadow-md">
                   <Compass className="w-3.5 h-3.5 text-sky-400" />
                   <span>Wayfare</span>
                 </span>
-                <ChevronRight className="w-3 h-3 text-slate-400" />
-                <span className="text-sky-300 font-bold drop-shadow-sm">Kế Hoạch & Lịch Trình</span>
+                <ChevronRight className="w-3 h-3 text-slate-300 drop-shadow-md" />
+                <span className="text-white font-bold drop-shadow-md">Kế Hoạch & Lịch Trình</span>
 
-                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-400"></span>
+                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300"></span>
 
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-950/40 backdrop-blur-md text-sky-200 border border-sky-400/40 text-[11px] font-bold shadow-sm">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-amber-300 border border-amber-400/40 text-[11px] font-bold shadow-md">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
                   <span>WanderAI Trip Engine • Tối ưu 63 tỉnh thành</span>
                 </span>
               </div>
 
               {/* Main Headline with Deep Shadow & Vivid Contrast */}
-              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
+              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-[0_3px_12px_rgba(0,0,0,0.95)]">
                 Lịch Trình Du Lịch{' '}
-                <span className="bg-gradient-to-r from-sky-300 via-cyan-200 to-sky-300 bg-clip-text text-transparent filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                <span className="bg-gradient-to-r from-sky-300 via-cyan-200 to-blue-300 bg-clip-text text-transparent filter drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)]">
                   Của Bạn
                 </span>
               </h1>
               
-              {/* Subtitle - Crisp, Ultra Legible with Contrast Protection */}
-              <p className="text-white/95 text-sm sm:text-base max-w-2xl leading-relaxed font-normal tracking-[0.01em] drop-shadow-[0_1px_5px_rgba(0,0,0,0.95)]">
+              {/* Subtitle - Thay đổi màu chữ sang vàng kem ấm tương phản cao, cực kỳ rõ nét trên nền ảnh */}
+              <p className="text-amber-100/95 text-sm sm:text-base max-w-2xl leading-relaxed font-medium tracking-[0.015em] drop-shadow-[0_2px_8px_rgba(0,0,0,1)]">
                 Quản lý các chuyến đi sắp tới, đồng bộ danh lam thắng cảnh từ Khám phá, kiểm soát ngân sách chi tiết và kiến tạo hành trình từng giờ chỉ với một chạm cùng AI.
               </p>
             </div>
