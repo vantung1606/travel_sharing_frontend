@@ -11,7 +11,69 @@ import {
 } from '../mock/data';
 import { notificationApi, userApi, placeApi, INITIAL_MOCK_NOTIFICATIONS } from '../services/api';
 
-const AppContext = createContext();
+const DEFAULT_APP_STATE = {
+  portalMode: 'user',
+  setPortalMode: () => {},
+  userTab: 'home',
+  setUserTab: () => {},
+  adminTab: 'dashboard',
+  setAdminTab: () => {},
+  isAIGeneratorOpen: false,
+  setIsAIGeneratorOpen: () => {},
+  aiGeneratorInitialData: null,
+  openAIGeneratorWithItem: () => {},
+  isAuthModalOpen: false,
+  setIsAuthModalOpen: () => {},
+  authMode: 'login',
+  setAuthMode: () => {},
+  destinations: INITIAL_DESTINATIONS || [],
+  places: [],
+  setPlaces: () => {},
+  fetchPlaces: () => {},
+  addNewPlace: () => {},
+  posts: INITIAL_POSTS || [],
+  itineraries: INITIAL_ITINERARIES || [],
+  pendingPlaces: INITIAL_PENDING_PLACES || [],
+  users: INITIAL_USER_LIST || [],
+  reports: INITIAL_REPORTS || [],
+  stats: ADMIN_STATS || {},
+  currentUser: {
+    id: null,
+    name: 'Khách',
+    fullName: 'Khách vãng lai',
+    handle: '@guest',
+    email: '',
+    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
+    bio: '',
+    destinationsCount: 0,
+    tripsCount: 0,
+    savedItinerariesCount: 0,
+    roles: []
+  },
+  isLoggedIn: false,
+  setIsLoggedIn: () => {},
+  login: () => {},
+  logout: () => {},
+  updateCurrentUser: () => {},
+  toggleLikePost: () => {},
+  addCommunityPost: () => {},
+  generateAITrip: () => {},
+  approvePlace: () => {},
+  rejectPlace: () => {},
+  resolveReport: () => {},
+  toggleUserStatus: () => {},
+  notifications: [],
+  unreadNotificationsCount: 0,
+  isNotificationLiveBackend: false,
+  markNotificationAsRead: () => {},
+  markAllNotificationsAsRead: () => {},
+  deleteNotification: () => {},
+  addTestNotification: () => {},
+  broadcastNotification: () => {},
+  fetchNotifications: () => {}
+};
+
+export const AppContext = createContext(DEFAULT_APP_STATE);
 
 export const AppProvider = ({ children }) => {
   const location = useLocation();
@@ -552,4 +614,11 @@ export const AppProvider = ({ children }) => {
   );
 };
 
-export const useApp = () => useContext(AppContext);
+export const useApp = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    console.warn('[useApp] Context not found or not initialized yet, falling back to DEFAULT_APP_STATE.');
+    return DEFAULT_APP_STATE;
+  }
+  return context;
+};
