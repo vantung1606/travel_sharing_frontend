@@ -1207,113 +1207,102 @@ export const CommunityPage = () => {
     return itineraries.find(i => String(i.id) === String(attachedItineraryId));
   }, [attachedItineraryId, itineraries]);
 
+  // Real Statistics derived from database posts
+  const realItineraryCount = useMemo(() => {
+    return posts.filter(p => p.itineraryId || p.itinerary || p.hasItinerary).length;
+  }, [posts]);
+
+  // Real Location Stories extracted dynamically from loaded posts
+  const realLocationStories = useMemo(() => {
+    if (!Array.isArray(posts) || posts.length === 0) return [];
+    const map = new Map();
+    posts.forEach(p => {
+      const loc = p.location?.trim();
+      if (loc) {
+        const existing = map.get(loc);
+        const img = (Array.isArray(p.mediaUrls) && p.mediaUrls.length > 0 ? p.mediaUrls[0] : null) || p.imageUrl || null;
+        if (!existing) {
+          map.set(loc, {
+            id: loc,
+            location: loc,
+            count: 1,
+            image: img
+          });
+        } else {
+          existing.count += 1;
+          if (!existing.image && img) existing.image = img;
+        }
+      }
+    });
+    return Array.from(map.values()).sort((a, b) => b.count - a.count).slice(0, 10);
+  }, [posts]);
+
   return (
     <div className="w-full min-h-screen bg-[#f8fafc] text-slate-900 pb-20">
-      {/* ─── 1. FULL-WIDTH CINEMATIC COMMUNITY HERO (ĐỒNG BỘ TRANG CHỦ & LỊCH TRÌNH) ─── */}
-      <section className="relative w-full overflow-hidden -mt-16 pt-24 pb-20 sm:pt-28 sm:pb-24 lg:pt-30 lg:pb-28 bg-[#031726] text-white">
-        {/* Cinematic Backdrop with Vibrant Landscape & Seamless Bottom Blend */}
-        <div className="absolute inset-0 z-0 pointer-events-none select-none">
-          <div
-            className="w-full h-full bg-cover bg-center transition-all duration-1000 scale-105"
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?auto=format&fit=crop&w=2400&q=90')`
-            }}
-          />
-          {/* Refined Photographic Scrim - Đều màu toàn cảnh, bảo toàn độ rõ nét rực rỡ */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-[#031726]/40 to-slate-950/60" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/20 to-[#031726]/85" />
-
-          {/* DẢI LOANG CHÂN DƯỚI CÙNG XUỐNG MÀU #f8fafc (CHỈ Ở CHÂN ĐÁY, KHÔNG ĐÈ LÊN CHỮ) */}
-          <div className="absolute bottom-0 left-0 right-0 h-24 sm:h-32 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/50 to-transparent pointer-events-none" />
-
-          {/* Radiant Subtle Ambient Light with Pulse Animations */}
-          <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-sky-500/20 blur-[140px] pointer-events-none animate-pulse-slow" />
-          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/15 blur-[130px] pointer-events-none animate-pulse-slow [animation-delay:3.5s]" />
-        </div>
-
-        {/* Hero Content Container Aligned Exactly with Navbar Spacing */}
-        <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+      {/* ─── 1. COMPACT & CLEAN COMMUNITY HEADER BAR (GỌN GÀNG, DỮ LIỆU THẬT) ─── */}
+      <section className="w-full pt-4 pb-2 sm:pt-6 sm:pb-3">
+        <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             
-            {/* Left Content Column */}
-            <div className="max-w-3xl space-y-3">
-              {/* Breadcrumb */}
-              <div className="flex flex-wrap items-center gap-2.5 text-xs">
-                <span className="flex items-center gap-1.5 text-sky-300 hover:text-white transition-colors cursor-pointer font-semibold drop-shadow-md">
-                  <Compass className="w-3.5 h-3.5 text-sky-400" />
+            {/* Left: Title & Subtitle */}
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-xs text-slate-500 font-semibold">
+                <span className="flex items-center gap-1 text-sky-600 hover:text-sky-700 cursor-pointer">
+                  <Compass className="w-3.5 h-3.5" />
                   <span>Wayfare</span>
                 </span>
-                <ChevronRight className="w-3 h-3 text-slate-300 drop-shadow-md" />
-                <span className="text-white font-bold drop-shadow-md">Cộng Đồng Du Khách</span>
-                <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300"></span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-amber-300 border border-amber-400/40 text-[11px] font-bold shadow-md">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-                  <span>Nhịp Đập Du Lịch Thực Tế • 63 Tỉnh Thành</span>
-                </span>
+                <ChevronRight className="w-3 h-3 text-slate-400" />
+                <span className="text-slate-800 font-bold">Cộng đồng du khách</span>
               </div>
-
-              {/* Main Headline */}
-              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-[0_3px_12px_rgba(0,0,0,0.95)]">
-                Cộng Đồng Khám Phá{' '}
-                <span className="bg-gradient-to-r from-sky-300 via-cyan-200 to-blue-300 bg-clip-text text-transparent filter drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)]">
-                  Wayfare
+              <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+                <span>Bảng Tin Cộng Đồng</span>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[11px] font-bold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Trực tuyến</span>
                 </span>
               </h1>
-
-              {/* Subtitle - Chữ màu vàng kem ấm áp tương phản cao */}
-              <p className="text-amber-100/95 text-sm sm:text-base max-w-2xl leading-relaxed font-medium tracking-[0.015em] drop-shadow-[0_2px_8px_rgba(0,0,0,1)]">
-                Nơi hàng ngàn lữ khách chia sẻ khoảnh khắc check-in sống ảo, review ẩm thực bản địa chân thực và sao chép lịch trình thực chiến chỉ với một chạm.
+              <p className="text-xs sm:text-sm text-slate-500 max-w-xl font-normal leading-relaxed">
+                Khám phá trải nghiệm thực tế từ các chuyến đi, đánh giá ẩm thực chân thực và sao chép lịch trình du lịch chỉ với một chạm.
               </p>
-
-              {/* Live Pulse Ticker */}
-              <div className="flex flex-wrap items-center gap-3 pt-2 text-xs text-slate-200">
-                <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                  <span className="font-bold text-white">1.450+</span>
-                  <span className="text-slate-300">lữ khách trực tuyến</span>
-                </div>
-                <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-sm">
-                  <Camera className="w-3.5 h-3.5 text-sky-400" />
-                  <span className="font-bold text-white">{posts.length}+</span>
-                  <span className="text-slate-300">bài viết review</span>
-                </div>
-                <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-sm">
-                  <Copy className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="font-bold text-white">850+</span>
-                  <span className="text-slate-300">tour đã sao chép</span>
-                </div>
-              </div>
             </div>
 
-            {/* Action CTA Cluster */}
-            <div className="flex flex-wrap items-center gap-3.5 shrink-0 pt-2 lg:pt-0">
+            {/* Right: Real Stats & Action Buttons */}
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 shrink-0">
+              {/* Real Stats Badges */}
+              <div className="flex items-center gap-3 px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
+                <div className="flex items-center gap-1.5" title="Tổng số bài viết thực tế trong hệ thống">
+                  <Camera className="w-3.5 h-3.5 text-sky-600" />
+                  <span className="font-extrabold text-slate-800">{posts.length}</span>
+                  <span className="text-slate-500">bài viết</span>
+                </div>
+                <span className="w-1 h-1 rounded-full bg-slate-300" />
+                <div className="flex items-center gap-1.5" title="Số tour có đính kèm lịch trình chi tiết">
+                  <Route className="w-3.5 h-3.5 text-blue-600" />
+                  <span className="font-extrabold text-slate-800">{realItineraryCount}</span>
+                  <span className="text-slate-500">lịch trình</span>
+                </div>
+              </div>
+
+              {/* Primary Action: Tạo bài viết */}
               <button
                 type="button"
                 onClick={() => {
                   if (!requireAuth('đăng bài viết mới')) return;
                   setIsCreateModalOpen(true);
                 }}
-                className="group relative inline-flex items-center gap-2.5 px-7 py-4 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white text-sm sm:text-base font-extrabold shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer ring-2 ring-blue-300/40"
+                className="inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer active:scale-95"
               >
-                <Plus className="w-5 h-5 text-amber-300" />
-                <span>Chia Sẻ Khoảnh Khắc ✨</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveCategory('Có Lịch trình đính kèm')}
-                className="inline-flex items-center gap-2 px-6 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-sm sm:text-base transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer hover:scale-105 active:scale-95"
-              >
-                <Route className="w-5 h-5 text-sky-300" />
-                <span>Tour Có Lịch Trình</span>
+                <Plus className="w-4 h-4 text-white" />
+                <span>Đăng Bài Viết</span>
               </button>
             </div>
+
           </div>
         </div>
       </section>
 
-      {/* ─── 2. ELEVATED 3-COLUMN COMMUNITY WORKSPACE ─── */}
-      <div className="relative -mt-8 sm:-mt-10 z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+      {/* ─── 2. 3-COLUMN COMMUNITY WORKSPACE ─── */}
+      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-2 sm:pt-4">
         {/* 3-COLUMN DESKTOP GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
@@ -1554,34 +1543,82 @@ export const CommunityPage = () => {
                 <span className="text-xs text-slate-400 font-semibold">Cập nhật liên tục</span>
               </div>
 
-              {/* Horizontal Scroll Story Circles */}
+              {/* Horizontal Scroll Story Circles - Dữ liệu địa điểm thực tế từ bài viết */}
               <div className="flex items-center gap-3.5 overflow-x-auto pb-2 scrollbar-none select-none">
-                {COMMUNITY_STORIES.map(story => (
-                  <div
-                    key={story.id}
-                    onClick={() => setSearchQuery(story.tag)}
-                    className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group"
-                    title={`Bấm để xem các bài viết về ${story.location}`}
-                  >
-                    <div className="relative p-0.5 rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-sky-500 group-hover:scale-105 transition-transform shadow-xs">
-                      <div className="p-0.5 rounded-full bg-white">
-                        <img
-                          src={story.image}
-                          alt={story.location}
-                          className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover"
-                        />
+                {/* Reset / All Filter */}
+                <div
+                  onClick={() => setSearchQuery('')}
+                  className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group"
+                  title="Xem tất cả bài viết"
+                >
+                  <div className={`relative p-0.5 rounded-full transition-transform group-hover:scale-105 shadow-xs ${
+                    !searchQuery
+                      ? 'bg-gradient-to-tr from-sky-500 to-blue-600 ring-2 ring-sky-400/40'
+                      : 'bg-slate-200 group-hover:bg-slate-300'
+                  }`}>
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-100 flex items-center justify-center p-0.5">
+                      <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-sky-600">
+                        <Compass className="w-6 h-6" />
                       </div>
-                      {story.badge && (
-                        <span className="absolute -bottom-1 -right-1 text-[10px] bg-slate-900 text-white px-1.5 py-0.2 rounded-full border border-white font-bold">
-                          {story.badge}
-                        </span>
-                      )}
                     </div>
-                    <span className="text-[11px] font-bold text-slate-700 group-hover:text-sky-600 transition-colors truncate max-w-[72px] text-center">
-                      {story.location}
-                    </span>
                   </div>
-                ))}
+                  <span className={`text-[11px] font-bold transition-colors truncate max-w-[72px] text-center ${
+                    !searchQuery ? 'text-sky-600 font-extrabold' : 'text-slate-700 group-hover:text-sky-600'
+                  }`}>
+                    Tất cả
+                  </span>
+                </div>
+
+                {/* Real Location Stories from database */}
+                {(realLocationStories.length > 0 ? realLocationStories : COMMUNITY_STORIES).map(story => {
+                  const locName = story.location;
+                  const isSelected = searchQuery.toLowerCase().includes(locName.toLowerCase());
+                  const postCount = story.count || null;
+                  const imgSrc = story.image || (story.badge ? null : null);
+
+                  return (
+                    <div
+                      key={story.id || locName}
+                      onClick={() => setSearchQuery(isSelected ? '' : locName)}
+                      className="flex flex-col items-center gap-1.5 shrink-0 cursor-pointer group"
+                      title={`Bấm để xem các bài viết về ${locName}${postCount ? ` (${postCount} bài)` : ''}`}
+                    >
+                      <div className={`relative p-0.5 rounded-full transition-transform group-hover:scale-105 shadow-xs ${
+                        isSelected
+                          ? 'bg-gradient-to-tr from-amber-400 via-rose-500 to-sky-500 ring-2 ring-sky-400/50'
+                          : 'bg-gradient-to-tr from-slate-200 via-slate-300 to-slate-200 group-hover:from-amber-400 group-hover:via-rose-500 group-hover:to-sky-500'
+                      }`}>
+                        <div className="p-0.5 rounded-full bg-white">
+                          {imgSrc ? (
+                            <img
+                              src={imgSrc}
+                              alt={locName}
+                              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-sky-50 flex items-center justify-center text-sky-600 font-extrabold text-base">
+                              📍
+                            </div>
+                          )}
+                        </div>
+                        {postCount ? (
+                          <span className="absolute -bottom-1 -right-1 text-[10px] bg-slate-900 text-white px-1.5 py-0.2 rounded-full border border-white font-bold">
+                            {postCount}
+                          </span>
+                        ) : story.badge ? (
+                          <span className="absolute -bottom-1 -right-1 text-[10px] bg-slate-900 text-white px-1.5 py-0.2 rounded-full border border-white font-bold">
+                            {story.badge}
+                          </span>
+                        ) : null}
+                      </div>
+                      <span className={`text-[11px] font-bold transition-colors truncate max-w-[72px] text-center ${
+                        isSelected ? 'text-sky-600 font-extrabold' : 'text-slate-700 group-hover:text-sky-600'
+                      }`}>
+                        {locName}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
             

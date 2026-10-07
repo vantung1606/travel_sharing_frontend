@@ -44,8 +44,8 @@ export const Navbar = () => {
     };
   }, []);
 
-  // When on homepage, itinerary, or community hero and NOT scrolled, navbar is transparent over dark photo hero:
-  const isDarkHero = (isHomePage || isItineraryPage || isCommunityPage) && !isScrolled;
+  // When on homepage or itinerary hero and NOT scrolled, navbar is transparent over dark photo hero:
+  const isDarkHero = (isHomePage || isItineraryPage) && !isScrolled;
 
   const {
     portalMode,
@@ -102,10 +102,10 @@ export const Navbar = () => {
     <>
       <header
         className={`sticky top-0 z-40 w-full select-none transition-all duration-300 border-0 border-b-0 ${
-          !isScrolled
-            ? 'bg-transparent shadow-none'
+          isDarkHero
+            ? 'bg-transparent shadow-none text-white'
             : 'bg-white shadow-[0_1px_0_0_rgba(15,23,42,0.06),0_4px_16px_-6px_rgba(15,23,42,0.08)] text-slate-900'
-        } ${isDarkHero ? 'text-white' : 'text-slate-900'}`}
+        }`}
       >
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="flex items-center justify-between h-16 gap-2 sm:gap-3">
