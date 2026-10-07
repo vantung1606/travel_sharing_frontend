@@ -1461,6 +1461,59 @@ export const placeApi = {
     }
   },
 
+  async getPendingPlaces() {
+    try {
+      const res = await fetch(`${BASE_URL}/places/admin/pending`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching pending places:', err.message);
+      return [];
+    }
+  },
+
+  async approvePlace(id) {
+    try {
+      const res = await fetch(`${BASE_URL}/places/admin/${id}/approve`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error(`API error approving place #${id}:`, err.message);
+      throw err;
+    }
+  },
+
+  async rejectPlace(id, reason = 'Thông tin chưa hợp lệ') {
+    try {
+      const res = await fetch(`${BASE_URL}/places/admin/${id}/reject?reason=${encodeURIComponent(reason)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error(`API error rejecting place #${id}:`, err.message);
+      throw err;
+    }
+  },
+
   async deletePlace(id, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
@@ -1477,6 +1530,69 @@ export const placeApi = {
       return json;
     } catch (err) {
       console.error(`API error deleting place #${id}:`, err.message);
+      throw err;
+    }
+  }
+};
+
+export const reviewApi = {
+  async getReviews(placeId) {
+    try {
+      const res = await fetch(`${BASE_URL}/places/${placeId}/reviews`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn(`API error fetching reviews for place #${placeId}:`, err.message);
+      return [];
+    }
+  },
+
+  async addReview(placeId, { rating, comment }, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/places/${placeId}/reviews?email=${encodeURIComponent(userEmail)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        },
+        body: JSON.stringify({ rating: Number(rating), comment: String(comment || '').trim() })
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.message || `HTTP error ${res.status}`);
+      }
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error(`API error adding review for place #${placeId}:`, err.message);
+      throw err;
+    }
+  },
+
+  async deleteReview(reviewId, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/places/reviews/${reviewId}?email=${encodeURIComponent(userEmail)}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json;
+    } catch (err) {
+      console.error(`API error deleting review #${reviewId}:`, err.message);
       throw err;
     }
   }

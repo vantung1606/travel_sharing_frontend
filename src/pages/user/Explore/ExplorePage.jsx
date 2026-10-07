@@ -38,13 +38,25 @@ import {
   Radio,
   Check,
   Building2,
-  Send
+  Send,
+  CalendarPlus,
+  Plus
 } from 'lucide-react';
 import { useToast } from '../../../components/common/Toast';
 import { RealMapView } from '../../../components/map/RealMapView';
+import { reviewApi } from '../../../services/api';
 
 export const ExplorePage = () => {
-  const { destinations, places, addNewPlace, setIsAIGeneratorOpen, openAIGeneratorWithItem, currentUser } = useApp();
+  const {
+    destinations,
+    places,
+    addNewPlace,
+    setIsAIGeneratorOpen,
+    openAIGeneratorWithItem,
+    currentUser,
+    itineraries = [],
+    setItineraries = () => {}
+  } = useApp();
   const toast = useToast();
 
   // Explore Layer: 'spots' (Tọa độ bản địa & Cơ sở) | 'destinations' (Tỉnh thành & Điểm đến) | 'all' (Tất cả)
@@ -73,6 +85,16 @@ export const ExplorePage = () => {
   // Active Item for Map & Detail Modal
   const [activeItem, setActiveItem] = useState(null);
   const [detailModalItem, setDetailModalItem] = useState(null);
+
+  // Reviews state for active Place in detail modal
+  const [placeReviews, setPlaceReviews] = useState([]);
+  const [isReviewsLoading, setIsReviewsLoading] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  // Add to Itinerary modal state
+  const [isAddToTripModalOpen, setIsAddToTripModalOpen] = useState(false);
 
   // Add Place Modal State
   const [isAddPlaceModalOpen, setIsAddPlaceModalOpen] = useState(false);
@@ -365,7 +387,7 @@ export const ExplorePage = () => {
       };
 
       const created = await addNewPlace(payload);
-      toast.success(`Chúc mừng! "${created.name}" đã được đăng tải thành công lên Wayfare 🎉`);
+      toast.success(`Đã gửi yêu cầu đăng ký "${created.name}"! Vui lòng chờ Ban Quản Trị phê duyệt trước khi xuất hiện trên bản đồ 🎉`);
       setIsAddPlaceModalOpen(false);
       setNewPlaceForm({
         name: '',
@@ -389,6 +411,84 @@ export const ExplorePage = () => {
     } finally {
       setIsSubmittingPlace(false);
     }
+  };
+
+  // Load reviews when detailModalItem opens
+  useEffect(() => {
+    if (detailModalItem?.rawId) {
+      setIsReviewsLoading(true);
+      reviewApi.getReviews(detailModalItem.rawId)
+        .then(res => setPlaceReviews(res || []))
+        .catch(err => {
+          console.warn('Could not load reviews:', err);
+          setPlaceReviews([]);
+        })
+        .finally(() => setIsReviewsLoading(false));
+    } else {
+      setPlaceReviews([]);
+    }
+  }, [detailModalItem]);
+
+  // Submit Place Review
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!detailModalItem?.rawId) return;
+    if (!reviewComment.trim()) {
+      toast.warn('Vui lòng viết đôi lời nhận xét về địa điểm này!');
+      return;
+    }
+    setIsSubmittingReview(true);
+    try {
+      const created = await reviewApi.addReview(
+        detailModalItem.rawId,
+        { rating: reviewRating, comment: reviewComment.trim() },
+        currentUser?.email
+      );
+      toast.success('Gửi đánh giá thành công! Cảm ơn đóng góp của bạn. ⭐');
+      setPlaceReviews(prev => [created, ...prev]);
+      setReviewComment('');
+      setReviewRating(5);
+    } catch (err) {
+      toast.error('Lỗi gửi đánh giá: ' + err.message);
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  // Add Place to Existing Itinerary
+  const handleAddToTrip = (itin) => {
+    if (!itin || !detailModalItem) return;
+    const newActivity = {
+      time: '14:30 – 16:30',
+      category: detailModalItem.category || 'Điểm tham quan',
+      title: detailModalItem.name,
+      location: detailModalItem.name,
+      address: detailModalItem.address || `${detailModalItem.city}, Việt Nam`,
+      note: detailModalItem.tagline || detailModalItem.description || 'Được thêm từ trang Khám phá.',
+      cost: detailModalItem.priceEstimate || 'Miễn phí',
+      image: detailModalItem.image
+    };
+
+    const updatedDays = (itin.days || []).map((day, idx) => {
+      if (idx === 0) {
+        return {
+          ...day,
+          activities: [...(day.activities || []), newActivity]
+        };
+      }
+      return day;
+    });
+
+    const updatedItin = {
+      ...itin,
+      days: updatedDays,
+      placesCount: (itin.placesCount || 0) + 1,
+      placesList: [...(itin.placesList || []), detailModalItem.name]
+    };
+
+    setItineraries(prev => prev.map(item => item.id === itin.id ? updatedItin : item));
+    toast.success(`Đã thêm "${detailModalItem.name}" vào lịch trình "${itin.title}"! 🚀`);
+    setIsAddToTripModalOpen(false);
   };
 
   // Format Items depending on exploreLayer
@@ -1461,6 +1561,90 @@ export const ExplorePage = () => {
                 </div>
               )}
 
+              {/* Reviews & Ratings Section */}
+              <div className="pt-4 border-t border-slate-100 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-sm text-slate-900">Đánh giá & Trải nghiệm thực tế</h4>
+                    <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-200">
+                      ★ {detailModalItem.rating || '5.0'} ({placeReviews.length} nhận xét)
+                    </span>
+                  </div>
+                </div>
+
+                {/* Submit New Review Box */}
+                <form onSubmit={handleSubmitReview} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-700">Chấm điểm của bạn:</span>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map(star => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setReviewRating(star)}
+                          className="p-1 text-slate-300 hover:text-amber-400 transition-colors cursor-pointer"
+                        >
+                          <Star className={`w-4 h-4 ${star <= reviewRating ? 'fill-amber-400 text-amber-400' : ''}`} />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="relative">
+                    <textarea
+                      rows={2}
+                      placeholder="Chia sẻ trải nghiệm thực tế của bạn tại địa điểm này (chất lượng phục vụ, cảnh quan, món ngon...)"
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      className="w-full p-2.5 bg-white text-slate-800 rounded-xl text-xs placeholder:text-slate-400 border border-slate-200 outline-none focus:ring-2 focus:ring-sky-500/20 resize-none"
+                    />
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={isSubmittingReview || !reviewComment.trim()}
+                      className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span>{isSubmittingReview ? 'Đang gửi...' : 'Gửi nhận xét'}</span>
+                    </button>
+                  </div>
+                </form>
+
+                {/* Reviews List */}
+                <div className="space-y-2.5">
+                  {isReviewsLoading ? (
+                    <div className="py-4 text-center text-slate-400 text-xs">Đang tải đánh giá...</div>
+                  ) : placeReviews.length === 0 ? (
+                    <div className="p-4 rounded-xl bg-slate-50 text-center text-slate-400 text-xs">
+                      Chưa có đánh giá nào. Hãy là người đầu tiên chia sẻ cảm nhận về địa điểm này!
+                    </div>
+                  ) : (
+                    placeReviews.map(rev => (
+                      <div key={rev.id} className="p-3 rounded-2xl bg-white border border-slate-100 shadow-2xs space-y-1">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <img
+                              src={rev.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
+                              alt=""
+                              className="w-6 h-6 rounded-full object-cover"
+                            />
+                            <span className="font-bold text-slate-800 text-xs">{rev.authorName || 'Du khách'}</span>
+                          </div>
+                          <div className="flex items-center gap-0.5 text-amber-400">
+                            {Array.from({ length: rev.rating || 5 }).map((_, i) => (
+                              <Star key={i} className="w-3 h-3 fill-current" />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-slate-600 text-xs leading-relaxed">{rev.comment}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
             </div>
 
             {/* Modal Footer Controls */}
@@ -1484,6 +1668,15 @@ export const ExplorePage = () => {
 
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
+                  onClick={() => setIsAddToTripModalOpen(true)}
+                  className="px-4 py-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-1.5 border border-emerald-200 transition-colors cursor-pointer"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>➕ Thêm vào Lịch trình</span>
+                </button>
+
+                <button
                   onClick={() => setDetailModalItem(null)}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 cursor-pointer"
                 >
@@ -1502,6 +1695,76 @@ export const ExplorePage = () => {
               </div>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* ─── MODAL CHỌN LỊCH TRÌNH ĐỂ THÊM ĐIỂM (ADD TO ITINERARY MODAL) ─── */}
+      {isAddToTripModalOpen && detailModalItem && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 p-6 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div>
+                <h3 className="font-bold text-base text-slate-900">Thêm vào Lịch trình của bạn</h3>
+                <p className="text-xs text-slate-500 mt-0.5">Chọn chuyến đi để thêm "{detailModalItem.name}"</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddToTripModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {itineraries.length === 0 ? (
+                <div className="p-4 rounded-2xl bg-slate-50 text-center space-y-2">
+                  <p className="text-xs text-slate-500">Bạn chưa có lịch trình nào.</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddToTripModalOpen(false);
+                      setDetailModalItem(null);
+                      openAIGeneratorWithItem(detailModalItem);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-sky-600 text-white text-xs font-bold hover:bg-sky-700 transition-colors cursor-pointer"
+                  >
+                    Tạo chuyến đi mới với điểm này ✨
+                  </button>
+                </div>
+              ) : (
+                itineraries.map(itin => (
+                  <div
+                    key={itin.id}
+                    onClick={() => handleAddToTrip(itin)}
+                    className="p-3.5 rounded-2xl border border-slate-200/80 hover:border-sky-500 hover:bg-sky-50/50 transition-all cursor-pointer flex items-center justify-between gap-3 group"
+                  >
+                    <div className="min-w-0">
+                      <h4 className="font-bold text-xs text-slate-900 truncate group-hover:text-sky-600">
+                        {itin.title}
+                      </h4>
+                      <p className="text-[11px] text-slate-500 mt-0.5">
+                        {itin.duration} • {itin.placesCount || 0} điểm dừng chân
+                      </p>
+                    </div>
+                    <span className="p-1.5 rounded-full bg-slate-100 group-hover:bg-sky-600 group-hover:text-white text-slate-600 transition-colors shrink-0">
+                      <Plus className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="pt-2 border-t border-slate-100 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setIsAddToTripModalOpen(false)}
+                className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition-colors cursor-pointer"
+              >
+                Hủy bỏ
+              </button>
+            </div>
           </div>
         </div>
       )}
