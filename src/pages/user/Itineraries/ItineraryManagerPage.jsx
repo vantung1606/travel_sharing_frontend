@@ -225,94 +225,106 @@ export const ItineraryManagerPage = () => {
 
   return (
     <div className="w-full min-h-screen bg-[#f8fafc] text-slate-900 pb-24">
-      {/* ─── 1. TOP CINEMATIC TRAVEL COVER HERO (BACKGROUND PHONG CẢNH DU LỊCH) ─── */}
-      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6 sm:pt-8">
-        <div className="relative overflow-hidden rounded-3xl sm:rounded-[2.2rem] shadow-lg border border-slate-200/80 min-h-[220px] sm:min-h-[250px] flex items-center">
-          
-          {/* Background Travel Landscape Photography */}
-          <img
-            src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1920&q=80"
-            alt="Vietnam Travel Panorama"
-            className="absolute inset-0 w-full h-full object-cover object-center scale-105 hover:scale-100 transition-transform duration-1000 ease-out"
+      {/* ─── 1. FULL-WIDTH CINEMATIC HERO (LOANG NỀN TRÀN VIỀN GIỐNG TRANG CHỦ) ─── */}
+      <section className="relative w-full overflow-hidden -mt-16 pt-24 pb-20 sm:pt-28 sm:pb-28 lg:pt-32 lg:pb-32 bg-[#031726] text-white">
+        {/* Cinematic Backdrop with Vibrant Landscape & Seamless Bottom Blend */}
+        <div className="absolute inset-0 z-0 pointer-events-none select-none">
+          <div
+            className="w-full h-full bg-cover bg-center transition-all duration-1000 scale-105"
+            style={{
+              backgroundImage: `url('https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=2400&q=90')`
+            }}
           />
+          {/* Refined Scrim Layers: Vừa bảo toàn độ rõ nét cảnh đẹp, vừa đảm bảo độ tương phản chữ */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-[#031726]/40 to-slate-950/50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/15 to-[#031726]/75" />
 
-          {/* Cinematic Vignette Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/65 to-slate-900/30"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent"></div>
+          {/* LOANG NỀN TỰ NHIÊN XUỐNG MÀU #f8fafc GIỐNG HỆT TRANG CHỦ (KHÔNG BỊ ĐÓNG HỘP) */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#f8fafc]/10 to-[#f8fafc]" />
+          <div className="absolute bottom-0 left-0 right-0 h-32 sm:h-44 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/80 to-transparent" />
 
-          {/* Content Layer */}
-          <div className="relative z-10 w-full p-6 sm:p-9 lg:p-11 flex flex-col lg:flex-row lg:items-end justify-between gap-6 text-white">
+          {/* Radiant Subtle Ambient Light with Pulse Animations */}
+          <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-sky-500/20 blur-[140px] pointer-events-none animate-pulse-slow" />
+          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/15 blur-[130px] pointer-events-none animate-pulse-slow [animation-delay:3.5s]" />
+        </div>
+
+        {/* Hero Content Container Aligned Exactly with Navbar Spacing */}
+        <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             
-            {/* Left Content */}
-            <div className="max-w-2xl space-y-2.5">
+            {/* Left Content Column */}
+            <div className="max-w-3xl space-y-3">
               {/* Breadcrumb & Pill */}
               <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-300">
                 <span className="flex items-center gap-1.5 hover:text-white transition-colors cursor-pointer font-medium">
-                  <Compass className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Trang chủ</span>
+                  <Compass className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Wayfare</span>
                 </span>
                 <ChevronRight className="w-3 h-3 text-slate-400" />
-                <span className="text-sky-300 font-bold">Kế hoạch chuyến đi</span>
+                <span className="text-sky-300 font-bold">Kế Hoạch & Lịch Trình</span>
 
                 <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-400"></span>
 
-                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white/15 backdrop-blur-md text-amber-300 border border-white/20 text-[11px] font-bold shadow-xs">
-                  <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
-                  <span>WanderAI Engine • 63 Tỉnh Thành</span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-500/20 backdrop-blur-md text-sky-200 border border-sky-400/30 text-[11px] font-bold shadow-inner">
+                  <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                  <span>WanderAI Trip Engine • Tối ưu 63 tỉnh thành</span>
                 </span>
               </div>
 
-              {/* Title */}
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white drop-shadow-md">
-                Lịch Trình Du Lịch
+              {/* Main Headline */}
+              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
+                Lịch Trình Du Lịch{' '}
+                <span className="bg-gradient-to-r from-sky-400 via-blue-300 to-indigo-300 bg-clip-text text-transparent">
+                  Của Bạn
+                </span>
               </h1>
               
-              {/* Description */}
-              <p className="text-xs sm:text-sm text-slate-200/90 leading-relaxed font-normal max-w-xl drop-shadow-xs">
-                Lập kế hoạch từng giờ, đồng bộ danh lam thắng cảnh từ Khám phá và tận hưởng hành trình trọn vẹn được tối ưu riêng cho bạn.
+              {/* Subtitle */}
+              <p className="text-slate-200 text-sm sm:text-base max-w-2xl leading-relaxed font-normal drop-shadow-sm">
+                Quản lý các chuyến đi sắp tới, đồng bộ danh lam thắng cảnh từ Khám phá, kiểm soát ngân sách chi tiết và kiến tạo hành trình từng giờ chỉ với một chạm cùng AI.
               </p>
             </div>
 
-            {/* Right Action CTA & Floating Mini Widget */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3.5 shrink-0">
-              {/* AI CTA Button */}
+            {/* Action CTA Cluster */}
+            <div className="flex flex-wrap items-center gap-3.5 shrink-0 pt-2 lg:pt-0">
+              {/* AI CTA Button with Shimmer & Glow */}
               <button
                 type="button"
                 onClick={() => {
                   if (!requireAuth('lập lịch trình bằng AI')) return;
                   setIsAIGeneratorOpen(true);
                 }}
-                className="group relative inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white text-xs sm:text-sm font-bold shadow-xl shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-[1.02] active:scale-95 transition-all duration-300 cursor-pointer border border-amber-300/30"
+                className="group relative inline-flex items-center gap-2.5 px-7 py-4 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white text-sm sm:text-base font-extrabold shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer ring-2 ring-blue-300/40"
               >
-                <Sparkles className="w-4 h-4 text-amber-200 group-hover:rotate-12 transition-transform duration-300" />
+                <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
                 <span>Lập Tour Bằng AI (30s) ✨</span>
-                <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                <span className="px-2.5 py-0.5 rounded-full bg-black/25 text-xs font-black uppercase tracking-wider">
+                  Miễn phí
                 </span>
               </button>
 
-              {/* Manual Trip CTA Button (Frosted Glassmorphism) */}
+              {/* Manual Trip CTA (Frosted Glassmorphism Button) */}
               <button
                 type="button"
                 onClick={() => {
                   if (!requireAuth('tạo chuyến đi mới')) return;
                   setIsManualCreateOpen(true);
                 }}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white/15 hover:bg-white/25 text-white border border-white/25 backdrop-blur-md text-xs sm:text-sm font-bold shadow-md hover:border-white/40 active:scale-95 transition-all duration-200 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-sm sm:text-base transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer hover:scale-105 active:scale-95"
               >
-                <Plus className="w-4 h-4 text-amber-300" />
-                <span>Tạo Thủ Công</span>
+                <Plus className="w-5 h-5 text-sky-300" />
+                <span>+ Tạo Thủ Công</span>
               </button>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ─── 2. GUEST RESTRICTION BANNER (NẾU CHƯA ĐĂNG NHẬP) ────────────────────── */}
-      {!isLoggedIn && (
-        <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6">
-          <div className="bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-50 border border-sky-200 rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* ─── 2. ELEVATED DASHBOARD LAYER (OVERLAPPING SEAMLESS HERO GRADIENT) ─── */}
+      <div className="relative -mt-8 sm:-mt-12 z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 space-y-5">
+        {/* Guest Restriction Banner (Nếu chưa đăng nhập) */}
+        {!isLoggedIn && (
+          <div className="bg-gradient-to-r from-sky-50 via-blue-50 to-indigo-50 border border-sky-200/90 rounded-2xl p-5 sm:p-6 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-sm">
             <div className="flex items-start sm:items-center gap-4">
               <div className="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-sky-600/20">
                 <Calendar className="w-6 h-6" />
@@ -337,11 +349,9 @@ export const ItineraryManagerPage = () => {
               Đăng nhập ngay
             </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ─── 3. STATS KPI DASHBOARD (4 METRIC CARDS) ─────────────────────────── */}
-      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6">
+        {/* STATS KPI DASHBOARD (4 METRIC CARDS) */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {/* Card 1: Tổng số chuyến */}
           <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs hover:shadow-md hover:border-sky-300 transition-all flex items-center gap-4">

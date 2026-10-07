@@ -24,6 +24,7 @@ import { WayfarePlaneLogo } from './WayfarePlaneLogo';
 export const Navbar = () => {
   const location = useLocation();
   const isHomePage = location.pathname === '/' || location.pathname === '/home';
+  const isItineraryPage = location.pathname === '/itineraries';
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -42,8 +43,8 @@ export const Navbar = () => {
     };
   }, []);
 
-  // When on homepage and NOT scrolled, we are directly over the dark photo hero:
-  const isDarkHero = isHomePage && !isScrolled;
+  // When on homepage or itinerary hero and NOT scrolled, navbar is transparent over dark photo hero:
+  const isDarkHero = (isHomePage || isItineraryPage) && !isScrolled;
 
   const {
     portalMode,
