@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
@@ -46,7 +46,11 @@ export const ItineraryManagerPage = () => {
     setIsAIGeneratorOpen,
     isLoggedIn,
     setIsAuthModalOpen,
-    setAuthMode
+    setAuthMode,
+    activeViewingItinerary,
+    setActiveViewingItinerary,
+    aiGeneratingStatus,
+    setAiGeneratingStatus
   } = useApp();
   const toast = useToast();
 
@@ -70,6 +74,14 @@ export const ItineraryManagerPage = () => {
 
   // Selected Itinerary for Detail Modal
   const [selectedItinerary, setSelectedItinerary] = useState(null);
+
+  // Tự động mở xem chi tiết lịch trình khi WanderAI vừa khởi tạo xong
+  useEffect(() => {
+    if (activeViewingItinerary) {
+      setSelectedItinerary(activeViewingItinerary);
+      setActiveViewingItinerary(null);
+    }
+  }, [activeViewingItinerary, setActiveViewingItinerary]);
 
   // Manual Trip Creator Modal State
   const [isManualCreateOpen, setIsManualCreateOpen] = useState(false);

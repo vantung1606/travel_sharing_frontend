@@ -58,6 +58,10 @@ const DEFAULT_APP_STATE = {
   toggleLikePost: () => {},
   addCommunityPost: () => {},
   generateAITrip: () => {},
+  activeViewingItinerary: null,
+  setActiveViewingItinerary: () => {},
+  aiGeneratingStatus: { isGenerating: false, destination: '', daysCount: 3, progress: 0 },
+  setAiGeneratingStatus: () => {},
   approvePlace: () => {},
   rejectPlace: () => {},
   resolveReport: () => {},
@@ -151,6 +155,13 @@ export const AppProvider = ({ children }) => {
   const [aiGeneratorInitialData, setAiGeneratorInitialData] = useState(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login'); // 'login' | 'register'
+  const [activeViewingItinerary, setActiveViewingItinerary] = useState(null);
+  const [aiGeneratingStatus, setAiGeneratingStatus] = useState({
+    isGenerating: false,
+    destination: '',
+    daysCount: 3,
+    progress: 0
+  });
 
   const openAIGeneratorWithItem = (item) => {
     if (item) {
@@ -527,7 +538,9 @@ export const AppProvider = ({ children }) => {
 
     setItineraries(prev => [newItinerary, ...prev]);
     setStats(prev => ({ ...prev, aiGenerationsToday: prev.aiGenerationsToday + 1 }));
+    setActiveViewingItinerary(newItinerary);
     setUserTab('itineraries');
+    return newItinerary;
   };
 
   // Admin Actions
@@ -594,6 +607,10 @@ export const AppProvider = ({ children }) => {
         toggleLikePost,
         addCommunityPost,
         generateAITrip,
+        activeViewingItinerary,
+        setActiveViewingItinerary,
+        aiGeneratingStatus,
+        setAiGeneratingStatus,
         approvePlace,
         rejectPlace,
         resolveReport,
