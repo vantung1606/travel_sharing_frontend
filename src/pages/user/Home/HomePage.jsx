@@ -548,6 +548,9 @@ export const HomePage = () => {
           {/* Radiant Subtle Ambient Light with Pulse Animations */}
           <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-sky-500/20 blur-[140px] pointer-events-none animate-pulse-slow" />
           <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/15 blur-[130px] pointer-events-none animate-pulse-slow [animation-delay:3.5s]" />
+
+          {/* Seamless Bottom Fade Transition to Light Canvas (Loang mờ đáy tự nhiên xuống nền trang) */}
+          <div className="absolute bottom-0 left-0 right-0 h-28 sm:h-40 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/50 to-transparent pointer-events-none" />
         </div>
 
         {/* Content Container Aligned with Navbar Width */}
