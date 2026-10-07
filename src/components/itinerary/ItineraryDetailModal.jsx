@@ -67,7 +67,22 @@ const VIETNAM_COORDINATES = {
 
 // Từ điển tọa độ GPS thực tế có thật 100% của danh lam, di tích và điểm ẩm thực nổi tiếng tại Việt Nam
 const VIETNAM_LANDMARKS = {
-  // === HÀ TĨNH ===
+  // === HÀ TĨNH & CÁC HUYỆN (THẠCH HÀ, CAN LỘC, KỲ ANH, CẨM XUYÊN...) ===
+  'biển thạch hải': { lat: 18.3667, lng: 105.9917, address: 'Bãi biển Thạch Hải, Huyện Thạch Hà, Hà Tĩnh' },
+  'thạch hải': { lat: 18.3667, lng: 105.9917, address: 'Bãi biển Thạch Hải, Huyện Thạch Hà, Hà Tĩnh' },
+  'khu sinh thái quỳnh viên': { lat: 18.3972, lng: 106.0125, address: 'Khu du lịch Quỳnh Viên, Thạch Hải, Huyện Thạch Hà, Hà Tĩnh' },
+  'quỳnh viên': { lat: 18.3972, lng: 106.0125, address: 'Khu du lịch Quỳnh Viên, Thạch Hải, Thạch Hà, Hà Tĩnh' },
+  'đền lê khôi': { lat: 18.4056, lng: 106.0167, address: 'Đền Chiêu Trưng Đại Vương Lê Khôi, Núi Long Ngâm, Thạch Hà, Hà Tĩnh' },
+  'đền chiêu trưng lê khôi': { lat: 18.4056, lng: 106.0167, address: 'Đền Chiêu Trưng Đại Vương Lê Khôi, Núi Long Ngâm, Thạch Hà, Hà Tĩnh' },
+  'chùa tượng sơn': { lat: 18.3222, lng: 105.8167, address: 'Chùa Tượng Sơn, Xã Sơn Giang, Huyện Thạch Hà, Hà Tĩnh' },
+  'tượng sơn': { lat: 18.3222, lng: 105.8167, address: 'Chùa Tượng Sơn, Huyện Thạch Hà, Hà Tĩnh' },
+  'hồ khe xai': { lat: 18.2583, lng: 105.7833, address: 'Hồ Khe Xai, Xã Thạch Xuân, Huyện Thạch Hà, Hà Tĩnh' },
+  'khe xai': { lat: 18.2583, lng: 105.7833, address: 'Hồ Khe Xai, Xã Thạch Xuân, Huyện Thạch Hà, Hà Tĩnh' },
+  'chợ cày': { lat: 18.3422, lng: 105.8544, address: 'Chợ Cày, Thị trấn Thạch Hà, Huyện Thạch Hà, Hà Tĩnh' },
+  'thị trấn thạch hà': { lat: 18.3417, lng: 105.8500, address: 'Thị trấn Thạch Hà, Huyện Thạch Hà, Hà Tĩnh' },
+  'thạch hà': { lat: 18.3417, lng: 105.8500, address: 'Huyện Thạch Hà, Hà Tĩnh' },
+  'đền nguyễn thiếp': { lat: 18.3180, lng: 105.8350, address: 'Đền thờ La Sơn Phu Tử Nguyễn Thiếp, Thạch Hà, Hà Tĩnh' },
+  'bánh cuốn ram giò thạch hà': { lat: 18.3410, lng: 105.8530, address: 'Đường Lý Tự Trọng, Thị trấn Thạch Hà, Hà Tĩnh' },
   'chùa hương tích': { lat: 18.4967, lng: 105.8617, address: 'Xã Thiên Lộc, Huyện Can Lộc, Hà Tĩnh' },
   'hương tích': { lat: 18.4967, lng: 105.8617, address: 'Xã Thiên Lộc, Huyện Can Lộc, Hà Tĩnh' },
   'ngã ba đồng lộc': { lat: 18.3375, lng: 105.7161, address: 'Thị trấn Đồng Lộc, Huyện Can Lộc, Hà Tĩnh' },
@@ -386,6 +401,23 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
       });
     });
 
+    // Tách các điểm bị trùng tọa độ để các trạm (1, 2, 3...) không đè khít lên nhau tạo thành 1 điểm duy nhất
+    const coordSeen = new Map();
+    points.forEach((pt, idx) => {
+      const key = `${pt.lat.toFixed(3)},${pt.lng.toFixed(3)}`;
+      if (coordSeen.has(key)) {
+        const count = coordSeen.get(key);
+        coordSeen.set(key, count + 1);
+        // Tách nhẹ theo vòng tròn bán kính 400m - 1.2km (0.005 - 0.012 độ)
+        const angle = ((count * 60) + (idx * 30)) * (Math.PI / 180);
+        const dist = 0.005 + (count * 0.0025);
+        pt.lat = Number((pt.lat + Math.sin(angle) * dist).toFixed(6));
+        pt.lng = Number((pt.lng + Math.cos(angle) * dist).toFixed(6));
+      } else {
+        coordSeen.set(key, 1);
+      }
+    });
+
     return points;
   }, [days, activeTab, baseCoords, destinationName]);
 
@@ -581,7 +613,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 bg-slate-50/40">
           
           {/* CỘT TRÁI (7 CỘT): LỊCH TRÌNH CHI TIẾT TỪNG HOẠT ĐỘNG */}
-          <div className={`space-y-5 sm:space-y-6 ${mobileTab === 'timeline' ? 'block' : 'hidden lg:block lg:col-span-7'}`}>
+          <div className={`space-y-5 sm:space-y-6 lg:col-span-7 ${mobileTab === 'timeline' ? 'block' : 'hidden lg:block'}`}>
             {displayedDays.map((dayItem, dayIdx) => (
               <div key={dayIdx} className="space-y-3.5 sm:space-y-4">
                 
@@ -689,7 +721,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
           </div>
 
           {/* CỘT PHẢI (5 CỘT): BẢN ĐỒ TƯƠNG TÁC THẬT 100% & BAO QUÁT LỘ TRÌNH */}
-          <div className={`space-y-5 ${mobileTab === 'map' ? 'block' : 'hidden lg:block lg:col-span-5'}`}>
+          <div className={`space-y-5 lg:col-span-5 ${mobileTab === 'map' ? 'block' : 'hidden lg:block'}`}>
             
             {/* 1. BẢN ĐỒ LỘ TRÌNH TƯƠNG TÁC (LEAFLET OPENSTREETMAP THỰC TẾ) */}
             <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
