@@ -1239,64 +1239,92 @@ export const CommunityPage = () => {
 
   return (
     <div className="w-full min-h-screen bg-[#f8fafc] text-slate-900 pb-20">
-      {/* ─── 1. COMPACT & CLEAN COMMUNITY HEADER BAR (GỌN GÀNG, DỮ LIỆU THẬT) ─── */}
+      {/* ─── 1. COMPACT SCENIC COMMUNITY BANNER (CÓ NỀN PHONG CẢNH DU LỊCH, GỌN GÀNG, DỮ LIỆU THẬT) ─── */}
       <section className="w-full pt-4 pb-2 sm:pt-6 sm:pb-3">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-            
-            {/* Left: Title & Subtitle */}
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-xs text-slate-500 font-semibold">
-                <span className="flex items-center gap-1 text-sky-600 hover:text-sky-700 cursor-pointer">
-                  <Compass className="w-3.5 h-3.5" />
-                  <span>Wayfare</span>
-                </span>
-                <ChevronRight className="w-3 h-3 text-slate-400" />
-                <span className="text-slate-800 font-bold">Cộng đồng du khách</span>
-              </div>
-              <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
-                <span>Bảng Tin Cộng Đồng</span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[11px] font-bold">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>Trực tuyến</span>
-                </span>
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-500 max-w-xl font-normal leading-relaxed">
-                Khám phá trải nghiệm thực tế từ các chuyến đi, đánh giá ẩm thực chân thực và sao chép lịch trình du lịch chỉ với một chạm.
-              </p>
-            </div>
-
-            {/* Right: Real Stats & Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4 shrink-0">
-              {/* Real Stats Badges */}
-              <div className="flex items-center gap-3 px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
-                <div className="flex items-center gap-1.5" title="Tổng số bài viết thực tế trong hệ thống">
-                  <Camera className="w-3.5 h-3.5 text-sky-600" />
-                  <span className="font-extrabold text-slate-800">{posts.length}</span>
-                  <span className="text-slate-500">bài viết</span>
-                </div>
-                <span className="w-1 h-1 rounded-full bg-slate-300" />
-                <div className="flex items-center gap-1.5" title="Số tour có đính kèm lịch trình chi tiết">
-                  <Route className="w-3.5 h-3.5 text-blue-600" />
-                  <span className="font-extrabold text-slate-800">{realItineraryCount}</span>
-                  <span className="text-slate-500">lịch trình</span>
-                </div>
-              </div>
-
-              {/* Primary Action: Tạo bài viết */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (!requireAuth('đăng bài viết mới')) return;
-                  setIsCreateModalOpen(true);
+          <div className="relative rounded-3xl overflow-hidden shadow-md border border-slate-700/30 min-h-[160px] sm:min-h-[190px] flex items-center p-6 sm:p-8 text-white select-none">
+            {/* Scenic Background Image with Smooth Gradient Scrim */}
+            <div className="absolute inset-0 z-0 pointer-events-none">
+              <div
+                className="w-full h-full bg-cover bg-center transition-all duration-700 scale-105"
+                style={{
+                  backgroundImage: `url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2000&q=85')`
                 }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm shadow-sm hover:shadow transition-all cursor-pointer active:scale-95"
-              >
-                <Plus className="w-4 h-4 text-white" />
-                <span>Đăng Bài Viết</span>
-              </button>
+              />
+              {/* Rich Cinematic Dark Gradient for High Contrast & Text Legibility */}
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/70 to-slate-900/40" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-black/30" />
+              
+              {/* Ambient Glow Orbs */}
+              <div className="absolute -top-10 left-1/4 w-72 h-72 rounded-full bg-sky-500/20 blur-[90px] pointer-events-none" />
+              <div className="absolute -bottom-10 right-1/4 w-72 h-72 rounded-full bg-blue-600/15 blur-[90px] pointer-events-none" />
             </div>
 
+            {/* Banner Content Container */}
+            <div className="relative z-10 w-full flex flex-col md:flex-row md:items-center justify-between gap-5">
+              
+              {/* Left Column: Breadcrumb, Title & Subtitle */}
+              <div className="space-y-2 max-w-2xl">
+                {/* Compact Breadcrumb */}
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="flex items-center gap-1.5 text-sky-300 hover:text-white transition-colors cursor-pointer font-semibold drop-shadow-sm">
+                    <Compass className="w-3.5 h-3.5 text-sky-400" />
+                    <span>Wayfare</span>
+                  </span>
+                  <ChevronRight className="w-3 h-3 text-slate-300" />
+                  <span className="text-white font-bold drop-shadow-sm">Cộng Đồng Du Khách</span>
+                  <span className="inline-flex items-center gap-1.5 ml-1 px-2.5 py-0.5 rounded-full bg-black/40 backdrop-blur-md text-amber-300 border border-amber-400/30 text-[11px] font-bold">
+                    <Sparkles className="w-3 h-3 text-amber-400 animate-pulse" />
+                    <span>63 Tỉnh Thành</span>
+                  </span>
+                </div>
+
+                {/* Headline */}
+                <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight drop-shadow-md">
+                  Cộng Đồng Khám Phá{' '}
+                  <span className="bg-gradient-to-r from-sky-300 via-cyan-200 to-blue-200 bg-clip-text text-transparent">
+                    Wayfare
+                  </span>
+                </h1>
+
+                {/* Subtitle with High Contrast Warm Color */}
+                <p className="text-amber-100/95 text-xs sm:text-sm leading-relaxed font-medium drop-shadow-sm max-w-xl">
+                  Nơi chia sẻ khoảnh khắc check-in sống ảo, review ẩm thực chân thực và sao chép lịch trình du lịch chỉ với một chạm.
+                </p>
+              </div>
+
+              {/* Right Column: Real Stats Badges & CTA */}
+              <div className="flex flex-wrap items-center gap-3 sm:gap-4 shrink-0">
+                {/* Real Live Stats Badges */}
+                <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-slate-900/70 backdrop-blur-md border border-white/15 text-xs text-slate-200 shadow-md">
+                  <div className="flex items-center gap-1.5" title="Tổng số bài viết thật trong CSDL">
+                    <Camera className="w-3.5 h-3.5 text-sky-400" />
+                    <span className="font-extrabold text-white">{posts.length}</span>
+                    <span className="text-slate-300">bài viết</span>
+                  </div>
+                  <span className="w-1 h-1 rounded-full bg-slate-500" />
+                  <div className="flex items-center gap-1.5" title="Số bài viết có đính kèm lịch trình tour">
+                    <Route className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="font-extrabold text-white">{realItineraryCount}</span>
+                    <span className="text-slate-300">lịch trình</span>
+                  </div>
+                </div>
+
+                {/* Primary CTA Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!requireAuth('đăng bài viết mới')) return;
+                    setIsCreateModalOpen(true);
+                  }}
+                  className="group relative inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer ring-2 ring-blue-300/40"
+                >
+                  <Plus className="w-4 h-4 text-amber-300" />
+                  <span>Đăng Bài Viết ✨</span>
+                </button>
+              </div>
+
+            </div>
           </div>
         </div>
       </section>
