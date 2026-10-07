@@ -410,7 +410,7 @@ export const AITripGeneratorModal = () => {
     try {
       // Build Prompt yêu cầu địa danh thật 100%, không văn mẫu chung chung
       const prompt = `Bạn là chuyên gia tư vấn du lịch bản địa hàng đầu tại Việt Nam.
-Nhiệm vụ: Lập kế hoạch lịch trình du lịch chi tiết cho ${daysCount} ngày tại "${destination}".
+Nhiệm vụ: Lập kế hoạch lịch trình du lịch chi tiết cho ${daysCount} ngày tại "${destination}" (hỗ trợ toàn diện bất kỳ địa phương, tỉnh thành, huyện đảo nào trên khắp 63 tỉnh thành Việt Nam).
 Thông tin chuyến đi:
 - Điểm đến: ${destination}
 - Thời lượng: ${daysCount} ngày (${daysCount}N${Math.max(1, daysCount - 1)}Đ)
@@ -424,7 +424,7 @@ Thông tin chuyến đi:
 ${customPrompt ? `- Yêu cầu thêm: ${customPrompt}` : ''}
 
 QUY TẮC BẮT BUỘC (CRITICAL):
-1. TẤT CẢ các địa điểm tham quan, danh lam, bãi biển, di tích, quán ăn, đặc sản PHẢI LÀ ĐỊA DANH / QUÁN ĂN CỤ THỂ CÓ THẬT 100% tại ${destination} (Ví dụ: nếu ở Hà Tĩnh PHẢI CÓ Chùa Hương Tích Can Lộc, Khu di tích Ngã ba Đồng Lộc, Bãi biển Thiên Cầm, Hồ Kẻ Gỗ, Bánh mướt ram giò Hà Huy Tập, Kẹo Cu đơ Cầu Phủ... TUYỆT ĐỐI KHÔNG dùng từ chung chung như "ngắm hoàng hôn", "đi dạo", "quán ăn bản địa").
+1. TẤT CẢ các địa điểm tham quan, danh lam thắng cảnh, bãi biển, di tích lịch sử, chợ địa phương, quán ăn đặc sản PHẢI LÀ ĐỊA DANH / QUÁN ĂN CỤ THỂ CÓ THẬT 100% tại "${destination}" hoặc tỉnh thành tương ứng ở Việt Nam (Ví dụ: tại Côn Đảo thì có Nhà tù Côn Đảo, Bãi Đầm Trầu, Nghĩa trang Hàng Dương; tại Phú Yên có Gành Đá Đĩa, Mũi Điện, Bãi Xép, Mắt cá ngừ bà Tám; tại Cà Mau có Mốc tọa độ Mũi Cà Mau, Rừng U Minh Hạ, Cua Năm Căn; tại Hà Giang có Đèo Mã Pí Lèng, Cột cờ Lũng Cú... TUYỆT ĐỐI KHÔNG dùng từ chung chung như "ngắm hoàng hôn", "đi dạo", "quán ăn bản địa").
 2. Mỗi ngày có 3-4 hoạt động sắp xếp từ sáng đến tối theo lộ trình địa lý hợp lý.
 3. Chỉ trả về DUY NHẤT một chuỗi JSON hợp lệ không có markdown bọc ngoài theo mẫu:
 {
@@ -479,9 +479,6 @@ QUY TẮC BẮT BUỘC (CRITICAL):
       {/* COMPACT MODAL CARD (Max-w: 640px, thoáng đãng, gọn gàng, không chằng chịt) */}
       <div className="relative w-full max-w-[640px] bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh] border border-slate-200">
         
-        {/* Top Accent Gradient Bar */}
-        <div className="h-1.5 w-full bg-gradient-to-r from-sky-500 via-blue-600 to-indigo-600 shrink-0" />
-
         {/* MODAL HEADER - Gọn gàng, sạch sẽ */}
         <div className="px-5 sm:px-6 py-4 bg-white flex items-center justify-between border-b border-slate-100 shrink-0">
           <div className="flex items-center gap-2.5">
@@ -493,7 +490,7 @@ QUY TẮC BẮT BUỘC (CRITICAL):
                 Lập Lịch Trình AI Thông Minh
               </h2>
               <p className="text-xs text-slate-500 font-normal">
-                Điền nhanh mong muốn, AI sẽ thiết kế tour thực tế cho bạn.
+                Tra cứu địa danh thật trên toàn bộ 63 tỉnh thành & hải đảo Việt Nam.
               </p>
             </div>
           </div>
@@ -513,17 +510,22 @@ QUY TẮC BẮT BUỘC (CRITICAL):
 
           {/* 1. Điểm đến du lịch */}
           <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-sky-600" />
-              <span>Điểm đến du lịch</span>
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-sky-600" />
+                <span>Điểm đến du lịch</span>
+              </label>
+              <span className="text-[11px] font-semibold text-slate-400">
+                Toàn quốc (63 tỉnh thành)
+              </span>
+            </div>
             <div className="relative">
               <Navigation className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
               <input
                 type="text"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                placeholder="Nhập tỉnh, thành phố (ví dụ: Đà Lạt, Phú Quốc, Ninh Bình...)"
+                placeholder="Nhập bất kỳ điểm đến nào (ví dụ: Côn Đảo, Phú Yên, Hà Giang, Cà Mau, Sa Pa...)"
                 className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-slate-50 text-slate-900 text-xs font-semibold border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
               />
               {destination && (
@@ -539,7 +541,7 @@ QUY TẮC BẮT BUỘC (CRITICAL):
 
             {/* Quick destination tags */}
             <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-              <span className="text-[11px] font-bold text-slate-400">Gợi ý:</span>
+              <span className="text-[11px] font-bold text-slate-400">Phổ biến:</span>
               {HOT_DESTINATIONS.map(tag => (
                 <button
                   key={tag}
