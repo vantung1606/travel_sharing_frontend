@@ -632,37 +632,56 @@ QUY TẮC BẮT BUỘC:
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto animate-fade-in font-['Inter',sans-serif]">
       {/* CARD MODAL CAO CẤP & GỌN GÀNG (Max-width: 620px) */}
-      <div className="relative w-full max-w-[620px] bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh] border border-slate-200/80">
+      <div className="relative w-full max-w-[620px] bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[92vh] border border-slate-200/80 font-['Inter',sans-serif]">
         
-        {/* 1. HEADER TINH TẾ - Duy nhất 1 nút đóng X, không trùng lặp */}
-        <div className="px-6 py-4.5 bg-gradient-to-b from-sky-50/60 to-white flex items-center justify-between border-b border-slate-100 shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-sky-500/25 shrink-0">
-              <Sparkles className="w-5 h-5 text-white" />
+        {/* Top Accent Gradient Bar */}
+        <div className="h-1 bg-gradient-to-r from-sky-400 via-indigo-500 to-purple-500 shrink-0" />
+
+        {/* 1. HEADER CHUYÊN NGHIỆP - SẮC NÉT, TINH TẾ */}
+        <div className="px-6 py-4.5 bg-gradient-to-b from-slate-50/70 via-white to-white flex items-start justify-between gap-4 border-b border-slate-100/90 shrink-0">
+          <div className="flex items-start gap-3.5 min-w-0">
+            {/* Glowing AI Icon Squircle */}
+            <div className="relative shrink-0 mt-0.5">
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500 via-sky-500 to-cyan-400 p-0.5 shadow-md shadow-sky-500/20">
+                <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-sky-300 animate-pulse" />
+                </div>
+              </div>
+              <span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center" title="AI Trực tuyến">
+                <span className="w-1.5 h-1.5 rounded-full bg-white" />
+              </span>
             </div>
-            <div>
-              <h2 className="font-display text-base sm:text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-                <span>Thiết Kế Tour Cùng WanderAI</span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100 text-sky-700 tracking-wider">
-                  REAL-TIME AI
+
+            {/* Typography Content */}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-200/70 shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-ping" />
+                  WanderAI Engine 3.5
                 </span>
+                <span className="text-[11px] font-medium text-slate-400 hidden sm:inline">
+                  • Phân tích thực địa trực tiếp
+                </span>
+              </div>
+              <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-snug">
+                Kiến Tạo Lịch Trình Thực Địa
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5 font-normal">
-                AI tự động nghiên cứu thực địa theo bất kỳ địa điểm nào bạn nhập.
+              <p className="text-xs text-slate-500 leading-relaxed mt-0.5 font-normal">
+                Tự động tra cứu địa danh, quán ăn có thật & tối ưu hóa lộ trình từng ngày.
               </p>
             </div>
           </div>
 
-          {/* Duy nhất 1 nút X thanh lịch để đóng popup */}
+          {/* Nút đóng X thanh lịch */}
           <button
             type="button"
             onClick={() => setIsAIGeneratorOpen(false)}
-            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-all cursor-pointer"
-            title="Đóng popup"
+            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200/80 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-all cursor-pointer hover:rotate-90 active:scale-95 shrink-0 mt-0.5"
+            title="Đóng (Esc)"
           >
-            <X className="w-4.5 h-4.5" />
+            <X className="w-4 h-4 stroke-[2.5]" />
           </button>
         </div>
 
