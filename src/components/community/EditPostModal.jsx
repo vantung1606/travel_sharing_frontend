@@ -14,10 +14,13 @@ import {
   Globe,
   Trash2,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Flame,
+  Compass
 } from 'lucide-react';
 import { postApi, uploadApi } from '../../services/api';
 import { useToast } from '../common/Toast';
+import { CustomSelect } from '../common/CustomSelect';
 
 export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
   const [title, setTitle] = useState(post.title || '');
@@ -218,16 +221,18 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Chủ đề</label>
-              <select
+              <CustomSelect
                 value={category}
-                onChange={e => setCategory(e.target.value)}
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-              >
-                <option value="Ẩm thực & Check-in">Ẩm thực & Check-in</option>
-                <option value="Phượt & Khám phá">Phượt & Khám phá</option>
-                <option value="Biển đảo & Nghỉ dưỡng">Biển đảo & Nghỉ dưỡng</option>
-                <option value="Văn hóa & Lịch sử">Văn hóa & Lịch sử</option>
-              </select>
+                onChange={setCategory}
+                size="sm"
+                buttonClassName="bg-slate-50 border-slate-200 py-2.5 rounded-xl font-semibold text-xs"
+                options={[
+                  { value: 'Ẩm thực & Check-in', label: 'Ẩm thực & Check-in', icon: MapPin },
+                  { value: 'Phượt & Khám phá', label: 'Phượt & Khám phá', icon: Flame },
+                  { value: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Sparkles },
+                  { value: 'Văn hóa & Lịch sử', label: 'Văn hóa & Lịch sử', icon: Compass }
+                ]}
+              />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Gắn địa điểm</label>

@@ -11,6 +11,7 @@ import { FollowListModal } from '../../../components/community/FollowListModal';
 import { ShareModal } from '../../../components/community/ShareModal';
 import { ReportPostModal } from '../../../components/community/ReportPostModal';
 import { ImageLightboxModal } from '../../../components/community/ImageLightboxModal';
+import { CustomSelect } from '../../../components/common/CustomSelect';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../components/community/MentionSuggestions';
 import {
   AtSign,
@@ -41,6 +42,7 @@ import {
   Eye,
   MoreHorizontal,
   Tag,
+  ChevronLeft,
   ChevronRight,
   Layers,
   ExternalLink,
@@ -247,6 +249,63 @@ export const CommunityPage = () => {
       initialIndex: initialIndex,
       post: post
     });
+  };
+
+  // Topic Filter Bar Drag & Scroll Controls
+  const topicScrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const isDraggingTopics = useRef(false);
+  const startTopicX = useRef(0);
+  const startTopicScrollLeft = useRef(0);
+  const hasDraggedTopics = useRef(false);
+
+  const checkTopicScroll = useCallback(() => {
+    const el = topicScrollRef.current;
+    if (!el) return;
+    const canLeft = el.scrollLeft > 6;
+    const canRight = el.scrollLeft < el.scrollWidth - el.clientWidth - 6;
+    setCanScrollLeft(canLeft);
+    setCanScrollRight(canRight);
+  }, []);
+
+  useEffect(() => {
+    checkTopicScroll();
+    window.addEventListener('resize', checkTopicScroll);
+    return () => window.removeEventListener('resize', checkTopicScroll);
+  }, [checkTopicScroll]);
+
+  const handleTopicScrollLeft = () => {
+    topicScrollRef.current?.scrollBy({ left: -220, behavior: 'smooth' });
+    setTimeout(checkTopicScroll, 300);
+  };
+
+  const handleTopicScrollRight = () => {
+    topicScrollRef.current?.scrollBy({ left: 220, behavior: 'smooth' });
+    setTimeout(checkTopicScroll, 300);
+  };
+
+  const handleTopicMouseDown = (e) => {
+    isDraggingTopics.current = true;
+    startTopicX.current = e.pageX - (topicScrollRef.current?.offsetLeft || 0);
+    startTopicScrollLeft.current = topicScrollRef.current?.scrollLeft || 0;
+    hasDraggedTopics.current = false;
+  };
+
+  const handleTopicMouseMove = (e) => {
+    if (!isDraggingTopics.current || !topicScrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - topicScrollRef.current.offsetLeft;
+    const walk = (x - startTopicX.current) * 1.5;
+    if (Math.abs(walk) > 4) {
+      hasDraggedTopics.current = true;
+    }
+    topicScrollRef.current.scrollLeft = startTopicScrollLeft.current - walk;
+    checkTopicScroll();
+  };
+
+  const handleTopicMouseUpOrLeave = () => {
+    isDraggingTopics.current = false;
   };
 
   // Share Modal State
@@ -1830,53 +1889,93 @@ export const CommunityPage = () => {
               </div>
 
               {/* Sort Selector Dropdown */}
-              <div className="flex items-center gap-1.5 px-3.5 py-2.5 sm:py-3 bg-white border border-slate-200/90 rounded-2xl text-xs font-bold text-slate-700 shadow-xs hover:border-sky-300 transition-all shrink-0">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                <select
+              <div className="w-36 sm:w-44 shrink-0">
+                <CustomSelect
                   value={activeSort}
-                  onChange={e => setActiveSort(e.target.value)}
-                  className="bg-transparent text-xs font-bold text-slate-700 border-none outline-hidden cursor-pointer pr-1"
-                >
-                  <option value="newest">Mới nhất</option>
-                  <option value="popular">Nhiều like nhất</option>
-                  <option value="has_itinerary">Có lịch trình</option>
-                </select>
+                  onChange={setActiveSort}
+                  icon={SlidersHorizontal}
+                  size="sm"
+                  buttonClassName="py-2.5 sm:py-3 font-bold border-slate-200/90 shadow-xs rounded-2xl"
+                  options={[
+                    { value: 'newest', label: 'Mới nhất', badge: 'Mới' },
+                    { value: 'popular', label: 'Nhiều like nhất', badge: 'Hot' },
+                    { value: 'has_itinerary', label: 'Có lịch trình', badge: 'Tour' }
+                  ]}
+                />
               </div>
             </div>
 
-            {/* TIER 2: TOPIC & MEDIA FILTER PILLS */}
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar select-none">
-              {TOPIC_FILTERS.map(topic => {
-                const Icon = topic.icon;
-                const isActive = topicFilter === topic.id;
-                const isVideo = topic.id === 'video';
+            {/* TIER 2: TOPIC & MEDIA FILTER PILLS WITH DRAG-TO-SCROLL & CHEVRONS */}
+            <div className="relative group/topicbar w-full min-w-0">
+              {/* Left Navigation Chevron Button */}
+              {canScrollLeft && (
+                <button
+                  type="button"
+                  onClick={handleTopicScrollLeft}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 hover:text-sky-600 shadow-md border border-slate-200/80 flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs active:scale-95"
+                  title="Cuộn sang trái"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+              )}
 
-                return (
-                  <button
-                    key={topic.id}
-                    onClick={() => setTopicFilter(topic.id)}
-                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs transition-all shrink-0 cursor-pointer ${
-                      isActive
-                        ? isVideo
-                          ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white shadow-md shadow-rose-600/25 font-extrabold'
-                          : 'bg-sky-600 text-white shadow-md shadow-sky-600/25 font-extrabold'
-                        : isVideo
-                        ? 'bg-white text-rose-700 border border-rose-200 hover:bg-rose-50 shadow-2xs font-bold'
-                        : 'bg-white text-slate-700 border border-slate-200/90 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 shadow-2xs font-semibold'
-                    }`}
-                  >
-                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : isVideo ? 'text-rose-500' : 'text-slate-400'}`} />
-                    <span>{topic.label}</span>
-                    {topic.badge && (
-                      <span className={`text-[9px] px-1.5 py-0.2 rounded-md font-black uppercase ${
-                        isActive ? 'bg-white/30 text-white' : 'bg-slate-100 text-slate-600'
-                      }`}>
-                        {topic.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+              {/* Scrollable Container with Drag Support */}
+              <div
+                ref={topicScrollRef}
+                onScroll={checkTopicScroll}
+                onMouseDown={handleTopicMouseDown}
+                onMouseMove={handleTopicMouseMove}
+                onMouseUp={handleTopicMouseUpOrLeave}
+                onMouseLeave={handleTopicMouseUpOrLeave}
+                className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar select-none cursor-grab active:cursor-grabbing scroll-smooth px-0.5"
+              >
+                {TOPIC_FILTERS.map(topic => {
+                  const Icon = topic.icon;
+                  const isActive = topicFilter === topic.id;
+                  const isVideo = topic.id === 'video';
+
+                  return (
+                    <button
+                      key={topic.id}
+                      onClick={() => {
+                        if (hasDraggedTopics.current) return;
+                        setTopicFilter(topic.id);
+                      }}
+                      className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs transition-all shrink-0 cursor-pointer ${
+                        isActive
+                          ? isVideo
+                            ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white shadow-md shadow-rose-600/25 font-extrabold'
+                            : 'bg-sky-600 text-white shadow-md shadow-sky-600/25 font-extrabold'
+                          : isVideo
+                          ? 'bg-white text-rose-700 border border-rose-200 hover:bg-rose-50 shadow-2xs font-bold'
+                          : 'bg-white text-slate-700 border border-slate-200/90 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 shadow-2xs font-semibold'
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : isVideo ? 'text-rose-500' : 'text-slate-400'}`} />
+                      <span>{topic.label}</span>
+                      {topic.badge && (
+                        <span className={`text-[9px] px-1.5 py-0.2 rounded-md font-black uppercase ${
+                          isActive ? 'bg-white/30 text-white' : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          {topic.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Right Navigation Chevron Button */}
+              {canScrollRight && (
+                <button
+                  type="button"
+                  onClick={handleTopicScrollRight}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/95 hover:bg-white text-slate-700 hover:text-sky-600 shadow-md border border-slate-200/80 flex items-center justify-center transition-all cursor-pointer backdrop-blur-xs active:scale-95"
+                  title="Cuộn sang phải"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )}
             </div>
           </div>
 
@@ -2909,16 +3008,18 @@ export const CommunityPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">Chủ đề</label>
-                  <select
+                  <CustomSelect
                     value={postCategory}
-                    onChange={e => setPostCategory(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                  >
-                    <option value="Ẩm thực & Check-in">Ẩm thực & Check-in</option>
-                    <option value="Phượt & Khám phá">Phượt & Khám phá</option>
-                    <option value="Biển đảo & Nghỉ dưỡng">Biển đảo & Nghỉ dưỡng</option>
-                    <option value="Văn hóa & Lịch sử">Văn hóa & Lịch sử</option>
-                  </select>
+                    onChange={setPostCategory}
+                    size="sm"
+                    buttonClassName="bg-slate-50 border-slate-200 py-2.5 rounded-xl font-semibold text-xs"
+                    options={[
+                      { value: 'Ẩm thực & Check-in', label: 'Ẩm thực & Check-in', icon: MapPin },
+                      { value: 'Phượt & Khám phá', label: 'Phượt & Khám phá', icon: Flame },
+                      { value: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Sparkles },
+                      { value: 'Văn hóa & Lịch sử', label: 'Văn hóa & Lịch sử', icon: Compass }
+                    ]}
+                  />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">Gắn địa điểm</label>
@@ -3025,18 +3126,30 @@ export const CommunityPage = () => {
                   )}
                 </div>
 
-                <select
+                <CustomSelect
                   value={attachedItineraryId}
-                  onChange={e => setAttachedItineraryId(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-white border border-sky-200 rounded-xl text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-sky-500/30"
-                >
-                  <option value="">-- Không đính kèm chuyến đi --</option>
-                  {itineraries.map(itin => (
-                    <option key={itin.id} value={itin.id}>
-                      {itin.title} ({itin.destination} - {Number(itin.budgetTotal || 0).toLocaleString('vi-VN')}đ)
-                    </option>
-                  ))}
-                </select>
+                  onChange={setAttachedItineraryId}
+                  placeholder="-- Chọn chuyến đi từ lịch trình của bạn --"
+                  searchable={true}
+                  searchPlaceholder="Tìm kiếm chuyến đi theo tên hoặc địa điểm..."
+                  clearable={true}
+                  onClear={() => setAttachedItineraryId('')}
+                  buttonClassName="bg-white border-sky-200 py-2.5 rounded-xl text-xs font-semibold"
+                  options={[
+                    {
+                      value: '',
+                      label: '-- Không đính kèm chuyến đi --',
+                      description: 'Đăng bài viết chia sẻ thông thường không kèm tour'
+                    },
+                    ...itineraries.map(itin => ({
+                      value: String(itin.id),
+                      label: itin.title,
+                      description: `${itin.destination || 'Việt Nam'} • ${Number(itin.budgetTotal || 0).toLocaleString('vi-VN')} đ`,
+                      image: itin.coverImageUrl,
+                      badge: itin.duration ? `${itin.duration} ngày` : 'Tour'
+                    }))
+                  ]}
+                />
 
                 {selectedTripPreview && (
                   <div className="bg-white p-3 rounded-xl border border-sky-100 flex items-center gap-3 mt-2 shadow-2xs">
