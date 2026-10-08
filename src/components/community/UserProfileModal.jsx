@@ -25,11 +25,13 @@ import {
 import { userApi, postApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 import { PostDetailModal } from './PostDetailModal';
 import { FollowListModal } from './FollowListModal';
 import { ItineraryDetailModal } from '../itinerary/ItineraryDetailModal';
 
 export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
@@ -131,6 +133,20 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
     }
   };
 
+  const handleStartChat = () => {
+    if (!requireAuth(`nhắn tin với ${profile?.fullName || 'tác giả'}`)) return;
+    if (onClose) onClose();
+    const targetId = profile?.id || profile?.userId || userId;
+    const targetName = profile?.fullName || profile?.name || '';
+    const targetAvatar = profile?.avatar || profile?.avatarUrl || '';
+    const params = new URLSearchParams({
+      userId: targetId,
+      name: targetName,
+      avatar: targetAvatar
+    }).toString();
+    navigate(`/messages?${params}`);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl max-w-3xl sm:max-w-4xl w-full shadow-2xl border border-slate-100 max-h-[92vh] flex flex-col overflow-hidden relative animate-in zoom-in-95 duration-200">
@@ -210,29 +226,41 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                       Tài khoản của bạn
                     </span>
                   ) : (
-                    <button
-                      onClick={handleToggleFollow}
-                      disabled={followLoading}
-                      className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-95 ${
-                        profile.isFollowing
-                          ? 'bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-200'
-                          : 'bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white shadow-md shadow-sky-500/20'
-                      }`}
-                    >
-                      {followLoading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : profile.isFollowing ? (
-                        <>
-                          <UserCheck className="w-4 h-4 text-sky-600" />
-                          <span>Đang theo dõi</span>
-                        </>
-                      ) : (
-                        <>
-                          <UserPlus className="w-4 h-4" />
-                          <span>Theo dõi</span>
-                        </>
-                      )}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleToggleFollow}
+                        disabled={followLoading}
+                        className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm active:scale-95 ${
+                          profile.isFollowing
+                            ? 'bg-slate-100 hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-200'
+                            : 'bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white shadow-md shadow-sky-500/20'
+                        }`}
+                      >
+                        {followLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : profile.isFollowing ? (
+                          <>
+                            <UserCheck className="w-4 h-4 text-sky-600" />
+                            <span>Đang theo dõi</span>
+                          </>
+                        ) : (
+                          <>
+                            <UserPlus className="w-4 h-4" />
+                            <span>Theo dõi</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleStartChat}
+                        className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold bg-white hover:bg-sky-50 text-sky-700 border border-sky-200 hover:border-sky-300 transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs active:scale-95"
+                        title={`Gửi tin nhắn trực tiếp cho ${profile?.fullName || 'thành viên này'}`}
+                      >
+                        <MessageCircle className="w-4 h-4 text-sky-600" />
+                        <span>Nhắn tin</span>
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

@@ -28,8 +28,10 @@ import {
   Copy,
   Flag,
   Trash2,
-  AtSign
+  AtSign,
+  MessageSquare
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { postApi, userApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';
@@ -87,6 +89,19 @@ export const PostDetailModal = ({
 
   const effectivePostId = post?.id || postId;
   const effectiveAuthorId = post?.authorId || post?.author?.id;
+
+  const navigate = useNavigate();
+
+  const handleStartChatWithAuthor = () => {
+    if (!requireAuth(`nhắn tin với ${authorName}`)) return;
+    if (typeof onClose === 'function') onClose();
+    const params = new URLSearchParams({
+      userId: effectiveAuthorId,
+      name: authorName,
+      avatar: authorAvatar
+    }).toString();
+    navigate(`/messages?${params}`);
+  };
 
   // Click outside to close post menu
   useEffect(() => {
@@ -523,30 +538,42 @@ export const PostDetailModal = ({
                     Bạn
                   </span>
                 ) : effectiveAuthorId ? (
-                  <button
-                    onClick={handleToggleFollowAuthor}
-                    disabled={followLoading}
-                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs ${
-                      isFollowingAuthor
-                        ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 border border-slate-200'
-                        : 'ocean-gradient text-white hover:opacity-95 shadow-sky-500/20'
-                    }`}
-                    title={isFollowingAuthor ? 'Hủy theo dõi tác giả' : 'Theo dõi tác giả'}
-                  >
-                    {followLoading ? (
-                      <Loader2 className="w-3 h-3 animate-spin" />
-                    ) : isFollowingAuthor ? (
-                      <>
-                        <UserCheck className="w-3 h-3 text-sky-600" />
-                        <span>Đang theo dõi</span>
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="w-3 h-3" />
-                        <span>Theo dõi</span>
-                      </>
-                    )}
-                  </button>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      onClick={handleToggleFollowAuthor}
+                      disabled={followLoading}
+                      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer shrink-0 shadow-2xs ${
+                        isFollowingAuthor
+                          ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 border border-slate-200'
+                          : 'ocean-gradient text-white hover:opacity-95 shadow-sky-500/20'
+                      }`}
+                      title={isFollowingAuthor ? 'Hủy theo dõi tác giả' : 'Theo dõi tác giả'}
+                    >
+                      {followLoading ? (
+                        <Loader2 className="w-3 h-3 animate-spin" />
+                      ) : isFollowingAuthor ? (
+                        <>
+                          <UserCheck className="w-3 h-3 text-sky-600" />
+                          <span>Đang theo dõi</span>
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="w-3 h-3" />
+                          <span>Theo dõi</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleStartChatWithAuthor}
+                      className="px-2.5 py-0.5 rounded-full text-[10px] font-bold transition-all flex items-center gap-1 cursor-pointer shrink-0 bg-white hover:bg-sky-50 text-sky-700 border border-sky-200 hover:border-sky-300 shadow-2xs active:scale-95"
+                      title={`Nhắn tin trực tiếp với ${authorName}`}
+                    >
+                      <MessageSquare className="w-3 h-3 text-sky-600" />
+                      <span>Nhắn tin</span>
+                    </button>
+                  </div>
                 ) : null}
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">

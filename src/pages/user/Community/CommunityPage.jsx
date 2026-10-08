@@ -13,10 +13,12 @@ import { ReportPostModal } from '../../../components/community/ReportPostModal';
 import { ImageLightboxModal } from '../../../components/community/ImageLightboxModal';
 import { CustomSelect } from '../../../components/common/CustomSelect';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../components/community/MentionSuggestions';
+import { useNavigate } from 'react-router-dom';
 import {
   AtSign,
   Heart,
   MessageCircle,
+  MessageSquare,
   Share2,
   Bookmark,
   MapPin,
@@ -195,6 +197,21 @@ export const CommunityPage = () => {
       return false;
     }
     return true;
+  };
+
+  const navigate = useNavigate();
+
+  // Handle navigating to direct chat with post author
+  const handleDirectMessage = (author) => {
+    if (!requireAuth(`nhắn tin với ${author?.name || 'tác giả'}`)) return;
+    const targetId = author?.id || author?.userId;
+    if (!targetId) return;
+    const params = new URLSearchParams({
+      userId: targetId,
+      name: author?.name || author?.fullName || '',
+      avatar: author?.avatar || author?.avatarUrl || ''
+    }).toString();
+    navigate(`/messages?${params}`);
   };
 
   // Feed State
@@ -2289,6 +2306,18 @@ export const CommunityPage = () => {
                               </>
                             ) : (
                               <>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setOpenMenuPostId(null);
+                                    handleDirectMessage(post.author);
+                                  }}
+                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2 cursor-pointer"
+                                >
+                                  <MessageSquare className="w-3.5 h-3.5 text-sky-600" />
+                                  <span>Nhắn tin cho {post.author?.name || 'tác giả'}</span>
+                                </button>
                                 <button
                                   type="button"
                                   onClick={(e) => {
