@@ -35,6 +35,7 @@ import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';
 import { ShareModal } from './ShareModal';
 import { ReportPostModal } from './ReportPostModal';
+import { ImageLightboxModal } from './ImageLightboxModal';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from './MentionSuggestions';
 
 export const PostDetailModal = ({
@@ -817,8 +818,18 @@ export const PostDetailModal = ({
                       <img
                         src={images[activeImageIndex]}
                         alt={`Ảnh ${activeImageIndex + 1}`}
-                        className="w-full max-h-[460px] object-contain mx-auto transition-transform duration-300"
+                        onClick={() => setIsLightboxOpen(true)}
+                        className="w-full max-h-[460px] object-contain mx-auto transition-transform duration-300 cursor-zoom-in hover:scale-[1.01]"
+                        title="Bấm để xem ảnh phóng to toàn màn hình"
                       />
+                      <button
+                        onClick={() => setIsLightboxOpen(true)}
+                        className="absolute top-3 right-3 px-3 py-1.5 rounded-xl bg-black/60 hover:bg-black/85 text-white backdrop-blur-xs transition-all cursor-pointer opacity-85 group-hover:opacity-100 flex items-center gap-1.5 text-xs font-semibold shadow-md"
+                        title="Xem toàn màn hình"
+                      >
+                        <Maximize2 className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Phóng to</span>
+                      </button>
                       {images.length > 1 && (
                         <>
                           <button
@@ -1263,6 +1274,17 @@ export const PostDetailModal = ({
               onClose();
             }
           }}
+        />
+      )}
+
+      {/* Fullscreen Photo Lightbox Modal */}
+      {isLightboxOpen && post && (
+        <ImageLightboxModal
+          isOpen={isLightboxOpen}
+          images={images}
+          initialIndex={activeImageIndex}
+          post={post}
+          onClose={() => setIsLightboxOpen(false)}
         />
       )}
     </div>

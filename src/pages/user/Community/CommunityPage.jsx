@@ -10,6 +10,7 @@ import { PostDetailModal } from '../../../components/community/PostDetailModal';
 import { FollowListModal } from '../../../components/community/FollowListModal';
 import { ShareModal } from '../../../components/community/ShareModal';
 import { ReportPostModal } from '../../../components/community/ReportPostModal';
+import { ImageLightboxModal } from '../../../components/community/ImageLightboxModal';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../components/community/MentionSuggestions';
 import {
   AtSign,
@@ -228,6 +229,25 @@ export const CommunityPage = () => {
 
   // Single Post Detail Modal State
   const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
+
+  // Fullscreen Photo Lightbox State
+  const [lightboxState, setLightboxState] = useState({
+    isOpen: false,
+    images: [],
+    initialIndex: 0,
+    post: null
+  });
+
+  const handleOpenLightbox = (post, initialIndex = 0, e = null) => {
+    if (e) e.stopPropagation();
+    if (!post?.images || post.images.length === 0) return;
+    setLightboxState({
+      isOpen: true,
+      images: post.images,
+      initialIndex: initialIndex,
+      post: post
+    });
+  };
 
   // Share Modal State
   const [sharingPost, setSharingPost] = useState(null);
@@ -2325,7 +2345,8 @@ export const CommunityPage = () => {
                               <img
                                 src={post.sharedPost.images[0]}
                                 alt="Shared post"
-                                className="w-full max-h-80 object-cover"
+                                onClick={(e) => handleOpenLightbox(post.sharedPost, 0, e)}
+                                className="w-full max-h-80 object-cover cursor-pointer hover:scale-[1.01] transition-transform"
                               />
                             ) : (
                               <div className="grid grid-cols-2 gap-1 max-h-72 overflow-hidden">
@@ -2334,7 +2355,8 @@ export const CommunityPage = () => {
                                     key={idx}
                                     src={img}
                                     alt={`Shared post ${idx}`}
-                                    className="w-full h-44 sm:h-52 object-cover"
+                                    onClick={(e) => handleOpenLightbox(post.sharedPost, idx, e)}
+                                    className="w-full h-44 sm:h-52 object-cover cursor-pointer hover:scale-105 transition-transform"
                                   />
                                 ))}
                               </div>
@@ -2402,14 +2424,14 @@ export const CommunityPage = () => {
                       {/* Post Photos Display */}
                       {post.images && post.images.length > 0 && (
                         <div
-                          onClick={() => setSelectedPostForDetail(post)}
                           className="rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 cursor-pointer"
-                          title="Bấm để xem ảnh và chi tiết bài viết"
+                          title="Bấm vào ảnh để phóng to toàn màn hình"
                         >
                           {post.images.length === 1 ? (
                             <img
                               src={post.images[0]}
                               alt="Post photo"
+                              onClick={(e) => handleOpenLightbox(post, 0, e)}
                               className="w-full max-h-96 object-cover hover:scale-[1.01] transition-transform duration-300"
                             />
                           ) : post.images.length === 2 ? (
@@ -2419,33 +2441,41 @@ export const CommunityPage = () => {
                                   key={i}
                                   src={img}
                                   alt={`Post photo ${i}`}
+                                  onClick={(e) => handleOpenLightbox(post, i, e)}
                                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                 />
                               ))}
                             </div>
                           ) : (
                             <div className="grid grid-cols-12 gap-1.5 h-72 sm:h-84">
-                              <div className="col-span-8 h-full">
+                              <div className="col-span-8 h-full overflow-hidden">
                                 <img
                                   src={post.images[0]}
                                   alt="Post photo 1"
+                                  onClick={(e) => handleOpenLightbox(post, 0, e)}
                                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                 />
                               </div>
                               <div className="col-span-4 grid grid-rows-2 gap-1.5 h-full">
-                                <img
-                                  src={post.images[1]}
-                                  alt="Post photo 2"
-                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                />
-                                <div className="relative h-full">
+                                <div className="h-full overflow-hidden">
+                                  <img
+                                    src={post.images[1]}
+                                    alt="Post photo 2"
+                                    onClick={(e) => handleOpenLightbox(post, 1, e)}
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                  />
+                                </div>
+                                <div
+                                  className="relative h-full overflow-hidden"
+                                  onClick={(e) => handleOpenLightbox(post, 2, e)}
+                                >
                                   <img
                                     src={post.images[2]}
                                     alt="Post photo 3"
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                   />
                                   {post.images.length > 3 && (
-                                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center text-white text-xs font-bold">
+                                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center text-white text-xs font-bold hover:bg-slate-900/70 transition-colors">
                                       +{post.images.length - 3} ảnh
                                     </div>
                                   )}
@@ -3658,6 +3688,20 @@ export const CommunityPage = () => {
               setHiddenPostIds(prev => new Set(prev).add(Number(postToReport.id)));
             }
           }}
+        />
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 10: FULLSCREEN PHOTO LIGHTBOX MODAL                 */}
+      {/* ========================================================= */}
+      {lightboxState.isOpen && (
+        <ImageLightboxModal
+          isOpen={lightboxState.isOpen}
+          images={lightboxState.images}
+          initialIndex={lightboxState.initialIndex}
+          post={lightboxState.post}
+          onClose={() => setLightboxState(prev => ({ ...prev, isOpen: false }))}
+          onOpenPostDetail={(targetPost) => setSelectedPostForDetail(targetPost)}
         />
       )}
 
