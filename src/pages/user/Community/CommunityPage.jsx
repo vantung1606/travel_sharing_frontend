@@ -1563,7 +1563,7 @@ export const CommunityPage = () => {
                   action: () => setActiveSort(activeSort === 'popular' ? 'newest' : 'popular')
                 },
                 {
-                  label: `Bài viết đã lưu (${bookmarkedPostIds.size})`,
+                  label: 'Bài viết đã lưu',
                   icon: Bookmark,
                   active: feedScope === 'saved',
                   action: () => {
@@ -1830,11 +1830,6 @@ export const CommunityPage = () => {
               {FEED_SCOPES.map(scope => {
                 const Icon = scope.icon;
                 const isActive = feedScope === scope.id;
-                const badgeCount = scope.id === 'following'
-                  ? followingIds.size
-                  : scope.id === 'saved'
-                  ? bookmarkedPostIds.size
-                  : null;
 
                 return (
                   <button
@@ -1854,13 +1849,6 @@ export const CommunityPage = () => {
                   >
                     <Icon className={`w-4 h-4 ${isActive ? 'text-sky-600' : 'text-slate-400'}`} />
                     <span className="truncate">{scope.label}</span>
-                    {badgeCount !== null && badgeCount > 0 && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
-                        isActive ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'bg-slate-200/80 text-slate-600'
-                      }`}>
-                        {badgeCount}
-                      </span>
-                    )}
                   </button>
                 );
               })}
