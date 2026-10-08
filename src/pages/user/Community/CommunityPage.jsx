@@ -206,7 +206,6 @@ export const CommunityPage = () => {
   const [postVisibility, setPostVisibility] = useState('PUBLIC');
   const [postImagesList, setPostImagesList] = useState([]);
   const [postVideoUrl, setPostVideoUrl] = useState('');
-  const [customImageUrl, setCustomImageUrl] = useState('');
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [attachedItineraryId, setAttachedItineraryId] = useState('');
   const [submittingPost, setSubmittingPost] = useState(false);
@@ -1027,18 +1026,6 @@ export const CommunityPage = () => {
     }
   };
 
-  const handleAddCustomImageUrlForCreate = () => {
-    if (!customImageUrl.trim()) return;
-    if (customImageUrl.match(/\.(mp4|webm|mov|mkv)$/i)) {
-      setPostVideoUrl(customImageUrl.trim());
-      toast.showInfo('Đã gán đường dẫn Video!');
-    } else {
-      setPostImagesList(prev => [...prev, customImageUrl.trim()]);
-      toast.showSuccess('Đã thêm ảnh vào bài viết!');
-    }
-    setCustomImageUrl('');
-  };
-
   const handleRemoveCreateImage = (indexToRemove) => {
     setPostImagesList(prev => prev.filter((_, idx) => idx !== indexToRemove));
   };
@@ -1149,7 +1136,6 @@ export const CommunityPage = () => {
       setPostVisibility('PUBLIC');
       setPostImagesList([]);
       setPostVideoUrl('');
-      setCustomImageUrl('');
       setAttachedItineraryId('');
       setTaggedUsersInPost([]);
       setPostMentionState({ isOpen: false, query: '', cursorIndex: -1 });
@@ -2968,31 +2954,24 @@ export const CommunityPage = () => {
                 )}
               </div>
 
-              {/* MEDIA SECTION: DEVICE UPLOAD + URL */}
-              <div className="space-y-2 p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
+              {/* MEDIA SECTION: CLOUDINARY UPLOAD */}
+              <div className="space-y-3 p-3.5 bg-slate-50/80 rounded-2xl border border-slate-100">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <ImageIcon className="w-4 h-4 text-sky-600" />
-                    <span>Hình ảnh & Video ({postImagesList.length} ảnh{postVideoUrl ? ', 1 video' : ''})</span>
+                    <span>Ảnh & Video ({postImagesList.length} ảnh{postVideoUrl ? ', 1 video' : ''})</span>
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => createFileInputRef.current?.click()}
-                    disabled={uploadingMedia}
-                    className="px-3 py-1.5 rounded-xl bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer disabled:opacity-50"
-                  >
-                    {uploadingMedia ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Đang tải lên...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="w-3.5 h-3.5" />
-                        <span>Tải từ thiết bị</span>
-                      </>
-                    )}
-                  </button>
+                  {(postImagesList.length > 0 || postVideoUrl) && (
+                    <button
+                      type="button"
+                      onClick={() => createFileInputRef.current?.click()}
+                      disabled={uploadingMedia}
+                      className="px-2.5 py-1 rounded-lg bg-white border border-sky-200 text-sky-700 hover:bg-sky-50 text-[11px] font-bold transition-all flex items-center gap-1 shadow-2xs cursor-pointer disabled:opacity-50"
+                    >
+                      <Upload className="w-3 h-3" />
+                      <span>Thêm tệp</span>
+                    </button>
+                  )}
                   <input
                     ref={createFileInputRef}
                     type="file"
@@ -3003,50 +2982,64 @@ export const CommunityPage = () => {
                   />
                 </div>
 
-                {/* Custom URL Input */}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Hoặc dán URL ảnh / video..."
-                    value={customImageUrl}
-                    onChange={e => setCustomImageUrl(e.target.value)}
-                    className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 font-mono"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddCustomImageUrlForCreate}
-                    className="px-3 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                {/* Upload Status Banner */}
+                {uploadingMedia && (
+                  <div className="flex items-center gap-2.5 px-3 py-2 bg-sky-50 border border-sky-200 rounded-xl text-xs text-sky-700 font-semibold animate-pulse">
+                    <Loader2 className="w-4 h-4 animate-spin text-sky-600 shrink-0" />
+                    <span>Đang tải và tối ưu ảnh / video qua Cloudinary CDN...</span>
+                  </div>
+                )}
+
+                {/* Empty State: Dropzone button */}
+                {postImagesList.length === 0 && !postVideoUrl && !uploadingMedia && (
+                  <div
+                    onClick={() => createFileInputRef.current?.click()}
+                    className="border-2 border-dashed border-slate-200 hover:border-sky-400 bg-white hover:bg-sky-50/40 rounded-xl p-4 text-center cursor-pointer transition-all group"
                   >
-                    Thêm
-                  </button>
-                </div>
+                    <div className="w-10 h-10 mx-auto rounded-full bg-sky-100/70 group-hover:bg-sky-100 text-sky-600 flex items-center justify-center mb-2 transition-transform group-hover:scale-110">
+                      <Upload className="w-5 h-5" />
+                    </div>
+                    <p className="text-xs font-bold text-slate-700 group-hover:text-sky-700">
+                      Tải ảnh hoặc video thước phim từ thiết bị
+                    </p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Hỗ trợ chọn nhiều ảnh (JPG, PNG, WEBP) và video (MP4, MOV) • Tối ưu tự động trên Cloudinary
+                    </p>
+                  </div>
+                )}
 
                 {/* Thumbnails preview */}
                 {(postImagesList.length > 0 || postVideoUrl) && (
-                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 pt-2">
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 pt-1">
                     {postImagesList.map((img, idx) => (
-                      <div key={idx} className="relative group rounded-xl overflow-hidden aspect-square border border-slate-200 bg-white">
+                      <div key={idx} className="relative group rounded-xl overflow-hidden aspect-square border border-slate-200 bg-white shadow-2xs">
                         <img src={img} alt="thumb" className="w-full h-full object-cover" />
+                        {idx === 0 && (
+                          <span className="absolute bottom-1 left-1 px-1.5 py-0.5 rounded-md bg-sky-600/90 backdrop-blur-xs text-white text-[9px] font-extrabold shadow-xs">
+                            Ảnh bìa
+                          </span>
+                        )}
                         <button
                           type="button"
                           onClick={() => handleRemoveCreateImage(idx)}
-                          className="absolute top-1 right-1 w-6 h-6 rounded-full bg-rose-600/90 text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-700 cursor-pointer"
+                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-700 cursor-pointer shadow-xs"
                           title="Xóa ảnh"
                         >
-                          <X className="w-3.5 h-3.5" />
+                          <X className="w-3 h-3" />
                         </button>
                       </div>
                     ))}
                     {postVideoUrl && (
-                      <div className="relative group rounded-xl overflow-hidden aspect-square border border-sky-300 bg-slate-900 flex items-center justify-center text-white">
-                        <Video className="w-6 h-6 text-sky-400" />
+                      <div className="relative group rounded-xl overflow-hidden aspect-square border border-sky-300 bg-slate-900 flex flex-col items-center justify-center text-white shadow-2xs">
+                        <Video className="w-6 h-6 text-sky-400 mb-1" />
+                        <span className="text-[9px] font-bold text-slate-300 bg-slate-800/80 px-1 rounded">Video</span>
                         <button
                           type="button"
                           onClick={handleRemoveCreateVideo}
-                          className="absolute top-1 right-1 w-6 h-6 rounded-full bg-rose-600/90 text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-700 cursor-pointer"
+                          className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-600 text-white flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-700 cursor-pointer shadow-xs"
                           title="Xóa video"
                         >
-                          <X className="w-3.5 h-3.5" />
+                          <X className="w-3 h-3" />
                         </button>
                       </div>
                     )}
@@ -3065,10 +3058,15 @@ export const CommunityPage = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={submittingPost}
+                  disabled={submittingPost || uploadingMedia}
                   className="bg-sky-600 hover:bg-sky-700 text-white px-6 py-2.5 rounded-xl text-xs font-extrabold shadow-md shadow-sky-600/25 hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
-                  {submittingPost ? (
+                  {uploadingMedia ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Đang tải tệp...</span>
+                    </>
+                  ) : submittingPost ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
                       <span>Đang xuất bản...</span>
@@ -3076,7 +3074,7 @@ export const CommunityPage = () => {
                   ) : (
                     <>
                       <Send className="w-4 h-4" />
-                      <span>Đăng bài viết</span>
+                      <span>Đăng bài viết 🚀</span>
                     </>
                   )}
                 </button>
