@@ -194,6 +194,80 @@ export const itineraryApi = {
     }
   },
 
+  async createItinerary(payload, email) {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || 'tung@gmail.com';
+    const response = await fetch(`${BASE_URL}/itineraries?email=${encodeURIComponent(userEmail)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    const res = await response.json();
+    return res.data;
+  },
+
+  async getItineraryById(id, email) {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || 'tung@gmail.com';
+    const response = await fetch(`${BASE_URL}/itineraries/${id}?email=${encodeURIComponent(userEmail)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    const res = await response.json();
+    return res.data;
+  },
+
+  async updateItinerary(id, payload, email) {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || 'tung@gmail.com';
+    const response = await fetch(`${BASE_URL}/itineraries/${id}?email=${encodeURIComponent(userEmail)}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    const res = await response.json();
+    return res.data;
+  },
+
+  async deleteItinerary(id, email) {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user.email || 'tung@gmail.com';
+    const response = await fetch(`${BASE_URL}/itineraries/${id}?email=${encodeURIComponent(userEmail)}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    const res = await response.json();
+    return res.data;
+  },
+
   async cloneItinerary(id, email) {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
     const userEmail = email || user.email || 'tung@gmail.com';

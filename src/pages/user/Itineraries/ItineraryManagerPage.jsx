@@ -50,7 +50,10 @@ export const ItineraryManagerPage = () => {
     activeViewingItinerary,
     setActiveViewingItinerary,
     aiGeneratingStatus,
-    setAiGeneratingStatus
+    setAiGeneratingStatus,
+    fetchItineraries,
+    createManualItinerary,
+    deleteItineraryFromBackend
   } = useApp();
   const toast = useToast();
 
@@ -165,17 +168,21 @@ export const ItineraryManagerPage = () => {
   };
 
   // Handle Delete Trip
-  const handleDeleteItinerary = (itinId, itinTitle, e) => {
+  const handleDeleteItinerary = async (itinId, itinTitle, e) => {
     e.stopPropagation();
     if (!requireAuth('xóa lịch trình')) return;
     if (window.confirm(`Bạn có chắc chắn muốn xóa lịch trình "${itinTitle}" không?`)) {
-      setItineraries(prev => prev.filter(item => item.id !== itinId));
+      if (deleteItineraryFromBackend) {
+        await deleteItineraryFromBackend(itinId);
+      } else {
+        setItineraries(prev => prev.filter(item => item.id !== itinId));
+      }
       toast.showSuccess(`Đã xóa chuyến đi "${itinTitle}" thành công.`);
     }
   };
 
   // Handle Manual Trip Creation
-  const handleCreateManualTrip = (e) => {
+  const handleCreateManualTrip = async (e) => {
     e.preventDefault();
     if (!requireAuth('tạo chuyến đi mới')) return;
     if (!manualTitle.trim() || !manualDest.trim()) {
@@ -208,7 +215,7 @@ export const ItineraryManagerPage = () => {
       budgetPerPerson: Math.round(Number(manualBudget) / (manualGroup.includes('Nhóm') ? 4 : manualGroup.includes('Cặp đôi') ? 2 : 1)),
       totalBudget: Number(manualBudget),
       budgetProgress: 25,
-      budgetNote: `Ngân sách tự lập: ${Number(manualBudget).toLocaleString('vi-VN')}đ`,
+      budgetNote: `Dự toán: ~${Number(manualBudget).toLocaleString('vi-VN')}đ`,
       pace: 'Tự do',
       style: 'Lịch trình tự thiết kế',
       aiTipNote: manualNote || 'Lịch trình thủ công do bạn tự tạo và quản lý trên Wayfare.',
@@ -224,7 +231,6 @@ export const ItineraryManagerPage = () => {
       }))
     };
 
-    setItineraries(prev => [newTrip, ...prev]);
     setIsManualCreateOpen(false);
     setSelectedItinerary(newTrip);
     toast.showSuccess(`Đã tạo thành công chuyến đi mới: ${newTrip.title}! 🎉`);
@@ -233,6 +239,13 @@ export const ItineraryManagerPage = () => {
     setManualDest('');
     setManualPlaces('');
     setManualNote('');
+
+    // Persist to MySQL backend database
+    if (createManualItinerary) {
+      await createManualItinerary(newTrip);
+    } else {
+      setItineraries(prev => [newTrip, ...prev]);
+    }
   };
 
   return (
@@ -395,13 +408,13 @@ export const ItineraryManagerPage = () => {
               <DollarSign className="w-7 h-7" />
             </div>
             <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Ngân Sách Tích Lũy</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tổng Dự Toán Chi Phí</p>
               <div className="flex items-baseline gap-2 mt-1">
                 <span className="text-xl sm:text-2xl font-extrabold text-sky-700">
                   {((itineraries || []).reduce((acc, curr) => acc + (curr.totalBudget || (curr.budgetPerPerson ? curr.budgetPerPerson * 2 : 4000000)), 0) / 1000000).toFixed(1)}M
                 </span>
                 <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-sky-50 text-sky-700">
-                  Tối ưu chi phí
+                  Ước tính
                 </span>
               </div>
             </div>
@@ -684,26 +697,18 @@ export const ItineraryManagerPage = () => {
                       </div>
                     )}
 
-                    {/* Budget Progress Bar */}
-                    <div className="mt-auto pt-4 border-t border-slate-100 space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-400 font-medium">Ngân sách dự kiến:</span>
+                    {/* Simplified Budget Estimate */}
+                    <div className="mt-auto pt-3.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1.5 text-slate-500">
+                        <DollarSign className="w-4 h-4 text-emerald-600" />
+                        <span className="font-semibold text-slate-600">Dự toán chi phí:</span>
+                      </div>
+                      <div className="text-right">
                         <span className="font-extrabold text-sky-700 text-sm">
-                          {itin.budgetPerPerson ? `${itin.budgetPerPerson.toLocaleString('vi-VN')}đ` : '3.500.000đ'}
-                          <span className="font-normal text-[11px] text-slate-400 ml-1">/người</span>
+                          {itin.budgetPerPerson ? `${itin.budgetPerPerson.toLocaleString('vi-VN')}đ` : (itin.totalBudget ? `${itin.totalBudget.toLocaleString('vi-VN')}đ` : '3.500.000đ')}
                         </span>
+                        <span className="font-normal text-[11px] text-slate-400 ml-1">/người</span>
                       </div>
-
-                      <div className="w-full h-2 rounded-full bg-slate-100 overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-sky-500 to-indigo-500 rounded-full"
-                          style={{ width: `${itin.budgetProgress || 45}%` }}
-                        ></div>
-                      </div>
-
-                      {itin.budgetNote && (
-                        <p className="text-[10px] text-slate-400 text-right truncate">{itin.budgetNote}</p>
-                      )}
                     </div>
 
                     {/* Action Buttons */}

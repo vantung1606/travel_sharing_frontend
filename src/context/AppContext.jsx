@@ -9,7 +9,7 @@ import {
   INITIAL_USER_LIST,
   INITIAL_REPORTS
 } from '../mock/data';
-import { notificationApi, userApi, placeApi, INITIAL_MOCK_NOTIFICATIONS } from '../services/api';
+import { notificationApi, userApi, placeApi, itineraryApi, INITIAL_MOCK_NOTIFICATIONS } from '../services/api';
 
 const DEFAULT_APP_STATE = {
   portalMode: 'user',
@@ -431,6 +431,152 @@ export const AppProvider = ({ children }) => {
 
   const unreadNotificationsCount = notifications.filter(n => !n.isRead).length;
 
+  // ─── ITINERARY PERSISTENCE & SYNC WITH MYSQL BACKEND ─────────────────────────
+  const mapBackendItineraryToFrontend = useCallback((item) => {
+    if (!item) return null;
+    const places = (item.details || []).map(d => d.locationName).filter(Boolean);
+    const dayNumbers = (item.details || []).map(d => d.dayNumber).filter(Boolean);
+    const daysCount = dayNumbers.length > 0 ? Math.max(...dayNumbers, 1) : 3;
+
+    // Group activities by day
+    const dayMap = {};
+    (item.details || []).forEach(d => {
+      const dayNum = d.dayNumber || 1;
+      if (!dayMap[dayNum]) {
+        dayMap[dayNum] = {
+          dayNumber: dayNum,
+          title: `Ngày ${dayNum}: Khám phá ${item.destination || 'Điểm đến'}`,
+          activities: []
+        };
+      }
+      dayMap[dayNum].activities.push({
+        id: d.id,
+        time: d.startTime ? d.startTime.substring(0, 5) : '08:30',
+        title: d.locationName || 'Điểm tham quan',
+        location: d.locationName || item.destination,
+        address: d.locationAddress || `${item.destination || 'Việt Nam'}`,
+        category: d.category || 'Khám phá',
+        note: d.note || d.transitInfo || 'Trải nghiệm du lịch bản địa',
+        aiTip: d.aiTip || '',
+        cost: d.estimatedCost ? `${Number(d.estimatedCost).toLocaleString('vi-VN')}đ` : 'Tùy chọn'
+      });
+    });
+
+    const days = Object.values(dayMap).sort((a, b) => a.dayNumber - b.dayNumber);
+
+    return {
+      id: item.id,
+      title: item.title,
+      destination: item.destination,
+      region: item.destination || 'Điểm đến du lịch',
+      coverImage: item.coverImageUrl || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
+      duration: `${daysCount}N${Math.max(1, daysCount - 1)}Đ`,
+      daysCount: daysCount,
+      status: (item.status || 'ACTIVE').toLowerCase() === 'active' ? 'upcoming' : (item.status || 'upcoming').toLowerCase(),
+      isAiGenerated: Boolean(item.isAiGenerated),
+      countdown: item.startDate ? `Khởi hành ${item.startDate}` : 'Sắp khởi hành',
+      departureDate: item.startDate ? `${item.startDate}${item.endDate ? ' – ' + item.endDate : ''}` : 'Khởi hành trong tháng tới',
+      groupType: 'Nhóm bạn / Cặp đôi',
+      placesCount: places.length > 0 ? places.length : (daysCount * 3),
+      placesList: places.length > 0 ? places : [item.destination + ' City Tour'],
+      budgetPerPerson: item.budgetTotal ? Math.round(Number(item.budgetTotal) / 2) : 3500000,
+      totalBudget: item.budgetTotal ? Number(item.budgetTotal) : 7000000,
+      budgetProgress: 35,
+      budgetNote: `Dự toán: ~${Number(item.budgetTotal || 5000000).toLocaleString('vi-VN')}đ`,
+      pace: 'Cân bằng',
+      style: 'Trải nghiệm tổng hợp',
+      aiTipNote: 'Lịch trình được lưu trữ trên hệ thống máy chủ Wayfare.',
+      days: days.length > 0 ? days : [
+        {
+          dayNumber: 1,
+          title: `Ngày 1: Khám phá điểm nhấn ${item.destination || 'Việt Nam'}`,
+          activities: [
+            { time: '08:30', title: `Bắt đầu lịch trình tại ${item.destination}`, note: 'Khởi hành khám phá', cost: '150.000đ' },
+            { time: '14:00', title: 'Tham quan điểm check-in nổi bật', note: 'Trải nghiệm danh lam thắng cảnh', cost: 'Tùy chọn' },
+            { time: '18:30', title: 'Thưởng thức ẩm thực và dạo phố đêm', note: 'Không khí về đêm rực rỡ', cost: '200.000đ' }
+          ]
+        }
+      ]
+    };
+  }, []);
+
+  const fetchItineraries = useCallback(async (email) => {
+    try {
+      const activeEmail = email || currentUser?.email || 'admin@gmail.com';
+      const data = await itineraryApi.getMyItineraries(activeEmail);
+      if (data && data.length > 0) {
+        const mapped = data.map(mapBackendItineraryToFrontend).filter(Boolean);
+        const existingIds = new Set(mapped.map(m => String(m.id)));
+        const nonDuplicateInitials = INITIAL_ITINERARIES.filter(i => !existingIds.has(String(i.id)));
+        setItineraries([...mapped, ...nonDuplicateInitials]);
+      }
+    } catch (err) {
+      console.warn('Failed to fetch itineraries from backend:', err);
+    }
+  }, [currentUser?.email, mapBackendItineraryToFrontend]);
+
+  // Sync itineraries on mount and when user session changes
+  useEffect(() => {
+    fetchItineraries();
+  }, [fetchItineraries]);
+
+  const saveItineraryToBackend = async (itineraryObj, email) => {
+    try {
+      const activeEmail = email || currentUser?.email || 'admin@gmail.com';
+      const payload = {
+        title: itineraryObj.title || 'Chuyến đi mới',
+        destination: itineraryObj.destination || 'Việt Nam',
+        startDate: itineraryObj.startDate || (new Date().toISOString().split('T')[0]),
+        endDate: itineraryObj.endDate || null,
+        budgetTotal: itineraryObj.totalBudget || (itineraryObj.budgetPerPerson ? itineraryObj.budgetPerPerson * 2 : 5000000),
+        coverImageUrl: itineraryObj.coverImage || itineraryObj.coverImageUrl || null,
+        isAiGenerated: Boolean(itineraryObj.isAiGenerated ?? true),
+        status: (itineraryObj.status || 'ACTIVE').toUpperCase(),
+        details: (itineraryObj.days || []).flatMap(day =>
+          (day.activities || []).map((act, idx) => ({
+            dayNumber: day.dayNumber || 1,
+            visitOrder: idx + 1,
+            startTime: act.time ? (act.time.length === 5 ? `${act.time}:00` : (act.time.includes(':') ? act.time.substring(0, 5) + ':00' : '08:30:00')) : '08:30:00',
+            locationName: act.title || act.location || 'Điểm dừng chân',
+            locationAddress: act.address || itineraryObj.destination || 'Việt Nam',
+            category: act.category || 'Khám phá',
+            estimatedCost: typeof act.cost === 'number' ? act.cost : (parseInt((act.cost || '').replace(/\D/g, '')) || 100000),
+            aiTip: act.aiTip || '',
+            transitInfo: act.transit || '',
+            note: act.note || ''
+          }))
+        )
+      };
+
+      const saved = await itineraryApi.createItinerary(payload, activeEmail);
+      if (saved && saved.id) {
+        const mapped = mapBackendItineraryToFrontend(saved);
+        setItineraries(prev => prev.map(item => item.id === itineraryObj.id ? mapped : item));
+        return mapped;
+      }
+    } catch (err) {
+      console.warn('Persist itinerary to backend failed, kept in local state:', err.message);
+    }
+    return itineraryObj;
+  };
+
+  const deleteItineraryFromBackend = async (id, email) => {
+    try {
+      const activeEmail = email || currentUser?.email || 'admin@gmail.com';
+      if (typeof id === 'number' || !String(id).startsWith('itin-')) {
+        await itineraryApi.deleteItinerary(id, activeEmail);
+      }
+    } catch (err) {
+      console.warn('Backend delete itinerary warning:', err.message);
+    }
+    setItineraries(prev => prev.filter(item => String(item.id) !== String(id)));
+  };
+
+  const createManualItinerary = async (tripData, email) => {
+    setItineraries(prev => [tripData, ...prev]);
+    return await saveItineraryToBackend(tripData, email);
+  };
+
   const markNotificationAsRead = async (id) => {
     setNotifications(prev => prev.map(n => (n.id === id ? { ...n, isRead: true } : n)));
     await notificationApi.markAsRead(id, currentUser?.email);
@@ -543,6 +689,8 @@ export const AppProvider = ({ children }) => {
     setStats(prev => ({ ...prev, aiGenerationsToday: prev.aiGenerationsToday + 1 }));
     setActiveViewingItinerary(newItinerary);
     setUserTab('itineraries');
+    // Asynchronously persist to MySQL backend database
+    saveItineraryToBackend(newItinerary);
     return newItinerary;
   };
 
@@ -626,7 +774,11 @@ export const AppProvider = ({ children }) => {
         deleteNotification,
         addTestNotification,
         broadcastNotification,
-        fetchNotifications
+        fetchNotifications,
+        fetchItineraries,
+        saveItineraryToBackend,
+        deleteItineraryFromBackend,
+        createManualItinerary
       }}
     >
       {children}
