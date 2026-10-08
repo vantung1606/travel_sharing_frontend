@@ -1286,8 +1286,38 @@ export const postApi = {
   }
 };
 
-// ─── File Upload API (Images & Videos) ────────────────────────────────────────
+// ─── File Upload API (Images & Videos - Cloudinary CDN / Local Fallback) ──────
 export const uploadApi = {
+  async getStorageStatus() {
+    try {
+      const res = await fetch(`${BASE_URL}/upload/status`);
+      if (!res.ok) return { provider: 'LOCAL_DISK', isCloudinaryActive: false };
+      const json = await res.json();
+      return json.data || { provider: 'LOCAL_DISK', isCloudinaryActive: false };
+    } catch {
+      return { provider: 'LOCAL_DISK', isCloudinaryActive: false };
+    }
+  },
+
+  async uploadSingle(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = getAuthToken();
+    const headers = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(`${BASE_URL}/upload`, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  },
+
   async uploadFiles(fileList) {
     const formData = new FormData();
     for (let i = 0; i < fileList.length; i++) {
