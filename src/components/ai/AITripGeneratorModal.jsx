@@ -230,7 +230,7 @@ export const AITripGeneratorModal = () => {
                 <h3 className="text-sm font-extrabold text-white flex items-center gap-1.5">
                   <span>WanderAI Live Inspector</span>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-mono font-bold">
-                    Gemini 3.5 Flash
+                    Gemini 1.5 Flash
                   </span>
                 </h3>
                 <p className="text-[11px] text-slate-400">
