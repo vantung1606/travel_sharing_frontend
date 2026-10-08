@@ -9,6 +9,7 @@ import { AdminHeader } from './components/common/AdminHeader';
 import { Footer } from './components/common/Footer';
 import { AITripGeneratorModal } from './components/ai/AITripGeneratorModal';
 import { AuthModal } from './components/auth/AuthModal';
+import { FloatingChatWidget } from './components/common/FloatingChatWidget';
 import { PageTitleManager, AdminRouteGuard, UserAuthGuard } from './components/common/RouteGuards';
 
 // User Pages
@@ -130,6 +131,7 @@ const AppContent = () => {
       {/* Global Overlays & Modals */}
       <AITripGeneratorModal />
       <AuthModal />
+      {!isAdminPath && <FloatingChatWidget />}
     </div>
   );
 };
