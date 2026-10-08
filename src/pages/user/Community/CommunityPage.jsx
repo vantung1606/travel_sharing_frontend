@@ -65,14 +65,19 @@ import {
   EyeOff
 } from 'lucide-react';
 
-const CATEGORIES = [
-  { id: 'Tất cả', label: 'Tất cả', icon: Compass },
-  { id: 'Đang theo dõi', label: 'Đang theo dõi', icon: UserCheck },
-  { id: 'Đã lưu', label: 'Đã lưu', icon: Bookmark },
-  { id: 'Ẩm thực & Check-in', label: 'Ẩm thực & Check-in', icon: MapPin },
-  { id: 'Phượt & Khám phá', label: 'Phượt & Khám phá', icon: Flame },
-  { id: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Sparkles },
-  { id: 'Có Lịch trình đính kèm', label: 'Tour có Lịch trình AI', icon: Route }
+const FEED_SCOPES = [
+  { id: 'all', label: 'Khám phá dành cho bạn', icon: Compass },
+  { id: 'following', label: 'Đang theo dõi', icon: UserCheck },
+  { id: 'saved', label: 'Bài viết đã lưu', icon: Bookmark }
+];
+
+const TOPIC_FILTERS = [
+  { id: 'Tất cả', label: 'Tất cả chủ đề', icon: Compass },
+  { id: 'video', label: 'Thước phim video', icon: Video, badge: 'Video' },
+  { id: 'itinerary', label: 'Có Lịch trình AI', icon: Route, badge: 'Tour' },
+  { id: 'food', label: 'Ẩm thực & Check-in', icon: MapPin },
+  { id: 'adventure', label: 'Phượt & Khám phá', icon: Flame },
+  { id: 'beach', label: 'Biển đảo & Nghỉ dưỡng', icon: Sparkles }
 ];
 
 const COMMUNITY_STORIES = [
@@ -192,7 +197,8 @@ export const CommunityPage = () => {
   // Feed State
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('Tất cả');
+  const [feedScope, setFeedScope] = useState('all'); // 'all' | 'following' | 'saved'
+  const [topicFilter, setTopicFilter] = useState('Tất cả'); // 'Tất cả' | 'video' | 'itinerary' | 'food' | 'adventure' | 'beach'
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSort, setActiveSort] = useState('newest'); // 'newest' | 'popular' | 'has_itinerary'
   const [bookmarkedPostIds, setBookmarkedPostIds] = useState(new Set());
@@ -451,7 +457,7 @@ export const CommunityPage = () => {
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      if (activeCategory === 'Đã lưu') {
+      if (feedScope === 'saved') {
         const bookmarkedList = await postApi.getBookmarkedPosts(currentUser?.email);
         if (Array.isArray(bookmarkedList)) {
           setPosts(bookmarkedList);
@@ -461,9 +467,8 @@ export const CommunityPage = () => {
         }
         return;
       }
-      const categoryParam = (activeCategory === 'Có Lịch trình đính kèm' || activeCategory === 'Đang theo dõi') ? '' : activeCategory;
+
       const data = await postApi.getPosts({
-        category: categoryParam,
         keyword: searchQuery,
         email: currentUser?.email
       });
@@ -479,7 +484,6 @@ export const CommunityPage = () => {
           return next;
         });
       } else {
-        // Fallback demo posts if DB empty or starting up
         setPosts([]);
       }
     } catch (err) {
@@ -487,7 +491,7 @@ export const CommunityPage = () => {
     } finally {
       setLoading(false);
     }
-  }, [activeCategory, searchQuery, currentUser?.email]);
+  }, [feedScope, searchQuery, currentUser?.email]);
 
   useEffect(() => {
     fetchPosts();
@@ -618,26 +622,31 @@ export const CommunityPage = () => {
       });
     }
 
-    // Filter by Category
-    if (activeCategory === 'Đang theo dõi') {
+    // 1. Filter by Feed Scope (Nguồn cấp tin)
+    if (feedScope === 'following') {
       result = result.filter(p => followingIds.has(Number(p.authorId || p.author?.id)));
-    } else if (activeCategory === 'Đã lưu') {
+    } else if (feedScope === 'saved') {
       result = result.filter(p => bookmarkedPostIds.has(Number(p.id)) || Boolean(p.isBookmarked));
-    } else if (activeCategory === 'Có Lịch trình đính kèm') {
+    }
+
+    // 2. Filter by Topic / Media format (Chủ đề & Định dạng)
+    if (topicFilter === 'video') {
+      result = result.filter(p => Boolean(p.videoUrl));
+    } else if (topicFilter === 'itinerary') {
       result = result.filter(p => p.itineraryId || p.itineraryTitle || (p.sharedPost && (p.sharedPost.itineraryId || p.sharedPost.itineraryTitle)));
-    } else if (activeCategory === 'Ẩm thực & Check-in') {
+    } else if (topicFilter === 'food') {
       result = result.filter(p =>
         (p.tags && (p.tags.toLowerCase().includes('ẩm thực') || p.tags.toLowerCase().includes('check-in') || p.tags.toLowerCase().includes('food'))) ||
         (p.category && p.category.toLowerCase().includes('ẩm thực')) ||
         (p.content && (p.content.toLowerCase().includes('ẩm thực') || p.content.toLowerCase().includes('món') || p.content.toLowerCase().includes('quán') || p.content.toLowerCase().includes('check-in')))
       );
-    } else if (activeCategory === 'Phượt & Khám phá') {
+    } else if (topicFilter === 'adventure') {
       result = result.filter(p =>
         (p.tags && (p.tags.toLowerCase().includes('phượt') || p.tags.toLowerCase().includes('khám phá') || p.tags.toLowerCase().includes('trekking'))) ||
         (p.category && (p.category.toLowerCase().includes('phượt') || p.category.toLowerCase().includes('khám phá'))) ||
         (p.content && (p.content.toLowerCase().includes('phượt') || p.content.toLowerCase().includes('khám phá') || p.content.toLowerCase().includes('đèo') || p.content.toLowerCase().includes('núi')))
       );
-    } else if (activeCategory === 'Biển đảo & Nghỉ dưỡng') {
+    } else if (topicFilter === 'beach') {
       result = result.filter(p =>
         (p.tags && (p.tags.toLowerCase().includes('biển') || p.tags.toLowerCase().includes('đảo') || p.tags.toLowerCase().includes('nghỉ dưỡng') || p.tags.toLowerCase().includes('resort'))) ||
         (p.category && (p.category.toLowerCase().includes('biển') || p.category.toLowerCase().includes('nghỉ dưỡng'))) ||
@@ -656,7 +665,7 @@ export const CommunityPage = () => {
     }
 
     return result;
-  }, [posts, activeCategory, activeSort, followingIds, bookmarkedPostIds, searchQuery, hiddenPostIds]);
+  }, [posts, feedScope, topicFilter, activeSort, followingIds, bookmarkedPostIds, searchQuery, hiddenPostIds]);
 
   // Handle Like Post
   const handleToggleLike = async (postId) => {
@@ -1316,7 +1325,7 @@ export const CommunityPage = () => {
 
               <button
                 type="button"
-                onClick={() => setActiveCategory('Có Lịch trình đính kèm')}
+                onClick={() => setTopicFilter('itinerary')}
                 className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-xs sm:text-sm transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer hover:scale-105 active:scale-95"
               >
                 <Route className="w-4 h-4 text-sky-300" />
@@ -1384,9 +1393,9 @@ export const CommunityPage = () => {
                     <span className="text-[10px] text-slate-500 font-semibold group-hover:text-sky-800">Đang follow</span>
                   </div>
                   <div
-                    onClick={() => setActiveCategory(activeCategory === 'Đã lưu' ? 'Tất cả' : 'Đã lưu')}
+                    onClick={() => setFeedScope(feedScope === 'saved' ? 'all' : 'saved')}
                     className="p-1 rounded-xl bg-white border border-slate-100 cursor-pointer hover:bg-sky-50 transition-colors group"
-                    title="Bấm để lọc danh sách bài viết đã lưu"
+                    title="Bấm để xem bài viết đã lưu"
                   >
                     <span className="font-extrabold text-sm text-sky-600 group-hover:scale-105 transition-transform block">
                       {bookmarkedPostIds.size}
@@ -1438,25 +1447,35 @@ export const CommunityPage = () => {
                 {
                   label: 'Tất cả bài viết',
                   icon: Compass,
-                  active: activeCategory === 'Tất cả',
-                  action: () => setActiveCategory('Tất cả')
+                  active: feedScope === 'all' && topicFilter === 'Tất cả',
+                  action: () => {
+                    setFeedScope('all');
+                    setTopicFilter('Tất cả');
+                  }
                 },
                 {
                   label: `Đang theo dõi (${followingIds.size})`,
                   icon: UserCheck,
-                  active: activeCategory === 'Đang theo dõi',
+                  active: feedScope === 'following',
                   action: () => {
                     if (!requireAuth('xem bài viết của người đang theo dõi')) return;
-                    setActiveCategory('Đang theo dõi');
+                    setFeedScope('following');
                   },
                   badge: followingIds.size > 0 ? `${followingIds.size}` : null
                 },
                 {
+                  label: 'Thước phim & Video',
+                  icon: Video,
+                  active: topicFilter === 'video',
+                  action: () => setTopicFilter('video'),
+                  badge: 'Hot'
+                },
+                {
                   label: 'Tour có Lịch trình AI',
                   icon: Route,
-                  active: activeCategory === 'Có Lịch trình đính kèm',
-                  action: () => setActiveCategory('Có Lịch trình đính kèm'),
-                  badge: 'Hot'
+                  active: topicFilter === 'itinerary',
+                  action: () => setTopicFilter('itinerary'),
+                  badge: 'AI'
                 },
                 {
                   label: 'Xu hướng (Nhiều Like)',
@@ -1467,10 +1486,10 @@ export const CommunityPage = () => {
                 {
                   label: `Bài viết đã lưu (${bookmarkedPostIds.size})`,
                   icon: Bookmark,
-                  active: activeCategory === 'Đã lưu',
+                  active: feedScope === 'saved',
                   action: () => {
                     if (!requireAuth('xem bài viết đã lưu')) return;
-                    setActiveCategory('Đã lưu');
+                    setFeedScope('saved');
                   },
                   badge: bookmarkedPostIds.size > 0 ? `${bookmarkedPostIds.size}` : null
                 }
@@ -1723,9 +1742,52 @@ export const CommunityPage = () => {
             </div>
           )}
 
-          {/* Search, Sort & Category Tabs */}
-          <div className="space-y-3">
-            {/* Row 1: Search Input & Sort Selector */}
+          {/* ========================================================= */}
+          {/* TWO-TIER FEED CONTROL: TIER 1 SCOPE + TIER 2 TOPICS       */}
+          {/* ========================================================= */}
+          <div className="space-y-3.5">
+            {/* TIER 1: FEED SCOPE TABS */}
+            <div className="flex items-center gap-1.5 p-1.5 bg-slate-200/60 rounded-2xl border border-slate-200 shadow-2xs">
+              {FEED_SCOPES.map(scope => {
+                const Icon = scope.icon;
+                const isActive = feedScope === scope.id;
+                const badgeCount = scope.id === 'following'
+                  ? followingIds.size
+                  : scope.id === 'saved'
+                  ? bookmarkedPostIds.size
+                  : null;
+
+                return (
+                  <button
+                    key={scope.id}
+                    onClick={() => {
+                      if ((scope.id === 'following' || scope.id === 'saved') && !isLoggedIn) {
+                        requireAuth(`xem mục "${scope.label}"`);
+                        return;
+                      }
+                      setFeedScope(scope.id);
+                    }}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer ${
+                      isActive
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-sky-600' : 'text-slate-400'}`} />
+                    <span className="truncate">{scope.label}</span>
+                    {badgeCount !== null && badgeCount > 0 && (
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
+                        isActive ? 'bg-sky-50 text-sky-700 border border-sky-200' : 'bg-slate-200/80 text-slate-600'
+                      }`}>
+                        {badgeCount}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* SEARCH & SORT BAR */}
             <div className="flex items-center gap-3">
               <div className="relative flex-1">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -1734,7 +1796,7 @@ export const CommunityPage = () => {
                   placeholder="Tìm bài viết theo tác giả, địa điểm, nội dung..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 bg-white border border-slate-200/90 rounded-2xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-4 focus:ring-sky-100 focus:border-sky-600 transition-all shadow-xs font-medium"
+                  className="w-full pl-10 pr-10 py-2.5 sm:py-3 bg-white border border-slate-200/90 rounded-2xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-4 focus:ring-sky-100 focus:border-sky-600 transition-all shadow-xs font-medium"
                 />
                 {searchQuery && (
                   <button
@@ -1748,7 +1810,7 @@ export const CommunityPage = () => {
               </div>
 
               {/* Sort Selector Dropdown */}
-              <div className="flex items-center gap-1.5 px-3.5 py-2.5 bg-white border border-slate-200/90 rounded-2xl text-xs font-bold text-slate-700 shadow-xs hover:border-sky-300 transition-all shrink-0">
+              <div className="flex items-center gap-1.5 px-3.5 py-2.5 sm:py-3 bg-white border border-slate-200/90 rounded-2xl text-xs font-bold text-slate-700 shadow-xs hover:border-sky-300 transition-all shrink-0">
                 <SlidersHorizontal className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                 <select
                   value={activeSort}
@@ -1762,34 +1824,34 @@ export const CommunityPage = () => {
               </div>
             </div>
 
-            {/* Row 2: Category Filter Pills */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {CATEGORIES.map(cat => {
-                const Icon = cat.icon;
-                const isActive = activeCategory === cat.id;
+            {/* TIER 2: TOPIC & MEDIA FILTER PILLS */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar select-none">
+              {TOPIC_FILTERS.map(topic => {
+                const Icon = topic.icon;
+                const isActive = topicFilter === topic.id;
+                const isVideo = topic.id === 'video';
+
                 return (
                   <button
-                    key={cat.id}
-                    onClick={() => {
-                      if ((cat.id === 'Đang theo dõi' || cat.id === 'Đã lưu') && !isLoggedIn) {
-                        requireAuth(`xem mục "${cat.label}"`);
-                        return;
-                      }
-                      setActiveCategory(cat.id);
-                    }}
-                    className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs transition-all cursor-pointer ${
+                    key={topic.id}
+                    onClick={() => setTopicFilter(topic.id)}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs transition-all shrink-0 cursor-pointer ${
                       isActive
-                        ? 'bg-sky-600 text-white shadow-md shadow-sky-600/25 font-extrabold'
+                        ? isVideo
+                          ? 'bg-gradient-to-r from-rose-600 to-amber-600 text-white shadow-md shadow-rose-600/25 font-extrabold'
+                          : 'bg-sky-600 text-white shadow-md shadow-sky-600/25 font-extrabold'
+                        : isVideo
+                        ? 'bg-white text-rose-700 border border-rose-200 hover:bg-rose-50 shadow-2xs font-bold'
                         : 'bg-white text-slate-700 border border-slate-200/90 hover:bg-sky-50 hover:text-sky-700 hover:border-sky-200 shadow-2xs font-semibold'
                     }`}
                   >
-                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
-                    <span>{cat.label}</span>
-                    {cat.id === 'Đang theo dõi' && followingIds.size > 0 && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold leading-tight ${
-                        isActive ? 'bg-white/25 text-white' : 'bg-sky-50 text-sky-700 border border-sky-200'
+                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : isVideo ? 'text-rose-500' : 'text-slate-400'}`} />
+                    <span>{topic.label}</span>
+                    {topic.badge && (
+                      <span className={`text-[9px] px-1.5 py-0.2 rounded-md font-black uppercase ${
+                        isActive ? 'bg-white/30 text-white' : 'bg-slate-100 text-slate-600'
                       }`}>
-                        {followingIds.size}
+                        {topic.badge}
                       </span>
                     )}
                   </button>
@@ -1821,38 +1883,47 @@ export const CommunityPage = () => {
           {!loading && displayPosts.length === 0 && (
             <div className="bg-white rounded-3xl p-10 border border-slate-200/90 shadow-sm text-center space-y-4">
               <div className="w-16 h-16 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto shadow-sm">
-                {activeCategory === 'Đang theo dõi' ? (
+                {feedScope === 'following' ? (
                   <UserCheck className="w-8 h-8 text-sky-600" />
-                ) : activeCategory === 'Đã lưu' ? (
+                ) : feedScope === 'saved' ? (
                   <Bookmark className="w-8 h-8 text-amber-500 fill-amber-500/20" />
+                ) : topicFilter === 'video' ? (
+                  <Video className="w-8 h-8 text-rose-500" />
                 ) : (
                   <Compass className="w-8 h-8 text-sky-600" />
                 )}
               </div>
               <div className="max-w-md mx-auto">
                 <h3 className="text-base font-extrabold text-slate-900">
-                  {activeCategory === 'Đang theo dõi'
+                  {feedScope === 'following'
                     ? (followingIds.size === 0
                         ? 'Bạn chưa theo dõi tác giả nào'
                         : 'Các tác giả bạn theo dõi chưa có bài viết mới')
-                    : activeCategory === 'Đã lưu'
+                    : feedScope === 'saved'
                     ? 'Chưa có bài viết nào trong bộ sưu tập'
+                    : topicFilter === 'video'
+                    ? 'Chưa có video thước phim nào'
                     : 'Chưa tìm thấy bài viết phù hợp'}
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1 leading-relaxed font-normal">
-                  {activeCategory === 'Đang theo dõi'
+                  {feedScope === 'following'
                     ? (followingIds.size === 0
                         ? 'Hãy bấm "Theo dõi" các phượt thủ hoặc tác giả nổi bật ở cột bên phải để luôn cập nhật những hành trình mới nhất từ họ!'
-                        : 'Hãy khám phá thêm bài viết hấp dẫn tại mục Tất cả hoặc chia sẻ chuyến đi của riêng bạn!')
-                    : activeCategory === 'Đã lưu'
+                        : 'Hãy khám phá thêm bài viết hấp dẫn tại mục Khám phá hoặc chia sẻ chuyến đi của riêng bạn!')
+                    : feedScope === 'saved'
                     ? 'Bạn có thể bấm vào biểu tượng Bookmark trên các bài viết hay để lưu vào bộ sưu tập cá nhân và xem lại bất cứ lúc nào!'
+                    : topicFilter === 'video'
+                    ? 'Hãy là người đầu tiên đăng tải video thước phim ngắn chia sẻ trải nghiệm du lịch tuyệt vời của bạn!'
                     : 'Hãy thử tìm kiếm với từ khóa khác, chọn danh mục khác hoặc là người đầu tiên chia sẻ chuyến đi của bạn!'}
                 </p>
               </div>
               <div className="flex items-center justify-center gap-3 pt-2">
-                {(activeCategory === 'Đang theo dõi' || activeCategory === 'Đã lưu') && (
+                {(feedScope !== 'all' || topicFilter !== 'Tất cả') && (
                   <button
-                    onClick={() => setActiveCategory('Tất cả')}
+                    onClick={() => {
+                      setFeedScope('all');
+                      setTopicFilter('Tất cả');
+                    }}
                     className="px-5 py-2.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer"
                   >
                     Xem tất cả bài viết
@@ -2541,7 +2612,8 @@ export const CommunityPage = () => {
                 const budgetText = tour.budgetTotal
                   ? Number(tour.budgetTotal).toLocaleString('vi-VN') + 'đ'
                   : (tour.budget || '3.500.000đ');
-                const clonesCount = tour.id ? `${(tour.id * 180 + 320)} lượt chép` : '850 lượt chép';
+                const durationText = tour.duration || '3N2Đ';
+                const placesInfo = tour.placesCount ? `${tour.placesCount} điểm` : (tour.destination || 'Việt Nam');
 
                 return (
                   <div
@@ -2562,7 +2634,9 @@ export const CommunityPage = () => {
                       <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-0.5">
                         <span className="font-extrabold text-blue-600">{budgetText}</span>
                         <span>•</span>
-                        <span>{clonesCount}</span>
+                        <span>{durationText}</span>
+                        <span>•</span>
+                        <span>{placesInfo}</span>
                       </div>
                     </div>
                     <button
