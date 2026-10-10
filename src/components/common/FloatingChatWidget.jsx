@@ -297,7 +297,21 @@ export const FloatingChatWidget = () => {
                     </h4>
                     <span className="text-[10px] text-sky-100 flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>
-                      <span>{activeThreadObj?.type === 'DIRECT' ? 'Đang hoạt động' : `${activeThreadObj?.membersCount || 2} thành viên`}</span>
+                      {activeThreadObj?.type === 'DIRECT' ? (
+                        <span>Đang hoạt động</span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigate('/messages');
+                            setIsOpen(false);
+                          }}
+                          className="hover:underline cursor-pointer font-bold flex items-center gap-0.5"
+                          title="Xem & quản lý thành viên trên trang tin nhắn"
+                        >
+                          <span>{activeThreadObj?.membersCount || 2} thành viên</span>
+                        </button>
+                      )}
                     </span>
                   </div>
                 </>
@@ -441,18 +455,29 @@ export const FloatingChatWidget = () => {
                     Chưa có tin nhắn nào. Hãy gửi lời chào đầu tiên!
                   </div>
                 ) : (
-                  messages.map(msg => (
-                    <div
-                      key={msg.id}
-                      className={`flex gap-2 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'}`}
-                    >
-                      {!msg.isMe && (
-                        <img
-                          src={msg.senderAvatar || activeThreadObj?.avatar}
-                          alt=""
-                          className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5"
-                        />
-                      )}
+                  messages.map(msg => {
+                    if (msg.messageType === 'SYSTEM') {
+                      return (
+                        <div key={msg.id} className="flex justify-center my-1.5 px-2">
+                          <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-[10px] font-medium border border-slate-200 text-center">
+                            {msg.content}
+                          </span>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div
+                        key={msg.id}
+                        className={`flex gap-2 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'}`}
+                      >
+                        {!msg.isMe && (
+                          <img
+                            src={msg.senderAvatar || activeThreadObj?.avatar}
+                            alt=""
+                            className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5"
+                          />
+                        )}
                       <div className={`max-w-[75%] space-y-0.5 flex flex-col ${msg.isMe ? 'items-end' : 'items-start'}`}>
                         {!msg.isMe && (
                           <span className="text-[9px] font-bold text-slate-400 px-1">{msg.senderName}</span>
@@ -487,9 +512,10 @@ export const FloatingChatWidget = () => {
                           <span>{msg.time}</span>
                           {msg.isMe && <CheckCheck className="w-2.5 h-2.5 text-sky-500" />}
                         </div>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
                 <div ref={messagesEndRef} />
               </div>

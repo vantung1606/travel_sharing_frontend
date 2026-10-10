@@ -1843,6 +1843,66 @@ export const chatApi = {
       console.error('API error fetching available users:', err);
       return [];
     }
+  },
+
+  async getRoomMembers(roomId, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/members?email=${encodeURIComponent(userEmail)}`, {
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        throw new Error(errJson?.message || `HTTP error ${res.status}`);
+      }
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.error(`API error fetching members for room ${roomId}:`, err);
+      throw err;
+    }
+  },
+
+  async addMembers(roomId, memberIds = [], email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/members?email=${encodeURIComponent(userEmail)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify({ memberIds })
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        throw new Error(errJson?.message || `HTTP error ${res.status}`);
+      }
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error(`API error adding members to room ${roomId}:`, err);
+      throw err;
+    }
+  },
+
+  async removeMember(roomId, targetUserId, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/members/${targetUserId}?email=${encodeURIComponent(userEmail)}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        throw new Error(errJson?.message || `HTTP error ${res.status}`);
+      }
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error(`API error removing member ${targetUserId} from room ${roomId}:`, err);
+      throw err;
+    }
   }
 };
 
