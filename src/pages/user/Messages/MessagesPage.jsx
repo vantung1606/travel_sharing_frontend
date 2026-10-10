@@ -143,6 +143,30 @@ export const MessagesPage = () => {
     loadRooms();
   }, [loadRooms]);
 
+  // Chuẩn hóa xác định người gửi có phải là phiên hiện tại (bản thân) hay không
+  const isMessageFromMe = useCallback((msg) => {
+    if (!msg) return false;
+    // 1. Đối chiếu theo ID người dùng
+    if (currentUser?.id && msg.senderId != null) {
+      if (String(currentUser.id) === String(msg.senderId)) return true;
+    }
+    // 2. Đối chiếu theo Email người dùng
+    if (msg.senderEmail) {
+      const msgEmail = msg.senderEmail.toLowerCase().trim();
+      if (currentUser?.email && msgEmail === currentUser.email.toLowerCase().trim()) return true;
+      if (effectiveEmail && msgEmail === effectiveEmail.toLowerCase().trim()) return true;
+    }
+    // 3. Tin nhắn tạm (optimistic / pending) vừa tạo trên giao diện này
+    if (msg.isPending || (typeof msg.id === 'string' && msg.id.startsWith('temp-'))) {
+      return true;
+    }
+    // 4. Fallback: Dùng cờ isMe từ REST API nếu không đủ dữ liệu đối soát
+    if (msg.isMe !== undefined && msg.isMe !== null) {
+      return Boolean(msg.isMe);
+    }
+    return false;
+  }, [currentUser?.id, currentUser?.email, effectiveEmail]);
+
   // 2. Tải tin nhắn của phòng chat được chọn
   const loadMessages = useCallback(async (roomId, silent = false) => {
     if (!roomId) return;
@@ -150,15 +174,19 @@ export const MessagesPage = () => {
     try {
       const msgs = await chatApi.getRoomMessages(roomId, effectiveEmail);
       if (Array.isArray(msgs)) {
+        const normalizedMsgs = msgs.map(m => ({
+          ...m,
+          isMe: isMessageFromMe(m)
+        }));
         setMessages(prev => {
           // Tránh cập nhật mảng mới nếu danh sách tin nhắn không đổi (chặn kích hoạt useEffect khi polling)
           if (
-            prev.length === msgs.length &&
-            (prev.length === 0 || prev[prev.length - 1]?.id === msgs[msgs.length - 1]?.id)
+            prev.length === normalizedMsgs.length &&
+            (prev.length === 0 || prev[prev.length - 1]?.id === normalizedMsgs[normalizedMsgs.length - 1]?.id)
           ) {
             return prev;
           }
-          return msgs;
+          return normalizedMsgs;
         });
       }
     } catch (err) {
@@ -166,7 +194,7 @@ export const MessagesPage = () => {
     } finally {
       if (!silent) setIsLoadingMessages(false);
     }
-  }, [effectiveEmail]);
+  }, [effectiveEmail, isMessageFromMe]);
 
   useEffect(() => {
     if (activeThreadId) {
@@ -182,14 +210,31 @@ export const MessagesPage = () => {
     const unsubscribe = chatSocket.subscribeToRoom(activeThreadId, (incomingMsg) => {
       if (!incomingMsg) return;
 
+      const isFromMe = isMessageFromMe(incomingMsg);
+      const normalizedIncoming = {
+        ...incomingMsg,
+        isMe: isFromMe
+      };
+
       setMessages(prev => {
-        // Tránh trùng lặp nếu tin nhắn đã có
-        if (prev.some(m => m.id === incomingMsg.id)) {
+        // Tránh trùng lặp nếu tin nhắn đã có theo ID thật
+        if (prev.some(m => m.id === normalizedIncoming.id)) {
           return prev;
         }
-        // Xóa optimistic/pending message tương ứng nếu có
-        const cleanPrev = prev.filter(m => !m.isPending);
-        return [...cleanPrev, incomingMsg];
+
+        // Nếu là tin nhắn do chính mình gửi, thay thế optimistic temp message tương ứng
+        if (isFromMe) {
+          const tempIndex = prev.findIndex(m => m.isPending || (typeof m.id === 'string' && m.id.startsWith('temp-')));
+          if (tempIndex !== -1) {
+            const next = [...prev];
+            next[tempIndex] = normalizedIncoming;
+            return next;
+          }
+        }
+
+        // Xóa optimistic message cũ nếu cùng nội dung
+        const cleanPrev = prev.filter(m => !(m.isPending && m.content === normalizedIncoming.content));
+        return [...cleanPrev, normalizedIncoming];
       });
 
       // Cập nhật ngay preview tin nhắn cuối trong danh sách phòng
@@ -216,7 +261,7 @@ export const MessagesPage = () => {
       if (unsubscribe) unsubscribe();
       clearInterval(interval);
     };
-  }, [activeThreadId, loadMessages]);
+  }, [activeThreadId, loadMessages, isMessageFromMe]);
 
   // 4. Quản lý cuộn thông minh trong khung chat (TUYỆT ĐỐI không cuộn toàn bộ trang web window)
   const chatScrollContainerRef = useRef(null);
@@ -267,14 +312,14 @@ export const MessagesPage = () => {
     // Có tin nhắn mới: Nếu người dùng đang gần đáy hoặc là tin do chính mình gửi -> Cuộn mượt
     const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 160;
     const latestMsg = messages[messages.length - 1];
-    const isSentByMe = latestMsg?.isMe;
+    const isSentByMe = isMessageFromMe(latestMsg);
 
     if (isNearBottom || isSentByMe) {
       setTimeout(() => scrollToBottom(true), 50);
     }
 
     prevMessagesCountRef.current = count;
-  }, [messages, scrollToBottom]);
+  }, [messages, scrollToBottom, isMessageFromMe]);
 
   // 5. Xử lý mở nhanh cuộc trò chuyện từ Query Params (ví dụ: bấm nút Nhắn tin ở Profile người khác)
   const openingDirectUserIdRef = useRef(null);
@@ -329,28 +374,35 @@ export const MessagesPage = () => {
     setInputText('');
 
     // Optimistic UI update
+    const tempId = 'temp-text-' + Date.now();
     const tempMsg = {
-      id: Date.now(),
+      id: tempId,
       roomId: activeThreadId,
       senderId: currentUser?.id,
+      senderEmail: effectiveEmail,
       senderName: currentUser?.name || 'Bạn',
       senderAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
       content: contentToSend,
       messageType: 'TEXT',
       time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-      isMe: true
+      isMe: true,
+      isPending: true
     };
     setMessages(prev => [...prev, tempMsg]);
 
     try {
       const savedMsg = await chatApi.sendMessage(activeThreadId, { content: contentToSend, messageType: 'TEXT' }, effectiveEmail);
       if (savedMsg) {
-        setMessages(prev => prev.map(m => m.id === tempMsg.id ? savedMsg : m));
+        const normalizedSaved = {
+          ...savedMsg,
+          isMe: true
+        };
+        setMessages(prev => prev.map(m => m.id === tempId ? normalizedSaved : m));
       }
       loadRooms();
     } catch (err) {
       toast.showError('Không thể gửi tin nhắn. Vui lòng thử lại!');
-      setMessages(prev => prev.filter(m => m.id !== tempMsg.id));
+      setMessages(prev => prev.filter(m => m.id !== tempId));
     }
   };
 
@@ -390,6 +442,7 @@ export const MessagesPage = () => {
       id: tempId,
       roomId: activeThreadId,
       senderId: currentUser?.id,
+      senderEmail: effectiveEmail,
       senderName: currentUser?.name || 'Bạn',
       senderAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
       content: localPreviewUrl,
@@ -417,7 +470,11 @@ export const MessagesPage = () => {
       );
 
       if (savedMsg) {
-        setMessages(prev => prev.map(m => m.id === tempId ? savedMsg : m));
+        const normalizedSaved = {
+          ...savedMsg,
+          isMe: true
+        };
+        setMessages(prev => prev.map(m => m.id === tempId ? normalizedSaved : m));
       }
       loadRooms();
       toast.showSuccess(`Đã gửi ${isVideo ? 'video' : 'hình ảnh'} thành công! 🚀`);
@@ -1528,6 +1585,7 @@ export const MessagesPage = () => {
                   </div>
                 ) : (
                   messages.map(msg => {
+                    const isMe = isMessageFromMe(msg);
                     if (msg.messageType === 'SYSTEM') {
                       return (
                         <div key={msg.id} className="flex justify-center my-2">
@@ -1543,17 +1601,17 @@ export const MessagesPage = () => {
                     return (
                       <div
                         key={msg.id}
-                        className={`flex gap-2.5 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'}`}
+                        className={`flex gap-2.5 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}
                       >
-                        {!msg.isMe && (
+                        {!isMe && (
                           <img
                             src={msg.senderAvatar || currentThreadObj?.avatar}
                             alt=""
                             className="w-8 h-8 rounded-full object-cover shrink-0 mt-0.5"
                           />
                         )}
-                      <div className={`max-w-md space-y-1 flex flex-col ${msg.isMe ? 'items-end' : 'items-start'}`}>
-                        {!msg.isMe && (
+                      <div className={`max-w-md space-y-1 flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                        {!isMe && (
                           <span className="text-[10px] font-bold text-slate-500 px-1">
                             {msg.senderName}
                           </span>
@@ -1599,7 +1657,7 @@ export const MessagesPage = () => {
                         ) : (
                           <div
                             className={`p-3 rounded-2xl text-xs leading-relaxed break-words ${
-                              msg.isMe
+                              isMe
                                 ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-tr-none shadow-sm shadow-sky-600/20'
                                 : 'bg-slate-100 text-slate-800 rounded-tl-none border border-slate-200/60'
                             }`}
@@ -1610,7 +1668,7 @@ export const MessagesPage = () => {
 
                         <div className="flex items-center gap-1 text-[10px] text-slate-400 px-1">
                           <span>{msg.time}</span>
-                          {msg.isMe && <CheckCheck className="w-3 h-3 text-sky-500" />}
+                          {isMe && <CheckCheck className="w-3 h-3 text-sky-500" />}
                         </div>
                       </div>
                     </div>

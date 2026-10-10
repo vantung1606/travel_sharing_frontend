@@ -69,6 +69,26 @@ export const FloatingChatWidget = () => {
     }
   }, [isOpen, loadRooms]);
 
+  // Chuẩn hóa xác định người gửi có phải là phiên hiện tại (bản thân) hay không
+  const isMessageFromMe = useCallback((msg) => {
+    if (!msg) return false;
+    if (currentUser?.id && msg.senderId != null) {
+      if (String(currentUser.id) === String(msg.senderId)) return true;
+    }
+    if (msg.senderEmail) {
+      const msgEmail = msg.senderEmail.toLowerCase().trim();
+      if (currentUser?.email && msgEmail === currentUser.email.toLowerCase().trim()) return true;
+      if (effectiveEmail && msgEmail === effectiveEmail.toLowerCase().trim()) return true;
+    }
+    if (msg.isPending || (typeof msg.id === 'string' && msg.id.startsWith('widget-temp-'))) {
+      return true;
+    }
+    if (msg.isMe !== undefined && msg.isMe !== null) {
+      return Boolean(msg.isMe);
+    }
+    return false;
+  }, [currentUser?.id, currentUser?.email, effectiveEmail]);
+
   // 2. Tải tin nhắn khi mở một phòng chat
   const loadMessages = useCallback(async (roomId, silent = false) => {
     if (!roomId) return;
@@ -76,14 +96,18 @@ export const FloatingChatWidget = () => {
     try {
       const msgs = await chatApi.getRoomMessages(roomId, effectiveEmail);
       if (Array.isArray(msgs)) {
+        const normalizedMsgs = msgs.map(m => ({
+          ...m,
+          isMe: isMessageFromMe(m)
+        }));
         setMessages(prev => {
           if (
-            prev.length === msgs.length &&
-            (prev.length === 0 || prev[prev.length - 1]?.id === msgs[msgs.length - 1]?.id)
+            prev.length === normalizedMsgs.length &&
+            (prev.length === 0 || prev[prev.length - 1]?.id === normalizedMsgs[normalizedMsgs.length - 1]?.id)
           ) {
             return prev;
           }
-          return msgs;
+          return normalizedMsgs;
         });
       }
     } catch (err) {
@@ -91,7 +115,7 @@ export const FloatingChatWidget = () => {
     } finally {
       if (!silent) setIsLoadingMessages(false);
     }
-  }, [effectiveEmail]);
+  }, [effectiveEmail, isMessageFromMe]);
 
   useEffect(() => {
     if (activeThreadId) {
@@ -105,10 +129,27 @@ export const FloatingChatWidget = () => {
 
     const unsubscribe = chatSocket.subscribeToRoom(activeThreadId, (incomingMsg) => {
       if (!incomingMsg) return;
+
+      const isFromMe = isMessageFromMe(incomingMsg);
+      const normalizedIncoming = {
+        ...incomingMsg,
+        isMe: isFromMe
+      };
+
       setMessages(prev => {
-        if (prev.some(m => m.id === incomingMsg.id)) return prev;
-        const cleanPrev = prev.filter(m => !m.isPending);
-        return [...cleanPrev, incomingMsg];
+        if (prev.some(m => m.id === normalizedIncoming.id)) return prev;
+
+        if (isFromMe) {
+          const tempIdx = prev.findIndex(m => m.isPending || (typeof m.id === 'string' && m.id.startsWith('widget-temp-')));
+          if (tempIdx !== -1) {
+            const next = [...prev];
+            next[tempIdx] = normalizedIncoming;
+            return next;
+          }
+        }
+
+        const cleanPrev = prev.filter(m => !(m.isPending && m.content === normalizedIncoming.content));
+        return [...cleanPrev, normalizedIncoming];
       });
 
       setThreads(prev => prev.map(t => {
@@ -133,7 +174,7 @@ export const FloatingChatWidget = () => {
       if (unsubscribe) unsubscribe();
       clearInterval(interval);
     };
-  }, [isOpen, activeThreadId, loadMessages]);
+  }, [isOpen, activeThreadId, loadMessages, isMessageFromMe]);
 
   // Quản lý cuộn thông minh trong widget
   const widgetScrollContainerRef = useRef(null);
@@ -168,14 +209,15 @@ export const FloatingChatWidget = () => {
 
     const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 120;
     const latestMsg = messages[messages.length - 1];
-    if (isNearBottom || latestMsg?.isMe) {
+    const isSentByMe = isMessageFromMe(latestMsg);
+    if (isNearBottom || isSentByMe) {
       setTimeout(() => {
         container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
       }, 50);
     }
 
     prevWidgetMsgCountRef.current = count;
-  }, [activeThreadId, messages]);
+  }, [activeThreadId, messages, isMessageFromMe]);
 
   // Hide floating widget if user is currently on the full /messages page
   if (location.pathname === '/messages' || location.pathname.startsWith('/admin')) {
@@ -219,28 +261,35 @@ export const FloatingChatWidget = () => {
     const contentToSend = inputText.trim();
     setInputText('');
 
+    const tempId = 'widget-temp-text-' + Date.now();
     const tempMsg = {
-      id: Date.now(),
+      id: tempId,
       roomId: activeThreadId,
       senderId: currentUser?.id,
+      senderEmail: effectiveEmail,
       senderName: currentUser?.name || 'Bạn',
       senderAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
       content: contentToSend,
       messageType: 'TEXT',
       time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
-      isMe: true
+      isMe: true,
+      isPending: true
     };
     setMessages(prev => [...prev, tempMsg]);
 
     try {
       const saved = await chatApi.sendMessage(activeThreadId, { content: contentToSend, messageType: 'TEXT' }, effectiveEmail);
       if (saved) {
-        setMessages(prev => prev.map(m => m.id === tempMsg.id ? saved : m));
+        const normalizedSaved = {
+          ...saved,
+          isMe: true
+        };
+        setMessages(prev => prev.map(m => m.id === tempId ? normalizedSaved : m));
       }
       loadRooms();
     } catch (err) {
       toast.showError('Không thể gửi tin nhắn.');
-      setMessages(prev => prev.filter(m => m.id !== tempMsg.id));
+      setMessages(prev => prev.filter(m => m.id !== tempId));
     }
   };
 
@@ -271,12 +320,13 @@ export const FloatingChatWidget = () => {
 
     setIsUploading(true);
 
-    const tempId = 'widget-temp-' + Date.now();
+    const tempId = 'widget-temp-media-' + Date.now();
     const localPreviewUrl = URL.createObjectURL(file);
     const tempMsg = {
       id: tempId,
       roomId: activeThreadId,
       senderId: currentUser?.id,
+      senderEmail: effectiveEmail,
       senderName: currentUser?.name || 'Bạn',
       senderAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
       content: localPreviewUrl,
@@ -298,7 +348,11 @@ export const FloatingChatWidget = () => {
       );
 
       if (savedMsg) {
-        setMessages(prev => prev.map(m => m.id === tempId ? savedMsg : m));
+        const normalizedSaved = {
+          ...savedMsg,
+          isMe: true
+        };
+        setMessages(prev => prev.map(m => m.id === tempId ? normalizedSaved : m));
       }
       loadRooms();
       toast.showSuccess(`Đã gửi ${isVideo ? 'video' : 'ảnh'} thành công! 🚀`);
@@ -537,20 +591,21 @@ export const FloatingChatWidget = () => {
                       );
                     }
 
+                    const isMe = isMessageFromMe(msg);
                     return (
                       <div
                         key={msg.id}
-                        className={`flex gap-2 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'}`}
+                        className={`flex gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}
                       >
-                        {!msg.isMe && (
+                        {!isMe && (
                           <img
                             src={msg.senderAvatar || activeThreadObj?.avatar}
                             alt=""
                             className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5"
                           />
                         )}
-                      <div className={`max-w-[75%] space-y-0.5 flex flex-col ${msg.isMe ? 'items-end' : 'items-start'}`}>
-                        {!msg.isMe && (
+                      <div className={`max-w-[75%] space-y-0.5 flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                        {!isMe && (
                           <span className="text-[9px] font-bold text-slate-400 px-1">{msg.senderName}</span>
                         )}
 
@@ -570,7 +625,7 @@ export const FloatingChatWidget = () => {
                         ) : (
                           <div
                             className={`p-2.5 rounded-2xl text-xs leading-relaxed break-words ${
-                              msg.isMe
+                              isMe
                                 ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-tr-none shadow-xs'
                                 : 'bg-slate-100 text-slate-800 rounded-tl-none border border-slate-200/50'
                             }`}
@@ -579,9 +634,9 @@ export const FloatingChatWidget = () => {
                           </div>
                         )}
 
-                        <div className={`flex items-center gap-1 text-[8px] text-slate-400 px-1 ${msg.isMe ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`flex items-center gap-1 text-[8px] text-slate-400 px-1 ${isMe ? 'justify-end' : 'justify-start'}`}>
                           <span>{msg.time}</span>
-                          {msg.isMe && <CheckCheck className="w-2.5 h-2.5 text-sky-500" />}
+                          {isMe && <CheckCheck className="w-2.5 h-2.5 text-sky-500" />}
                         </div>
                         </div>
                       </div>
