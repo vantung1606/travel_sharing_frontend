@@ -3,7 +3,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
-import { Sparkles, MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation } from 'lucide-react';
+import { ItineraryExportModal } from '../../../components/itinerary/ItineraryExportModal';
+import { Sparkles, MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation, Download } from 'lucide-react';
 
 export const ItineraryManagerPage = () => {
   const {
@@ -43,6 +44,7 @@ export const ItineraryManagerPage = () => {
 
   // Selected Itinerary for Detail Modal
   const [selectedItinerary, setSelectedItinerary] = useState(null);
+  const [exportModalItinerary, setExportModalItinerary] = useState(null);
 
   // Tự động mở xem chi tiết lịch trình khi WanderAI vừa khởi tạo xong
   useEffect(() => {
@@ -690,6 +692,18 @@ export const ItineraryManagerPage = () => {
 
                       <button
                         type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExportModalItinerary(itin);
+                        }}
+                        className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-sky-50 text-slate-600 hover:text-sky-600 flex items-center justify-center transition-colors cursor-pointer active:scale-90"
+                        title="Tải lịch trình (PDF, Lịch Google, In ấn)"
+                      >
+                        <Download className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        type="button"
                         onClick={(e) => handleShareItinerary(itin, e)}
                         className="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer active:scale-90"
                         title="Chia sẻ chuyến đi"
@@ -781,6 +795,14 @@ export const ItineraryManagerPage = () => {
         <ItineraryDetailModal
           itinerary={selectedItinerary}
           onClose={() => setSelectedItinerary(null)}
+        />
+      )}
+
+      {/* Modal Xuất Lịch Trình (PDF, iCal, Print) Trực Tiếp */}
+      {exportModalItinerary && (
+        <ItineraryExportModal
+          itinerary={exportModalItinerary}
+          onClose={() => setExportModalItinerary(null)}
         />
       )}
 

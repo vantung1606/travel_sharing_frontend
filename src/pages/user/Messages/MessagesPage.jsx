@@ -27,7 +27,12 @@ import {
   UserMinus,
   LogOut,
   Shield,
-  AlertTriangle
+  AlertTriangle,
+  Mic,
+  Play,
+  Pause,
+  FileText,
+  Download
 } from 'lucide-react';
 
 // Hàm chuẩn hóa tiếng Việt loại bỏ dấu để tìm kiếm tức thì theo chuỗi con (VD: 'tu' -> khớp 'tùng', 'tg' -> không khớp)
@@ -40,6 +45,142 @@ export const normalizeVietnamese = (str) => {
     .replace(/đ/g, 'd')
     .replace(/Đ/g, 'd')
     .trim();
+};
+
+// Trình phát Tin nhắn Thoại Tuỳ biến Thanh lịch
+const AudioMessagePlayer = ({ src, isMe }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const onLoadedMetadata = () => {
+      if (audio.duration && !isNaN(audio.duration)) {
+        setDuration(audio.duration);
+      }
+    };
+    const onTimeUpdate = () => {
+      setCurrentTime(audio.currentTime);
+    };
+    const onEnded = () => {
+      setIsPlaying(false);
+      setCurrentTime(0);
+    };
+
+    audio.addEventListener('loadedmetadata', onLoadedMetadata);
+    audio.addEventListener('timeupdate', onTimeUpdate);
+    audio.addEventListener('ended', onEnded);
+
+    return () => {
+      audio.removeEventListener('loadedmetadata', onLoadedMetadata);
+      audio.removeEventListener('timeupdate', onTimeUpdate);
+      audio.removeEventListener('ended', onEnded);
+    };
+  }, []);
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+    } else {
+      audio.play().then(() => setIsPlaying(true)).catch(e => console.warn('Audio play warning:', e));
+    }
+  };
+
+  const handleSeek = (e) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const time = Number(e.target.value);
+    audio.currentTime = time;
+    setCurrentTime(time);
+  };
+
+  const formatSec = (sec) => {
+    if (!sec || isNaN(sec)) return '0:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  return (
+    <div className={`flex items-center gap-2.5 p-2.5 rounded-2xl min-w-[210px] sm:min-w-[240px] select-none ${
+      isMe ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-800 border border-slate-200/80'
+    }`}>
+      <audio ref={audioRef} src={src} preload="metadata" />
+      <button
+        type="button"
+        onClick={togglePlay}
+        className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-90 cursor-pointer ${
+          isMe ? 'bg-white text-sky-600 hover:bg-sky-50 shadow-xs' : 'bg-sky-600 text-white hover:bg-sky-700 shadow-xs'
+        }`}
+        title={isPlaying ? 'Tạm dừng' : 'Phát tin thoại'}
+      >
+        {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}
+      </button>
+
+      <div className="flex-1 space-y-1">
+        <input
+          type="range"
+          min="0"
+          max={duration || 100}
+          value={currentTime}
+          onChange={handleSeek}
+          className="w-full h-1.5 bg-slate-200/40 rounded-lg appearance-none cursor-pointer accent-sky-500"
+        />
+        <div className="flex items-center justify-between text-[10px] font-semibold opacity-85 leading-none">
+          <span>{formatSec(currentTime)}</span>
+          <span>{duration > 0 ? formatSec(duration) : 'Tin thoại'}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Hiển thị Thẻ Tệp Đính Kèm (PDF, Tài liệu, v.v.)
+const FileAttachmentBubble = ({ src, isMe }) => {
+  const fileName = useMemo(() => {
+    try {
+      const parts = src.split('/');
+      const last = parts[parts.length - 1];
+      return decodeURIComponent(last.split('?')[0]);
+    } catch {
+      return 'Tệp tin đính kèm';
+    }
+  }, [src]);
+
+  return (
+    <div className={`flex items-center gap-3 p-3 rounded-2xl max-w-xs ${
+      isMe ? 'bg-sky-700 text-white shadow-sm' : 'bg-slate-100 text-slate-800 border border-slate-200/80'
+    }`}>
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+        isMe ? 'bg-white/20 text-white' : 'bg-sky-50 text-sky-600 border border-sky-100'
+      }`}>
+        <FileText className="w-5 h-5" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs font-bold truncate">{fileName}</p>
+        <span className="text-[10px] opacity-75">Tệp tin chia sẻ</span>
+      </div>
+      <a
+        href={src}
+        download
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`p-2 rounded-xl transition-all shrink-0 cursor-pointer ${
+          isMe ? 'hover:bg-white/20 text-white' : 'hover:bg-slate-200 text-slate-600'
+        }`}
+        title="Tải tệp tin về máy"
+      >
+        <Download className="w-4 h-4" />
+      </a>
+    </div>
+  );
 };
 
 export const MessagesPage = () => {
@@ -84,6 +225,14 @@ export const MessagesPage = () => {
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Voice Recording State
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const mediaRecorderRef = useRef(null);
+  const audioChunksRef = useRef([]);
+  const recordingTimerRef = useRef(null);
+  const recordingStreamRef = useRef(null);
 
   const effectiveEmail = currentUser?.email || 'tung@gmail.com';
 
@@ -406,13 +555,13 @@ export const MessagesPage = () => {
     }
   };
 
-  // 7. Gửi Tệp đa phương tiện (Ảnh hoặc Video lên Đám mây Cloudinary CDN)
+  // 7. Gửi Tệp đa phương tiện (Ảnh, Video, Audio hoặc Tài liệu lên Đám mây Cloudinary CDN)
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     if (!activeThreadId) {
-      toast.showInfo('Vui lòng chọn hoặc tạo một cuộc trò chuyện trước khi tải ảnh/video!');
+      toast.showInfo('Vui lòng chọn hoặc tạo một cuộc trò chuyện trước khi tải tệp!');
       e.target.value = '';
       return;
     }
@@ -420,20 +569,25 @@ export const MessagesPage = () => {
     // Reset input để người dùng có thể chọn lại cùng 1 file nếu muốn
     e.target.value = '';
 
-    const isVideo = file.type.startsWith('video/') ||
-      /\.(mp4|mov|webm|avi|mkv)$/i.test(file.name);
+    const isVideo = file.type.startsWith('video/') || /\.(mp4|mov|webm|avi|mkv)$/i.test(file.name);
+    const isAudio = file.type.startsWith('audio/') || /\.(mp3|wav|ogg|m4a|aac)$/i.test(file.name);
+    const isImage = file.type.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name);
 
-    const msgType = isVideo ? 'VIDEO' : 'IMAGE';
+    let msgType = 'FILE';
+    if (isVideo) msgType = 'VIDEO';
+    else if (isAudio) msgType = 'AUDIO';
+    else if (isImage) msgType = 'IMAGE';
 
-    // Giới hạn dung lượng: 100MB cho video, 25MB cho ảnh
+    // Giới hạn dung lượng: 100MB cho video, 25MB cho ảnh/tệp/audio
     const maxMb = isVideo ? 100 : 25;
     if (file.size > maxMb * 1024 * 1024) {
-      toast.showError(`Dung lượng ${isVideo ? 'video' : 'ảnh'} tối đa là ${maxMb}MB!`);
+      toast.showError(`Dung lượng tệp tối đa là ${maxMb}MB!`);
       return;
     }
 
     setIsUploading(true);
-    setUploadProgressText(`Đang tải ${isVideo ? 'video' : 'hình ảnh'} lên Đám mây CDN...`);
+    const typeLabel = isVideo ? 'video' : isAudio ? 'âm thanh' : isImage ? 'hình ảnh' : 'tài liệu';
+    setUploadProgressText(`Đang tải ${typeLabel} lên Đám mây CDN...`);
 
     // Tạo tin nhắn tạm (optimistic preview)
     const tempId = 'temp-media-' + Date.now();
@@ -477,7 +631,7 @@ export const MessagesPage = () => {
         setMessages(prev => prev.map(m => m.id === tempId ? normalizedSaved : m));
       }
       loadRooms();
-      toast.showSuccess(`Đã gửi ${isVideo ? 'video' : 'hình ảnh'} thành công! 🚀`);
+      toast.showSuccess(`Đã gửi ${typeLabel} thành công! 🚀`);
     } catch (err) {
       console.error('Lỗi tải tệp lên chat:', err);
       toast.showError(`Tải tệp thất bại: ${err.message || 'Vui lòng kiểm tra lại mạng!'}`);
@@ -486,6 +640,107 @@ export const MessagesPage = () => {
       setIsUploading(false);
       setUploadProgressText('');
     }
+  };
+
+  // 7.1 Bắt đầu ghi âm tin nhắn thoại
+  const handleStartRecording = async () => {
+    if (!activeThreadId) {
+      toast.showInfo('Vui lòng chọn hoặc tạo cuộc trò chuyện trước khi ghi âm!');
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      recordingStreamRef.current = stream;
+      audioChunksRef.current = [];
+
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.start(100);
+      setIsRecording(true);
+      setRecordingDuration(0);
+
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingDuration(prev => prev + 1);
+      }, 1000);
+    } catch (err) {
+      console.warn('Lỗi mở micro:', err);
+      toast.showError('Không thể truy cập Micro. Vui lòng cấp quyền micro cho trình duyệt!');
+    }
+  };
+
+  // 7.2 Dừng và Gửi tin nhắn thoại
+  const handleStopAndSendRecording = async () => {
+    if (!mediaRecorderRef.current || !isRecording) return;
+
+    if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+    const mediaRecorder = mediaRecorderRef.current;
+
+    mediaRecorder.onstop = async () => {
+      try {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        if (recordingStreamRef.current) {
+          recordingStreamRef.current.getTracks().forEach(track => track.stop());
+        }
+
+        if (audioBlob.size < 800) {
+          toast.showInfo('Bản ghi quá ngắn để gửi.');
+          setIsRecording(false);
+          setRecordingDuration(0);
+          return;
+        }
+
+        const voiceFile = new File([audioBlob], `voice_${Date.now()}.webm`, { type: 'audio/webm' });
+
+        setIsUploading(true);
+        setUploadProgressText('Đang gửi tin nhắn thoại lên Đám mây CDN...');
+
+        const secureUrl = await uploadApi.uploadSingle(voiceFile);
+        if (!secureUrl) {
+          throw new Error('Máy chủ đám mây không phản hồi đường dẫn tệp thoại.');
+        }
+
+        await chatApi.sendMessage(
+          activeThreadId,
+          { content: secureUrl, messageType: 'AUDIO' },
+          effectiveEmail
+        );
+
+        toast.showSuccess('Đã gửi tin nhắn thoại thành công! 🎙️');
+        await loadMessages(activeThreadId, true);
+        await loadRooms();
+      } catch (err) {
+        console.error('Lỗi gửi tin nhắn thoại:', err);
+        toast.showError('Không thể gửi tin nhắn thoại: ' + err.message);
+      } finally {
+        setIsUploading(false);
+        setUploadProgressText('');
+        setIsRecording(false);
+        setRecordingDuration(0);
+      }
+    };
+
+    mediaRecorder.stop();
+  };
+
+  // 7.3 Hủy ghi âm
+  const handleCancelRecording = () => {
+    if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
+      mediaRecorderRef.current.stop();
+    }
+    if (recordingStreamRef.current) {
+      recordingStreamRef.current.getTracks().forEach(track => track.stop());
+    }
+    setIsRecording(false);
+    setRecordingDuration(0);
+    audioChunksRef.current = [];
   };
 
   // Chọn hoặc bỏ chọn thành viên trong modal tạo nhóm
@@ -1654,6 +1909,10 @@ export const MessagesPage = () => {
                               </div>
                             )}
                           </div>
+                        ) : msg.messageType === 'AUDIO' ? (
+                          <AudioMessagePlayer src={msg.content} isMe={isMe} />
+                        ) : msg.messageType === 'FILE' ? (
+                          <FileAttachmentBubble src={msg.content} isMe={isMe} />
                         ) : (
                           <div
                             className={`p-3 rounded-2xl text-xs leading-relaxed break-words ${
@@ -1710,51 +1969,105 @@ export const MessagesPage = () => {
             </div>
           )}
 
-          {/* Form Nhập tin nhắn & Nút Chọn Ảnh/Video */}
+          {/* Form Nhập tin nhắn & Nút Chọn Ảnh/Video/Tệp/Ghi âm */}
           {currentThreadObj && (
-            <form onSubmit={handleSendMessage} className="flex items-center gap-2 pt-3 border-t border-slate-100">
-              {/* Input file ẩn hỗ trợ cả Ảnh và Video */}
+            <>
+              {/* Input file ẩn hỗ trợ Ảnh, Video, Audio và Tài liệu PDF/Doc/Zip */}
               <input
                 type="file"
                 ref={fileInputRef}
-                accept="image/*,video/*"
+                accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.zip"
                 onChange={handleFileUpload}
                 className="hidden"
               />
 
-              {/* Nút đính kèm ảnh/video lên Cloudinary */}
-              <button
-                type="button"
-                disabled={isUploading}
-                onClick={() => fileInputRef.current?.click()}
-                title="Gửi hình ảnh hoặc video lên Cloudinary CDN"
-                className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-sky-600 hover:border-sky-300 hover:bg-sky-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
-              >
-                <Paperclip className="w-4 h-4" />
-              </button>
+              {isRecording ? (
+                /* Thanh Trạng Thái Đang Ghi Âm Tin Nhắn Thoại */
+                <div className="flex items-center gap-2 pt-3 border-t border-slate-100 animate-fade-in">
+                  <div className="flex-1 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700">
+                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping shrink-0" />
+                    <span className="text-xs font-bold text-rose-600">Đang ghi âm...</span>
+                    <span className="font-mono text-xs font-black text-rose-700 bg-rose-100/70 px-2 py-0.5 rounded-md">
+                      {Math.floor(recordingDuration / 60)}:{String(recordingDuration % 60).padStart(2, '0')}
+                    </span>
+                    {/* Hiệu ứng sóng âm thanh động */}
+                    <div className="flex items-center gap-1 ml-auto">
+                      <span className="w-1 h-3 bg-rose-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                      <span className="w-1 h-5 bg-rose-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                      <span className="w-1 h-3.5 bg-rose-400 rounded-full animate-bounce [animation-delay:-0.45s]"></span>
+                      <span className="w-1 h-6 bg-rose-600 rounded-full animate-bounce"></span>
+                      <span className="w-1 h-3 bg-rose-400 rounded-full animate-bounce [animation-delay:-0.2s]"></span>
+                    </div>
+                  </div>
 
-              <input
-                type="text"
-                placeholder={
-                  currentThreadObj?.type === 'DIRECT'
-                    ? `Nhắn tin cho ${currentThreadObj.name}...`
-                    : 'Nhập tin nhắn nhóm (hoặc bấm biểu tượng ghim kẹp để gửi ảnh/video)...'
-                }
-                value={inputText}
-                onChange={e => setInputText(e.target.value)}
-                disabled={isUploading}
-                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-slate-50/50 focus:bg-white transition-all font-medium disabled:opacity-60"
-              />
+                  <button
+                    type="button"
+                    onClick={handleCancelRecording}
+                    className="p-2.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-all cursor-pointer shrink-0"
+                    title="Hủy ghi âm"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
 
-              <button
-                type="submit"
-                disabled={!inputText.trim() || isUploading}
-                className="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed px-5 py-2.5 rounded-xl text-white text-xs font-bold shrink-0 shadow-md shadow-sky-600/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>Gửi</span>
-              </button>
-            </form>
+                  <button
+                    type="button"
+                    onClick={handleStopAndSendRecording}
+                    disabled={isUploading}
+                    className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 transition-all flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Gửi Thoại</span>
+                  </button>
+                </div>
+              ) : (
+                /* Thanh Nhập Tin Nhắn Bình Thường */
+                <form onSubmit={handleSendMessage} className="flex items-center gap-2 pt-3 border-t border-slate-100">
+                  {/* Nút đính kèm ảnh/video/tệp lên Cloudinary */}
+                  <button
+                    type="button"
+                    disabled={isUploading}
+                    onClick={() => fileInputRef.current?.click()}
+                    title="Đính kèm ảnh, video hoặc tệp tài liệu"
+                    className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-sky-600 hover:border-sky-300 hover:bg-sky-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                  >
+                    <Paperclip className="w-4 h-4" />
+                  </button>
+
+                  {/* Nút Ghi âm Tin nhắn Thoại */}
+                  <button
+                    type="button"
+                    disabled={isUploading}
+                    onClick={handleStartRecording}
+                    title="Bấm để ghi âm tin nhắn thoại"
+                    className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                  >
+                    <Mic className="w-4 h-4" />
+                  </button>
+
+                  <input
+                    type="text"
+                    placeholder={
+                      currentThreadObj?.type === 'DIRECT'
+                        ? `Nhắn tin cho ${currentThreadObj.name}...`
+                        : 'Nhập tin nhắn nhóm (hoặc bấm biểu tượng ghim/micro để gửi tệp/thoại)...'
+                    }
+                    value={inputText}
+                    onChange={e => setInputText(e.target.value)}
+                    disabled={isUploading}
+                    className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-slate-50/50 focus:bg-white transition-all font-medium disabled:opacity-60"
+                  />
+
+                  <button
+                    type="submit"
+                    disabled={!inputText.trim() || isUploading}
+                    className="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed px-5 py-2.5 rounded-xl text-white text-xs font-bold shrink-0 shadow-md shadow-sky-600/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Gửi</span>
+                  </button>
+                </form>
+              )}
+            </>
           )}
 
         </div>

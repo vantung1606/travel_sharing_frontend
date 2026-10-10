@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useToast } from '../common/Toast';
-import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon } from 'lucide-react';
+import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers } from 'lucide-react';
 import { ItineraryExportModal } from './ItineraryExportModal';
 
 // Tọa độ trung tâm các tỉnh/thành phố du lịch chính tại Việt Nam
@@ -275,6 +275,8 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
   const [mobileTab, setMobileTab] = useState('timeline');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [selectedMapPoint, setSelectedMapPoint] = useState(null);
+  const [mapLayer, setMapLayer] = useState('standard'); // 'standard' | 'satellite' | 'topo'
+  const [isMapFullscreen, setIsMapFullscreen] = useState(false);
 
   // Checklist chuẩn bị hành trang cơ bản
   const [checklist, setChecklist] = useState([
@@ -403,6 +405,54 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
   const polylinePositions = useMemo(() => {
     return mapPoints.map(p => [p.lat, p.lng]);
   }, [mapPoints]);
+
+  // Tính tổng quãng đường di chuyển dự kiến giữa các trạm dừng (Haversine km)
+  const totalRouteDistanceKm = useMemo(() => {
+    if (polylinePositions.length < 2) return 0;
+    let totalKm = 0;
+    for (let i = 0; i < polylinePositions.length - 1; i++) {
+      const [lat1, lng1] = polylinePositions[i];
+      const [lat2, lng2] = polylinePositions[i + 1];
+      const R = 6371;
+      const dLat = ((lat2 - lat1) * Math.PI) / 180;
+      const dLng = ((lng2 - lng1) * Math.PI) / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLng / 2) * Math.sin(dLng / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      totalKm += R * c;
+    }
+    return Math.round(totalKm * 10) / 10;
+  }, [polylinePositions]);
+
+  // Thời gian di chuyển dự kiến (trung bình 35 km/h đường cảnh quan du lịch)
+  const estimatedTravelMinutes = useMemo(() => {
+    if (totalRouteDistanceKm <= 0) return 0;
+    return Math.max(15, Math.round((totalRouteDistanceKm / 35) * 60));
+  }, [totalRouteDistanceKm]);
+
+  // Cấu hình lớp bản đồ tương tác
+  const tileLayerConfig = useMemo(() => {
+    switch (mapLayer) {
+      case 'satellite':
+        return {
+          url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+          attribution: '&copy; Esri &mdash; World Imagery'
+        };
+      case 'topo':
+        return {
+          url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+          attribution: '&copy; OpenTopoMap (CC-BY-SA)'
+        };
+      case 'standard':
+      default:
+        return {
+          url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          attribution: '&copy; OpenStreetMap contributors'
+        };
+    }
+  }, [mapLayer]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8 bg-slate-950/75 backdrop-blur-sm overflow-y-auto animate-fade-in font-display">
@@ -704,20 +754,72 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
             
             {/* 1. BẢN ĐỒ LỘ TRÌNH TƯƠNG TÁC (LEAFLET OPENSTREETMAP THỰC TẾ) */}
             <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <Navigation className="w-4 h-4 text-sky-600" />
-                  <span>
-                    Bản đồ Lộ trình {activeTab === 'all' ? 'Toàn Chuyến' : `Ngày ${Number(activeTab) + 1}`}
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5 truncate">
+                    <Navigation className="w-4 h-4 text-sky-600 shrink-0" />
+                    <span className="truncate">
+                      Bản đồ Lộ trình {activeTab === 'all' ? 'Toàn Chuyến' : `Ngày ${Number(activeTab) + 1}`}
+                    </span>
+                  </h4>
+                  {totalRouteDistanceKm > 0 && (
+                    <p className="text-[10px] text-slate-500 font-semibold mt-0.5 flex items-center gap-1">
+                      <span>Lộ trình:</span>
+                      <span className="text-sky-700 font-bold">~{totalRouteDistanceKm} km</span>
+                      <span>•</span>
+                      <span>~{estimatedTravelMinutes} phút di chuyển</span>
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-100 text-[10px] font-extrabold">
+                    {mapPoints.length} Trạm
                   </span>
-                </h4>
-                <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-100 text-[10px] font-extrabold">
-                  {mapPoints.length} Trạm Dừng
-                </span>
+                  <button
+                    type="button"
+                    onClick={() => setIsMapFullscreen(true)}
+                    className="p-1.5 rounded-lg bg-slate-100 hover:bg-sky-50 text-slate-600 hover:text-sky-600 text-xs font-bold transition-all cursor-pointer border border-slate-200/60"
+                    title="Mở rộng bản đồ toàn màn hình"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
               {/* KHUNG BẢN ĐỒ LEAFLET THỰC TẾ (RESPONSIVE HEIGHT) */}
               <div className="relative w-full h-56 sm:h-64 md:h-72 rounded-xl overflow-hidden border border-slate-200 z-0">
+                {/* Bộ nút chuyển đổi lớp bản đồ nổi */}
+                <div className="absolute top-2.5 right-2.5 z-1000 flex items-center bg-white/90 backdrop-blur-md p-0.5 rounded-xl border border-slate-200/80 shadow-md text-[10px] font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setMapLayer('standard')}
+                    className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                      mapLayer === 'standard' ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    Đường phố
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMapLayer('satellite')}
+                    className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                      mapLayer === 'satellite' ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    Vệ tinh
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMapLayer('topo')}
+                    className={`px-2 py-1 rounded-lg transition-all cursor-pointer ${
+                      mapLayer === 'topo' ? 'bg-sky-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    Địa hình
+                  </button>
+                </div>
+
                 <MapContainer
                   center={[baseCoords.lat, baseCoords.lng]}
                   zoom={baseCoords.zoom || 11}
@@ -725,8 +827,8 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
                   className="w-full h-full"
                 >
                   <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    url={tileLayerConfig.url}
+                    attribution={tileLayerConfig.attribution}
                     maxZoom={19}
                   />
 
@@ -974,6 +1076,181 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
           itinerary={itinerary}
           onClose={() => setIsExportModalOpen(false)}
         />
+      )}
+
+      {/* Chế độ xem Bản đồ Toàn màn hình (Fullscreen Interactive Map) */}
+      {isMapFullscreen && (
+        <div className="fixed inset-0 z-100 bg-slate-950/95 backdrop-blur-xl flex flex-col p-3 sm:p-5 animate-fade-in">
+          {/* Header Bản đồ toàn cảnh */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800 text-white shrink-0">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-2xl bg-sky-600/30 border border-sky-500/40 text-sky-400 flex items-center justify-center shrink-0">
+                <Navigation className="w-5 h-5" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-extrabold text-sm sm:text-base text-white truncate">
+                  Bản Đồ Lộ Trình: {itinerary.title || destinationName}
+                </h3>
+                <p className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
+                  <span className="text-sky-400 font-bold">{mapPoints.length} trạm dừng</span>
+                  {totalRouteDistanceKm > 0 && (
+                    <>
+                      <span>•</span>
+                      <span className="text-emerald-400 font-bold">~{totalRouteDistanceKm} km</span>
+                      <span>•</span>
+                      <span>~{estimatedTravelMinutes} phút di chuyển</span>
+                    </>
+                  )}
+                </p>
+              </div>
+            </div>
+
+            {/* Điều khiển Lớp Bản Đồ & Nút Đóng */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <div className="flex items-center bg-slate-900/90 p-1 rounded-xl border border-slate-700 text-xs font-bold">
+                <button
+                  type="button"
+                  onClick={() => setMapLayer('standard')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    mapLayer === 'standard' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Đường phố
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMapLayer('satellite')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    mapLayer === 'satellite' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Vệ tinh
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMapLayer('topo')}
+                  className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    mapLayer === 'topo' ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  Địa hình
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsMapFullscreen(false)}
+                className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border border-slate-700"
+              >
+                <Minimize2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Thu nhỏ</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Khung bản đồ rộng lớn chiếm trọn không gian */}
+          <div className="flex-1 w-full rounded-2xl overflow-hidden border border-slate-800 my-3 relative z-0">
+            <MapContainer
+              center={[baseCoords.lat, baseCoords.lng]}
+              zoom={baseCoords.zoom || 12}
+              scrollWheelZoom={true}
+              className="w-full h-full"
+            >
+              <TileLayer
+                url={tileLayerConfig.url}
+                attribution={tileLayerConfig.attribution}
+                maxZoom={19}
+              />
+
+              <MapController
+                points={mapPoints}
+                selectedPoint={selectedMapPoint}
+                triggerResize={isMapFullscreen}
+              />
+
+              {polylinePositions.length > 1 && (
+                <Polyline
+                  positions={polylinePositions}
+                  pathOptions={{
+                    color: '#38bdf8',
+                    weight: 4,
+                    opacity: 0.9,
+                    dashArray: '8, 8'
+                  }}
+                />
+              )}
+
+              {mapPoints.map((pt) => {
+                const isSelected = selectedMapPoint?.id === pt.id;
+                const googleMapsDirectUrl = pt.isExact
+                  ? `https://www.google.com/maps/search/?api=1&query=${pt.lat},${pt.lng}`
+                  : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${pt.cleanName}, ${pt.address || destinationName}`)}`;
+
+                return (
+                  <Marker
+                    key={pt.id}
+                    position={[pt.lat, pt.lng]}
+                    icon={createNumberedMarkerIcon(pt.order, isSelected)}
+                    eventHandlers={{
+                      click: () => setSelectedMapPoint(pt)
+                    }}
+                  >
+                    <Popup className="custom-leaflet-popup">
+                      <div className="p-1 space-y-1.5 min-w-[200px] text-slate-800">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded-full bg-sky-600 text-white font-extrabold text-[10px] flex items-center justify-center shrink-0">
+                            {pt.order}
+                          </span>
+                          <h5 className="font-extrabold text-xs text-slate-900 leading-tight">
+                            {pt.cleanName}
+                          </h5>
+                        </div>
+                        <p className="text-[11px] text-slate-600 leading-snug">
+                          {pt.address || destinationName}
+                        </p>
+                        <div className="pt-1 flex items-center justify-between border-t border-slate-100">
+                          <a
+                            href={googleMapsDirectUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[11px] text-sky-600 hover:underline font-bold inline-flex items-center gap-1"
+                          >
+                            <span>Mở trên Google Maps</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        </div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
+            </MapContainer>
+          </div>
+
+          {/* Thanh cuộn ngang các trạm dừng bên dưới để chuyển nhanh */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 shrink-0 custom-dropdown-scroll">
+            {mapPoints.map((pt) => {
+              const isSelected = selectedMapPoint?.id === pt.id;
+              return (
+                <button
+                  key={pt.id}
+                  type="button"
+                  onClick={() => setSelectedMapPoint(pt)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 flex items-center gap-1.5 transition-all cursor-pointer border ${
+                    isSelected
+                      ? 'bg-sky-600 text-white border-sky-400 shadow-md'
+                      : 'bg-slate-900/90 text-slate-300 border-slate-800 hover:bg-slate-800'
+                  }`}
+                >
+                  <span className="w-4 h-4 rounded-full bg-white/20 text-white text-[10px] font-black flex items-center justify-center">
+                    {pt.order}
+                  </span>
+                  <span className="truncate max-w-[140px]">{pt.cleanName}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       )}
     </div>
   );
