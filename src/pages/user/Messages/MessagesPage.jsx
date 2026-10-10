@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { chatApi, uploadApi } from '../../../services/api';
@@ -32,8 +32,11 @@ import {
   Play,
   Pause,
   FileText,
-  Download
+  Download,
+  Route
 } from 'lucide-react';
+import { ItineraryMessageBubble } from '../../../components/chat/ItineraryMessageBubble';
+import { ItineraryPickerModal } from '../../../components/chat/ItineraryPickerModal';
 
 // Hàm chuẩn hóa tiếng Việt loại bỏ dấu để tìm kiếm tức thì theo chuỗi con (VD: 'tu' -> khớp 'tùng', 'tg' -> không khớp)
 export const normalizeVietnamese = (str) => {
@@ -185,6 +188,7 @@ const FileAttachmentBubble = ({ src, isMe }) => {
 
 export const MessagesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { currentUser } = useApp();
   const toast = useToast();
 
@@ -200,6 +204,7 @@ export const MessagesPage = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgressText, setUploadProgressText] = useState('');
   const [previewMediaUrl, setPreviewMediaUrl] = useState(null); // Lightbox for image
+  const [isItineraryPickerOpen, setIsItineraryPickerOpen] = useState(false);
 
   // Modal Tạo Nhóm Mới
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -741,6 +746,42 @@ export const MessagesPage = () => {
     setIsRecording(false);
     setRecordingDuration(0);
     audioChunksRef.current = [];
+  };
+
+  // 7.4 Gửi Lịch Trình AI vào cuộc trò chuyện
+  const handleSendItinerary = async (itin) => {
+    if (!activeThreadId) {
+      toast.showInfo('Vui lòng chọn một cuộc trò chuyện để gửi lịch trình!');
+      return;
+    }
+    setIsItineraryPickerOpen(false);
+
+    const itinPayload = {
+      id: itin.id,
+      title: itin.title || 'Lịch trình du lịch',
+      destination: itin.destination || 'Việt Nam',
+      budgetTotal: itin.budgetTotal || itin.totalBudget || 0,
+      duration: itin.duration || (itin.days ? `${itin.days} ngày` : 'Nhiều ngày'),
+      coverImageUrl: itin.coverImageUrl || itin.imageUrl || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80',
+      placesCount: itin.placesCount || (Array.isArray(itin.places) ? itin.places.length : 0),
+      isAiGenerated: itin.isAiGenerated ?? true
+    };
+
+    const content = JSON.stringify(itinPayload);
+
+    try {
+      await chatApi.sendMessage(
+        activeThreadId,
+        { content, messageType: 'ITINERARY' },
+        effectiveEmail
+      );
+      toast.showSuccess('Đã gửi lịch trình vào cuộc trò chuyện! 🗺️');
+      await loadMessages(activeThreadId, true);
+      await loadRooms();
+    } catch (err) {
+      console.error('Lỗi gửi lịch trình:', err);
+      toast.showError('Không thể gửi lịch trình: ' + err.message);
+    }
   };
 
   // Chọn hoặc bỏ chọn thành viên trong modal tạo nhóm
@@ -1913,6 +1954,14 @@ export const MessagesPage = () => {
                           <AudioMessagePlayer src={msg.content} isMe={isMe} />
                         ) : msg.messageType === 'FILE' ? (
                           <FileAttachmentBubble src={msg.content} isMe={isMe} />
+                        ) : msg.messageType === 'ITINERARY' ? (
+                          <ItineraryMessageBubble
+                            content={msg.content}
+                            isMe={isMe}
+                            onViewItinerary={(itinData) => {
+                              navigate(`/itinerary?id=${itinData.id || ''}`);
+                            }}
+                          />
                         ) : (
                           <div
                             className={`p-3 rounded-2xl text-xs leading-relaxed break-words ${
@@ -2044,12 +2093,23 @@ export const MessagesPage = () => {
                     <Mic className="w-4 h-4" />
                   </button>
 
+                  {/* Nút Gửi Lịch Trình AI */}
+                  <button
+                    type="button"
+                    disabled={isUploading}
+                    onClick={() => setIsItineraryPickerOpen(true)}
+                    title="Gửi lịch trình du lịch vào cuộc trò chuyện"
+                    className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                  >
+                    <Route className="w-4 h-4 text-blue-600" />
+                  </button>
+
                   <input
                     type="text"
                     placeholder={
                       currentThreadObj?.type === 'DIRECT'
                         ? `Nhắn tin cho ${currentThreadObj.name}...`
-                        : 'Nhập tin nhắn nhóm (hoặc bấm biểu tượng ghim/micro để gửi tệp/thoại)...'
+                        : 'Nhập tin nhắn nhóm (hoặc bấm biểu tượng ghim/micro/lịch trình để gửi)...'
                     }
                     value={inputText}
                     onChange={e => setInputText(e.target.value)}
@@ -2073,6 +2133,13 @@ export const MessagesPage = () => {
         </div>
 
       </div>
+
+      {/* Modal Chọn Lịch Trình AI để gửi vào cuộc trò chuyện */}
+      <ItineraryPickerModal
+        isOpen={isItineraryPickerOpen}
+        onClose={() => setIsItineraryPickerOpen(false)}
+        onSelectItinerary={handleSendItinerary}
+      />
     </div>
   );
 };

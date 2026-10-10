@@ -21,8 +21,12 @@ import {
   FileText,
   Download,
   Mic,
-  Trash2
+  Trash2,
+  Route,
+  Sparkles
 } from 'lucide-react';
+import { ItineraryMessageBubble } from '../chat/ItineraryMessageBubble';
+import { ItineraryPickerModal } from '../chat/ItineraryPickerModal';
 
 const normalizeVietnamese = (str) => {
   if (!str) return '';
@@ -173,6 +177,7 @@ export const FloatingChatWidget = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [isItineraryPickerOpen, setIsItineraryPickerOpen] = useState(false);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -621,6 +626,60 @@ export const FloatingChatWidget = () => {
     };
   }, []);
 
+  // 5. Gửi Lịch Trình AI vào cuộc trò chuyện
+  const handleSendItinerary = async (itin) => {
+    if (!activeThreadId) {
+      toast.showInfo('Vui lòng chọn một cuộc trò chuyện để gửi lịch trình!');
+      return;
+    }
+    setIsItineraryPickerOpen(false);
+
+    const itinPayload = {
+      id: itin.id,
+      title: itin.title || 'Lịch trình du lịch',
+      destination: itin.destination || 'Việt Nam',
+      budgetTotal: itin.budgetTotal || itin.totalBudget || 0,
+      duration: itin.duration || (itin.days ? `${itin.days} ngày` : 'Nhiều ngày'),
+      coverImageUrl: itin.coverImageUrl || itin.imageUrl || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80',
+      placesCount: itin.placesCount || (Array.isArray(itin.places) ? itin.places.length : 0),
+      isAiGenerated: itin.isAiGenerated ?? true
+    };
+
+    const content = JSON.stringify(itinPayload);
+    const tempId = 'widget-temp-itin-' + Date.now();
+    const tempMsg = {
+      id: tempId,
+      roomId: activeThreadId,
+      senderId: currentUser?.id,
+      senderEmail: effectiveEmail,
+      senderName: currentUser?.name || 'Bạn',
+      senderAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+      content,
+      messageType: 'ITINERARY',
+      time: 'Đang gửi...',
+      isMe: true,
+      isPending: true
+    };
+    setMessages(prev => [...prev, tempMsg]);
+
+    try {
+      const savedMsg = await chatApi.sendMessage(
+        activeThreadId,
+        { content, messageType: 'ITINERARY' },
+        effectiveEmail
+      );
+      if (savedMsg) {
+        setMessages(prev => prev.map(m => m.id === tempId ? { ...savedMsg, isMe: true } : m));
+      }
+      toast.showSuccess('Đã gửi lịch trình vào cuộc trò chuyện! 🗺️');
+      loadRooms();
+    } catch (err) {
+      console.error('Lỗi gửi lịch trình:', err);
+      toast.showError('Không thể gửi lịch trình: ' + err.message);
+      setMessages(prev => prev.filter(m => m.id !== tempId));
+    }
+  };
+
   const activeThreadObj = threads.find(t => t.id === activeThreadId);
 
   const filteredThreads = threads.filter(t => {
@@ -883,6 +942,15 @@ export const FloatingChatWidget = () => {
                           <AudioMessagePlayer src={msg.content} isMe={isMe} />
                         ) : msg.messageType === 'FILE' ? (
                           <FileAttachmentBubble src={msg.content} isMe={isMe} />
+                        ) : msg.messageType === 'ITINERARY' ? (
+                          <ItineraryMessageBubble
+                            content={msg.content}
+                            isMe={isMe}
+                            onViewItinerary={(itinData) => {
+                              setIsOpen(false);
+                              navigate(`/itinerary?id=${itinData.id || ''}`);
+                            }}
+                          />
                         ) : (
                           <div
                             className={`p-2.5 rounded-2xl text-xs leading-relaxed break-words ${
@@ -987,6 +1055,17 @@ export const FloatingChatWidget = () => {
                     <Mic className="w-3.5 h-3.5 text-rose-500" />
                   </button>
 
+                  {/* Nút Gửi Lịch Trình AI */}
+                  <button
+                    type="button"
+                    disabled={isUploading}
+                    onClick={() => setIsItineraryPickerOpen(true)}
+                    className="p-2 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 transition-all cursor-pointer disabled:opacity-50 shrink-0 border border-slate-200/70"
+                    title="Gửi lịch trình du lịch vào cuộc trò chuyện"
+                  >
+                    <Route className="w-3.5 h-3.5 text-blue-600" />
+                  </button>
+
                   <input
                     type="text"
                     placeholder="Nhập tin nhắn..."
@@ -1010,6 +1089,13 @@ export const FloatingChatWidget = () => {
 
         </div>
       )}
+
+      {/* Modal Chọn Lịch Trình AI để gửi */}
+      <ItineraryPickerModal
+        isOpen={isItineraryPickerOpen}
+        onClose={() => setIsItineraryPickerOpen(false)}
+        onSelectItinerary={handleSendItinerary}
+      />
 
       {/* Floating Trigger Circle Button */}
       <button
