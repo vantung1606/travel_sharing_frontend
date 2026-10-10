@@ -1804,6 +1804,22 @@ export const chatApi = {
       console.error('API error creating chat room:', err);
       throw err;
     }
+  },
+
+  async deleteRoom(roomId, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}?email=${encodeURIComponent(userEmail)}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      return true;
+    } catch (err) {
+      console.error(`API error deleting room ${roomId}:`, err);
+      throw err;
+    }
   }
 };
 

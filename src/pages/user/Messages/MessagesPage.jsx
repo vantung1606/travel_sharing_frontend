@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
@@ -18,11 +18,12 @@ import {
   X,
   Maximize2,
   Plus,
-  Compass
+  Compass,
+  Trash2
 } from 'lucide-react';
 
 export const MessagesPage = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { currentUser } = useApp();
   const toast = useToast();
 
@@ -113,13 +114,17 @@ export const MessagesPage = () => {
   }, [messages]);
 
   // 5. Xử lý mở nhanh cuộc trò chuyện từ Query Params (ví dụ: bấm nút Nhắn tin ở Profile người khác)
+  const openingDirectUserIdRef = useRef(null);
+
   useEffect(() => {
     const targetUserId = searchParams.get('userId');
-    if (targetUserId) {
+    if (targetUserId && openingDirectUserIdRef.current !== targetUserId) {
+      openingDirectUserIdRef.current = targetUserId;
       (async () => {
         try {
           const room = await chatApi.openDirectRoom(targetUserId, effectiveEmail);
           if (room) {
+            setSearchParams({}, { replace: true });
             await loadRooms();
             setActiveThreadId(room.id);
             setShowMobileChat(true);
@@ -129,7 +134,24 @@ export const MessagesPage = () => {
         }
       })();
     }
-  }, [searchParams, effectiveEmail, loadRooms]);
+  }, [searchParams, effectiveEmail, loadRooms, setSearchParams]);
+
+  // Xóa vĩnh viễn một cuộc trò chuyện
+  const handleDeleteRoom = async (roomId) => {
+    if (!roomId) return;
+    const ok = window.confirm('Bạn có chắc chắn muốn xóa cuộc trò chuyện này? Toàn bộ tin nhắn sẽ bị xóa vĩnh viễn.');
+    if (!ok) return;
+
+    try {
+      await chatApi.deleteRoom(roomId, effectiveEmail);
+      toast.showSuccess('Đã xóa cuộc trò chuyện thành công!');
+      setActiveThreadId(null);
+      setMessages([]);
+      await loadRooms();
+    } catch (err) {
+      toast.showError('Không thể xóa cuộc trò chuyện: ' + err.message);
+    }
+  };
 
   // 6. Gửi tin nhắn Text
   const handleSendMessage = async (e) => {
@@ -280,16 +302,29 @@ export const MessagesPage = () => {
 
   const currentThreadObj = threads.find(t => t.id === activeThreadId);
 
-  const filteredThreads = threads.filter(t => {
-    const matchesFilter =
-      filterTab === 'all'
-        ? true
-        : filterTab === 'direct'
-        ? t.type === 'DIRECT'
-        : t.type === 'GROUP';
-    const matchesSearch = t.name?.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+  // Lọc trùng lặp tuyệt đối ở Frontend: Cùng 1 người chỉ xuất hiện 1 lần trong danh sách
+  const filteredThreads = useMemo(() => {
+    const seenDirectNames = new Set();
+    const unique = threads.filter(t => {
+      if (t.type === 'DIRECT') {
+        const key = t.name?.trim().toLowerCase();
+        if (seenDirectNames.has(key)) return false;
+        seenDirectNames.add(key);
+      }
+      return true;
+    });
+
+    return unique.filter(t => {
+      const matchesFilter =
+        filterTab === 'all'
+          ? true
+          : filterTab === 'direct'
+          ? t.type === 'DIRECT'
+          : t.type === 'GROUP';
+      const matchesSearch = t.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesFilter && matchesSearch;
+    });
+  }, [threads, filterTab, searchTerm]);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8 space-y-6">
@@ -593,10 +628,19 @@ export const MessagesPage = () => {
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100 flex items-center gap-1">
+                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100 flex items-center gap-1 hidden sm:flex">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                     <span>Cloud CDN Sẵn Sàng</span>
                   </span>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteRoom(currentThreadObj.id)}
+                    title="Xóa cuộc trò chuyện này"
+                    className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
 
