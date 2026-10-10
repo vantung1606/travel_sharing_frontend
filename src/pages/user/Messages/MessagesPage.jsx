@@ -20,7 +20,9 @@ import {
   Maximize2,
   Plus,
   Compass,
-  Trash2
+  Trash2,
+  Check,
+  UserPlus
 } from 'lucide-react';
 
 export const MessagesPage = () => {
@@ -46,11 +48,34 @@ export const MessagesPage = () => {
   const [newRoomName, setNewRoomName] = useState('');
   const [newRoomIntro, setNewRoomIntro] = useState('');
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
+  const [availableUsers, setAvailableUsers] = useState([]);
+  const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [userSearchKeyword, setUserSearchKeyword] = useState('');
+  const [isLoadingAvailableUsers, setIsLoadingAvailableUsers] = useState(false);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
   const effectiveEmail = currentUser?.email || 'tung@gmail.com';
+
+  // Tải danh sách người dùng khả dụng để thêm vào nhóm
+  const loadAvailableUsers = useCallback(async (keyword = '') => {
+    setIsLoadingAvailableUsers(true);
+    try {
+      const data = await chatApi.getAvailableUsers(keyword, effectiveEmail);
+      setAvailableUsers(data || []);
+    } catch (err) {
+      console.warn('Lỗi tải danh sách người dùng khả dụng:', err);
+    } finally {
+      setIsLoadingAvailableUsers(false);
+    }
+  }, [effectiveEmail]);
+
+  useEffect(() => {
+    if (isCreateModalOpen) {
+      loadAvailableUsers(userSearchKeyword);
+    }
+  }, [isCreateModalOpen, userSearchKeyword, loadAvailableUsers]);
 
   // 1. Tải danh sách phòng chat từ Backend
   const loadRooms = useCallback(async () => {
@@ -304,6 +329,13 @@ export const MessagesPage = () => {
     }
   };
 
+  // Chọn hoặc bỏ chọn thành viên trong modal tạo nhóm
+  const handleToggleUserSelection = (userId) => {
+    setSelectedUserIds(prev =>
+      prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]
+    );
+  };
+
   // 8. Tạo Nhóm Chat Mới
   const handleCreateGroup = async (e) => {
     e?.preventDefault();
@@ -312,25 +344,33 @@ export const MessagesPage = () => {
       return;
     }
 
+    if (selectedUserIds.length === 0) {
+      toast.showError('Một mình không thể tạo nhóm! Vui lòng chọn ít nhất 1 thành viên khác để lập nhóm.');
+      return;
+    }
+
     setIsCreatingRoom(true);
     try {
       const room = await chatApi.createRoom({
         name: newRoomName.trim(),
-        initialMessage: newRoomIntro.trim() || `Chào mừng mọi người tham gia ${newRoomName.trim()}!`
+        memberIds: selectedUserIds,
+        initialMessage: newRoomIntro.trim() || `Chào mừng mọi người tham gia nhóm ${newRoomName.trim()}!`
       }, effectiveEmail);
 
       if (room) {
-        toast.showSuccess(`Tạo nhóm "${room.name}" thành công!`);
+        toast.showSuccess(`Tạo nhóm "${room.name}" thành công với ${selectedUserIds.length + 1} thành viên! 🎉`);
         setIsCreateModalOpen(false);
         setNewRoomName('');
         setNewRoomIntro('');
+        setSelectedUserIds([]);
+        setUserSearchKeyword('');
         await loadRooms();
         setActiveThreadId(room.id);
         setShowMobileChat(true);
       }
     } catch (err) {
       console.error('Lỗi tạo nhóm chat:', err);
-      toast.showError('Không thể tạo nhóm chat. Vui lòng thử lại!');
+      toast.showError(err.message || 'Không thể tạo nhóm chat. Vui lòng thử lại!');
     } finally {
       setIsCreatingRoom(false);
     }
@@ -389,15 +429,17 @@ export const MessagesPage = () => {
       {/* Modal Tạo Nhóm Trò Chuyện Mới */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200 space-y-5">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200 space-y-4 max-h-[92vh] flex flex-col">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center">
-                  <Users className="w-5 h-5" />
+                <div className="w-10 h-10 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                  <UserPlus className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-sm text-slate-900">Tạo nhóm trò chuyện mới</h3>
-                  <p className="text-xs text-slate-500">Cùng bạn bè chia sẻ lịch trình & ảnh/video</p>
+                  <h3 className="font-extrabold text-sm sm:text-base text-slate-900">Tạo nhóm trò chuyện mới</h3>
+                  <p className="text-xs text-slate-500">Cùng bạn bè lập đội phượt, trao đổi lịch trình & ảnh/video</p>
                 </div>
               </div>
               <button
@@ -409,12 +451,13 @@ export const MessagesPage = () => {
               </button>
             </div>
 
-            <form onSubmit={handleCreateGroup} className="space-y-4">
+            <form onSubmit={handleCreateGroup} className="space-y-4 overflow-y-auto pr-1 flex-1 custom-dropdown-scroll">
+              {/* Tên nhóm */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Tên nhóm *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Tên nhóm phượt *</label>
                 <input
                   type="text"
-                  placeholder="Ví dụ: Hội Phượt Hà Giang, Nhóm Đi Phú Quốc..."
+                  placeholder="Ví dụ: Đội Phượt Hà Giang 2026, Nhóm Đi Phú Quốc..."
                   value={newRoomName}
                   onChange={e => setNewRoomName(e.target.value)}
                   required
@@ -422,18 +465,129 @@ export const MessagesPage = () => {
                 />
               </div>
 
+              {/* Thêm thành viên vào nhóm (Bắt buộc tối thiểu 1 người) */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <span>Thêm thành viên vào nhóm *</span>
+                    <span className="text-[11px] font-normal text-slate-500">(Tối thiểu 1 người khác)</span>
+                  </label>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    selectedUserIds.length > 0 ? 'bg-sky-100 text-sky-700' : 'bg-slate-100 text-slate-500'
+                  }`}>
+                    Đã chọn: {selectedUserIds.length} người
+                  </span>
+                </div>
+
+                {/* Huy hiệu các thành viên ĐÃ CHỌN */}
+                {selectedUserIds.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 p-2 bg-slate-50 rounded-2xl border border-slate-100 max-h-24 overflow-y-auto">
+                    {selectedUserIds.map(uid => {
+                      const userObj = availableUsers.find(u => u.userId === uid);
+                      return (
+                        <span
+                          key={uid}
+                          className="inline-flex items-center gap-1.5 pl-1.5 pr-2 py-1 rounded-xl bg-white border border-sky-200 text-slate-800 text-xs font-semibold shadow-2xs animate-in zoom-in-95 duration-150"
+                        >
+                          <img
+                            src={userObj?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
+                            alt=""
+                            className="w-4 h-4 rounded-full object-cover"
+                          />
+                          <span className="text-[11px] truncate max-w-[120px]">{userObj?.fullName || 'Thành viên'}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleToggleUserSelection(uid)}
+                            className="text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Ô tìm kiếm thành viên */}
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Tìm theo tên hoặc email người dùng..."
+                    value={userSearchKeyword}
+                    onChange={e => setUserSearchKeyword(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50/70 border border-slate-200 text-xs focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-hidden transition-all placeholder:text-slate-400"
+                  />
+                </div>
+
+                {/* Danh sách người dùng khả dụng */}
+                <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-white max-h-44 overflow-y-auto custom-dropdown-scroll divide-y divide-slate-100">
+                  {isLoadingAvailableUsers ? (
+                    <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
+                      <span>Đang tìm kiếm thành viên...</span>
+                    </div>
+                  ) : availableUsers.length === 0 ? (
+                    <div className="py-6 text-center text-xs text-slate-400">
+                      Không tìm thấy người dùng phù hợp
+                    </div>
+                  ) : (
+                    availableUsers.map(user => {
+                      const isSelected = selectedUserIds.includes(user.userId);
+                      return (
+                        <div
+                          key={user.userId}
+                          onClick={() => handleToggleUserSelection(user.userId)}
+                          className={`p-2.5 flex items-center justify-between gap-2.5 cursor-pointer transition-colors ${
+                            isSelected ? 'bg-sky-50/60' : 'hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <img
+                              src={user.avatarUrl}
+                              alt=""
+                              className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-slate-200"
+                            />
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-slate-900 truncate">{user.fullName}</p>
+                              <p className="text-[10px] text-slate-400 truncate">{user.handle || user.email}</p>
+                            </div>
+                          </div>
+
+                          <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all shrink-0 ${
+                            isSelected
+                              ? 'bg-sky-600 border-sky-600 text-white'
+                              : 'border-slate-300 hover:border-sky-400'
+                          }`}>
+                            {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {selectedUserIds.length === 0 && (
+                  <p className="text-[11px] text-amber-600 font-medium flex items-center gap-1 mt-1">
+                    <span>💡 Nhóm trò chuyện cần ít nhất 2 thành viên trở lên để bắt đầu.</span>
+                  </p>
+                )}
+              </div>
+
+              {/* Tin nhắn mở đầu */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1.5">Tin nhắn mở đầu (tùy chọn)</label>
                 <textarea
                   placeholder="Nhập lời chào khởi đầu cho các thành viên trong nhóm..."
                   value={newRoomIntro}
                   onChange={e => setNewRoomIntro(e.target.value)}
-                  rows={3}
+                  rows={2}
                   className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-hidden transition-all resize-none font-medium"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-2">
+              {/* Footer nút hành động */}
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
@@ -443,11 +597,11 @@ export const MessagesPage = () => {
                 </button>
                 <button
                   type="submit"
-                  disabled={!newRoomName.trim() || isCreatingRoom}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-sky-600/20 transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+                  disabled={!newRoomName.trim() || selectedUserIds.length === 0 || isCreatingRoom}
+                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-sky-600/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
                 >
                   {isCreatingRoom && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>Tạo nhóm ngay</span>
+                  <span>Tạo nhóm ngay ({selectedUserIds.length + 1} người)</span>
                 </button>
               </div>
             </form>

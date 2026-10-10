@@ -1820,6 +1820,23 @@ export const chatApi = {
       console.error(`API error deleting room ${roomId}:`, err);
       throw err;
     }
+  },
+
+  async getAvailableUsers(keyword = '', email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const qs = keyword ? `&keyword=${encodeURIComponent(keyword)}` : '';
+      const res = await fetch(`${BASE_URL}/chat/available-users?email=${encodeURIComponent(userEmail)}${qs}`, {
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.error('API error fetching available users:', err);
+      return [];
+    }
   }
 };
 
