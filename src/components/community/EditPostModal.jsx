@@ -1,23 +1,5 @@
 import React, { useState, useRef } from 'react';
-import {
-  X,
-  MapPin,
-  Route,
-  ImageIcon,
-  Video,
-  Upload,
-  Loader2,
-  Send,
-  ShieldCheck,
-  Sparkles,
-  Lock,
-  Globe,
-  Trash2,
-  CheckCircle2,
-  AlertTriangle,
-  Flame,
-  Compass
-} from 'lucide-react';
+import { X, MapPin, ImageIcon, Video, Upload, Loader2, Send, ShieldCheck, Sparkles, Lock, Globe, Flame, Compass } from 'lucide-react';
 import { postApi, uploadApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { CustomSelect } from '../common/CustomSelect';

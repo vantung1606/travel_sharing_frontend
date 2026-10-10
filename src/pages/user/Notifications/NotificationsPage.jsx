@@ -1,35 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
-import {
-  Bell,
-  Sparkles,
-  Heart,
-  MessageCircle,
-  Users,
-  MapPin,
-  ShieldCheck,
-  CheckCheck,
-  Trash2,
-  Filter,
-  Search,
-  ChevronRight,
-  ExternalLink,
-  Clock,
-  Send,
-  PlusCircle,
-  RotateCcw,
-  CheckCircle2,
-  AlertCircle,
-  SlidersHorizontal,
-  Megaphone,
-  Radio,
-  X,
-  Share2,
-  EyeOff,
-  ShieldAlert,
-  Flag
-} from 'lucide-react';
+import { Bell, Sparkles, Heart, MessageCircle, Users, MapPin, ShieldCheck, CheckCheck, Trash2, Filter, Search, ChevronRight, ExternalLink, Clock, Send, PlusCircle, RotateCcw, CheckCircle2, Megaphone, X, Share2, EyeOff, ShieldAlert, Flag } from 'lucide-react';
 
 export const NotificationsPage = () => {
   const toast = useToast();

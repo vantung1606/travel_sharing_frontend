@@ -1,33 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { adminReportApi } from '../../../services/api';
-import {
-  MessageSquare,
-  AlertTriangle,
-  Flame,
-  ShieldAlert,
-  Search,
-  Filter,
-  Download,
-  CheckCircle2,
-  XCircle,
-  Eye,
-  EyeOff,
-  UserX,
-  Trash2,
-  RefreshCw,
-  TrendingUp,
-  FileText,
-  ShieldCheck,
-  Bot,
-  ExternalLink,
-  History,
-  Building,
-  X,
-  MapPin,
-  Calendar,
-  Sparkles
-} from 'lucide-react';
+import { AlertTriangle, Flame, ShieldAlert, Search, Filter, Download, CheckCircle2, Eye, EyeOff, UserX, Trash2, RefreshCw, TrendingUp, FileText, ShieldCheck, Bot, History, X, MapPin, Sparkles } from 'lucide-react';
 
 export const AdminReportsPage = () => {
   const toast = useToast();

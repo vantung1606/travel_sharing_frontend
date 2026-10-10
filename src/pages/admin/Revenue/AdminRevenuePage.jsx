@@ -1,24 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { adminApi } from '../../../services/api';
-import {
-  TrendingUp,
-  DollarSign,
-  Building2,
-  Crown,
-  CreditCard,
-  BarChart3,
-  Sparkles,
-  Zap,
-  CheckCircle2,
-  Clock,
-  ArrowUpRight,
-  PieChart,
-  Target,
-  ShieldCheck,
-  AlertCircle,
-  RefreshCw
-} from 'lucide-react';
+import { TrendingUp, DollarSign, Building2, Crown, CreditCard, BarChart3, Sparkles, Zap, CheckCircle2, Clock, PieChart, Target } from 'lucide-react';
 
 export const AdminRevenuePage = () => {
   const toast = useToast();

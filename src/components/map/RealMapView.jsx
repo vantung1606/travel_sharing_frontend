@@ -1,21 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import {
-  Navigation,
-  ExternalLink,
-  Phone,
-  Eye,
-  Star,
-  Sparkles,
-  MapPin,
-  Clock,
-  ChevronUp,
-  X,
-  Compass,
-  CheckCircle2,
-  Share2
-} from 'lucide-react';
+import { Navigation, Phone, Eye, Star, Sparkles, MapPin, Clock, ChevronUp, X, CheckCircle2 } from 'lucide-react';
 
 // Custom Map Controller to smoothly fly to active item or user location
 function MapFlyController({ activeItem, userCoords }) {

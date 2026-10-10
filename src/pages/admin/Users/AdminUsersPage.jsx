@@ -1,39 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { adminUserApi } from '../../../services/api';
-import {
-  Users,
-  Shield,
-  AlertTriangle,
-  CheckCircle2,
-  Ban,
-  Trash2,
-  Search,
-  UserPlus,
-  ChevronRight,
-  UserCheck,
-  Mail,
-  Award,
-  MoreHorizontal,
-  Download,
-  SlidersHorizontal,
-  Eye,
-  BadgeCheck,
-  Gavel,
-  RefreshCw,
-  Sparkles,
-  Link,
-  ChevronLeft,
-  Lock,
-  Unlock,
-  X,
-  Check,
-  Phone,
-  KeyRound,
-  ShieldCheck,
-  ShieldAlert,
-  UserCog
-} from 'lucide-react';
+import { Users, Shield, CheckCircle2, Ban, Search, UserPlus, ChevronRight, UserCheck, Award, Download, Eye, BadgeCheck, RefreshCw, Sparkles, ChevronLeft, Lock, Unlock, X, ShieldCheck, UserCog } from 'lucide-react';
 
 export const AdminUsersPage = () => {
   const toast = useToast();

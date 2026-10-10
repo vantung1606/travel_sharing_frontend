@@ -3,42 +3,7 @@ import { useApp } from '../../context/AppContext';
 import { useToast } from '../common/Toast';
 import { aiService } from '../../services/aiService';
 import { generateCustomVietnamItinerary } from '../../services/vietnamTravelDatabase';
-import {
-  Sparkles,
-  X,
-  MapPin,
-  Calendar,
-  DollarSign,
-  Bike,
-  Car,
-  Bus,
-  Loader2,
-  Check,
-  CheckCircle2,
-  ShieldCheck,
-  Camera,
-  Utensils,
-  Sun,
-  Landmark,
-  Compass,
-  Music,
-  Heart,
-  ShoppingBag,
-  Users,
-  User,
-  Home,
-  Sliders,
-  RotateCcw,
-  Bookmark,
-  Zap,
-  Info,
-  Navigation,
-  Minimize2,
-  Maximize2,
-  Activity,
-  Terminal,
-  ChevronDown
-} from 'lucide-react';
+import { Sparkles, X, MapPin, Calendar, DollarSign, Loader2, Check, CheckCircle2, Camera, Utensils, Sun, Landmark, Compass, Music, Heart, ShoppingBag, Users, User, Home, Info, Navigation, Minimize2, Maximize2, Activity, Terminal } from 'lucide-react';
 
 const HOT_DESTINATIONS = ['Đà Lạt', 'Hà Giang', 'Phú Quốc', 'Ninh Bình', 'Sa Pa', 'Đà Nẵng - Hội An', 'Quy Nhơn'];
 

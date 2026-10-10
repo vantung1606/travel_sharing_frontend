@@ -1,20 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../../../context/AppContext';
-import {
-  MessageSquare,
-  Users,
-  Send,
-  Search,
-  MapPin,
-  Plus,
-  User,
-  ShieldCheck,
-  Compass,
-  ArrowLeft,
-  CheckCheck,
-  Sparkles
-} from 'lucide-react';
+import { MessageSquare, Users, Send, Search, Plus, ArrowLeft, CheckCheck, Sparkles } from 'lucide-react';
 
 const INITIAL_THREADS = [
   {

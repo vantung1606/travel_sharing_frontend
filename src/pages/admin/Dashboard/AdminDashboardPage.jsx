@@ -2,35 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { adminApi, adminReportApi } from '../../../services/api';
-import {
-  Users,
-  MapPin,
-  Sparkles,
-  DollarSign,
-  TrendingUp,
-  AlertCircle,
-  CheckCircle2,
-  FileText,
-  Calendar,
-  Plus,
-  Compass,
-  Activity,
-  ArrowUpRight,
-  ChevronRight,
-  Search,
-  Filter,
-  Cpu,
-  Flag,
-  Clock,
-  PieChart,
-  Eye,
-  Download,
-  SlidersHorizontal,
-  Map,
-  ArrowRight,
-  RefreshCw,
-  Award
-} from 'lucide-react';
+import { Users, MapPin, Sparkles, DollarSign, TrendingUp, CheckCircle2, Calendar, Plus, ChevronRight, Search, Filter, Cpu, Flag, Eye, Download, Map, ArrowRight, RefreshCw } from 'lucide-react';
 
 export const AdminDashboardPage = () => {
   const toast = useToast();

@@ -2,24 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
-import {
-  Compass,
-  Sparkles,
-  MapPin,
-  Users,
-  Calendar,
-  MessageSquare,
-  User,
-  Shield,
-  Bell,
-  Menu,
-  X,
-  ChevronRight,
-  ChevronDown,
-  LogOut
-} from 'lucide-react';
+import { Compass, Sparkles, MapPin, Users, Calendar, MessageSquare, User, Shield, Bell, Menu, X, ChevronRight, LogOut } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
-import { WayfarePlaneLogo } from './WayfarePlaneLogo';
+
 
 export const Navbar = () => {
   const location = useLocation();

@@ -2,28 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useToast } from '../common/Toast';
-import {
-  X,
-  Calendar,
-  MapPin,
-  Clock,
-  Car,
-  Utensils,
-  Navigation,
-  DollarSign,
-  Share2,
-  Download,
-  Users,
-  ExternalLink,
-  FileText,
-  CheckCircle2,
-  Square,
-  CheckSquare,
-  Compass,
-  Info,
-  ListFilter,
-  Map as MapIcon
-} from 'lucide-react';
+import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon } from 'lucide-react';
 import { ItineraryExportModal } from './ItineraryExportModal';
 
 // Tọa độ trung tâm các tỉnh/thành phố du lịch chính tại Việt Nam

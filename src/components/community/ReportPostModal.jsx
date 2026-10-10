@@ -1,16 +1,5 @@
 import React, { useState } from 'react';
-import {
-  X,
-  ShieldAlert,
-  AlertTriangle,
-  Megaphone,
-  EyeOff,
-  FileWarning,
-  HelpCircle,
-  Loader2,
-  Send,
-  CheckCircle2
-} from 'lucide-react';
+import { X, ShieldAlert, AlertTriangle, Megaphone, EyeOff, FileWarning, HelpCircle, Loader2, Send } from 'lucide-react';
 import { postApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';

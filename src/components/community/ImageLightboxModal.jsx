@@ -1,15 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  X,
-  ChevronLeft,
-  ChevronRight,
-  MapPin,
-  ExternalLink,
-  MessageCircle,
-  Heart,
-  ZoomIn,
-  Download
-} from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, MapPin, MessageCircle, ZoomIn } from 'lucide-react';
 
 export const ImageLightboxModal = ({
   isOpen,

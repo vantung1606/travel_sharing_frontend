@@ -9,7 +9,7 @@ import {
   INITIAL_USER_LIST,
   INITIAL_REPORTS
 } from '../mock/data';
-import { notificationApi, userApi, placeApi, itineraryApi, INITIAL_MOCK_NOTIFICATIONS } from '../services/api';
+import { notificationApi, userApi, placeApi, itineraryApi } from '../services/api';
 
 const DEFAULT_APP_STATE = {
   portalMode: 'user',

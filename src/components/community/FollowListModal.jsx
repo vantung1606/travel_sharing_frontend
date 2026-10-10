@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  X,
-  Search,
-  UserCheck,
-  UserPlus,
-  Users,
-  Compass,
-  Loader2,
-  Sparkles
-} from 'lucide-react';
+import { X, Search, UserCheck, UserPlus, Users, Compass, Loader2 } from 'lucide-react';
 import { userApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';

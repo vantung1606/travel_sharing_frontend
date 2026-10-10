@@ -10,7 +10,7 @@ import {
   EyeOff,
   User
 } from 'lucide-react';
-import { WayfarePlaneLogo } from '../common/WayfarePlaneLogo';
+
 
 export const AuthModal = () => {
   const { isAuthModalOpen, setIsAuthModalOpen, authMode, setAuthMode, login } = useApp();

@@ -5,41 +5,7 @@ import { FollowListModal } from '../../../components/community/FollowListModal';
 import { PostDetailModal } from '../../../components/community/PostDetailModal';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { useToast } from '../../../components/common/Toast';
-import {
-  User,
-  MapPin,
-  Calendar,
-  Heart,
-  Award,
-  Sparkles,
-  Settings,
-  Share2,
-  Bookmark,
-  MessageCircle,
-  Route,
-  ShieldCheck,
-  Edit,
-  Camera,
-  CheckCircle2,
-  Compass,
-  Star,
-  Download,
-  PlusCircle,
-  Zap,
-  Globe,
-  Tag,
-  Gift,
-  MoreHorizontal,
-  X,
-  Users,
-  UserCheck,
-  Loader2,
-  Copy,
-  Eye,
-  ArrowRight,
-  Lock,
-  DollarSign
-} from 'lucide-react';
+import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock } from 'lucide-react';
 
 export const ProfilePage = () => {
   const { currentUser, updateCurrentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab, setItineraries } = useApp();

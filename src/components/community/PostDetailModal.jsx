@@ -1,36 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCommunityRealtime } from '../../hooks/useCommunityRealtime';
-import {
-  X,
-  Heart,
-  MessageCircle,
-  Share2,
-  Bookmark,
-  MapPin,
-  Calendar,
-  Sparkles,
-  Route,
-  Eye,
-  Send,
-  Loader2,
-  Lock,
-  Globe,
-  Tag,
-  CheckCircle2,
-  ExternalLink,
-  ChevronLeft,
-  ChevronRight,
-  Maximize2,
-  UserPlus,
-  UserCheck,
-  CornerDownRight,
-  MoreHorizontal,
-  Copy,
-  Flag,
-  Trash2,
-  AtSign,
-  MessageSquare
-} from 'lucide-react';
+import { X, Heart, MessageCircle, Share2, Bookmark, MapPin, Sparkles, Route, Eye, Send, Loader2, Lock, Globe, Tag, ChevronLeft, ChevronRight, Maximize2, UserPlus, UserCheck, CornerDownRight, MoreHorizontal, Copy, Flag, Trash2, AtSign, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { postApi, userApi } from '../../services/api';
 import { useToast } from '../common/Toast';

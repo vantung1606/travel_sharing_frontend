@@ -1,47 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
-import {
-  Search,
-  MapPin,
-  Filter,
-  Star,
-  Sparkles,
-  Navigation,
-  Layers,
-  List,
-  Map as MapIcon,
-  Grid,
-  Heart,
-  Calendar,
-  Clock,
-  Compass,
-  DollarSign,
-  Sun,
-  Eye,
-  X,
-  ChevronRight,
-  Share2,
-  Copy,
-  CheckCircle2,
-  SlidersHorizontal,
-  Flame,
-  Umbrella,
-  Camera,
-  Utensils,
-  Phone,
-  ExternalLink,
-  PlusCircle,
-  Store,
-  Coffee,
-  Home,
-  Award,
-  Radio,
-  Check,
-  Building2,
-  Send,
-  CalendarPlus,
-  Plus
-} from 'lucide-react';
+import { Search, MapPin, Filter, Star, Sparkles, Navigation, Layers, List, Map as MapIcon, Grid, Heart, Calendar, Compass, Eye, X, Copy, CheckCircle2, Camera, Phone, ExternalLink, PlusCircle, Store, Radio, Check, Send, Plus } from 'lucide-react';
 import { useToast } from '../../../components/common/Toast';
 import { RealMapView } from '../../../components/map/RealMapView';
 import { reviewApi } from '../../../services/api';

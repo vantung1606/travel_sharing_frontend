@@ -248,8 +248,6 @@ export async function callGeminiGenerate({ apiKey, apiEndpoint, prompt, systemPr
   };
 }
 
-export const SAMPLE_PROMPT = 'Lên lịch trình 2N1Đ đi Ninh Bình cho 2 người, thích chụp ảnh sống ảo và ẩm thực dê núi';
-
 export const PRESET_PROMPTS = [
   'Lên lịch trình 2N1Đ đi Ninh Bình cho 2 người, thích chụp ảnh sống ảo và ẩm thực dê núi',
   'Gợi ý lộ trình 3N2Đ Đà Nẵng - Hội An nghỉ dưỡng biển và ẩm thực miền Trung',

@@ -1,19 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import {
-  MessageCircle,
-  X,
-  Minus,
-  Maximize2,
-  Send,
-  Search,
-  Users,
-  ArrowLeft,
-  CheckCheck,
-  Sparkles,
-  Bot
-} from 'lucide-react';
+import { MessageCircle, X, Minus, Maximize2, Send, Search, Users, ArrowLeft, CheckCheck } from 'lucide-react';
 
 const SAMPLE_THREADS = [
   {

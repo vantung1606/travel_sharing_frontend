@@ -24,50 +24,7 @@ const DOCK_DURATION_OPTIONS = [
   { val: '4d3n', title: '4 Ngày 3 Đêm', sub: 'Trọn vẹn, thảnh thơi khám phá sâu', icon: '🌿' },
   { val: '5d4n', title: '5 Ngày 4 Đêm', sub: 'Hành trình xuyên suốt mọi ngóc ngách', icon: '🗺️', badge: 'Chuyên sâu' }
 ];
-import {
-  Sparkles,
-  MapPin,
-  Calendar,
-  DollarSign,
-  Star,
-  CheckCircle2,
-  ArrowRight,
-  Clock,
-  Compass,
-  Users,
-  Search,
-  ShieldCheck,
-  Utensils,
-  Camera,
-  Zap,
-  Bot,
-  Radar,
-  Copy,
-  Heart,
-  RefreshCw,
-  Send,
-  Check,
-  ExternalLink,
-  ChevronRight,
-  ChevronDown,
-  TrendingUp,
-  Map,
-  Layers,
-  ArrowDown,
-  Timer,
-  Wallet,
-  Navigation as NavigationIcon,
-  Flame,
-  Award,
-  SlidersHorizontal,
-  Bookmark,
-  Coffee,
-  Sun,
-  ShieldAlert,
-  Play,
-  MessageSquare,
-  Share2
-} from 'lucide-react';
+import { Sparkles, MapPin, Calendar, DollarSign, Star, CheckCircle2, ArrowRight, Compass, Users, Search, ShieldCheck, Zap, Bot, Radar, Copy, Heart, RefreshCw, Check, ChevronDown, Map, ArrowDown, Wallet, Navigation as NavigationIcon, SlidersHorizontal, Bookmark, MessageSquare } from 'lucide-react';
 
 export const HomePage = () => {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, Plus, Bell, Menu, X, Compass, Shield } from 'lucide-react';
+import { Search, Plus, Bell, Menu, X, Shield } from 'lucide-react';
 import { AdminSidebar } from './AdminSidebar';
 import { NotificationDropdown } from './NotificationDropdown';
 

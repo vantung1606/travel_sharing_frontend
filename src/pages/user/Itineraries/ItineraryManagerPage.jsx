@@ -1,43 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
-import {
-  Sparkles,
-  MapPin,
-  Calendar,
-  Clock,
-  DollarSign,
-  Users,
-  Search,
-  SlidersHorizontal,
-  ChevronRight,
-  Share2,
-  Plus,
-  Compass,
-  CheckCircle2,
-  Heart,
-  X,
-  ArrowRight,
-  TrendingDown,
-  Info,
-  Layers,
-  Map,
-  Download,
-  Trash2,
-  RefreshCw,
-  Eye,
-  Check,
-  Send,
-  Loader2,
-  Smile,
-  AlertCircle,
-  Filter,
-  Navigation,
-  Bookmark,
-  ChevronDown
-} from 'lucide-react';
+import { Sparkles, MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation } from 'lucide-react';
 
 export const ItineraryManagerPage = () => {
   const {

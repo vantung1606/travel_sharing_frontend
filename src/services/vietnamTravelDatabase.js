@@ -4,7 +4,7 @@
  * ẩm thực bản địa trứ danh, không lặp lại mẫu câu generic.
  */
 
-export const REAL_VIETNAM_ITINERARIES = {
+const REAL_VIETNAM_ITINERARIES = {
   // ─── 1. THẠCH HÀ & HÀ TĨNH ───────────────────────────────────────────────
   'thạch hà': {
     region: 'Bắc Trung Bộ',

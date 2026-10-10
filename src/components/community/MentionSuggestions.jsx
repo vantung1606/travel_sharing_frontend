@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Users, UserCheck, Search, AtSign, X, Check } from 'lucide-react';
+import { Users, Search, AtSign, X, Check } from 'lucide-react';
 
 /**
  * Dropdown list displaying followed users for @tagging

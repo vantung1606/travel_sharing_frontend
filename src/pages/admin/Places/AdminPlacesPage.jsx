@@ -1,26 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { placeApi } from '../../../services/api';
-import {
-  MapPin,
-  Check,
-  X,
-  Search,
-  Star,
-  CheckCircle2,
-  Clock,
-  Sparkles,
-  ChevronRight,
-  Eye,
-  Trash2,
-  RefreshCw,
-  Camera,
-  Map,
-  ShieldCheck,
-  Phone,
-  Building2,
-  AlertCircle
-} from 'lucide-react';
+import { MapPin, Check, X, Search, Star, Clock, ChevronRight, Eye, Trash2, RefreshCw, ShieldCheck, Phone, AlertCircle } from 'lucide-react';
 
 export const AdminPlacesPage = () => {
   const toast = useToast();

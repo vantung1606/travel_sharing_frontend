@@ -1,26 +1,5 @@
 export const BASE_URL = 'http://localhost:8081/api';
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-export const getStoredUser = () => {
-  try {
-    const raw = localStorage.getItem('wayfare_user');
-    return raw ? JSON.parse(raw) : null;
-  } catch (e) {
-    console.warn('Error reading wayfare_user from localStorage', e);
-    return null;
-  }
-};
-
-export const getAuthToken = () => {
-  const user = getStoredUser();
-  return user?.token || null;
-};
-
-export const getAuthHeader = () => {
-  const token = getAuthToken();
-  return token ? { 'Authorization': `Bearer ${token}` } : {};
-};
-
 export const authApi = {
   // Login API Call
   async login(email, password) {

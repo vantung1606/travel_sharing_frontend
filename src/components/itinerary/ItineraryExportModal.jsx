@@ -1,25 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useToast } from '../common/Toast';
-import {
-  X,
-  Download,
-  Printer,
-  Calendar,
-  FileText,
-  Copy,
-  Check,
-  Sparkles,
-  Share2,
-  MapPin,
-  Clock,
-  DollarSign,
-  ShieldCheck,
-  CheckSquare,
-  Phone,
-  Eye,
-  FileCode,
-  Smartphone
-} from 'lucide-react';
+import { X, Download, Printer, Calendar, FileText, Copy, Check, FileCode } from 'lucide-react';
 
 export const ItineraryExportModal = ({ itinerary, onClose }) => {
   const toast = useToast();

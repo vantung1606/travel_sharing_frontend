@@ -1,20 +1,5 @@
 import React, { useState } from 'react';
-import {
-  X,
-  Globe,
-  Lock,
-  Users,
-  Smile,
-  Send,
-  Share2,
-  Copy,
-  Check,
-  MessageCircle,
-  ExternalLink,
-  ChevronDown,
-  Sparkles,
-  Loader2
-} from 'lucide-react';
+import { X, Globe, Lock, Users, Smile, Send, Copy, Check, ExternalLink, ChevronDown, Loader2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '../common/Toast';
 import { postApi } from '../../services/api';

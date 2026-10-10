@@ -1,19 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import {
-  LayoutDashboard,
-  MapPin,
-  Users,
-  FileText,
-  BarChart3,
-  Cpu,
-  LogOut,
-  Compass,
-  MessageSquare,
-  DollarSign,
-  History
-} from 'lucide-react';
-import { WayfarePlaneLogo } from './WayfarePlaneLogo';
+import { LayoutDashboard, MapPin, Users, BarChart3, Cpu, LogOut, MessageSquare, DollarSign, History } from 'lucide-react';
+
 
 export const AdminSidebar = ({ onNavigate }) => {
   const { adminTab, setAdminTab, setPortalMode, stats, currentUser } = useApp();

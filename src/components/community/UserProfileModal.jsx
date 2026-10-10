@@ -1,28 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  X,
-  MapPin,
-  Calendar,
-  Users,
-  UserPlus,
-  UserCheck,
-  Compass,
-  Route,
-  Heart,
-  MessageCircle,
-  Eye,
-  Copy,
-  DollarSign,
-  Sparkles,
-  ShieldCheck,
-  CheckCircle2,
-  Loader2,
-  Lock,
-  Globe,
-  ArrowRight,
-  Award
-} from 'lucide-react';
-import { userApi, postApi } from '../../services/api';
+import { X, MapPin, Users, UserPlus, UserCheck, Compass, Route, Heart, MessageCircle, Eye, Copy, DollarSign, Sparkles, Loader2, Lock, Globe, ArrowRight, Award } from 'lucide-react';
+import { userApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';

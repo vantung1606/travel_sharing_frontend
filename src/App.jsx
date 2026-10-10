@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { AppProvider, useApp } from './context/AppContext';
+import React from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AppProvider } from './context/AppContext';
 import { ToastProvider } from './components/common/Toast';
 import { Navbar } from './components/common/Navbar';
 import { BottomNav } from './components/common/BottomNav';
