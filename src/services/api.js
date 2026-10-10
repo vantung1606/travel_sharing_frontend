@@ -1,5 +1,20 @@
 export const BASE_URL = 'http://localhost:8081/api';
 
+const getAuthToken = () => {
+  try {
+    const raw = localStorage.getItem('wayfare_user');
+    const u = raw ? JSON.parse(raw) : null;
+    return u?.token || null;
+  } catch {
+    return null;
+  }
+};
+
+const getAuthHeader = () => {
+  const token = getAuthToken();
+  return token ? { 'Authorization': `Bearer ${token}` } : {};
+};
+
 export const authApi = {
   // Login API Call
   async login(email, password) {
@@ -1680,5 +1695,93 @@ export const reviewApi = {
     }
   }
 };
+
+// ─── Real-Time Chat API (Group & Direct Rooms, Cloud Media) ───────────────────
+export const chatApi = {
+  async getRooms(email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/chat/rooms?email=${encodeURIComponent(userEmail)}`, {
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.error('API error fetching chat rooms:', err);
+      throw err;
+    }
+  },
+
+  async getRoomMessages(roomId, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/messages?email=${encodeURIComponent(userEmail)}`, {
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.error(`API error fetching messages for room ${roomId}:`, err);
+      throw err;
+    }
+  },
+
+  async sendMessage(roomId, { content, messageType = 'TEXT' }, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/messages?email=${encodeURIComponent(userEmail)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify({ content, messageType })
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error(`API error sending message to room ${roomId}:`, err);
+      throw err;
+    }
+  },
+
+  async openDirectRoom(targetUserId, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/chat/direct?targetUserId=${targetUserId}&email=${encodeURIComponent(userEmail)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error(`API error opening direct room with user ${targetUserId}:`, err);
+      throw err;
+    }
+  },
+
+  async openItineraryRoom(itineraryId, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/chat/itinerary/${itineraryId}?email=${encodeURIComponent(userEmail)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error(`API error opening itinerary chat room ${itineraryId}:`, err);
+      throw err;
+    }
+  }
+};
+
 
 
