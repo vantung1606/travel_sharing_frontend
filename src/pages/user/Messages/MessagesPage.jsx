@@ -16,7 +16,9 @@ import {
   Paperclip,
   Loader2,
   X,
-  Maximize2
+  Maximize2,
+  Plus,
+  Compass
 } from 'lucide-react';
 
 export const MessagesPage = () => {
@@ -37,6 +39,12 @@ export const MessagesPage = () => {
   const [uploadProgressText, setUploadProgressText] = useState('');
   const [previewMediaUrl, setPreviewMediaUrl] = useState(null); // Lightbox for image
 
+  // Modal Tạo Nhóm Mới
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [newRoomName, setNewRoomName] = useState('');
+  const [newRoomIntro, setNewRoomIntro] = useState('');
+  const [isCreatingRoom, setIsCreatingRoom] = useState(false);
+
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -46,10 +54,13 @@ export const MessagesPage = () => {
   const loadRooms = useCallback(async () => {
     try {
       const data = await chatApi.getRooms(effectiveEmail);
-      if (Array.isArray(data) && data.length > 0) {
+      if (Array.isArray(data)) {
         setThreads(data);
-        if (!activeThreadId) {
-          setActiveThreadId(data[0].id);
+        if (data.length > 0) {
+          setActiveThreadId(prev => (prev && data.some(r => r.id === prev)) ? prev : data[0].id);
+        } else {
+          setActiveThreadId(null);
+          setMessages([]);
         }
       }
     } catch (err) {
@@ -57,7 +68,7 @@ export const MessagesPage = () => {
     } finally {
       setIsLoadingRooms(false);
     }
-  }, [effectiveEmail, activeThreadId]);
+  }, [effectiveEmail]);
 
   useEffect(() => {
     loadRooms();
@@ -123,7 +134,11 @@ export const MessagesPage = () => {
   // 6. Gửi tin nhắn Text
   const handleSendMessage = async (e) => {
     e?.preventDefault();
-    if (!inputText.trim() || !activeThreadId) return;
+    if (!activeThreadId) {
+      toast.showInfo('Vui lòng chọn hoặc tạo một cuộc trò chuyện để bắt đầu gửi tin nhắn!');
+      return;
+    }
+    if (!inputText.trim()) return;
 
     const contentToSend = inputText.trim();
     setInputText('');
@@ -154,30 +169,51 @@ export const MessagesPage = () => {
     }
   };
 
-  // 7. Gửi Tệp đa phương tiện (Ảnh hoặc Video lên Đám mây Cloudinary)
+  // 7. Gửi Tệp đa phương tiện (Ảnh hoặc Video lên Đám mây Cloudinary CDN)
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
-    if (!file || !activeThreadId) return;
+    if (!file) return;
 
-    // Reset input
+    if (!activeThreadId) {
+      toast.showInfo('Vui lòng chọn hoặc tạo một cuộc trò chuyện trước khi tải ảnh/video!');
+      e.target.value = '';
+      return;
+    }
+
+    // Reset input để người dùng có thể chọn lại cùng 1 file nếu muốn
     e.target.value = '';
 
     const isVideo = file.type.startsWith('video/') ||
-      file.name.toLowerCase().endsWith('.mp4') ||
-      file.name.toLowerCase().endsWith('.mov') ||
-      file.name.toLowerCase().endsWith('.webm');
+      /\.(mp4|mov|webm|avi|mkv)$/i.test(file.name);
 
     const msgType = isVideo ? 'VIDEO' : 'IMAGE';
 
-    // Giới hạn dung lượng: 50MB cho video, 10MB cho ảnh
-    const maxMb = isVideo ? 50 : 10;
+    // Giới hạn dung lượng: 100MB cho video, 25MB cho ảnh
+    const maxMb = isVideo ? 100 : 25;
     if (file.size > maxMb * 1024 * 1024) {
       toast.showError(`Dung lượng ${isVideo ? 'video' : 'ảnh'} tối đa là ${maxMb}MB!`);
       return;
     }
 
     setIsUploading(true);
-    setUploadProgressText(`Đang tải ${isVideo ? 'video' : 'hình ảnh'} lên Cloudinary CDN...`);
+    setUploadProgressText(`Đang tải ${isVideo ? 'video' : 'hình ảnh'} lên Đám mây CDN...`);
+
+    // Tạo tin nhắn tạm (optimistic preview)
+    const tempId = 'temp-media-' + Date.now();
+    const localPreviewUrl = URL.createObjectURL(file);
+    const tempMsg = {
+      id: tempId,
+      roomId: activeThreadId,
+      senderId: currentUser?.id,
+      senderName: currentUser?.name || 'Bạn',
+      senderAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+      content: localPreviewUrl,
+      messageType: msgType,
+      time: 'Đang tải...',
+      isMe: true,
+      isPending: true
+    };
+    setMessages(prev => [...prev, tempMsg]);
 
     try {
       // Đẩy tệp lên Cloudinary thông qua Backend
@@ -186,7 +222,7 @@ export const MessagesPage = () => {
         throw new Error('Máy chủ đám mây không phản hồi đường dẫn tệp.');
       }
 
-      setUploadProgressText('Đang phát sóng tin nhắn vào nhóm...');
+      setUploadProgressText('Đang phát sóng tin nhắn vào cuộc trò chuyện...');
 
       // Gửi tin nhắn chứa URL CDN
       const savedMsg = await chatApi.sendMessage(
@@ -196,20 +232,53 @@ export const MessagesPage = () => {
       );
 
       if (savedMsg) {
-        setMessages(prev => [...prev, savedMsg]);
+        setMessages(prev => prev.map(m => m.id === tempId ? savedMsg : m));
       }
       loadRooms();
-      toast.showSuccess(`Đã gửi ${isVideo ? 'video' : 'hình ảnh'} thành công lên nhóm! 🚀`);
+      toast.showSuccess(`Đã gửi ${isVideo ? 'video' : 'hình ảnh'} thành công! 🚀`);
     } catch (err) {
       console.error('Lỗi tải tệp lên chat:', err);
       toast.showError(`Tải tệp thất bại: ${err.message || 'Vui lòng kiểm tra lại mạng!'}`);
+      setMessages(prev => prev.filter(m => m.id !== tempId));
     } finally {
       setIsUploading(false);
       setUploadProgressText('');
     }
   };
 
-  const currentThreadObj = threads.find(t => t.id === activeThreadId) || threads[0];
+  // 8. Tạo Nhóm Chat Mới
+  const handleCreateGroup = async (e) => {
+    e?.preventDefault();
+    if (!newRoomName.trim()) {
+      toast.showError('Vui lòng nhập tên nhóm trò chuyện!');
+      return;
+    }
+
+    setIsCreatingRoom(true);
+    try {
+      const room = await chatApi.createRoom({
+        name: newRoomName.trim(),
+        initialMessage: newRoomIntro.trim() || `Chào mừng mọi người tham gia ${newRoomName.trim()}!`
+      }, effectiveEmail);
+
+      if (room) {
+        toast.showSuccess(`Tạo nhóm "${room.name}" thành công!`);
+        setIsCreateModalOpen(false);
+        setNewRoomName('');
+        setNewRoomIntro('');
+        await loadRooms();
+        setActiveThreadId(room.id);
+        setShowMobileChat(true);
+      }
+    } catch (err) {
+      console.error('Lỗi tạo nhóm chat:', err);
+      toast.showError('Không thể tạo nhóm chat. Vui lòng thử lại!');
+    } finally {
+      setIsCreatingRoom(false);
+    }
+  };
+
+  const currentThreadObj = threads.find(t => t.id === activeThreadId);
 
   const filteredThreads = threads.filter(t => {
     const matchesFilter =
@@ -223,30 +292,125 @@ export const MessagesPage = () => {
   });
 
   return (
-    <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8 space-y-6">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8 space-y-6">
       
-      {/* Lightbox Phóng to ảnh */}
+      {/* Lightbox Xem Ảnh Chi Tiết */}
       {previewMediaUrl && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
           onClick={() => setPreviewMediaUrl(null)}
         >
-          <div className="relative max-w-4xl max-h-[90vh]">
-            <button
-              onClick={() => setPreviewMediaUrl(null)}
-              className="absolute -top-12 right-0 p-2 text-white hover:text-sky-400 bg-white/10 rounded-full cursor-pointer"
-            >
-              <X className="w-6 h-6" />
-            </button>
-            <img
-              src={previewMediaUrl}
-              alt="Preview"
-              className="max-w-full max-h-[85vh] rounded-2xl object-contain shadow-2xl"
-              onClick={e => e.stopPropagation()}
-            />
+          <button
+            onClick={() => setPreviewMediaUrl(null)}
+            className="absolute top-6 right-6 p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all cursor-pointer"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <img
+            src={previewMediaUrl}
+            alt="Ảnh xem chi tiết"
+            className="max-w-full max-h-[90vh] rounded-2xl object-contain shadow-2xl ring-1 ring-white/10"
+            onClick={e => e.stopPropagation()}
+          />
+        </div>
+      )}
+
+      {/* Modal Tạo Nhóm Trò Chuyện Mới */}
+      {isCreateModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200 space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center">
+                  <Users className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-sm text-slate-900">Tạo nhóm trò chuyện mới</h3>
+                  <p className="text-xs text-slate-500">Cùng bạn bè chia sẻ lịch trình & ảnh/video</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(false)}
+                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateGroup} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Tên nhóm *</label>
+                <input
+                  type="text"
+                  placeholder="Ví dụ: Hội Phượt Hà Giang, Nhóm Đi Phú Quốc..."
+                  value={newRoomName}
+                  onChange={e => setNewRoomName(e.target.value)}
+                  required
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-hidden transition-all font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5">Tin nhắn mở đầu (tùy chọn)</label>
+                <textarea
+                  placeholder="Nhập lời chào khởi đầu cho các thành viên trong nhóm..."
+                  value={newRoomIntro}
+                  onChange={e => setNewRoomIntro(e.target.value)}
+                  rows={3}
+                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-hidden transition-all resize-none font-medium"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={!newRoomName.trim() || isCreatingRoom}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-sky-600/20 transition-all disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+                >
+                  {isCreatingRoom && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>Tạo nhóm ngay</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
+
+      {/* Header Trang Tin Nhắn */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="p-2 rounded-2xl bg-sky-100 text-sky-700">
+              <MessageSquare className="w-5 h-5" />
+            </span>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              Tin Nhắn & Đội Phượt
+            </h1>
+          </div>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
+            Trò chuyện trực tiếp, chia sẻ hình ảnh và video chất lượng cao lưu trữ Cloudinary CDN.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsCreateModalOpen(true)}
+            className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-sky-600/20 flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Tạo nhóm chat mới</span>
+          </button>
+        </div>
+      </div>
 
       {/* Khung chat chính */}
       <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[600px] sm:min-h-[680px]">
@@ -257,13 +421,17 @@ export const MessagesPage = () => {
             <div>
               <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
                 <MessageSquare className="w-5 h-5 text-sky-600" />
-                <span>Trò chuyện</span>
+                <span>Hộp thư</span>
               </h2>
               <p className="text-[11px] text-slate-500 font-medium">Kết nối trực tiếp & Nhóm chuyến đi</p>
             </div>
-            <span className="px-2.5 py-1 bg-sky-100/70 text-sky-800 text-[11px] font-bold rounded-full">
-              {threads.length} phòng
-            </span>
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              title="Tạo nhóm mới"
+              className="p-1.5 rounded-xl bg-sky-100/80 hover:bg-sky-200 text-sky-800 transition-all cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Ô tìm kiếm phòng chat */}
@@ -315,8 +483,20 @@ export const MessagesPage = () => {
                 <p>Đang tải danh sách cuộc trò chuyện...</p>
               </div>
             ) : filteredThreads.length === 0 ? (
-              <div className="py-12 text-center text-slate-400 text-xs">
-                Không tìm thấy phòng chat nào
+              <div className="py-12 text-center text-slate-400 text-xs space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto">
+                  <MessageSquare className="w-6 h-6" />
+                </div>
+                <p className="font-semibold text-slate-600">Chưa có cuộc trò chuyện nào</p>
+                <p className="text-[11px] text-slate-400 px-4">Hãy tạo nhóm mới hoặc nhắn tin từ trang Lịch trình / Bạn bè để kết nối!</p>
+                <button
+                  type="button"
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-bold shadow-xs transition-all cursor-pointer inline-flex items-center gap-1"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Tạo nhóm ngay</span>
+                </button>
               </div>
             ) : (
               filteredThreads.map(thread => (
@@ -367,185 +547,230 @@ export const MessagesPage = () => {
         {/* CỘT PHẢI: Khung nhắn tin chi tiết (8 Cột) */}
         <div className={`md:col-span-8 lg:col-span-8 p-4 sm:p-6 flex flex-col justify-between space-y-4 ${!showMobileChat ? 'hidden md:flex' : 'flex'}`}>
           
-          {/* Header phòng chat */}
-          <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
-            <div className="flex items-center gap-3 min-w-0">
-              <button
-                onClick={() => setShowMobileChat(false)}
-                className="md:hidden p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-bold cursor-pointer"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </button>
+          {/* Header phòng chat hoặc Empty State */}
+          {currentThreadObj ? (
+            <>
+              <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
+                <div className="flex items-center gap-3 min-w-0">
+                  <button
+                    onClick={() => setShowMobileChat(false)}
+                    className="md:hidden p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-bold cursor-pointer"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </button>
 
-              <div className="relative shrink-0">
-                <img
-                  src={currentThreadObj?.avatar || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=150&q=80'}
-                  alt=""
-                  className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl object-cover ring-2 ring-sky-100"
-                />
-                <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
-              </div>
-
-              <div className="min-w-0">
-                <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 truncate">
-                  {currentThreadObj?.name || 'Đang mở cuộc trò chuyện...'}
-                </h3>
-                <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-                  {currentThreadObj?.type === 'DIRECT' ? (
-                    <>
-                      <span className="text-emerald-600 font-bold">● Đang hoạt động</span>
-                      <span>•</span>
-                      <span>Hội thoại 1-1 trực tiếp</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>{currentThreadObj?.membersCount || 2} thành viên</span>
-                      <span>•</span>
-                      <span>Nhóm thảo luận chuyến đi</span>
-                    </>
-                  )}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Cloud CDN Sẵn Sàng</span>
-              </span>
-            </div>
-          </div>
-
-          {/* Lịch sử tin nhắn */}
-          <div className="flex-1 space-y-3.5 max-h-[440px] overflow-y-auto pr-1.5 custom-dropdown-scroll">
-            {isLoadingMessages ? (
-              <div className="py-24 text-center text-slate-400 text-xs space-y-2">
-                <Loader2 className="w-6 h-6 animate-spin mx-auto text-sky-600" />
-                <p>Đang đồng bộ tin nhắn đám mây...</p>
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="py-24 text-center text-slate-400 text-xs space-y-1">
-                <p className="font-semibold text-slate-600">Chưa có tin nhắn nào trong phòng</p>
-                <p>Gửi tin nhắn hoặc hình ảnh/video đầu tiên để bắt đầu chuyến hành trình!</p>
-              </div>
-            ) : (
-              messages.map(msg => (
-                <div
-                  key={msg.id}
-                  className={`flex gap-2.5 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'}`}
-                >
-                  {!msg.isMe && (
+                  <div className="relative shrink-0">
                     <img
-                      src={msg.senderAvatar || currentThreadObj?.avatar}
+                      src={currentThreadObj?.avatar || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=150&q=80'}
                       alt=""
-                      className="w-8 h-8 rounded-full object-cover shrink-0 mt-0.5"
+                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl object-cover ring-2 ring-sky-100"
                     />
-                  )}
-                  <div className={`max-w-md space-y-1 flex flex-col ${msg.isMe ? 'items-end' : 'items-start'}`}>
-                    {!msg.isMe && (
-                      <span className="text-[10px] font-bold text-slate-500 px-1">
-                        {msg.senderName}
-                      </span>
-                    )}
+                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
+                  </div>
 
-                    {/* RENDER NỘI DUNG TIN NHẮN THEO LOẠI */}
-                    {msg.messageType === 'IMAGE' ? (
-                      <div className="relative group overflow-hidden rounded-2xl border border-slate-200/80 shadow-sm bg-slate-100">
-                        <img
-                          src={msg.content}
-                          alt="Ảnh chia sẻ"
-                          className="max-w-[260px] sm:max-w-xs max-h-64 rounded-2xl object-cover cursor-pointer hover:opacity-95 transition-all"
-                          onClick={() => setPreviewMediaUrl(msg.content)}
-                        />
-                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1 cursor-pointer pointer-events-none">
-                          <Maximize2 className="w-4 h-4" />
-                          <span>Xem ảnh</span>
-                        </div>
-                      </div>
-                    ) : msg.messageType === 'VIDEO' ? (
-                      <div className="rounded-2xl overflow-hidden border border-slate-800 shadow-md max-w-[280px] sm:max-w-xs bg-black">
-                        <video
-                          controls
-                          src={msg.content}
-                          className="w-full max-h-64 object-contain rounded-2xl"
-                          preload="metadata"
-                        />
-                      </div>
-                    ) : (
-                      <div
-                        className={`p-3 rounded-2xl text-xs leading-relaxed break-words ${
-                          msg.isMe
-                            ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-tr-none shadow-sm shadow-sky-600/20'
-                            : 'bg-slate-100 text-slate-800 rounded-tl-none border border-slate-200/60'
-                        }`}
-                      >
-                        {msg.content}
-                      </div>
-                    )}
-
-                    <div className={`flex items-center gap-1 text-[9px] text-slate-400 px-1 ${msg.isMe ? 'justify-end' : 'justify-start'}`}>
-                      <span>{msg.time}</span>
-                      {msg.isMe && <CheckCheck className="w-3 h-3 text-sky-500" />}
-                    </div>
+                  <div className="min-w-0">
+                    <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 truncate">
+                      {currentThreadObj?.name}
+                    </h3>
+                    <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                      {currentThreadObj?.type === 'DIRECT' ? (
+                        <>
+                          <span className="text-emerald-600 font-bold">● Đang hoạt động</span>
+                          <span>•</span>
+                          <span>Hội thoại 1-1 trực tiếp</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-sky-600 font-bold">
+                            {currentThreadObj?.membersCount || 1} thành viên
+                          </span>
+                          <span>•</span>
+                          <span>Nhóm thảo luận chia sẻ ảnh & video</span>
+                        </>
+                      )}
+                    </p>
                   </div>
                 </div>
-              ))
-            )}
-            <div ref={messagesEndRef} />
-          </div>
 
-          {/* Thanh Upload Media Đang Tiến Hành */}
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100 flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Cloud CDN Sẵn Sàng</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Lịch sử tin nhắn */}
+              <div className="flex-1 space-y-3.5 max-h-[440px] overflow-y-auto pr-1.5 custom-dropdown-scroll">
+                {isLoadingMessages ? (
+                  <div className="py-24 text-center text-slate-400 text-xs space-y-2">
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-sky-600" />
+                    <p>Đang đồng bộ tin nhắn đám mây...</p>
+                  </div>
+                ) : messages.length === 0 ? (
+                  <div className="py-24 text-center text-slate-400 text-xs space-y-1">
+                    <p className="font-semibold text-slate-600">Chưa có tin nhắn nào trong phòng</p>
+                    <p>Gửi tin nhắn hoặc đính kèm ảnh/video đầu tiên để bắt đầu cuộc trò chuyện!</p>
+                  </div>
+                ) : (
+                  messages.map(msg => (
+                    <div
+                      key={msg.id}
+                      className={`flex gap-2.5 ${msg.isMe ? 'flex-row-reverse' : 'flex-row'}`}
+                    >
+                      {!msg.isMe && (
+                        <img
+                          src={msg.senderAvatar || currentThreadObj?.avatar}
+                          alt=""
+                          className="w-8 h-8 rounded-full object-cover shrink-0 mt-0.5"
+                        />
+                      )}
+                      <div className={`max-w-md space-y-1 flex flex-col ${msg.isMe ? 'items-end' : 'items-start'}`}>
+                        {!msg.isMe && (
+                          <span className="text-[10px] font-bold text-slate-500 px-1">
+                            {msg.senderName}
+                          </span>
+                        )}
+
+                        {/* RENDER NỘI DUNG THEO LOẠI */}
+                        {msg.messageType === 'IMAGE' ? (
+                          <div className="relative group overflow-hidden rounded-2xl border border-slate-200/80 shadow-sm bg-slate-100">
+                            <img
+                              src={msg.content}
+                              alt="Ảnh chia sẻ"
+                              className="max-w-[260px] sm:max-w-xs max-h-64 rounded-2xl object-cover cursor-pointer hover:opacity-95 transition-all"
+                              onClick={() => setPreviewMediaUrl(msg.content)}
+                            />
+                            {msg.isPending && (
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xs font-bold gap-1.5">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Đang tải lên Cloud...</span>
+                              </div>
+                            )}
+                            {!msg.isPending && (
+                              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1 cursor-pointer pointer-events-none">
+                                <Maximize2 className="w-4 h-4" />
+                                <span>Xem ảnh</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : msg.messageType === 'VIDEO' ? (
+                          <div className="rounded-2xl overflow-hidden border border-slate-800 shadow-md max-w-[280px] sm:max-w-xs bg-black relative">
+                            <video
+                              controls
+                              src={msg.content}
+                              className="w-full max-h-64 object-contain rounded-2xl"
+                              preload="metadata"
+                            />
+                            {msg.isPending && (
+                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xs font-bold gap-1.5">
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                <span>Đang tải video lên Cloud...</span>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div
+                            className={`p-3 rounded-2xl text-xs leading-relaxed break-words ${
+                              msg.isMe
+                                ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-tr-none shadow-sm shadow-sky-600/20'
+                                : 'bg-slate-100 text-slate-800 rounded-tl-none border border-slate-200/60'
+                            }`}
+                          >
+                            {msg.content}
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-1 text-[10px] text-slate-400 px-1">
+                          <span>{msg.time}</span>
+                          {msg.isMe && <CheckCheck className="w-3 h-3 text-sky-500" />}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+            </>
+          ) : (
+            /* Khi chưa có phòng chat nào được chọn */
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-4">
+              <div className="w-16 h-16 rounded-3xl bg-sky-100/70 text-sky-600 flex items-center justify-center shadow-inner">
+                <Compass className="w-8 h-8" />
+              </div>
+              <div className="max-w-md space-y-2">
+                <h3 className="text-base sm:text-lg font-black text-slate-900">
+                  Chào mừng bạn đến với Tin Nhắn Wayfare!
+                </h3>
+                <p className="text-xs text-slate-500 leading-relaxed">
+                  Hiện bạn chưa có cuộc trò chuyện nào. Hãy tạo một nhóm mới hoặc nhắn tin kết nối với bạn bè qua các lịch trình du lịch để bắt đầu chia sẻ hình ảnh và video.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(true)}
+                className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-sky-600/20 flex items-center gap-2 transition-all cursor-pointer active:scale-95"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tạo nhóm trò chuyện ngay</span>
+              </button>
+            </div>
+          )}
+
+          {/* Thanh Tiến Trình Tải Lên Media */}
           {isUploading && (
-            <div className="p-3 bg-sky-50 rounded-2xl border border-sky-200/80 flex items-center gap-2.5 text-xs text-sky-700 animate-fade-in font-medium">
+            <div className="p-3 bg-sky-50 border border-sky-100 rounded-2xl flex items-center gap-2.5 text-xs text-sky-800 font-bold animate-pulse">
               <Loader2 className="w-4 h-4 animate-spin text-sky-600 shrink-0" />
               <span className="flex-1 truncate">{uploadProgressText}</span>
             </div>
           )}
 
           {/* Form Nhập tin nhắn & Nút Chọn Ảnh/Video */}
-          <form onSubmit={handleSendMessage} className="flex items-center gap-2 pt-3 border-t border-slate-100">
-            {/* Input file ẩn hỗ trợ cả Ảnh và Video */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              accept="image/*,video/*"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
+          {currentThreadObj && (
+            <form onSubmit={handleSendMessage} className="flex items-center gap-2 pt-3 border-t border-slate-100">
+              {/* Input file ẩn hỗ trợ cả Ảnh và Video */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*,video/*"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
 
-            {/* Nút đính kèm ảnh/video lên Cloudinary */}
-            <button
-              type="button"
-              disabled={isUploading}
-              onClick={() => fileInputRef.current?.click()}
-              title="Gửi hình ảnh hoặc video lên Cloud"
-              className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-sky-600 hover:border-sky-300 hover:bg-sky-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
-            >
-              <Paperclip className="w-4 h-4" />
-            </button>
+              {/* Nút đính kèm ảnh/video lên Cloudinary */}
+              <button
+                type="button"
+                disabled={isUploading}
+                onClick={() => fileInputRef.current?.click()}
+                title="Gửi hình ảnh hoặc video lên Cloudinary CDN"
+                className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-sky-600 hover:border-sky-300 hover:bg-sky-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+              >
+                <Paperclip className="w-4 h-4" />
+              </button>
 
-            <input
-              type="text"
-              placeholder={
-                currentThreadObj?.type === 'DIRECT'
-                  ? `Nhắn tin cho ${currentThreadObj.name}...`
-                  : 'Nhập tin nhắn nhóm chuyến đi (hoặc đính kèm ảnh/video)...'
-              }
-              value={inputText}
-              onChange={e => setInputText(e.target.value)}
-              disabled={isUploading}
-              className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-slate-50/50 focus:bg-white transition-all font-medium disabled:opacity-60"
-            />
+              <input
+                type="text"
+                placeholder={
+                  currentThreadObj?.type === 'DIRECT'
+                    ? `Nhắn tin cho ${currentThreadObj.name}...`
+                    : 'Nhập tin nhắn nhóm (hoặc bấm biểu tượng ghim kẹp để gửi ảnh/video)...'
+                }
+                value={inputText}
+                onChange={e => setInputText(e.target.value)}
+                disabled={isUploading}
+                className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-slate-50/50 focus:bg-white transition-all font-medium disabled:opacity-60"
+              />
 
-            <button
-              type="submit"
-              disabled={!inputText.trim() || isUploading}
-              className="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed px-5 py-2.5 rounded-xl text-white text-xs font-bold shrink-0 shadow-md shadow-sky-600/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>Gửi</span>
-            </button>
-          </form>
+              <button
+                type="submit"
+                disabled={!inputText.trim() || isUploading}
+                className="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed px-5 py-2.5 rounded-xl text-white text-xs font-bold shrink-0 shadow-md shadow-sky-600/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>Gửi</span>
+              </button>
+            </form>
+          )}
 
         </div>
 

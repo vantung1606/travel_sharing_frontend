@@ -1783,7 +1783,25 @@ export const chatApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error(`API error opening itinerary chat room ${itineraryId}:`, err);
+      console.error(`API error opening itinerary room ${itineraryId}:`, err);
+      throw err;
+    }
+  },
+
+  async createRoom(roomData, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user.email || 'tung@gmail.com';
+      const res = await fetch(`${BASE_URL}/chat/rooms?email=${encodeURIComponent(userEmail)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify(roomData)
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error('API error creating chat room:', err);
       throw err;
     }
   }

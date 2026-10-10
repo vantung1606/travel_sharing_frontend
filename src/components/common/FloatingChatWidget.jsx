@@ -163,15 +163,45 @@ export const FloatingChatWidget = () => {
   // Gửi Ảnh hoặc Video lên Cloudinary
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
-    if (!file || !activeThreadId) return;
+    if (!file) return;
+
+    if (!activeThreadId) {
+      toast.showInfo('Vui lòng chọn một cuộc trò chuyện để gửi tệp!');
+      e.target.value = '';
+      return;
+    }
+
     e.target.value = '';
 
     const isVideo = file.type.startsWith('video/') ||
-      file.name.toLowerCase().endsWith('.mp4') ||
-      file.name.toLowerCase().endsWith('.mov');
+      /\.(mp4|mov|webm|avi|mkv)$/i.test(file.name);
 
     const msgType = isVideo ? 'VIDEO' : 'IMAGE';
+
+    // Giới hạn 100MB cho video, 25MB cho ảnh
+    const maxMb = isVideo ? 100 : 25;
+    if (file.size > maxMb * 1024 * 1024) {
+      toast.showError(`Dung lượng ${isVideo ? 'video' : 'ảnh'} tối đa là ${maxMb}MB!`);
+      return;
+    }
+
     setIsUploading(true);
+
+    const tempId = 'widget-temp-' + Date.now();
+    const localPreviewUrl = URL.createObjectURL(file);
+    const tempMsg = {
+      id: tempId,
+      roomId: activeThreadId,
+      senderId: currentUser?.id,
+      senderName: currentUser?.name || 'Bạn',
+      senderAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+      content: localPreviewUrl,
+      messageType: msgType,
+      time: 'Đang gửi...',
+      isMe: true,
+      isPending: true
+    };
+    setMessages(prev => [...prev, tempMsg]);
 
     try {
       const secureUrl = await uploadApi.uploadSingle(file);
@@ -184,12 +214,13 @@ export const FloatingChatWidget = () => {
       );
 
       if (savedMsg) {
-        setMessages(prev => [...prev, savedMsg]);
+        setMessages(prev => prev.map(m => m.id === tempId ? savedMsg : m));
       }
       loadRooms();
-      toast.showSuccess(`Đã gửi ${isVideo ? 'video' : 'ảnh'} lên nhóm! 🚀`);
+      toast.showSuccess(`Đã gửi ${isVideo ? 'video' : 'ảnh'} thành công! 🚀`);
     } catch (err) {
       toast.showError(`Lỗi tải tệp: ${err.message || 'Thử lại sau'}`);
+      setMessages(prev => prev.filter(m => m.id !== tempId));
     } finally {
       setIsUploading(false);
     }
