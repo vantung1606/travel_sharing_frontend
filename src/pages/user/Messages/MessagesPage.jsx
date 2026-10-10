@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { chatApi, uploadApi } from '../../../services/api';
+import chatSocket from '../../../services/chatSocket';
 import {
   MessageSquare,
   Users,
@@ -95,13 +96,48 @@ export const MessagesPage = () => {
     }
   }, [activeThreadId, loadMessages]);
 
-  // 3. Polling ngầm để cập nhật tin nhắn mới mỗi 3 giây
+  // 3. Kết nối WebSocket STOMP nhận tin nhắn thời gian thực (Zero-Latency)
   useEffect(() => {
     if (!activeThreadId) return;
+
+    // Đăng ký nhận tin nhắn tức thì từ WebSocket broker /topic/room.{roomId}
+    const unsubscribe = chatSocket.subscribeToRoom(activeThreadId, (incomingMsg) => {
+      if (!incomingMsg) return;
+
+      setMessages(prev => {
+        // Tránh trùng lặp nếu tin nhắn đã có
+        if (prev.some(m => m.id === incomingMsg.id)) {
+          return prev;
+        }
+        // Xóa optimistic/pending message tương ứng nếu có
+        const cleanPrev = prev.filter(m => !m.isPending);
+        return [...cleanPrev, incomingMsg];
+      });
+
+      // Cập nhật ngay preview tin nhắn cuối trong danh sách phòng
+      setThreads(prev => prev.map(t => {
+        if (t.id === activeThreadId) {
+          const previewText = incomingMsg.messageType === 'IMAGE' ? '[Hình ảnh 📷]' :
+                              incomingMsg.messageType === 'VIDEO' ? '[Video 🎬]' : incomingMsg.content;
+          return {
+            ...t,
+            lastMsg: previewText,
+            time: incomingMsg.time || 'Vừa xong'
+          };
+        }
+        return t;
+      }));
+    });
+
+    // Polling phụ dự phòng (chạy mỗi 5 giây phòng khi mất kết nối mạng tạm thời)
     const interval = setInterval(() => {
       loadMessages(activeThreadId, true);
-    }, 3000);
-    return () => clearInterval(interval);
+    }, 5000);
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+      clearInterval(interval);
+    };
   }, [activeThreadId, loadMessages]);
 
   // 4. Tự động cuộn xuống tin nhắn mới nhất

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '../common/Toast';
 import { chatApi, uploadApi } from '../../services/api';
+import chatSocket from '../../services/chatSocket';
 import {
   MessageCircle,
   X,
@@ -77,13 +78,40 @@ export const FloatingChatWidget = () => {
     }
   }, [activeThreadId, loadMessages]);
 
-  // 3. Polling ngầm mỗi 3 giây khi đang mở phòng chat
+  // 3. Kết nối STOMP WebSocket nhận tin nhắn tức thì (Zero-Latency)
   useEffect(() => {
     if (!isOpen || !activeThreadId) return;
+
+    const unsubscribe = chatSocket.subscribeToRoom(activeThreadId, (incomingMsg) => {
+      if (!incomingMsg) return;
+      setMessages(prev => {
+        if (prev.some(m => m.id === incomingMsg.id)) return prev;
+        const cleanPrev = prev.filter(m => !m.isPending);
+        return [...cleanPrev, incomingMsg];
+      });
+
+      setThreads(prev => prev.map(t => {
+        if (t.id === activeThreadId) {
+          const previewText = incomingMsg.messageType === 'IMAGE' ? '[Hình ảnh 📷]' :
+                              incomingMsg.messageType === 'VIDEO' ? '[Video 🎬]' : incomingMsg.content;
+          return {
+            ...t,
+            lastMsg: previewText,
+            time: incomingMsg.time || 'Vừa xong'
+          };
+        }
+        return t;
+      }));
+    });
+
     const interval = setInterval(() => {
       loadMessages(activeThreadId, true);
-    }, 3000);
-    return () => clearInterval(interval);
+    }, 5000);
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+      clearInterval(interval);
+    };
   }, [isOpen, activeThreadId, loadMessages]);
 
   // Auto-scroll
