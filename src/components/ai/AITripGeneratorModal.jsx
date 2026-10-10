@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '../common/Toast';
 import { aiService } from '../../services/aiService';
-import { generateCustomVietnamItinerary } from '../../services/vietnamTravelDatabase';
 import { Sparkles, X, MapPin, Calendar, DollarSign, Loader2, Check, CheckCircle2, Camera, Utensils, Sun, Landmark, Compass, Music, Heart, ShoppingBag, Users, User, Home, Info, Navigation, Minimize2, Maximize2, Activity, Terminal } from 'lucide-react';
 
 const HOT_DESTINATIONS = ['Đà Lạt', 'Hà Giang', 'Phú Quốc', 'Ninh Bình', 'Sa Pa', 'Đà Nẵng - Hội An', 'Quy Nhơn'];
@@ -594,9 +593,9 @@ QUY TẮC BẮT BUỘC:
         console.warn('Could not parse JSON from Gemini:', e);
       }
 
-      // Nếu kết quả AI không có cấu trúc days hợp lệ, lập tức sử dụng cơ sở dữ liệu thực địa chuyên sâu
+      // Nếu kết quả AI không có cấu trúc days hợp lệ, báo lỗi rõ ràng
       if (!parsedData.days || !Array.isArray(parsedData.days) || parsedData.days.length === 0) {
-        parsedData = generateCustomVietnamItinerary(destination, daysCount);
+        throw new Error('Dữ liệu phản hồi từ AI không đúng cấu trúc lịch trình. Vui lòng thử lại!');
       }
 
       // Xây dựng đối tượng hành trình từ kết quả AI
@@ -607,7 +606,7 @@ QUY TẮC BẮT BUỘC:
         ...prev,
         progress: 100,
         currentStep: 'Hoàn tất 100%! Đang mở chi tiết lịch trình...',
-        logs: [...(prev.logs || []), { time: getTimeString(), message: `Hoàn tất 100%! Khởi tạo giao diện chi tiết hành trình.` }]
+        logs: [...(prev.logs || []), { time: getTimeString(), message: `Google Gemini đã phản hồi thành công. Khởi tạo giao diện chi tiết hành trình.` }]
       }));
 
       // Chờ 600ms để người dùng thấy con số 100%
@@ -635,12 +634,7 @@ QUY TẮC BẮT BUỘC:
       clearInterval(progressTimer);
       console.error('AI Generation error:', err);
 
-      // Khi có lỗi mạng hoặc API, sinh lịch trình thực tế 100% từ cơ sở dữ liệu thực địa chuyên sâu Việt Nam
-      const fallbackAI = generateCustomVietnamItinerary(destination, daysCount);
-
-      const fullItinerary = buildItineraryFromAI(fallbackAI, isDraft);
-      generateAITrip({ fullItinerary });
-
+      // Đóng thanh tiến trình và thông báo lỗi rõ ràng cho người dùng
       setAiGeneratingStatus({
         isGenerating: false,
         isExpanded: false,
@@ -651,7 +645,7 @@ QUY TẮC BẮT BUỘC:
         logs: []
       });
 
-      toast.showSuccess(`WanderAI đã hoàn tất lịch trình thực tế cho ${destination}! Đang mở chi tiết... 🎉`);
+      toast.showError(err.message || 'Không thể kết nối đến máy chủ AI lúc này. Vui lòng kiểm tra lại mạng hoặc thử lại sau!');
     }
   };
 
