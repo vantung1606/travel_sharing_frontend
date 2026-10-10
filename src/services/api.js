@@ -1797,7 +1797,10 @@ export const chatApi = {
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
         body: JSON.stringify(roomData)
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        throw new Error(errJson?.message || `HTTP error ${res.status}`);
+      }
       const json = await res.json();
       return json.data;
     } catch (err) {
@@ -1814,7 +1817,10 @@ export const chatApi = {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => null);
+        throw new Error(errJson?.message || `HTTP error ${res.status}`);
+      }
       return true;
     } catch (err) {
       console.error(`API error deleting room ${roomId}:`, err);
