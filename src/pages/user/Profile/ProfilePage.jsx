@@ -4,8 +4,9 @@ import { userApi } from '../../../services/api';
 import { FollowListModal } from '../../../components/community/FollowListModal';
 import { PostDetailModal } from '../../../components/community/PostDetailModal';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
+import { TravelFootprintSection } from '../../../components/profile/TravelFootprintSection';
 import { useToast } from '../../../components/common/Toast';
-import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock } from 'lucide-react';
+import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass } from 'lucide-react';
 
 export const ProfilePage = () => {
   const { currentUser, updateCurrentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab, setItineraries } = useApp();
@@ -239,12 +240,16 @@ export const ProfilePage = () => {
 
           {/* Key Travel Metrics Bento Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
-            <div className="p-2">
-              <span className="text-slate-400 block text-[11px] font-semibold">Điểm Đến Đã Ghé</span>
-              <span className="font-display font-extrabold text-xl text-slate-900 mt-0.5 block flex items-center gap-1">
-                {currentUser.destinationsCount} <MapPin className="w-4 h-4 text-sky-600" />
+            <div
+              onClick={() => setActiveTab('footprint')}
+              className="p-2 cursor-pointer hover:bg-sky-100/60 rounded-xl transition-colors group"
+              title="Bấm để xem Bản đồ Dấu Chân Du Lịch 63 Tỉnh Thành"
+            >
+              <span className="text-slate-400 block text-[11px] font-semibold group-hover:text-sky-700">Điểm Đến Đã Ghé</span>
+              <span className="font-display font-extrabold text-xl text-slate-900 mt-0.5 block flex items-center gap-1 group-hover:scale-105 transition-transform">
+                {currentUser.destinationsCount || 24} <MapPin className="w-4 h-4 text-sky-600" />
               </span>
-              <span className="text-[10px] text-sky-600 font-semibold">24 / 63 Tỉnh thành</span>
+              <span className="text-[10px] text-sky-600 font-semibold group-hover:underline">Bản đồ dấu chân &rarr;</span>
             </div>
 
             <div className="p-2 border-l border-slate-200/80">
@@ -303,6 +308,7 @@ export const ProfilePage = () => {
           {[
             { id: 'itineraries', label: 'Lịch Trình AI Của Tôi', count: displayItineraries.length, icon: Route },
             { id: 'posts', label: 'Bài Viết & Review', count: displayPosts.length, icon: Globe },
+            { id: 'footprint', label: 'Dấu Chân Du Lịch', badge: 'Mới', icon: Compass },
             { id: 'ai-dna', label: 'Gu Du Lịch & AI DNA', badge: 'WanderAI', icon: Sparkles },
             { id: 'saved', label: 'Địa Điểm Đã Lưu', count: destinations.length, icon: Bookmark },
             { id: 'badges', label: 'Huy Hiệu & Thành Tích', count: achievements.length, icon: Award }
@@ -785,6 +791,16 @@ export const ProfilePage = () => {
             ))}
           </div>
         </div>
+      )}
+
+      {/* TAB 6: TRAVEL FOOTPRINT MAP (63 Tỉnh Thành Việt Nam) */}
+      {activeTab === 'footprint' && (
+        <TravelFootprintSection
+          posts={displayPosts}
+          itineraries={displayItineraries}
+          userId={currentUser?.id || 1}
+          userName={currentUser?.name || 'Bạn'}
+        />
       )}
 
       {/* ========================================================= */}

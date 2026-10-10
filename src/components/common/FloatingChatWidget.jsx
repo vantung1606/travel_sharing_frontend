@@ -15,7 +15,11 @@ import {
   ArrowLeft,
   CheckCheck,
   Paperclip,
-  Loader2
+  Loader2,
+  Play,
+  Pause,
+  FileText,
+  Download
 } from 'lucide-react';
 
 const normalizeVietnamese = (str) => {
@@ -27,6 +31,129 @@ const normalizeVietnamese = (str) => {
     .replace(/đ/g, 'd')
     .replace(/Đ/g, 'd')
     .trim();
+};
+
+// Compact Audio Voice Player for Widget
+const AudioMessagePlayer = ({ src, isMe }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const updateTime = () => setCurrentTime(audio.currentTime);
+    const updateDuration = () => setDuration(audio.duration || 0);
+    const onEnded = () => { setIsPlaying(false); setCurrentTime(0); };
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('loadedmetadata', updateDuration);
+    audio.addEventListener('ended', onEnded);
+    return () => {
+      audio.removeEventListener('timeupdate', updateTime);
+      audio.removeEventListener('loadedmetadata', updateDuration);
+      audio.removeEventListener('ended', onEnded);
+    };
+  }, []);
+
+  const togglePlay = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isPlaying) {
+      audio.pause();
+      setIsPlaying(false);
+    } else {
+      audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+    }
+  };
+
+  const handleSeek = (e) => {
+    const val = Number(e.target.value);
+    if (audioRef.current) {
+      audioRef.current.currentTime = val;
+      setCurrentTime(val);
+    }
+  };
+
+  const formatSec = (sec) => {
+    if (!sec || isNaN(sec)) return '0:00';
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
+  return (
+    <div className={`flex items-center gap-2 p-2 rounded-2xl min-w-[180px] max-w-[210px] select-none ${
+      isMe ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-xs' : 'bg-slate-100 text-slate-800 border border-slate-200/70'
+    }`}>
+      <audio ref={audioRef} src={src} preload="metadata" />
+      <button
+        type="button"
+        onClick={togglePlay}
+        className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-90 cursor-pointer ${
+          isMe ? 'bg-white text-sky-600 hover:bg-sky-50 shadow-2xs' : 'bg-sky-600 text-white hover:bg-sky-700 shadow-2xs'
+        }`}
+        title={isPlaying ? 'Tạm dừng' : 'Phát tin thoại'}
+      >
+        {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current ml-0.5" />}
+      </button>
+      <div className="flex-1 space-y-0.5">
+        <input
+          type="range"
+          min="0"
+          max={duration || 100}
+          value={currentTime}
+          onChange={handleSeek}
+          className="w-full h-1 bg-slate-200/50 rounded-lg appearance-none cursor-pointer accent-sky-500"
+        />
+        <div className="flex items-center justify-between text-[9px] font-semibold opacity-85 leading-none">
+          <span>{formatSec(currentTime)}</span>
+          <span>{duration > 0 ? formatSec(duration) : 'Thoại'}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Compact File Attachment Bubble for Widget
+const FileAttachmentBubble = ({ src, isMe }) => {
+  const fileName = React.useMemo(() => {
+    try {
+      const parts = src.split('/');
+      const last = parts[parts.length - 1];
+      return decodeURIComponent(last.split('?')[0]);
+    } catch {
+      return 'Tệp tin đính kèm';
+    }
+  }, [src]);
+
+  return (
+    <div className={`flex items-center gap-2 p-2 rounded-2xl max-w-[210px] ${
+      isMe ? 'bg-sky-700 text-white shadow-xs' : 'bg-slate-100 text-slate-800 border border-slate-200/70'
+    }`}>
+      <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 ${
+        isMe ? 'bg-white/20 text-white' : 'bg-sky-50 text-sky-600 border border-sky-100'
+      }`}>
+        <FileText className="w-4 h-4" />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-bold truncate leading-tight">{fileName}</p>
+        <span className="text-[8px] opacity-75">Tệp đính kèm</span>
+      </div>
+      <a
+        href={src}
+        download
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`p-1.5 rounded-lg transition-all shrink-0 cursor-pointer ${
+          isMe ? 'hover:bg-white/20 text-white' : 'hover:bg-slate-200 text-slate-600'
+        }`}
+        title="Tải tệp tin"
+      >
+        <Download className="w-3.5 h-3.5" />
+      </a>
+    </div>
+  );
 };
 
 export const FloatingChatWidget = () => {
@@ -622,6 +749,10 @@ export const FloatingChatWidget = () => {
                             src={msg.content}
                             className="max-w-[220px] max-h-48 rounded-2xl bg-black"
                           />
+                        ) : msg.messageType === 'AUDIO' ? (
+                          <AudioMessagePlayer src={msg.content} isMe={isMe} />
+                        ) : msg.messageType === 'FILE' ? (
+                          <FileAttachmentBubble src={msg.content} isMe={isMe} />
                         ) : (
                           <div
                             className={`p-2.5 rounded-2xl text-xs leading-relaxed break-words ${

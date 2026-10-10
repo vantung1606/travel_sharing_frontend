@@ -11,15 +11,30 @@ import { FollowListModal } from '../../../components/community/FollowListModal';
 import { ShareModal } from '../../../components/community/ShareModal';
 import { ReportPostModal } from '../../../components/community/ReportPostModal';
 import { ImageLightboxModal } from '../../../components/community/ImageLightboxModal';
+import { BlogArticleReaderModal } from '../../../components/community/BlogArticleReaderModal';
 import { CustomSelect } from '../../../components/common/CustomSelect';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../components/community/MentionSuggestions';
 import { useNavigate } from 'react-router-dom';
-import { AtSign, Heart, MessageCircle, MessageSquare, Share2, Bookmark, MapPin, Sparkles, Award, TrendingUp, Compass, Route, Copy, DollarSign, Camera, Image as ImageIcon, CheckCircle2, Send, Search, SlidersHorizontal, Filter, Plus, X, Loader2, Eye, MoreHorizontal, ChevronLeft, ChevronRight, ArrowRight, Flame, Check, UserCheck, ShieldCheck, AlertCircle, AlertTriangle, ShieldAlert, Lock, Globe, Upload, Video, Trash2, Edit, UserPlus, Users, CornerDownRight, Flag, EyeOff } from 'lucide-react';
+import { AtSign, Heart, MessageCircle, MessageSquare, Share2, Bookmark, MapPin, Sparkles, Award, TrendingUp, Compass, Route, Copy, DollarSign, Camera, Image as ImageIcon, CheckCircle2, Send, Search, SlidersHorizontal, Filter, Plus, X, Loader2, Eye, MoreHorizontal, ChevronLeft, ChevronRight, ArrowRight, Flame, Check, UserCheck, ShieldCheck, AlertCircle, AlertTriangle, ShieldAlert, Lock, Globe, Upload, Video, Trash2, Edit, UserPlus, Users, CornerDownRight, Flag, EyeOff, BookOpen, Hash } from 'lucide-react';
 
 const FEED_SCOPES = [
   { id: 'all', label: 'Khám phá dành cho bạn', icon: Compass },
   { id: 'following', label: 'Đang theo dõi', icon: UserCheck },
   { id: 'saved', label: 'Bài viết đã lưu', icon: Bookmark }
+];
+
+const TRAVEL_HASHTAGS = [
+  { id: 'all', label: '#TấtCả' },
+  { id: 'KinhNghiem', label: '#KinhNghiệm' },
+  { id: 'ReviewAmThuc', label: '#ReviewẨmThực' },
+  { id: 'PhuotSolo', label: '#PhượtSolo' },
+  { id: 'DaLat', label: '#ĐàLạt' },
+  { id: 'HaGiang', label: '#HàGiang' },
+  { id: 'SaPa', label: '#SaPa' },
+  { id: 'PhuQuoc', label: '#PhúQuốc' },
+  { id: 'DaNang', label: '#ĐàNẵng' },
+  { id: 'CheckIn', label: '#CheckInSốngẢo' },
+  { id: 'TietKiem', label: '#DuLịchTiếtKiệm' }
 ];
 
 const TOPIC_FILTERS = [
@@ -165,6 +180,8 @@ export const CommunityPage = () => {
   const [loading, setLoading] = useState(true);
   const [feedScope, setFeedScope] = useState('all'); // 'all' | 'following' | 'saved'
   const [topicFilter, setTopicFilter] = useState('Tất cả'); // 'Tất cả' | 'video' | 'itinerary' | 'food' | 'adventure' | 'beach'
+  const [selectedHashtag, setSelectedHashtag] = useState('all'); // 'all' | 'KinhNghiem' | 'ReviewAmThuc' ...
+  const [readingPost, setReadingPost] = useState(null); // Post currently in Blog Article Reader Mode
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSort, setActiveSort] = useState('newest'); // 'newest' | 'popular' | 'has_itinerary'
   const [bookmarkedPostIds, setBookmarkedPostIds] = useState(new Set());
@@ -696,6 +713,27 @@ export const CommunityPage = () => {
       );
     }
 
+    // 3. Filter by Travel Hashtag (#KinhNghiem, #DaLat, etc.)
+    if (selectedHashtag !== 'all') {
+      const tagMapping = {
+        KinhNghiem: ['kinh nghiệm', 'kinhnghiem', 'tips', 'bí kíp', 'cẩm nang'],
+        ReviewAmThuc: ['ẩm thực', 'quán', 'món', 'ăn', 'food', 'reviewamthuc'],
+        PhuotSolo: ['phượt', 'solo', 'độc hành', 'xe máy', 'phuotsolo'],
+        DaLat: ['đà lạt', 'dalat', 'lâm đồng'],
+        HaGiang: ['hà giang', 'hagiang', 'mã pí lèng', 'đồng văn'],
+        SaPa: ['sa pa', 'sapa', 'lào cai', 'fansipan'],
+        PhuQuoc: ['phú quốc', 'phuquoc', 'kiên giang'],
+        DaNang: ['đà nẵng', 'danang', 'bà nà'],
+        CheckIn: ['check-in', 'checkin', 'sống ảo', 'view đẹp', 'ảnh đẹp'],
+        TietKiem: ['tiết kiệm', 'tietkiem', 'giá rẻ', 'chi phí', 'budget']
+      };
+      const keywords = tagMapping[selectedHashtag] || [selectedHashtag.toLowerCase()];
+      result = result.filter(p => {
+        const text = `${p.title || ''} ${p.content || ''} ${p.tags || ''} ${p.category || ''} ${p.locationTag || ''}`.toLowerCase();
+        return keywords.some(kw => text.includes(kw));
+      });
+    }
+
     // Sort
     if (activeSort === 'popular') {
       result.sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
@@ -707,7 +745,7 @@ export const CommunityPage = () => {
     }
 
     return result;
-  }, [posts, feedScope, topicFilter, activeSort, followingIds, bookmarkedPostIds, searchQuery, hiddenPostIds]);
+  }, [posts, feedScope, topicFilter, selectedHashtag, activeSort, followingIds, bookmarkedPostIds, searchQuery, hiddenPostIds]);
 
   // Handle Like Post
   const handleToggleLike = async (postId) => {
@@ -1928,6 +1966,30 @@ export const CommunityPage = () => {
                 </button>
               )}
             </div>
+
+            {/* TIER 3: TRAVEL BLOG HASHTAG QUICK-TAGS BAR */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar pt-0.5">
+              <span className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider shrink-0 flex items-center gap-1 mr-1">
+                <Hash className="w-3.5 h-3.5 text-sky-600" />
+                Hashtag:
+              </span>
+              {TRAVEL_HASHTAGS.map(tag => {
+                const isActive = selectedHashtag === tag.id;
+                return (
+                  <button
+                    key={tag.id}
+                    onClick={() => setSelectedHashtag(prev => prev === tag.id ? 'all' : tag.id)}
+                    className={`px-3 py-1 rounded-full text-xs transition-all shrink-0 cursor-pointer ${
+                      isActive
+                        ? 'bg-slate-900 text-white font-extrabold shadow-sm scale-[1.03]'
+                        : 'bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-700 border border-slate-200/80 font-bold hover:border-sky-200'
+                    }`}
+                  >
+                    {tag.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           {/* Loading Skeleton */}
@@ -1988,11 +2050,12 @@ export const CommunityPage = () => {
                 </p>
               </div>
               <div className="flex items-center justify-center gap-3 pt-2">
-                {(feedScope !== 'all' || topicFilter !== 'Tất cả') && (
+                {(feedScope !== 'all' || topicFilter !== 'Tất cả' || selectedHashtag !== 'all') && (
                   <button
                     onClick={() => {
                       setFeedScope('all');
                       setTopicFilter('Tất cả');
+                      setSelectedHashtag('all');
                     }}
                     className="px-5 py-2.5 rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all cursor-pointer"
                   >
@@ -2456,16 +2519,29 @@ export const CommunityPage = () => {
                   ) : (
                     <>
                       {/* Post Title & Content */}
-                      <div className="space-y-1.5">
-                        {post.title && (
-                          <h3
-                            onClick={() => setSelectedPostForDetail(post)}
-                            className="font-display font-extrabold text-base sm:text-lg text-slate-900 leading-snug hover:text-blue-600 transition-colors cursor-pointer"
-                            title="Bấm để xem riêng chi tiết bài viết"
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-3">
+                          {post.title ? (
+                            <h3
+                              onClick={() => setSelectedPostForDetail(post)}
+                              className="font-display font-extrabold text-base sm:text-lg text-slate-900 leading-snug hover:text-blue-600 transition-colors cursor-pointer flex-1"
+                              title="Bấm để xem riêng chi tiết bài viết"
+                            >
+                              {post.title}
+                            </h3>
+                          ) : (
+                            <div className="flex-1" />
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setReadingPost(post)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-800 text-xs font-bold transition-all shadow-2xs hover:shadow-xs shrink-0 cursor-pointer border border-sky-200/70 active:scale-95"
+                            title="Mở chế độ đọc blog bài viết toàn màn hình chuẩn tạp chí"
                           >
-                            {post.title}
-                          </h3>
-                        )}
+                            <BookOpen className="w-3.5 h-3.5 text-sky-600" />
+                            <span>Đọc bài</span>
+                          </button>
+                        </div>
                         <p className="text-sm sm:text-[15px] text-slate-700 leading-relaxed whitespace-pre-line font-normal tracking-[0.015em]">
                           {renderTextWithMentions(post.content, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
                         </p>
@@ -2660,6 +2736,16 @@ export const CommunityPage = () => {
                       >
                         <Share2 className="w-4 h-4 text-slate-400 hover:text-blue-700" />
                         <span className="hidden sm:inline">Chia sẻ</span>
+                      </button>
+
+                      {/* Read Article Mode */}
+                      <button
+                        onClick={() => setReadingPost(post)}
+                        className="flex items-center gap-1.5 font-bold text-sky-700 hover:text-sky-800 transition-colors cursor-pointer"
+                        title="Đọc bài viết trong giao diện đọc tạp chí chuyên sâu"
+                      >
+                        <BookOpen className="w-4 h-4 text-sky-600" />
+                        <span className="hidden sm:inline">Đọc blog</span>
                       </button>
 
                       {/* View Single Post Button */}
@@ -3778,6 +3864,28 @@ export const CommunityPage = () => {
           post={lightboxState.post}
           onClose={() => setLightboxState(prev => ({ ...prev, isOpen: false }))}
           onOpenPostDetail={(targetPost) => setSelectedPostForDetail(targetPost)}
+        />
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 11: BLOG ARTICLE READER MODAL (Magazine Style)       */}
+      {/* ========================================================= */}
+      {readingPost && (
+        <BlogArticleReaderModal
+          post={readingPost}
+          onClose={() => setReadingPost(null)}
+          onOpenItinerary={(itin) => {
+            setReadingPost(null);
+            setSelectedItineraryForModal(itin);
+          }}
+          onToggleLike={(postId) => handleToggleLike(postId)}
+          onBookmarkToggle={(postId) => handleToggleBookmark(postId)}
+          onAuthorClick={(authorId) => {
+            setReadingPost(null);
+            setSelectedUserIdForModal(authorId);
+          }}
+          onReadRelated={(relatedPost) => setReadingPost(relatedPost)}
+          relatedPosts={posts.filter(p => Number(p.id) !== Number(readingPost.id)).slice(0, 4)}
         />
       )}
 
