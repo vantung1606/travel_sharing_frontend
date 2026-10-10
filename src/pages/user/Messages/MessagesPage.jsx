@@ -124,7 +124,18 @@ export const MessagesPage = () => {
     if (!silent) setIsLoadingMessages(true);
     try {
       const msgs = await chatApi.getRoomMessages(roomId, effectiveEmail);
-      setMessages(msgs || []);
+      if (Array.isArray(msgs)) {
+        setMessages(prev => {
+          // Tránh cập nhật mảng mới nếu danh sách tin nhắn không đổi (chặn kích hoạt useEffect khi polling)
+          if (
+            prev.length === msgs.length &&
+            (prev.length === 0 || prev[prev.length - 1]?.id === msgs[msgs.length - 1]?.id)
+          ) {
+            return prev;
+          }
+          return msgs;
+        });
+      }
     } catch (err) {
       console.warn(`Lỗi tải tin nhắn phòng ${roomId}:`, err.message);
     } finally {
@@ -182,14 +193,63 @@ export const MessagesPage = () => {
     };
   }, [activeThreadId, loadMessages]);
 
-  // 4. Tự động cuộn xuống tin nhắn mới nhất
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
+  // 4. Quản lý cuộn thông minh trong khung chat (TUYỆT ĐỐI không cuộn toàn bộ trang web window)
+  const chatScrollContainerRef = useRef(null);
+  const prevMessagesCountRef = useRef(0);
+  const isFirstLoadOfRoomRef = useRef(true);
 
+  const scrollToBottom = useCallback((smooth = true) => {
+    const container = chatScrollContainerRef.current;
+    if (!container) return;
+    try {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+    } catch {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, []);
+
+  // Đổi phòng -> Đặt lại trạng thái cuộn ban đầu
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    isFirstLoadOfRoomRef.current = true;
+    prevMessagesCountRef.current = 0;
+  }, [activeThreadId]);
+
+  // Chỉ cuộn khi cần thiết (mở phòng lần đầu, người dùng gửi tin, hoặc đang ở đáy khi có tin nhắn mới)
+  useEffect(() => {
+    const container = chatScrollContainerRef.current;
+    if (!container) return;
+
+    const count = messages.length;
+    const prevCount = prevMessagesCountRef.current;
+
+    // Lần tải đầu tiên khi mở phòng: Cuộn tức thì xuống đáy khung chat
+    if (isFirstLoadOfRoomRef.current && count > 0) {
+      isFirstLoadOfRoomRef.current = false;
+      prevMessagesCountRef.current = count;
+      setTimeout(() => scrollToBottom(false), 50);
+      return;
+    }
+
+    // Nếu số lượng tin nhắn không tăng (polling trả về mảng cũ) -> Không làm gì cả
+    if (count <= prevCount) {
+      prevMessagesCountRef.current = count;
+      return;
+    }
+
+    // Có tin nhắn mới: Nếu người dùng đang gần đáy hoặc là tin do chính mình gửi -> Cuộn mượt
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 160;
+    const latestMsg = messages[messages.length - 1];
+    const isSentByMe = latestMsg?.isMe;
+
+    if (isNearBottom || isSentByMe) {
+      setTimeout(() => scrollToBottom(true), 50);
+    }
+
+    prevMessagesCountRef.current = count;
+  }, [messages, scrollToBottom]);
 
   // 5. Xử lý mở nhanh cuộc trò chuyện từ Query Params (ví dụ: bấm nút Nhắn tin ở Profile người khác)
   const openingDirectUserIdRef = useRef(null);
@@ -1335,7 +1395,7 @@ export const MessagesPage = () => {
               </div>
 
               {/* Lịch sử tin nhắn */}
-              <div className="flex-1 space-y-3.5 max-h-[440px] overflow-y-auto pr-1.5 custom-dropdown-scroll">
+              <div ref={chatScrollContainerRef} className="flex-1 space-y-3.5 max-h-[440px] overflow-y-auto pr-1.5 custom-dropdown-scroll">
                 {isLoadingMessages ? (
                   <div className="py-24 text-center text-slate-400 text-xs space-y-2">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-sky-600" />

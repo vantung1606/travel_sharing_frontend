@@ -64,7 +64,17 @@ export const FloatingChatWidget = () => {
     if (!silent) setIsLoadingMessages(true);
     try {
       const msgs = await chatApi.getRoomMessages(roomId, effectiveEmail);
-      setMessages(msgs || []);
+      if (Array.isArray(msgs)) {
+        setMessages(prev => {
+          if (
+            prev.length === msgs.length &&
+            (prev.length === 0 || prev[prev.length - 1]?.id === msgs[msgs.length - 1]?.id)
+          ) {
+            return prev;
+          }
+          return msgs;
+        });
+      }
     } catch (err) {
       console.warn(`Lỗi tải tin nhắn phòng ${roomId}:`, err.message);
     } finally {
@@ -114,11 +124,46 @@ export const FloatingChatWidget = () => {
     };
   }, [isOpen, activeThreadId, loadMessages]);
 
-  // Auto-scroll
+  // Quản lý cuộn thông minh trong widget
+  const widgetScrollContainerRef = useRef(null);
+  const prevWidgetMsgCountRef = useRef(0);
+  const isWidgetFirstLoadRef = useRef(true);
+
   useEffect(() => {
-    if (activeThreadId) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    isWidgetFirstLoadRef.current = true;
+    prevWidgetMsgCountRef.current = 0;
+  }, [activeThreadId]);
+
+  useEffect(() => {
+    const container = widgetScrollContainerRef.current;
+    if (!container || !activeThreadId) return;
+
+    const count = messages.length;
+    const prevCount = prevWidgetMsgCountRef.current;
+
+    if (isWidgetFirstLoadRef.current && count > 0) {
+      isWidgetFirstLoadRef.current = false;
+      prevWidgetMsgCountRef.current = count;
+      setTimeout(() => {
+        container.scrollTop = container.scrollHeight;
+      }, 50);
+      return;
     }
+
+    if (count <= prevCount) {
+      prevWidgetMsgCountRef.current = count;
+      return;
+    }
+
+    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 120;
+    const latestMsg = messages[messages.length - 1];
+    if (isNearBottom || latestMsg?.isMe) {
+      setTimeout(() => {
+        container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+      }, 50);
+    }
+
+    prevWidgetMsgCountRef.current = count;
   }, [activeThreadId, messages]);
 
   // Hide floating widget if user is currently on the full /messages page
@@ -444,7 +489,7 @@ export const FloatingChatWidget = () => {
           ) : (
             /* Khung chat tin nhắn */
             <div className="flex-1 flex flex-col min-h-0 bg-white">
-              <div className="flex-1 p-3 overflow-y-auto space-y-3 custom-dropdown-scroll">
+              <div ref={widgetScrollContainerRef} className="flex-1 p-3 overflow-y-auto space-y-3 custom-dropdown-scroll">
                 {isLoadingMessages ? (
                   <div className="py-12 text-center text-slate-400 text-xs space-y-1">
                     <Loader2 className="w-5 h-5 animate-spin mx-auto text-sky-600" />
