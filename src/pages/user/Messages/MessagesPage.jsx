@@ -30,6 +30,18 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
+// Hàm chuẩn hóa tiếng Việt loại bỏ dấu để tìm kiếm tức thì theo chuỗi con (VD: 'tu' -> khớp 'tùng', 'tg' -> không khớp)
+export const normalizeVietnamese = (str) => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'd')
+    .trim();
+};
+
 export const MessagesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { currentUser } = useApp();
@@ -88,9 +100,13 @@ export const MessagesPage = () => {
     }
   }, [effectiveEmail]);
 
+  // Debounce gọi API tìm kiếm bổ sung trên server khi từ khóa thay đổi
   useEffect(() => {
     if (isCreateModalOpen) {
-      loadAvailableUsers(userSearchKeyword);
+      const timer = setTimeout(() => {
+        loadAvailableUsers(userSearchKeyword);
+      }, 250);
+      return () => clearTimeout(timer);
     }
   }, [isCreateModalOpen, userSearchKeyword, loadAvailableUsers]);
 
@@ -467,6 +483,8 @@ export const MessagesPage = () => {
       return true;
     });
 
+    const normSearch = normalizeVietnamese(searchTerm);
+
     return unique.filter(t => {
       const matchesFilter =
         filterTab === 'all'
@@ -474,10 +492,27 @@ export const MessagesPage = () => {
           : filterTab === 'direct'
           ? t.type === 'DIRECT'
           : t.type === 'GROUP';
-      const matchesSearch = t.name?.toLowerCase().includes(searchTerm.toLowerCase());
-      return matchesFilter && matchesSearch;
+
+      if (!matchesFilter) return false;
+      if (!normSearch) return true;
+
+      const normName = normalizeVietnamese(t.name);
+      const normLastMsg = normalizeVietnamese(t.lastMsg);
+      return normName.includes(normSearch) || normLastMsg.includes(normSearch);
     });
   }, [threads, filterTab, searchTerm]);
+
+  // Lọc tức thì danh sách người dùng khả dụng theo từng ký tự (gõ t hay tu đều ra tùng, tg thì không)
+  const filteredAvailableUsers = useMemo(() => {
+    if (!userSearchKeyword.trim()) return availableUsers;
+    const kw = normalizeVietnamese(userSearchKeyword);
+    return availableUsers.filter(u => {
+      const name = normalizeVietnamese(u.fullName);
+      const handle = normalizeVietnamese(u.handle);
+      const email = normalizeVietnamese(u.email);
+      return name.includes(kw) || handle.includes(kw) || email.includes(kw);
+    });
+  }, [availableUsers, userSearchKeyword]);
 
   // Tải danh sách thành viên của phòng
   const loadRoomMembers = useCallback(async (roomId) => {
@@ -571,11 +606,19 @@ export const MessagesPage = () => {
     );
   };
 
-  // Lọc những người chưa có trong nhóm khi tìm kiếm để thêm vào
+  // Lọc những người chưa có trong nhóm khi tìm kiếm để thêm vào (bỏ dấu tiếng Việt tức thì)
   const candidateUsersToAdd = useMemo(() => {
     const existingMemberUserIds = new Set(roomMembers.map(m => m.userId));
-    return availableUsers.filter(u => !existingMemberUserIds.has(u.userId));
-  }, [availableUsers, roomMembers]);
+    const notInRoom = availableUsers.filter(u => !existingMemberUserIds.has(u.userId));
+    if (!addMemberSearchKeyword.trim()) return notInRoom;
+    const kw = normalizeVietnamese(addMemberSearchKeyword);
+    return notInRoom.filter(u => {
+      const name = normalizeVietnamese(u.fullName);
+      const handle = normalizeVietnamese(u.handle);
+      const email = normalizeVietnamese(u.email);
+      return name.includes(kw) || handle.includes(kw) || email.includes(kw);
+    });
+  }, [availableUsers, roomMembers, addMemberSearchKeyword]);
 
   // Xác định thành viên hiện tại và quyền Trưởng nhóm (OWNER)
   const currentMember = useMemo(() => {
@@ -719,12 +762,12 @@ export const MessagesPage = () => {
                       <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
                       <span>Đang tìm kiếm thành viên...</span>
                     </div>
-                  ) : availableUsers.length === 0 ? (
+                  ) : filteredAvailableUsers.length === 0 ? (
                     <div className="py-6 text-center text-xs text-slate-400">
                       Không tìm thấy người dùng phù hợp
                     </div>
                   ) : (
-                    availableUsers.map(user => {
+                    filteredAvailableUsers.map(user => {
                       const isSelected = selectedUserIds.includes(user.userId);
                       return (
                         <div

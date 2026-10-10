@@ -18,6 +18,17 @@ import {
   Loader2
 } from 'lucide-react';
 
+const normalizeVietnamese = (str) => {
+  if (!str) return '';
+  return str
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'd')
+    .trim();
+};
+
 export const FloatingChatWidget = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -308,8 +319,14 @@ export const FloatingChatWidget = () => {
         : filterTab === 'direct'
         ? t.type === 'DIRECT'
         : t.type === 'GROUP';
-    const matchesSearch = t.name?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesFilter && matchesSearch;
+
+    if (!matchesFilter) return false;
+    if (!searchQuery.trim()) return true;
+
+    const normQuery = normalizeVietnamese(searchQuery);
+    const normName = normalizeVietnamese(t.name);
+    const normLastMsg = normalizeVietnamese(t.lastMsg);
+    return normName.includes(normQuery) || normLastMsg.includes(normQuery);
   });
 
   return (
