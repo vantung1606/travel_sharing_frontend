@@ -1,19 +1,25 @@
 export const BASE_URL = 'http://localhost:8081/api';
 
-const getAuthToken = () => {
+// ─── Core Auth & User Storage Helpers ─────────────────────────────────────────
+export function getStoredUser() {
   try {
     const raw = localStorage.getItem('wayfare_user');
-    const u = raw ? JSON.parse(raw) : null;
-    return u?.token || null;
-  } catch {
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    console.warn('Error reading wayfare_user from localStorage', e);
     return null;
   }
-};
+}
 
-const getAuthHeader = () => {
+export function getAuthToken() {
+  const user = getStoredUser();
+  return user?.token || null;
+}
+
+export function getAuthHeader() {
   const token = getAuthToken();
   return token ? { 'Authorization': `Bearer ${token}` } : {};
-};
+}
 
 export const authApi = {
   // Login API Call
