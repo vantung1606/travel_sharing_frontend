@@ -57,6 +57,10 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
       case 'COMMENT':
       case 'COMMENT_REPLY':
         return <MessageCircle className="w-3.5 h-3.5 text-sky-600" />;
+      case 'CHAT_MESSAGE':
+        return <MessageCircle className="w-3.5 h-3.5 text-blue-500 fill-blue-500/20" />;
+      case 'FOLLOW':
+        return <Users className="w-3.5 h-3.5 text-indigo-500" />;
       case 'SHARE':
       case 'COMMUNITY_SHARE':
         return <Share2 className="w-3.5 h-3.5 text-sky-600" />;

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AppProvider } from './context/AppContext';
-import { ToastProvider } from './components/common/Toast';
+import { AppProvider, useApp } from './context/AppContext';
+import { ToastProvider, useToast } from './components/common/Toast';
+import { chatSocket } from './services/chatSocket';
 import { Navbar } from './components/common/Navbar';
 import { BottomNav } from './components/common/BottomNav';
 import { AdminSidebar } from './components/common/AdminSidebar';
@@ -34,6 +35,31 @@ import { AdminAIConfigPage } from './pages/admin/AIConfig/AdminAIConfigPage';
 const AppContent = () => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
+  const { isLoggedIn, currentUser, addNewNotification } = useApp();
+  const toast = useToast();
+
+  // Đăng ký nhận thông báo Real-time qua STOMP WebSocket
+  useEffect(() => {
+    if (!isLoggedIn || !currentUser?.email) return;
+
+    const unsubscribe = chatSocket.subscribeToNotifications(
+      currentUser.id,
+      currentUser.email,
+      (notification) => {
+        if (!notification) return;
+        addNewNotification(notification);
+
+        // Hiển thị Toast nổi thông báo tức thời
+        const title = notification.title || 'Thông báo';
+        const msg = notification.message || 'Bạn có thông báo mới';
+        toast.showInfo(`🔔 ${title}: ${msg}`, 4500);
+      }
+    );
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [isLoggedIn, currentUser?.id, currentUser?.email, addNewNotification, toast]);
 
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900 selection:bg-sky-600 selection:text-white">

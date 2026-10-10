@@ -85,6 +85,76 @@ class ChatSocketService {
     };
   }
 
+  subscribeToNotifications(userId, userEmail, onNotification) {
+    this.connect();
+    const subs = [];
+
+    const doSub = () => {
+      if (!this.client || !this.client.connected) return;
+
+      // 1. Kênh theo ID người dùng
+      if (userId) {
+        try {
+          const subId = this.client.subscribe(`/topic/notifications.${userId}`, (msg) => {
+            try {
+              const body = JSON.parse(msg.body);
+              if (onNotification) onNotification(body);
+            } catch (e) {
+              console.warn('[STOMP Notif] Parse error:', e);
+            }
+          });
+          subs.push(subId);
+        } catch (e) {}
+      }
+
+      // 2. Kênh theo Email người dùng
+      if (userEmail) {
+        try {
+          const subEmail = this.client.subscribe(`/topic/notifications.${userEmail.toLowerCase().trim()}`, (msg) => {
+            try {
+              const body = JSON.parse(msg.body);
+              if (onNotification) onNotification(body);
+            } catch (e) {
+              console.warn('[STOMP Notif] Parse error:', e);
+            }
+          });
+          subs.push(subEmail);
+        } catch (e) {}
+      }
+
+      // 3. Kênh phát sóng toàn hệ thống
+      try {
+        const subBroadcast = this.client.subscribe(`/topic/notifications.broadcast`, (msg) => {
+          try {
+            const body = JSON.parse(msg.body);
+            if (onNotification) onNotification(body);
+          } catch (e) {
+            console.warn('[STOMP Notif] Parse error:', e);
+          }
+        });
+        subs.push(subBroadcast);
+      } catch (e) {}
+    };
+
+    if (this.client && this.client.connected) {
+      doSub();
+    } else {
+      const checkInterval = setInterval(() => {
+        if (this.client && this.client.connected) {
+          clearInterval(checkInterval);
+          doSub();
+        }
+      }, 150);
+      setTimeout(() => clearInterval(checkInterval), 5000);
+    }
+
+    return () => {
+      subs.forEach(s => {
+        try { s.unsubscribe(); } catch (e) {}
+      });
+    };
+  }
+
   disconnect() {
     if (this.client) {
       try {

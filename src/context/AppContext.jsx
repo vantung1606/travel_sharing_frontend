@@ -67,6 +67,8 @@ const DEFAULT_APP_STATE = {
   resolveReport: () => {},
   toggleUserStatus: () => {},
   notifications: [],
+  setNotifications: () => {},
+  addNewNotification: () => {},
   unreadNotificationsCount: 0,
   isNotificationLiveBackend: false,
   markNotificationAsRead: () => {},
@@ -397,6 +399,14 @@ export const AppProvider = ({ children }) => {
   // Notification State - Synced with currentUser
   const [notifications, setNotifications] = useState([]);
   const [isNotificationLiveBackend, setIsNotificationLiveBackend] = useState(false);
+
+  const addNewNotification = useCallback((incomingNotif) => {
+    if (!incomingNotif) return;
+    setNotifications(prev => {
+      if (prev.some(n => n.id && n.id === incomingNotif.id)) return prev;
+      return [incomingNotif, ...prev];
+    });
+  }, []);
 
   const fetchNotifications = useCallback(async (targetEmail) => {
     if (!isLoggedIn) {
@@ -771,6 +781,8 @@ export const AppProvider = ({ children }) => {
         resolveReport,
         toggleUserStatus,
         notifications,
+        setNotifications,
+        addNewNotification,
         unreadNotificationsCount,
         isNotificationLiveBackend,
         markNotificationAsRead,

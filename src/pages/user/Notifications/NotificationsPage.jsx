@@ -66,6 +66,20 @@ export const NotificationsPage = () => {
           badgeText: 'Phản Hồi',
           actionText: 'Trả Lời'
         };
+      case 'CHAT_MESSAGE':
+        return {
+          icon: MessageCircle,
+          color: 'text-blue-600 bg-blue-50 border-blue-200',
+          badgeText: 'Tin Nhắn Mới',
+          actionText: 'Vào Trò Chuyện'
+        };
+      case 'FOLLOW':
+        return {
+          icon: Users,
+          color: 'text-indigo-600 bg-indigo-50 border-indigo-200',
+          badgeText: 'Người Theo Dõi',
+          actionText: 'Xem Cộng Đồng'
+        };
       case 'SHARE':
       case 'COMMUNITY_SHARE':
         return {
