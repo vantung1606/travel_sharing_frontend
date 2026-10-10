@@ -87,25 +87,34 @@ export const MessagesPage = () => {
 
   const effectiveEmail = currentUser?.email || 'tung@gmail.com';
 
-  // Tải danh sách người dùng khả dụng để thêm vào nhóm
-  const loadAvailableUsers = useCallback(async (keyword = '') => {
-    setIsLoadingAvailableUsers(true);
+  // Tải danh sách người dùng khả dụng để thêm vào nhóm (hỗ trợ silent update để không giật màn hình khi gõ phím)
+  const loadAvailableUsers = useCallback(async (keyword = '', silent = false) => {
+    if (!silent) setIsLoadingAvailableUsers(true);
     try {
       const data = await chatApi.getAvailableUsers(keyword, effectiveEmail);
-      setAvailableUsers(data || []);
+      if (Array.isArray(data)) {
+        setAvailableUsers(data);
+      }
     } catch (err) {
       console.warn('Lỗi tải danh sách người dùng khả dụng:', err);
     } finally {
-      setIsLoadingAvailableUsers(false);
+      if (!silent) setIsLoadingAvailableUsers(false);
     }
   }, [effectiveEmail]);
 
-  // Debounce gọi API tìm kiếm bổ sung trên server khi từ khóa thay đổi
+  // Tải trước người dùng ngay lập tức khi mở modal tạo nhóm (0ms delay)
   useEffect(() => {
     if (isCreateModalOpen) {
+      loadAvailableUsers('', availableUsers.length > 0);
+    }
+  }, [isCreateModalOpen, loadAvailableUsers]);
+
+  // Đồng bộ tìm kiếm nền phía server khi gõ từ khóa mà không chặn hiển thị danh sách bộ nhớ cục bộ
+  useEffect(() => {
+    if (isCreateModalOpen && userSearchKeyword.trim()) {
       const timer = setTimeout(() => {
-        loadAvailableUsers(userSearchKeyword);
-      }, 250);
+        loadAvailableUsers(userSearchKeyword, true);
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [isCreateModalOpen, userSearchKeyword, loadAvailableUsers]);
@@ -627,12 +636,18 @@ export const MessagesPage = () => {
 
   const isCurrentOwner = currentMember?.role === 'OWNER' || currentThreadObj?.creator?.id === currentUser?.id;
 
-  // Lắng nghe tìm kiếm khi chuyển qua tab thêm thành viên
+  // Lắng nghe khi chuyển qua tab thêm thành viên, tải sẵn ngay lập tức không làm giật UI
   useEffect(() => {
     if (isMembersModalOpen && membersModalTab === 'add') {
+      loadAvailableUsers('', availableUsers.length > 0);
+    }
+  }, [isMembersModalOpen, membersModalTab, loadAvailableUsers]);
+
+  useEffect(() => {
+    if (isMembersModalOpen && membersModalTab === 'add' && addMemberSearchKeyword.trim()) {
       const timer = setTimeout(() => {
-        loadAvailableUsers(addMemberSearchKeyword);
-      }, 250);
+        loadAvailableUsers(addMemberSearchKeyword, true);
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [isMembersModalOpen, membersModalTab, addMemberSearchKeyword, loadAvailableUsers]);
@@ -757,10 +772,10 @@ export const MessagesPage = () => {
 
                 {/* Danh sách người dùng khả dụng */}
                 <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-white max-h-44 overflow-y-auto custom-dropdown-scroll divide-y divide-slate-100">
-                  {isLoadingAvailableUsers ? (
+                  {isLoadingAvailableUsers && availableUsers.length === 0 ? (
                     <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
-                      <span>Đang tìm kiếm thành viên...</span>
+                      <span>Đang tải danh sách thành viên...</span>
                     </div>
                   ) : filteredAvailableUsers.length === 0 ? (
                     <div className="py-6 text-center text-xs text-slate-400">
@@ -778,14 +793,31 @@ export const MessagesPage = () => {
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <img
-                              src={user.avatarUrl}
-                              alt=""
-                              className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-slate-200"
-                            />
+                            <div className="relative shrink-0">
+                              <img
+                                src={user.avatarUrl}
+                                alt=""
+                                className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-slate-200"
+                              />
+                              <span
+                                className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
+                                  user.isOnline ? 'bg-emerald-500' : 'bg-slate-300'
+                                }`}
+                                title={user.isOnline ? 'Đang hoạt động' : (user.statusText || 'Ngoại tuyến')}
+                              />
+                            </div>
                             <div className="min-w-0">
-                              <p className="text-xs font-bold text-slate-900 truncate">{user.fullName}</p>
-                              <p className="text-[10px] text-slate-400 truncate">{user.handle || user.email}</p>
+                              <div className="flex items-center gap-1.5">
+                                <p className="text-xs font-bold text-slate-900 truncate">{user.fullName}</p>
+                                {user.isOnline && (
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">
+                                    Online
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10px] text-slate-400 truncate">
+                                {user.handle || user.email} {user.statusText ? `• ${user.statusText}` : ''}
+                              </p>
                             </div>
                           </div>
 
@@ -1013,6 +1045,12 @@ export const MessagesPage = () => {
                                 alt=""
                                 className="w-10 h-10 rounded-full object-cover ring-2 ring-slate-100"
                               />
+                              <span
+                                className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
+                                  member.isOnline ? 'bg-emerald-500' : 'bg-slate-300'
+                                }`}
+                                title={member.isOnline ? 'Đang hoạt động' : (member.statusText || 'Ngoại tuyến')}
+                              />
                               {isOwnerRole && (
                                 <span className="absolute -top-1 -right-1 p-0.5 rounded-full bg-amber-500 text-white shadow-2xs" title="Trưởng nhóm">
                                   <Crown className="w-2.5 h-2.5" />
@@ -1030,9 +1068,14 @@ export const MessagesPage = () => {
                                     Bạn
                                   </span>
                                 )}
+                                {member.isOnline && (
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">
+                                    Online
+                                  </span>
+                                )}
                               </div>
                               <p className="text-[11px] text-slate-400 truncate">
-                                {member.handle || member.email}
+                                {member.handle || member.email} {member.statusText ? `• ${member.statusText}` : ''}
                               </p>
                             </div>
                           </div>
@@ -1125,10 +1168,10 @@ export const MessagesPage = () => {
 
                 {/* Danh sách người dùng khả dụng */}
                 <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-white max-h-52 overflow-y-auto custom-dropdown-scroll divide-y divide-slate-100">
-                  {isLoadingAvailableUsers ? (
+                  {isLoadingAvailableUsers && availableUsers.length === 0 ? (
                     <div className="py-8 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
                       <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
-                      <span>Đang tìm kiếm...</span>
+                      <span>Đang tải danh sách người dùng...</span>
                     </div>
                   ) : candidateUsersToAdd.length === 0 ? (
                     <div className="py-8 text-center text-xs text-slate-400">
@@ -1146,14 +1189,31 @@ export const MessagesPage = () => {
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <img
-                              src={user.avatarUrl}
-                              alt=""
-                              className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-slate-200"
-                            />
+                            <div className="relative shrink-0">
+                              <img
+                                src={user.avatarUrl}
+                                alt=""
+                                className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-slate-200"
+                              />
+                              <span
+                                className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
+                                  user.isOnline ? 'bg-emerald-500' : 'bg-slate-300'
+                                }`}
+                                title={user.isOnline ? 'Đang hoạt động' : (user.statusText || 'Ngoại tuyến')}
+                              />
+                            </div>
                             <div className="min-w-0">
-                              <p className="text-xs font-bold text-slate-900 truncate">{user.fullName}</p>
-                              <p className="text-[10px] text-slate-400 truncate">{user.handle || user.email}</p>
+                              <div className="flex items-center gap-1.5">
+                                <p className="text-xs font-bold text-slate-900 truncate">{user.fullName}</p>
+                                {user.isOnline && (
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">
+                                    Online
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10px] text-slate-400 truncate">
+                                {user.handle || user.email} {user.statusText ? `• ${user.statusText}` : ''}
+                              </p>
                             </div>
                           </div>
 
@@ -1329,7 +1389,12 @@ export const MessagesPage = () => {
                       className="w-11 h-11 rounded-2xl object-cover ring-1 ring-slate-200"
                     />
                     {thread.type === 'DIRECT' ? (
-                      <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white" title="Trực tuyến" />
+                      <span
+                        className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white ${
+                          thread.isOnline ? 'bg-emerald-500' : 'bg-slate-300'
+                        }`}
+                        title={thread.isOnline ? 'Đang hoạt động' : (thread.statusText || 'Ngoại tuyến')}
+                      />
                     ) : (
                       <span className="absolute -bottom-0.5 -right-0.5 p-0.5 rounded-full bg-sky-600 text-white border border-white text-[8px]" title="Nhóm tour">
                         <Users className="w-2.5 h-2.5" />
@@ -1375,7 +1440,9 @@ export const MessagesPage = () => {
                       alt=""
                       className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl object-cover ring-2 ring-sky-100"
                     />
-                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
+                    <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
+                      currentThreadObj?.isOnline ? 'bg-emerald-500' : 'bg-slate-300'
+                    }`} />
                   </div>
 
                   <div className="min-w-0">
@@ -1385,7 +1452,17 @@ export const MessagesPage = () => {
                     <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
                       {currentThreadObj?.type === 'DIRECT' ? (
                         <>
-                          <span className="text-emerald-600 font-bold">● Đang hoạt động</span>
+                          {currentThreadObj?.isOnline ? (
+                            <span className="text-emerald-600 font-bold flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                              <span>Đang hoạt động</span>
+                            </span>
+                          ) : (
+                            <span className="text-slate-500 font-medium flex items-center gap-1">
+                              <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                              <span>{currentThreadObj?.statusText || 'Ngoại tuyến'}</span>
+                            </span>
+                          )}
                           <span>•</span>
                           <span>Hội thoại 1-1 trực tiếp</span>
                         </>

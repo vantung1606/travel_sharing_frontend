@@ -84,6 +84,25 @@ export const authApi = {
         }
       };
     }
+  },
+
+  // Logout API Call (Ghi nhận nhật ký kiểm toán hệ thống & cập nhật trạng thái offline)
+  async logout(email) {
+    try {
+      const user = getStoredUser();
+      const userEmail = email || user?.email || '';
+      const response = await fetch(`${BASE_URL}/auth/logout?email=${encodeURIComponent(userEmail)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!response.ok) {
+        console.warn('Backend logout response not OK:', response.status);
+      }
+      return true;
+    } catch (error) {
+      console.warn('Backend API connection warning on logout:', error.message);
+      return false;
+    }
   }
 };
 

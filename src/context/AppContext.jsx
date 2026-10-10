@@ -9,7 +9,7 @@ import {
   INITIAL_USER_LIST,
   INITIAL_REPORTS
 } from '../mock/data';
-import { notificationApi, userApi, placeApi, itineraryApi } from '../services/api';
+import { notificationApi, userApi, placeApi, itineraryApi, authApi } from '../services/api';
 
 const DEFAULT_APP_STATE = {
   portalMode: 'user',
@@ -326,8 +326,12 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Safe Logout: Reset sạch sẽ về Guest
+  // Safe Logout: Gửi thông báo đến Backend ghi log kiểm toán và Reset sạch sẽ về Guest
   const logout = () => {
+    const userToLogout = currentUser;
+    if (userToLogout?.email) {
+      authApi.logout(userToLogout.email).catch(e => console.warn('Logout API error:', e));
+    }
     setIsLoggedIn(false);
     setCurrentUser(GUEST_USER);
     setPortalMode('user');

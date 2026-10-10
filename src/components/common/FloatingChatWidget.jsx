@@ -358,9 +358,13 @@ export const FloatingChatWidget = () => {
                       {activeThreadObj?.name}
                     </h4>
                     <span className="text-[10px] text-sky-100 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-300"></span>
                       {activeThreadObj?.type === 'DIRECT' ? (
-                        <span>Đang hoạt động</span>
+                        <>
+                          <span className={`w-1.5 h-1.5 rounded-full ${
+                            activeThreadObj?.isOnline ? 'bg-emerald-300 animate-pulse' : 'bg-slate-300'
+                          }`} />
+                          <span>{activeThreadObj?.isOnline ? 'Đang hoạt động' : (activeThreadObj?.statusText || 'Ngoại tuyến')}</span>
+                        </>
                       ) : (
                         <button
                           type="button"
@@ -479,7 +483,12 @@ export const FloatingChatWidget = () => {
                           className="w-10 h-10 rounded-xl object-cover ring-1 ring-slate-200"
                         />
                         {thread.type === 'DIRECT' ? (
-                          <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white" />
+                          <span
+                            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
+                              thread.isOnline ? 'bg-emerald-500' : 'bg-slate-300'
+                            }`}
+                            title={thread.isOnline ? 'Đang hoạt động' : (thread.statusText || 'Ngoại tuyến')}
+                          />
                         ) : (
                           <span className="absolute -bottom-0.5 -right-0.5 p-0.5 rounded-full bg-sky-600 text-white border border-white text-[7px]">
                             <Users className="w-2 h-2" />
