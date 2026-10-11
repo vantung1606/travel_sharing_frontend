@@ -1,4 +1,8 @@
-export const BASE_URL = 'http://localhost:8081/api';
+export const BASE_URL = (() => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (!envUrl) return 'http://localhost:8081/api';
+  return envUrl.endsWith('/api') ? envUrl : `${envUrl.replace(/\/$/, '')}/api`;
+})();
 
 // ─── Core Auth & User Storage Helpers ─────────────────────────────────────────
 export function getStoredUser() {

@@ -13,8 +13,16 @@ class ChatSocketService {
       return;
     }
 
-    const host = window.location.hostname || 'localhost';
-    const wsUrl = `ws://${host}:8081/ws/chat`;
+    const getWsUrl = () => {
+      if (import.meta.env.VITE_WS_URL) return import.meta.env.VITE_WS_URL;
+      if (import.meta.env.VITE_API_URL) {
+        const clean = import.meta.env.VITE_API_URL.replace(/^http/, 'ws').replace(/\/api\/?$/, '');
+        return `${clean}/ws/chat`;
+      }
+      const host = window.location.hostname || 'localhost';
+      return `ws://${host}:8081/ws/chat`;
+    };
+    const wsUrl = getWsUrl();
 
     this.client = new Client({
       brokerURL: wsUrl,
