@@ -1,4 +1,4 @@
-name: Frontend CI Pipeline
+name: Frontend CI/CD Pipeline
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-lint:
-    name: Build React Vite Bundle
+    name: 1. Build React Vite Bundle (CI)
     runs-on: ubuntu-latest
 
     steps:
@@ -28,7 +28,7 @@ jobs:
         run: npm run build
 
   docker-validation:
-    name: Docker Build Validation
+    name: 2. Docker Build Validation (CI)
     needs: build-and-lint
     runs-on: ubuntu-latest
 
@@ -46,3 +46,21 @@ jobs:
           file: ./Dockerfile
           push: false
           tags: wayfare-frontend:latest
+
+  deploy-to-railway:
+    name: 3. Deploy to Railway Production (CD)
+    needs: [build-and-lint, docker-validation]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm i -g @railway/cli
+
+      - name: Deploy to Railway Service
+        run: railway up --service travel_sharing_frontend --detach
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
