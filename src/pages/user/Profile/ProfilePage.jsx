@@ -1,27 +1,48 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../../context/AppContext';
-import { userApi, itineraryApi } from '../../../services/api';
+import { userApi, itineraryApi, uploadApi } from '../../../services/api';
 import { FollowListModal } from '../../../components/community/FollowListModal';
 import { PostDetailModal } from '../../../components/community/PostDetailModal';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { TravelFootprintSection } from '../../../components/profile/TravelFootprintSection';
+import { TravelPassportCardModal } from '../../../components/profile/TravelPassportCardModal';
 import { useToast } from '../../../components/common/Toast';
-import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass } from 'lucide-react';
+import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass, Phone, CheckCircle2 } from 'lucide-react';
 
 export const ProfilePage = () => {
   const { currentUser, updateCurrentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
   const toast = useToast();
 
-  const [activeTab, setActiveTab] = useState('itineraries'); // 'itineraries' | 'posts' | 'ai-dna' | 'saved' | 'badges'
+  const [activeTab, setActiveTab] = useState('itineraries'); // 'itineraries' | 'posts' | 'footprint' | 'ai-dna' | 'saved' | 'badges'
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [profileName, setProfileName] = useState(currentUser?.name || '');
+  const [isPassportModalOpen, setIsPassportModalOpen] = useState(false);
+  
+  // Profile edit fields
+  const [profileName, setProfileName] = useState(currentUser?.name || currentUser?.fullName || '');
+  const [profileHandle, setProfileHandle] = useState(currentUser?.handle || '');
   const [profileBio, setProfileBio] = useState(currentUser?.bio || '');
+  const [profilePhone, setProfilePhone] = useState(currentUser?.phoneNumber || '');
+  const [profileTravelStyle, setProfileTravelStyle] = useState(currentUser?.travelStyle || 'Khám phá tự do');
+  const [profileBudget, setProfileBudget] = useState(currentUser?.budgetPreference || 'Linh hoạt');
+  
+  // Media upload & preview states
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const avatarInputRef = useRef(null);
+  const coverInputRef = useRef(null);
 
   // Keep form fields synced with current active user
   useEffect(() => {
     if (currentUser?.name) setProfileName(currentUser.name);
+    if (currentUser?.fullName) setProfileName(currentUser.fullName);
+    if (currentUser?.handle) setProfileHandle(currentUser.handle);
     if (currentUser?.bio !== undefined) setProfileBio(currentUser.bio || '');
-  }, [currentUser?.name, currentUser?.bio]);
+    if (currentUser?.phoneNumber) setProfilePhone(currentUser.phoneNumber);
+    if (currentUser?.travelStyle) setProfileTravelStyle(currentUser.travelStyle);
+    if (currentUser?.budgetPreference) setProfileBudget(currentUser.budgetPreference);
+  }, [currentUser]);
 
   // Full Profile data from Backend API
   const [profileData, setProfileData] = useState(null);
@@ -50,7 +71,12 @@ export const ProfilePage = () => {
       if (data) {
         setProfileData(data);
         if (data.fullName) setProfileName(data.fullName);
-        if (data.bio) setProfileBio(data.bio);
+        if (data.handle) setProfileHandle(data.handle);
+        if (data.bio !== undefined) setProfileBio(data.bio || '');
+        if (data.phoneNumber) setProfilePhone(data.phoneNumber || '');
+        if (data.travelStyle) setProfileTravelStyle(data.travelStyle);
+        if (data.budgetPreference) setProfileBudget(data.budgetPreference);
+        if (data.coverImageUrl) setCoverPhotoUrl(data.coverImageUrl);
         if (data.followersCount !== undefined) setFollowersCount(data.followersCount);
         if (data.followingCount !== undefined) setFollowingCount(data.followingCount);
       }
@@ -103,6 +129,89 @@ export const ProfilePage = () => {
       toast.showError('Không thể sao chép: ' + (err.message || 'Lỗi kết nối'));
     } finally {
       setCloningItinId(null);
+    }
+  };
+
+  const handleAvatarFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setIsUploadingAvatar(true);
+      toast.showInfo('Đang tải ảnh đại diện lên...');
+      const uploadedUrl = await uploadApi.uploadSingle(file);
+      if (uploadedUrl) {
+        await userApi.updateProfile({ avatarUrl: uploadedUrl }, currentUser?.email);
+        updateCurrentUser({ avatar: uploadedUrl, avatarUrl: uploadedUrl });
+        setProfileData(prev => prev ? { ...prev, avatarUrl: uploadedUrl } : prev);
+        toast.showSuccess('Cập nhật ảnh đại diện thành công! 🎉');
+      }
+    } catch (err) {
+      toast.showError('Lỗi khi tải ảnh đại diện: ' + (err.message || 'Vui lòng thử lại'));
+    } finally {
+      setIsUploadingAvatar(false);
+      if (avatarInputRef.current) avatarInputRef.current.value = '';
+    }
+  };
+
+  const handleCoverFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      setIsUploadingCover(true);
+      toast.showInfo('Đang tải ảnh bìa du lịch...');
+      const uploadedUrl = await uploadApi.uploadSingle(file);
+      if (uploadedUrl) {
+        setCoverPhotoUrl(uploadedUrl);
+        toast.showSuccess('Đã cập nhật ảnh bìa mới! 📸');
+      }
+    } catch (err) {
+      toast.showError('Lỗi khi tải ảnh bìa: ' + (err.message || 'Vui lòng thử lại'));
+    } finally {
+      setIsUploadingCover(false);
+      if (coverInputRef.current) coverInputRef.current.value = '';
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!profileName.trim()) {
+      toast.showError('Họ và tên không được để trống!');
+      return;
+    }
+    try {
+      setIsSavingProfile(true);
+      const updatePayload = {
+        fullName: profileName.trim(),
+        handle: profileHandle.trim(),
+        bio: profileBio.trim(),
+        phoneNumber: profilePhone.trim(),
+        travelStyle: profileTravelStyle,
+        budgetPreference: profileBudget
+      };
+      await userApi.updateProfile(updatePayload, currentUser?.email);
+      updateCurrentUser({
+        name: profileName.trim(),
+        fullName: profileName.trim(),
+        handle: profileHandle.trim(),
+        bio: profileBio.trim(),
+        phoneNumber: profilePhone.trim(),
+        travelStyle: profileTravelStyle,
+        budgetPreference: profileBudget
+      });
+      setProfileData(prev => prev ? {
+        ...prev,
+        fullName: profileName.trim(),
+        handle: profileHandle.trim(),
+        bio: profileBio.trim(),
+        phoneNumber: profilePhone.trim(),
+        travelStyle: profileTravelStyle,
+        budgetPreference: profileBudget
+      } : prev);
+      setIsEditModalOpen(false);
+      toast.showSuccess('Đã lưu thông tin hồ sơ của bạn thành công vào CSDL! 🎉');
+    } catch (err) {
+      toast.showError('Không thể cập nhật hồ sơ: ' + (err.message || 'Lỗi kết nối'));
+    } finally {
+      setIsSavingProfile(false);
     }
   };
 
@@ -180,17 +289,47 @@ export const ProfilePage = () => {
       {/* ========================================================= */}
       <div className="bg-white rounded-3xl border border-slate-200/80 shadow-md overflow-hidden relative">
         
+        {/* Hidden File Inputs */}
+        <input
+          type="file"
+          ref={coverInputRef}
+          onChange={handleCoverFileChange}
+          accept="image/*"
+          className="hidden"
+        />
+        <input
+          type="file"
+          ref={avatarInputRef}
+          onChange={handleAvatarFileChange}
+          accept="image/*"
+          className="hidden"
+        />
+
         {/* Cover Photo */}
         <div
-          className="h-36 sm:h-52 bg-cover bg-center relative"
+          className="h-36 sm:h-52 bg-cover bg-center relative transition-all duration-300"
           style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80')`
+            backgroundImage: `url('${coverPhotoUrl}')`
           }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent"></div>
-          <button className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-slate-900/60 backdrop-blur-md text-white text-xs font-bold flex items-center gap-1.5 border border-white/20 hover:bg-slate-900/80 transition-colors">
-            <Camera className="w-4 h-4" />
-            <span className="hidden sm:inline">Đổi ảnh bìa</span>
+          <button
+            onClick={() => coverInputRef.current?.click()}
+            disabled={isUploadingCover}
+            className="absolute top-4 right-4 px-3.5 py-1.5 rounded-full bg-slate-900/70 backdrop-blur-md text-white text-xs font-bold flex items-center gap-1.5 border border-white/20 hover:bg-slate-900 transition-all cursor-pointer shadow-sm active:scale-95"
+            title="Bấm để tải ảnh bìa du lịch từ máy"
+          >
+            {isUploadingCover ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-sky-400" />
+                <span>Đang tải ảnh bìa...</span>
+              </>
+            ) : (
+              <>
+                <Camera className="w-4 h-4 text-sky-300" />
+                <span className="hidden sm:inline">Đổi ảnh bìa</span>
+              </>
+            )}
           </button>
         </div>
 
@@ -201,12 +340,30 @@ export const ProfilePage = () => {
             {/* Avatar & Main Info */}
             <div className="flex flex-col sm:flex-row items-start sm:items-end gap-5">
               {/* Avatar: only avatar is pulled up to overlap cover photo */}
-              <div className="relative -mt-16 sm:-mt-20 shrink-0">
+              <div className="relative -mt-16 sm:-mt-20 shrink-0 group">
                 <img
-                  src={currentUser.avatar}
+                  src={currentUser.avatar || profileData?.avatarUrl}
                   alt={currentUser.name}
-                  className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover ring-4 ring-white shadow-xl bg-white"
+                  className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover ring-4 ring-white shadow-xl bg-white transition-transform group-hover:scale-[1.02]"
                 />
+                
+                {/* Upload Avatar Overlay Button */}
+                <button
+                  onClick={() => avatarInputRef.current?.click()}
+                  disabled={isUploadingAvatar}
+                  className="absolute inset-0 rounded-full bg-slate-950/50 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[11px] font-bold cursor-pointer"
+                  title="Thay đổi ảnh đại diện"
+                >
+                  {isUploadingAvatar ? (
+                    <Loader2 className="w-6 h-6 animate-spin text-sky-400" />
+                  ) : (
+                    <>
+                      <Camera className="w-6 h-6 text-white mb-0.5" />
+                      <span>Đổi ảnh</span>
+                    </>
+                  )}
+                </button>
+
                 <span className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs font-bold border-2 border-white shadow-sm" title="Tài khoản đã xác minh">
                   ✓
                 </span>
@@ -222,14 +379,27 @@ export const ProfilePage = () => {
                     <Award className="w-3.5 h-3.5 text-amber-600" />
                     Wanderer Gold
                   </span>
+                  {profileTravelStyle && (
+                    <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[11px] font-bold border border-sky-200/80">
+                      🧭 {profileTravelStyle}
+                    </span>
+                  )}
                 </div>
 
                 <p className="text-xs sm:text-sm text-slate-500 font-mono font-medium flex items-center gap-2">
-                  <span className="text-slate-700 font-semibold">{currentUser.handle}</span>
+                  <span className="text-slate-700 font-semibold">{profileHandle || currentUser.handle}</span>
                   <span className="text-slate-300">•</span>
                   <span className="flex items-center gap-1 text-slate-600 font-sans">
-                    <MapPin className="w-3.5 h-3.5 text-sky-600" /> Đà Nẵng, Việt Nam
+                    <MapPin className="w-3.5 h-3.5 text-sky-600" /> {profileData?.location || 'Việt Nam'}
                   </span>
+                  {profileBudget && (
+                    <>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-emerald-700 font-sans font-semibold text-xs">
+                        💰 {profileBudget}
+                      </span>
+                    </>
+                  )}
                 </p>
 
                 {/* Follow Counts Quick Bar */}
@@ -271,13 +441,18 @@ export const ProfilePage = () => {
                 <span>Chỉnh Sửa Hồ Sơ</span>
               </button>
 
-              <button className="p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer shadow-xs" title="Chia sẻ hồ sơ">
-                <Share2 className="w-4 h-4" />
+              <button
+                onClick={() => setIsPassportModalOpen(true)}
+                className="p-2.5 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200/70 transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5 font-bold text-xs"
+                title="Mã QR & Thẻ Căn Cước Du Khách"
+              >
+                <Share2 className="w-4 h-4 text-sky-600" />
+                <span className="hidden sm:inline">Thẻ Passport QR</span>
               </button>
 
               <button
                 onClick={() => setIsAIGeneratorOpen(true)}
-                className="sparkle-btn text-white px-5 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                className="sparkle-btn text-white px-5 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer hover:scale-102 transition-all"
               >
                 <Sparkles className="w-4 h-4 text-amber-200" />
                 <span className="hidden sm:inline">Tạo Tour AI</span>
@@ -734,39 +909,48 @@ export const ProfilePage = () => {
       {/* TAB 3: WANDERAI TRAVEL DNA PREFERENCES */}
       {activeTab === 'ai-dna' && (
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl ocean-gradient text-white flex items-center justify-center shadow-md">
-              <Sparkles className="w-5 h-5" />
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl ocean-gradient text-white flex items-center justify-center shadow-md shrink-0">
+                <Sparkles className="w-5 h-5 text-amber-200" />
+              </div>
+              <div>
+                <h3 className="font-bold text-base text-slate-900">Cấu Hình Gu Du Lịch & AI DNA</h3>
+                <p className="text-xs text-slate-500">Trợ lý WanderAI tự động ghi nhớ khẩu vị du lịch của bạn để tối ưu gợi ý tour</p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-bold text-base text-slate-900">Cấu Hình Gu Du Lịch & AI DNA</h3>
-              <p className="text-xs text-slate-500">Trợ lý WanderAI tự động ghi nhớ khẩu vị du lịch của bạn để tối ưu gợi ý chuyến đi</p>
-            </div>
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer self-start sm:self-auto"
+            >
+              <Edit className="w-3.5 h-3.5 text-sky-600" />
+              <span>Chỉnh sửa Gu du lịch</span>
+            </button>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
-            <div className="p-4 rounded-2xl bg-sky-50/60 border border-sky-100 space-y-1">
-              <span className="text-[11px] font-bold text-sky-700 uppercase tracking-wider block">Phong cách ưu tiên</span>
-              <span className="font-bold text-slate-900 text-sm block">🏖️ Nghỉ dưỡng & Biển</span>
-              <p className="text-[11px] text-slate-500">Thích đón bình minh, chụp ảnh check-in bãi biển đẹp</p>
+            <div className="p-4 rounded-2xl bg-sky-50/70 border border-sky-100 space-y-1">
+              <span className="text-[11px] font-bold text-sky-700 uppercase tracking-wider block">Phong cách du lịch</span>
+              <span className="font-bold text-slate-900 text-sm block">🧭 {profileTravelStyle || 'Khám phá tự do'}</span>
+              <p className="text-[11px] text-slate-500">Khẩu vị di chuyển & trải nghiệm điểm đến</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-100 space-y-1">
-              <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider block">Hạng mức khách sạn</span>
-              <span className="font-bold text-slate-900 text-sm block">🏡 Homestay & 3-4 Sao</span>
-              <p className="text-[11px] text-slate-500">Ưu tiên view đẹp mộc mạc hoặc resort 4 sao tiện nghi</p>
+            <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-100 space-y-1">
+              <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider block">Mức ngân sách ưa thích</span>
+              <span className="font-bold text-slate-900 text-sm block">💰 {profileBudget || 'Linh hoạt'}</span>
+              <p className="text-[11px] text-slate-500">Cân đối chi phí di chuyển, ăn uống & lưu trú</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-sky-50/60 border border-sky-100 space-y-1">
-              <span className="text-[11px] font-bold text-sky-700 uppercase tracking-wider block">Phương tiện di chuyển</span>
-              <span className="font-bold text-slate-900 text-sm block">🏍️ Xe máy & Taxi công nghệ</span>
-              <p className="text-[11px] text-slate-500">Linh hoạt đường ngõ và đèo núi dốc</p>
+            <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-100 space-y-1">
+              <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider block">Cấp bậc nhà thám hiểm</span>
+              <span className="font-bold text-slate-900 text-sm block">🌟 {profileData?.rank || 'Wanderer Gold'}</span>
+              <p className="text-[11px] text-slate-500">Đã mở khóa toàn bộ quyền năng gợi ý lộ trình</p>
             </div>
 
-            <div className="p-4 rounded-2xl bg-purple-50/60 border border-purple-100 space-y-1">
-              <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider block">Ẩm thực yêu thích</span>
-              <span className="font-bold text-slate-900 text-sm block">🍜 Quán bản địa truyền thống</span>
-              <p className="text-[11px] text-slate-500">Trải nghiệm đặc sản chợ đêm & quán ăn lâu đời</p>
+            <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-100 space-y-1">
+              <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider block">Mục tiêu năm 2026</span>
+              <span className="font-bold text-slate-900 text-sm block">🇻🇳 Chinh phục 63 Tỉnh Thành</span>
+              <p className="text-[11px] text-slate-500">Đã đánh dấu trên Bản đồ dấu chân du lịch</p>
             </div>
           </div>
 
@@ -860,8 +1044,8 @@ export const ProfilePage = () => {
       {/* 3. EDIT PROFILE MODAL DIALOG                              */}
       {/* ========================================================= */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
                 <Edit className="w-4 h-4 text-sky-600" />
@@ -869,63 +1053,185 @@ export const ProfilePage = () => {
               </h3>
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500"
+                className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
+            {/* Quick Avatar Change Header inside modal */}
+            <div className="flex items-center gap-4 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="relative shrink-0">
+                <img
+                  src={currentUser.avatar || profileData?.avatarUrl}
+                  alt={profileName}
+                  className="w-14 h-14 rounded-full object-cover ring-2 ring-white shadow-xs bg-white"
+                />
+                {isUploadingAvatar && (
+                  <div className="absolute inset-0 rounded-full bg-slate-900/60 flex items-center justify-center">
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  </div>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-xs text-slate-900">Ảnh đại diện du khách</p>
+                <p className="text-[11px] text-slate-500">Định dạng JPG, PNG hoặc WEBP</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                disabled={isUploadingAvatar}
+                className="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold border border-slate-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Camera className="w-3.5 h-3.5 text-sky-600" />
+                <span>Đổi ảnh</span>
+              </button>
+            </div>
+
             <div className="space-y-4 text-xs font-bold text-slate-700">
+              {/* Họ và tên */}
               <div>
-                <label className="block mb-1">Họ và tên</label>
+                <label className="block mb-1 text-slate-800">Họ và tên <span className="text-rose-500">*</span></label>
                 <input
                   type="text"
                   value={profileName}
                   onChange={(e) => setProfileName(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-sky-500"
+                  placeholder="Nhập họ và tên..."
+                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 outline-none focus:ring-2 focus:ring-sky-500 transition-all"
                 />
               </div>
 
+              {/* Tên người dùng Handle & Số điện thoại */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block mb-1 text-slate-800">Biệt danh / Handle</label>
+                  <input
+                    type="text"
+                    value={profileHandle}
+                    onChange={(e) => setProfileHandle(e.target.value)}
+                    placeholder="@wanderer"
+                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-900 outline-none focus:ring-2 focus:ring-sky-500 transition-all"
+                  />
+                </div>
+                <div>
+                  <label className="block mb-1 text-slate-800">Số điện thoại</label>
+                  <input
+                    type="text"
+                    value={profilePhone}
+                    onChange={(e) => setProfilePhone(e.target.value)}
+                    placeholder="VD: 0912345678"
+                    className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-900 outline-none focus:ring-2 focus:ring-sky-500 transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Phong cách du lịch (Travel Style) */}
               <div>
-                <label className="block mb-1">Tiểu sử (Bio)</label>
+                <label className="block mb-1.5 text-slate-800">Phong cách / Gu du lịch chính</label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    'Khám phá tự do',
+                    'Phượt mạo hiểm',
+                    'Nghỉ dưỡng & Spa',
+                    'Foodie ẩm thực',
+                    'Khám phá văn hóa',
+                    'Check-in sống ảo',
+                    'Du lịch chữa lành'
+                  ].map(style => (
+                    <button
+                      key={style}
+                      type="button"
+                      onClick={() => setProfileTravelStyle(style)}
+                      className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition-all cursor-pointer ${
+                        profileTravelStyle === style
+                          ? 'bg-sky-600 text-white shadow-xs'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                      }`}
+                    >
+                      {style}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Ngân sách du lịch ưa thích (Budget Preference) */}
+              <div>
+                <label className="block mb-1.5 text-slate-800">Mức ngân sách ưa thích</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { id: 'Tiết kiệm', label: 'Tiết kiệm', desc: 'Tối ưu chi phí' },
+                    { id: 'Linh hoạt', label: 'Linh hoạt', desc: 'Tiêu chuẩn hợp lý' },
+                    { id: 'Sang chảnh', label: 'Sang chảnh', desc: 'Cao cấp & Resort' }
+                  ].map(budget => (
+                    <button
+                      key={budget.id}
+                      type="button"
+                      onClick={() => setProfileBudget(budget.id)}
+                      className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
+                        profileBudget === budget.id
+                          ? 'border-emerald-500 bg-emerald-50/70 text-emerald-900 font-extrabold shadow-xs'
+                          : 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium'
+                      }`}
+                    >
+                      <span className="block text-xs">{budget.label}</span>
+                      <span className="block text-[10px] text-slate-400 font-normal">{budget.desc}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tiểu sử (Bio) */}
+              <div>
+                <label className="block mb-1 text-slate-800">Tiểu sử cá nhân (Bio)</label>
                 <textarea
                   rows={3}
                   value={profileBio}
                   onChange={(e) => setProfileBio(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500"
+                  placeholder="Chia sẻ đôi nét về bạn, sở thích du lịch và những nơi bạn từng đi..."
+                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:ring-2 focus:ring-sky-500 transition-all leading-relaxed"
                 ></textarea>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-2">
+            <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
               <button
+                type="button"
                 onClick={() => setIsEditModalOpen(false)}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100"
+                disabled={isSavingProfile}
+                className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-500 hover:bg-slate-100 cursor-pointer"
               >
                 Hủy
               </button>
               <button
-                onClick={() => {
-                  if (!profileName.trim()) {
-                    toast.error('Họ và tên không được để trống!');
-                    return;
-                  }
-                  updateCurrentUser({
-                    name: profileName.trim(),
-                    fullName: profileName.trim(),
-                    bio: profileBio.trim()
-                  });
-                  setProfileData(prev => prev ? { ...prev, fullName: profileName.trim(), bio: profileBio.trim() } : prev);
-                  setIsEditModalOpen(false);
-                  toast.success('Đã cập nhật thông tin hồ sơ của bạn thành công! 🎉');
-                }}
-                className="sparkle-btn text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md cursor-pointer"
+                type="button"
+                onClick={handleSaveProfile}
+                disabled={isSavingProfile}
+                className="sparkle-btn text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-md cursor-pointer flex items-center gap-1.5"
               >
-                Lưu Thay Đổi
+                {isSavingProfile ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Đang lưu vào CSDL...</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Lưu Thay Đổi</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Travel Passport QR Modal (Mã QR & Thẻ Hộ Chiếu Du Khách) */}
+      {isPassportModalOpen && (
+        <TravelPassportCardModal
+          user={currentUser}
+          profileData={profileData}
+          onClose={() => setIsPassportModalOpen(false)}
+        />
       )}
 
       {/* Follow List Modal (Followers & Following) */}

@@ -1197,6 +1197,23 @@ export const userApi = {
     return json.data;
   },
 
+  async updateProfile(profileData, email) {
+    const user = getStoredUser() || {};
+    const userEmail = email || user.email || '';
+    const qs = userEmail ? `?email=${encodeURIComponent(userEmail)}` : '';
+    const res = await fetch(`${BASE_URL}/users/profile${qs}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(profileData)
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data;
+  },
+
   async toggleFollow(userId, email) {
     const user = getStoredUser() || {};
     const userEmail = email || user.email || '';
