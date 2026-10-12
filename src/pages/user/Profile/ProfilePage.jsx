@@ -282,8 +282,9 @@ export const ProfilePage = () => {
   ];
 
   // ─── TIER & AVATAR FRAME CALCULATION (Prestige Honor System) ─────────
-  // Tính điểm uy tín & cấp độ du khách dựa trên dữ liệu thật từ CSDL
-  const destinationsCount = currentUser?.destinationsCount || 12;
+  const destinationsCount = typeof currentUser?.destinationsCount === 'number' 
+    ? currentUser.destinationsCount 
+    : (itinsCount > 0 ? Math.min(itinsCount * 2, 25) : 0);
   const userTotalXP = (itinsCount * 60) + (postsCount * 40) + (activeFollowersCount * 15) + (destinationsCount * 25);
 
   const TIERS = [
