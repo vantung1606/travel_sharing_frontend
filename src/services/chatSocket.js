@@ -88,9 +88,7 @@ class ChatSocketService {
           });
           item.subs.push(subId);
         } catch (e) {}
-      }
-
-      if (userEmail) {
+      } else if (userEmail) {
         try {
           const subEmail = this.client.subscribe(`/topic/notifications.${userEmail.toLowerCase().trim()}`, (msg) => {
             try { callback(JSON.parse(msg.body)); } catch (e) {}
@@ -196,9 +194,7 @@ class ChatSocketService {
           });
           listenerItem.subs.push(subId);
         } catch (e) {}
-      }
-
-      if (userEmail) {
+      } else if (userEmail) {
         try {
           const subEmail = this.client.subscribe(`/topic/notifications.${userEmail.toLowerCase().trim()}`, (msg) => {
             try { onNotification(JSON.parse(msg.body)); } catch (e) {}
@@ -215,19 +211,30 @@ class ChatSocketService {
       } catch (e) {}
     };
 
+    let checkInterval = null;
     if (this.client && this.client.connected) {
       doSub();
     } else {
-      const checkInterval = setInterval(() => {
+      checkInterval = setInterval(() => {
         if (this.client && this.client.connected) {
           clearInterval(checkInterval);
+          checkInterval = null;
           doSub();
         }
       }, 150);
-      setTimeout(() => clearInterval(checkInterval), 5000);
+      setTimeout(() => {
+        if (checkInterval) {
+          clearInterval(checkInterval);
+          checkInterval = null;
+        }
+      }, 5000);
     }
 
     return () => {
+      if (checkInterval) {
+        clearInterval(checkInterval);
+        checkInterval = null;
+      }
       if (listenerItem.subs) {
         listenerItem.subs.forEach(s => {
           try { s.unsubscribe(); } catch (e) {}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { ToastProvider, useToast } from './components/common/Toast';
@@ -37,6 +37,7 @@ const AppContent = () => {
   const isAdminPath = location.pathname.startsWith('/admin');
   const { isLoggedIn, currentUser, addNewNotification } = useApp();
   const toast = useToast();
+  const recentNotifKeysRef = useRef(new Set());
 
   // Đăng ký nhận thông báo Real-time qua STOMP WebSocket
   useEffect(() => {
@@ -47,12 +48,28 @@ const AppContent = () => {
       currentUser.email,
       (notification) => {
         if (!notification) return;
+
+        // 1. Chống trùng lặp thông báo (Deduplication trong 4 giây)
+        const notifKey = notification.id
+          ? String(notification.id)
+          : `${notification.type}_${notification.message}`;
+        if (recentNotifKeysRef.current.has(notifKey)) return;
+        recentNotifKeysRef.current.add(notifKey);
+        setTimeout(() => recentNotifKeysRef.current.delete(notifKey), 4000);
+
         addNewNotification(notification);
+
+        // 2. Không làm phiền người dùng bằng Toast nếu đang ở màn hình chat (/messages)
+        const isChatNotification = notification.type === 'CHAT_MESSAGE';
+        const isOnMessagesPage = window.location.pathname.startsWith('/messages');
+        if (isChatNotification && isOnMessagesPage) {
+          return;
+        }
 
         // Hiển thị Toast nổi thông báo tức thời
         const title = notification.title || 'Thông báo';
         const msg = notification.message || 'Bạn có thông báo mới';
-        toast.showInfo(`🔔 ${title}: ${msg}`, 4500);
+        toast.showInfo(`🔔 ${title}: ${msg}`, 4000);
       }
     );
 
