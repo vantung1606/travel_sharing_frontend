@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, MapPin, Users, UserPlus, UserCheck, Compass, Route, Heart, MessageCircle, Eye, Copy, DollarSign, Sparkles, Loader2, Lock, Globe, ArrowRight, Award } from 'lucide-react';
-import { userApi } from '../../services/api';
+import { userApi, itineraryApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { useApp } from '../../context/AppContext';
 import { useNavigate } from 'react-router-dom';
@@ -92,20 +92,13 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
     if (!requireAuth('sao chép lịch trình')) return;
     try {
       setCloningItinId(itin.id);
-      const newItinerary = {
-        id: Date.now(),
-        title: 'Bản sao: ' + itin.title,
-        destination: itin.destination || 'Việt Nam',
-        budgetTotal: itin.budgetTotal || 5000000,
-        coverImageUrl: itin.coverImageUrl || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
-        isAiGenerated: itin.isAiGenerated ?? true,
-        status: 'ACTIVE',
-        createdAt: new Date().toISOString()
-      };
-      setItineraries(prev => [newItinerary, ...prev]);
-      toast.showSuccess(`Đã sao chép lịch trình "${itin.title}" vào kho của bạn! 🎉`);
+      const cloned = await itineraryApi.cloneItinerary(itin.id, currentUser?.email);
+      if (cloned) {
+        setItineraries(prev => [cloned, ...prev]);
+        toast.showSuccess(`Đã sao chép lịch trình "${itin.title}" vào kho của bạn! 🎉`);
+      }
     } catch (err) {
-      toast.showError('Không thể sao chép: ' + err.message);
+      toast.showError('Không thể sao chép lịch trình: ' + (err.message || 'Lỗi kết nối'));
     } finally {
       setCloningItinId(null);
     }

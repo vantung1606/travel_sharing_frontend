@@ -495,7 +495,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
               <span className="text-slate-300">•</span>
               <span className="flex items-center gap-1 font-bold text-sky-700">
                 <DollarSign className="w-3.5 h-3.5 text-sky-600" />
-                <span>{Number(itinerary.totalBudget || 11000000).toLocaleString('vi-VN')}đ</span>
+                <span>{Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0).toLocaleString('vi-VN')}đ</span>
               </span>
             </div>
           </div>
@@ -553,7 +553,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
           <div className="space-y-0.5">
             <span className="text-slate-500 text-[10px] sm:text-[11px] font-medium block">Mỗi thành viên</span>
             <span className="font-extrabold text-sky-700 text-xs sm:text-sm">
-              ~{Number(itinerary.budgetPerPerson || Math.round(Number(itinerary.totalBudget || 11000000) / 2)).toLocaleString('vi-VN')}đ
+              ~{Number(itinerary.budgetPerPerson || Math.round(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) / 2)).toLocaleString('vi-VN')}đ
             </span>
           </div>
 
@@ -978,24 +978,24 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
               <div className="space-y-2 text-xs">
                 <div className="flex items-center justify-between text-slate-600">
                   <span>Lưu trú ({days.length - 1} đêm)</span>
-                  <span className="font-bold text-slate-800">40% (~{(Number(itinerary.totalBudget || 11000000) * 0.4).toLocaleString('vi-VN')}đ)</span>
+                  <span className="font-bold text-slate-800">40% (~{(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) * 0.4).toLocaleString('vi-VN')}đ)</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-600">
                   <span>Ẩm thực & Đặc sản</span>
-                  <span className="font-bold text-slate-800">30% (~{(Number(itinerary.totalBudget || 11000000) * 0.3).toLocaleString('vi-VN')}đ)</span>
+                  <span className="font-bold text-slate-800">30% (~{(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) * 0.3).toLocaleString('vi-VN')}đ)</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-600">
                   <span>Vé tham quan & Trải nghiệm</span>
-                  <span className="font-bold text-slate-800">20% (~{(Number(itinerary.totalBudget || 11000000) * 0.2).toLocaleString('vi-VN')}đ)</span>
+                  <span className="font-bold text-slate-800">20% (~{(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) * 0.2).toLocaleString('vi-VN')}đ)</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-600">
                   <span>Di chuyển & Chi phí dự phòng</span>
-                  <span className="font-bold text-slate-800">10% (~{(Number(itinerary.totalBudget || 11000000) * 0.1).toLocaleString('vi-VN')}đ)</span>
+                  <span className="font-bold text-slate-800">10% (~{(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) * 0.1).toLocaleString('vi-VN')}đ)</span>
                 </div>
 
                 <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs sm:text-sm font-extrabold text-slate-900">
                   <span>Tổng cộng dự kiến:</span>
-                  <span className="text-sky-700">{Number(itinerary.totalBudget || 11000000).toLocaleString('vi-VN')}đ</span>
+                  <span className="text-sky-700">{Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0).toLocaleString('vi-VN')}đ</span>
                 </div>
               </div>
             </div>

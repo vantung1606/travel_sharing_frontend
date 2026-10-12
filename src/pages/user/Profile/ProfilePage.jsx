@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
-import { userApi } from '../../../services/api';
+import { userApi, itineraryApi } from '../../../services/api';
 import { FollowListModal } from '../../../components/community/FollowListModal';
 import { PostDetailModal } from '../../../components/community/PostDetailModal';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
@@ -93,28 +93,22 @@ export const ProfilePage = () => {
   const handleCloneItinerary = async (itin) => {
     try {
       setCloningItinId(itin.id);
-      const newItinerary = {
-        id: Date.now(),
-        title: 'Bản sao: ' + itin.title,
-        destination: itin.destination || 'Việt Nam',
-        budgetTotal: itin.budgetTotal || 5000000,
-        coverImageUrl: itin.coverImageUrl || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
-        isAiGenerated: itin.isAiGenerated ?? true,
-        status: 'ACTIVE',
-        createdAt: new Date().toISOString()
-      };
-      setItineraries(prev => [newItinerary, ...prev]);
-      toast.showSuccess(`Đã sao chép lịch trình "${itin.title}" vào kho của bạn! 🎉`);
+      const cloned = await itineraryApi.cloneItinerary(itin.id, currentUser?.email);
+      if (cloned) {
+        setItineraries(prev => [cloned, ...prev]);
+        toast.showSuccess(`Đã sao chép lịch trình "${itin.title}" vào kho của bạn! 🎉`);
+        loadFullProfile();
+      }
     } catch (err) {
-      toast.showError('Không thể sao chép: ' + err.message);
+      toast.showError('Không thể sao chép: ' + (err.message || 'Lỗi kết nối'));
     } finally {
       setCloningItinId(null);
     }
   };
 
-  // Derive real database lists with fallback to initial data
-  const displayPosts = profileData?.posts && profileData.posts.length > 0 ? profileData.posts : posts;
-  const displayItineraries = profileData?.itineraries && profileData.itineraries.length > 0 ? profileData.itineraries : itineraries;
+  // Real database lists: only show user's own posts and itineraries, never fall back to community posts
+  const displayPosts = profileData?.posts || [];
+  const displayItineraries = profileData?.itineraries || [];
 
   // Mock Achievements
   const achievements = [
