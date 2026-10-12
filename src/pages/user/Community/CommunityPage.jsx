@@ -2115,6 +2115,9 @@ export const CommunityPage = () => {
                             id: authorId,
                             fullName: authorName,
                             avatarUrl: authorAvatar,
+                            email: authorEmail,
+                            tier: post.authorTier,
+                            role: post.authorRole,
                             isVerified: true
                           }}
                           size="md"
@@ -2379,14 +2382,18 @@ export const CommunityPage = () => {
                       >
                         {/* Original Author Header */}
                         <div className="flex items-center gap-3">
-                          <img
-                            src={
-                              post.sharedPost.authorAvatar ||
-                              post.sharedPost.author?.avatar ||
-                              'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
-                            }
-                            alt={post.sharedPost.authorName || 'Tác giả gốc'}
-                            className="w-10 h-10 rounded-full object-cover ring-1 ring-slate-200"
+                          <UserAvatar
+                            user={{
+                              id: post.sharedPost.authorId || post.sharedPost.author?.id,
+                              fullName: post.sharedPost.authorName || post.sharedPost.author?.fullName,
+                              avatarUrl: post.sharedPost.authorAvatar || post.sharedPost.author?.avatar,
+                              email: post.sharedPost.authorEmail || post.sharedPost.author?.email,
+                              tier: post.sharedPost.authorTier,
+                              role: post.sharedPost.authorRole,
+                              isVerified: true
+                            }}
+                            size="sm"
+                            showBadge={true}
                           />
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 flex-wrap">

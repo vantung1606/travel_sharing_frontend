@@ -287,6 +287,7 @@ export const AppProvider = ({ children }) => {
       destinationsCount: typeof userData.destinationsCount === 'number' ? userData.destinationsCount : 0,
       tripsCount: typeof userData.tripsCount === 'number' ? userData.tripsCount : 0,
       savedItinerariesCount: typeof userData.savedItinerariesCount === 'number' ? userData.savedItinerariesCount : 0,
+      tier: userData.tier || (rawEmail.startsWith('tung1@') || rawEmail.startsWith('admin@') ? 'diamond' : rawEmail.startsWith('tung2@') ? 'gold' : rawEmail.startsWith('tung3@') ? 'silver' : 'bronze'),
       roles: Array.isArray(userData.roles) && userData.roles.length > 0
         ? userData.roles
         : ['ROLE_USER']
