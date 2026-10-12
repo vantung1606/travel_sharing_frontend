@@ -12,8 +12,12 @@ RUN npm ci || npm install
 # Build arguments for environment variables
 ARG VITE_API_URL
 ARG VITE_WS_URL
+ARG VITE_GOOGLE_CLIENT_ID
+ARG VITE_GEMINI_API_KEY
 ENV VITE_API_URL=$VITE_API_URL
 ENV VITE_WS_URL=$VITE_WS_URL
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+ENV VITE_GEMINI_API_KEY=$VITE_GEMINI_API_KEY
 
 # Copy source files and compile production bundle
 COPY . .

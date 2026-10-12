@@ -134,9 +134,12 @@ export const AuthModal = () => {
   };
 
   const handleGoogleLogin = () => {
-    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const googleClientId = (
+      import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+      '340055145050-thlfrv3nl1j1jcahh75n8inr8v5j4574.apps.googleusercontent.com'
+    )?.trim();
 
-    if (!googleClientId || googleClientId.trim() === '' || googleClientId.includes('your_google_client_id')) {
+    if (!googleClientId || googleClientId.includes('your_google_client_id')) {
       toast.error('Chưa cấu hình VITE_GOOGLE_CLIENT_ID trong file .env! Vui lòng thêm Google Client ID từ Google Cloud Console.');
       return;
     }
