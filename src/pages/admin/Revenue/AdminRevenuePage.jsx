@@ -5,18 +5,24 @@ import { TrendingUp, DollarSign, Building2, Crown, CreditCard, BarChart3, Sparkl
 
 export const AdminRevenuePage = () => {
   const toast = useToast();
-  const [liveGmv, setLiveGmv] = useState(21000000);
-  const [itinCount, setItinCount] = useState(4);
+  const [liveGmv, setLiveGmv] = useState(0);
+  const [itinCount, setItinCount] = useState(0);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     adminApi.getAllItineraries().then(res => {
-      if (Array.isArray(res) && res.length > 0) {
+      if (Array.isArray(res)) {
         setItinCount(res.length);
         const sum = res.reduce((acc, it) => acc + (Number(it.budgetTotal) || 0), 0);
-        if (sum > 0) setLiveGmv(sum);
+        setLiveGmv(sum);
       }
-    }).catch(() => {});
+    }).catch(() => {
+      setItinCount(0);
+      setLiveGmv(0);
+    }).finally(() => {
+      setLoading(false);
+    });
   }, []);
 
   const revenueStreams = [

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useToast } from '../../../components/common/Toast';
-import { adminReportApi } from '../../../services/api';
+import { adminReportApi, auditLogApi } from '../../../services/api';
 import { AlertTriangle, Flame, ShieldAlert, Search, Filter, Download, CheckCircle2, Eye, EyeOff, UserX, Trash2, RefreshCw, TrendingUp, FileText, ShieldCheck, Bot, History, X, MapPin, Sparkles } from 'lucide-react';
 
 export const AdminReportsPage = () => {
@@ -25,17 +25,8 @@ export const AdminReportsPage = () => {
   const [selectedPostModal, setSelectedPostModal] = useState(null);
   const [confirmModal, setConfirmModal] = useState(null);
 
-  // Local Audit Log session
-  const [auditLogs, setAuditLogs] = useState([
-    {
-      id: 1,
-      admin: 'Quản Trị Viên (Admin)',
-      action: 'Khởi tạo hệ thống',
-      target: 'WanderAI Moderation Shield v2.4 Active',
-      time: 'Vừa xong',
-      type: 'system'
-    }
-  ]);
+  // Real Audit Logs from MySQL Database
+  const [auditLogs, setAuditLogs] = useState([]);
 
   // Load Real Data from Backend
   const loadData = async (isManual = false) => {
@@ -43,15 +34,26 @@ export const AdminReportsPage = () => {
     else setLoading(true);
 
     try {
-      const [metricsData, pendingReportsData, allArticlesData] = await Promise.all([
+      const [metricsData, pendingReportsData, allArticlesData, logsData] = await Promise.all([
         adminReportApi.getMetrics(),
         adminReportApi.getPendingReports(searchQuery),
-        adminReportApi.getAllArticles({ keyword: searchQuery, status: activeTab })
+        adminReportApi.getAllArticles({ keyword: searchQuery, status: activeTab }),
+        auditLogApi.getLogs({ size: 25 }).catch(() => null)
       ]);
 
       setMetrics(metricsData);
       setReports(pendingReportsData);
       setArticles(allArticlesData);
+      if (logsData && Array.isArray(logsData.content)) {
+        setAuditLogs(logsData.content.map(l => ({
+          id: l.id,
+          admin: l.userName || 'Quản Trị Viên',
+          action: l.action || 'Thao tác hệ thống',
+          target: l.details || l.target || '',
+          time: l.createdAt ? new Date(l.createdAt).toLocaleTimeString('vi-VN') + ' - ' + new Date(l.createdAt).toLocaleDateString('vi-VN') : 'Vừa xong',
+          type: (l.action && (l.action.includes('BAN') || l.action.includes('REMOVE') || l.action.includes('REJECT'))) ? 'error' : (l.action && l.action.includes('HIDE')) ? 'warning' : 'success'
+        })));
+      }
 
       if (isManual) {
         toast.success('Đã đồng bộ dữ liệu bài viết & báo cáo thời gian thực!');
@@ -73,22 +75,7 @@ export const AdminReportsPage = () => {
   const handleApprovePost = async (id, title = '') => {
     try {
       await adminReportApi.approvePost(id);
-      setReports(prev => prev.filter(r => r.id !== id));
-      setMetrics(prev => ({
-        ...prev,
-        pendingReportsCount: Math.max(0, prev.pendingReportsCount - 1)
-      }));
-      setAuditLogs(prev => [
-        {
-          id: Date.now(),
-          admin: 'Quản Trị Viên (Admin)',
-          action: 'Phê duyệt xuất bản bài viết',
-          target: `Bài viết #${id} ${title ? `("${title}")` : ''}`,
-          time: 'Vừa xong',
-          type: 'success'
-        },
-        ...prev
-      ]);
+      await loadData();
       toast.success(`Đã phê duyệt xuất bản bài viết #${id} thành công! Hệ thống đã gửi thông báo đến tác giả.`);
       if (selectedPostModal && selectedPostModal.id === id) {
         setSelectedPostModal(null);
@@ -101,22 +88,7 @@ export const AdminReportsPage = () => {
   const handleDismissReport = async (id, title = '') => {
     try {
       await adminReportApi.dismissReport(id);
-      setReports(prev => prev.filter(r => r.id !== id));
-      setMetrics(prev => ({
-        ...prev,
-        pendingReportsCount: Math.max(0, prev.pendingReportsCount - 1)
-      }));
-      setAuditLogs(prev => [
-        {
-          id: Date.now(),
-          admin: 'Quản Trị Viên (Admin)',
-          action: 'Bác bỏ báo cáo (Hợp lệ)',
-          target: `Bài viết #${id} ${title ? `("${title}")` : ''}`,
-          time: 'Vừa xong',
-          type: 'info'
-        },
-        ...prev
-      ]);
+      await loadData();
       toast.info(`Đã bác bỏ báo cáo bài viết #${id} (Nội dung hợp lệ). Hệ thống đã gửi thông báo xác nhận đến tác giả.`);
       if (selectedPostModal && selectedPostModal.id === id) {
         setSelectedPostModal(null);
@@ -129,23 +101,7 @@ export const AdminReportsPage = () => {
   const executeHidePost = async (id, title = '') => {
     try {
       await adminReportApi.hidePost(id);
-      setReports(prev => prev.filter(r => r.id !== id));
-      setMetrics(prev => ({
-        ...prev,
-        pendingReportsCount: Math.max(0, prev.pendingReportsCount - 1),
-        hiddenPostsCount: prev.hiddenPostsCount + 1
-      }));
-      setAuditLogs(prev => [
-        {
-          id: Date.now(),
-          admin: 'Quản Trị Viên (Admin)',
-          action: 'Tạm ẩn bài viết',
-          target: `Bài viết #${id} ${title ? `("${title}")` : ''}`,
-          time: 'Vừa xong',
-          type: 'warning'
-        },
-        ...prev
-      ]);
+      await loadData();
       toast.warning(`Đã tạm ẩn bài viết #${id} khỏi cộng đồng! Hệ thống đã gửi thông báo cảnh báo đến tác giả.`);
       if (selectedPostModal && selectedPostModal.id === id) {
         setSelectedPostModal(null);
@@ -159,23 +115,7 @@ export const AdminReportsPage = () => {
   const executeBanUser = async (id, authorName, title = '') => {
     try {
       await adminReportApi.removePostAndBanAuthor(id);
-      setReports(prev => prev.filter(r => r.id !== id));
-      setMetrics(prev => ({
-        ...prev,
-        pendingReportsCount: Math.max(0, prev.pendingReportsCount - 1),
-        hiddenPostsCount: prev.hiddenPostsCount + 1
-      }));
-      setAuditLogs(prev => [
-        {
-          id: Date.now(),
-          admin: 'Quản Trị Viên (Admin)',
-          action: 'Gỡ bài & Khóa tài khoản',
-          target: `Tác giả: ${authorName} (Bài #${id})`,
-          time: 'Vừa xong',
-          type: 'error'
-        },
-        ...prev
-      ]);
+      await loadData();
       toast.error(`Đã gỡ bài #${id}, khóa tài khoản ${authorName} và gửi thông báo cảnh cáo chính thức.`);
       if (selectedPostModal && selectedPostModal.id === id) {
         setSelectedPostModal(null);

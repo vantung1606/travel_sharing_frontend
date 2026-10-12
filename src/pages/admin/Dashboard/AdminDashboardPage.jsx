@@ -9,15 +9,15 @@ export const AdminDashboardPage = () => {
   const { currentUser, setAdminTab } = useApp();
 
   const [stats, setStats] = useState({
-    totalUsers: 6,
-    newUsersThisMonth: 6,
-    totalPosts: 6,
-    totalPlaces: 6,
-    totalItineraries: 4,
-    activeItineraries: 4,
-    totalLikes: 316,
-    totalComments: 96,
-    averagePlaceRating: 4.8,
+    totalUsers: 0,
+    newUsersThisMonth: 0,
+    totalPosts: 0,
+    totalPlaces: 0,
+    totalItineraries: 0,
+    activeItineraries: 0,
+    totalLikes: 0,
+    totalComments: 0,
+    averagePlaceRating: 0,
     topDestinations: [],
     topPlaces: []
   });
@@ -43,7 +43,7 @@ export const AdminDashboardPage = () => {
       if (fetchedStats) {
         setStats(fetchedStats);
       }
-      if (Array.isArray(fetchedItins) && fetchedItins.length > 0) {
+      if (Array.isArray(fetchedItins)) {
         setItinerariesList(fetchedItins);
       }
       if (Array.isArray(fetchedReports)) {

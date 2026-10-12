@@ -110,12 +110,40 @@ export const ProfilePage = () => {
   const displayPosts = profileData?.posts || [];
   const displayItineraries = profileData?.itineraries || [];
 
-  // Mock Achievements
+  // Real Account Achievements (Calculated dynamically from MySQL database stats)
+  const postsCount = displayPosts.length;
+  const itinsCount = displayItineraries.length;
+  const activeFollowersCount = followersCount || profileData?.followersCount || 0;
+
   const achievements = [
-    { title: 'Săn Mây Hà Giang Pro', icon: '☁️', desc: 'Đã hoàn thành 3 tour phượt vùng cao', date: 'Tháng 10, 2026', unlocked: true },
-    { title: 'Chuyên Gia Điểm Check-in', icon: '📸', desc: 'Đã chia sẻ 15 bài viết chất lượng', date: 'Tháng 9, 2026', unlocked: true },
-    { title: 'Nhà Sáng Tạo Tour AI', icon: '✨', desc: 'Tạo thành công 10+ lịch trình AI', date: 'Tháng 8, 2026', unlocked: true },
-    { title: 'Khám Phá Di Sản Việt Nam', icon: '🏛️', desc: 'Ghé thăm 5 di sản thiên nhiên thế giới', date: 'Đang tiến hành (3/5)', unlocked: false }
+    {
+      title: 'Tác Giả Cộng Đồng',
+      icon: '✍️',
+      desc: postsCount >= 5 ? `Đã đăng ${postsCount} bài viết chia sẻ` : `Đã đăng ${postsCount}/5 bài viết`,
+      date: postsCount > 0 ? 'Đang hoạt động' : 'Chưa mở khóa',
+      unlocked: postsCount >= 5
+    },
+    {
+      title: 'Nhà Sáng Lập Tour',
+      icon: '🗺️',
+      desc: itinsCount >= 3 ? `Đã thiết kế ${itinsCount} lịch trình du lịch` : `Đã thiết kế ${itinsCount}/3 lịch trình`,
+      date: itinsCount > 0 ? 'Đang hoạt động' : 'Chưa mở khóa',
+      unlocked: itinsCount >= 3
+    },
+    {
+      title: 'Gương Mặt Truyền Cảm Hứng',
+      icon: '🌟',
+      desc: activeFollowersCount >= 10 ? `Có ${activeFollowersCount} người theo dõi` : `Đạt ${activeFollowersCount}/10 người theo dõi`,
+      date: activeFollowersCount >= 10 ? 'Đã đạt tiêu chuẩn' : 'Đang phấn đấu',
+      unlocked: activeFollowersCount >= 10
+    },
+    {
+      title: 'Thành Viên Xác Thực',
+      icon: '🛡️',
+      desc: Boolean(profileData?.isVerified) ? 'Hồ sơ đã được xác thực bảo mật' : 'Cần cập nhật hồ sơ đầy đủ',
+      date: Boolean(profileData?.isVerified) ? 'Đã xác minh' : 'Chưa hoàn tất',
+      unlocked: Boolean(profileData?.isVerified)
+    }
   ];
 
   // Nếu người dùng chưa đăng nhập hoặc không có ID hợp lệ, hiển thị thông báo yêu cầu đăng nhập
