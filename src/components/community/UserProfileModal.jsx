@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { PostDetailModal } from './PostDetailModal';
 import { FollowListModal } from './FollowListModal';
 import { ItineraryDetailModal } from '../itinerary/ItineraryDetailModal';
+import { UserAvatar } from '../common/UserAvatar';
+import { getUserTier } from '../../utils/tierSystem';
 
 export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   const navigate = useNavigate();
@@ -154,26 +156,22 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
               <div className="relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 pt-1 sm:pt-2">
                 <div className="flex items-end gap-4">
                   <div className="relative shrink-0 -mt-16 sm:-mt-20">
-                    <img
-                      src={profile.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
-                      alt={profile.fullName}
-                      className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover ring-4 ring-white shadow-xl bg-white shrink-0"
-                    />
-                    {profile.isVerified && (
-                      <span className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs font-bold border-2 border-white shadow-sm" title="Tài khoản đã xác minh">
-                        ✓
-                      </span>
-                    )}
+                    <UserAvatar user={profile} size="2xl" showBadge={true} showVerified={Boolean(profile.isVerified)} />
                   </div>
                   <div className="pb-1 min-w-0">
                     <div className="flex items-center gap-2.5 flex-wrap">
                       <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug tracking-tight truncate">
                         {profile.fullName}
                       </h3>
-                      <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[11px] font-bold flex items-center gap-1 border border-amber-200/80 shadow-xs">
-                        <Award className="w-3.5 h-3.5 text-amber-600" />
-                        {profile.role || profile.rank || 'Wanderer Gold'}
-                      </span>
+                      {(() => {
+                        const tier = getUserTier(profile);
+                        return (
+                          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1 border shadow-xs ${tier.badgeBg}`}>
+                            <span>{tier.icon}</span>
+                            <span>{tier.name}</span>
+                          </span>
+                        );
+                      })()}
                     </div>
                     <p className="text-xs sm:text-sm text-slate-500 font-mono font-medium flex items-center gap-2 mt-1 truncate">
                       <span className="text-slate-700 font-semibold">{profile.handle || '@wayfarer'}</span>

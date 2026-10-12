@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { adminUserApi } from '../../../services/api';
 import { Users, Shield, CheckCircle2, Ban, Search, UserPlus, ChevronRight, UserCheck, Award, Download, Eye, BadgeCheck, RefreshCw, Sparkles, ChevronLeft, Lock, Unlock, X, ShieldCheck, UserCog } from 'lucide-react';
+import { UserAvatar } from '../../../components/common/UserAvatar';
 
 export const AdminUsersPage = () => {
   const toast = useToast();
@@ -431,9 +432,8 @@ export const AdminUsersPage = () => {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold">
-            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">Super Admin</span>
-            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">Moderator</span>
-            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">Guide</span>
+            <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">ROLE_ADMIN (Super Admin)</span>
+            <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">ROLE_USER (Thành viên)</span>
           </div>
         </div>
 
@@ -655,17 +655,7 @@ export const AdminUsersPage = () => {
                           {/* User Info */}
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-3">
-                              {user.avatarUrl ? (
-                                <img 
-                                  src={user.avatarUrl} 
-                                  alt={user.fullName} 
-                                  className="w-10 h-10 rounded-full object-cover border border-slate-200" 
-                                />
-                              ) : (
-                                <div className="w-10 h-10 rounded-full bg-sky-600 text-white font-bold flex items-center justify-center text-xs">
-                                  {user.fullName ? user.fullName.charAt(0).toUpperCase() : 'U'}
-                                </div>
-                              )}
+                              <UserAvatar user={user} size="sm" showBadge={true} />
                               <div>
                                 <div className="font-bold text-slate-900 flex items-center gap-1.5">
                                   {user.fullName}
@@ -976,9 +966,7 @@ export const AdminUsersPage = () => {
             </div>
 
             <div className="p-3 bg-slate-50 rounded-2xl flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-sky-600 text-white font-bold flex items-center justify-center text-xs">
-                {userToChangeRole.fullName?.charAt(0).toUpperCase() || 'U'}
-              </div>
+              <UserAvatar user={userToChangeRole} size="md" showBadge={true} />
               <div>
                 <div className="font-bold text-xs text-slate-900">{userToChangeRole.fullName}</div>
                 <div className="text-[11px] text-slate-400">{userToChangeRole.email}</div>
@@ -986,14 +974,12 @@ export const AdminUsersPage = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-700 block">Chọn vai trò hệ thống:</label>
+              <label className="text-xs font-bold text-slate-700 block">Chọn vai trò hệ thống chuẩn (RBAC CSDL):</label>
               
               <div className="space-y-2">
                 {[
-                  { role: 'ROLE_ADMIN', title: 'Super Admin', desc: 'Toàn quyền cấu hình AI, quản trị người dùng, duyệt điểm và xem báo cáo tài chính.' },
-                  { role: 'ROLE_MODERATOR', title: 'Kiểm duyệt viên (Mod)', desc: 'Xử lý báo cáo vi phạm cộng đồng, kiểm duyệt bài viết và bình luận.' },
-                  { role: 'ROLE_GUIDE', title: 'Đối tác / HDV (Guide)', desc: 'Được phép tạo tour chuyên nghiệp, nhận đặt cọc và kết nối khách.' },
-                  { role: 'ROLE_USER', title: 'Thành viên (Wanderer)', desc: 'Tạo lịch trình du lịch cá nhân, chia sẻ bài viết và tham gia cộng đồng.' }
+                  { role: 'ROLE_ADMIN', title: 'Quản trị viên (Super Admin)', desc: 'Toàn quyền cấu hình hệ thống, quản trị người dùng, duyệt địa điểm và kiểm duyệt báo cáo vi phạm.' },
+                  { role: 'ROLE_USER', title: 'Người dùng tiêu chuẩn (Wanderer User)', desc: 'Tạo lịch trình du lịch cá nhân, chia sẻ bài viết, đánh giá địa điểm và tham gia cộng đồng.' }
                 ].map((item) => (
                   <label
                     key={item.role}
@@ -1013,7 +999,14 @@ export const AdminUsersPage = () => {
                       className="mt-0.5 text-purple-600 focus:ring-purple-500" 
                     />
                     <div>
-                      <div className="font-bold text-xs text-slate-900">{item.title}</div>
+                      <div className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                        <span>{item.title}</span>
+                        {item.role === 'ROLE_ADMIN' ? (
+                          <span className="px-1.5 py-0.2 rounded bg-purple-100 text-purple-700 text-[10px] font-mono">ROLE_ADMIN</span>
+                        ) : (
+                          <span className="px-1.5 py-0.2 rounded bg-sky-100 text-sky-700 text-[10px] font-mono">ROLE_USER</span>
+                        )}
+                      </div>
                       <div className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{item.desc}</div>
                     </div>
                   </label>

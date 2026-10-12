@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
 import { Compass, Sparkles, MapPin, Users, Calendar, MessageSquare, User, Shield, Bell, Menu, X, ChevronRight, LogOut } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
+import { UserAvatar } from './UserAvatar';
 
 
 export const Navbar = () => {
@@ -230,15 +231,10 @@ export const Navbar = () => {
                 <div ref={profileDropdownRef} className="relative group ml-1">
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                    className="relative flex items-center justify-center p-0.5 rounded-full hover:ring-2 hover:ring-sky-500/30 transition-all cursor-pointer shrink-0 focus:outline-hidden"
+                    className="relative flex items-center justify-center p-0.5 rounded-full transition-all cursor-pointer shrink-0 focus:outline-hidden hover:scale-105 active:scale-95"
                     aria-label={`Tài khoản: ${currentUser.name}`}
                   >
-                    <img
-                      src={currentUser.avatar}
-                      alt={currentUser.name}
-                      className="w-9 h-9 rounded-full object-cover ring-2 ring-sky-500/20 hover:scale-105 active:scale-95 transition-transform"
-                    />
-                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-sky-500 ring-2 ring-white" title="Trực tuyến"></span>
+                    <UserAvatar user={currentUser} size="sm" showBadge={true} />
                   </button>
 
                   {/* Floating Tooltip on Hover (ẩn khi dropdown mở) */}
@@ -257,11 +253,7 @@ export const Navbar = () => {
                   {isProfileDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200/90 py-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/70 flex items-center gap-3">
-                        <img
-                          src={currentUser.avatar}
-                          alt={currentUser.name}
-                          className="w-10 h-10 rounded-full object-cover ring-2 ring-sky-500/20 shrink-0"
-                        />
+                        <UserAvatar user={currentUser} size="md" showBadge={true} />
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</p>
                           <p className="text-[11px] text-slate-400 truncate">{currentUser.handle || currentUser.email}</p>
@@ -463,11 +455,7 @@ export const Navbar = () => {
                   className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200/80 cursor-pointer hover:bg-slate-100 transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <img
-                      src={currentUser.avatar}
-                      alt={currentUser.name}
-                      className="w-10 h-10 rounded-full object-cover ring-2 ring-sky-500/20"
-                    />
+                    <UserAvatar user={currentUser} size="md" showBadge={true} />
                     <div>
                       <h4 className="font-bold text-xs text-slate-900">{currentUser.name}</h4>
                       <p className="text-[10px] text-slate-400">{currentUser.handle}</p>

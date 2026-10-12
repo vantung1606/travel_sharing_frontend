@@ -13,6 +13,7 @@ import { ReportPostModal } from '../../../components/community/ReportPostModal';
 import { ImageLightboxModal } from '../../../components/community/ImageLightboxModal';
 import { BlogArticleReaderModal } from '../../../components/community/BlogArticleReaderModal';
 import { CustomSelect } from '../../../components/common/CustomSelect';
+import { UserAvatar } from '../../../components/common/UserAvatar';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../components/community/MentionSuggestions';
 import { useNavigate } from 'react-router-dom';
 import { AtSign, Heart, MessageCircle, MessageSquare, Share2, Bookmark, MapPin, Sparkles, Award, TrendingUp, Compass, Route, Copy, DollarSign, Camera, Image as ImageIcon, CheckCircle2, Send, Search, SlidersHorizontal, Filter, Plus, X, Loader2, Eye, MoreHorizontal, ChevronLeft, ChevronRight, ArrowRight, Flame, Check, UserCheck, ShieldCheck, AlertCircle, AlertTriangle, ShieldAlert, Lock, Globe, Upload, Video, Trash2, Edit, UserPlus, Users, CornerDownRight, Flag, EyeOff, BookOpen, Hash } from 'lucide-react';
@@ -2106,17 +2107,19 @@ export const CommunityPage = () => {
                         onClick={() => {
                           if (authorId) setSelectedUserIdForModal(authorId);
                         }}
-                        className="relative cursor-pointer group shrink-0"
+                        className="cursor-pointer group shrink-0"
                         title="Xem trang cá nhân của tác giả"
                       >
-                        <img
-                          src={authorAvatar}
-                          alt={authorName}
-                          className="w-12 h-12 rounded-full object-cover ring-2 ring-slate-100 group-hover:ring-blue-500 transition-all shadow-xs"
+                        <UserAvatar
+                          user={{
+                            id: authorId,
+                            fullName: authorName,
+                            avatarUrl: authorAvatar,
+                            isVerified: true
+                          }}
+                          size="md"
+                          showBadge={true}
                         />
-                        <span className="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-blue-600 text-white flex items-center justify-center text-[9px] font-bold ring-2 ring-white">
-                          ✓
-                        </span>
                       </div>
                       <div>
                         <div className="flex items-center gap-2 flex-wrap">

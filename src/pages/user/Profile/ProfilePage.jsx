@@ -8,6 +8,8 @@ import { TravelFootprintSection } from '../../../components/profile/TravelFootpr
 import { TravelPassportCardModal } from '../../../components/profile/TravelPassportCardModal';
 import { useToast } from '../../../components/common/Toast';
 import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass, Phone, CheckCircle2, ChevronLeft, ChevronRight, Crown } from 'lucide-react';
+import { TierPromotionModal } from '../../../components/common/TierPromotionModal';
+import { TIERS, calculateUserXP, getUserTier, getNextTier, calculateTierProgress, checkTierPromotion } from '../../../utils/tierSystem';
 
 export const ProfilePage = () => {
   const { currentUser, updateCurrentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
@@ -16,6 +18,7 @@ export const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('itineraries'); // 'itineraries' | 'posts' | 'footprint' | 'ai-dna' | 'saved' | 'badges'
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPassportModalOpen, setIsPassportModalOpen] = useState(false);
+  const [promotionData, setPromotionData] = useState(null);
   
   // Tab scroll reference & scroll buttons state
   const tabScrollRef = useRef(null);
@@ -285,87 +288,27 @@ export const ProfilePage = () => {
   const destinationsCount = typeof currentUser?.destinationsCount === 'number' 
     ? currentUser.destinationsCount 
     : (itinsCount > 0 ? Math.min(itinsCount * 2, 25) : 0);
-  const userTotalXP = (itinsCount * 60) + (postsCount * 40) + (activeFollowersCount * 15) + (destinationsCount * 25);
+  const userTotalXP = calculateUserXP({
+    itinsCount,
+    postsCount,
+    followersCount: activeFollowersCount,
+    destinationsCount
+  });
 
-  const TIERS = [
-    {
-      level: 1,
-      id: 'bronze',
-      name: 'Tân Thủ Khám Phá',
-      nameEn: 'Bronze Explorer',
-      minXP: 0,
-      nextXP: 150,
-      icon: '🥉',
-      badgeBg: 'bg-amber-900/10 text-amber-800 border-amber-300',
-      tagText: 'Cấp 1 • Bronze',
-      avatarRing: 'ring-4 ring-amber-700/60 shadow-md shadow-amber-900/10',
-      avatarEffect: '',
-      cornerIcon: '🥉',
-      cornerBg: 'bg-amber-800 text-white',
-      desc: 'Bước đầu khám phá các vùng đất mới trên nền tảng Wayfare'
-    },
-    {
-      level: 2,
-      id: 'silver',
-      name: 'Lữ Hành Bạc',
-      nameEn: 'Silver Wanderer',
-      minXP: 150,
-      nextXP: 400,
-      icon: '🥈',
-      badgeBg: 'bg-slate-100 text-slate-800 border-slate-300',
-      tagText: 'Cấp 2 • Silver',
-      avatarRing: 'ring-4 ring-slate-300 shadow-lg shadow-slate-400/30',
-      avatarEffect: 'p-[3px] bg-gradient-to-tr from-slate-300 via-slate-100 to-slate-400',
-      cornerIcon: '🥈',
-      cornerBg: 'bg-slate-600 text-white',
-      desc: 'Đã có lịch trình và bài viết chia sẻ truyền cảm hứng'
-    },
-    {
-      level: 3,
-      id: 'gold',
-      name: 'Nhà Thám Hiểm Vàng',
-      nameEn: 'Gold Voyager',
-      minXP: 400,
-      nextXP: 800,
-      icon: '👑',
-      badgeBg: 'bg-amber-50 text-amber-900 border-amber-300',
-      tagText: 'Cấp 3 • Gold',
-      avatarRing: 'ring-4 ring-amber-400 shadow-xl shadow-amber-500/40',
-      avatarEffect: 'p-[4px] bg-gradient-to-tr from-amber-400 via-yellow-200 to-amber-600 shadow-lg shadow-amber-500/30',
-      cornerIcon: '👑',
-      cornerBg: 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900',
-      desc: 'Thành viên cốt cán với mạng lưới cộng đồng đông đảo và dấu chân rộng lớn'
-    },
-    {
-      level: 4,
-      id: 'diamond',
-      name: 'Huyền Thoại Kim Cương',
-      nameEn: 'Diamond Legend',
-      minXP: 800,
-      nextXP: 800,
-      icon: '💎',
-      badgeBg: 'bg-gradient-to-r from-purple-100 via-pink-100 to-amber-100 text-purple-900 border-purple-300',
-      tagText: 'Cấp 4 • Diamond VIP',
-      avatarRing: 'ring-4 ring-purple-500 shadow-2xl shadow-purple-500/50',
-      avatarEffect: 'p-[5px] bg-gradient-to-tr from-purple-600 via-pink-500 to-amber-400 shadow-xl shadow-purple-500/40 animate-pulse',
-      cornerIcon: '💎',
-      cornerBg: 'bg-gradient-to-tr from-purple-600 to-pink-500 text-white',
-      desc: 'Đỉnh cao danh dự! Top 1% bậc thầy lữ hành có sức ảnh hưởng bậc nhất'
+  const currentTier = getUserTier(userTotalXP);
+  const nextTier = getNextTier(currentTier);
+  const progressPercent = calculateTierProgress(userTotalXP, currentTier, nextTier);
+
+  // Kiểm tra sự kiện thăng cấp để hiển thị modal chúc mừng
+  useEffect(() => {
+    if (currentUser?.id && userTotalXP > 0) {
+      const promo = checkTierPromotion({ ...currentUser, totalXp: userTotalXP });
+      if (promo) {
+        setPromotionData(promo);
+        toast.showSuccess(`🎉 Chúc mừng bạn đã thăng hạng lên Cấp ${promo.newTier.name}!`);
+      }
     }
-  ];
-
-  const currentTier = userTotalXP >= 800
-    ? TIERS[3]
-    : userTotalXP >= 400
-    ? TIERS[2]
-    : userTotalXP >= 150
-    ? TIERS[1]
-    : TIERS[0];
-
-  const nextTier = currentTier.level < 4 ? TIERS[currentTier.level] : null;
-  const progressPercent = nextTier
-    ? Math.min(100, Math.round(((userTotalXP - currentTier.minXP) / (nextTier.minXP - currentTier.minXP)) * 100))
-    : 100;
+  }, [currentUser?.id, userTotalXP]);
 
   // Nếu người dùng chưa đăng nhập hoặc không có ID hợp lệ, hiển thị thông báo yêu cầu đăng nhập
   if (!currentUser?.id) {
@@ -667,7 +610,7 @@ export const ProfilePage = () => {
               { id: 'itineraries', label: 'Lịch Trình AI Của Tôi', count: displayItineraries.length, icon: Route },
               { id: 'posts', label: 'Bài Viết & Review', count: displayPosts.length, icon: Globe },
               { id: 'footprint', label: 'Dấu Chân Du Lịch', badge: 'Mới', icon: Compass },
-              { id: 'ai-dna', label: 'Gu Du Lịch & AI DNA', badge: 'WanderAI', icon: Sparkles },
+              { id: 'ai-dna', label: 'Gu Du Lịch & AI DNA', icon: Sparkles },
               { id: 'saved', label: 'Địa Điểm Đã Lưu', count: destinations.length, icon: Bookmark },
               { id: 'badges', label: 'Huy Hiệu & Khung Avatar', count: achievements.length, icon: Award }
             ].map(tab => {
@@ -1087,14 +1030,17 @@ export const ProfilePage = () => {
 
             <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-100 space-y-1">
               <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider block">Cấp bậc nhà thám hiểm</span>
-              <span className="font-bold text-slate-900 text-sm block">🌟 {profileData?.rank || 'Wanderer Gold'}</span>
-              <p className="text-[11px] text-slate-500">Đã mở khóa toàn bộ quyền năng gợi ý lộ trình</p>
+              <span className="font-bold text-slate-900 text-sm block flex items-center gap-1.5">
+                <span>{currentTier.icon}</span>
+                <span>{currentTier.name}</span>
+              </span>
+              <p className="text-[11px] text-slate-500">{currentTier.desc}</p>
             </div>
 
             <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-100 space-y-1">
               <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider block">Mục tiêu năm 2026</span>
-              <span className="font-bold text-slate-900 text-sm block">🇻🇳 Chinh phục 63 Tỉnh Thành</span>
-              <p className="text-[11px] text-slate-500">Đã đánh dấu trên Bản đồ dấu chân du lịch</p>
+              <span className="font-bold text-slate-900 text-sm block">🇻🇳 {destinationsCount}/63 Tỉnh Thành</span>
+              <p className="text-[11px] text-slate-500">Đã đánh dấu trên Bản đồ ({Math.round((destinationsCount / 63) * 100)}% Việt Nam)</p>
             </div>
           </div>
 
@@ -1104,7 +1050,7 @@ export const ProfilePage = () => {
               <span>Ghi chú riêng của bạn dành cho AI Engine</span>
             </h4>
             <p className="text-xs text-slate-600 leading-relaxed bg-white p-3 rounded-xl border border-slate-200">
-              "Thường đi du lịch nhóm 4-6 người. Muốn dậy sớm từ 5:30 để đón bình minh. Thích các quán cafe view thung lũng yên tĩnh."
+              "{profileData?.bio || currentUser?.bio || "Thường đi du lịch trải nghiệm tự túc, thích chụp ảnh và khám phá ẩm thực bản địa độc đáo."}"
             </p>
           </div>
         </div>
@@ -1573,6 +1519,19 @@ export const ProfilePage = () => {
           onSelectItinerary={(itin) => {
             setSelectedPostForDetail(null);
             setSelectedItineraryForModal(itin);
+          }}
+        />
+      )}
+
+      {/* Level Up & Tier Promotion Celebration Modal */}
+      {promotionData && (
+        <TierPromotionModal
+          promotion={promotionData}
+          user={currentUser}
+          onClose={() => setPromotionData(null)}
+          onViewBadges={() => {
+            setPromotionData(null);
+            setActiveTab('badges');
           }}
         />
       )}
