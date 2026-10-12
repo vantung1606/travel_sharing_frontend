@@ -28,66 +28,56 @@ export function getAuthHeader() {
 export const authApi = {
   // Login API Call
   async login(email, password) {
+    let response;
     try {
-      const response = await fetch(`${BASE_URL}/auth/login`, {
+      response = await fetch(`${BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Đăng nhập không thành công');
-      }
-      return data;
-    } catch (error) {
-      console.warn('Backend API connection warning, using local mock auth fallback:', error.message);
-      const isAdmin = email.toLowerCase().includes('admin');
-      return {
-        success: true,
-        message: isAdmin ? 'Đăng nhập thành công với quyền Quản Trị Viên! 🛡️' : 'Đăng nhập thành công!',
-        data: {
-          token: 'mock-jwt-token-' + Date.now(),
-          user: {
-            name: isAdmin ? 'Quản Trị Viên (Admin)' : (email.split('@')[0] || 'Nguyễn Thanh Tùng'),
-            handle: isAdmin ? '@admin_wayfare' : ('@' + (email.split('@')[0] || 'tung_wanderlust')),
-            email: email,
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-            roles: isAdmin ? ['ROLE_ADMIN', 'ROLE_USER'] : ['ROLE_USER']
-          }
-        }
-      };
+    } catch (networkError) {
+      throw new Error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng hoặc thử lại sau!');
     }
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      throw new Error('Phản hồi từ máy chủ không hợp lệ.');
+    }
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || 'Email hoặc mật khẩu không chính xác!');
+    }
+
+    return data;
   },
 
   // Register API Call
   async register(fullName, email, password) {
+    let response;
     try {
-      const response = await fetch(`${BASE_URL}/auth/register`, {
+      response = await fetch(`${BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ fullName, email, password })
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || 'Đăng ký không thành công');
-      }
-      return data;
-    } catch (error) {
-      console.warn('Backend API connection warning, using local mock auth fallback:', error.message);
-      return {
-        success: true,
-        message: 'Đăng ký tài khoản thành công! (Demo Mode)',
-        data: {
-          token: 'mock-jwt-token-' + Date.now(),
-          user: {
-            name: fullName || email.split('@')[0],
-            handle: '@' + (fullName ? fullName.toLowerCase().replace(/\s+/g, '_') : 'user'),
-            email: email,
-            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
-          }
-        }
-      };
+    } catch (networkError) {
+      throw new Error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng hoặc thử lại sau!');
     }
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      throw new Error('Phản hồi từ máy chủ không hợp lệ.');
+    }
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || 'Đăng ký tài khoản không thành công!');
+    }
+
+    return data;
   },
 
   // Logout API Call (Ghi nhận nhật ký kiểm toán hệ thống & cập nhật trạng thái offline)

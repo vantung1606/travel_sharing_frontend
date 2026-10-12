@@ -4,12 +4,14 @@ class ChatSocketService {
   constructor() {
     this.client = null;
     this.subscriptions = new Map();
+    this.roomCallbacks = new Map(); // roomId -> Set of callbacks
+    this.notifListeners = new Map(); // key -> { userId, userEmail, callback, subs: [] }
     this.isConnected = false;
   }
 
   connect(onConnected) {
-    if (this.client && this.isConnected) {
-      if (onConnected) onConnected();
+    if (this.client && this.client.active) {
+      if (this.isConnected && onConnected) onConnected();
       return;
     }
 
@@ -32,6 +34,8 @@ class ChatSocketService {
       debug: () => {}, // Tắt log verbose để sạch console
       onConnect: () => {
         this.isConnected = true;
+        // Tự động re-subscribe lại toàn bộ các room và kênh thông báo đang active khi reconnect thành công
+        this.reapplyAllSubscriptions();
         if (onConnected) onConnected();
       },
       onStompError: (frame) => {
@@ -39,108 +43,175 @@ class ChatSocketService {
       },
       onWebSocketClose: () => {
         this.isConnected = false;
+        // Dọn dẹp con trỏ subscription cũ vì socket đã đóng, broker đã hủy session
+        this.subscriptions.clear();
       }
     });
 
     this.client.activate();
   }
 
+  reapplyAllSubscriptions() {
+    if (!this.client || !this.client.connected) return;
+
+    // 1. Re-subscribe các phòng chat đang mở
+    for (const [roomId, callbacks] of this.roomCallbacks.entries()) {
+      if (!callbacks || callbacks.size === 0) continue;
+      const topic = `/topic/room.${roomId}`;
+      try {
+        const sub = this.client.subscribe(topic, (message) => {
+          try {
+            const body = JSON.parse(message.body);
+            callbacks.forEach(cb => {
+              try { cb(body); } catch (e) { console.error('[STOMP Chat] Callback err:', e); }
+            });
+          } catch (e) {
+            console.warn('[STOMP Chat] Lỗi parse payload:', e);
+          }
+        });
+        this.subscriptions.set(roomId, sub);
+      } catch (e) {
+        console.warn(`[STOMP Chat] Không thể re-subscribe room ${roomId}:`, e);
+      }
+    }
+
+    // 2. Re-subscribe các kênh thông báo
+    for (const [key, item] of this.notifListeners.entries()) {
+      if (!item || !item.callback) continue;
+      item.subs = [];
+      const { userId, userEmail, callback } = item;
+
+      if (userId) {
+        try {
+          const subId = this.client.subscribe(`/topic/notifications.${userId}`, (msg) => {
+            try { callback(JSON.parse(msg.body)); } catch (e) {}
+          });
+          item.subs.push(subId);
+        } catch (e) {}
+      }
+
+      if (userEmail) {
+        try {
+          const subEmail = this.client.subscribe(`/topic/notifications.${userEmail.toLowerCase().trim()}`, (msg) => {
+            try { callback(JSON.parse(msg.body)); } catch (e) {}
+          });
+          item.subs.push(subEmail);
+        } catch (e) {}
+      }
+
+      try {
+        const subBc = this.client.subscribe(`/topic/notifications.broadcast`, (msg) => {
+          try { callback(JSON.parse(msg.body)); } catch (e) {}
+        });
+        item.subs.push(subBc);
+      } catch (e) {}
+    }
+  }
+
   subscribeToRoom(roomId, onMessage) {
-    if (!roomId) return () => {};
+    if (!roomId || !onMessage) return () => {};
     this.connect();
+
+    if (!this.roomCallbacks.has(roomId)) {
+      this.roomCallbacks.set(roomId, new Set());
+    }
+    const cbs = this.roomCallbacks.get(roomId);
+    cbs.add(onMessage);
 
     const topic = `/topic/room.${roomId}`;
 
-    // Hủy đăng ký cũ nếu có
-    if (this.subscriptions.has(roomId)) {
-      try {
-        this.subscriptions.get(roomId).unsubscribe();
-      } catch (e) {}
-    }
-
-    const doSub = () => {
+    const setupSub = () => {
       if (!this.client || !this.client.connected) return;
-      const sub = this.client.subscribe(topic, (message) => {
-        try {
-          const body = JSON.parse(message.body);
-          if (onMessage) onMessage(body);
-        } catch (e) {
-          console.warn('[STOMP Chat] Lỗi parse payload:', e);
-        }
-      });
-      this.subscriptions.set(roomId, sub);
+      if (this.subscriptions.has(roomId)) return; // Đã subscribe topic này rồi
+
+      try {
+        const sub = this.client.subscribe(topic, (message) => {
+          try {
+            const body = JSON.parse(message.body);
+            const activeCbs = this.roomCallbacks.get(roomId);
+            if (activeCbs) {
+              activeCbs.forEach(cb => {
+                try { cb(body); } catch (e) { console.error('[STOMP Chat] Callback err:', e); }
+              });
+            }
+          } catch (e) {
+            console.warn('[STOMP Chat] Lỗi parse payload:', e);
+          }
+        });
+        this.subscriptions.set(roomId, sub);
+      } catch (e) {
+        console.warn(`[STOMP Chat] Lỗi subscribe room ${roomId}:`, e);
+      }
     };
 
     if (this.client && this.client.connected) {
-      doSub();
+      setupSub();
     } else {
       const checkInterval = setInterval(() => {
         if (this.client && this.client.connected) {
           clearInterval(checkInterval);
-          doSub();
+          setupSub();
         }
       }, 150);
       setTimeout(() => clearInterval(checkInterval), 4000);
     }
 
     return () => {
-      if (this.subscriptions.has(roomId)) {
-        try {
-          this.subscriptions.get(roomId).unsubscribe();
-        } catch (e) {}
-        this.subscriptions.delete(roomId);
+      const activeCbs = this.roomCallbacks.get(roomId);
+      if (activeCbs) {
+        activeCbs.delete(onMessage);
+        if (activeCbs.size === 0) {
+          this.roomCallbacks.delete(roomId);
+          if (this.subscriptions.has(roomId)) {
+            try {
+              this.subscriptions.get(roomId).unsubscribe();
+            } catch (e) {}
+            this.subscriptions.delete(roomId);
+          }
+        }
       }
     };
   }
 
   subscribeToNotifications(userId, userEmail, onNotification) {
+    if (!onNotification) return () => {};
     this.connect();
-    const subs = [];
+
+    const listenerKey = `${userId || 'anon'}_${userEmail || 'anon'}_${Date.now()}`;
+    const listenerItem = {
+      userId,
+      userEmail,
+      callback: onNotification,
+      subs: []
+    };
+    this.notifListeners.set(listenerKey, listenerItem);
 
     const doSub = () => {
       if (!this.client || !this.client.connected) return;
 
-      // 1. Kênh theo ID người dùng
       if (userId) {
         try {
           const subId = this.client.subscribe(`/topic/notifications.${userId}`, (msg) => {
-            try {
-              const body = JSON.parse(msg.body);
-              if (onNotification) onNotification(body);
-            } catch (e) {
-              console.warn('[STOMP Notif] Parse error:', e);
-            }
+            try { onNotification(JSON.parse(msg.body)); } catch (e) {}
           });
-          subs.push(subId);
+          listenerItem.subs.push(subId);
         } catch (e) {}
       }
 
-      // 2. Kênh theo Email người dùng
       if (userEmail) {
         try {
           const subEmail = this.client.subscribe(`/topic/notifications.${userEmail.toLowerCase().trim()}`, (msg) => {
-            try {
-              const body = JSON.parse(msg.body);
-              if (onNotification) onNotification(body);
-            } catch (e) {
-              console.warn('[STOMP Notif] Parse error:', e);
-            }
+            try { onNotification(JSON.parse(msg.body)); } catch (e) {}
           });
-          subs.push(subEmail);
+          listenerItem.subs.push(subEmail);
         } catch (e) {}
       }
 
-      // 3. Kênh phát sóng toàn hệ thống
       try {
-        const subBroadcast = this.client.subscribe(`/topic/notifications.broadcast`, (msg) => {
-          try {
-            const body = JSON.parse(msg.body);
-            if (onNotification) onNotification(body);
-          } catch (e) {
-            console.warn('[STOMP Notif] Parse error:', e);
-          }
+        const subBc = this.client.subscribe(`/topic/notifications.broadcast`, (msg) => {
+          try { onNotification(JSON.parse(msg.body)); } catch (e) {}
         });
-        subs.push(subBroadcast);
+        listenerItem.subs.push(subBc);
       } catch (e) {}
     };
 
@@ -157,9 +228,12 @@ class ChatSocketService {
     }
 
     return () => {
-      subs.forEach(s => {
-        try { s.unsubscribe(); } catch (e) {}
-      });
+      if (listenerItem.subs) {
+        listenerItem.subs.forEach(s => {
+          try { s.unsubscribe(); } catch (e) {}
+        });
+      }
+      this.notifListeners.delete(listenerKey);
     };
   }
 
@@ -171,6 +245,8 @@ class ChatSocketService {
       this.client = null;
       this.isConnected = false;
       this.subscriptions.clear();
+      this.roomCallbacks.clear();
+      this.notifListeners.clear();
     }
   }
 }

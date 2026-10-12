@@ -295,10 +295,9 @@ export const AppProvider = ({ children }) => {
       console.warn('Could not clean old storage:', e);
     }
 
-    // 2. KHỞI TẠO USER MỚI HOÀN TOÀN ĐỘC LẬP (Tuyệt đối KHÔNG merge với currentUser cũ)
+    // 2. KHỞI TẠO USER MỚI HOÀN TOÀN ĐỘC LẬP TỪ DỮ LIỆU BACKEND
     const rawEmail = userData.email ? String(userData.email).trim() : '';
     const emailPrefix = rawEmail ? rawEmail.split('@')[0] : 'user';
-    const isAdmin = rawEmail.toLowerCase().includes('admin');
 
     const freshUser = {
       id: userData.id || null,
@@ -308,13 +307,13 @@ export const AppProvider = ({ children }) => {
       email: rawEmail,
       avatar: userData.avatar || userData.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
       bio: userData.bio || '',
-      token: userData.token || ('mock-token-' + Date.now()),
+      token: userData.token || '',
       destinationsCount: typeof userData.destinationsCount === 'number' ? userData.destinationsCount : 0,
       tripsCount: typeof userData.tripsCount === 'number' ? userData.tripsCount : 0,
       savedItinerariesCount: typeof userData.savedItinerariesCount === 'number' ? userData.savedItinerariesCount : 0,
       roles: Array.isArray(userData.roles) && userData.roles.length > 0
         ? userData.roles
-        : (isAdmin ? ['ROLE_ADMIN', 'ROLE_USER'] : ['ROLE_USER'])
+        : ['ROLE_USER']
     };
 
     setIsLoggedIn(true);

@@ -9,7 +9,7 @@ import { useToast } from '../../../components/common/Toast';
 import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass } from 'lucide-react';
 
 export const ProfilePage = () => {
-  const { currentUser, updateCurrentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab, setItineraries } = useApp();
+  const { currentUser, updateCurrentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('itineraries'); // 'itineraries' | 'posts' | 'ai-dna' | 'saved' | 'badges'
@@ -37,9 +37,13 @@ export const ProfilePage = () => {
   const [followingCount, setFollowingCount] = useState(0);
   const [followersCount, setFollowersCount] = useState(0);
 
-  const myUserId = currentUser.id || 1;
+  const myUserId = currentUser?.id;
 
   const loadFullProfile = async () => {
+    if (!myUserId) {
+      setLoadingProfile(false);
+      return;
+    }
     try {
       setLoadingProfile(true);
       const data = await userApi.getProfile(myUserId, currentUser?.email);
@@ -58,6 +62,7 @@ export const ProfilePage = () => {
   };
 
   const loadFollowCounts = async () => {
+    if (!myUserId) return;
     try {
       const [following, followers] = await Promise.all([
         userApi.getFollowing(myUserId),
@@ -118,6 +123,32 @@ export const ProfilePage = () => {
     { title: 'Nhà Sáng Tạo Tour AI', icon: '✨', desc: 'Tạo thành công 10+ lịch trình AI', date: 'Tháng 8, 2026', unlocked: true },
     { title: 'Khám Phá Di Sản Việt Nam', icon: '🏛️', desc: 'Ghé thăm 5 di sản thiên nhiên thế giới', date: 'Đang tiến hành (3/5)', unlocked: false }
   ];
+
+  // Nếu người dùng chưa đăng nhập hoặc không có ID hợp lệ, hiển thị thông báo yêu cầu đăng nhập
+  if (!currentUser?.id) {
+    return (
+      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-16 sm:py-24 flex flex-col items-center justify-center text-center">
+        <div className="w-20 h-20 rounded-2xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 mb-6 shadow-xs">
+          <User className="w-10 h-10" />
+        </div>
+        <h2 className="text-2xl sm:text-3xl font-bold font-display text-slate-800 mb-3">
+          Chưa đăng nhập tài khoản
+        </h2>
+        <p className="text-slate-500 max-w-md mb-8 text-sm sm:text-base leading-relaxed">
+          Vui lòng đăng nhập bằng tài khoản Wayfare của bạn để xem và quản lý hồ sơ cá nhân, lịch trình du lịch và các bài viết chia sẻ.
+        </p>
+        <button
+          onClick={() => {
+            setAuthMode('login');
+            setIsAuthModalOpen(true);
+          }}
+          className="px-7 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white font-semibold shadow-md shadow-sky-500/20 transition-all hover:scale-[1.02] cursor-pointer"
+        >
+          Đăng nhập ngay
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8 space-y-6 sm:space-y-8">
@@ -798,7 +829,7 @@ export const ProfilePage = () => {
         <TravelFootprintSection
           posts={displayPosts}
           itineraries={displayItineraries}
-          userId={currentUser?.id || 1}
+          userId={currentUser?.id}
           userName={currentUser?.name || 'Bạn'}
         />
       )}

@@ -63,29 +63,37 @@ export const AuthModal = () => {
     try {
       if (authMode === 'login') {
         const res = await authApi.login(email, password);
-        const userData = res.data?.user || {
-          id: res.data?.id,
-          name: res.data?.fullName || email.split('@')[0],
-          fullName: res.data?.fullName,
-          email: res.data?.email || email,
-          handle: res.data?.handle || ('@' + email.split('@')[0]),
-          avatar: res.data?.avatar,
-          roles: res.data?.roles,
-          token: res.data?.token
+        const raw = res.data;
+        if (!raw || !raw.id) {
+          throw new Error('Không nhận được dữ liệu tài khoản hợp lệ từ máy chủ.');
+        }
+        const userData = {
+          id: raw.id,
+          name: raw.fullName || raw.name || email.split('@')[0],
+          fullName: raw.fullName || raw.name,
+          email: raw.email || email,
+          handle: raw.handle || ('@' + email.split('@')[0]),
+          avatar: raw.avatar || raw.avatarUrl,
+          roles: Array.isArray(raw.roles) ? raw.roles : (raw.roles ? Array.from(raw.roles) : ['ROLE_USER']),
+          token: raw.token
         };
         login(userData);
         toast.success(res.message || 'Đăng nhập thành công! 🎉');
       } else {
         const res = await authApi.register(fullName, email, password);
-        const userData = res.data?.user || {
-          id: res.data?.id,
-          name: res.data?.fullName || fullName || email.split('@')[0],
-          fullName: res.data?.fullName || fullName,
-          email: res.data?.email || email,
-          handle: res.data?.handle || ('@' + (fullName ? fullName.toLowerCase().replace(/\s+/g, '_') : email.split('@')[0])),
-          avatar: res.data?.avatar,
-          roles: res.data?.roles,
-          token: res.data?.token
+        const raw = res.data;
+        if (!raw || !raw.id) {
+          throw new Error('Đăng ký tài khoản không thành công, vui lòng thử lại.');
+        }
+        const userData = {
+          id: raw.id,
+          name: raw.fullName || raw.name || fullName || email.split('@')[0],
+          fullName: raw.fullName || raw.name || fullName,
+          email: raw.email || email,
+          handle: raw.handle || ('@' + (fullName ? fullName.toLowerCase().replace(/\s+/g, '_') : email.split('@')[0])),
+          avatar: raw.avatar || raw.avatarUrl,
+          roles: Array.isArray(raw.roles) ? raw.roles : (raw.roles ? Array.from(raw.roles) : ['ROLE_USER']),
+          token: raw.token
         };
         login(userData);
         toast.success(res.message || 'Đăng ký tài khoản thành công! 🎉');
