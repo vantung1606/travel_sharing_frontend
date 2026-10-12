@@ -190,7 +190,7 @@ export const FloatingChatWidget = () => {
   const recordingTimerRef = useRef(null);
   const recordingStreamRef = useRef(null);
 
-  const effectiveEmail = currentUser?.email || 'tung@gmail.com';
+  const effectiveEmail = currentUser?.email || '';
 
   // 1. Tải danh sách phòng khi widget được mở
   const loadRooms = useCallback(async () => {

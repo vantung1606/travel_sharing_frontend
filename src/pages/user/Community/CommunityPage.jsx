@@ -994,28 +994,14 @@ export const CommunityPage = () => {
       setCloningPostId(post.id);
       const result = await postApi.cloneItinerary(post.id);
 
-      // Add to user's itineraries in AppContext
       if (result && result.itinerary) {
         setItineraries(prev => [result.itinerary, ...prev]);
+        toast.showSuccess(
+          `Đã sao chép thành công "${post.itineraryTitle || 'Lịch trình'}" vào kho Lịch trình của bạn! 🎉`
+        );
       } else {
-        // Fallback: mock duplicate object
-        const mockCloned = {
-          id: Date.now(),
-          title: 'Bản sao: ' + (post.itineraryTitle || 'Chuyến đi ' + post.locationTag),
-          destination: post.locationTag || 'Việt Nam',
-          startDate: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
-          endDate: new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0],
-          budgetTotal: post.itineraryBudget || 5000000,
-          coverImageUrl: post.images?.[0] || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
-          isAiGenerated: true,
-          status: 'ACTIVE'
-        };
-        setItineraries(prev => [mockCloned, ...prev]);
+        throw new Error('Máy chủ không phản hồi lịch trình nhân bản.');
       }
-
-      toast.showSuccess(
-        `Đã sao chép thành công "${post.itineraryTitle || 'Lịch trình'}" vào kho Lịch trình của bạn! 🎉`
-      );
     } catch (err) {
       toast.showError('Không thể sao chép lịch trình: ' + err.message);
     } finally {

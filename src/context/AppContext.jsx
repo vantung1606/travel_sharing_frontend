@@ -1,14 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  INITIAL_DESTINATIONS,
-  INITIAL_POSTS,
-  INITIAL_ITINERARIES,
-  ADMIN_STATS,
-  INITIAL_PENDING_PLACES,
-  INITIAL_USER_LIST,
-  INITIAL_REPORTS
-} from '../mock/data';
 import { notificationApi, userApi, placeApi, itineraryApi, authApi } from '../services/api';
 
 const DEFAULT_APP_STATE = {
@@ -26,17 +17,17 @@ const DEFAULT_APP_STATE = {
   setIsAuthModalOpen: () => {},
   authMode: 'login',
   setAuthMode: () => {},
-  destinations: INITIAL_DESTINATIONS || [],
+  destinations: [],
   places: [],
   setPlaces: () => {},
   fetchPlaces: () => {},
   addNewPlace: () => {},
-  posts: INITIAL_POSTS || [],
-  itineraries: INITIAL_ITINERARIES || [],
-  pendingPlaces: INITIAL_PENDING_PLACES || [],
-  users: INITIAL_USER_LIST || [],
-  reports: INITIAL_REPORTS || [],
-  stats: ADMIN_STATS || {},
+  posts: [],
+  itineraries: [],
+  pendingPlaces: [],
+  users: [],
+  reports: [],
+  stats: {},
   currentUser: {
     id: null,
     name: 'Khách',
@@ -184,20 +175,20 @@ export const AppProvider = ({ children }) => {
   };
 
   // Data States
-  const [destinations, setDestinations] = useState(INITIAL_DESTINATIONS);
-  const [posts, setPosts] = useState(INITIAL_POSTS);
-  const [itineraries, setItineraries] = useState(INITIAL_ITINERARIES);
-  const [pendingPlaces, setPendingPlaces] = useState(INITIAL_PENDING_PLACES);
+  const [destinations, setDestinations] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [itineraries, setItineraries] = useState([]);
+  const [pendingPlaces, setPendingPlaces] = useState([]);
   const [places, setPlaces] = useState([]);
-  const [users, setUsers] = useState(INITIAL_USER_LIST);
-  const [reports, setReports] = useState(INITIAL_REPORTS);
-  const [stats, setStats] = useState(ADMIN_STATS);
+  const [users, setUsers] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [stats, setStats] = useState({});
 
   // Fetch places from backend on mount
   const fetchPlaces = useCallback(async (filters = {}) => {
     try {
       const data = await placeApi.getPlaces(filters);
-      if (data && data.length > 0) {
+      if (data && Array.isArray(data)) {
         setPlaces(data);
       }
     } catch (err) {
@@ -211,31 +202,16 @@ export const AppProvider = ({ children }) => {
 
   // Host / User adds new place
   const addNewPlace = async (placeData) => {
-    try {
-      const activeEmail = (currentUser?.email) || '';
-      const created = await placeApi.createPlace(placeData, activeEmail);
-      if (created) {
-        setPlaces(prev => [created, ...prev]);
-        return created;
-      }
-    } catch (err) {
-      console.warn('Backend place create failed, using local place state:', err.message);
-      const fallback = {
-        id: 'place-' + Date.now(),
-        ...placeData,
-        ownerId: currentUser?.id || null,
-        ownerName: (currentUser?.id ? currentUser.name : 'Người dùng bản địa'),
-        ownerHandle: (currentUser?.id ? currentUser.handle : '@local_host'),
-        ownerAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=300&q=80',
-        status: 'ACTIVE',
-        isVerifiedHost: false,
-        averageRating: 5.0,
-        reviewCount: 0,
-        createdAt: new Date().toISOString()
-      };
-      setPlaces(prev => [fallback, ...prev]);
-      return fallback;
+    const activeEmail = (currentUser?.email) || '';
+    if (!activeEmail) {
+      throw new Error('Vui lòng đăng nhập để đề xuất hoặc thêm địa điểm mới!');
     }
+    const created = await placeApi.createPlace(placeData, activeEmail);
+    if (created) {
+      setPlaces(prev => [created, ...prev]);
+      return created;
+    }
+    throw new Error('Không nhận được dữ liệu địa điểm từ máy chủ.');
   };
 
   // Safe Fallback Guest User when NOT logged in (No leaked data from previous users)
@@ -412,7 +388,11 @@ export const AppProvider = ({ children }) => {
       setNotifications([]);
       return;
     }
-    const emailToUse = targetEmail || currentUser?.email || 'admin@gmail.com';
+    const emailToUse = targetEmail || currentUser?.email || '';
+    if (!emailToUse) {
+      setNotifications([]);
+      return;
+    }
     try {
       const res = await notificationApi.getNotifications(emailToUse);
       if (res && res.data) {
@@ -515,16 +495,21 @@ export const AppProvider = ({ children }) => {
 
   const fetchItineraries = useCallback(async (email) => {
     try {
-      const activeEmail = email || currentUser?.email || 'admin@gmail.com';
+      const activeEmail = email || currentUser?.email || '';
+      if (!activeEmail) {
+        setItineraries([]);
+        return;
+      }
       const data = await itineraryApi.getMyItineraries(activeEmail);
-      if (data && data.length > 0) {
+      if (data && Array.isArray(data)) {
         const mapped = data.map(mapBackendItineraryToFrontend).filter(Boolean);
-        const existingIds = new Set(mapped.map(m => String(m.id)));
-        const nonDuplicateInitials = INITIAL_ITINERARIES.filter(i => !existingIds.has(String(i.id)));
-        setItineraries([...mapped, ...nonDuplicateInitials]);
+        setItineraries(mapped);
+      } else {
+        setItineraries([]);
       }
     } catch (err) {
       console.warn('Failed to fetch itineraries from backend:', err);
+      setItineraries([]);
     }
   }, [currentUser?.email, mapBackendItineraryToFrontend]);
 
@@ -534,49 +519,48 @@ export const AppProvider = ({ children }) => {
   }, [fetchItineraries]);
 
   const saveItineraryToBackend = async (itineraryObj, email) => {
-    try {
-      const activeEmail = email || currentUser?.email || 'admin@gmail.com';
-      const payload = {
-        title: itineraryObj.title || 'Chuyến đi mới',
-        destination: itineraryObj.destination || 'Việt Nam',
-        startDate: itineraryObj.startDate || (new Date().toISOString().split('T')[0]),
-        endDate: itineraryObj.endDate || null,
-        budgetTotal: itineraryObj.totalBudget || (itineraryObj.budgetPerPerson ? itineraryObj.budgetPerPerson * 2 : 5000000),
-        coverImageUrl: itineraryObj.coverImage || itineraryObj.coverImageUrl || null,
-        isAiGenerated: Boolean(itineraryObj.isAiGenerated ?? true),
-        status: (itineraryObj.status || 'ACTIVE').toUpperCase(),
-        details: (itineraryObj.days || []).flatMap(day =>
-          (day.activities || []).map((act, idx) => ({
-            dayNumber: day.dayNumber || 1,
-            visitOrder: idx + 1,
-            startTime: act.time ? (act.time.length === 5 ? `${act.time}:00` : (act.time.includes(':') ? act.time.substring(0, 5) + ':00' : '08:30:00')) : '08:30:00',
-            locationName: act.title || act.location || 'Điểm dừng chân',
-            locationAddress: act.address || itineraryObj.destination || 'Việt Nam',
-            category: act.category || 'Khám phá',
-            estimatedCost: typeof act.cost === 'number' ? act.cost : (parseInt((act.cost || '').replace(/\D/g, '')) || 100000),
-            aiTip: act.aiTip || '',
-            transitInfo: act.transit || '',
-            note: act.note || ''
-          }))
-        )
-      };
+    const activeEmail = email || currentUser?.email || '';
+    if (!activeEmail) {
+      throw new Error('Vui lòng đăng nhập để lưu lịch trình chuyến đi!');
+    }
+    const payload = {
+      title: itineraryObj.title || 'Chuyến đi mới',
+      destination: itineraryObj.destination || 'Việt Nam',
+      startDate: itineraryObj.startDate || (new Date().toISOString().split('T')[0]),
+      endDate: itineraryObj.endDate || null,
+      budgetTotal: itineraryObj.totalBudget || (itineraryObj.budgetPerPerson ? itineraryObj.budgetPerPerson * 2 : 5000000),
+      coverImageUrl: itineraryObj.coverImage || itineraryObj.coverImageUrl || null,
+      isAiGenerated: Boolean(itineraryObj.isAiGenerated ?? true),
+      status: (itineraryObj.status || 'ACTIVE').toUpperCase(),
+      details: (itineraryObj.days || []).flatMap(day =>
+        (day.activities || []).map((act, idx) => ({
+          dayNumber: day.dayNumber || 1,
+          visitOrder: idx + 1,
+          startTime: act.time ? (act.time.length === 5 ? `${act.time}:00` : (act.time.includes(':') ? act.time.substring(0, 5) + ':00' : '08:30:00')) : '08:30:00',
+          locationName: act.title || act.location || 'Điểm dừng chân',
+          locationAddress: act.address || itineraryObj.destination || 'Việt Nam',
+          category: act.category || 'Khám phá',
+          estimatedCost: typeof act.cost === 'number' ? act.cost : (parseInt((act.cost || '').replace(/\D/g, '')) || 100000),
+          aiTip: act.aiTip || '',
+          transitInfo: act.transit || '',
+          note: act.note || ''
+        }))
+      )
+    };
 
-      const saved = await itineraryApi.createItinerary(payload, activeEmail);
-      if (saved && saved.id) {
-        const mapped = mapBackendItineraryToFrontend(saved);
-        setItineraries(prev => prev.map(item => item.id === itineraryObj.id ? mapped : item));
-        return mapped;
-      }
-    } catch (err) {
-      console.warn('Persist itinerary to backend failed, kept in local state:', err.message);
+    const saved = await itineraryApi.createItinerary(payload, activeEmail);
+    if (saved && saved.id) {
+      const mapped = mapBackendItineraryToFrontend(saved);
+      setItineraries(prev => prev.map(item => item.id === itineraryObj.id ? mapped : item));
+      return mapped;
     }
     return itineraryObj;
   };
 
   const deleteItineraryFromBackend = async (id, email) => {
     try {
-      const activeEmail = email || currentUser?.email || 'admin@gmail.com';
-      if (typeof id === 'number' || !String(id).startsWith('itin-')) {
+      const activeEmail = email || currentUser?.email || '';
+      if (activeEmail && (typeof id === 'number' || !String(id).startsWith('itin-'))) {
         await itineraryApi.deleteItinerary(id, activeEmail);
       }
     } catch (err) {

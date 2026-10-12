@@ -40,23 +40,12 @@ export const PageTitleManager = () => {
 
 // Protected Route Guard for Admin Portal (/admin/*)
 export const AdminRouteGuard = ({ children }) => {
-  const { isLoggedIn, currentUser, setIsAuthModalOpen, setAuthMode, login } = useApp();
+  const { isLoggedIn, currentUser, setIsAuthModalOpen, setAuthMode } = useApp();
   const navigate = useNavigate();
 
   const isAdmin = isLoggedIn && (
-    (currentUser?.roles && currentUser.roles.includes('ROLE_ADMIN')) ||
-    (currentUser?.email && currentUser.email.toLowerCase().includes('admin'))
+    Array.isArray(currentUser?.roles) && currentUser.roles.includes('ROLE_ADMIN')
   );
-
-  const handleQuickAdminLogin = () => {
-    login({
-      name: 'Quản Trị Viên (Admin)',
-      handle: '@admin_wayfare',
-      email: 'admin@gmail.com',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-      roles: ['ROLE_ADMIN', 'ROLE_USER']
-    });
-  };
 
   // 1. Not Logged In -> Require Admin Login
   if (!isLoggedIn) {
@@ -69,24 +58,18 @@ export const AdminRouteGuard = ({ children }) => {
           <div>
             <h2 className="text-xl font-bold text-slate-900 font-display">Khu vực Quản Trị Viên (Admin Portal)</h2>
             <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-              Bạn đang truy cập trang Quản lý Người dùng & Phân quyền bảo mật. Vui lòng xác thực tài khoản có thẩm quyền Quản Trị Viên.
+              Bạn đang truy cập phân hệ Quản trị hệ thống. Vui lòng đăng nhập bằng tài khoản Quản Trị Viên được cấp quyền.
             </p>
           </div>
           <div className="pt-2 flex flex-col gap-2.5">
-            <button
-              onClick={handleQuickAdminLogin}
-              className="w-full py-3 rounded-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-md shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
-            >
-              <LogIn className="w-4 h-4" /> ⚡ Đăng nhập Nhanh Quản Trị Viên (Admin)
-            </button>
             <button
               onClick={() => {
                 setAuthMode('login');
                 setIsAuthModalOpen(true);
               }}
-              className="w-full py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-md shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
             >
-              Nhập Email / Mật khẩu Quản trị
+              <LogIn className="w-4 h-4" /> Đăng nhập tài khoản Quản trị
             </button>
             <button
               onClick={() => navigate('/')}

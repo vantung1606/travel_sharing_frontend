@@ -239,7 +239,7 @@ export const MessagesPage = () => {
   const recordingTimerRef = useRef(null);
   const recordingStreamRef = useRef(null);
 
-  const effectiveEmail = currentUser?.email || 'tung@gmail.com';
+  const effectiveEmail = currentUser?.email || '';
 
   // Tải danh sách người dùng khả dụng để thêm vào nhóm (hỗ trợ silent update để không giật màn hình khi gõ phím)
   const loadAvailableUsers = useCallback(async (keyword = '', silent = false) => {

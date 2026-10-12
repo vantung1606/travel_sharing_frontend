@@ -103,49 +103,17 @@ export const authApi = {
 // ─── Admin API ────────────────────────────────────────────────────────────────
 export const adminApi = {
   async getStats() {
-    try {
-      const response = await fetch(`${BASE_URL}/admin/stats`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        }
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+    const response = await fetch(`${BASE_URL}/admin/stats`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
       }
-      return await response.json();
-    } catch (error) {
-      console.warn('Admin stats API unavailable, using mock data:', error.message);
-      // Fallback mock data for development
-      const makeGrowth = (base) => {
-        const now = new Date();
-        return Array.from({ length: 6 }, (_, i) => {
-          const d = new Date(now.getFullYear(), now.getMonth() - 5 + i, 1);
-          return {
-            label: `Th${d.getMonth() + 1}/${d.getFullYear()}`,
-            count: Math.floor(base * (0.5 + Math.random()))
-          };
-        });
-      };
-      return {
-        totalUsers: 1,
-        newUsersThisMonth: 1,
-        totalPosts: 0,
-        newPostsThisMonth: 0,
-        totalPlaces: 0,
-        totalItineraries: 0,
-        newItinerariesThisMonth: 0,
-        activeItineraries: 0,
-        totalLikes: 0,
-        totalComments: 0,
-        averagePlaceRating: 0,
-        userGrowth: makeGrowth(5),
-        postGrowth: makeGrowth(10),
-        topDestinations: [],
-        topPlaces: []
-      };
+    });
+    if (!response.ok) {
+      throw new Error(`Không thể lấy số liệu thống kê (Mã lỗi: ${response.status})`);
     }
+    return await response.json();
   },
 
   async getAllItineraries() {
@@ -190,7 +158,8 @@ export const itineraryApi = {
   async getMyItineraries(email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
+      if (!userEmail) return [];
       const response = await fetch(`${BASE_URL}/itineraries?email=${encodeURIComponent(userEmail)}`, {
         method: 'GET',
         headers: {
@@ -209,7 +178,7 @@ export const itineraryApi = {
 
   async createItinerary(payload, email) {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-    const userEmail = email || user.email || 'tung@gmail.com';
+    const userEmail = email || user?.email || '';
     const response = await fetch(`${BASE_URL}/itineraries?email=${encodeURIComponent(userEmail)}`, {
       method: 'POST',
       headers: {
@@ -228,7 +197,7 @@ export const itineraryApi = {
 
   async getItineraryById(id, email) {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-    const userEmail = email || user.email || 'tung@gmail.com';
+    const userEmail = email || user?.email || '';
     const response = await fetch(`${BASE_URL}/itineraries/${id}?email=${encodeURIComponent(userEmail)}`, {
       method: 'GET',
       headers: {
@@ -246,7 +215,7 @@ export const itineraryApi = {
 
   async updateItinerary(id, payload, email) {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-    const userEmail = email || user.email || 'tung@gmail.com';
+    const userEmail = email || user?.email || '';
     const response = await fetch(`${BASE_URL}/itineraries/${id}?email=${encodeURIComponent(userEmail)}`, {
       method: 'PUT',
       headers: {
@@ -265,7 +234,7 @@ export const itineraryApi = {
 
   async deleteItinerary(id, email) {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-    const userEmail = email || user.email || 'tung@gmail.com';
+    const userEmail = email || user?.email || '';
     const response = await fetch(`${BASE_URL}/itineraries/${id}?email=${encodeURIComponent(userEmail)}`, {
       method: 'DELETE',
       headers: {
@@ -283,7 +252,7 @@ export const itineraryApi = {
 
   async cloneItinerary(id, email) {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-    const userEmail = email || user.email || 'tung@gmail.com';
+    const userEmail = email || user?.email || '';
     const response = await fetch(`${BASE_URL}/itineraries/${id}/clone?email=${encodeURIComponent(userEmail)}`, {
       method: 'POST',
       headers: {
@@ -301,7 +270,7 @@ export const itineraryApi = {
 
   async aiQuickGenerate(payload, email) {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-    const userEmail = email || user.email || 'tung@gmail.com';
+    const userEmail = email || user?.email || '';
     const response = await fetch(`${BASE_URL}/itineraries/ai-quick-generate?email=${encodeURIComponent(userEmail)}`, {
       method: 'POST',
       headers: {
@@ -633,295 +602,126 @@ export const adminReportApi = {
 };
 
 // ─── Notification API ────────────────────────────────────────────────────────
-export const INITIAL_MOCK_NOTIFICATIONS = [
-  {
-    id: 1,
-    recipientId: 1,
-    actorId: 2,
-    actorName: 'Linh Hoàng',
-    actorHandle: '@linh_hoang92',
-    actorAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80',
-    type: 'AI_READY',
-    message: 'Trợ lý AI đã tạo xong toàn bộ lịch trình chi tiết 3N2Đ Đà Nẵng - Hội An cho bạn!',
-    targetUrl: '/itineraries',
-    isRead: false,
-    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString()
-  },
-  {
-    id: 2,
-    recipientId: 1,
-    actorId: 2,
-    actorName: 'Linh Hoàng',
-    actorHandle: '@linh_hoang92',
-    actorAvatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80',
-    type: 'LIKE',
-    message: 'Linh Hoàng đã thích bài viết review "Săn mây Tà Xùa - Hướng dẫn chi tiết từ A-Z" của bạn.',
-    targetUrl: '/community',
-    isRead: false,
-    createdAt: new Date(Date.now() - 35 * 60 * 1000).toISOString()
-  },
-  {
-    id: 3,
-    recipientId: 1,
-    actorId: 3,
-    actorName: 'Hoàng Nam',
-    actorHandle: '@namwanderer',
-    actorAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80',
-    type: 'COMMENT',
-    message: 'Hoàng Nam đã bình luận: "Cung đường này đi xe máy có khó khăn vào mùa mưa không bạn?"',
-    targetUrl: '/community',
-    isRead: false,
-    createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString()
-  },
-  {
-    id: 4,
-    recipientId: 1,
-    actorId: 4,
-    actorName: 'Minh Anh',
-    actorHandle: '@minh_anh',
-    actorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-    type: 'CHAT_INVITE',
-    message: 'Bạn đã được mời tham gia nhóm chuyến đi: "Phượt Cực Bắc - Mùa Hoa Tam Giác Mạch".',
-    targetUrl: '/messages',
-    isRead: true,
-    createdAt: new Date(Date.now() - 6 * 3600 * 1000).toISOString()
-  },
-  {
-    id: 5,
-    recipientId: 1,
-    actorId: null,
-    actorName: 'Ban Quản Trị Wayfare',
-    actorHandle: '@wayfare_admin',
-    actorAvatar: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=300&q=80',
-    type: 'PLACE_APPROVED',
-    message: 'Địa điểm "Tiệm Cafe Túi Mơ To (Đà Lạt)" do bạn đề xuất đã được duyệt hiển thị trên bản đồ!',
-    targetUrl: '/explore',
-    isRead: true,
-    createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString()
-  },
-  {
-    id: 6,
-    recipientId: 1,
-    actorId: null,
-    actorName: 'Hệ Thống WanderAI',
-    actorHandle: '@wanderai_engine',
-    actorAvatar: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=300&q=80',
-    type: 'SYSTEM',
-    message: 'Bản cập nhật WanderAI Core v2.4-turbo: Nâng cấp Semantic Cache giúp tăng 60% tốc độ tạo lịch trình.',
-    targetUrl: '/ai-config',
-    isRead: true,
-    createdAt: new Date(Date.now() - 48 * 3600 * 1000).toISOString()
-  }
-];
-
-const LOCAL_NOTIF_KEY = 'wayfare_notifications_store_v1';
-
 const getCurrentUserEmail = () => {
   try {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-    return user.email || 'admin@gmail.com';
+    return user?.email || '';
   } catch {
-    return 'admin@gmail.com';
-  }
-};
-
-const getStoredLocalNotifications = () => {
-  try {
-    const raw = localStorage.getItem(LOCAL_NOTIF_KEY);
-    if (!raw) {
-      localStorage.setItem(LOCAL_NOTIF_KEY, JSON.stringify(INITIAL_MOCK_NOTIFICATIONS));
-      return INITIAL_MOCK_NOTIFICATIONS;
-    }
-    return JSON.parse(raw);
-  } catch {
-    return INITIAL_MOCK_NOTIFICATIONS;
-  }
-};
-
-const saveStoredLocalNotifications = (list) => {
-  try {
-    localStorage.setItem(LOCAL_NOTIF_KEY, JSON.stringify(list));
-  } catch (e) {
-    console.error('Failed to save notifications to localStorage', e);
+    return '';
   }
 };
 
 export const notificationApi = {
   // Fetch list of notifications
   async getNotifications(email = getCurrentUserEmail()) {
-    try {
-      const response = await fetch(`${BASE_URL}/notifications?email=${encodeURIComponent(email)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        }
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error ${response.status}`);
-      }
-      const data = await response.json();
-      if (Array.isArray(data) && data.length > 0) {
-        saveStoredLocalNotifications(data);
-        return { isBackend: true, data };
-      }
-      return { isBackend: true, data };
-    } catch (err) {
-      console.warn('Real backend notifications unavailable, using local mock notifications fallback:', err.message);
-      return { isBackend: false, data: getStoredLocalNotifications() };
+    if (!email) {
+      return { isBackend: true, data: [] };
     }
+    const response = await fetch(`${BASE_URL}/notifications?email=${encodeURIComponent(email)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`Lỗi lấy thông báo: HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    return { isBackend: true, data: Array.isArray(data) ? data : [] };
   },
 
   // Get unread notification count
   async getUnreadCount(email = getCurrentUserEmail()) {
-    try {
-      const response = await fetch(`${BASE_URL}/notifications/unread-count?email=${encodeURIComponent(email)}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        }
-      });
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      const data = await response.json();
-      const count = typeof data.unreadCount === 'number' ? data.unreadCount : (typeof data.count === 'number' ? data.count : 0);
-      return { isBackend: true, count };
-    } catch (err) {
-      const list = getStoredLocalNotifications();
-      return { isBackend: false, count: list.filter(n => !n.isRead).length };
+    if (!email) {
+      return { isBackend: true, count: 0 };
     }
+    const response = await fetch(`${BASE_URL}/notifications/unread-count?email=${encodeURIComponent(email)}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    const data = await response.json();
+    const count = typeof data.unreadCount === 'number' ? data.unreadCount : (typeof data.count === 'number' ? data.count : 0);
+    return { isBackend: true, count };
   },
 
   // Mark a single notification as read
   async markAsRead(id, email = getCurrentUserEmail()) {
-    try {
-      const response = await fetch(`${BASE_URL}/notifications/${id}/read?email=${encodeURIComponent(email)}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        }
-      });
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      const updated = await response.json();
-      return { isBackend: true, data: updated };
-    } catch (err) {
-      const list = getStoredLocalNotifications().map(n => (n.id === id ? { ...n, isRead: true } : n));
-      saveStoredLocalNotifications(list);
-      return { isBackend: false, data: list.find(n => n.id === id) };
-    }
+    const response = await fetch(`${BASE_URL}/notifications/${id}/read?email=${encodeURIComponent(email)}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    const updated = await response.json();
+    return { isBackend: true, data: updated };
   },
 
   // Mark all notifications as read
   async markAllAsRead(email = getCurrentUserEmail()) {
-    try {
-      const response = await fetch(`${BASE_URL}/notifications/read-all?email=${encodeURIComponent(email)}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        }
-      });
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      return { isBackend: true };
-    } catch (err) {
-      const list = getStoredLocalNotifications().map(n => ({ ...n, isRead: true }));
-      saveStoredLocalNotifications(list);
-      return { isBackend: false };
-    }
+    const response = await fetch(`${BASE_URL}/notifications/read-all?email=${encodeURIComponent(email)}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    return { isBackend: true };
   },
 
   // Delete a notification
   async deleteNotification(id, email = getCurrentUserEmail()) {
-    try {
-      const response = await fetch(`${BASE_URL}/notifications/${id}?email=${encodeURIComponent(email)}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        }
-      });
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      return { isBackend: true };
-    } catch (err) {
-      const list = getStoredLocalNotifications().filter(n => n.id !== id);
-      saveStoredLocalNotifications(list);
-      return { isBackend: false };
-    }
+    const response = await fetch(`${BASE_URL}/notifications/${id}?email=${encodeURIComponent(email)}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    return { isBackend: true };
   },
 
   // Create test / real push notification
   async createTestNotification(payload, email = getCurrentUserEmail()) {
-    try {
-      const response = await fetch(`${BASE_URL}/notifications/test?email=${encodeURIComponent(email)}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        },
-        body: JSON.stringify(payload)
-      });
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      const created = await response.json();
-      return { isBackend: true, data: created };
-    } catch (err) {
-      const newNotif = {
-        id: Date.now(),
-        recipientId: 1,
-        actorId: null,
-        actorName: payload.actorName || 'Hệ Thống Wayfare',
-        actorHandle: payload.actorHandle || '@wayfare_live',
-        actorAvatar: payload.actorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
-        type: payload.type || 'SYSTEM',
-        message: payload.message || 'Thông báo thử nghiệm mới.',
-        targetUrl: payload.targetUrl || '/community',
-        isRead: false,
-        createdAt: new Date().toISOString()
-      };
-      const list = [newNotif, ...getStoredLocalNotifications()];
-      saveStoredLocalNotifications(list);
-      return { isBackend: false, data: newNotif };
-    }
+    const response = await fetch(`${BASE_URL}/notifications/test?email=${encodeURIComponent(email)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    const created = await response.json();
+    return { isBackend: true, data: created };
   },
 
   // Broadcast a notification to all users (Admin only)
   async broadcastNotification(payload) {
     const senderEmail = payload.senderEmail || getCurrentUserEmail();
-    try {
-      const response = await fetch(`${BASE_URL}/notifications/broadcast?email=${encodeURIComponent(senderEmail)}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        },
-        body: JSON.stringify({
-          type: payload.type || 'SYSTEM',
-          message: payload.message,
-          targetUrl: payload.targetUrl || '/'
-        })
-      });
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-      const data = await response.json();
-      return { isBackend: true, data };
-    } catch (err) {
-      console.warn('Backend broadcast failed, broadcasting to local storage:', err.message);
-      const newNotif = {
-        id: Date.now(),
-        recipientId: null,
-        actorId: null,
-        actorName: 'Wayfare Ban Quản Trị',
-        actorHandle: '@wayfare_system',
-        actorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80',
+    const response = await fetch(`${BASE_URL}/notifications/broadcast?email=${encodeURIComponent(senderEmail)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({
         type: payload.type || 'SYSTEM',
         message: payload.message,
-        targetUrl: payload.targetUrl || '/',
-        isRead: false,
-        createdAt: new Date().toISOString()
-      };
-      const list = [newNotif, ...getStoredLocalNotifications()];
-      saveStoredLocalNotifications(list);
-      return { isBackend: false, data: newNotif };
-    }
+        targetUrl: payload.targetUrl || '/'
+      })
+    });
+    if (!response.ok) throw new Error(`Phát sóng thông báo thất bại: HTTP ${response.status}`);
+    const data = await response.json();
+    return { isBackend: true, data };
   }
 };
 
@@ -1520,7 +1320,7 @@ export const placeApi = {
   async createPlace(placeData, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/places?email=${encodeURIComponent(userEmail)}`, {
         method: 'POST',
         headers: {
@@ -1544,7 +1344,7 @@ export const placeApi = {
   async getMyPlaces(email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/places/my-places?email=${encodeURIComponent(userEmail)}`, {
         headers: {
           'Content-Type': 'application/json',
@@ -1634,7 +1434,7 @@ export const placeApi = {
   async deletePlace(id, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/places/${id}?email=${encodeURIComponent(userEmail)}`, {
         method: 'DELETE',
         headers: {
@@ -1673,7 +1473,7 @@ export const reviewApi = {
   async addReview(placeId, { rating, comment }, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/places/${placeId}/reviews?email=${encodeURIComponent(userEmail)}`, {
         method: 'POST',
         headers: {
@@ -1697,7 +1497,7 @@ export const reviewApi = {
   async deleteReview(reviewId, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/places/reviews/${reviewId}?email=${encodeURIComponent(userEmail)}`, {
         method: 'DELETE',
         headers: {
@@ -1720,7 +1520,7 @@ export const chatApi = {
   async getRooms(email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/chat/rooms?email=${encodeURIComponent(userEmail)}`, {
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
@@ -1736,7 +1536,7 @@ export const chatApi = {
   async getRoomMessages(roomId, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/messages?email=${encodeURIComponent(userEmail)}`, {
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
@@ -1752,7 +1552,7 @@ export const chatApi = {
   async sendMessage(roomId, { content, messageType = 'TEXT' }, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/messages?email=${encodeURIComponent(userEmail)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
@@ -1770,7 +1570,7 @@ export const chatApi = {
   async openDirectRoom(targetUserId, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/chat/direct?targetUserId=${targetUserId}&email=${encodeURIComponent(userEmail)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
@@ -1787,7 +1587,7 @@ export const chatApi = {
   async openItineraryRoom(itineraryId, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/chat/itinerary/${itineraryId}?email=${encodeURIComponent(userEmail)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
@@ -1804,7 +1604,7 @@ export const chatApi = {
   async createRoom(roomData, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/chat/rooms?email=${encodeURIComponent(userEmail)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
@@ -1825,7 +1625,7 @@ export const chatApi = {
   async deleteRoom(roomId, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}?email=${encodeURIComponent(userEmail)}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
@@ -1844,7 +1644,7 @@ export const chatApi = {
   async getAvailableUsers(keyword = '', email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const qs = keyword ? `&keyword=${encodeURIComponent(keyword)}` : '';
       const res = await fetch(`${BASE_URL}/chat/available-users?email=${encodeURIComponent(userEmail)}${qs}`, {
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
@@ -1861,7 +1661,7 @@ export const chatApi = {
   async getRoomMembers(roomId, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/members?email=${encodeURIComponent(userEmail)}`, {
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
@@ -1880,7 +1680,7 @@ export const chatApi = {
   async addMembers(roomId, memberIds = [], email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/members?email=${encodeURIComponent(userEmail)}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
@@ -1901,7 +1701,7 @@ export const chatApi = {
   async removeMember(roomId, targetUserId, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
-      const userEmail = email || user.email || 'tung@gmail.com';
+      const userEmail = email || user?.email || '';
       const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/members/${targetUserId}?email=${encodeURIComponent(userEmail)}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
