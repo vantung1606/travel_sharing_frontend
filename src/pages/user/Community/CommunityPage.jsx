@@ -1021,9 +1021,9 @@ export const CommunityPage = () => {
         id: post.itineraryId,
         title: post.itineraryTitle || 'Lịch trình khám phá ' + post.locationTag,
         destination: post.locationTag || 'Điểm đến nổi bật',
-        duration: post.itineraryDuration || '3N2Đ',
-        budgetTotal: post.itineraryBudget || 4500000,
-        coverImageUrl: post.images?.[0] || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80',
+        duration: post.itineraryDuration || '',
+        budgetTotal: post.itineraryBudget || 0,
+        coverImageUrl: post.images?.[0] || null,
         isAiGenerated: post.itineraryIsAi ?? true,
         days: [
           {
@@ -1193,9 +1193,7 @@ export const CommunityPage = () => {
         locationTag: postLocation.trim() || 'Việt Nam',
         category: postCategory,
         visibility: postVisibility,
-        images: postImagesList.length > 0 ? postImagesList : [
-          'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80'
-        ],
+        images: postImagesList.length > 0 ? postImagesList : [],
         videoUrl: postVideoUrl || null,
         itineraryId: attachedItineraryId ? Number(attachedItineraryId) : null
       };
