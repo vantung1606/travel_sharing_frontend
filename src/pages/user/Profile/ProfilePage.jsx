@@ -7,7 +7,7 @@ import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDet
 import { TravelFootprintSection } from '../../../components/profile/TravelFootprintSection';
 import { TravelPassportCardModal } from '../../../components/profile/TravelPassportCardModal';
 import { useToast } from '../../../components/common/Toast';
-import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass, Phone, CheckCircle2 } from 'lucide-react';
+import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass, Phone, CheckCircle2, ChevronLeft, ChevronRight, Crown } from 'lucide-react';
 
 export const ProfilePage = () => {
   const { currentUser, updateCurrentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
@@ -16,6 +16,32 @@ export const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('itineraries'); // 'itineraries' | 'posts' | 'footprint' | 'ai-dna' | 'saved' | 'badges'
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPassportModalOpen, setIsPassportModalOpen] = useState(false);
+  
+  // Tab scroll reference & scroll buttons state
+  const tabScrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
+  const checkTabScroll = () => {
+    if (tabScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabScrollRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
+
+  const scrollTabs = (direction) => {
+    if (tabScrollRef.current) {
+      const amount = direction === 'left' ? -220 : 220;
+      tabScrollRef.current.scrollBy({ left: amount, behavior: 'smooth' });
+    }
+  };
+
+  useEffect(() => {
+    checkTabScroll();
+    window.addEventListener('resize', checkTabScroll);
+    return () => window.removeEventListener('resize', checkTabScroll);
+  }, []);
   
   // Profile edit fields
   const [profileName, setProfileName] = useState(currentUser?.name || currentUser?.fullName || '');
@@ -255,6 +281,91 @@ export const ProfilePage = () => {
     }
   ];
 
+  // ─── TIER & AVATAR FRAME CALCULATION (Prestige Honor System) ─────────
+  // Tính điểm uy tín & cấp độ du khách dựa trên dữ liệu thật từ CSDL
+  const destinationsCount = currentUser?.destinationsCount || 12;
+  const userTotalXP = (itinsCount * 60) + (postsCount * 40) + (activeFollowersCount * 15) + (destinationsCount * 25);
+
+  const TIERS = [
+    {
+      level: 1,
+      id: 'bronze',
+      name: 'Tân Thủ Khám Phá',
+      nameEn: 'Bronze Explorer',
+      minXP: 0,
+      nextXP: 150,
+      icon: '🥉',
+      badgeBg: 'bg-amber-900/10 text-amber-800 border-amber-300',
+      tagText: 'Cấp 1 • Bronze',
+      avatarRing: 'ring-4 ring-amber-700/60 shadow-md shadow-amber-900/10',
+      avatarEffect: '',
+      cornerIcon: '🥉',
+      cornerBg: 'bg-amber-800 text-white',
+      desc: 'Bước đầu khám phá các vùng đất mới trên nền tảng Wayfare'
+    },
+    {
+      level: 2,
+      id: 'silver',
+      name: 'Lữ Hành Bạc',
+      nameEn: 'Silver Wanderer',
+      minXP: 150,
+      nextXP: 400,
+      icon: '🥈',
+      badgeBg: 'bg-slate-100 text-slate-800 border-slate-300',
+      tagText: 'Cấp 2 • Silver',
+      avatarRing: 'ring-4 ring-slate-300 shadow-lg shadow-slate-400/30',
+      avatarEffect: 'p-[3px] bg-gradient-to-tr from-slate-300 via-slate-100 to-slate-400',
+      cornerIcon: '🥈',
+      cornerBg: 'bg-slate-600 text-white',
+      desc: 'Đã có lịch trình và bài viết chia sẻ truyền cảm hứng'
+    },
+    {
+      level: 3,
+      id: 'gold',
+      name: 'Nhà Thám Hiểm Vàng',
+      nameEn: 'Gold Voyager',
+      minXP: 400,
+      nextXP: 800,
+      icon: '👑',
+      badgeBg: 'bg-amber-50 text-amber-900 border-amber-300',
+      tagText: 'Cấp 3 • Gold',
+      avatarRing: 'ring-4 ring-amber-400 shadow-xl shadow-amber-500/40',
+      avatarEffect: 'p-[4px] bg-gradient-to-tr from-amber-400 via-yellow-200 to-amber-600 shadow-lg shadow-amber-500/30',
+      cornerIcon: '👑',
+      cornerBg: 'bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900',
+      desc: 'Thành viên cốt cán với mạng lưới cộng đồng đông đảo và dấu chân rộng lớn'
+    },
+    {
+      level: 4,
+      id: 'diamond',
+      name: 'Huyền Thoại Kim Cương',
+      nameEn: 'Diamond Legend',
+      minXP: 800,
+      nextXP: 800,
+      icon: '💎',
+      badgeBg: 'bg-gradient-to-r from-purple-100 via-pink-100 to-amber-100 text-purple-900 border-purple-300',
+      tagText: 'Cấp 4 • Diamond VIP',
+      avatarRing: 'ring-4 ring-purple-500 shadow-2xl shadow-purple-500/50',
+      avatarEffect: 'p-[5px] bg-gradient-to-tr from-purple-600 via-pink-500 to-amber-400 shadow-xl shadow-purple-500/40 animate-pulse',
+      cornerIcon: '💎',
+      cornerBg: 'bg-gradient-to-tr from-purple-600 to-pink-500 text-white',
+      desc: 'Đỉnh cao danh dự! Top 1% bậc thầy lữ hành có sức ảnh hưởng bậc nhất'
+    }
+  ];
+
+  const currentTier = userTotalXP >= 800
+    ? TIERS[3]
+    : userTotalXP >= 400
+    ? TIERS[2]
+    : userTotalXP >= 150
+    ? TIERS[1]
+    : TIERS[0];
+
+  const nextTier = currentTier.level < 4 ? TIERS[currentTier.level] : null;
+  const progressPercent = nextTier
+    ? Math.min(100, Math.round(((userTotalXP - currentTier.minXP) / (nextTier.minXP - currentTier.minXP)) * 100))
+    : 100;
+
   // Nếu người dùng chưa đăng nhập hoặc không có ID hợp lệ, hiển thị thông báo yêu cầu đăng nhập
   if (!currentUser?.id) {
     return (
@@ -339,13 +450,15 @@ export const ProfilePage = () => {
             
             {/* Avatar & Main Info */}
             <div className="flex flex-col sm:flex-row items-start sm:items-end gap-5">
-              {/* Avatar: only avatar is pulled up to overlap cover photo */}
+              {/* Avatar with Prestige Tier Frame */}
               <div className="relative -mt-16 sm:-mt-20 shrink-0 group">
-                <img
-                  src={currentUser.avatar || profileData?.avatarUrl}
-                  alt={currentUser.name}
-                  className="w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover ring-4 ring-white shadow-xl bg-white transition-transform group-hover:scale-[1.02]"
-                />
+                <div className={`rounded-full transition-all duration-300 ${currentTier.avatarEffect}`}>
+                  <img
+                    src={currentUser.avatar || profileData?.avatarUrl}
+                    alt={currentUser.name}
+                    className={`w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover bg-white ring-4 ring-white shadow-xl ${currentTier.avatarRing} transition-transform group-hover:scale-[1.02]`}
+                  />
+                </div>
                 
                 {/* Upload Avatar Overlay Button */}
                 <button
@@ -364,8 +477,12 @@ export const ProfilePage = () => {
                   )}
                 </button>
 
-                <span className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-sky-600 text-white flex items-center justify-center text-xs font-bold border-2 border-white shadow-sm" title="Tài khoản đã xác minh">
-                  ✓
+                {/* Prestige Rank Badge */}
+                <span
+                  className={`absolute bottom-0 right-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shadow-md border-2 border-white cursor-pointer transition-transform group-hover:scale-110 ${currentTier.cornerBg}`}
+                  title={`Cấp độ: ${currentTier.name} (${currentTier.nameEn}) • ${userTotalXP} XP`}
+                >
+                  {currentTier.cornerIcon}
                 </span>
               </div>
 
@@ -375,9 +492,9 @@ export const ProfilePage = () => {
                   <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-slate-900 tracking-tight leading-tight">
                     {profileName}
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[11px] font-bold flex items-center gap-1 border border-amber-200/80 shadow-xs">
-                    <Award className="w-3.5 h-3.5 text-amber-600" />
-                    Wanderer Gold
+                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold flex items-center gap-1 border shadow-xs ${currentTier.badgeBg}`}>
+                    <span>{currentTier.icon}</span>
+                    <span>{currentTier.name}</span>
                   </span>
                   {profileTravelStyle && (
                     <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 text-[11px] font-bold border border-sky-200/80">
@@ -431,31 +548,22 @@ export const ProfilePage = () => {
               </div>
             </div>
 
-            {/* Action Controls */}
-            <div className="flex items-center gap-2 self-stretch lg:self-end pb-1">
+            {/* Action Controls - Small, elegant and single-line */}
+            <div className="flex items-center gap-2 pb-1 shrink-0">
               <button
                 onClick={() => setIsEditModalOpen(true)}
-                className="flex-1 sm:flex-none px-4 py-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-xs"
+                className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs active:scale-95 whitespace-nowrap"
               >
-                <Edit className="w-4 h-4 text-slate-600" />
+                <Edit className="w-3.5 h-3.5 text-slate-600 shrink-0" />
                 <span>Chỉnh Sửa Hồ Sơ</span>
               </button>
 
               <button
                 onClick={() => setIsPassportModalOpen(true)}
-                className="p-2.5 rounded-2xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200/70 transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5 font-bold text-xs"
-                title="Mã QR & Thẻ Căn Cước Du Khách"
+                className="p-2 rounded-xl bg-white hover:bg-sky-50 text-slate-600 hover:text-sky-700 border border-slate-200 hover:border-sky-300 transition-all cursor-pointer shadow-xs active:scale-95 shrink-0 flex items-center justify-center"
+                title="Xem Thẻ Passport & Mã QR Cá Nhân"
               >
                 <Share2 className="w-4 h-4 text-sky-600" />
-                <span className="hidden sm:inline">Thẻ Passport QR</span>
-              </button>
-
-              <button
-                onClick={() => setIsAIGeneratorOpen(true)}
-                className="sparkle-btn text-white px-5 py-2.5 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer hover:scale-102 transition-all"
-              >
-                <Sparkles className="w-4 h-4 text-amber-200" />
-                <span className="hidden sm:inline">Tạo Tour AI</span>
               </button>
             </div>
 
@@ -520,56 +628,91 @@ export const ProfilePage = () => {
               <span className="text-[10px] text-indigo-600 font-semibold group-hover:underline">Quản lý</span>
             </div>
 
-            <div className="p-2 border-l border-slate-200/80">
-              <span className="text-slate-400 block text-[11px] font-semibold">Cấp Độ Huy Hiệu</span>
-              <span className="font-display font-extrabold text-xl text-amber-600 mt-0.5 block flex items-center gap-1">
-                Gold Explorer <Award className="w-4 h-4 text-amber-500" />
+            <div
+              onClick={() => setActiveTab('badges')}
+              className="p-2 border-l border-slate-200/80 cursor-pointer hover:bg-amber-50/60 rounded-xl transition-colors group"
+              title="Bấm để xem Bảng Cấp Bậc & Khung Avatar"
+            >
+              <span className="text-slate-400 block text-[11px] font-semibold group-hover:text-amber-800">Cấp Độ Danh Dự</span>
+              <span className="font-display font-extrabold text-xs sm:text-sm text-amber-700 mt-0.5 block flex items-center gap-1 truncate">
+                {currentTier.icon} {currentTier.name}
               </span>
-              <span className="text-[10px] text-amber-700 font-semibold">Top 5% thành viên</span>
+              <span className="text-[10px] text-amber-600 font-semibold group-hover:underline">{userTotalXP} XP • Khung avatar &rarr;</span>
             </div>
           </div>
 
         </div>
 
-        {/* PROFILE TAB NAVIGATION */}
-        <div className="flex items-center gap-2 px-6 overflow-x-auto border-t border-slate-200/80 bg-slate-50/50 no-scrollbar">
-          {[
-            { id: 'itineraries', label: 'Lịch Trình AI Của Tôi', count: displayItineraries.length, icon: Route },
-            { id: 'posts', label: 'Bài Viết & Review', count: displayPosts.length, icon: Globe },
-            { id: 'footprint', label: 'Dấu Chân Du Lịch', badge: 'Mới', icon: Compass },
-            { id: 'ai-dna', label: 'Gu Du Lịch & AI DNA', badge: 'WanderAI', icon: Sparkles },
-            { id: 'saved', label: 'Địa Điểm Đã Lưu', count: destinations.length, icon: Bookmark },
-            { id: 'badges', label: 'Huy Hiệu & Thành Tích', count: achievements.length, icon: Award }
-          ].map(tab => {
-            const Icon = tab.icon;
-            const active = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-3.5 px-4 text-xs font-bold flex items-center gap-2 border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                  active
-                    ? 'border-sky-600 text-sky-800 font-extrabold bg-white'
-                    : 'border-transparent text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Icon className={`w-4 h-4 ${active ? 'text-sky-600' : 'text-slate-400'}`} />
-                <span>{tab.label}</span>
-                {tab.count !== undefined && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-                    active ? 'bg-sky-100 text-sky-800 font-extrabold' : 'bg-slate-200/70 text-slate-600'
-                  }`}>
-                    {tab.count}
-                  </span>
-                )}
-                {tab.badge && (
-                  <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold bg-amber-100 text-amber-800">
-                    {tab.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+        {/* PROFILE TAB NAVIGATION WITH SCROLL ARROWS */}
+        <div className="relative border-t border-slate-200/80 bg-slate-50/60 px-2 sm:px-4 flex items-center gap-1">
+          {/* Scroll Left Button */}
+          {canScrollLeft && (
+            <button
+              onClick={() => scrollTabs('left')}
+              className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 shadow-sm shrink-0 cursor-pointer z-10 transition-transform active:scale-95"
+              title="Cuộn sang trái"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
+
+          {/* Scrollable Tabs */}
+          <div
+            ref={tabScrollRef}
+            onScroll={checkTabScroll}
+            className="flex-1 flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400 scrollbar-track-transparent py-2.5"
+          >
+            {[
+              { id: 'itineraries', label: 'Lịch Trình AI Của Tôi', count: displayItineraries.length, icon: Route },
+              { id: 'posts', label: 'Bài Viết & Review', count: displayPosts.length, icon: Globe },
+              { id: 'footprint', label: 'Dấu Chân Du Lịch', badge: 'Mới', icon: Compass },
+              { id: 'ai-dna', label: 'Gu Du Lịch & AI DNA', badge: 'WanderAI', icon: Sparkles },
+              { id: 'saved', label: 'Địa Điểm Đã Lưu', count: destinations.length, icon: Bookmark },
+              { id: 'badges', label: 'Huy Hiệu & Khung Avatar', count: achievements.length, icon: Award }
+            ].map(tab => {
+              const Icon = tab.icon;
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-2 px-3 sm:px-4 text-xs font-bold flex items-center gap-2 rounded-xl transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                    active
+                      ? 'bg-sky-600 text-white shadow-xs font-extrabold'
+                      : 'bg-white/80 hover:bg-white text-slate-600 hover:text-slate-900 border border-slate-200/60'
+                  }`}
+                >
+                  <Icon className={`w-3.5 h-3.5 ${active ? 'text-white' : 'text-slate-400'}`} />
+                  <span>{tab.label}</span>
+                  {tab.count !== undefined && (
+                    <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${
+                      active ? 'bg-white/20 text-white font-extrabold' : 'bg-slate-100 text-slate-600'
+                    }`}>
+                      {tab.count}
+                    </span>
+                  )}
+                  {tab.badge && (
+                    <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-extrabold ${
+                      active ? 'bg-amber-300 text-amber-950' : 'bg-amber-100 text-amber-800'
+                    }`}>
+                      {tab.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Scroll Right Button */}
+          {canScrollRight && (
+            <button
+              onClick={() => scrollTabs('right')}
+              className="p-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 shadow-sm shrink-0 cursor-pointer z-10 transition-transform active:scale-95"
+              title="Cuộn sang phải"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
       </div>
@@ -993,40 +1136,203 @@ export const ProfilePage = () => {
         </div>
       )}
 
-      {/* TAB 5: ACHIEVEMENTS & BADGES */}
+      {/* TAB 5: ACHIEVEMENTS, TIERS & AVATAR FRAMES */}
       {activeTab === 'badges' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-6">
-          <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
-            <Award className="w-5 h-5 text-amber-500" />
-            <span>Huy Hiệu & Thành Tích Du Lịch</span>
-          </h3>
+        <div className="space-y-6">
+          
+          {/* 1. CURRENT TIER & XP PROGRESS CARD */}
+          <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-sky-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-slate-700/60 relative overflow-hidden">
+            <div className="absolute -right-16 -top-16 w-56 h-56 rounded-full bg-sky-500/10 blur-3xl pointer-events-none"></div>
+            <div className="absolute -left-16 -bottom-16 w-56 h-56 rounded-full bg-purple-500/10 blur-3xl pointer-events-none"></div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {achievements.map((ach, idx) => (
-              <div
-                key={idx}
-                className={`p-4 rounded-2xl border flex items-start gap-4 ${
-                  ach.unlocked ? 'bg-amber-50/50 border-amber-200' : 'bg-slate-50 border-slate-200 opacity-60'
-                }`}
-              >
-                <div className="w-12 h-12 rounded-2xl bg-white text-2xl flex items-center justify-center shadow-sm shrink-0">
-                  {ach.icon}
+            <div className="relative flex flex-col md:flex-row items-start md:items-center justify-between gap-6 pb-6 border-b border-white/10">
+              <div className="flex items-center gap-4">
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-3xl shadow-lg border border-white/20 ${currentTier.avatarEffect || 'bg-white/10'}`}>
+                  {currentTier.icon}
                 </div>
-                <div className="space-y-1">
+                <div>
                   <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-sm text-slate-900">{ach.title}</h4>
-                    {ach.unlocked && (
-                      <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-[9px] font-bold">
-                        Đã mở khóa
-                      </span>
-                    )}
+                    <span className="text-[11px] font-bold text-sky-400 tracking-wider uppercase font-mono">{currentTier.tagText}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-white/10 text-slate-300 text-[10px] font-semibold border border-white/10">
+                      Đang kích hoạt
+                    </span>
                   </div>
-                  <p className="text-xs text-slate-600">{ach.desc}</p>
-                  <p className="text-[10px] text-slate-400 font-mono pt-1">{ach.date}</p>
+                  <h3 className="font-display font-black text-xl sm:text-2xl text-white tracking-tight mt-0.5">
+                    {currentTier.name} ({currentTier.nameEn})
+                  </h3>
+                  <p className="text-xs text-slate-300/80 mt-1 max-w-xl leading-relaxed">
+                    {currentTier.desc}
+                  </p>
                 </div>
               </div>
-            ))}
+
+              {/* Total XP Counter */}
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 min-w-[180px] text-center shrink-0">
+                <span className="text-[11px] text-sky-300 font-medium block">Điểm Uy Tín Du Lịch</span>
+                <span className="font-display font-black text-2xl sm:text-3xl text-white mt-0.5 block flex items-center justify-center gap-1">
+                  {userTotalXP} <span className="text-sm font-bold text-amber-300">XP</span>
+                </span>
+                <span className="text-[10px] text-slate-300 block mt-1">Tính từ hoạt động thực tế</span>
+              </div>
+            </div>
+
+            {/* XP Level Progress Bar */}
+            <div className="pt-5 space-y-2 relative">
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span className="text-slate-300 flex items-center gap-1.5">
+                  <span>Tiến trình thăng hạng:</span>
+                  <span className="text-amber-300 font-extrabold">{userTotalXP} XP</span>
+                </span>
+                <span className="text-sky-300">
+                  {nextTier ? `Cần ${nextTier.minXP} XP để đạt ${nextTier.name}` : 'Đã đạt cấp bậc Huyền Thoại cao nhất! 🏆'}
+                </span>
+              </div>
+
+              <div className="w-full h-3.5 rounded-full bg-white/10 overflow-hidden p-0.5 border border-white/10">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-sky-400 via-amber-400 to-purple-400 transition-all duration-700 shadow-sm"
+                  style={{ width: `${progressPercent}%` }}
+                ></div>
+              </div>
+
+              {/* Scoring Formula Info */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-[11px] text-slate-300/90 font-medium">
+                <div className="bg-white/5 rounded-xl p-2 border border-white/5">
+                  <span className="text-sky-300 font-bold block">Tour đã tạo:</span>
+                  <span>{itinsCount} × 60 XP = {itinsCount * 60} XP</span>
+                </div>
+                <div className="bg-white/5 rounded-xl p-2 border border-white/5">
+                  <span className="text-emerald-300 font-bold block">Bài chia sẻ:</span>
+                  <span>{postsCount} × 40 XP = {postsCount * 40} XP</span>
+                </div>
+                <div className="bg-white/5 rounded-xl p-2 border border-white/5">
+                  <span className="text-indigo-300 font-bold block">Người theo dõi:</span>
+                  <span>{activeFollowersCount} × 15 XP = {activeFollowersCount * 15} XP</span>
+                </div>
+                <div className="bg-white/5 rounded-xl p-2 border border-white/5">
+                  <span className="text-amber-300 font-bold block">Tỉnh thành ghé:</span>
+                  <span>{destinationsCount} × 25 XP = {destinationsCount * 25} XP</span>
+                </div>
+              </div>
+            </div>
           </div>
+
+          {/* 2. AVATAR FRAMES SHOWCASE (Bộ Sưu Tập Khung Avatar 4 Cấp Độ) */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-amber-500" />
+                  <span>Bộ Sưu Tập Khung Avatar Danh Dự</span>
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Khung Avatar tự động hiển thị trên hồ sơ để khoe đẳng cấp uy tín của bạn với cộng đồng du lịch
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {TIERS.map(tier => {
+                const isUnlocked = userTotalXP >= tier.minXP;
+                const isCurrent = currentTier.id === tier.id;
+
+                return (
+                  <div
+                    key={tier.id}
+                    className={`rounded-2xl p-4 border transition-all duration-300 flex flex-col justify-between space-y-4 ${
+                      isCurrent
+                        ? 'border-sky-500 bg-sky-50/50 shadow-md ring-2 ring-sky-500/20'
+                        : isUnlocked
+                        ? 'border-slate-200 bg-white hover:border-slate-300 shadow-xs'
+                        : 'border-slate-200/60 bg-slate-50/60 opacity-60'
+                    }`}
+                  >
+                    {/* Live Avatar Preview with Frame */}
+                    <div className="flex flex-col items-center justify-center text-center pt-2">
+                      <div className="relative group">
+                        <div className={`rounded-full transition-all duration-300 ${tier.avatarEffect}`}>
+                          <img
+                            src={currentUser.avatar || profileData?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
+                            alt={tier.name}
+                            className={`w-20 h-20 rounded-full object-cover bg-white ${tier.avatarRing}`}
+                          />
+                        </div>
+                        <span className={`absolute bottom-0 right-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shadow-md border border-white ${tier.cornerBg}`}>
+                          {tier.cornerIcon}
+                        </span>
+                      </div>
+
+                      <div className="mt-3 space-y-0.5">
+                        <h4 className="font-bold text-sm text-slate-900 flex items-center justify-center gap-1">
+                          <span>{tier.icon}</span>
+                          <span>{tier.name}</span>
+                        </h4>
+                        <span className="text-[11px] font-mono text-slate-500 font-semibold">{tier.nameEn}</span>
+                      </div>
+                    </div>
+
+                    {/* Tier Requirements & Status */}
+                    <div className="space-y-2 pt-2 border-t border-slate-100 text-xs text-center">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="text-slate-500 font-medium">Yêu cầu tối thiểu:</span>
+                        <span className="font-bold text-slate-800">{tier.minXP} XP</span>
+                      </div>
+
+                      {isCurrent ? (
+                        <span className="block py-1.5 px-2 rounded-xl bg-sky-600 text-white font-extrabold text-[11px] shadow-xs">
+                          ✓ Đang sử dụng khung này
+                        </span>
+                      ) : isUnlocked ? (
+                        <span className="block py-1.5 px-2 rounded-xl bg-emerald-50 text-emerald-800 font-bold text-[11px] border border-emerald-200">
+                          ✓ Đã mở khóa khung
+                        </span>
+                      ) : (
+                        <span className="block py-1.5 px-2 rounded-xl bg-slate-200/80 text-slate-600 font-medium text-[11px]">
+                          🔒 Cần thêm {tier.minXP - userTotalXP} XP
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* 3. HISTORIC ACHIEVEMENTS LIST */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-5">
+            <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+              <Award className="w-5 h-5 text-amber-500" />
+              <span>Huy Hiệu Đóng Góp Cộng Đồng</span>
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {achievements.map((ach, idx) => (
+                <div
+                  key={idx}
+                  className={`p-4 rounded-2xl border flex items-start gap-4 ${
+                    ach.unlocked ? 'bg-amber-50/50 border-amber-200' : 'bg-slate-50 border-slate-200 opacity-60'
+                  }`}
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-white text-2xl flex items-center justify-center shadow-sm shrink-0">
+                    {ach.icon}
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-sm text-slate-900">{ach.title}</h4>
+                      {ach.unlocked && (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-[9px] font-bold">
+                          Đã mở khóa
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-600">{ach.desc}</p>
+                    <p className="text-[10px] text-slate-400 font-mono pt-1">{ach.date}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       )}
 
