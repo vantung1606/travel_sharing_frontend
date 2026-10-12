@@ -361,10 +361,15 @@ export const FloatingChatWidget = () => {
     prevWidgetMsgCountRef.current = count;
   }, [activeThreadId, messages, isMessageFromMe]);
 
-  // Hide floating widget if user is currently on the full /messages page
-  if (location.pathname === '/messages' || location.pathname.startsWith('/admin')) {
-    return null;
-  }
+  // Cleanup micro stream khi rời khỏi
+  useEffect(() => {
+    return () => {
+      if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+      if (recordingStreamRef.current) {
+        recordingStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   const totalUnread = threads.reduce((acc, t) => acc + (t.unread || 0), 0);
 
@@ -616,15 +621,6 @@ export const FloatingChatWidget = () => {
     setRecordingDuration(0);
   };
 
-  // Cleanup micro stream khi rời khỏi
-  useEffect(() => {
-    return () => {
-      if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
-      if (recordingStreamRef.current) {
-        recordingStreamRef.current.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, []);
 
   // 5. Gửi Lịch Trình AI vào cuộc trò chuyện
   const handleSendItinerary = async (itin) => {
@@ -698,6 +694,11 @@ export const FloatingChatWidget = () => {
     const normLastMsg = normalizeVietnamese(t.lastMsg);
     return normName.includes(normQuery) || normLastMsg.includes(normQuery);
   });
+
+  // Hide floating widget if user is currently on the full /messages page or admin portal
+  if (location.pathname === '/messages' || location.pathname.startsWith('/admin')) {
+    return null;
+  }
 
   return (
     <div className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 select-none font-sans">

@@ -286,9 +286,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
     { id: 4, text: 'Thuốc cá nhân cơ bản (dị ứng, đau đầu, tiêu hóa)', done: false }
   ]);
 
-  if (!itinerary) return null;
-
-  const days = itinerary.days && itinerary.days.length > 0 ? itinerary.days : [
+  const days = itinerary?.days && itinerary.days.length > 0 ? itinerary.days : [
     {
       dayNumber: 1,
       title: 'Ngày 1: Khám phá các điểm dừng chân nổi bật',
@@ -326,8 +324,8 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
       .join(' ');
   };
 
-  const destinationName = formatDestination(itinerary.destination || 'Điểm Đến');
-  const baseCoords = useMemo(() => getDestinationCoordinates(itinerary.destination), [itinerary.destination]);
+  const destinationName = formatDestination(itinerary?.destination || 'Điểm Đến');
+  const baseCoords = useMemo(() => getDestinationCoordinates(itinerary?.destination), [itinerary?.destination]);
 
   const toggleChecklist = (id) => {
     setChecklist(prev =>
@@ -453,6 +451,8 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
         };
     }
   }, [mapLayer]);
+
+  if (!itinerary) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8 bg-slate-950/75 backdrop-blur-sm overflow-y-auto animate-fade-in font-display">
