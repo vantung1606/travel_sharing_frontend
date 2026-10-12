@@ -132,38 +132,41 @@ export const getUserTier = (userOrXP) => {
 
   const user = userOrXP;
 
-  // 1. Kiểm tra trường tier / authorTier từ CSDL hoặc API Backend
+  // 1. Tính điểm hoạt động thực tế (XP)
+  const xp = calculateUserXP(user);
+  let xpTierLevel = 1;
+  if (xp >= 800) xpTierLevel = 4;
+  else if (xp >= 400) xpTierLevel = 3;
+  else if (xp >= 150) xpTierLevel = 2;
+
+  // 2. Kiểm tra tier / authorTier từ CSDL hoặc API Backend
+  let dbTierLevel = 1;
   const rawTier = String(user.tier || user.authorTier || '').trim().toLowerCase();
-  if (rawTier === 'diamond' || rawTier === 'kim cương' || rawTier === 'vip') return TIERS[3];
-  if (rawTier === 'gold' || rawTier === 'vàng') return TIERS[2];
-  if (rawTier === 'silver' || rawTier === 'bạc') return TIERS[1];
-  if (rawTier === 'bronze' || rawTier === 'đồng') return TIERS[0];
+  if (rawTier === 'diamond' || rawTier === 'kim cương' || rawTier === 'vip') dbTierLevel = 4;
+  else if (rawTier === 'gold' || rawTier === 'vàng') dbTierLevel = 3;
+  else if (rawTier === 'silver' || rawTier === 'bạc') dbTierLevel = 2;
+  else if (rawTier === 'bronze' || rawTier === 'đồng') dbTierLevel = 1;
 
-  // 2. Kiểm tra theo rank hoặc role text
+  // 3. Kiểm tra theo rank hoặc role text
   const rawRank = String(user.rank || user.role || user.authorRole || '').trim().toLowerCase();
-  if (rawRank.includes('kim cương') || rawRank.includes('diamond')) return TIERS[3];
-  if (rawRank.includes('vàng') || rawRank.includes('gold')) return TIERS[2];
-  if (rawRank.includes('bạc') || rawRank.includes('silver')) return TIERS[1];
-  if (rawRank.includes('đồng') || rawRank.includes('bronze')) return TIERS[0];
+  if (rawRank.includes('kim cương') || rawRank.includes('diamond')) dbTierLevel = Math.max(dbTierLevel, 4);
+  else if (rawRank.includes('vàng') || rawRank.includes('gold')) dbTierLevel = Math.max(dbTierLevel, 3);
+  else if (rawRank.includes('bạc') || rawRank.includes('silver')) dbTierLevel = Math.max(dbTierLevel, 2);
 
-  // 3. Quy tắc tài khoản hệ thống (Seed Accounts) đảm bảo không bao giờ bị lệch khung:
+  // 4. Quy tắc tài khoản hệ thống (Seed Accounts)
   const email = String(user.email || user.authorEmail || '').trim().toLowerCase();
-  if (email.startsWith('tung1@') || email.startsWith('admin@')) return TIERS[3]; // tung1 là Admin Kim Cương
-  if (email.startsWith('tung2@')) return TIERS[2]; // tung2 là Cấp Vàng
-  if (email.startsWith('tung3@')) return TIERS[1]; // tung3 là Cấp Bạc
-  if (email.startsWith('tung')) return TIERS[0];   // tung4 -> tung20 là Cấp Đồng
+  if (email.startsWith('tung1@') || email.startsWith('admin@')) dbTierLevel = Math.max(dbTierLevel, 4);
+  else if (email.startsWith('tung2@')) dbTierLevel = Math.max(dbTierLevel, 3);
+  else if (email.startsWith('tung3@')) dbTierLevel = Math.max(dbTierLevel, 2);
 
-  // 4. Nếu là Admin hệ thống thì luôn được hưởng vinh dự Kim Cương VIP
+  // 5. Nếu là Admin hệ thống thì luôn được hưởng vinh dự Kim Cương VIP
   if (Array.isArray(user.roles) && user.roles.some(r => r === 'ROLE_ADMIN' || r?.name === 'ROLE_ADMIN')) {
-    return TIERS[3];
+    dbTierLevel = Math.max(dbTierLevel, 4);
   }
 
-  // 5. Nếu có dữ liệu hoạt động thật (stats: itins, posts, followers), tính theo XP
-  const xp = calculateUserXP(user);
-  if (xp >= 800) return TIERS[3]; // Diamond
-  if (xp >= 400) return TIERS[2]; // Gold
-  if (xp >= 150) return TIERS[1]; // Silver
-  return TIERS[0]; // Bronze
+  // Kết quả cuối cùng là cấp cao nhất giữa cấu hình CSDL và thành tích XP thực tế
+  const finalLevel = Math.max(dbTierLevel, xpTierLevel);
+  return TIERS[finalLevel - 1] || TIERS[0];
 };
 
 /**

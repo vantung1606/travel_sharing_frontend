@@ -295,7 +295,12 @@ export const ProfilePage = () => {
     destinationsCount
   });
 
-  const currentTier = getUserTier(userTotalXP);
+  const currentTier = getUserTier({
+    ...currentUser,
+    ...profileData,
+    tier: profileData?.tier || currentUser?.tier,
+    totalXp: userTotalXP
+  });
   const nextTier = getNextTier(currentTier);
   const progressPercent = calculateTierProgress(userTotalXP, currentTier, nextTier);
 
