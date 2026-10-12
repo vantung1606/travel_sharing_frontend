@@ -47,20 +47,6 @@ jobs:
           push: false
           tags: wayfare-frontend:latest
 
-  deploy-to-railway:
-    name: 3. Deploy to Railway Production (CD)
-    needs: [build-and-lint, docker-validation]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
+  # Note: Frontend deployment is managed via native Railway/Vercel GitHub integration.
+  # Running 'railway up' via CLI in GitHub Actions is redundant and causes concurrent build conflicts.
 
-    steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
-      - name: Install Railway CLI
-        run: npm i -g @railway/cli
-
-      - name: Deploy to Railway Service
-        run: railway up --service travel_sharing_frontend --detach
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
