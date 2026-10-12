@@ -106,6 +106,94 @@ export const AuthModal = () => {
     }
   };
 
+  const processGoogleAuth = async (token) => {
+    try {
+      const res = await authApi.loginWithGoogle(token);
+      const raw = res.data;
+      if (!raw || !raw.id) {
+        throw new Error('Dữ liệu tài khoản trả về từ máy chủ không hợp lệ.');
+      }
+      const userData = {
+        id: raw.id,
+        name: raw.fullName || raw.name || raw.email.split('@')[0],
+        fullName: raw.fullName || raw.name,
+        email: raw.email,
+        handle: raw.handle || ('@' + raw.email.split('@')[0]),
+        avatar: raw.avatar || raw.avatarUrl,
+        roles: Array.isArray(raw.roles) ? raw.roles : (raw.roles ? Array.from(raw.roles) : ['ROLE_USER']),
+        token: raw.token
+      };
+      login(userData);
+      toast.success(res.message || 'Đăng nhập bằng tài khoản Google thành công! 🎉');
+      setIsAuthModalOpen(false);
+    } catch (err) {
+      toast.error(err.message || 'Xác thực tài khoản Google thất bại, vui lòng thử lại!');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    if (!googleClientId || googleClientId.trim() === '' || googleClientId.includes('your_google_client_id')) {
+      toast.error('Chưa cấu hình VITE_GOOGLE_CLIENT_ID trong file .env! Vui lòng thêm Google Client ID từ Google Cloud Console.');
+      return;
+    }
+
+    if (!window.google) {
+      toast.error('Đang tải Google Sign-In SDK, vui lòng kiểm tra kết nối mạng và thử lại!');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Ưu tiên sử dụng Token Client popup chuẩn OAuth 2.0
+      if (window.google.accounts?.oauth2?.initTokenClient) {
+        const tokenClient = window.google.accounts.oauth2.initTokenClient({
+          client_id: googleClientId.trim(),
+          scope: 'email profile openid',
+          callback: async (tokenResponse) => {
+            if (tokenResponse.error) {
+              setIsLoading(false);
+              toast.error('Đăng nhập Google bị hủy hoặc thất bại: ' + (tokenResponse.error_description || tokenResponse.error));
+              return;
+            }
+            if (tokenResponse.access_token) {
+              await processGoogleAuth(tokenResponse.access_token);
+            } else {
+              setIsLoading(false);
+              toast.error('Không nhận được mã xác thực từ Google!');
+            }
+          }
+        });
+        tokenClient.requestAccessToken();
+      } else if (window.google.accounts?.id) {
+        // Fallback: Google ID Token One-tap / Prompt
+        window.google.accounts.id.initialize({
+          client_id: googleClientId.trim(),
+          callback: async (response) => {
+            if (response.credential) {
+              await processGoogleAuth(response.credential);
+            } else {
+              setIsLoading(false);
+              toast.error('Không nhận được chứng chỉ xác thực từ Google!');
+            }
+          }
+        });
+        window.google.accounts.id.prompt();
+      } else {
+        setIsLoading(false);
+        toast.error('Trình duyệt chưa sẵn sàng cho Google Sign-In.');
+      }
+    } catch (err) {
+      setIsLoading(false);
+      console.error('Google Sign-In Error:', err);
+      toast.error('Lỗi khi mở giao diện đăng nhập Google: ' + err.message);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 lg:p-8 bg-slate-950/70 backdrop-blur-md transition-opacity duration-300 animate-fadeIn">
       
@@ -266,8 +354,9 @@ export const AuthModal = () => {
             <div className="grid grid-cols-3 gap-3">
               <button
                 type="button"
-                onClick={() => toast.info('Tính năng đăng nhập Google đang được kết nối!')}
-                className="flex items-center justify-center gap-2 h-10 rounded-full bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs shadow-2xs border border-white transition-all cursor-pointer"
+                onClick={handleGoogleLogin}
+                className="flex items-center justify-center gap-2 h-10 rounded-full bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs shadow-2xs border border-white transition-all cursor-pointer hover:shadow-sm"
+                title="Đăng nhập bảo mật với Google"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />

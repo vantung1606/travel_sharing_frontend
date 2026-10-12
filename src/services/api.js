@@ -97,6 +97,33 @@ export const authApi = {
       console.warn('Backend API connection warning on logout:', error.message);
       return false;
     }
+  },
+
+  // Google OAuth Login API Call
+  async loginWithGoogle(idToken) {
+    let response;
+    try {
+      response = await fetch(`${BASE_URL}/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken })
+      });
+    } catch (networkError) {
+      throw new Error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra lại mạng hoặc thử lại sau!');
+    }
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      throw new Error('Phản hồi từ máy chủ không hợp lệ.');
+    }
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || 'Xác thực tài khoản Google không thành công!');
+    }
+
+    return data;
   }
 };
 
