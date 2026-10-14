@@ -24,7 +24,7 @@ const DOCK_DURATION_OPTIONS = [
   { val: '4d3n', title: '4 Ngày 3 Đêm', sub: 'Trọn vẹn, thảnh thơi khám phá sâu', icon: '🌿' },
   { val: '5d4n', title: '5 Ngày 4 Đêm', sub: 'Hành trình xuyên suốt mọi ngóc ngách', icon: '🗺️', badge: 'Chuyên sâu' }
 ];
-import { Sparkles, MapPin, Calendar, DollarSign, Star, CheckCircle2, ArrowRight, Compass, Users, Search, ShieldCheck, Zap, Bot, Radar, Copy, Heart, RefreshCw, Check, ChevronDown, Map, ArrowDown, Wallet, Navigation as NavigationIcon, SlidersHorizontal, Bookmark, MessageSquare } from 'lucide-react';
+import { MapPin, Calendar, DollarSign, Star, CheckCircle2, ArrowRight, Compass, Users, Search, ShieldCheck, Zap, Copy, Heart, RefreshCw, Check, ChevronDown, Map, ArrowDown, Wallet, Navigation as NavigationIcon, SlidersHorizontal, Bookmark, MessageSquare } from 'lucide-react';
 
 export const HomePage = () => {
   const navigate = useNavigate();
@@ -510,44 +510,44 @@ export const HomePage = () => {
           <div className="absolute bottom-0 left-0 right-0 h-28 sm:h-40 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/50 to-transparent pointer-events-none" />
         </div>
 
-        {/* Content Container Aligned with Navbar Width */}
+          {/* Content Container Aligned with Navbar Width */}
         <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Main Hero Header Stack */}
-          <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-6">
-            {/* Expansive Grand Headline with Gradient Flow */}
-            <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.18] text-white drop-shadow-md">
+          <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-4 sm:space-y-6">
+            {/* Expansive Grand Headline with Gradient Flow - Scaled for Mobile */}
+            <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight leading-[1.2] text-white drop-shadow-md">
               Kiến Tạo Chuyến Đi Mơ Ước <br className="hidden sm:inline" />
               <span className="bg-gradient-to-r from-sky-400 via-blue-300 to-indigo-300 bg-clip-text text-transparent animate-gradient-flow">
                 Cùng Wayfare
               </span>{' '}
             </h1>
 
-            {/* Subtitle with High Legibility & Relaxed 14px-16px Text */}
-            <p className="text-slate-100 text-sm sm:text-base max-w-2xl leading-relaxed font-normal tracking-[0.015em] drop-shadow-sm">
+            {/* Subtitle with High Legibility & Scaled Mobile Typography */}
+            <p className="text-slate-100 text-xs sm:text-sm md:text-base max-w-2xl leading-relaxed font-normal tracking-[0.015em] drop-shadow-sm px-2">
               Từ ý tưởng mơ hồ đến lịch trình chi tiết từng phút, dự toán ngân sách chính xác theo
               thời gian thực và cá nhân hóa theo gu riêng của bạn chỉ với một chạm.
             </p>
 
-            {/* Action Buttons: VIBRANT ROYAL BLUE BUTTONS WITH SHIMMER */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+            {/* Action Buttons: Responsive full-width on mobile, compact and clean travel icons */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2 sm:pt-4 w-full sm:w-auto">
               <a
                 href="#ai-dock"
-                className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-extrabold text-sm sm:text-base shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-blue-300/40 tracking-[0.015em] shimmer-effect"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-extrabold text-xs sm:text-sm md:text-base shadow-[0_10px_25px_rgba(2,132,199,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-blue-300/40 tracking-[0.015em]"
               >
-                <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
-                <span>Lập Lịch Trình AI Ngay</span>
-                <span className="px-2.5 py-0.5 rounded-full bg-black/25 text-xs font-black uppercase tracking-wider">
+                <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-sky-200" />
+                <span>Lên Kế Hoạch Chuyến Đi</span>
+                <span className="px-2 py-0.5 rounded-full bg-black/25 text-[10px] sm:text-xs font-black uppercase tracking-wider">
                   Miễn phí
                 </span>
               </a>
 
               <a
                 href="#kham-pha"
-                className="inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-sm sm:text-base transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer tracking-[0.015em] hover:scale-105 active:scale-95 group"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-xs sm:text-sm md:text-base transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer tracking-[0.015em] hover:scale-105 active:scale-95 group"
               >
-                <Compass className="w-5 h-5 text-sky-300 group-hover:rotate-45 transition-transform duration-300" />
-                <span>Khám Phá Điểm Đến Hot</span>
-                <ArrowDown className="w-4 h-4 text-sky-300 group-hover:translate-y-1 transition-transform" />
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-sky-300" />
+                <span>Khám Phá Điểm Đến</span>
+                <ArrowDown className="w-3.5 h-3.5 text-sky-300 group-hover:translate-y-0.5 transition-transform" />
               </a>
             </div>
           </div>
@@ -555,30 +555,29 @@ export const HomePage = () => {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          2. SMART AI PLANNER DOCK (CRISP WHITE ELEVATED CARD - NO WASHOUT)
-          - Crisp white backdrop with soft ambient depth
-          - High-contrast search inputs with clear states
-          - Royal Blue CTA button with rocket launch icon
-          - Aligned with Navbar container padding
+          2. SMART TRAVEL PLANNER DOCK (CRISP WHITE ELEVATED CARD - NO WASHOUT)
+          - Compact responsive paddings
+          - Smooth mobile scrollable segmented tabs
+          - Clear, high-contrast travel inputs
       ────────────────────────────────────────────────────────────────────────── */}
       <section
-        className="relative z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 -mt-12 lg:-mt-16 mb-20"
+        className="relative z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 -mt-10 sm:-mt-12 lg:-mt-16 mb-12 sm:mb-16 lg:mb-20"
         id="ai-dock"
       >
-        <div className="p-6 sm:p-8 rounded-3xl bg-white/95 backdrop-blur-2xl shadow-[0_25px_60px_-15px_rgba(2,132,199,0.16)] border border-slate-200/90 transition-all">
-          {/* Planner Modes Segmented Control */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
-            <div className="flex items-center gap-1.5 p-1 rounded-full bg-slate-100 border border-slate-200/60 shadow-2xs">
+        <div className="p-4 sm:p-7 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/95 backdrop-blur-2xl shadow-[0_20px_50px_-15px_rgba(2,132,199,0.14)] border border-slate-200/90 transition-all">
+          {/* Planner Modes Segmented Control - Mobile Horizontally Scrollable & Fit */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-slate-100">
+            <div className="flex items-center gap-1 p-1 rounded-full bg-slate-100 border border-slate-200/60 shadow-2xs overflow-x-auto no-scrollbar max-w-full">
               <button
                 type="button"
                 onClick={() => setActiveDockTab('ai')}
-                className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-xs flex items-center gap-2 transition-all cursor-pointer ${activeDockTab === 'ai'
+                className={`px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-xs flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${activeDockTab === 'ai'
                   ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
                   : 'text-slate-700 hover:text-sky-700 hover:bg-white'
                   }`}
               >
-                <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
-                <span>Lập lịch trình bằng AI</span>
+                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-200" />
+                <span>Lên lịch trình</span>
               </button>
 
               <button
@@ -587,12 +586,12 @@ export const HomePage = () => {
                   setActiveDockTab('explore');
                   navigate('/explore');
                 }}
-                className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${activeDockTab === 'explore'
+                className={`px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${activeDockTab === 'explore'
                   ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
                   : 'text-slate-700 hover:text-sky-700 hover:bg-white'
                   }`}
               >
-                <MapPin className="w-4 h-4" />
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 <span>Khám phá điểm đến</span>
               </button>
 
@@ -602,23 +601,23 @@ export const HomePage = () => {
                   setActiveDockTab('community');
                   navigate('/community');
                 }}
-                className={`px-5 py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${activeDockTab === 'community'
+                className={`px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${activeDockTab === 'community'
                   ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
                   : 'text-slate-700 hover:text-sky-700 hover:bg-white'
                   }`}
               >
-                <Users className="w-4 h-4" />
-                <span>Tìm bạn đồng hành</span>
+                <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span>Cộng đồng</span>
               </button>
             </div>
 
-            {/* Dynamic AI Estimate Pill */}
-            <div className="flex items-center gap-3">
-              <div className="px-3.5 py-1.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200/80 shadow-2xs flex items-center gap-2.5 text-xs sm:text-sm font-semibold animate-float-slow">
-                <ShieldCheck className="w-4 h-4 text-sky-600" />
-                <span>Dự toán: ~{dockEstimate.budgetText}</span>
-                <span className="w-1 h-1 rounded-full bg-sky-400" />
-                <span className="text-sky-700 font-bold">{dockEstimate.savings}</span>
+            {/* Dynamic Estimate Pill */}
+            <div className="flex items-center justify-end sm:justify-start">
+              <div className="px-3 py-1 sm:py-1.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200/80 shadow-2xs flex items-center gap-2 text-xs sm:text-sm font-semibold">
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-600 shrink-0" />
+                <span className="truncate">Dự toán: ~{dockEstimate.budgetText}</span>
+                <span className="w-1 h-1 rounded-full bg-sky-400 shrink-0" />
+                <span className="text-sky-700 font-bold shrink-0">{dockEstimate.savings}</span>
               </div>
             </div>
           </div>
@@ -627,12 +626,12 @@ export const HomePage = () => {
           <form
             ref={dockRef}
             onSubmit={handleDockGenerate}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6"
           >
             {/* Field 1: Destination */}
-            <div className="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-100/60 shadow-xs hover:-translate-y-0.5">
-              <label className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider mb-1">
-                <MapPin className="w-4 h-4 text-blue-600" />
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-3 focus-within:ring-blue-100/60 shadow-xs">
+              <label className="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider mb-0.5 sm:mb-1">
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
                 <span>Điểm đến mong muốn</span>
               </label>
               <input
@@ -640,7 +639,7 @@ export const HomePage = () => {
                 value={dockDest}
                 onChange={(e) => setDockDest(e.target.value)}
                 placeholder="Đà Nẵng, Sa Pa, Phú Quốc..."
-                className="w-full bg-transparent text-sm sm:text-[15px] font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none truncate tracking-[0.015em]"
+                className="w-full bg-transparent text-xs sm:text-sm md:text-[15px] font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none truncate tracking-[0.015em]"
               />
             </div>
 
@@ -899,17 +898,17 @@ export const HomePage = () => {
               type="button"
               disabled={isDockGenerating}
               onClick={handleDockGenerate}
-              className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 tracking-tight whitespace-nowrap shrink-0"
+              className="w-full sm:w-auto px-6 py-3 rounded-xl sm:rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 tracking-tight whitespace-nowrap shrink-0"
             >
               {isDockGenerating ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin text-white" />
-                  <span>Đang khởi tạo...</span>
+                  <span>Đang khởi tạo lịch trình...</span>
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 text-amber-200" />
-                  <span>Tạo Lộ Trình AI</span>
+                  <Compass className="w-4 h-4 text-sky-200" />
+                  <span>Tạo Lịch Trình Chuyến Đi</span>
                   <span className="px-1.5 py-0.5 rounded-md bg-white/20 text-[10px] font-extrabold uppercase">
                     3s
                   </span>
@@ -924,113 +923,112 @@ export const HomePage = () => {
           3. 4 VALUE PILLARS (CLEAN MODERN BENTO CARDS)
           - Subtle sage leaf gradient canvas
           - Crisp white cards with distinctive accent borders
-          - Gradient icon bubbles & crisp 14px typography
+          - Gradient icon bubbles & responsive typography
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-20 bg-gradient-to-b from-[#f2f7f4] via-[#f8faf9] to-[#edf5f0] border-t border-b border-sky-900/10">
+      <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#f2f7f4] via-[#f8faf9] to-[#edf5f0] border-t border-b border-sky-900/10">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header */}
-          <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-14 space-y-3">
-
-            <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-2 sm:space-y-3">
+            <h2 className="font-display text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
               Tại Sao Hơn {homeStats.totalUsers.toLocaleString()}+ Du Khách Chọn Wayfare?
             </h2>
-            <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-normal tracking-[0.015em]">
+            <p className="text-slate-600 text-xs sm:text-sm md:text-base leading-relaxed font-normal tracking-[0.015em]">
               Không còn nỗi lo lập bảng tính excel phức tạp, lúng túng khi thời tiết xấu hay chi tiêu
               thâm hụt ngoài dự kiến.
             </p>
           </div>
 
           {/* 4 Cards Bento Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Pillar 1 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400 cursor-pointer">
+            <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400 cursor-pointer">
               <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-500 to-sky-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                    <Zap className="w-6 h-6" />
+                <div className="flex items-center justify-between mb-4 sm:mb-5">
+                  <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-br from-blue-500 to-sky-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                    <Zap className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200/60 group-hover:scale-105 transition-transform">
+                  <span className="px-2.5 sm:px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold text-[11px] sm:text-xs border border-blue-200/60 group-hover:scale-105 transition-transform">
                     Tốc độ 3.2s
                   </span>
                 </div>
-                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-blue-700 transition-colors">Lập Lịch Trình Siêu Tốc</h3>
-                <p className="text-slate-600 text-sm leading-relaxed font-normal tracking-[0.015em]">
+                <h3 className="font-bold text-base sm:text-lg text-slate-900 mb-1.5 sm:mb-2 group-hover:text-blue-700 transition-colors">Lập Lịch Trình Siêu Tốc</h3>
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal tracking-[0.015em]">
                   Xử lý dữ liệu phân luồng giao thông, giờ mở cửa và thứ tự ghé thăm hợp lý nhất
                   trong 3 giây, tránh hoàn toàn đi lòng vòng.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-blue-600 font-bold text-sm">
+              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-slate-100 flex items-center gap-1.5 text-blue-600 font-bold text-xs sm:text-sm">
                 <span>Tự động tối ưu 100%</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
             </div>
 
             {/* Pillar 2 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-sky-400 cursor-pointer">
+            <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-sky-400 cursor-pointer">
               <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-sky-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                    <Wallet className="w-6 h-6" />
+                <div className="flex items-center justify-between mb-4 sm:mb-5">
+                  <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-sky-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                    <Wallet className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-sky-50 text-sky-700 font-bold text-xs border border-sky-200/60 group-hover:scale-105 transition-transform">
+                  <span className="px-2.5 sm:px-3 py-1 rounded-full bg-sky-50 text-sky-700 font-bold text-[11px] sm:text-xs border border-sky-200/60 group-hover:scale-105 transition-transform">
                     Tiết kiệm 22%
                   </span>
                 </div>
-                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-sky-700 transition-colors">Tối Ưu Ngân Sách Thực Tế</h3>
-                <p className="text-slate-600 text-sm leading-relaxed font-normal tracking-[0.015em]">
+                <h3 className="font-bold text-base sm:text-lg text-slate-900 mb-1.5 sm:mb-2 group-hover:text-sky-700 transition-colors">Tối Ưu Ngân Sách Thực Tế</h3>
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal tracking-[0.015em]">
                   Dự toán chi tiết từng khoản chi: vé máy bay, phòng ốc, ăn uống địa phương và dự
                   phòng phát sinh chính xác đến 95%.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-sky-700 font-bold text-sm">
+              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-slate-100 flex items-center gap-1.5 text-sky-700 font-bold text-xs sm:text-sm">
                 <span>Cắt giảm chi phí thừa</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
             </div>
 
             {/* Pillar 3 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400 cursor-pointer">
+            <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400 cursor-pointer">
               <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-600/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                    <NavigationIcon className="w-6 h-6" />
+                <div className="flex items-center justify-between mb-4 sm:mb-5">
+                  <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-600/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                    <NavigationIcon className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200/60 group-hover:scale-105 transition-transform">
-                    GPS 24/7
+                  <span className="px-2.5 sm:px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold text-[11px] sm:text-xs border border-blue-200/60 group-hover:scale-105 transition-transform">
+                    Lộ trình chuẩn xác
                   </span>
                 </div>
-                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-blue-700 transition-colors">Trợ Lý Đi Đường On-The-Go</h3>
-                <p className="text-slate-600 text-sm leading-relaxed font-normal tracking-[0.015em]">
-                  Trời mưa bất ngờ? Điểm tham quan đóng cửa? AI chủ động đề xuất phương án B thay thế
-                  ngay tức thì trong bán kính 1km.
+                <h3 className="font-bold text-base sm:text-lg text-slate-900 mb-1.5 sm:mb-2 group-hover:text-blue-700 transition-colors">Lộ Trình Tinh Gọn On-The-Go</h3>
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal tracking-[0.015em]">
+                  Trời mưa bất ngờ? Điểm tham quan đóng cửa? Wayfare chủ động gợi ý phương án dự phòng
+                  ngay tức thì trong bán kính gần.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-blue-600 font-bold text-sm">
-                <span>Đồng hành theo GPS</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-slate-100 flex items-center gap-1.5 text-blue-600 font-bold text-xs sm:text-sm">
+                <span>Linh hoạt theo điểm đến</span>
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
             </div>
 
             {/* Pillar 4 */}
-            <div className="p-7 rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-amber-400 cursor-pointer">
+            <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-amber-400 cursor-pointer">
               <div>
-                <div className="flex items-center justify-between mb-5">
-                  <div className="w-13 h-13 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
-                    <Users className="w-6 h-6" />
+                <div className="flex items-center justify-between mb-4 sm:mb-5">
+                  <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
+                    <Users className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 font-bold text-xs border border-amber-200/60 group-hover:scale-105 transition-transform">
+                  <span className="px-2.5 sm:px-3 py-1 rounded-full bg-amber-50 text-amber-800 font-bold text-[11px] sm:text-xs border border-amber-200/60 group-hover:scale-105 transition-transform">
                     {homeStats.totalPosts.toLocaleString()}+ Bài Viết
                   </span>
                 </div>
-                <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-amber-700 transition-colors">Cộng Đồng Trải Nghiệm Thật</h3>
-                <p className="text-slate-600 text-sm leading-relaxed font-normal tracking-[0.015em]">
+                <h3 className="font-bold text-base sm:text-lg text-slate-900 mb-1.5 sm:mb-2 group-hover:text-amber-700 transition-colors">Cộng Đồng Trải Nghiệm Thật</h3>
+                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal tracking-[0.015em]">
                   Khám phá và sao chép lịch trình thực chiến từ hàng ngàn travel blogger, hướng dẫn
                   viên bản địa đã được kiểm chứng.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center gap-1.5 text-amber-700 font-bold text-sm">
+              <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-slate-100 flex items-center gap-1.5 text-amber-700 font-bold text-xs sm:text-sm">
                 <span>Sao chép 1-click</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+                <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
             </div>
           </div>
@@ -1038,52 +1036,52 @@ export const HomePage = () => {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          4. LIVE INTERACTIVE AI TRAVEL STUDIO
+          4. LIVE INTERACTIVE TRAVEL STUDIO
           - Dedicated soft blue-slate lab environment
           - Elevated grand white workspace card
           - Left: Natural Prompt Lab with chips & Royal Blue action
           - Right: Dynamic multi-day timeline with instant estimates
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-20 bg-gradient-to-b from-[#eaf2f8] via-[#f1f6fa] to-[#e4eef6] border-b border-blue-900/10">
+      <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#eaf2f8] via-[#f1f6fa] to-[#e4eef6] border-b border-blue-900/10">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="rounded-[2.5rem] bg-white p-7 sm:p-10 lg:p-12 shadow-xl border border-blue-200/80">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="rounded-2xl sm:rounded-[2.5rem] bg-white p-5 sm:p-8 lg:p-12 shadow-xl border border-blue-200/80">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
               {/* Left Column: Interactive Prompt Lab (5 cols) */}
               <div className="lg:col-span-5 flex flex-col">
-                <div className="inline-flex items-center gap-2 text-blue-700 font-extrabold text-xs uppercase tracking-wider mb-3">
-                  <Bot className="w-4 h-4" />
+                <div className="inline-flex items-center gap-2 text-blue-700 font-extrabold text-[11px] sm:text-xs uppercase tracking-wider mb-2 sm:mb-3">
+                  <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span>Trải nghiệm thử nghiệm trực tiếp</span>
                 </div>
 
-                <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3 tracking-tight">
+                <h3 className="font-display text-xl sm:text-2xl lg:text-3xl font-extrabold text-slate-900 mb-2 sm:mb-3 tracking-tight">
                   Mô Tả Chuyến Đi Theo Cách Của Bạn
                 </h3>
 
-                <p className="text-slate-600 text-sm sm:text-base mb-6 leading-relaxed font-normal tracking-[0.015em]">
+                <p className="text-slate-600 text-xs sm:text-sm md:text-base mb-4 sm:mb-6 leading-relaxed font-normal tracking-[0.015em]">
                   Chỉ cần nhập một câu tự nhiên nói rõ mong muốn của bạn. Wayfare sẽ bóc tách danh
                   thắng, căn chỉnh thời gian vàng và lên thực đơn chi tiết.
                 </p>
 
-                <div className="relative mb-4">
+                <div className="relative mb-3 sm:mb-4">
                   <textarea
                     rows={4}
                     value={sandboxPrompt}
                     onChange={(e) => setSandboxPrompt(e.target.value)}
-                    className="w-full p-4 rounded-2xl bg-slate-50/70 font-medium text-sm sm:text-[15px] text-slate-900 focus:outline-none focus:ring-4 focus:ring-sky-100 focus:border-sky-600 focus:bg-white border border-slate-300/80 resize-none shadow-xs placeholder:text-slate-400 tracking-[0.015em] transition-all"
+                    className="w-full p-3.5 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50/70 font-medium text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-3 focus:ring-sky-100 focus:border-sky-600 focus:bg-white border border-slate-300/80 resize-none shadow-xs placeholder:text-slate-400 tracking-[0.015em] transition-all"
                   />
                   <button
                     type="button"
                     onClick={handleRunSandbox}
-                    className="absolute bottom-3 right-3 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95 shimmer-effect"
+                    className="absolute bottom-2.5 right-2.5 sm:bottom-3 sm:right-3 px-4 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer hover:scale-105 active:scale-95"
                   >
-                    <Sparkles className="w-4 h-4 text-amber-300 animate-spin-slow" />
-                    <span>Phân tích</span>
+                    <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-200" />
+                    <span>Lên kế hoạch</span>
                   </button>
                 </div>
 
                 {/* Quick Template Prompt Pills */}
-                <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-                  <span className="text-slate-500 font-semibold">Thử mẫu:</span>
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                  <span className="text-slate-500 font-semibold text-[11px] sm:text-xs">Thử mẫu:</span>
                   <button
                     type="button"
                     onClick={() => {
@@ -1091,7 +1089,7 @@ export const HomePage = () => {
                         'Gia đình 4 người đi Đà Nẵng 4N3Đ có người lớn tuổi, ưu tiên resort biển và ẩm thực nhẹ nhàng.'
                       );
                     }}
-                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
+                    className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 text-[11px] sm:text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
                   >
                     👨‍👩‍👧‍👦 Gia đình Đà Nẵng
                   </button>
@@ -1102,7 +1100,7 @@ export const HomePage = () => {
                         'Solo trekking Hà Giang 3N2Đ săn mây Mã Pí Lèng, ngân sách sinh viên tiết kiệm.'
                       );
                     }}
-                    className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
+                    className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 text-[11px] sm:text-xs font-semibold transition-all border border-slate-200 cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
                   >
                     🏍️ Phượt Hà Giang
                   </button>
@@ -1110,31 +1108,31 @@ export const HomePage = () => {
               </div>
 
               {/* Right Column: Real-time Multi-Day Interactive Canvas (7 cols) */}
-              <div className="lg:col-span-7 rounded-3xl bg-slate-50/90 p-6 sm:p-7 flex flex-col justify-between text-slate-900 shadow-sm border border-slate-200/90 hover:shadow-md transition-shadow">
+              <div className="lg:col-span-7 rounded-2xl sm:rounded-3xl bg-slate-50/90 p-4 sm:p-6 lg:p-7 flex flex-col justify-between text-slate-900 shadow-sm border border-slate-200/90 hover:shadow-md transition-shadow">
                 {/* Header with Title and Day Switcher */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200/80 gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 sm:pb-4 border-b border-slate-200/80 gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-sm shadow-sm animate-pulse-slow">
-                      AI
+                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-sky-600 text-white flex items-center justify-center font-black text-xs sm:text-sm shadow-sm shrink-0">
+                      <Compass className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-extrabold text-base sm:text-lg text-slate-900">
+                      <h4 className="font-extrabold text-sm sm:text-base lg:text-lg text-slate-900">
                         Đà Lạt • Hành Trình Lãng Mạn (3N2Đ)
                       </h4>
-                      <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                      <p className="text-[11px] sm:text-xs md:text-sm text-slate-500 font-medium">
                         Dự toán: 3.920.000đ • Tối ưu 98%
                       </p>
                     </div>
                   </div>
 
-                  {/* Multi-Day Tabs in Royal Blue */}
-                  <div className="flex items-center gap-1.5 p-1 rounded-xl bg-white border border-slate-200 shadow-2xs">
+                  {/* Multi-Day Tabs */}
+                  <div className="flex items-center gap-1 p-1 rounded-xl bg-white border border-slate-200 shadow-2xs overflow-x-auto no-scrollbar shrink-0">
                     {[1, 2, 3].map((dayNum) => (
                       <button
                         key={dayNum}
                         type="button"
                         onClick={() => setSandboxActiveDay(dayNum)}
-                        className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer hover:scale-105 active:scale-95 ${sandboxActiveDay === dayNum
+                        className={`px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap hover:scale-105 active:scale-95 ${sandboxActiveDay === dayNum
                           ? 'bg-sky-600 text-white shadow-xs'
                           : 'text-slate-600 hover:text-sky-700 hover:bg-slate-100'
                           }`}
@@ -1146,8 +1144,8 @@ export const HomePage = () => {
                 </div>
 
                 {/* Day Subtitle */}
-                <div className="py-2.5 text-xs sm:text-sm font-bold text-sky-700 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-500 animate-spin-slow" />
+                <div className="py-2.5 text-xs sm:text-sm font-bold text-sky-700 flex items-center gap-1.5 sm:gap-2">
+                  <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-600" />
                   <span>{sandboxMultiDayData[sandboxActiveDay].dayTitle}</span>
                 </div>
 
@@ -1216,21 +1214,26 @@ export const HomePage = () => {
           - Category filter pills with Royal Blue active state
           - White photo cards with verified metrics & prices
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-20 bg-gradient-to-b from-[#f0f9ff] via-[#f8fafc] to-[#e0f2fe] border-b border-sky-900/10" id="kham-pha">
+      {/* ──────────────────────────────────────────────────────────────────────────
+          5. CURATED TRENDING ITINERARIES SHOWCASE
+          - Soft natural canvas
+          - Category filter pills with Royal Blue active state
+          - White photo cards with verified metrics & prices
+      ────────────────────────────────────────────────────────────────────────── */}
+      <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#f0f9ff] via-[#f8fafc] to-[#e0f2fe] border-b border-sky-900/10" id="kham-pha">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header with Filter Tabs */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 sm:mb-10">
             <div>
-
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
-                Bộ Sưu Tập Lộ Trình AI Nổi Bật
+              <h2 className="font-display text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+                Bộ Sưu Tập Lộ Trình Nổi Bật
               </h2>
-              <p className="text-slate-600 text-sm sm:text-base mt-1 font-normal tracking-[0.015em]">
+              <p className="text-slate-600 text-xs sm:text-sm md:text-base mt-1 font-normal tracking-[0.015em]">
                 Được tổng hợp từ hơn 50.000 lượt lưu và đánh giá cao từ cộng đồng người dùng thực tế.
               </p>
             </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+            <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar max-w-full">
               {[
                 { id: 'all', label: 'Tất cả' },
                 { id: 'bac', label: 'Miền Bắc' },
@@ -1241,7 +1244,7 @@ export const HomePage = () => {
                   key={tab.id}
                   type="button"
                   onClick={() => setShowcaseRegion(tab.id)}
-                  className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer ${showcaseRegion === tab.id
+                  className={`px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all whitespace-nowrap cursor-pointer shrink-0 ${showcaseRegion === tab.id
                     ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
                     : 'bg-white hover:bg-sky-50 text-slate-700 border border-sky-200/80 shadow-2xs'
                     }`}
@@ -1253,74 +1256,74 @@ export const HomePage = () => {
           </div>
 
           {/* 4 Cards Grid Showcase */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {featuredTours.map((tour) => (
               <div
                 key={tour.id}
-                className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-2xl hover-elevate transition-all duration-300 flex flex-col group border border-sky-100 hover:border-sky-400 cursor-pointer"
+                className="rounded-2xl sm:rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-2xl hover-elevate transition-all duration-300 flex flex-col group border border-sky-100 hover:border-sky-400 cursor-pointer"
               >
-                <div className="relative h-56 w-full overflow-hidden">
+                <div className="relative h-48 sm:h-56 w-full overflow-hidden">
                   <img
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
                     alt={tour.title}
                     src={tour.image}
                   />
-                  <div className="absolute top-3.5 right-3.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-xs font-black text-sky-900 shadow-md group-hover:scale-105 transition-transform">
+                  <div className="absolute top-3 right-3 px-2.5 sm:px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-[11px] sm:text-xs font-black text-sky-900 shadow-md group-hover:scale-105 transition-transform">
                     {tour.duration}
                   </div>
-                  <div className="absolute top-3.5 left-3.5 px-3 py-1 rounded-full bg-sky-600 text-white text-xs font-bold flex items-center gap-1 shadow-md">
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-spin-slow" />
+                  <div className="absolute top-3 left-3 px-2.5 sm:px-3 py-1 rounded-full bg-sky-600 text-white text-[11px] sm:text-xs font-bold flex items-center gap-1 shadow-md">
+                    <Compass className="w-3.5 h-3.5 text-sky-200" />
                     <span>{tour.tag}</span>
                   </div>
-                  <div className="absolute bottom-3.5 left-3.5 px-3.5 py-1 rounded-full bg-slate-950/75 backdrop-blur-md text-white text-xs font-bold">
+                  <div className="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-slate-950/75 backdrop-blur-md text-white text-[11px] sm:text-xs font-bold">
                     {tour.category}
                   </div>
                 </div>
 
-                <div className="p-6 flex flex-col flex-1 justify-between bg-white">
+                <div className="p-4 sm:p-6 flex flex-col flex-1 justify-between bg-white">
                   <div>
-                    <div className="flex items-center justify-between text-slate-500 text-xs sm:text-sm mb-2 font-semibold">
+                    <div className="flex items-center justify-between text-slate-500 text-xs sm:text-sm mb-1.5 sm:mb-2 font-semibold">
                       <span className="flex items-center gap-1">
-                        <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                        <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 fill-amber-400" />
                         <strong className="text-slate-900">{tour.rating}</strong> ({tour.saves} lưu)
                       </span>
-                      <span className="text-sky-700 font-bold">{tour.location}</span>
+                      <span className="text-sky-700 font-bold truncate max-w-[120px]">{tour.location}</span>
                     </div>
 
-                    <h3 className="font-extrabold text-base text-slate-900 mb-2 group-hover:text-sky-700 transition-colors line-clamp-1">
+                    <h3 className="font-extrabold text-sm sm:text-base text-slate-900 mb-1.5 sm:mb-2 group-hover:text-sky-700 transition-colors line-clamp-1">
                       {tour.title}
                     </h3>
-                    <p className="text-slate-600 text-sm mb-5 line-clamp-2 leading-relaxed font-normal tracking-[0.015em]">
+                    <p className="text-slate-600 text-xs sm:text-sm mb-3 sm:mb-5 line-clamp-2 leading-relaxed font-normal tracking-[0.015em]">
                       {tour.desc}
                     </p>
                   </div>
 
-                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+                  <div className="pt-3 sm:pt-4 border-t border-slate-100 flex items-center justify-between">
                     <div>
-                      <span className="text-xs text-slate-500 font-semibold block">
+                      <span className="text-[11px] sm:text-xs text-slate-500 font-semibold block">
                         Dự toán/người
                       </span>
-                      <span className="font-black text-base sm:text-lg text-sky-700">
+                      <span className="font-black text-sm sm:text-base lg:text-lg text-sky-700">
                         {tour.price}
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={() => handleCopyTour(tour)}
-                      className={`px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all border flex items-center gap-1.5 cursor-pointer hover:scale-105 active:scale-95 ${savedTours[tour.id]
+                      className={`px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all border flex items-center gap-1.5 cursor-pointer hover:scale-105 active:scale-95 ${savedTours[tour.id]
                         ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
                         : 'bg-sky-50 hover:bg-sky-600 hover:text-white text-sky-800 border-sky-200'
                         }`}
                     >
                       {savedTours[tour.id] ? (
                         <>
-                          <Check className="w-4 h-4" />
+                          <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                           <span>Đã lưu</span>
                         </>
                       ) : (
                         <>
-                          <Copy className="w-4 h-4" />
-                          <span>Sao chép tour</span>
+                          <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                          <span>Sao chép</span>
                         </>
                       )}
                     </button>
@@ -1338,21 +1341,20 @@ export const HomePage = () => {
           - Shows top community travel stories with likes, comments, author badges
           - Guest vs Member actions (Like/Bookmark/Create prompt login if guest)
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-20 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#edf2f7] border-b border-slate-200">
+      <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#edf2f7] border-b border-slate-200">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 sm:mb-12">
             <div>
-
-              <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
+              <h2 className="font-display text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
                 Nhịp Sống Du Lịch & Khoảnh Khắc Thực Tế
               </h2>
-              <p className="text-slate-600 text-sm sm:text-base mt-1 font-normal tracking-[0.015em]">
+              <p className="text-slate-600 text-xs sm:text-sm md:text-base mt-1 font-normal tracking-[0.015em]">
                 Khám phá những trải nghiệm check-in, ẩm thực và kinh nghiệm đắt giá được chia sẻ trực tiếp từ cộng đồng.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => {
@@ -1362,15 +1364,15 @@ export const HomePage = () => {
                     navigate('/community');
                   }
                 }}
-                className="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer hover:scale-105 active:scale-95"
+                className="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-105 active:scale-95"
               >
-                <Sparkles className="w-4 h-4 text-amber-300" />
+                <Compass className="w-4 h-4 text-sky-200" />
                 <span>Chia sẻ chuyến đi của bạn</span>
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/community')}
-                className="px-5 py-2.5 rounded-full bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-300 text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer hover:scale-105"
+                className="w-full sm:w-auto px-4 sm:px-5 py-2.5 rounded-full bg-white hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-300 text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer hover:scale-105"
               >
                 <span>Xem tất cả ({homeStats.totalPosts}+ bài viết)</span>
               </button>
@@ -1378,22 +1380,22 @@ export const HomePage = () => {
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {communityPosts.length > 0 ? (
               communityPosts.slice(0, 4).map((post) => (
                 <div
                   key={post.id}
-                  className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-xl hover-elevate transition-all duration-300 flex flex-col group border border-slate-200/90 hover:border-blue-400"
+                  className="rounded-2xl sm:rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-xl hover-elevate transition-all duration-300 flex flex-col group border border-slate-200/90 hover:border-blue-400"
                 >
                   {/* Photo */}
-                  <div className="relative h-48 w-full overflow-hidden bg-slate-100">
+                  <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-slate-100">
                     <img
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       src={post.image || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80'}
                       alt={post.title}
                     />
                     {post.locationTag && (
-                      <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold flex items-center gap-1">
+                      <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-[11px] font-bold flex items-center gap-1">
                         <MapPin className="w-3.5 h-3.5 text-rose-400" />
                         <span className="truncate max-w-[120px]">{post.locationTag}</span>
                       </div>
@@ -1401,43 +1403,43 @@ export const HomePage = () => {
                   </div>
 
                   {/* Body */}
-                  <div className="p-5 flex flex-col flex-1 justify-between">
+                  <div className="p-4 sm:p-5 flex flex-col flex-1 justify-between">
                     <div>
                       {/* Author */}
-                      <div className="flex items-center gap-2.5 mb-3">
+                      <div className="flex items-center gap-2.5 mb-2.5 sm:mb-3">
                         <img
                           src={post.author?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
                           alt={post.author?.name}
-                          className="w-8 h-8 rounded-full object-cover ring-1 ring-blue-400"
+                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-blue-400 shrink-0"
                         />
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-slate-900 truncate">
                             {post.author?.name || 'Thành viên Wayfare'}
                           </p>
-                          <p className="text-[11px] text-slate-400">{post.timeAgo || 'Gần đây'}</p>
+                          <p className="text-[10px] sm:text-[11px] text-slate-400">{post.timeAgo || 'Gần đây'}</p>
                         </div>
                       </div>
 
                       <h3
                         onClick={() => navigate('/community')}
-                        className="font-bold text-sm sm:text-base text-slate-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors cursor-pointer"
+                        className="font-bold text-xs sm:text-sm md:text-base text-slate-900 mb-1.5 line-clamp-1 group-hover:text-blue-600 transition-colors cursor-pointer"
                       >
                         {post.title}
                       </h3>
-                      <p className="text-slate-600 text-xs sm:text-sm line-clamp-2 leading-relaxed mb-4">
+                      <p className="text-slate-600 text-xs sm:text-sm line-clamp-2 leading-relaxed mb-3 sm:mb-4">
                         {post.content}
                       </p>
                     </div>
 
                     {/* Footer Interactions */}
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-semibold">
+                    <div className="pt-2.5 sm:pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-semibold">
                       <button
                         type="button"
                         onClick={() => handleLikePost(post.id)}
                         className={`flex items-center gap-1.5 transition-colors cursor-pointer ${likedPosts[post.id] || post.isLiked ? 'text-rose-600 font-bold' : 'hover:text-rose-600'
                           }`}
                       >
-                        <Heart className={`w-4 h-4 ${likedPosts[post.id] || post.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
+                        <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${likedPosts[post.id] || post.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
                         <span>{(post.likes || 0) + (likedPosts[post.id] ? 1 : 0)}</span>
                       </button>
 
@@ -1446,7 +1448,7 @@ export const HomePage = () => {
                         onClick={() => navigate('/community')}
                         className="flex items-center gap-1.5 hover:text-blue-600 transition-colors cursor-pointer"
                       >
-                        <MessageSquare className="w-4 h-4" />
+                        <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span>{post.commentsCount || 0} phản hồi</span>
                       </button>
 
@@ -1457,7 +1459,7 @@ export const HomePage = () => {
                           }`}
                         title={bookmarkedPosts[post.id] ? 'Đã lưu' : 'Lưu bài viết'}
                       >
-                        <Bookmark className={`w-4 h-4 ${bookmarkedPosts[post.id] ? 'fill-amber-500 text-amber-500' : ''}`} />
+                        <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${bookmarkedPosts[post.id] ? 'fill-amber-500 text-amber-500' : ''}`} />
                       </button>
                     </div>
                   </div>
@@ -1513,53 +1515,53 @@ export const HomePage = () => {
               ].map((post) => (
                 <div
                   key={post.id}
-                  className="rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-xl hover-elevate transition-all duration-300 flex flex-col group border border-slate-200/90 hover:border-blue-400"
+                  className="rounded-2xl sm:rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-xl hover-elevate transition-all duration-300 flex flex-col group border border-slate-200/90 hover:border-blue-400"
                 >
-                  <div className="relative h-48 w-full overflow-hidden bg-slate-100">
+                  <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-slate-100">
                     <img
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       src={post.image}
                       alt={post.title}
                     />
-                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-xs font-bold flex items-center gap-1">
+                    <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-white text-[11px] font-bold flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5 text-rose-400" />
                       <span>{post.location}</span>
                     </div>
                   </div>
 
-                  <div className="p-5 flex flex-col flex-1 justify-between">
+                  <div className="p-4 sm:p-5 flex flex-col flex-1 justify-between">
                     <div>
-                      <div className="flex items-center gap-2.5 mb-3">
+                      <div className="flex items-center gap-2.5 mb-2.5 sm:mb-3">
                         <img
                           src={post.avatar}
                           alt={post.author}
-                          className="w-8 h-8 rounded-full object-cover ring-1 ring-blue-400"
+                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover ring-1 ring-blue-400 shrink-0"
                         />
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-slate-900 truncate">{post.author}</p>
-                          <p className="text-[11px] text-slate-400">1 ngày trước</p>
+                          <p className="text-[10px] sm:text-[11px] text-slate-400">1 ngày trước</p>
                         </div>
                       </div>
 
                       <h3
                         onClick={() => navigate('/community')}
-                        className="font-bold text-sm sm:text-base text-slate-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors cursor-pointer"
+                        className="font-bold text-xs sm:text-sm md:text-base text-slate-900 mb-1.5 line-clamp-1 group-hover:text-blue-600 transition-colors cursor-pointer"
                       >
                         {post.title}
                       </h3>
-                      <p className="text-slate-600 text-xs sm:text-sm line-clamp-2 leading-relaxed mb-4">
+                      <p className="text-slate-600 text-xs sm:text-sm line-clamp-2 leading-relaxed mb-3 sm:mb-4">
                         {post.content}
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-semibold">
+                    <div className="pt-2.5 sm:pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-semibold">
                       <button
                         type="button"
                         onClick={() => handleLikePost(post.id)}
                         className={`flex items-center gap-1.5 transition-colors cursor-pointer ${likedPosts[post.id] ? 'text-rose-600 font-bold' : 'hover:text-rose-600'
                           }`}
                       >
-                        <Heart className={`w-4 h-4 ${likedPosts[post.id] ? 'fill-rose-500 text-rose-500' : ''}`} />
+                        <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${likedPosts[post.id] ? 'fill-rose-500 text-rose-500' : ''}`} />
                         <span>{post.likes + (likedPosts[post.id] ? 1 : 0)}</span>
                       </button>
 
@@ -1568,7 +1570,7 @@ export const HomePage = () => {
                         onClick={() => navigate('/community')}
                         className="flex items-center gap-1.5 hover:text-blue-600 transition-colors cursor-pointer"
                       >
-                        <MessageSquare className="w-4 h-4" />
+                        <MessageSquare className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         <span>{post.comments}</span>
                       </button>
 
@@ -1578,7 +1580,7 @@ export const HomePage = () => {
                         className={`transition-colors cursor-pointer ${bookmarkedPosts[post.id] ? 'text-amber-500' : 'hover:text-amber-500'
                           }`}
                       >
-                        <Bookmark className={`w-4 h-4 ${bookmarkedPosts[post.id] ? 'fill-amber-500 text-amber-500' : ''}`} />
+                        <Bookmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${bookmarkedPosts[post.id] ? 'fill-amber-500 text-amber-500' : ''}`} />
                       </button>
                     </div>
                   </div>
@@ -1590,31 +1592,29 @@ export const HomePage = () => {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          6. INTERACTIVE MAP & HIDDEN GEMS RADAR
+          6. INTERACTIVE MAP & HIDDEN GEMS
           - Immersive midnight obsidian section canvas
-          - High-tech glowing satellite radar & destination preview
+          - Natural travel discovery & destination preview
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-20 bg-gradient-to-b from-[#0a111a] via-[#0f1926] to-[#070d14] text-white border-b border-slate-800">
+      <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#0a111a] via-[#0f1926] to-[#070d14] text-white border-b border-slate-800">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="rounded-3xl bg-slate-900/90 backdrop-blur-xl text-white p-7 sm:p-12 shadow-2xl border border-slate-700/80">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="rounded-2xl sm:rounded-3xl bg-slate-900/90 backdrop-blur-xl text-white p-5 sm:p-8 lg:p-12 shadow-2xl border border-slate-700/80">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
               {/* Text & List Details (5 cols) */}
               <div className="lg:col-span-5 flex flex-col">
-
-
-                <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-4 leading-tight">
+                <h2 className="font-display text-xl sm:text-2xl lg:text-3xl font-extrabold text-white tracking-tight mb-2 sm:mb-4 leading-tight">
                   Khám Phá Điểm Đến Bí Mật Không Có Trên Bản Đồ Thường
                 </h2>
 
-                <p className="text-slate-300 text-sm sm:text-base mb-7 leading-relaxed font-normal tracking-[0.015em]">
-                  Hệ thống định vị thông minh của Wayfare quét sâu vào dữ liệu bản địa, tìm ra những
-                  con thác nguyên sơ, quán cà phê ẩn mình và góc săn mây bình minh tuyệt đối riêng tư.
+                <p className="text-slate-300 text-xs sm:text-sm md:text-base mb-4 sm:mb-7 leading-relaxed font-normal tracking-[0.015em]">
+                  Hệ thống kết nối sâu vào dữ liệu bản địa của Wayfare giúp bạn tìm ra những
+                  con thác nguyên sơ, quán cà phê ẩn mình và góc ngắm bình minh tuyệt đối riêng tư.
                 </p>
 
                 {/* Clickable Hidden Gem Cards */}
-                <div className="space-y-3.5 mb-7">
+                <div className="space-y-2.5 sm:space-y-3.5 mb-5 sm:mb-7">
                   {[
-                    { id: 'dalat', name: 'Suối Tía - Hồ Tuyền Lâm (Đà Lạt)', tag: 'Chấm xanh AI' },
+                    { id: 'dalat', name: 'Suối Tía - Hồ Tuyền Lâm (Đà Lạt)', tag: 'Tọa độ bí mật' },
                     { id: 'sapa', name: 'Bản Sâu Chua - Sa Pa (Lào Cai)', tag: 'Bản địa nguyên bản' },
                     { id: 'phuquoc', name: 'Hòn Dăm & Bãi Rạch Tràm (Phú Quốc)', tag: 'Hoang sơ 100%' }
                   ].map((gem) => (
@@ -1622,25 +1622,25 @@ export const HomePage = () => {
                       key={gem.id}
                       type="button"
                       onClick={() => setSelectedGemId(gem.id)}
-                      className={`w-full p-4 rounded-2xl flex items-center justify-between transition-all text-left cursor-pointer border hover:scale-[1.02] active:scale-[0.98] ${selectedGemId === gem.id
+                      className={`w-full p-3 sm:p-4 rounded-xl sm:rounded-2xl flex items-center justify-between gap-2 transition-all text-left cursor-pointer border hover:scale-[1.01] active:scale-[0.99] ${selectedGemId === gem.id
                         ? 'bg-blue-600/35 border-blue-400 shadow-md ring-1 ring-blue-400/30'
                         : 'bg-white/10 hover:bg-white/15 border-white/15'
                         }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <span
-                          className={`w-3 h-3 rounded-full ${selectedGemId === gem.id ? 'bg-sky-400 animate-ping' : 'bg-sky-400'
+                          className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shrink-0 ${selectedGemId === gem.id ? 'bg-sky-400 animate-ping' : 'bg-sky-400'
                             }`}
                         />
-                        <div>
-                          <h4 className="font-bold text-sm sm:text-base text-white">{gem.name}</h4>
-                          <p className="text-xs text-slate-300 font-medium">
+                        <div className="min-w-0">
+                          <h4 className="font-bold text-xs sm:text-sm md:text-base text-white truncate">{gem.name}</h4>
+                          <p className="text-[11px] sm:text-xs text-slate-300 font-medium truncate">
                             {hiddenGems[gem.id].time}
                           </p>
                         </div>
                       </div>
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-black uppercase transition-colors ${selectedGemId === gem.id
+                        className={`px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-black uppercase transition-colors shrink-0 ${selectedGemId === gem.id
                           ? 'bg-blue-500 text-white'
                           : 'bg-white/20 text-slate-300'
                           }`}
@@ -1653,16 +1653,16 @@ export const HomePage = () => {
 
                 <a
                   href="#ai-dock"
-                  className="inline-flex items-center gap-2 text-sky-400 font-bold text-sm sm:text-base hover:text-sky-300 hover:underline cursor-pointer group"
+                  className="inline-flex items-center gap-2 text-sky-400 font-bold text-xs sm:text-sm md:text-base hover:text-sky-300 hover:underline cursor-pointer group"
                 >
-                  <span>Bật radar quét điểm bí mật xung quanh bạn</span>
-                  <Radar className="w-5 h-5 animate-pulse group-hover:rotate-45 transition-transform" />
+                  <span>Khám phá các tọa độ ẩn xung quanh bạn</span>
+                  <NavigationIcon className="w-4 h-4 sm:w-5 sm:h-5 text-sky-300 group-hover:translate-x-0.5 transition-transform" />
                 </a>
               </div>
 
               {/* Dynamic Map & Scenic View Container (7 cols) */}
               <div className="lg:col-span-7">
-                <div className="relative w-full h-[460px] rounded-3xl overflow-hidden shadow-2xl bg-slate-900 border border-slate-700">
+                <div className="relative w-full h-[320px] sm:h-[400px] lg:h-[460px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl bg-slate-900 border border-slate-700">
                   <div
                     className="w-full h-full bg-cover bg-center transition-all duration-700"
                     style={{
@@ -1672,25 +1672,25 @@ export const HomePage = () => {
                   <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]" />
 
                   {/* Top Badge: Weather & Crowd */}
-                  <div className="absolute top-5 left-5 flex items-center gap-2.5">
-                    <span className="px-3 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-sky-300 text-xs font-bold border border-sky-400/40">
+                  <div className="absolute top-3.5 sm:top-5 left-3.5 sm:left-5 flex items-center gap-2 sm:gap-2.5">
+                    <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-sky-300 text-[11px] sm:text-xs font-bold border border-sky-400/40">
                       🌤️ {hiddenGems[selectedGemId].temp}
                     </span>
-                    <span className="px-3 py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-sky-300 text-xs font-bold border border-sky-400/40">
+                    <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-sky-300 text-[11px] sm:text-xs font-bold border border-sky-400/40">
                       👥 {hiddenGems[selectedGemId].crowd}
                     </span>
                   </div>
 
-                  {/* Floating GPS Radar Card with Dynamic Selected Gem Details */}
-                  <div className="absolute bottom-6 left-6 right-6 sm:right-auto sm:max-w-md p-5 rounded-2xl bg-slate-900/95 backdrop-blur-xl shadow-2xl flex items-center gap-4 text-white border border-slate-700 hover:scale-[1.02] transition-transform">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/50">
-                      <Radar className="w-6 h-6 animate-spin-slow" />
+                  {/* Floating GPS Card with Dynamic Selected Gem Details */}
+                  <div className="absolute bottom-3.5 sm:bottom-6 left-3.5 sm:left-6 right-3.5 sm:right-auto sm:max-w-md p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-slate-900/95 backdrop-blur-xl shadow-2xl flex items-center gap-3 sm:gap-4 text-white border border-slate-700">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/50">
+                      <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     </div>
-                    <div>
-                      <h5 className="font-extrabold text-sm sm:text-base text-white">
+                    <div className="min-w-0">
+                      <h5 className="font-extrabold text-xs sm:text-sm md:text-base text-white truncate">
                         {hiddenGems[selectedGemId].title}
                       </h5>
-                      <p className="text-xs text-slate-300 font-medium mt-0.5 line-clamp-2">
+                      <p className="text-[11px] sm:text-xs text-slate-300 font-medium mt-0.5 line-clamp-2">
                         {hiddenGems[selectedGemId].desc}
                       </p>
                     </div>
@@ -1706,20 +1706,18 @@ export const HomePage = () => {
           7. SOCIAL PROOF & TESTIMONIALS
           - Crisp warm slate canvas with color-accented review cards
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-20 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#eef2f6] border-b border-slate-200/90">
+      <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#eef2f6] border-b border-slate-200/90">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="text-center max-w-2xl mx-auto mb-12 space-y-2.5">
-
-            <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-2">
+            <h2 className="font-display text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
               Câu Chuyện Từ Những Người Đã Đi
             </h2>
-            <p className="text-slate-600 text-sm sm:text-base font-normal tracking-[0.015em]">
-              Hàng ngàn chuyến đi đáng nhớ đã được hoàn thành trọn vẹn nhờ sự đồng hành của AI
-              Wayfare.
+            <p className="text-slate-600 text-xs sm:text-sm md:text-base font-normal tracking-[0.015em]">
+              Hàng ngàn chuyến đi đáng nhớ đã được hoàn thành trọn vẹn nhờ sự đồng hành của Wayfare.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {/* Review 1 */}
             <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl hover-elevate transition-all flex flex-col justify-between border-t-4 border-t-blue-600 border border-slate-200/90 cursor-pointer">
               <div>
@@ -1808,52 +1806,56 @@ export const HomePage = () => {
           8. GRAND FINALE CTA BANNER
           - Framed on a soft sapphire ambient pedestal
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-16 bg-gradient-to-b from-[#f0f9ff] to-[#f8fafc]">
+      {/* ──────────────────────────────────────────────────────────────────────────
+          8. GRAND FINALE CTA BANNER
+          - Framed on a soft sapphire ambient pedestal
+      ────────────────────────────────────────────────────────────────────────── */}
+      <section className="w-full py-10 sm:py-16 bg-gradient-to-b from-[#f0f9ff] to-[#f8fafc]">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="relative rounded-3xl overflow-hidden p-8 sm:p-12 lg:p-16 bg-gradient-to-r from-[#031726] via-[#082845] to-[#0c385f] text-white shadow-2xl border border-sky-900/40">
+          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden p-6 sm:p-10 lg:p-16 bg-gradient-to-r from-[#031726] via-[#082845] to-[#0c385f] text-white shadow-2xl border border-sky-900/40">
             {/* Subtle Ambient Light Orbs with Pulse Animations */}
             <div className="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-blue-500/20 blur-3xl pointer-events-none animate-pulse-slow" />
             <div className="absolute top-0 right-1/3 w-64 h-64 rounded-full bg-sky-400/20 blur-2xl pointer-events-none animate-pulse-slow [animation-delay:3s]" />
 
-            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
               {/* Left Column: Heading, Subtitle & Actions (7 cols) */}
-              <div className="lg:col-span-7 flex flex-col items-start space-y-6">
-                <h2 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+              <div className="lg:col-span-7 flex flex-col items-start space-y-4 sm:space-y-6">
+                <h2 className="font-display text-xl sm:text-3xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
                   Sẵn Sàng Cho Chuyến Phiêu Lưu Kế Tiếp?
                 </h2>
 
-                <p className="text-sky-100 text-sm sm:text-base leading-relaxed font-normal tracking-[0.015em] max-w-xl">
-                  Hãy để AI lo mọi khâu chuẩn bị, nghiên cứu và tối ưu chi phí. Bạn chỉ cần tận hưởng
+                <p className="text-sky-100 text-xs sm:text-sm md:text-base leading-relaxed font-normal tracking-[0.015em] max-w-xl">
+                  Hãy để Wayfare đồng hành chuẩn bị, lên lịch trình và tối ưu chi phí. Bạn chỉ cần tận hưởng
                   từng khoảnh khắc trọn vẹn bên người thân yêu.
                 </p>
 
-                <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto pt-1">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto pt-1">
                   <a
                     href="#ai-dock"
-                    className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-blue-700 text-white font-extrabold text-sm sm:text-base shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2.5 cursor-pointer shimmer-effect"
+                    className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-blue-700 text-white font-extrabold text-xs sm:text-sm md:text-base shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
-                    <span>Lập Lịch Trình Miễn Phí Ngay</span>
+                    <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-sky-200" />
+                    <span>Lên Lịch Trình Miễn Phí Ngay</span>
                   </a>
 
                   <button
                     type="button"
                     onClick={() => navigate('/community')}
-                    className="w-full sm:w-auto px-7 py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-sm sm:text-base transition-all border border-white/20 hover:border-white/40 shadow-sm cursor-pointer hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-xs sm:text-sm md:text-base transition-all border border-white/20 hover:border-white/40 shadow-sm cursor-pointer hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
                   >
-                    <Users className="w-5 h-5 text-sky-300" />
+                    <Users className="w-4 h-4 sm:w-5 sm:h-5 text-sky-300" />
                     <span>Khám Phá Cộng Đồng</span>
                   </button>
                 </div>
 
-                <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-4 text-xs sm:text-sm text-sky-100">
-                  <div className="flex items-center gap-2 font-medium">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-[11px] sm:text-xs md:text-sm text-sky-100">
+                  <div className="flex items-center gap-1.5 sm:gap-2 font-medium">
+                    <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 shrink-0" />
                     <span>Không cần thẻ tín dụng • Trải nghiệm ngay 100% miễn phí</span>
                   </div>
                   <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-sky-400/50" />
                   <div className="flex items-center gap-1.5 text-sky-200">
-                    <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 fill-amber-400" />
                     <span className="font-bold text-white">4.9/5</span>
                     <span>từ 50.000+ du khách</span>
                   </div>
@@ -1861,55 +1863,55 @@ export const HomePage = () => {
               </div>
 
               {/* Right Column: High-tech Glassmorphism Trip Preview Card (5 cols - fills empty space) */}
-              <div className="lg:col-span-5 flex justify-center lg:justify-end">
-                <div className="w-full max-w-md rounded-3xl bg-slate-900/80 backdrop-blur-2xl p-6 border border-sky-400/30 shadow-2xl space-y-4 hover:border-sky-400/60 transition-all hover:scale-[1.02]">
+              <div className="lg:col-span-5 flex justify-center lg:justify-end w-full">
+                <div className="w-full max-w-md rounded-2xl sm:rounded-3xl bg-slate-900/80 backdrop-blur-2xl p-4 sm:p-6 border border-sky-400/30 shadow-2xl space-y-3 sm:space-y-4 hover:border-sky-400/60 transition-all">
                   {/* Card Header Preview */}
                   <div className="flex items-center justify-between pb-3 border-b border-white/10">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md">
-                        <Sparkles className="w-5 h-5 text-amber-300 animate-spin-slow" />
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shrink-0">
+                        <Compass className="w-5 h-5 text-white" />
                       </div>
-                      <div>
-                        <h4 className="font-bold text-sm sm:text-base text-white">Lộ Trình AI Tối Ưu</h4>
-                        <p className="text-xs text-sky-200">Đà Lạt • Sương Mù & Thung Lũng</p>
+                      <div className="min-w-0">
+                        <h4 className="font-bold text-xs sm:text-sm md:text-base text-white truncate">Lộ Trình Tinh Gọn</h4>
+                        <p className="text-[11px] sm:text-xs text-sky-200 truncate">Đà Lạt • Sương Mù & Thung Lũng</p>
                       </div>
                     </div>
-                    <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold">
+                    <span className="px-2.5 sm:px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[11px] sm:text-xs font-bold shrink-0">
                       Sẵn sàng
                     </span>
                   </div>
 
                   {/* 3 Live Feature Chips */}
-                  <div className="space-y-2.5">
-                    <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs text-slate-200">
-                      <span className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping" />
-                        <span>Tự động phân luồng thứ tự ghé thăm</span>
+                  <div className="space-y-2 sm:space-y-2.5">
+                    <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-[11px] sm:text-xs text-slate-200">
+                      <span className="flex items-center gap-2 truncate pr-2">
+                        <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping shrink-0" />
+                        <span className="truncate">Tự động phân luồng thứ tự ghé thăm</span>
                       </span>
-                      <span className="font-bold text-sky-300">Tốc độ 3.2s</span>
+                      <span className="font-bold text-sky-300 shrink-0">Tốc độ 3.2s</span>
                     </div>
 
-                    <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs text-slate-200">
-                      <span className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                        <span>Dự toán chi phí & cảnh báo phát sinh</span>
+                    <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-[11px] sm:text-xs text-slate-200">
+                      <span className="flex items-center gap-2 truncate pr-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                        <span className="truncate">Dự toán chi phí & cảnh báo phát sinh</span>
                       </span>
-                      <span className="font-bold text-emerald-300">Chuẩn 98%</span>
+                      <span className="font-bold text-emerald-300 shrink-0">Chuẩn 98%</span>
                     </div>
 
-                    <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-xs text-slate-200">
-                      <span className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-amber-400" />
-                        <span>Phương án B khi thời tiết xấu</span>
+                    <div className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-[11px] sm:text-xs text-slate-200">
+                      <span className="flex items-center gap-2 truncate pr-2">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                        <span className="truncate">Phương án dự phòng linh hoạt</span>
                       </span>
-                      <span className="font-bold text-amber-300">Tự động 24/7</span>
+                      <span className="font-bold text-amber-300 shrink-0">Tự động 24/7</span>
                     </div>
                   </div>
 
                   {/* Footer Stat Summary within Preview */}
-                  <div className="pt-2 flex items-center justify-between text-xs">
+                  <div className="pt-2 flex items-center justify-between text-[11px] sm:text-xs">
                     <span className="text-slate-300">Tiết kiệm trung bình</span>
-                    <span className="font-black text-sm text-sky-300 bg-sky-500/10 px-3 py-1 rounded-lg border border-sky-500/20">
+                    <span className="font-black text-xs sm:text-sm text-sky-300 bg-sky-500/10 px-2.5 sm:px-3 py-1 rounded-lg border border-sky-500/20">
                       ~850.000đ / chuyến
                     </span>
                   </div>
