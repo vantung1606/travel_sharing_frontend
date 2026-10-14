@@ -312,6 +312,17 @@ export const CommunityPage = () => {
   // Hidden Post IDs (User local hide preference)
   const [hiddenPostIds, setHiddenPostIds] = useState(new Set());
 
+  // Facebook-style Expandable Post Content State ("... Xem thêm")
+  const [expandedPostIds, setExpandedPostIds] = useState(new Set());
+  const toggleExpandPost = (postId) => {
+    setExpandedPostIds(prev => {
+      const next = new Set(prev);
+      if (next.has(postId)) next.delete(postId);
+      else next.add(postId);
+      return next;
+    });
+  };
+
   // AI Moderation Scanning Step & Feedback State
   const [moderationStep, setModerationStep] = useState(0); // 0: idle, 1: text scan, 2: safety rules, 3: AI scoring
   const [moderationFeedback, setModerationFeedback] = useState(null); // { type, title, score, reason, message }
@@ -2154,7 +2165,9 @@ export const CommunityPage = () => {
             paginatedPosts.map(post => {
               const hasItinerary = Boolean(post.itineraryId || post.itineraryTitle);
               const isBookmarked = bookmarkedPostIds.has(Number(post.id)) || Boolean(post.isBookmarked);
-              const authorName = post.authorName || post.author?.fullName || post.author?.name || 'Thành viên Wayfare';
+              const rawAuthorName = post.authorName || post.author?.fullName || post.author?.name || 'Thành viên Wayfare';
+              const cleanAuthorName = rawAuthorName.replace(/\s*\([^)]*\)\s*$/, '').trim();
+              const authorName = cleanAuthorName;
               const authorAvatar = post.authorAvatar || post.author?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
               const authorId = post.authorId || post.author?.id;
               const authorEmail = post.authorEmail || post.author?.email || '';
@@ -2171,7 +2184,7 @@ export const CommunityPage = () => {
               return (
                 <article
                   key={post.id}
-                  className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-blue-200/80 transition-all space-y-3.5 relative overflow-hidden"
+                  className="bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-slate-200/90 shadow-2xs hover:shadow-md transition-all space-y-3 relative overflow-hidden"
                 >
                   {/* Status Banner for Posts Pending Review */}
                   {post.status === 'PENDING_REVIEW' && (
@@ -2191,14 +2204,14 @@ export const CommunityPage = () => {
                     </div>
                   )}
 
-                  {/* Post Header: Author, Verification Badge, Time, Location */}
-                  <div className="flex items-start justify-between gap-2.5">
-                    <div className="flex items-start gap-2.5 sm:gap-3.5 flex-1 min-w-0">
+                  {/* Post Header: Facebook Style (Avatar + Name · Follow + Subline + Right controls) */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
                       <div
                         onClick={() => {
                           if (authorId) setSelectedUserIdForModal(authorId);
                         }}
-                        className="cursor-pointer group shrink-0 mt-0.5"
+                        className="cursor-pointer group shrink-0"
                         title="Xem trang cá nhân của tác giả"
                       >
                         <UserAvatar
@@ -2212,24 +2225,24 @@ export const CommunityPage = () => {
                             isVerified: true
                           }}
                           size="md"
-                          showBadge={true}
+                          showBadge={false}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        {/* Row 1: Name + Follow Button */}
-                        <div className="flex items-center gap-2 flex-wrap">
+                        {/* Row 1: Name · Theo dõi */}
+                        <div className="flex items-center gap-1.5 flex-wrap leading-tight">
                           <h4
                             onClick={() => {
                               if (authorId) setSelectedUserIdForModal(authorId);
                             }}
-                            className="font-extrabold text-sm sm:text-base text-slate-900 hover:text-blue-600 cursor-pointer transition-colors truncate max-w-[190px] sm:max-w-none"
+                            className="font-bold text-[14px] sm:text-[15px] text-slate-900 hover:text-blue-600 hover:underline cursor-pointer transition-colors truncate max-w-[190px] sm:max-w-none"
                             title={authorName}
                           >
                             {authorName}
                           </h4>
 
                           {post.sharedPost && (
-                            <span className="text-xs sm:text-sm font-normal text-slate-500 flex items-center gap-1">
+                            <span className="text-xs font-normal text-slate-500 flex items-center gap-1">
                               <span>đã chia sẻ bài viết của</span>
                               <strong
                                 onClick={(e) => {
@@ -2237,77 +2250,78 @@ export const CommunityPage = () => {
                                   const origAuthorId = post.sharedPost.authorId || post.sharedPost.author?.id;
                                   if (origAuthorId) setSelectedUserIdForModal(origAuthorId);
                                 }}
-                                className="font-bold text-slate-900 hover:text-blue-600 transition-colors cursor-pointer"
+                                className="font-bold text-slate-900 hover:text-blue-600 hover:underline transition-colors cursor-pointer"
                               >
-                                {post.sharedPost.authorName || post.sharedPost.author?.fullName || 'thành viên'}
+                                {(post.sharedPost.authorName || post.sharedPost.author?.fullName || 'thành viên').replace(/\s*\([^)]*\)\s*$/, '').trim()}
                               </strong>
                             </span>
                           )}
 
                           {isSelf ? (
-                            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
-                              Bạn
+                            <span className="text-[11px] text-slate-400 font-medium">
+                              (Bạn)
                             </span>
                           ) : authorId ? (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleFollowAuthor(authorId, authorName);
-                              }}
-                              disabled={followingLoadingIds.has(authorId)}
-                              className={`px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold transition-all inline-flex items-center gap-1 cursor-pointer shadow-2xs ${
-                                followingIds.has(Number(authorId))
-                                  ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 border border-slate-200'
-                                  : 'bg-sky-600 hover:bg-sky-700 text-white shadow-sky-600/20'
-                              }`}
-                              title={followingIds.has(Number(authorId)) ? 'Hủy theo dõi tác giả' : 'Theo dõi tác giả'}
-                            >
-                              {followingLoadingIds.has(authorId) ? (
-                                <Loader2 className="w-3 h-3 animate-spin" />
-                              ) : followingIds.has(Number(authorId)) ? (
-                                <>
-                                  <UserCheck className="w-3 h-3 text-sky-600" />
-                                  <span>Đang theo dõi</span>
-                                </>
-                              ) : (
-                                <>
-                                  <UserPlus className="w-3 h-3" />
+                            <div className="inline-flex items-center gap-1.5">
+                              <span className="text-slate-400 font-bold text-xs select-none">·</span>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleFollowAuthor(authorId, authorName);
+                                }}
+                                disabled={followingLoadingIds.has(authorId)}
+                                className="text-xs sm:text-[13px] font-bold text-sky-600 hover:text-sky-700 hover:underline cursor-pointer transition-colors disabled:opacity-50 inline-flex items-center gap-1"
+                                title={followingIds.has(Number(authorId)) ? 'Hủy theo dõi tác giả' : 'Theo dõi tác giả'}
+                              >
+                                {followingLoadingIds.has(authorId) ? (
+                                  <Loader2 className="w-3 h-3 animate-spin text-sky-600" />
+                                ) : followingIds.has(Number(authorId)) ? (
+                                  <span className="text-slate-500 font-semibold">Đang theo dõi</span>
+                                ) : (
                                   <span>Theo dõi</span>
-                                </>
-                              )}
-                            </button>
+                                )}
+                              </button>
+                            </div>
                           ) : null}
                         </div>
 
-                        {/* Row 2: Category + Time + Location (Compact single-line on mobile) */}
-                        <div className="text-[11px] sm:text-xs text-slate-500 flex items-center gap-1.5 mt-1 flex-wrap font-medium">
-                          {post.category && (
-                            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] sm:text-[11px] font-bold border border-blue-200/80">
-                              {post.category}
-                            </span>
-                          )}
-                          <span title={post.formattedDate || post.timeAgo}>{post.timeAgo || 'Vừa xong'}</span>
-                          <span className="hidden sm:inline text-slate-400">({post.formattedDate})</span>
+                        {/* Row 2: Metadata (Time · Location · Category · Globe icon) */}
+                        <div className="text-[11px] sm:text-xs text-slate-500 flex items-center gap-1 mt-0.5 font-normal flex-wrap">
+                          <span>{post.timeAgo || 'Vừa xong'}</span>
                           {post.locationTag && (
                             <>
-                              <span className="text-slate-300">•</span>
-                              <span className="inline-flex items-center gap-0.5 text-slate-700 font-semibold truncate max-w-[140px] sm:max-w-none">
-                                <MapPin className="w-3 h-3 text-blue-600 shrink-0" />
-                                <span>{post.locationTag}</span>
+                              <span className="text-slate-300">·</span>
+                              <span className="inline-flex items-center gap-0.5 text-slate-600 font-medium">
+                                <MapPin className="w-3 h-3 text-blue-500 shrink-0" />
+                                <span className="truncate max-w-[120px] sm:max-w-none">{post.locationTag}</span>
                               </span>
                             </>
                           )}
-                          {post.visibility === 'PRIVATE' && (
-                            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold inline-flex items-center gap-1 border border-slate-200">
-                              <Lock className="w-2.5 h-2.5" /> Chỉ mình tôi
+                          {post.category && (
+                            <>
+                              <span className="text-slate-300">·</span>
+                              <span className="text-slate-600 font-medium">{post.category}</span>
+                            </>
+                          )}
+                          <span className="text-slate-300">·</span>
+                          {post.visibility === 'PRIVATE' ? (
+                            <span className="inline-flex items-center text-slate-500" title="Chỉ mình tôi">
+                              <Lock className="w-2.5 h-2.5" />
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center text-slate-400" title="Công khai">
+                              <Globe className="w-3 h-3" />
                             </span>
                           )}
                         </div>
                       </div>
                     </div>
 
+                    {/* Header Right Actions: Bookmark + Options More Menu + Hide Post */}
                     <div className="flex items-center gap-0.5 shrink-0 self-start relative">
                       <button
+                        type="button"
                         onClick={() => handleToggleBookmark(post.id)}
                         className={`p-1.5 sm:p-2 rounded-xl transition-colors cursor-pointer ${
                           isBookmarked ? 'text-amber-500 bg-amber-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
@@ -2325,7 +2339,7 @@ export const CommunityPage = () => {
                             e.stopPropagation();
                             setOpenMenuPostId(prev => (prev === post.id ? null : post.id));
                           }}
-                          className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                          className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
                           title="Tùy chọn bài viết"
                         >
                           <MoreHorizontal className="w-4 h-4 pointer-events-none" />
@@ -2456,6 +2470,21 @@ export const CommunityPage = () => {
                           </div>
                         )}
                       </div>
+
+                      {/* Quick Hide Button (Facebook Style ✕) */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setHiddenPostIds(prev => new Set(prev).add(post.id));
+                          if (toast?.showInfo) toast.showInfo('Đã ẩn bài viết khỏi bảng tin của bạn');
+                          else if (toast?.info) toast.info('Đã ẩn bài viết khỏi bảng tin của bạn');
+                        }}
+                        className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                        title="Ẩn bài viết này"
+                      >
+                        <X className="w-4 h-4 pointer-events-none" />
+                      </button>
                     </div>
                   </div>
 
@@ -2606,31 +2635,52 @@ export const CommunityPage = () => {
                     </div>
                   ) : (
                     <>
-                      {/* Post Title & Content */}
+                      {/* Post Title & Content (Facebook style with '... Xem thêm' expand button) */}
                       <div className="space-y-1.5 sm:space-y-2">
                         {post.title && (
-                          <div className="flex items-start justify-between gap-2.5">
-                            <h3
-                              onClick={() => setSelectedPostForDetail(post)}
-                              className="font-extrabold text-sm sm:text-base lg:text-lg text-slate-900 leading-snug hover:text-blue-600 transition-colors cursor-pointer flex-1"
-                              title="Bấm để xem riêng chi tiết bài viết"
-                            >
-                              {post.title}
-                            </h3>
-                            <button
-                              type="button"
-                              onClick={() => setReadingPost(post)}
-                              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-800 text-xs font-bold transition-all shadow-2xs hover:shadow-xs shrink-0 cursor-pointer border border-sky-200/70 active:scale-95"
-                              title="Mở chế độ đọc blog bài viết toàn màn hình chuẩn tạp chí"
-                            >
-                              <BookOpen className="w-3.5 h-3.5 text-sky-600" />
-                              <span>Đọc bài</span>
-                            </button>
+                          <h3
+                            onClick={() => setSelectedPostForDetail(post)}
+                            className="font-bold text-[15px] sm:text-base text-slate-900 leading-snug hover:text-blue-600 transition-colors cursor-pointer"
+                            title="Bấm để xem riêng chi tiết bài viết"
+                          >
+                            {post.title}
+                          </h3>
+                        )}
+                        {post.content && (
+                          <div className="text-xs sm:text-sm text-slate-800 leading-relaxed font-normal tracking-[0.01em]">
+                            {(() => {
+                              const isExpanded = expandedPostIds.has(post.id);
+                              const shouldTruncate = post.content.length > 170 && !isExpanded;
+                              const textToShow = shouldTruncate
+                                ? post.content.slice(0, 170).trim()
+                                : post.content;
+
+                              return (
+                                <p className="whitespace-pre-line">
+                                  {renderTextWithMentions(textToShow, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
+                                  {shouldTruncate && (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleExpandPost(post.id)}
+                                      className="font-bold text-slate-900 hover:text-blue-600 hover:underline cursor-pointer ml-1 inline-block"
+                                    >
+                                      ... Xem thêm
+                                    </button>
+                                  )}
+                                  {isExpanded && post.content.length > 170 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleExpandPost(post.id)}
+                                      className="font-bold text-slate-400 hover:text-slate-600 hover:underline cursor-pointer ml-2 text-xs inline-block"
+                                    >
+                                      Thu gọn
+                                    </button>
+                                  )}
+                                </p>
+                              );
+                            })()}
                           </div>
                         )}
-                        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line font-normal tracking-[0.01em]">
-                          {renderTextWithMentions(post.content, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
-                        </p>
                       </div>
 
                       {/* Post Video Display */}
@@ -2791,18 +2841,19 @@ export const CommunityPage = () => {
                     </div>
                   )}
 
-                  {/* Post Interaction Bar */}
-                  <div className="flex items-center justify-between pt-3.5 border-t border-slate-100 text-xs text-slate-600 font-sans flex-wrap gap-y-2">
-                    <div className="flex items-center gap-3 sm:gap-5 flex-wrap">
+                  {/* Post Interaction Bar (Facebook Style) */}
+                  <div className="flex items-center justify-between pt-2.5 sm:pt-3 border-t border-slate-100 text-xs sm:text-sm text-slate-600 font-sans flex-wrap gap-y-2">
+                    <div className="flex items-center gap-1 sm:gap-2">
                       {/* Like Button */}
                       <button
                         type="button"
                         onClick={() => handleToggleLike(post.id)}
-                        className={`inline-flex items-center gap-1.5 font-bold transition-all cursor-pointer whitespace-nowrap ${
-                          post.isLiked ? 'text-rose-500 scale-105' : 'hover:text-rose-500 text-slate-600'
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+                          post.isLiked ? 'text-rose-600 font-bold' : 'text-slate-600 hover:text-rose-600'
                         }`}
+                        title={post.isLiked ? 'Bỏ thích' : 'Thích bài viết'}
                       >
-                        <Heart className={`w-4 h-4 shrink-0 ${post.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
+                        <Heart className={`w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0 ${post.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
                         <span>{post.likeCount || 0}</span>
                       </button>
 
@@ -2810,11 +2861,11 @@ export const CommunityPage = () => {
                       <button
                         type="button"
                         onClick={() => handleOpenComments(post)}
-                        className="inline-flex items-center gap-1.5 font-semibold hover:text-blue-700 text-slate-600 transition-colors cursor-pointer whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer whitespace-nowrap active:scale-95"
+                        title="Bình luận bài viết"
                       >
-                        <MessageCircle className="w-4 h-4 text-slate-400 shrink-0" />
+                        <MessageCircle className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-slate-500 shrink-0" />
                         <span>{post.commentCount || 0}</span>
-                        <span className="hidden sm:inline">bình luận</span>
                       </button>
 
                       {/* Share Button */}
@@ -2824,41 +2875,44 @@ export const CommunityPage = () => {
                           if (!requireAuth('chia sẻ bài viết')) return;
                           setSharingPost(post);
                         }}
-                        className="inline-flex items-center gap-1.5 font-semibold hover:text-blue-700 transition-colors cursor-pointer whitespace-nowrap"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-slate-100 font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer whitespace-nowrap active:scale-95"
                         title="Chia sẻ bài viết"
                       >
-                        <Share2 className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span className="hidden sm:inline">Chia sẻ</span>
+                        <Share2 className="w-4 h-4 sm:w-[18px] sm:h-[18px] text-slate-500 shrink-0" />
+                        <span>{post.shareCount || 0}</span>
                       </button>
 
-                      {/* Read Article Mode */}
+                    </div>
+
+                    {/* Right side: Reader Mode + Detail + Moderation */}
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       <button
                         type="button"
                         onClick={() => setReadingPost(post)}
-                        className="inline-flex items-center gap-1.5 font-bold text-sky-700 hover:text-sky-800 transition-colors cursor-pointer whitespace-nowrap"
-                        title="Đọc bài viết trong giao diện đọc tạp chí chuyên sâu"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200/60 transition-colors cursor-pointer whitespace-nowrap active:scale-95"
+                        title="Mở chế độ đọc blog bài viết toàn màn hình chuẩn tạp chí"
                       >
-                        <BookOpen className="w-4 h-4 text-sky-600 shrink-0" />
-                        <span className="hidden sm:inline">Đọc blog</span>
+                        <BookOpen className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                        <span className="hidden sm:inline">Đọc bài</span>
                       </button>
 
                       {/* View Single Post Button */}
                       <button
                         type="button"
                         onClick={() => setSelectedPostForDetail(post)}
-                        className="inline-flex items-center gap-1.5 font-bold text-blue-700 hover:text-blue-800 transition-colors cursor-pointer whitespace-nowrap"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer whitespace-nowrap active:scale-95"
                         title="Xem riêng bài viết"
                       >
-                        <Eye className="w-4 h-4 shrink-0" />
-                        <span className="hidden sm:inline">Xem riêng</span>
+                        <Eye className="w-3.5 h-3.5 shrink-0" />
+                        <span className="hidden sm:inline">Chi tiết</span>
                       </button>
-                    </div>
 
-                    {/* Report / Moderation status */}
-                    <span className="text-[11px] text-slate-400 inline-flex items-center gap-1 whitespace-nowrap shrink-0">
-                      <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                      <span className="hidden md:inline">Đã kiểm duyệt</span>
-                    </span>
+                      {/* Report / Moderation status */}
+                      <span className="text-[11px] text-slate-400 inline-flex items-center gap-1 whitespace-nowrap shrink-0">
+                        <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                        <span className="hidden md:inline">Đã duyệt</span>
+                      </span>
+                    </div>
                   </div>
                 </article>
               );
