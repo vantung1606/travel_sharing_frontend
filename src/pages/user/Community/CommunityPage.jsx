@@ -1389,9 +1389,9 @@ export const CommunityPage = () => {
   }, [posts]);
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden min-h-screen bg-[#f8fafc] text-slate-900 pb-16 sm:pb-20">
+    <div className="w-full max-w-full overflow-x-hidden min-h-screen bg-[#f8fafc] text-slate-900 pb-16 sm:pb-20 -mt-16">
       {/* ─── 1. FULL-WIDTH CINEMATIC COMMUNITY HERO (NỀN LOANG RA ÊM ÁI, GỌN GÀNG, DỮ LIỆU THẬT) ─── */}
-      <section className="relative w-full overflow-hidden -mt-16 pt-24 pb-14 sm:pt-26 sm:pb-16 lg:pt-28 lg:pb-18 bg-[#031726] text-white select-none">
+      <section className="relative w-full overflow-hidden pt-20 sm:pt-24 pb-14 sm:pb-16 lg:pt-28 lg:pb-18 bg-[#031726] text-white select-none">
         {/* Full-width Cinematic Backdrop with Vibrant Landscape & Seamless Bottom Loang Blend */}
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
           <div
@@ -2192,13 +2192,13 @@ export const CommunityPage = () => {
                   )}
 
                   {/* Post Header: Author, Verification Badge, Time, Location */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3.5">
+                  <div className="flex items-start justify-between gap-2.5">
+                    <div className="flex items-start gap-2.5 sm:gap-3.5 flex-1 min-w-0">
                       <div
                         onClick={() => {
                           if (authorId) setSelectedUserIdForModal(authorId);
                         }}
-                        className="cursor-pointer group shrink-0"
+                        className="cursor-pointer group shrink-0 mt-0.5"
                         title="Xem trang cá nhân của tác giả"
                       >
                         <UserAvatar
@@ -2215,14 +2215,15 @@ export const CommunityPage = () => {
                           showBadge={true}
                         />
                       </div>
-                      <div>
+                      <div className="flex-1 min-w-0">
+                        {/* Row 1: Name + Follow Button */}
                         <div className="flex items-center gap-2 flex-wrap">
                           <h4
                             onClick={() => {
                               if (authorId) setSelectedUserIdForModal(authorId);
                             }}
-                            className="font-extrabold text-sm sm:text-base text-slate-900 hover:text-blue-600 cursor-pointer transition-colors"
-                            title="Xem trang cá nhân của tác giả"
+                            className="font-extrabold text-sm sm:text-base text-slate-900 hover:text-blue-600 cursor-pointer transition-colors truncate max-w-[190px] sm:max-w-none"
+                            title={authorName}
                           >
                             {authorName}
                           </h4>
@@ -2244,7 +2245,7 @@ export const CommunityPage = () => {
                           )}
 
                           {isSelf ? (
-                            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
+                            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
                               Bạn
                             </span>
                           ) : authorId ? (
@@ -2254,7 +2255,7 @@ export const CommunityPage = () => {
                                 handleToggleFollowAuthor(authorId, authorName);
                               }}
                               disabled={followingLoadingIds.has(authorId)}
-                              className={`px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1 cursor-pointer shadow-2xs ${
+                              className={`px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-bold transition-all inline-flex items-center gap-1 cursor-pointer shadow-2xs ${
                                 followingIds.has(Number(authorId))
                                   ? 'bg-slate-100 text-slate-700 hover:bg-rose-50 hover:text-rose-600 border border-slate-200'
                                   : 'bg-sky-600 hover:bg-sky-700 text-white shadow-sky-600/20'
@@ -2265,48 +2266,50 @@ export const CommunityPage = () => {
                                 <Loader2 className="w-3 h-3 animate-spin" />
                               ) : followingIds.has(Number(authorId)) ? (
                                 <>
-                                  <UserCheck className="w-3.5 h-3.5 text-sky-600" />
+                                  <UserCheck className="w-3 h-3 text-sky-600" />
                                   <span>Đang theo dõi</span>
                                 </>
                               ) : (
                                 <>
-                                  <UserPlus className="w-3.5 h-3.5" />
+                                  <UserPlus className="w-3 h-3" />
                                   <span>Theo dõi</span>
                                 </>
                               )}
                             </button>
                           ) : null}
+                        </div>
+
+                        {/* Row 2: Category + Time + Location (Compact single-line on mobile) */}
+                        <div className="text-[11px] sm:text-xs text-slate-500 flex items-center gap-1.5 mt-1 flex-wrap font-medium">
                           {post.category && (
-                            <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200/80">
+                            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] sm:text-[11px] font-bold border border-blue-200/80">
                               {post.category}
                             </span>
                           )}
+                          <span title={post.formattedDate || post.timeAgo}>{post.timeAgo || 'Vừa xong'}</span>
+                          <span className="hidden sm:inline text-slate-400">({post.formattedDate})</span>
+                          {post.locationTag && (
+                            <>
+                              <span className="text-slate-300">•</span>
+                              <span className="inline-flex items-center gap-0.5 text-slate-700 font-semibold truncate max-w-[140px] sm:max-w-none">
+                                <MapPin className="w-3 h-3 text-blue-600 shrink-0" />
+                                <span>{post.locationTag}</span>
+                              </span>
+                            </>
+                          )}
                           {post.visibility === 'PRIVATE' && (
-                            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold flex items-center gap-1 border border-slate-200">
-                              <Lock className="w-3 h-3" /> Chỉ mình tôi
+                            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold inline-flex items-center gap-1 border border-slate-200">
+                              <Lock className="w-2.5 h-2.5" /> Chỉ mình tôi
                             </span>
                           )}
                         </div>
-                        <p className="text-xs sm:text-[13px] text-slate-500 flex items-center gap-1.5 mt-0.5 flex-wrap font-medium">
-                          <span title={post.formattedDate || post.timeAgo}>{post.timeAgo || 'Vừa xong'}</span>
-                          {post.formattedDate && (
-                            <span className="text-slate-400">({post.formattedDate})</span>
-                          )}
-                          {post.locationTag && (
-                            <>
-                              <span>•</span>
-                              <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
-                              <span className="text-slate-700 font-semibold">{post.locationTag}</span>
-                            </>
-                          )}
-                        </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 relative">
+                    <div className="flex items-center gap-0.5 shrink-0 self-start relative">
                       <button
                         onClick={() => handleToggleBookmark(post.id)}
-                        className={`p-2 rounded-xl transition-colors cursor-pointer ${
+                        className={`p-1.5 sm:p-2 rounded-xl transition-colors cursor-pointer ${
                           isBookmarked ? 'text-amber-500 bg-amber-50' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
                         }`}
                         title={isBookmarked ? 'Bỏ lưu' : 'Lưu bài viết'}
@@ -2604,30 +2607,28 @@ export const CommunityPage = () => {
                   ) : (
                     <>
                       {/* Post Title & Content */}
-                      <div className="space-y-2">
-                        <div className="flex items-start justify-between gap-3">
-                          {post.title ? (
+                      <div className="space-y-1.5 sm:space-y-2">
+                        {post.title && (
+                          <div className="flex items-start justify-between gap-2.5">
                             <h3
                               onClick={() => setSelectedPostForDetail(post)}
-                              className="font-display font-extrabold text-base sm:text-lg text-slate-900 leading-snug hover:text-blue-600 transition-colors cursor-pointer flex-1"
+                              className="font-extrabold text-sm sm:text-base lg:text-lg text-slate-900 leading-snug hover:text-blue-600 transition-colors cursor-pointer flex-1"
                               title="Bấm để xem riêng chi tiết bài viết"
                             >
                               {post.title}
                             </h3>
-                          ) : (
-                            <div className="flex-1" />
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => setReadingPost(post)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-800 text-xs font-bold transition-all shadow-2xs hover:shadow-xs shrink-0 cursor-pointer border border-sky-200/70 active:scale-95"
-                            title="Mở chế độ đọc blog bài viết toàn màn hình chuẩn tạp chí"
-                          >
-                            <BookOpen className="w-3.5 h-3.5 text-sky-600" />
-                            <span>Đọc bài</span>
-                          </button>
-                        </div>
-                        <p className="text-sm sm:text-[15px] text-slate-700 leading-relaxed whitespace-pre-line font-normal tracking-[0.015em]">
+                            <button
+                              type="button"
+                              onClick={() => setReadingPost(post)}
+                              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 hover:text-sky-800 text-xs font-bold transition-all shadow-2xs hover:shadow-xs shrink-0 cursor-pointer border border-sky-200/70 active:scale-95"
+                              title="Mở chế độ đọc blog bài viết toàn màn hình chuẩn tạp chí"
+                            >
+                              <BookOpen className="w-3.5 h-3.5 text-sky-600" />
+                              <span>Đọc bài</span>
+                            </button>
+                          </div>
+                        )}
+                        <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line font-normal tracking-[0.01em]">
                           {renderTextWithMentions(post.content, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
                         </p>
                       </div>
