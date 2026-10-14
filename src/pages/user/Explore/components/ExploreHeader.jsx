@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Store, Compass, Navigation, PlusCircle, MapPin, CloudSun } from 'lucide-react';
+import { Sparkles, Store, Compass, Navigation, PlusCircle, CloudSun } from 'lucide-react';
 
 export const ExploreHeader = ({
   placesCount = 0,
@@ -13,12 +13,12 @@ export const ExploreHeader = ({
 }) => {
   // Trạm thời tiết du lịch nhanh của các vùng đất tiêu biểu
   const weatherTickers = [
-    { city: 'Đà Lạt', temp: '18°C', icon: '🌫️', status: 'Se lạnh săn mây', bg: 'hover:border-sky-400' },
-    { city: 'Sa Pa', temp: '16°C', icon: '⛅', status: 'Sương mù mây ngàn', bg: 'hover:border-emerald-400' },
-    { city: 'Phú Quốc', temp: '29°C', icon: '☀️', status: 'Nắng ấm biển êm', bg: 'hover:border-amber-400' },
-    { city: 'Đà Nẵng', temp: '26°C', icon: '🌤️', status: 'Gió biển dễ chịu', bg: 'hover:border-cyan-400' },
-    { city: 'Hà Giang', temp: '21°C', icon: '🌾', status: 'Mát mẻ view đèo', bg: 'hover:border-orange-400' },
-    { city: 'Ninh Bình', temp: '23°C', icon: '🛶', status: 'Non nước thanh bình', bg: 'hover:border-indigo-400' }
+    { city: 'Đà Lạt', temp: '18°C', icon: '🌫️', status: 'Se lạnh săn mây' },
+    { city: 'Sa Pa', temp: '16°C', icon: '⛅', status: 'Sương mù mây ngàn' },
+    { city: 'Phú Quốc', temp: '29°C', icon: '☀️', status: 'Nắng ấm biển êm' },
+    { city: 'Đà Nẵng', temp: '26°C', icon: '🌤️', status: 'Gió biển dễ chịu' },
+    { city: 'Hà Giang', temp: '21°C', icon: '🌾', status: 'Mát mẻ view đèo' },
+    { city: 'Ninh Bình', temp: '23°C', icon: '🛶', status: 'Non nước thanh bình' }
   ];
 
   return (
@@ -33,73 +33,77 @@ export const ExploreHeader = ({
         <span className="text-slate-900 font-bold">Khám phá & Tọa độ Du lịch</span>
       </div>
 
-      {/* 2. Modern Compact Header Ribbon */}
-      <div className="bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 rounded-3xl p-5 sm:p-7 text-white relative overflow-hidden shadow-xl border border-sky-500/20">
-        {/* Subtle Ambient Glow */}
-        <div className="absolute top-0 right-0 w-72 h-72 bg-sky-500/10 rounded-full blur-[80px] pointer-events-none" />
-        <div className="absolute -bottom-8 left-1/4 w-60 h-60 bg-amber-500/10 rounded-full blur-[70px] pointer-events-none" />
+      {/* 2. Modern Clean & Breathable Header Card (Giao diện Sáng, Tinh tế, Không đen tối thô kệch) */}
+      <div className="bg-gradient-to-br from-white via-slate-50/60 to-sky-50/40 rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-xs relative overflow-hidden">
+        {/* Soft Decorative Ambient Background */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-sky-200/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-10 left-1/3 w-64 h-64 bg-amber-100/30 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          {/* Left: Title & Live Highlights */}
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-sky-300 text-xs font-bold border border-white/15">
-              <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-spin-slow" />
+          {/* Left: Title & Subtitle */}
+          <div className="space-y-2.5 max-w-2xl">
+            {/* Pill Tag */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-50 text-sky-800 text-xs font-bold border border-sky-200/80 shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
               <span>Wayfare Explorer • Bản Đồ Du Lịch Bản Địa Việt Nam</span>
             </div>
 
-            <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+            {/* Page Heading */}
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 leading-snug">
               Khám Phá Điểm Đến & Khí Hậu Du Lịch
             </h1>
 
-            <p className="text-slate-300 text-xs sm:text-sm font-normal leading-relaxed">
-              Theo dõi thời tiết thời gian thực, duyệt danh thắng kỳ vĩ và tọa độ săn mây trên khắp 63 tỉnh thành. Bấm chọn bất kỳ địa điểm nào để mở bản đồ chi tiết và lộ trình di chuyển.
+            {/* Subtitle */}
+            <p className="text-slate-600 text-xs sm:text-sm font-normal leading-relaxed">
+              Theo dõi thời tiết thực tế, duyệt danh thắng kỳ vĩ và tọa độ săn mây trên khắp 63 tỉnh thành. Bấm chọn địa điểm để xem bản đồ chi tiết và lộ trình di chuyển.
             </p>
 
-            {/* Micro Live Metrics */}
-            <div className="flex flex-wrap items-center gap-4 pt-1 text-xs text-sky-200/90 font-medium">
-              <span className="flex items-center gap-1.5">
-                <Store className="w-3.5 h-3.5 text-emerald-400" />
-                <strong className="text-white font-bold">{placesCount}+</strong> Tọa độ & Điểm đến
+            {/* Live Metrics Row */}
+            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-slate-500 font-medium">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-slate-200/80 text-slate-700 shadow-2xs font-semibold">
+                <Store className="w-3.5 h-3.5 text-sky-600" />
+                <strong className="text-slate-900 font-bold">{placesCount}+</strong> Tọa độ & Điểm đến
               </span>
-              <span className="text-sky-500">•</span>
-              <span className="flex items-center gap-1.5">
-                <CloudSun className="w-3.5 h-3.5 text-amber-400" />
-                <span className="text-amber-200 font-bold">Dự báo vệ tinh Open-Meteo</span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-slate-200/80 text-slate-700 shadow-2xs font-semibold">
+                <CloudSun className="w-3.5 h-3.5 text-amber-500" />
+                <span>Dự báo Open-Meteo vệ tinh</span>
               </span>
-              <span className="text-sky-500">•</span>
-              <span className="text-emerald-300 font-semibold">Tự động cập nhật</span>
+              <span className="inline-flex items-center gap-1.5 text-emerald-600 font-bold text-[11px]">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Tự động cập nhật
+              </span>
             </div>
           </div>
 
-          {/* Right: Quick Action Buttons */}
+          {/* Right: Harmonized Quick Action Buttons */}
           <div className="relative z-10 shrink-0 flex flex-wrap items-center gap-2.5">
             {/* GPS Radar Button */}
             <button
               onClick={onGetLiveLocation}
               disabled={isLocating}
-              className={`px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer border ${
+              className={`px-3.5 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer border shadow-2xs ${
                 userCoords
-                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/40 shadow-sm'
-                  : 'bg-white/10 text-slate-200 border-white/15 hover:bg-white/15'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+                  : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
               }`}
             >
-              <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin text-sky-400' : 'text-emerald-400'}`} />
+              <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin text-sky-500' : 'text-emerald-600'}`} />
               <span>{userCoords ? '📍 Đang dùng GPS' : 'Bật Radar GPS'}</span>
             </button>
 
             {/* AI Generator Button */}
             <button
               onClick={onOpenAIGenerator}
-              className="px-4 py-2.5 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs flex items-center gap-2 backdrop-blur-md transition-all cursor-pointer"
+              className="px-4 py-2.5 rounded-2xl bg-amber-50 hover:bg-amber-100/80 border border-amber-200/80 text-amber-800 font-bold text-xs flex items-center gap-2 shadow-2xs transition-all cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+              <Sparkles className="w-3.5 h-3.5 text-amber-600" />
               <span>Tour AI</span>
             </button>
 
-            {/* Add Place Button */}
+            {/* Add Place Button - Brand Sky color instead of clashing neon orange */}
             <button
               onClick={onOpenAddPlaceModal}
-              className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-orange-500/20 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+              className="px-4 py-2.5 rounded-2xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-2 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
             >
               <PlusCircle className="w-3.5 h-3.5" />
               <span>+ Đăng địa điểm</span>
@@ -110,7 +114,7 @@ export const ExploreHeader = ({
 
       {/* 3. Live Weather Stations Ribbon (Thanh Thời Tiết Du Lịch Trực Tiếp) */}
       <div className="flex items-center gap-2.5 overflow-x-auto pb-1 no-scrollbar">
-        <span className="text-[11px] font-black uppercase tracking-wider text-slate-600 shrink-0 flex items-center gap-1 pl-1">
+        <span className="text-[11px] font-black uppercase tracking-wider text-slate-500 shrink-0 flex items-center gap-1 pl-1">
           <CloudSun className="w-3.5 h-3.5 text-sky-600" />
           <span>Thời tiết nhanh:</span>
         </span>
@@ -118,7 +122,7 @@ export const ExploreHeader = ({
           <button
             key={station.city}
             onClick={() => onQuickFilterCity(station.city)}
-            className={`px-3 py-1.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/90 shadow-2xs text-xs font-semibold flex items-center gap-2 shrink-0 transition-all cursor-pointer group ${station.bg}`}
+            className="px-3 py-1.5 rounded-2xl bg-white hover:bg-sky-50 border border-slate-200/80 hover:border-sky-300 shadow-2xs text-xs font-semibold flex items-center gap-2 shrink-0 transition-all cursor-pointer group"
           >
             <span className="text-base select-none">{station.icon}</span>
             <span className="font-bold text-slate-800 group-hover:text-sky-600 transition-colors">{station.city}</span>
