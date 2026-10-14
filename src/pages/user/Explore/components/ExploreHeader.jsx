@@ -45,38 +45,38 @@ export const ExploreHeader = ({
           </p>
         </div>
 
-        {/* Right: Quick Action Buttons */}
-        <div className="flex items-center gap-2 shrink-0 flex-wrap">
+        {/* Right: Quick Action Buttons - 3 columns grid on mobile so they fit in 1 neat row */}
+        <div className="grid grid-cols-3 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto shrink-0">
           {/* GPS Radar Button */}
           <button
             onClick={onGetLiveLocation}
             disabled={isLocating}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border shadow-2xs ${
+            className={`w-full sm:w-auto px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer border shadow-2xs ${
               userCoords
                 ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
                 : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
             }`}
           >
-            <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin text-sky-500' : 'text-emerald-600'}`} />
-            <span>{userCoords ? '📍 Đang dùng GPS' : 'Gần tôi'}</span>
+            <Navigation className={`w-3.5 h-3.5 shrink-0 ${isLocating ? 'animate-spin text-sky-500' : 'text-emerald-600'}`} />
+            <span className="truncate">{userCoords ? '📍 Đang dùng' : 'Gần tôi'}</span>
           </button>
 
           {/* Quick Itinerary Planner Button */}
           <button
             onClick={onOpenAIGenerator}
-            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+            className="w-full sm:w-auto px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-800 font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow-2xs transition-all cursor-pointer"
           >
-            <Calendar className="w-3.5 h-3.5 text-sky-600" />
-            <span>Gợi ý lịch trình</span>
+            <Calendar className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+            <span className="truncate">Lịch trình</span>
           </button>
 
           {/* Add Place Button */}
           <button
             onClick={onOpenAddPlaceModal}
-            className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs hover:shadow-sm transition-all cursor-pointer"
+            className="w-full sm:w-auto px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow-xs hover:shadow-sm transition-all cursor-pointer"
           >
-            <PlusCircle className="w-3.5 h-3.5" />
-            <span>+ Đăng địa điểm</span>
+            <PlusCircle className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">+ Đăng điểm</span>
           </button>
         </div>
       </div>
@@ -88,21 +88,21 @@ export const ExploreHeader = ({
             e.currentTarget.scrollLeft += e.deltaY;
           }
         }}
-        className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar pt-0.5 scroll-smooth"
+        className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar pt-0.5 scroll-smooth"
       >
-        <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1 pl-0.5">
-          <CloudSun className="w-3.5 h-3.5 text-sky-500" />
-          <span>Thời tiết:</span>
+        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1 pl-0.5">
+          <CloudSun className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+          <span className="hidden sm:inline">Thời tiết:</span>
         </span>
         {weatherTickers.map((station) => (
           <button
             key={station.city}
             onClick={() => onQuickFilterCity(station.city)}
-            className="px-2.5 py-1 rounded-xl bg-white hover:bg-sky-50 border border-slate-200/80 hover:border-sky-300 shadow-2xs text-xs font-semibold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer group"
+            className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg sm:rounded-xl bg-white hover:bg-sky-50 border border-slate-200/80 hover:border-sky-300 shadow-2xs text-[11px] sm:text-xs font-semibold flex items-center gap-1 shrink-0 transition-all cursor-pointer group"
           >
-            <span className="text-sm select-none">{station.icon}</span>
+            <span className="text-xs sm:text-sm select-none">{station.icon}</span>
             <span className="font-bold text-slate-700 group-hover:text-sky-600 transition-colors">{station.city}</span>
-            <span className="font-extrabold text-sky-700 text-xs">{station.temp}</span>
+            <span className="font-extrabold text-sky-700 text-[11px] sm:text-xs">{station.temp}</span>
             <span className="text-[10px] text-slate-400 hidden lg:inline">• {station.status}</span>
           </button>
         ))}

@@ -31,17 +31,17 @@ export const ExploreFilterBar = ({
 
   return (
     <div className="bg-white rounded-2xl p-3.5 sm:p-4.5 shadow-xs border border-slate-200/80 space-y-3">
-      {/* 1. TOP ROW: PRIMARY DISCOVERY TABS & SAVED TAB + VIEW MODE SWITCHER (Tự động xuống dòng khi màn hình hẹp, không bao giờ bị cắt chữ) */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2.5 border-b border-slate-100">
-        {/* Layer Tabs */}
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+      {/* 1. TOP ROW: PRIMARY DISCOVERY TABS & SAVED TAB + VIEW MODE SWITCHER */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-2.5 pb-2.5 border-b border-slate-100">
+        {/* Layer Tabs - 3 cols on mobile so all 3 fit in 1 neat row */}
+        <div className="grid grid-cols-3 sm:flex sm:items-center gap-1 sm:gap-2 w-full sm:w-auto">
           {/* Tab: Local Spots */}
           <button
             onClick={() => {
               setExploreLayer('spots');
               setSelectedCategory('Tất cả');
             }}
-            className={`px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+            className={`w-full sm:w-auto px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
               exploreLayer === 'spots'
                 ? 'bg-sky-600 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
@@ -49,8 +49,8 @@ export const ExploreFilterBar = ({
           >
             <Store className="w-3.5 h-3.5 shrink-0" />
             <span className="hidden sm:inline">Tọa độ bản địa</span>
-            <span className="inline sm:hidden">Tọa độ</span>
-            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+            <span className="inline sm:hidden truncate">Tọa độ</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[9px] sm:text-[10px] font-black shrink-0 ${
               exploreLayer === 'spots' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
             }`}>
               {placesCount}
@@ -63,7 +63,7 @@ export const ExploreFilterBar = ({
               setExploreLayer('destinations');
               setSelectedCategory('Tất cả');
             }}
-            className={`px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+            className={`w-full sm:w-auto px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
               exploreLayer === 'destinations'
                 ? 'bg-sky-600 text-white shadow-xs'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
@@ -71,8 +71,8 @@ export const ExploreFilterBar = ({
           >
             <Compass className="w-3.5 h-3.5 shrink-0" />
             <span className="hidden sm:inline">Cẩm nang Tỉnh thành</span>
-            <span className="inline sm:hidden">Tỉnh thành</span>
-            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+            <span className="inline sm:hidden truncate">Tỉnh thành</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[9px] sm:text-[10px] font-black shrink-0 ${
               exploreLayer === 'destinations' ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'
             }`}>
               {destinationsCount}
@@ -85,7 +85,7 @@ export const ExploreFilterBar = ({
               setExploreLayer('saved');
               setSelectedCategory('Tất cả');
             }}
-            className={`px-3 sm:px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+            className={`w-full sm:w-auto px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 sm:gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
               exploreLayer === 'saved'
                 ? 'bg-rose-600 text-white shadow-xs'
                 : savedCount > 0
@@ -95,8 +95,8 @@ export const ExploreFilterBar = ({
           >
             <Heart className={`w-3.5 h-3.5 shrink-0 ${exploreLayer === 'saved' ? 'fill-current' : 'text-rose-500 fill-rose-500/20'}`} />
             <span className="hidden sm:inline">Địa điểm đã lưu</span>
-            <span className="inline sm:hidden">Đã lưu</span>
-            <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-black ${
+            <span className="inline sm:hidden truncate">Đã lưu</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[9px] sm:text-[10px] font-black shrink-0 ${
               exploreLayer === 'saved' ? 'bg-white/20 text-white' : savedCount > 0 ? 'bg-rose-500 text-white shadow-2xs' : 'bg-slate-200 text-slate-700'
             }`}>
               {savedCount}
@@ -105,36 +105,36 @@ export const ExploreFilterBar = ({
         </div>
 
         {/* View Mode Switcher (Split | Grid | Map) */}
-        <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl shrink-0 border border-slate-200/60 ml-auto sm:ml-0">
+        <div className="grid grid-cols-3 sm:flex sm:items-center gap-1 p-0.5 sm:p-1 bg-slate-100 rounded-xl shrink-0 border border-slate-200/60 w-full sm:w-auto">
           <button
             onClick={() => setViewMode('split')}
             title="Chế độ chia đôi (Danh sách + Bản đồ)"
-            className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
+            className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0 ${
               viewMode === 'split' ? 'bg-white text-sky-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <List className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Chia đôi</span>
+            <span className="hidden sm:inline">Chia đôi</span>
           </button>
           <button
             onClick={() => setViewMode('grid')}
             title="Chế độ lưới toàn cảnh"
-            className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
+            className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0 ${
               viewMode === 'grid' ? 'bg-white text-sky-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <Grid className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Lưới card</span>
+            <span className="hidden sm:inline">Lưới card</span>
           </button>
           <button
             onClick={() => setViewMode('map')}
             title="Bản đồ tọa độ toàn cảnh"
-            className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
+            className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer shrink-0 ${
               viewMode === 'map' ? 'bg-white text-sky-700 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             <MapIcon className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Bản đồ</span>
+            <span className="hidden sm:inline">Bản đồ</span>
           </button>
         </div>
       </div>

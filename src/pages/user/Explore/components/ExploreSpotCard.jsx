@@ -30,10 +30,10 @@ export const ExploreSpotCard = ({
     <div
       id={`explore-card-${item.id}`}
       onClick={() => onOpenDetail(item)}
-      className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 hover:border-sky-400 shadow-2xs hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative"
+      className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/80 hover:border-sky-400 shadow-2xs hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative"
     >
-      {/* 1. Panoramic Image Cover */}
-      <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-900 shrink-0">
+      {/* 1. Panoramic Image Cover - Compact height on mobile */}
+      <div className="relative h-32 sm:h-52 w-full overflow-hidden bg-slate-900 shrink-0">
         <img
           src={item.image}
           alt={item.name}
@@ -43,37 +43,37 @@ export const ExploreSpotCard = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
         {/* Top Badges Row */}
-        <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between pointer-events-none">
+        <div className="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none">
           {/* Category Pill Tag */}
-          <span className="px-3 py-1 rounded-full bg-slate-950/75 backdrop-blur-md text-[10px] font-bold text-white shadow-xs border border-white/15 tracking-wide">
+          <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[9px] sm:text-[10px] font-bold text-white shadow-xs border border-white/15 tracking-wide">
             {item.category}
           </span>
 
           {/* Wishlist Heart Button (pointer-events-auto) */}
           <button
             onClick={(e) => onToggleSave(item, e)}
-            className={`w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all cursor-pointer pointer-events-auto ${
+            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all cursor-pointer pointer-events-auto ${
               isSaved
                 ? 'bg-rose-500 text-white shadow-md scale-105'
                 : 'bg-black/40 text-white hover:bg-black/60'
             }`}
             title={isSaved ? 'Gỡ khỏi yêu thích' : 'Lưu vào yêu thích'}
           >
-            <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
+            <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isSaved ? 'fill-current' : ''}`} />
           </button>
         </div>
 
         {/* Bottom Badges on Image: Weather Vibe + GPS */}
-        <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-white pointer-events-none">
+        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white pointer-events-none">
           {/* Weather Tag */}
-          <span className="px-2.5 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[10px] font-semibold text-sky-200 flex items-center gap-1 border border-sky-400/25 shadow-xs">
+          <span className="px-2 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[9px] sm:text-[10px] font-semibold text-sky-200 flex items-center gap-1 border border-sky-400/25 shadow-xs">
             <span>{weather.icon}</span>
             <span>{weather.temp}°C • {weather.label}</span>
           </span>
 
           {/* GPS Distance (if radar active) */}
           {item.distanceKm && (
-            <span className="px-2 py-0.5 rounded-full bg-emerald-600/90 backdrop-blur-md text-[10px] font-bold text-white flex items-center gap-1 shadow-xs">
+            <span className="px-2 py-0.5 rounded-full bg-emerald-600/90 backdrop-blur-md text-[9px] sm:text-[10px] font-bold text-white flex items-center gap-1 shadow-xs">
               <Navigation className="w-2.5 h-2.5 text-white" />
               <span>{item.distanceKm} km</span>
             </span>
@@ -82,36 +82,36 @@ export const ExploreSpotCard = ({
       </div>
 
       {/* 2. Content Info Details */}
-      <div className="p-4 flex-1 flex flex-col justify-between space-y-2.5">
+      <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between space-y-1.5 sm:space-y-2.5">
         <div>
           {/* City & Rating Row */}
-          <div className="flex items-center justify-between gap-2 text-xs">
+          <div className="flex items-center justify-between gap-1.5 text-[11px] sm:text-xs">
             <span className="font-bold text-slate-500 flex items-center gap-1 truncate">
-              <MapPin className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+              <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-sky-600 shrink-0" />
               <span className="truncate">{item.city}</span>
               {item.region && <span className="text-slate-400 font-normal shrink-0">• {item.region}</span>}
             </span>
 
-            <div className="flex items-center gap-1 font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded-lg border border-amber-200/60 shrink-0">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <div className="flex items-center gap-1 font-black text-amber-600 bg-amber-50 px-1.5 sm:px-2 py-0.5 rounded-lg border border-amber-200/60 shrink-0">
+              <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-amber-400 text-amber-400" />
               <span>{item.rating || '4.9'}</span>
               <span className="text-[10px] text-slate-400 font-normal">({item.reviewsCount || 120})</span>
             </div>
           </div>
 
           {/* Place Title */}
-          <h3 className="font-display font-extrabold text-base text-slate-900 mt-1 line-clamp-1 group-hover:text-sky-600 transition-colors">
+          <h3 className="font-display font-extrabold text-sm sm:text-base text-slate-900 mt-1 line-clamp-1 group-hover:text-sky-600 transition-colors">
             {item.name}
           </h3>
 
-          {/* Short Description with minimum height for grid alignment */}
-          <p className="text-xs text-slate-500 line-clamp-2 mt-1 leading-relaxed min-h-[32px]">
+          {/* Short Description */}
+          <p className="text-[11px] sm:text-xs text-slate-500 line-clamp-2 mt-0.5 sm:mt-1 leading-relaxed">
             {item.description || item.tagline}
           </p>
         </div>
 
         {/* 3. Footer: Refined, Spacious & Zero Overflow */}
-        <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-2">
+        <div className="pt-2 sm:pt-2.5 border-t border-slate-100 flex items-center justify-between gap-1.5 sm:gap-2">
           {/* Price Tag */}
           <div className="min-w-0 flex items-center">
             {priceInfo.isFree ? (
