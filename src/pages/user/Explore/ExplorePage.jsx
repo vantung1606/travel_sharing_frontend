@@ -42,8 +42,8 @@ export const ExplorePage = () => {
   // 1. Primary Discovery Layer: 'spots' (Tọa độ & Cơ sở bản địa) | 'destinations' (Cẩm nang Tỉnh thành)
   const [exploreLayer, setExploreLayer] = useState('spots');
 
-  // 2. View Mode: 'split' (Cards + Map) | 'grid' (All Cards Grid) | 'map' (Full Map)
-  const [viewMode, setViewMode] = useState('split');
+  // 2. View Mode: 'grid' (Mặc định: Lưới trực quan) | 'split' (Chia đôi) | 'map' (Toàn bản đồ)
+  const [viewMode, setViewMode] = useState('grid');
   const [mapStyle, setMapStyle] = useState('osm');
 
   // 3. Filter States
@@ -548,6 +548,13 @@ export const ExplorePage = () => {
     toast.info('Đã đặt lại tất cả bộ lọc');
   };
 
+  // Quick City & Weather Filter
+  const handleQuickFilterCity = (cityName) => {
+    setSearchQuery(cityName);
+    setSelectedCategory('Tất cả');
+    toast.info(`Đang hiển thị điểm đến & thời tiết tại ${cityName} 🌤️`);
+  };
+
   return (
     <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 space-y-6">
       
@@ -560,6 +567,7 @@ export const ExplorePage = () => {
         onGetLiveLocation={handleGetLiveLocation}
         onOpenAddPlaceModal={() => setIsAddPlaceModalOpen(true)}
         onOpenAIGenerator={() => setIsAIGeneratorOpen(true)}
+        onQuickFilterCity={handleQuickFilterCity}
       />
 
       {/* 2. DUAL-LAYER FILTER & SEARCH TOOLBAR */}
@@ -682,7 +690,7 @@ export const ExplorePage = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredItems.map(item => {
                 if (exploreLayer === 'destinations') {
                   return (
