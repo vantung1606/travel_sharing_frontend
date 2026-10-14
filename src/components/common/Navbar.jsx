@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
-import { Compass, Sparkles, MapPin, Users, Calendar, MessageSquare, User, Shield, Bell, Menu, X, ChevronRight, LogOut } from 'lucide-react';
+import { Compass, Sparkles, MapPin, Users, Calendar, MessageSquare, User, Shield, Bell, Menu, X, ChevronRight, LogOut, Heart } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
 import { UserAvatar } from './UserAvatar';
 
@@ -44,7 +44,8 @@ export const Navbar = () => {
     currentUser,
     isLoggedIn,
     logout,
-    unreadNotificationsCount
+    unreadNotificationsCount,
+    savedPlaces = []
   } = useApp();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -292,6 +293,27 @@ export const Navbar = () => {
                       >
                         <Calendar className="w-4 h-4 text-sky-600" />
                         <span>Lịch trình của tôi</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setPortalMode('user');
+                          setUserTab('explore');
+                          window.history.pushState({}, '', '/explore?layer=saved');
+                          window.dispatchEvent(new CustomEvent('wayfare-switch-explore-layer', { detail: 'saved' }));
+                          setIsProfileDropdownOpen(false);
+                        }}
+                        className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-rose-50/50 hover:text-rose-700 transition-colors cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Heart className="w-4 h-4 text-rose-500" />
+                          <span>Địa điểm đã lưu</span>
+                        </div>
+                        {savedPlaces.length > 0 && (
+                          <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white font-bold text-[9px]">
+                            {savedPlaces.length}
+                          </span>
+                        )}
                       </button>
 
                       <button

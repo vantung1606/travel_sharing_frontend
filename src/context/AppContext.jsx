@@ -227,6 +227,47 @@ export const AppProvider = ({ children }) => {
     throw new Error('Không nhận được dữ liệu địa điểm từ máy chủ.');
   };
 
+  // Saved Places (Wishlist) persisted in localStorage
+  const [savedPlaces, setSavedPlaces] = useState(() => {
+    try {
+      const stored = localStorage.getItem('wayfare_saved_places');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const toggleSavePlace = (place) => {
+    if (!place) return false;
+    let isSavedNow = false;
+    setSavedPlaces(prev => {
+      const exists = prev.some(p => p.id === place.id || p.name === place.name);
+      let next;
+      if (exists) {
+        next = prev.filter(p => p.id !== place.id && p.name !== place.name);
+        isSavedNow = false;
+      } else {
+        next = [place, ...prev];
+        isSavedNow = true;
+      }
+      try {
+        localStorage.setItem('wayfare_saved_places', JSON.stringify(next));
+      } catch (e) {
+        console.warn('Failed to persist saved places:', e);
+      }
+      return next;
+    });
+    return isSavedNow;
+  };
+
+  const isPlaceSaved = (placeIdOrItem) => {
+    if (!placeIdOrItem) return false;
+    if (typeof placeIdOrItem === 'object') {
+      return savedPlaces.some(p => (p.id && p.id === placeIdOrItem.id) || (p.name && placeIdOrItem.name && p.name === placeIdOrItem.name));
+    }
+    return savedPlaces.some(p => p.id === placeIdOrItem || (p.name && p.name === placeIdOrItem));
+  };
+
   // Safe Fallback Guest User when NOT logged in (No leaked data from previous users)
   const GUEST_USER = {
     id: null,
@@ -791,7 +832,10 @@ export const AppProvider = ({ children }) => {
         fetchItineraries,
         saveItineraryToBackend,
         deleteItineraryFromBackend,
-        createManualItinerary
+        createManualItinerary,
+        savedPlaces,
+        toggleSavePlace,
+        isPlaceSaved
       }}
     >
       {children}

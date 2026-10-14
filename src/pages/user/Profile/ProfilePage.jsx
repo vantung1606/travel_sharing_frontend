@@ -12,7 +12,7 @@ import { TierPromotionModal } from '../../../components/common/TierPromotionModa
 import { TIERS, calculateUserXP, getUserTier, getNextTier, calculateTierProgress, checkTierPromotion } from '../../../utils/tierSystem';
 
 export const ProfilePage = () => {
-  const { currentUser, updateCurrentUser, itineraries, posts, destinations, setIsAIGeneratorOpen, setUserTab, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
+  const { currentUser, updateCurrentUser, itineraries, posts, destinations, savedPlaces = [], toggleSavePlace = () => {}, setIsAIGeneratorOpen, setUserTab, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
   const toast = useToast();
 
   const [activeTab, setActiveTab] = useState('itineraries'); // 'itineraries' | 'posts' | 'footprint' | 'ai-dna' | 'saved' | 'badges'
@@ -616,7 +616,7 @@ export const ProfilePage = () => {
               { id: 'posts', label: 'Bài Viết & Review', count: displayPosts.length, icon: Globe },
               { id: 'footprint', label: 'Dấu Chân Du Lịch', badge: 'Mới', icon: Compass },
               { id: 'ai-dna', label: 'Gu Du Lịch & AI DNA', icon: Sparkles },
-              { id: 'saved', label: 'Địa Điểm Đã Lưu', count: destinations.length, icon: Bookmark },
+              { id: 'saved', label: 'Địa Điểm Đã Lưu', count: savedPlaces.length, icon: Bookmark },
               { id: 'badges', label: 'Huy Hiệu & Khung Avatar', count: achievements.length, icon: Award }
             ].map(tab => {
               const Icon = tab.icon;
@@ -1064,27 +1064,78 @@ export const ProfilePage = () => {
       {/* TAB 4: SAVED DESTINATIONS */}
       {activeTab === 'saved' && (
         <div className="space-y-4">
-          <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
-            <Bookmark className="w-5 h-5 text-sky-600" />
-            <span>Địa Điểm Yêu Thích Đã Lưu</span>
-          </h3>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {destinations.map(dest => (
-              <div key={dest.id} className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-sm space-y-3 p-3 group">
-                <div className="h-40 rounded-2xl overflow-hidden relative">
-                  <img src={dest.image} alt={dest.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <span className="absolute top-2 right-2 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-slate-900 text-[10px] font-bold flex items-center gap-1">
-                    <Star className="w-3 h-3 text-amber-500 fill-amber-400" /> {dest.rating}
-                  </span>
-                </div>
-                <div className="space-y-1 px-1">
-                  <h4 className="font-bold text-sm text-slate-900 truncate">{dest.name}</h4>
-                  <p className="text-xs text-slate-500">{dest.category}</p>
-                </div>
-              </div>
-            ))}
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+              <Bookmark className="w-5 h-5 text-sky-600" />
+              <span>Địa Điểm Yêu Thích Đã Lưu ({savedPlaces.length})</span>
+            </h3>
+            <a
+              href="/explore"
+              className="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 hover:underline"
+            >
+              <span>+ Khám phá thêm địa điểm</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </a>
           </div>
+
+          {savedPlaces.length === 0 ? (
+            <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 shadow-xs space-y-3">
+              <div className="w-14 h-14 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mx-auto shadow-xs">
+                <Heart className="w-7 h-7" />
+              </div>
+              <h4 className="font-bold text-base text-slate-900">Chưa có địa điểm nào được lưu</h4>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+                Khi lướt trang Khám phá, hãy bấm biểu tượng trái tim ❤️ ở góc ảnh để lưu các tọa độ bạn muốn ghé thăm vào danh sách này nhé!
+              </p>
+              <a
+                href="/explore"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-sm transition-all"
+              >
+                <Compass className="w-4 h-4" />
+                <span>Khám Phá Địa Điểm Ngay ✨</span>
+              </a>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {savedPlaces.map(place => (
+                <div key={place.id} className="bg-white rounded-3xl overflow-hidden border border-slate-200/80 hover:border-sky-300 shadow-xs hover:shadow-md transition-all duration-300 space-y-3 p-3 group relative flex flex-col justify-between">
+                  <div className="h-44 rounded-2xl overflow-hidden relative bg-slate-100">
+                    <img
+                      src={place.image || place.coverImageUrl || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80'}
+                      alt={place.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {/* Rating badge */}
+                    <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-bold flex items-center gap-1">
+                      <Star className="w-3 h-3 text-amber-400 fill-amber-400" /> {place.rating || '4.9'}
+                    </span>
+                    {/* Remove from saved button */}
+                    <button
+                      onClick={() => toggleSavePlace(place)}
+                      title="Gỡ khỏi danh sách đã lưu"
+                      className="absolute top-2 right-2 w-8 h-8 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-md hover:scale-110 transition-all cursor-pointer"
+                    >
+                      <Heart className="w-4 h-4 fill-current" />
+                    </button>
+                  </div>
+                  <div className="space-y-1 px-1">
+                    <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-400">
+                      <MapPin className="w-3 h-3 text-sky-600" />
+                      <span>{place.city || 'Việt Nam'}</span>
+                    </div>
+                    <h4 className="font-bold text-sm text-slate-900 truncate">{place.name}</h4>
+                    <p className="text-[11px] text-slate-500 truncate">{place.category || place.categoryName}</p>
+                  </div>
+                  <a
+                    href={`/explore`}
+                    className="w-full py-2 rounded-xl bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white font-bold text-xs text-center border border-sky-200 transition-all block"
+                  >
+                    Xem trên Bản đồ 🗺️
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

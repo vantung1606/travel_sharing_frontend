@@ -35,7 +35,10 @@ export const ExplorePage = () => {
     openAIGeneratorWithItem,
     currentUser,
     itineraries = [],
-    setItineraries = () => {}
+    setItineraries = () => {},
+    savedPlaces = [],
+    toggleSavePlace = () => {},
+    isPlaceSaved = () => false
   } = useApp();
   const toast = useToast();
 
@@ -233,14 +236,47 @@ export const ExplorePage = () => {
     );
   };
 
-  // Toggle Save Wishlist
+  // Listen for navigation events and URL params for layer switching (e.g. ?layer=saved)
+  useEffect(() => {
+    const handleCustomLayerSwitch = (e) => {
+      if (e.detail) {
+        setExploreLayer(e.detail);
+        setSelectedCategory('Tất cả');
+      }
+    };
+    window.addEventListener('wayfare-switch-explore-layer', handleCustomLayerSwitch);
+
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const layer = params.get('layer') || params.get('tab');
+      if (layer === 'saved') {
+        setExploreLayer('saved');
+      } else if (layer === 'destinations') {
+        setExploreLayer('destinations');
+      }
+    } catch {
+      // ignore
+    }
+
+    return () => {
+      window.removeEventListener('wayfare-switch-explore-layer', handleCustomLayerSwitch);
+    };
+  }, []);
+
+  // Toggle Save Wishlist (persists into localStorage & syncs across app)
   const handleToggleSave = (item, e) => {
     e?.stopPropagation();
-    const idKey = item.id;
-    const isCurrentlySaved = !!savedItems[idKey];
-    setSavedItems(prev => ({ ...prev, [idKey]: !isCurrentlySaved }));
-    if (!isCurrentlySaved) {
-      toast.success(`Đã thêm "${item.name}" vào danh sách yêu thích! ❤️`);
+    const isSavedNow = toggleSavePlace(item);
+    if (isSavedNow) {
+      toast.success(
+        <div>
+          <p className="font-bold">Đã lưu "{item.name}"! ❤️</p>
+          <p className="text-[11px] text-slate-200 font-normal mt-0.5">
+            Xem tại tab <b>"Địa điểm đã lưu"</b> hoặc trong Trang cá nhân.
+          </p>
+        </div>,
+        { duration: 4000 }
+      );
     } else {
       toast.info(`Đã gỡ "${item.name}" khỏi danh sách yêu thích.`);
     }
@@ -437,6 +473,22 @@ export const ExplorePage = () => {
       }));
     }
 
+    // Saved Wishlist Items
+    if (exploreLayer === 'saved') {
+      return (savedPlaces || []).map((p, idx) => ({
+        ...p,
+        id: p.id ? String(p.id) : `saved-${idx}`,
+        rawId: p.rawId || p.id || idx,
+        isLocalSpot: p.isLocalSpot !== undefined ? p.isLocalSpot : true,
+        region: p.region || getRegionByCity(p.name || p.city),
+        image: p.image || p.coverImageUrl || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
+        category: p.categoryName || p.category || 'Tọa độ yêu thích',
+        rating: p.averageRating || p.rating || '4.9',
+        reviewsCount: p.reviewCount || p.reviewsCount || 120,
+        amenities: p.specialties || (typeof p.amenities === 'string' ? p.amenities.split(',').map(s => s.trim()) : p.amenities) || []
+      }));
+    }
+
     // Destinations
     return (destinations || []).map((d, index) => ({
       ...d,
@@ -452,7 +504,7 @@ export const ExplorePage = () => {
       reviewsCount: d.reviewCount || d.reviewsCount || 88,
       amenities: d.specialties || (typeof d.amenities === 'string' ? d.amenities.split(',').map(s => s.trim()) : d.amenities) || []
     }));
-  }, [exploreLayer, places, destinations]);
+  }, [exploreLayer, places, destinations, savedPlaces]);
 
   // Filter & Sort Items
   const filteredItems = useMemo(() => {
@@ -576,6 +628,7 @@ export const ExplorePage = () => {
         setExploreLayer={setExploreLayer}
         placesCount={places.length}
         destinationsCount={destinations.length}
+        savedCount={savedPlaces.length}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         categories={currentCategories}
@@ -645,7 +698,7 @@ export const ExplorePage = () => {
                     key={item.id}
                     item={item}
                     isActive={activeItem?.id === item.id}
-                    isSaved={!!savedItems[item.id]}
+                    isSaved={isPlaceSaved(item.id)}
                     onSelect={setActiveItem}
                     onToggleSave={handleToggleSave}
                     onOpenDetail={setDetailModalItem}
@@ -707,7 +760,7 @@ export const ExplorePage = () => {
                     key={item.id}
                     item={item}
                     isActive={activeItem?.id === item.id}
-                    isSaved={!!savedItems[item.id]}
+                    isSaved={isPlaceSaved(item.id)}
                     onSelect={setActiveItem}
                     onToggleSave={handleToggleSave}
                     onOpenDetail={setDetailModalItem}
