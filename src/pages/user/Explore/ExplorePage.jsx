@@ -139,54 +139,61 @@ export const ExplorePage = () => {
     ];
   }, [exploreLayer]);
 
-  // Determine Region by City name
+  // Determine Region by City / Province name (Chuẩn hóa 63 tỉnh thành Việt Nam)
   const getRegionByCity = (cityName = '') => {
     const c = String(cityName).toLowerCase().trim();
     if (!c) return 'Khác';
 
-    // Miền Bắc
+    // Miền Bắc (Đông Bắc, Tây Bắc & Đồng bằng sông Hồng)
     if (
-      c.includes('hà giang') || c.includes('sa pa') || c.includes('sapa') ||
-      c.includes('lào cai') || c.includes('hà nội') || c.includes('ninh bình') ||
-      c.includes('hạ long') || c.includes('quảng ninh') || c.includes('cao bằng') ||
-      c.includes('mộc châu') || c.includes('sơn la') || c.includes('mai châu') ||
-      c.includes('bắc kạn') || c.includes('lạng sơn') || c.includes('yên bái') ||
-      c.includes('tam đảo') || c.includes('vĩnh phúc') || c.includes('hải phòng') ||
-      c.includes('cát bà') || c.includes('điện biên') || c.includes('lai châu')
+      c.includes('hà nội') || c.includes('hải phòng') || c.includes('quảng ninh') ||
+      c.includes('hạ long') || c.includes('ninh bình') || c.includes('hà giang') ||
+      c.includes('lào cai') || c.includes('sa pa') || c.includes('sapa') ||
+      c.includes('cao bằng') || c.includes('lạng sơn') || c.includes('bắc kạn') ||
+      c.includes('tuyên quang') || c.includes('thái nguyên') || c.includes('phú thọ') ||
+      c.includes('bắc giang') || c.includes('bắc ninh') || c.includes('hải dương') ||
+      c.includes('hưng yên') || c.includes('hà nam') || c.includes('nam định') ||
+      c.includes('thái bình') || c.includes('vĩnh phúc') || c.includes('sơn la') ||
+      c.includes('mộc châu') || c.includes('hòa bình') || c.includes('điện biên') ||
+      c.includes('lai châu') || c.includes('yên bái')
     ) {
       return 'Miền Bắc';
     }
 
-    // Tây Nguyên
+    // Tây Nguyên (5 tỉnh Cao nguyên)
     if (
-      c.includes('đà lạt') || c.includes('lâm đồng') || c.includes('buôn ma thuột') ||
-      c.includes('đắk lắk') || c.includes('dak lak') || c.includes('pleiku') ||
-      c.includes('gia lai') || c.includes('măng đen') || c.includes('kon tum') ||
+      c.includes('đà lạt') || c.includes('lâm đồng') || c.includes('đắk lắk') ||
+      c.includes('dak lak') || c.includes('buôn ma thuột') || c.includes('gia lai') ||
+      c.includes('pleiku') || c.includes('kon tum') || c.includes('măng đen') ||
       c.includes('đắk nông') || c.includes('bảo lộc')
     ) {
       return 'Tây Nguyên';
     }
 
-    // Miền Trung
+    // Miền Trung (Bắc Trung Bộ & Duyên hải Nam Trung Bộ)
     if (
-      c.includes('đà nẵng') || c.includes('hội an') || c.includes('quảng nam') ||
-      c.includes('huế') || c.includes('thừa thiên') || c.includes('nha trang') ||
-      c.includes('khánh hòa') || c.includes('quy nhơn') || c.includes('bình định') ||
-      c.includes('phú yên') || c.includes('tuy hòa') || c.includes('quảng bình') ||
-      c.includes('phong nha') || c.includes('quảng trị') || c.includes('quảng ngãi') ||
-      c.includes('lý sơn') || c.includes('phan thiết') || c.includes('bình thuận') ||
-      c.includes('mũi né') || c.includes('ninh thuận') || c.includes('phan rang')
+      c.includes('thanh hóa') || c.includes('sầm sơn') || c.includes('nghệ an') ||
+      c.includes('hà tĩnh') || c.includes('quảng bình') || c.includes('phong nha') ||
+      c.includes('quảng trị') || c.includes('thừa thiên') || c.includes('huế') ||
+      c.includes('đà nẵng') || c.includes('quảng nam') || c.includes('hội an') ||
+      c.includes('quảng ngãi') || c.includes('bình định') || c.includes('quy nhơn') ||
+      c.includes('phú yên') || c.includes('tuy hòa') || c.includes('khánh hòa') ||
+      c.includes('nha trang') || c.includes('ninh thuận') || c.includes('phan rang') ||
+      c.includes('bình thuận') || c.includes('phan thiết') || c.includes('mũi né')
     ) {
       return 'Miền Trung';
     }
 
-    // Miền Nam
+    // Miền Nam (Đông Nam Bộ & Đồng bằng sông Cửu Long)
     if (
       c.includes('hồ chí minh') || c.includes('sài gòn') || c.includes('tphcm') ||
-      c.includes('phú quốc') || c.includes('kiên giang') || c.includes('vũng tàu') ||
-      c.includes('bà rịa') || c.includes('cần thơ') || c.includes('tây ninh') ||
-      c.includes('bến tre') || c.includes('an giang') || c.includes('châu đốc') ||
-      c.includes('cà mau') || c.includes('bạc liêu')
+      c.includes('bà rịa') || c.includes('vũng tàu') || c.includes('bình dương') ||
+      c.includes('bình phước') || c.includes('đồng nai') || c.includes('tây ninh') ||
+      c.includes('an giang') || c.includes('bạc liêu') || c.includes('bến tre') ||
+      c.includes('cà mau') || c.includes('cần thơ') || c.includes('đồng tháp') ||
+      c.includes('hậu giang') || c.includes('kiên giang') || c.includes('phú quốc') ||
+      c.includes('long an') || c.includes('sóc trăng') || c.includes('tiền giang') ||
+      c.includes('trà vinh') || c.includes('vĩnh long')
     ) {
       return 'Miền Nam';
     }

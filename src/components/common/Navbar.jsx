@@ -320,8 +320,8 @@ export const Navbar = () => {
                         onClick={() => { setIsAIGeneratorOpen(true); setIsProfileDropdownOpen(false); }}
                         className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
-                        <Sparkles className="w-4 h-4 text-amber-500" />
-                        <span>Trợ lý AI Lập Lịch Trình</span>
+                        <Compass className="w-4 h-4 text-sky-600" />
+                        <span>Lập lịch trình chuyến đi</span>
                       </button>
 
                       {/* Admin Portal Toggle - Protected: Only visible for ROLE_ADMIN */}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Compass, Navigation, PlusCircle, CloudSun } from 'lucide-react';
+import { Calendar, Compass, Navigation, PlusCircle, CloudSun } from 'lucide-react';
 
 export const ExploreHeader = ({
   placesCount = 0,
@@ -61,13 +61,13 @@ export const ExploreHeader = ({
             <span>{userCoords ? '📍 Đang dùng GPS' : 'Gần tôi'}</span>
           </button>
 
-          {/* AI Generator Button */}
+          {/* Quick Itinerary Planner Button */}
           <button
             onClick={onOpenAIGenerator}
-            className="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100/80 border border-amber-200/80 text-amber-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>Lên lịch AI</span>
+            <Calendar className="w-3.5 h-3.5 text-sky-600" />
+            <span>Gợi ý lịch trình</span>
           </button>
 
           {/* Add Place Button */}
