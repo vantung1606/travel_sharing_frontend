@@ -652,6 +652,9 @@ export const notificationApi = {
       }
     });
     if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        return { isBackend: true, data: [] };
+      }
       throw new Error(`Lỗi lấy thông báo: HTTP ${response.status}`);
     }
     const data = await response.json();
@@ -670,7 +673,12 @@ export const notificationApi = {
         ...getAuthHeader()
       }
     });
-    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        return { isBackend: true, count: 0 };
+      }
+      throw new Error(`HTTP error ${response.status}`);
+    }
     const data = await response.json();
     const count = typeof data.unreadCount === 'number' ? data.unreadCount : (typeof data.count === 'number' ? data.count : 0);
     return { isBackend: true, count };
