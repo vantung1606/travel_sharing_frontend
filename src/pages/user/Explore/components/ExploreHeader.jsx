@@ -81,8 +81,15 @@ export const ExploreHeader = ({
         </div>
       </div>
 
-      {/* 3. Live Weather Stations Tickers Ribbon */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar pt-0.5">
+      {/* 3. Live Weather Stations Tickers Ribbon (Cuộn ngang mượt mà bằng chuột) */}
+      <div
+        onWheel={(e) => {
+          if (e.deltaY !== 0) {
+            e.currentTarget.scrollLeft += e.deltaY;
+          }
+        }}
+        className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar pt-0.5 scroll-smooth"
+      >
         <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1 pl-0.5">
           <CloudSun className="w-3.5 h-3.5 text-sky-500" />
           <span>Thời tiết:</span>
