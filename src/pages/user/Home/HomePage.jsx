@@ -557,26 +557,27 @@ export const HomePage = () => {
       {/* ──────────────────────────────────────────────────────────────────────────
           2. SMART TRAVEL PLANNER DOCK (CRISP WHITE ELEVATED CARD - NO WASHOUT)
           - Compact responsive paddings
-          - Smooth mobile scrollable segmented tabs
+          - High-legibility mobile layout without clipped pills or oversized boxes
           - Clear, high-contrast travel inputs
       ────────────────────────────────────────────────────────────────────────── */}
       <section
-        className="relative z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 -mt-10 sm:-mt-12 lg:-mt-16 mb-12 sm:mb-16 lg:mb-20"
+        className="relative z-20 w-full max-w-[1700px] mx-auto px-3 sm:px-6 lg:px-8 xl:px-12 -mt-10 sm:-mt-12 lg:-mt-16 mb-12 sm:mb-16 lg:mb-20"
         id="ai-dock"
       >
-        <div className="p-4 sm:p-7 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/95 backdrop-blur-2xl shadow-[0_20px_50px_-15px_rgba(2,132,199,0.14)] border border-slate-200/90 transition-all">
-          {/* Planner Modes Segmented Control - Mobile Horizontally Scrollable & Fit */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-slate-100">
-            <div className="flex items-center gap-1 p-1 rounded-full bg-slate-100 border border-slate-200/60 shadow-2xs overflow-x-auto no-scrollbar max-w-full">
+        <div className="p-3.5 sm:p-7 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/98 backdrop-blur-2xl shadow-[0_15px_45px_-15px_rgba(2,132,199,0.18)] border border-slate-200/90 transition-all">
+          {/* Planner Modes Tabs & Estimate Pill */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 mb-3.5 sm:mb-6 pb-3 sm:pb-4 border-b border-slate-100">
+            {/* 3 Tabs: 3-column grid on mobile so no scrolling or truncation occurs */}
+            <div className="grid grid-cols-3 sm:flex sm:items-center gap-1 p-1 rounded-xl sm:rounded-full bg-slate-100/90 border border-slate-200/70 shadow-2xs w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setActiveDockTab('ai')}
-                className={`px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-xs flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${activeDockTab === 'ai'
+                className={`w-full sm:w-auto px-2.5 sm:px-5 py-2 sm:py-2 rounded-lg sm:rounded-full text-[11px] sm:text-sm font-bold shadow-xs flex items-center justify-center gap-1 sm:gap-2 transition-all cursor-pointer whitespace-nowrap ${activeDockTab === 'ai'
                   ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
                   : 'text-slate-700 hover:text-sky-700 hover:bg-white'
                   }`}
               >
-                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-200" />
+                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-200 shrink-0" />
                 <span>Lên lịch trình</span>
               </button>
 
@@ -586,13 +587,13 @@ export const HomePage = () => {
                   setActiveDockTab('explore');
                   navigate('/explore');
                 }}
-                className={`px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${activeDockTab === 'explore'
+                className={`w-full sm:w-auto px-2.5 sm:px-5 py-2 sm:py-2 rounded-lg sm:rounded-full text-[11px] sm:text-sm font-bold flex items-center justify-center gap-1 sm:gap-2 transition-all cursor-pointer whitespace-nowrap ${activeDockTab === 'explore'
                   ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
                   : 'text-slate-700 hover:text-sky-700 hover:bg-white'
                   }`}
               >
-                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span>Khám phá điểm đến</span>
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span>Điểm đến</span>
               </button>
 
               <button
@@ -601,24 +602,26 @@ export const HomePage = () => {
                   setActiveDockTab('community');
                   navigate('/community');
                 }}
-                className={`px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold flex items-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap shrink-0 ${activeDockTab === 'community'
+                className={`w-full sm:w-auto px-2.5 sm:px-5 py-2 sm:py-2 rounded-lg sm:rounded-full text-[11px] sm:text-sm font-bold flex items-center justify-center gap-1 sm:gap-2 transition-all cursor-pointer whitespace-nowrap ${activeDockTab === 'community'
                   ? 'bg-sky-600 text-white shadow-md shadow-sky-600/30'
                   : 'text-slate-700 hover:text-sky-700 hover:bg-white'
                   }`}
               >
-                <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                 <span>Cộng đồng</span>
               </button>
             </div>
 
-            {/* Dynamic Estimate Pill */}
-            <div className="flex items-center justify-end sm:justify-start">
-              <div className="px-3 py-1 sm:py-1.5 rounded-full bg-sky-50 text-sky-800 border border-sky-200/80 shadow-2xs flex items-center gap-2 text-xs sm:text-sm font-semibold">
+            {/* Dynamic Estimate Pill: Full width on mobile, balanced text */}
+            <div className="flex items-center justify-between sm:justify-end px-3 py-1.5 rounded-lg sm:rounded-full bg-sky-50 text-sky-800 border border-sky-200/80 shadow-2xs text-[11px] sm:text-sm font-semibold">
+              <span className="flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-600 shrink-0" />
-                <span className="truncate">Dự toán: ~{dockEstimate.budgetText}</span>
+                <span>Dự toán: ~{dockEstimate.budgetText}</span>
+              </span>
+              <span className="flex items-center gap-1.5 ml-2">
                 <span className="w-1 h-1 rounded-full bg-sky-400 shrink-0" />
                 <span className="text-sky-700 font-bold shrink-0">{dockEstimate.savings}</span>
-              </div>
+              </span>
             </div>
           </div>
 
@@ -626,12 +629,12 @@ export const HomePage = () => {
           <form
             ref={dockRef}
             onSubmit={handleDockGenerate}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mb-3 sm:mb-6"
           >
             {/* Field 1: Destination */}
-            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-3 focus-within:ring-blue-100/60 shadow-xs">
-              <label className="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider mb-0.5 sm:mb-1">
-                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 shrink-0" />
+            <div className="p-2.5 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50 hover:bg-slate-100/90 transition-all flex flex-col justify-center border border-slate-200/80 hover:border-blue-400 focus-within:border-blue-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100/60 shadow-xs">
+              <label className="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider mb-0.5">
+                <MapPin className="w-3.5 h-3.5 text-blue-600 shrink-0" />
                 <span>Điểm đến mong muốn</span>
               </label>
               <input
@@ -648,24 +651,24 @@ export const HomePage = () => {
               <button
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === 'budget' ? null : 'budget')}
-                className={`w-full text-left p-4 rounded-2xl transition-all flex flex-col justify-center border shadow-xs hover:-translate-y-0.5 cursor-pointer ${
+                className={`w-full text-left p-2.5 sm:p-4 rounded-xl sm:rounded-2xl transition-all flex flex-col justify-center border shadow-xs cursor-pointer ${
                   activeDropdown === 'budget'
-                    ? 'bg-white border-blue-600 ring-4 ring-blue-100/70 shadow-md'
+                    ? 'bg-white border-blue-600 ring-2 sm:ring-4 ring-blue-100/70 shadow-md'
                     : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/80 hover:border-blue-400'
                 }`}
               >
-                <div className="flex items-center justify-between w-full mb-1">
-                  <span className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider">
-                    <DollarSign className="w-4 h-4 text-blue-600" />
+                <div className="flex items-center justify-between w-full mb-0.5 sm:mb-1">
+                  <span className="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider">
+                    <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
                     <span>Ngân sách dự kiến</span>
                   </span>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                  <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 transition-transform duration-200 ${
                     activeDropdown === 'budget' ? 'rotate-180 text-blue-600' : ''
                   }`} />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm sm:text-[15px] font-bold text-slate-900 truncate">
-                    {selectedBudget.title} <span className="text-xs font-normal text-slate-500 hidden sm:inline">({selectedBudget.sub.split('/')[0]})</span>
+                  <span className="text-xs sm:text-sm md:text-[15px] font-bold text-slate-900 truncate">
+                    {selectedBudget.title} <span className="text-[11px] sm:text-xs font-normal text-slate-500 hidden sm:inline">({selectedBudget.sub.split('/')[0]})</span>
                   </span>
                 </div>
               </button>
@@ -725,23 +728,23 @@ export const HomePage = () => {
               <button
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === 'style' ? null : 'style')}
-                className={`w-full text-left p-4 rounded-2xl transition-all flex flex-col justify-center border shadow-xs hover:-translate-y-0.5 cursor-pointer ${
+                className={`w-full text-left p-2.5 sm:p-4 rounded-xl sm:rounded-2xl transition-all flex flex-col justify-center border shadow-xs cursor-pointer ${
                   activeDropdown === 'style'
-                    ? 'bg-white border-blue-600 ring-4 ring-blue-100/70 shadow-md'
+                    ? 'bg-white border-blue-600 ring-2 sm:ring-4 ring-blue-100/70 shadow-md'
                     : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/80 hover:border-blue-400'
                 }`}
               >
-                <div className="flex items-center justify-between w-full mb-1">
-                  <span className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider">
-                    <SlidersHorizontal className="w-4 h-4 text-blue-600" />
+                <div className="flex items-center justify-between w-full mb-0.5 sm:mb-1">
+                  <span className="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider">
+                    <SlidersHorizontal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
                     <span>Gu trải nghiệm</span>
                   </span>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                  <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 transition-transform duration-200 ${
                     activeDropdown === 'style' ? 'rotate-180 text-blue-600' : ''
                   }`} />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm sm:text-[15px] font-bold text-slate-900 truncate">
+                  <span className="text-xs sm:text-sm md:text-[15px] font-bold text-slate-900 truncate">
                     {selectedStyle.title}
                   </span>
                 </div>
@@ -802,24 +805,24 @@ export const HomePage = () => {
               <button
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === 'duration' ? null : 'duration')}
-                className={`w-full text-left p-4 rounded-2xl transition-all flex flex-col justify-center border shadow-xs hover:-translate-y-0.5 cursor-pointer ${
+                className={`w-full text-left p-2.5 sm:p-4 rounded-xl sm:rounded-2xl transition-all flex flex-col justify-center border shadow-xs cursor-pointer ${
                   activeDropdown === 'duration'
-                    ? 'bg-white border-blue-600 ring-4 ring-blue-100/70 shadow-md'
+                    ? 'bg-white border-blue-600 ring-2 sm:ring-4 ring-blue-100/70 shadow-md'
                     : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/80 hover:border-blue-400'
                 }`}
               >
-                <div className="flex items-center justify-between w-full mb-1">
-                  <span className="flex items-center gap-1.5 text-slate-500 text-[11px] font-extrabold uppercase tracking-wider">
-                    <Calendar className="w-4 h-4 text-blue-600" />
+                <div className="flex items-center justify-between w-full mb-0.5 sm:mb-1">
+                  <span className="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider">
+                    <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600" />
                     <span>Thời lượng chuyến đi</span>
                   </span>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
+                  <ChevronDown className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 transition-transform duration-200 ${
                     activeDropdown === 'duration' ? 'rotate-180 text-blue-600' : ''
                   }`} />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm sm:text-[15px] font-bold text-slate-900 truncate">
-                    {selectedDuration.title} <span className="text-xs font-normal text-slate-500 hidden sm:inline">({selectedDuration.sub.split(',')[0]})</span>
+                  <span className="text-xs sm:text-sm md:text-[15px] font-bold text-slate-900 truncate">
+                    {selectedDuration.title} <span className="text-[11px] sm:text-xs font-normal text-slate-500 hidden sm:inline">({selectedDuration.sub.split(',')[0]})</span>
                   </span>
                 </div>
               </button>
@@ -875,18 +878,18 @@ export const HomePage = () => {
             </div>
           </form>
 
-          {/* Quick Destination Tags & Royal Blue Primary Action Button */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
-            <div className="flex items-center gap-2 flex-wrap text-xs sm:text-sm">
-              <span className="text-slate-600 font-semibold">Gợi ý nhanh:</span>
+          {/* Quick Destination Tags & Primary Action Button */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 pt-1">
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap text-xs">
+              <span className="text-slate-500 font-semibold text-[11px] sm:text-xs">Gợi ý nhanh:</span>
               {trendingDestinations.map((chip) => (
                 <button
                   key={chip.val}
                   type="button"
                   onClick={() => setDockDest(chip.val)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border cursor-pointer shadow-2xs hover:scale-105 active:scale-95 ${dockDest === chip.val
+                  className={`px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold transition-all border cursor-pointer shadow-2xs hover:scale-105 active:scale-95 ${dockDest === chip.val
                     ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
-                    : 'bg-slate-100 hover:bg-sky-50 text-slate-700 hover:text-sky-700 border-slate-200'
+                    : 'bg-slate-100/90 hover:bg-sky-50 text-slate-700 hover:text-sky-700 border-slate-200'
                     }`}
                 >
                   {chip.label}
@@ -898,7 +901,7 @@ export const HomePage = () => {
               type="button"
               disabled={isDockGenerating}
               onClick={handleDockGenerate}
-              className="w-full sm:w-auto px-6 py-3 rounded-xl sm:rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 tracking-tight whitespace-nowrap shrink-0"
+              className="w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 tracking-tight whitespace-nowrap shrink-0"
             >
               {isDockGenerating ? (
                 <>
