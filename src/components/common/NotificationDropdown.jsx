@@ -138,7 +138,7 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
   return (
     <div
       ref={dropdownRef}
-      className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200/90 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden"
+      className="fixed left-3 right-3 top-16 sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96 max-w-[calc(100vw-1.5rem)] bg-white rounded-3xl shadow-2xl border border-slate-200/90 py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200 overflow-hidden"
     >
       {/* Header */}
       <div className="px-4 pb-3 border-b border-slate-100 flex items-center justify-between">
@@ -204,10 +204,26 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
               {/* Message Details */}
               <div className="flex-1 min-w-0 pr-2">
                 <p className="text-xs text-slate-800 leading-snug font-medium line-clamp-2">
-                  {item.type !== 'SYSTEM' && item.actorId && (
-                    <strong className="font-bold text-slate-900">{item.actorName} </strong>
-                  )}
-                  {item.message}
+                  {(() => {
+                    if (item.type === 'SYSTEM' || !item.actorId || !item.actorName) {
+                      return item.message;
+                    }
+                    if (item.message && item.message.startsWith(item.actorName)) {
+                      const rest = item.message.substring(item.actorName.length).trim();
+                      return (
+                        <>
+                          <strong className="font-bold text-slate-900">{item.actorName} </strong>
+                          <span>{rest}</span>
+                        </>
+                      );
+                    }
+                    return (
+                      <>
+                        <strong className="font-bold text-slate-900">{item.actorName} </strong>
+                        <span>{item.message}</span>
+                      </>
+                    );
+                  })()}
                 </p>
                 <span className="flex items-center gap-1 text-[10px] text-slate-400 mt-1">
                   <Clock3 className="w-3 h-3" />

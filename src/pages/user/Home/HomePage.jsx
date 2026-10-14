@@ -1634,36 +1634,48 @@ export const HomePage = () => {
                 </p>
 
                 {/* Clickable Hidden Gem Cards */}
-                <div className="space-y-2.5 sm:space-y-3.5 mb-5 sm:mb-7">
+                <div className="space-y-2 sm:space-y-3 mb-5 sm:mb-7">
                   {[
-                    { id: 'dalat', name: 'Suối Tía - Hồ Tuyền Lâm (Đà Lạt)', tag: 'Tọa độ bí mật' },
-                    { id: 'sapa', name: 'Bản Sâu Chua - Sa Pa (Lào Cai)', tag: 'Bản địa nguyên bản' },
-                    { id: 'phuquoc', name: 'Hòn Dăm & Bãi Rạch Tràm (Phú Quốc)', tag: 'Hoang sơ 100%' }
+                    { id: 'dalat', name: 'Suối Tía - Hồ Tuyền Lâm', location: 'Đà Lạt', tag: 'Tọa độ bí mật' },
+                    { id: 'sapa', name: 'Bản Sâu Chua', location: 'Sa Pa', tag: 'Bản địa' },
+                    { id: 'phuquoc', name: 'Hòn Dăm & Rạch Tràm', location: 'Phú Quốc', tag: 'Hoang sơ' }
                   ].map((gem) => (
                     <button
                       key={gem.id}
                       type="button"
                       onClick={() => setSelectedGemId(gem.id)}
-                      className={`w-full p-3 sm:p-4 rounded-xl sm:rounded-2xl flex items-center justify-between gap-2 transition-all text-left cursor-pointer border hover:scale-[1.01] active:scale-[0.99] ${selectedGemId === gem.id
-                        ? 'bg-blue-600/35 border-blue-400 shadow-md ring-1 ring-blue-400/30'
+                      className={`w-full p-2.5 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 transition-all text-left cursor-pointer border hover:scale-[1.01] active:scale-[0.99] ${selectedGemId === gem.id
+                        ? 'bg-sky-600/35 border-sky-400 shadow-md ring-1 ring-sky-400/30'
                         : 'bg-white/10 hover:bg-white/15 border-white/15'
                         }`}
                     >
                       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                         <span
-                          className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shrink-0 ${selectedGemId === gem.id ? 'bg-sky-400 animate-ping' : 'bg-sky-400'
+                          className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full shrink-0 ${selectedGemId === gem.id ? 'bg-sky-400 animate-pulse' : 'bg-slate-400'
                             }`}
                         />
-                        <div className="min-w-0">
-                          <h4 className="font-bold text-xs sm:text-sm md:text-base text-white truncate">{gem.name}</h4>
-                          <p className="text-[11px] sm:text-xs text-slate-300 font-medium truncate">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between sm:justify-start gap-1.5">
+                            <h4 className="font-bold text-xs sm:text-sm md:text-base text-white leading-tight">
+                              {gem.name} <span className="text-slate-400 font-normal">({gem.location})</span>
+                            </h4>
+                            <span
+                              className={`sm:hidden px-2 py-0.5 rounded-full text-[9px] font-bold uppercase transition-colors shrink-0 ${selectedGemId === gem.id
+                                ? 'bg-sky-500 text-white'
+                                : 'bg-white/20 text-slate-300'
+                                }`}
+                            >
+                              {gem.tag}
+                            </span>
+                          </div>
+                          <p className="text-[10px] sm:text-xs text-slate-300 font-normal mt-0.5 line-clamp-1">
                             {hiddenGems[gem.id].time}
                           </p>
                         </div>
                       </div>
                       <span
-                        className={`px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-black uppercase transition-colors shrink-0 ${selectedGemId === gem.id
-                          ? 'bg-blue-500 text-white'
+                        className={`hidden sm:inline-block px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase transition-colors shrink-0 ${selectedGemId === gem.id
+                          ? 'bg-sky-500 text-white'
                           : 'bg-white/20 text-slate-300'
                           }`}
                       >
@@ -1673,18 +1685,19 @@ export const HomePage = () => {
                   ))}
                 </div>
 
-                <a
-                  href="#ai-dock"
+                <button
+                  type="button"
+                  onClick={() => navigate('/explore')}
                   className="inline-flex items-center gap-2 text-sky-400 font-bold text-xs sm:text-sm md:text-base hover:text-sky-300 hover:underline cursor-pointer group"
                 >
                   <span>Khám phá các tọa độ ẩn xung quanh bạn</span>
-                  <NavigationIcon className="w-4 h-4 sm:w-5 sm:h-5 text-sky-300 group-hover:translate-x-0.5 transition-transform" />
-                </a>
+                  <NavigationIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-sky-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
               </div>
 
               {/* Dynamic Map & Scenic View Container (7 cols) */}
               <div className="lg:col-span-7">
-                <div className="relative w-full h-[320px] sm:h-[400px] lg:h-[460px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl bg-slate-900 border border-slate-700">
+                <div className="relative w-full h-[260px] sm:h-[400px] lg:h-[460px] rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl bg-slate-900 border border-slate-700">
                   <div
                     className="w-full h-full bg-cover bg-center transition-all duration-700"
                     style={{
@@ -1694,25 +1707,25 @@ export const HomePage = () => {
                   <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]" />
 
                   {/* Top Badge: Weather & Crowd */}
-                  <div className="absolute top-3.5 sm:top-5 left-3.5 sm:left-5 flex items-center gap-2 sm:gap-2.5">
-                    <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-sky-300 text-[11px] sm:text-xs font-bold border border-sky-400/40">
+                  <div className="absolute top-3 sm:top-5 left-3 sm:left-5 flex items-center gap-1.5 sm:gap-2.5">
+                    <span className="px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-sky-300 text-[10px] sm:text-xs font-bold border border-sky-400/40">
                       🌤️ {hiddenGems[selectedGemId].temp}
                     </span>
-                    <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-sky-300 text-[11px] sm:text-xs font-bold border border-sky-400/40">
+                    <span className="px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-full bg-slate-950/80 backdrop-blur-md text-sky-300 text-[10px] sm:text-xs font-bold border border-sky-400/40">
                       👥 {hiddenGems[selectedGemId].crowd}
                     </span>
                   </div>
 
                   {/* Floating GPS Card with Dynamic Selected Gem Details */}
-                  <div className="absolute bottom-3.5 sm:bottom-6 left-3.5 sm:left-6 right-3.5 sm:right-auto sm:max-w-md p-3.5 sm:p-5 rounded-xl sm:rounded-2xl bg-slate-900/95 backdrop-blur-xl shadow-2xl flex items-center gap-3 sm:gap-4 text-white border border-slate-700">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-600/50">
-                      <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                  <div className="absolute bottom-2.5 sm:bottom-6 left-2.5 sm:left-6 right-2.5 sm:right-auto sm:max-w-md p-2.5 sm:p-5 rounded-xl sm:rounded-2xl bg-slate-900/95 backdrop-blur-xl shadow-2xl flex items-center gap-2.5 sm:gap-4 text-white border border-slate-700">
+                    <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg sm:rounded-2xl bg-sky-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-sky-600/50">
+                      <MapPin className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                     </div>
                     <div className="min-w-0">
                       <h5 className="font-extrabold text-xs sm:text-sm md:text-base text-white truncate">
                         {hiddenGems[selectedGemId].title}
                       </h5>
-                      <p className="text-[11px] sm:text-xs text-slate-300 font-medium mt-0.5 line-clamp-2">
+                      <p className="text-[10px] sm:text-xs text-slate-300 font-medium mt-0.5 line-clamp-2">
                         {hiddenGems[selectedGemId].desc}
                       </p>
                     </div>
