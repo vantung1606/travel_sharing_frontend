@@ -180,20 +180,32 @@ export const AppProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
   const [itineraries, setItineraries] = useState([]);
   const [pendingPlaces, setPendingPlaces] = useState([]);
-  const [places, setPlaces] = useState([]);
+  const [places, setPlaces] = useState(() => {
+    return (officialDestinations || []).map((item, idx) => ({
+      ...item,
+      id: item.id || `official-${idx + 1}`,
+      isVerifiedHost: true
+    }));
+  });
   const [users, setUsers] = useState([]);
   const [reports, setReports] = useState([]);
   const [stats, setStats] = useState({});
 
-  // Fetch places from backend on mount
+  // Fetch places from backend on mount (merges remote places with official database)
   const fetchPlaces = useCallback(async (filters = {}) => {
     try {
       const data = await placeApi.getPlaces(filters);
-      if (data && Array.isArray(data)) {
-        setPlaces(data);
+      if (data && Array.isArray(data) && data.length > 0) {
+        setPlaces(prev => {
+          const backendIds = new Set(data.map(d => String(d.id)));
+          const remainingOfficial = (officialDestinations || [])
+            .map((item, idx) => ({ ...item, id: item.id || `official-${idx + 1}`, isVerifiedHost: true }))
+            .filter(item => !backendIds.has(String(item.id)));
+          return [...data, ...remainingOfficial];
+        });
       }
     } catch (err) {
-      console.warn('Failed to fetch places:', err);
+      console.warn('Using official curated places dataset:', err);
     }
   }, []);
 

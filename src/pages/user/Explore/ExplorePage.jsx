@@ -15,6 +15,17 @@ import { PlaceDetailModal } from './components/PlaceDetailModal';
 import { AddPlaceModal } from './components/AddPlaceModal';
 import { AddToTripModal } from './components/AddToTripModal';
 
+// Chuẩn hóa chuỗi tiếng Việt không dấu để tìm kiếm thông minh
+const removeVietnameseTones = (str = '') => {
+  return String(str)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd')
+    .replace(/Đ/g, 'D')
+    .toLowerCase()
+    .trim();
+};
+
 export const ExplorePage = () => {
   const {
     destinations = [],
@@ -447,15 +458,24 @@ export const ExplorePage = () => {
   const filteredItems = useMemo(() => {
     return unifiedItems
       .filter(item => {
-        // Search Query
-        const q = searchQuery.toLowerCase().trim();
+        // Search Query - Không phân biệt dấu tiếng Việt
+        const rawQ = searchQuery.toLowerCase().trim();
+        const cleanQ = removeVietnameseTones(searchQuery);
+
+        const cleanName = removeVietnameseTones(item.name);
+        const cleanCity = removeVietnameseTones(item.city);
+        const cleanTagline = removeVietnameseTones(item.tagline || item.description);
+        const cleanCategory = removeVietnameseTones(item.category);
+        const cleanAddress = removeVietnameseTones(item.address);
+
         const matchesSearch =
-          !q ||
-          item.name.toLowerCase().includes(q) ||
-          item.city?.toLowerCase().includes(q) ||
-          item.tagline?.toLowerCase().includes(q) ||
-          item.category?.toLowerCase().includes(q) ||
-          item.address?.toLowerCase().includes(q);
+          !rawQ ||
+          cleanName.includes(cleanQ) ||
+          cleanCity.includes(cleanQ) ||
+          cleanTagline.includes(cleanQ) ||
+          cleanCategory.includes(cleanQ) ||
+          cleanAddress.includes(cleanQ) ||
+          item.name.toLowerCase().includes(rawQ);
 
         // Region
         const matchesRegion =
