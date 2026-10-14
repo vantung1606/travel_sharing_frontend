@@ -125,7 +125,7 @@ export const HomePage = () => {
           time: '05:30',
           title: 'Săn mây bình minh Đồi Chè Cầu Đất',
           cost: 'Miễn phí vé',
-          desc: 'Thời điểm biển mây bồng bềnh đẹp nhất. AI định vị góc chụp vắng người và tuyến đường bê tông an toàn.',
+          desc: 'Thời điểm biển mây bồng bềnh đẹp nhất. Hệ thống định vị góc chụp vắng người và tuyến đường an toàn.',
           tagColor: 'text-amber-800 bg-amber-50 border-amber-200'
         },
         {
@@ -371,7 +371,7 @@ export const HomePage = () => {
         },
         currentUser?.email
       );
-      toast.success(`Đã khởi tạo lộ trình AI thành công cho ${dockDest}! ✨`);
+      toast.success(`Đã khởi tạo lộ trình thành công cho ${dockDest}! 🚀`);
       navigate('/itineraries');
     } catch (err) {
       console.warn('Backend quick generate warning, using local fallback:', err);
@@ -409,7 +409,7 @@ export const HomePage = () => {
 
   // Run Sandbox Simulation
   const handleRunSandbox = () => {
-    toast.info('Trợ lý AI đã phân tích yêu cầu và tối ưu lại lộ trình 3 ngày! 💡');
+    toast.info('Wayfare đã phân tích yêu cầu và tối ưu lại lộ trình 3 ngày! 💡');
   };
 
   // Copy Tour Action (Đồng bộ vào CSDL MySQL)
@@ -531,7 +531,7 @@ export const HomePage = () => {
             {/* Action Buttons: Responsive full-width on mobile, compact and clean travel icons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2 sm:pt-4 w-full sm:w-auto">
               <a
-                href="#ai-dock"
+                href="#plan-dock"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-extrabold text-xs sm:text-sm md:text-base shadow-[0_10px_25px_rgba(2,132,199,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-blue-300/40 tracking-[0.015em]"
               >
                 <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-sky-200" />
@@ -562,7 +562,7 @@ export const HomePage = () => {
       ────────────────────────────────────────────────────────────────────────── */}
       <section
         className="relative z-20 w-full max-w-[1700px] mx-auto px-3 sm:px-6 lg:px-8 xl:px-12 -mt-10 sm:-mt-12 lg:-mt-16 mb-12 sm:mb-16 lg:mb-20"
-        id="ai-dock"
+        id="plan-dock"
       >
         <div className="p-3.5 sm:p-7 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/98 backdrop-blur-2xl shadow-[0_15px_45px_-15px_rgba(2,132,199,0.18)] border border-slate-200/90 transition-all">
           {/* Planner Modes Tabs & Estimate Pill */}
@@ -1818,7 +1818,7 @@ export const HomePage = () => {
                   ))}
                 </div>
                 <p className="text-slate-800 italic text-sm leading-relaxed mb-6 font-medium tracking-[0.015em]">
-                  “Bọn mình đã có một kỳ trăng mật trong mơ tại Phú Quốc. Những quán bar hoàng hôn do AI
+                  “Bọn mình đã có một kỳ trăng mật trong mơ tại Phú Quốc. Những quán bar hoàng hôn do Wayfare
                   gợi ý không hề xô bồ như các tour đại trà, cực kỳ lãng mạn và tinh tế!”
                 </p>
               </div>
@@ -1867,7 +1867,7 @@ export const HomePage = () => {
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto pt-1">
                   <a
-                    href="#ai-dock"
+                    href="#plan-dock"
                     className="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-blue-700 text-white font-extrabold text-xs sm:text-sm md:text-base shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-sky-200" />
