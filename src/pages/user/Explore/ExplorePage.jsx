@@ -427,14 +427,19 @@ export const ExplorePage = () => {
     }
 
     // Destinations
-    return (destinations || []).map(d => ({
+    return (destinations || []).map((d, index) => ({
       ...d,
+      id: d.id ? `dest-${d.id}` : `dest-${index}`,
       isLocalSpot: false,
-      rawId: d.id,
+      rawId: d.id || index,
       region: d.region || getRegionByCity(d.name || d.city),
-      latitude: d.coordinates?.lat,
-      longitude: d.coordinates?.lng,
-      amenities: d.specialties || []
+      latitude: d.latitude || d.coordinates?.lat,
+      longitude: d.longitude || d.coordinates?.lng,
+      image: d.image || d.coverImageUrl || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
+      category: d.categoryName || d.category || 'Danh Lam & Thắng Cảnh',
+      rating: d.averageRating || d.rating || '4.9',
+      reviewsCount: d.reviewCount || d.reviewsCount || 88,
+      amenities: d.specialties || (typeof d.amenities === 'string' ? d.amenities.split(',').map(s => s.trim()) : d.amenities) || []
     }));
   }, [exploreLayer, places, destinations]);
 

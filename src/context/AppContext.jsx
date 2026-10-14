@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { notificationApi, userApi, placeApi, itineraryApi, authApi } from '../services/api';
+import officialDestinations from '../data/official_destinations.json';
 
 const DEFAULT_APP_STATE = {
   portalMode: 'user',
@@ -175,7 +176,7 @@ export const AppProvider = ({ children }) => {
   };
 
   // Data States
-  const [destinations, setDestinations] = useState([]);
+  const [destinations, setDestinations] = useState(officialDestinations || []);
   const [posts, setPosts] = useState([]);
   const [itineraries, setItineraries] = useState([]);
   const [pendingPlaces, setPendingPlaces] = useState([]);
