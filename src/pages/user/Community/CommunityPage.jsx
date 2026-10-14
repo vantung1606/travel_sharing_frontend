@@ -1400,7 +1400,7 @@ export const CommunityPage = () => {
   }, [posts]);
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden min-h-screen bg-[#f8fafc] text-slate-900 pb-16 sm:pb-20 -mt-16">
+    <div className="w-full max-w-full overflow-x-clip min-h-screen bg-[#f8fafc] text-slate-900 pb-16 sm:pb-20 -mt-16">
       {/* ─── 1. FULL-WIDTH CINEMATIC COMMUNITY HERO (NỀN LOANG RA ÊM ÁI, GỌN GÀNG, DỮ LIỆU THẬT) ─── */}
       <section className="relative w-full overflow-hidden pt-20 sm:pt-24 pb-14 sm:pb-16 lg:pt-28 lg:pb-18 bg-[#031726] text-white select-none">
         {/* Full-width Cinematic Backdrop with Vibrant Landscape & Seamless Bottom Loang Blend */}
@@ -1511,7 +1511,7 @@ export const CommunityPage = () => {
           {/* ========================================================= */}
           {/* LEFT COLUMN: User Mini-Profile, Quick Nav, Trending Tags */}
           {/* ========================================================= */}
-          <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-[5rem] h-[calc(100vh-6rem)] overflow-y-auto overscroll-contain sidebar-scrollbar pr-1.5 pb-12 select-none">
+          <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-20 self-start max-h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain sidebar-scrollbar pr-1.5 pb-8 select-none z-10">
             
             {/* User Profile Card or Guest Login Prompt */}
             {isLoggedIn ? (
@@ -2925,7 +2925,7 @@ export const CommunityPage = () => {
         {/* ========================================================= */}
         {/* RIGHT COLUMN: Trending Tours to Clone, Top Authors (3 cols) */}
         {/* ========================================================= */}
-        <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-[5rem] h-[calc(100vh-6rem)] overflow-y-auto overscroll-contain sidebar-scrollbar pr-1.5 pb-12 select-none">
+        <aside className="hidden lg:flex lg:col-span-3 flex-col gap-5 sticky top-20 self-start max-h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain sidebar-scrollbar pr-1.5 pb-8 select-none z-10">
           
           {/* Top Curated Tours to Clone 1-Click */}
           <div className="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm space-y-4">
