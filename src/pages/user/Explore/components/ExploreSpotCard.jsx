@@ -52,14 +52,14 @@ export const ExploreSpotCard = ({
           {/* Wishlist Heart Button (pointer-events-auto) */}
           <button
             onClick={(e) => onToggleSave(item, e)}
-            className={`w-8.5 h-8.5 rounded-full flex items-center justify-center backdrop-blur-md transition-all cursor-pointer pointer-events-auto shadow-md ${
+            className={`w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all cursor-pointer pointer-events-auto ${
               isSaved
-                ? 'bg-rose-500 text-white scale-105'
-                : 'bg-white/85 text-slate-700 hover:bg-white hover:text-rose-600 hover:scale-110 active:scale-95'
+                ? 'bg-rose-500 text-white shadow-md scale-105'
+                : 'bg-black/40 text-white hover:bg-black/60'
             }`}
-            title={isSaved ? 'Gỡ khỏi yêu thích' : 'Lưu vào danh sách yêu thích'}
+            title={isSaved ? 'Gỡ khỏi yêu thích' : 'Lưu vào yêu thích'}
           >
-            <Heart className={`w-4 h-4 ${isSaved ? 'fill-current text-white' : ''}`} />
+            <Heart className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
           </button>
         </div>
 
