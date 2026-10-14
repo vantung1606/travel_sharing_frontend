@@ -16,7 +16,7 @@ import { CustomSelect } from '../../../components/common/CustomSelect';
 import { UserAvatar } from '../../../components/common/UserAvatar';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../components/community/MentionSuggestions';
 import { useNavigate } from 'react-router-dom';
-import { AtSign, Heart, MessageCircle, MessageSquare, Share2, Bookmark, MapPin, Sparkles, Award, TrendingUp, Compass, Route, Copy, DollarSign, Camera, Image as ImageIcon, CheckCircle2, Send, Search, SlidersHorizontal, Filter, Plus, X, Loader2, Eye, MoreHorizontal, ChevronLeft, ChevronRight, ArrowRight, Flame, Check, UserCheck, ShieldCheck, AlertCircle, AlertTriangle, ShieldAlert, Lock, Globe, Upload, Video, Trash2, Edit, UserPlus, Users, CornerDownRight, Flag, EyeOff, BookOpen, Hash } from 'lucide-react';
+import { AtSign, Heart, MessageCircle, MessageSquare, Share2, Bookmark, MapPin, Award, TrendingUp, Compass, Route, Copy, DollarSign, Camera, Image as ImageIcon, CheckCircle2, Send, Search, SlidersHorizontal, Filter, Plus, X, Loader2, Eye, MoreHorizontal, ChevronLeft, ChevronRight, ArrowRight, Flame, Check, UserCheck, ShieldCheck, AlertCircle, AlertTriangle, ShieldAlert, Lock, Globe, Upload, Video, Trash2, Edit, UserPlus, Users, CornerDownRight, Flag, EyeOff, BookOpen, Hash } from 'lucide-react';
 
 const FEED_SCOPES = [
   { id: 'all', label: 'Khám phá dành cho bạn', icon: Compass },
@@ -41,10 +41,10 @@ const TRAVEL_HASHTAGS = [
 const TOPIC_FILTERS = [
   { id: 'Tất cả', label: 'Tất cả chủ đề', icon: Compass },
   { id: 'video', label: 'Thước phim video', icon: Video, badge: 'Video' },
-  { id: 'itinerary', label: 'Có Lịch trình AI', icon: Route, badge: 'Tour' },
+  { id: 'itinerary', label: 'Có Lịch trình', icon: Route, badge: 'Tour' },
   { id: 'food', label: 'Ẩm thực & Check-in', icon: MapPin },
   { id: 'adventure', label: 'Phượt & Khám phá', icon: Flame },
-  { id: 'beach', label: 'Biển đảo & Nghỉ dưỡng', icon: Sparkles }
+  { id: 'beach', label: 'Biển đảo & Nghỉ dưỡng', icon: Globe }
 ];
 
 const COMMUNITY_STORIES = [
@@ -748,6 +748,97 @@ export const CommunityPage = () => {
     return result;
   }, [posts, feedScope, topicFilter, selectedHashtag, activeSort, followingIds, bookmarkedPostIds, searchQuery, hiddenPostIds]);
 
+  // Pagination State for Feed
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 6;
+
+  // Reset to page 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [feedScope, topicFilter, selectedHashtag, searchQuery, activeSort]);
+
+  const totalPages = Math.ceil(displayPosts.length / postsPerPage) || 1;
+  const paginatedPosts = useMemo(() => {
+    const startIndex = (currentPage - 1) * postsPerPage;
+    return displayPosts.slice(startIndex, startIndex + postsPerPage);
+  }, [displayPosts, currentPage, postsPerPage]);
+
+  const generatePageNumbers = (current, total) => {
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    if (current <= 4) {
+      return [1, 2, 3, 4, 5, '...', total];
+    }
+    if (current >= total - 3) {
+      return [1, '...', total - 4, total - 3, total - 2, total - 1, total];
+    }
+    return [1, '...', current - 1, current, current + 1, '...', total];
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+    return (
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-4 pt-4 sm:pt-6 pb-2 border-t border-slate-200/80 mt-4 sm:mt-6">
+        <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
+          Hiển thị <strong className="text-slate-900 font-bold">{(currentPage - 1) * postsPerPage + 1}</strong> - <strong className="text-slate-900 font-bold">{Math.min(currentPage * postsPerPage, displayPosts.length)}</strong> trong số <strong className="text-slate-900 font-bold">{displayPosts.length}</strong> bài viết
+        </p>
+
+        <div className="flex items-center gap-1 flex-wrap justify-center">
+          <button
+            type="button"
+            disabled={currentPage === 1}
+            onClick={() => {
+              setCurrentPage((p) => Math.max(p - 1, 1));
+              window.scrollTo({ top: 380, behavior: 'smooth' });
+            }}
+            className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 transition-all shadow-2xs"
+          >
+            <ChevronLeft className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Trước</span>
+          </button>
+
+          {generatePageNumbers(currentPage, totalPages).map((p, idx) => (
+            typeof p === 'number' ? (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => {
+                  setCurrentPage(p);
+                  window.scrollTo({ top: 380, behavior: 'smooth' });
+                }}
+                className={`min-w-[28px] sm:min-w-[32px] h-7 sm:h-8 px-1.5 sm:px-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
+                  currentPage === p
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs'
+                }`}
+              >
+                {p}
+              </button>
+            ) : (
+              <span key={idx} className="px-1 text-xs text-slate-400 font-bold">
+                {p}
+              </span>
+            )
+          ))}
+
+          <button
+            type="button"
+            disabled={currentPage === totalPages}
+            onClick={() => {
+              setCurrentPage((p) => Math.min(p + 1, totalPages));
+              window.scrollTo({ top: 380, behavior: 'smooth' });
+            }}
+            className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 transition-all shadow-2xs"
+          >
+            <span className="hidden sm:inline">Sau</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   // Handle Like Post
   const handleToggleLike = async (postId) => {
     if (!requireAuth('thích bài viết')) return;
@@ -1233,7 +1324,7 @@ export const CommunityPage = () => {
             ? 'Wayfare là nền tảng chia sẻ Du lịch & Khám phá, nghiêm cấm các bài viết đòi nợ, bóc phốt tài chính hoặc giải quyết mâu thuẫn tiền bạc cá nhân. Bài viết đã bị chặn xuất bản và đưa vào diện xem xét vi phạm của Quản trị viên.'
             : isOffTopic
             ? 'Wayfare chỉ tự động duyệt các bài viết liên quan đến Du lịch, Lịch trình, Trải nghiệm điểm đến hoặc Ẩm thực địa phương. Bài viết của bạn đã được chuyển vào hàng đợi để Quản trị viên thẩm định thủ công.'
-            : 'Hệ thống WanderAI Safety Shield đã phát hiện một số cảnh báo an toàn. Bài viết của bạn đã được chuyển vào hàng đợi kiểm duyệt thủ công của Quản trị viên. Bạn sẽ nhận được thông báo ngay khi bài được duyệt!'
+            : 'Hệ thống Safety Shield đã phát hiện một số cảnh báo an toàn. Bài viết của bạn đã được chuyển vào hàng đợi kiểm duyệt thủ công của Quản trị viên. Bạn sẽ nhận được thông báo ngay khi bài được duyệt!'
         });
         toast.showWarning(isDebt 
           ? 'Bài viết bị chặn xuất bản do vi phạm quy tắc: Đòi nợ / Tranh chấp tài chính! 🚫'
@@ -1241,9 +1332,9 @@ export const CommunityPage = () => {
       } else {
         setModerationFeedback({
           type: 'APPROVED',
-          title: 'Thẩm định AI thành công! Xuất bản công khai 🎉',
+          title: 'Thẩm định thành công! Xuất bản công khai 🎉',
           score: result?.aiSafetyScore || 98,
-          message: 'Bài viết của bạn đã vượt qua toàn bộ quy chuẩn an toàn của Trợ lý AI và đã được đăng công khai trên Cộng đồng Wayfare!'
+          message: 'Bài viết của bạn đã vượt qua toàn bộ quy chuẩn an toàn của hệ thống và đã được đăng công khai trên Cộng đồng Wayfare!'
         });
         toast.showSuccess('Đã đăng bài viết thành công lên Cộng đồng Wayfare! 🚀');
       }
@@ -1298,7 +1389,7 @@ export const CommunityPage = () => {
   }, [posts]);
 
   return (
-    <div className="w-full min-h-screen bg-[#f8fafc] text-slate-900 pb-20">
+    <div className="w-full max-w-full overflow-x-hidden min-h-screen bg-[#f8fafc] text-slate-900 pb-16 sm:pb-20">
       {/* ─── 1. FULL-WIDTH CINEMATIC COMMUNITY HERO (NỀN LOANG RA ÊM ÁI, GỌN GÀNG, DỮ LIỆU THẬT) ─── */}
       <section className="relative w-full overflow-hidden -mt-16 pt-24 pb-14 sm:pt-26 sm:pb-16 lg:pt-28 lg:pb-18 bg-[#031726] text-white select-none">
         {/* Full-width Cinematic Backdrop with Vibrant Landscape & Seamless Bottom Loang Blend */}
@@ -1336,7 +1427,7 @@ export const CommunityPage = () => {
                 <ChevronRight className="w-3 h-3 text-slate-300 drop-shadow-md" />
                 <span className="text-white font-bold drop-shadow-md">Cộng Đồng Du Khách</span>
                 <span className="inline-flex items-center gap-1.5 ml-1 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-amber-300 border border-amber-400/40 text-[11px] font-bold shadow-md">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+                  <Compass className="w-3.5 h-3.5 text-amber-400" />
                   <span>Nhịp Đập Du Lịch Thực Tế • 63 Tỉnh Thành</span>
                 </span>
               </div>
@@ -1375,23 +1466,23 @@ export const CommunityPage = () => {
             </div>
 
             {/* Action CTA Cluster */}
-            <div className="flex flex-wrap items-center gap-3 shrink-0 pt-2 lg:pt-0">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0 pt-2 lg:pt-0">
               <button
                 type="button"
                 onClick={() => {
                   if (!requireAuth('đăng bài viết mới')) return;
                   setIsCreateModalOpen(true);
                 }}
-                className="group relative inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white text-xs sm:text-sm font-extrabold shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer ring-2 ring-blue-300/40"
+                className="group relative inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3.5 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white text-xs sm:text-sm font-extrabold shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer ring-2 ring-blue-300/40"
               >
                 <Plus className="w-4 h-4 text-amber-300" />
-                <span>Chia Sẻ Khoảnh Khắc ✨</span>
+                <span>Chia Sẻ Khoảnh Khắc</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setTopicFilter('itinerary')}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-xs sm:text-sm transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer hover:scale-105 active:scale-95"
+                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-xs sm:text-sm transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer hover:scale-105 active:scale-95"
               >
                 <Route className="w-4 h-4 text-sky-300" />
                 <span>Tour Có Lịch Trình</span>
@@ -1481,7 +1572,7 @@ export const CommunityPage = () => {
             ) : (
               <div className="bg-gradient-to-br from-white via-sky-50/50 to-indigo-50/30 rounded-3xl p-5 border border-sky-100 shadow-sm text-center space-y-4">
                 <div className="w-14 h-14 rounded-2xl bg-sky-600/10 text-sky-600 flex items-center justify-center mx-auto shadow-inner">
-                  <Sparkles className="w-7 h-7" />
+                  <Compass className="w-7 h-7" />
                 </div>
                 <div className="space-y-1.5">
                   <h3 className="font-extrabold text-base text-slate-900">Cộng đồng Wayfare</h3>
@@ -1536,11 +1627,11 @@ export const CommunityPage = () => {
                   badge: 'Hot'
                 },
                 {
-                  label: 'Tour có Lịch trình AI',
+                  label: 'Tour có Lịch trình',
                   icon: Route,
                   active: topicFilter === 'itinerary',
                   action: () => setTopicFilter('itinerary'),
-                  badge: 'AI'
+                  badge: 'Tour'
                 },
                 {
                   label: 'Xu hướng (Nhiều Like)',
@@ -1628,7 +1719,7 @@ export const CommunityPage = () => {
             {/* WanderAI Community Insight */}
             <div className="bg-gradient-to-br from-sky-50/70 via-white to-blue-50/50 p-5 rounded-3xl border border-sky-200/70 shadow-sm space-y-2">
               <div className="flex items-center gap-1.5 text-sky-800 text-xs font-extrabold uppercase tracking-wider">
-                <Sparkles className="w-4 h-4 text-amber-500" />
+                <Compass className="w-4 h-4 text-sky-600" />
                 <span>Gợi ý du lịch thông minh</span>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed font-normal">
@@ -1641,20 +1732,20 @@ export const CommunityPage = () => {
           {/* ========================================================= */}
           {/* CENTER COLUMN: Social Feed & Post Creator (6 cols) */}
           {/* ========================================================= */}
-          <main className="col-span-1 lg:col-span-6 space-y-6">
+          <main className="col-span-1 lg:col-span-6 space-y-4 sm:space-y-6">
 
             {/* ─── 24H COMMUNITY MOMENTS & STORIES CAROUSEL ─── */}
-            <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-slate-200/90 shadow-sm space-y-2.5 sm:space-y-3">
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></div>
-                  <h3 className="font-extrabold text-sm text-slate-900 tracking-tight">Khoảnh Khắc 24h • Trải Nghiệm Thực Tế</h3>
+                  <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 tracking-tight">Khoảnh Khắc 24h • Trải Nghiệm Thực Tế</h3>
                 </div>
-                <span className="text-xs text-slate-400 font-semibold">Cập nhật liên tục</span>
+                <span className="text-[11px] sm:text-xs text-slate-400 font-semibold">Cập nhật liên tục</span>
               </div>
 
               {/* Horizontal Scroll Story Circles - Dữ liệu địa điểm thực tế từ bài viết */}
-              <div className="flex items-center gap-3.5 overflow-x-auto pb-2 scrollbar-none select-none">
+              <div className="flex items-center gap-3 sm:gap-3.5 overflow-x-auto pb-2 scrollbar-none select-none">
                 {/* Reset / All Filter */}
                 <div
                   onClick={() => setSearchQuery('')}
@@ -1666,13 +1757,13 @@ export const CommunityPage = () => {
                       ? 'bg-gradient-to-tr from-sky-500 to-blue-600 ring-2 ring-sky-400/40'
                       : 'bg-slate-200 group-hover:bg-slate-300'
                   }`}>
-                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-100 flex items-center justify-center p-0.5">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-100 flex items-center justify-center p-0.5">
                       <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-sky-600">
-                        <Compass className="w-6 h-6" />
+                        <Compass className="w-5 h-5 sm:w-6 sm:h-6" />
                       </div>
                     </div>
                   </div>
-                  <span className={`text-[11px] font-bold transition-colors truncate max-w-[72px] text-center ${
+                  <span className={`text-[10px] sm:text-[11px] font-bold transition-colors truncate max-w-[62px] sm:max-w-[72px] text-center ${
                     !searchQuery ? 'text-sky-600 font-extrabold' : 'text-slate-700 group-hover:text-sky-600'
                   }`}>
                     Tất cả
@@ -1703,25 +1794,25 @@ export const CommunityPage = () => {
                             <img
                               src={imgSrc}
                               alt={locName}
-                              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover"
+                              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover"
                             />
                           ) : (
-                            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-sky-50 flex items-center justify-center text-sky-600 font-extrabold text-base">
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-sky-50 flex items-center justify-center text-sky-600 font-extrabold text-sm sm:text-base">
                               📍
                             </div>
                           )}
                         </div>
                         {postCount ? (
-                          <span className="absolute -bottom-1 -right-1 text-[10px] bg-slate-900 text-white px-1.5 py-0.2 rounded-full border border-white font-bold">
+                          <span className="absolute -bottom-1 -right-1 text-[9px] sm:text-[10px] bg-slate-900 text-white px-1.5 py-0.2 rounded-full border border-white font-bold">
                             {postCount}
                           </span>
                         ) : story.badge ? (
-                          <span className="absolute -bottom-1 -right-1 text-[10px] bg-slate-900 text-white px-1.5 py-0.2 rounded-full border border-white font-bold">
+                          <span className="absolute -bottom-1 -right-1 text-[9px] sm:text-[10px] bg-slate-900 text-white px-1.5 py-0.2 rounded-full border border-white font-bold">
                             {story.badge}
                           </span>
                         ) : null}
                       </div>
-                      <span className={`text-[11px] font-bold transition-colors truncate max-w-[72px] text-center ${
+                      <span className={`text-[10px] sm:text-[11px] font-bold transition-colors truncate max-w-[62px] sm:max-w-[72px] text-center ${
                         isSelected ? 'text-sky-600 font-extrabold' : 'text-slate-700 group-hover:text-sky-600'
                       }`}>
                         {locName}
@@ -1734,23 +1825,23 @@ export const CommunityPage = () => {
             
             {/* Quick Create Post Bar or Guest Invitation */}
             {isLoggedIn ? (
-            <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-sm space-y-4">
-              <div className="flex items-center gap-3.5">
+            <div className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-slate-200/90 shadow-sm space-y-3">
+              <div className="flex items-center gap-3">
                 <img
                   src={currentUser?.avatar}
                   alt="Avatar"
-                  className="w-12 h-12 rounded-full object-cover flex-shrink-0 ring-2 ring-blue-500/30"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover flex-shrink-0 ring-2 ring-blue-500/30"
                 />
                 <button
                   onClick={() => setIsCreateModalOpen(true)}
-                  className="w-full text-left bg-slate-50 hover:bg-blue-50/50 text-slate-400 hover:text-slate-600 px-5 py-3 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer flex items-center justify-between border border-slate-200/80 shadow-2xs"
+                  className="w-full text-left bg-slate-50 hover:bg-blue-50/50 text-slate-400 hover:text-slate-600 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-medium transition-all cursor-pointer flex items-center justify-between border border-slate-200/80 shadow-2xs"
                 >
-                  <span>Chia sẻ review, ảnh đẹp hoặc đính kèm lịch trình của bạn...</span>
-                  <Sparkles className="w-4 h-4 text-sky-600" />
+                  <span className="truncate">Chia sẻ review, ảnh đẹp hoặc đính kèm tour...</span>
+                  <Compass className="w-4 h-4 text-sky-600 shrink-0 ml-1.5" />
                 </button>
               </div>
 
-              <div className="flex items-center justify-between gap-1 pt-3 border-t border-slate-100 text-xs font-semibold text-slate-700">
+              <div className="flex items-center justify-between gap-1 pt-2.5 border-t border-slate-100 text-[11px] sm:text-xs font-semibold text-slate-700">
                 <button
                   onClick={() => setIsCreateModalOpen(true)}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2 hover:bg-sky-50 hover:text-sky-700 rounded-xl transition-colors cursor-pointer"
@@ -1776,20 +1867,20 @@ export const CommunityPage = () => {
                   onClick={() => setIsAIGeneratorOpen(true)}
                   className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-sky-50 text-sky-800 hover:bg-sky-100 rounded-xl font-bold transition-colors cursor-pointer border border-sky-200/60"
                 >
-                  <Sparkles className="w-4 h-4 text-sky-600" />
-                  <span className="hidden sm:inline">Tạo Tour AI</span>
+                  <Route className="w-4 h-4 text-sky-600" />
+                  <span className="hidden sm:inline">Tạo Tour Tùy Biến</span>
                 </button>
               </div>
             </div>
           ) : (
-            <div className="bg-gradient-to-r from-sky-50 via-white to-blue-50/70 rounded-3xl p-5 sm:p-6 border border-sky-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="bg-gradient-to-r from-sky-50 via-white to-blue-50/70 rounded-2xl sm:rounded-3xl p-4 sm:p-6 border border-sky-100 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-sky-600/10 text-sky-600 flex items-center justify-center shrink-0 shadow-inner">
-                  <Sparkles className="w-6 h-6" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-sky-600/10 text-sky-600 flex items-center justify-center shrink-0 shadow-inner">
+                  <Compass className="w-5 h-5 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-extrabold text-slate-900">Chia sẻ câu chuyện du lịch của bạn</h4>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <h4 className="text-xs sm:text-sm font-extrabold text-slate-900">Chia sẻ câu chuyện du lịch của bạn</h4>
+                  <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
                     Đăng nhập để đăng bài viết, tương tác thả tim, bình luận và lưu lại các hành trình yêu thích.
                   </p>
                 </div>
@@ -2060,7 +2151,7 @@ export const CommunityPage = () => {
 
           {/* Social Posts Feed */}
           {!loading &&
-            displayPosts.map(post => {
+            paginatedPosts.map(post => {
               const hasItinerary = Boolean(post.itineraryId || post.itineraryTitle);
               const isBookmarked = bookmarkedPostIds.has(Number(post.id)) || Boolean(post.isBookmarked);
               const authorName = post.authorName || post.author?.fullName || post.author?.name || 'Thành viên Wayfare';
@@ -2080,21 +2171,21 @@ export const CommunityPage = () => {
               return (
                 <article
                   key={post.id}
-                  className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-blue-200/80 transition-all space-y-4 relative"
+                  className="bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-blue-200/80 transition-all space-y-3.5 relative overflow-hidden"
                 >
                   {/* Status Banner for Posts Pending Review */}
                   {post.status === 'PENDING_REVIEW' && (
-                    <div className="bg-amber-50/90 border border-amber-200 p-3.5 rounded-2xl flex items-start gap-3 text-xs sm:text-sm text-amber-900 shadow-2xs">
-                      <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-                      <div className="flex-1">
+                    <div className="bg-amber-50/90 border border-amber-200 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl flex items-start gap-2.5 sm:gap-3 text-xs sm:text-sm text-amber-900 shadow-2xs">
+                      <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 shrink-0 mt-0.5" />
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-bold text-slate-900">Đang chờ Quản trị viên duyệt thủ công</span>
                           <span className="px-2 py-0.5 rounded-md bg-amber-200/80 text-amber-900 text-xs font-bold">
-                            Điểm AI: {post.aiSafetyScore || 45}/100
+                            Kiểm duyệt: {post.aiSafetyScore || 45}/100
                           </span>
                         </div>
                         <p className="text-xs text-amber-800 mt-1 leading-relaxed">
-                          <strong>Lý do AI gắn cờ:</strong> {post.aiFlagReason || 'Nội dung chứa yếu tố cần xác thực thêm trước khi công khai.'} <span className="text-slate-500 italic">(Hiện tại chỉ hiển thị trong feed của bạn)</span>
+                          <strong>Ghi chú hệ thống:</strong> {post.aiFlagReason || 'Nội dung chứa yếu tố cần xác thực thêm trước khi công khai.'} <span className="text-slate-500 italic">(Hiện tại chỉ hiển thị trong feed của bạn)</span>
                         </p>
                       </div>
                     </div>
@@ -2631,8 +2722,8 @@ export const CommunityPage = () => {
                         <div className="flex-1 min-w-0 space-y-1.5">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sky-600 text-white text-[10px] font-extrabold uppercase tracking-wider whitespace-nowrap shadow-2xs">
-                              <Sparkles className="w-3 h-3 text-amber-300 shrink-0" />
-                              <span>Lịch trình AI tối ưu</span>
+                              <Route className="w-3 h-3 text-amber-300 shrink-0" />
+                              <span>Lịch trình chi tiết</span>
                             </span>
                             {post.itineraryDuration && (
                               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold text-sky-900 bg-white border border-sky-200 whitespace-nowrap">
@@ -2765,12 +2856,15 @@ export const CommunityPage = () => {
                     {/* Report / Moderation status */}
                     <span className="text-[11px] text-slate-400 inline-flex items-center gap-1 whitespace-nowrap shrink-0">
                       <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                      <span className="hidden md:inline">Đã kiểm duyệt AI</span>
+                      <span className="hidden md:inline">Đã kiểm duyệt</span>
                     </span>
                   </div>
                 </article>
               );
             })}
+
+          {/* Feed Pagination */}
+          {!loading && renderPagination()}
         </main>
 
         {/* ========================================================= */}
@@ -2839,8 +2933,8 @@ export const CommunityPage = () => {
               onClick={() => setIsAIGeneratorOpen(true)}
               className="w-full py-2.5 rounded-xl bg-sky-50 hover:bg-sky-600 hover:text-white text-sky-700 text-xs font-extrabold transition-all border border-sky-200/80 flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Tạo Tour Tùy Biến Với AI</span>
+              <Route className="w-3.5 h-3.5" />
+              <span>Tạo Tour Tùy Biến</span>
             </button>
           </div>
 
@@ -2928,7 +3022,7 @@ export const CommunityPage = () => {
               <span>Quy tắc Cộng đồng Wayfare</span>
             </h5>
             <p className="text-[11px] leading-relaxed">
-              Tất cả bài viết được kiểm duyệt tự động bởi hệ thống WanderAI Safety Shield:
+              Tất cả bài viết được kiểm duyệt tự động bởi hệ thống Safety Shield:
             </p>
             <ul className="text-[11px] space-y-1.5 text-slate-600 list-disc list-inside">
               <li><strong className="text-slate-800">Chỉ duyệt chủ đề Du lịch:</strong> Lịch trình, review điểm đến, ẩm thực, phượt, văn hóa bản địa.</li>
@@ -2946,8 +3040,8 @@ export const CommunityPage = () => {
       {/* MODAL 1: CREATE POST WITH ATTACHED ITINERARY SELECTOR    */}
       {/* ========================================================= */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto space-y-4 animate-in fade-in zoom-in-95 duration-200 relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-xl w-full p-4 sm:p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto space-y-4 animate-in fade-in zoom-in-95 duration-200 relative">
             
             {/* AI Moderation & Shield Scanning Overlay */}
             {submittingPost && (
@@ -2956,7 +3050,7 @@ export const CommunityPage = () => {
                   <div className="w-16 h-16 rounded-2xl ocean-gradient text-white flex items-center justify-center shadow-lg shadow-sky-500/25 animate-pulse">
                     <ShieldCheck className="w-8 h-8" />
                   </div>
-                  <Sparkles className="w-6 h-6 text-amber-500 absolute -top-1 -right-1 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-sky-500 absolute -top-1 -right-1 animate-spin" />
                 </div>
                 <div className="space-y-1.5 max-w-sm">
                   <h4 className="font-extrabold text-sm text-slate-900">
@@ -2964,10 +3058,10 @@ export const CommunityPage = () => {
                       ? 'Đang quét từ khóa & ngữ cảnh an toàn du lịch...'
                       : moderationStep === 2
                       ? 'Đang thẩm định an toàn bảo tồn rừng & PCCC...'
-                      : 'Đang chấm điểm WanderAI Safety Score...'}
+                      : 'Đang hoàn tất thẩm định tiêu chuẩn an toàn...'}
                   </h4>
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Hệ thống AI Safety Shield đang thẩm định tự động để bảo vệ cộng đồng và thẩm định nội dung trước khi xuất bản.
+                    Hệ thống Safety Shield đang thẩm định tự động để bảo vệ cộng đồng và nội dung trước khi xuất bản.
                   </p>
                 </div>
                 <div className="w-48 h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -2982,7 +3076,7 @@ export const CommunityPage = () => {
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
-                  <Sparkles className="w-4 h-4" />
+                  <Compass className="w-4 h-4" />
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-slate-900">Chia sẻ với Cộng đồng</h3>
@@ -3068,7 +3162,7 @@ export const CommunityPage = () => {
                     options={[
                       { value: 'Ẩm thực & Check-in', label: 'Ẩm thực & Check-in', icon: MapPin },
                       { value: 'Phượt & Khám phá', label: 'Phượt & Khám phá', icon: Flame },
-                      { value: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Sparkles },
+                      { value: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Globe },
                       { value: 'Văn hóa & Lịch sử', label: 'Văn hóa & Lịch sử', icon: Compass }
                     ]}
                   />
@@ -3357,8 +3451,8 @@ export const CommunityPage = () => {
       {/* MODAL: AI MODERATION & SAFETY REVIEW FEEDBACK             */}
       {/* ========================================================= */}
       {moderationFeedback && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200 text-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-md w-full p-4 sm:p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-200 text-center">
             <div
               className="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center shadow-lg transition-transform duration-300 scale-105"
               style={{
@@ -3398,8 +3492,8 @@ export const CommunityPage = () => {
                       : '#b45309'
                 }}
               >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Điểm an toàn WanderAI: {moderationFeedback.score}/100</span>
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Điểm an toàn hệ thống: {moderationFeedback.score}/100</span>
               </div>
             </div>
 
@@ -3417,7 +3511,7 @@ export const CommunityPage = () => {
                       moderationFeedback.type === 'REJECTED_PREFLIGHT' ? 'text-rose-600' : 'text-amber-600'
                     }`}
                   />
-                  Cảnh báo AI phát hiện:
+                  Cảnh báo hệ thống:
                 </span>
                 <p className="text-[11px] leading-relaxed">
                   {moderationFeedback.reason}
