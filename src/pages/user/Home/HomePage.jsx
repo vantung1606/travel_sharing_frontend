@@ -481,7 +481,7 @@ export const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 selection:bg-blue-600 selection:text-white pb-20 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 selection:bg-blue-600 selection:text-white pb-20 w-full max-w-full overflow-x-clip -mt-16">
       {/* ──────────────────────────────────────────────────────────────────────────
           1. HERO SECTION (CINEMATIC DEEP ATMOSPHERE - NO WASHED-OUT BOTTOM)
           - Deep contrast dark green & slate canvas, no hazy bottom mist
@@ -489,7 +489,7 @@ export const HomePage = () => {
           - Royal Blue CTA buttons with energetic glow
           - Quick inspiration tags in unified row
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="relative w-full overflow-hidden -mt-16 pt-28 pb-24 lg:pt-32 lg:pb-32 bg-[#031726] text-white">
+      <section className="relative w-full overflow-hidden pt-28 pb-24 lg:pt-32 lg:pb-32 bg-[#031726] text-white">
         {/* Cinematic Backdrop with Clear Vibrant Landscape */}
         <div className="absolute inset-0 z-0">
           <div

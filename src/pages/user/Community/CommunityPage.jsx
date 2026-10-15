@@ -1369,11 +1369,6 @@ export const CommunityPage = () => {
     return itineraries.find(i => String(i.id) === String(attachedItineraryId));
   }, [attachedItineraryId, itineraries]);
 
-  // Real Statistics derived from database posts
-  const realItineraryCount = useMemo(() => {
-    return posts.filter(p => p.itineraryId || p.itinerary || p.hasItinerary).length;
-  }, [posts]);
-
   // Real Location Stories extracted dynamically from loaded posts
   const realLocationStories = useMemo(() => {
     if (!Array.isArray(posts) || posts.length === 0) return [];
@@ -1400,111 +1395,9 @@ export const CommunityPage = () => {
   }, [posts]);
 
   return (
-    <div className="w-full max-w-full overflow-x-clip min-h-screen bg-[#f8fafc] text-slate-900 pb-16 sm:pb-20 -mt-16">
-      {/* ─── 1. FULL-WIDTH CINEMATIC COMMUNITY HERO (NỀN LOANG RA ÊM ÁI, GỌN GÀNG, DỮ LIỆU THẬT) ─── */}
-      <section className="relative w-full overflow-hidden pt-20 sm:pt-24 pb-14 sm:pb-16 lg:pt-28 lg:pb-18 bg-[#031726] text-white select-none">
-        {/* Full-width Cinematic Backdrop with Vibrant Landscape & Seamless Bottom Loang Blend */}
-        <div className="absolute inset-0 z-0 pointer-events-none select-none">
-          <div
-            className="w-full h-full bg-cover bg-center transition-all duration-700 scale-105"
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=2400&q=90')`
-            }}
-          />
-          {/* Refined Photographic Scrim - Đều màu toàn cảnh, bảo toàn độ rõ nét rực rỡ */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-[#031726]/40 to-slate-950/60" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/20 to-[#031726]/85" />
-
-          {/* DẢI LOANG CHÂN DƯỚI CÙNG XUỐNG MÀU #f8fafc (LOANG MƯỢT MÀ, KHÔNG ĐÈ LÊN CHỮ) */}
-          <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-24 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/50 to-transparent pointer-events-none" />
-
-          {/* Radiant Subtle Ambient Light with Pulse Animations */}
-          <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-sky-500/20 blur-[140px] pointer-events-none animate-pulse-slow" />
-          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-blue-500/15 blur-[130px] pointer-events-none animate-pulse-slow [animation-delay:3.5s]" />
-        </div>
-
-        {/* Hero Content Container Aligned Exactly with Navbar Spacing */}
-        <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
-            
-            {/* Left Content Column */}
-            <div className="max-w-3xl space-y-2.5">
-              {/* Breadcrumb */}
-              <div className="flex flex-wrap items-center gap-2.5 text-xs">
-                <span className="flex items-center gap-1.5 text-sky-300 hover:text-white transition-colors cursor-pointer font-semibold drop-shadow-md">
-                  <Compass className="w-3.5 h-3.5 text-sky-400" />
-                  <span>Wayfare</span>
-                </span>
-                <ChevronRight className="w-3 h-3 text-slate-300 drop-shadow-md" />
-                <span className="text-white font-bold drop-shadow-md">Cộng Đồng Du Khách</span>
-                <span className="inline-flex items-center gap-1.5 ml-1 px-3 py-1 rounded-full bg-black/40 backdrop-blur-md text-amber-300 border border-amber-400/40 text-[11px] font-bold shadow-md">
-                  <Compass className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Nhịp Đập Du Lịch Thực Tế • 63 Tỉnh Thành</span>
-                </span>
-              </div>
-
-              {/* Main Headline */}
-              <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight drop-shadow-[0_3px_12px_rgba(0,0,0,0.95)]">
-                Cộng Đồng Khám Phá{' '}
-                <span className="bg-gradient-to-r from-sky-300 via-cyan-200 to-blue-300 bg-clip-text text-transparent filter drop-shadow-[0_3px_10px_rgba(0,0,0,0.95)]">
-                  Wayfare
-                </span>
-              </h1>
-
-              {/* Subtitle - Chữ màu vàng kem ấm áp tương phản cao */}
-              <p className="text-amber-100/95 text-xs sm:text-sm max-w-2xl leading-relaxed font-medium tracking-[0.015em] drop-shadow-[0_2px_8px_rgba(0,0,0,1)]">
-                Nơi hàng ngàn lữ khách chia sẻ khoảnh khắc check-in sống ảo, review ẩm thực bản địa chân thực và sao chép lịch trình thực chiến chỉ với một chạm.
-              </p>
-
-              {/* Live Real Data Ticker */}
-              <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-slate-200">
-                <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                  <span className="font-bold text-white">Trực tuyến</span>
-                  <span className="text-slate-300">kết nối lữ khách</span>
-                </div>
-                <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-sm" title="Tổng số bài viết thực tế trong CSDL">
-                  <Camera className="w-3.5 h-3.5 text-sky-400" />
-                  <span className="font-bold text-white">{posts.length}</span>
-                  <span className="text-slate-300">bài viết review</span>
-                </div>
-                <div className="flex items-center gap-2 bg-slate-900/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/10 shadow-sm" title="Số tour có lịch trình đính kèm trong CSDL">
-                  <Route className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="font-bold text-white">{realItineraryCount}</span>
-                  <span className="text-slate-300">tour có lịch trình</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Action CTA Cluster */}
-            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 shrink-0 pt-2 lg:pt-0">
-              <button
-                type="button"
-                onClick={() => {
-                  if (!requireAuth('đăng bài viết mới')) return;
-                  setIsCreateModalOpen(true);
-                }}
-                className="group relative inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3.5 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white text-xs sm:text-sm font-extrabold shadow-[0_12px_30px_rgba(2,132,199,0.5)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer ring-2 ring-blue-300/40"
-              >
-                <Plus className="w-4 h-4 text-amber-300" />
-                <span>Chia Sẻ Khoảnh Khắc</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setTopicFilter('itinerary')}
-                className="inline-flex items-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3.5 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-xs sm:text-sm transition-all border border-white/25 hover:border-white/50 shadow-md cursor-pointer hover:scale-105 active:scale-95"
-              >
-                <Route className="w-4 h-4 text-sky-300" />
-                <span>Tour Có Lịch Trình</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── 2. 3-COLUMN COMMUNITY WORKSPACE ─── */}
-      <div className="relative -mt-6 sm:-mt-8 z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+    <div className="w-full min-h-screen bg-[#f8fafc] text-slate-900 pb-16 sm:pb-20">
+      {/* ─── 3-COLUMN COMMUNITY WORKSPACE ─── */}
+      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8">
         {/* 3-COLUMN DESKTOP GRID */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
