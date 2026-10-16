@@ -9,13 +9,13 @@ import { uploadApi } from '../../../../services/api';
 const POPULAR_CITIES = ['Đà Lạt', 'Đà Nẵng', 'Hà Giang', 'Hội An', 'Phú Quốc', 'Ninh Bình', 'Sapa', 'Quy Nhơn'];
 
 const CATEGORY_ITEMS = [
-  { id: 'Danh Lam & Thắng Cảnh', label: 'Thắng Cảnh', icon: '🏔️' },
-  { id: 'Biển Đảo & Nghỉ Dưỡng', label: 'Biển Đảo', icon: '🏖️' },
-  { id: 'Quán Cafe & Săn Mây', label: 'Cafe Săn Mây', icon: '☕' },
-  { id: 'Ẩm Thực & Đặc Sản', label: 'Ẩm Thực', icon: '🍜' },
-  { id: 'Di Sản & Phố Cổ', label: 'Di Sản Phố Cổ', icon: '🏛️' },
-  { id: 'Homestay & Nghỉ Dưỡng', label: 'Homestay', icon: '🏡' },
-  { id: 'Trải Nghiệm & Hoạt Động', label: 'Cắm Trại & Phượt', icon: '🏕️' }
+  { id: 'Danh Lam & Thắng Cảnh', label: 'Thắng Cảnh' },
+  { id: 'Biển Đảo & Nghỉ Dưỡng', label: 'Biển Đảo' },
+  { id: 'Cà Phê', label: 'Cà Phê' },
+  { id: 'Ẩm Thực & Đặc Sản', label: 'Ẩm Thực' },
+  { id: 'Di Sản & Văn Hóa', label: 'Di Sản Văn Hóa' },
+  { id: 'Homestay & Khách Sạn', label: 'Homestay' },
+  { id: 'Cắm Trại & Hoạt Động', label: 'Cắm Trại & Phượt' }
 ];
 
 export const AddPlaceModal = ({
@@ -290,13 +290,12 @@ export const AddPlaceModal = ({
                     key={cat.id}
                     type="button"
                     onClick={() => setNewPlaceForm(prev => ({ ...prev, categoryName: cat.id }))}
-                    className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border ${
+                    className={`px-3.5 py-1.5 rounded-xl font-semibold text-xs transition-all cursor-pointer border ${
                       isSelected
-                        ? 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-600/30 scale-[1.02]'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
+                        ? 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-600/25'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
                     }`}
                   >
-                    <span>{cat.icon}</span>
                     <span>{cat.label}</span>
                   </button>
                 );

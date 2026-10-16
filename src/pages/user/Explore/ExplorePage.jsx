@@ -126,7 +126,7 @@ export const ExplorePage = () => {
     if (exploreLayer === 'spots') {
       return [
         'Tất cả',
-        'Quán Cafe & Săn Mây',
+        'Cà Phê',
         'Homestay & Nghỉ Dưỡng',
         'Ẩm Thực & Đặc Sản',
         'Trải Nghiệm & Hoạt Động',
