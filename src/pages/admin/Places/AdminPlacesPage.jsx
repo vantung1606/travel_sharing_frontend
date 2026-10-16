@@ -195,6 +195,7 @@ export const AdminPlacesPage = () => {
     try {
       const payload = {
         ...newPlaceForm,
+        status: 'ACTIVE',
         ticketPrice: newPlaceForm.ticketPrice ? Number(newPlaceForm.ticketPrice) : 0,
         latitude: newPlaceForm.latitude ? Number(newPlaceForm.latitude) : null,
         longitude: newPlaceForm.longitude ? Number(newPlaceForm.longitude) : null,
