@@ -11,7 +11,7 @@ import {
 
 export const AdminPlacesPage = () => {
   const toast = useToast();
-  const { currentUser, places: contextPlaces } = useApp();
+  const { currentUser } = useApp();
 
   // Tab & Filter States
   const [activeTab, setActiveTab] = useState('Đang hoạt động'); // 'Đang hoạt động' | 'Chờ duyệt' | 'Tất cả'
@@ -66,7 +66,7 @@ export const AdminPlacesPage = () => {
     'Khu vui chơi giải trí'
   ];
 
-  // Fetch real data from backend with resilient dataset fallback
+  // Fetch real data directly from backend database (Single Source of Truth)
   const loadData = useCallback(async (isManual = false) => {
     setIsLoading(true);
     try {
@@ -76,16 +76,7 @@ export const AdminPlacesPage = () => {
       ]);
       
       const pendingList = Array.isArray(pendingRes) ? pendingRes : [];
-      let fullList = Array.isArray(allRes) ? allRes : [];
-
-      // Resilient fallback: If backend returns fewer records, merge with 550+ curated official destinations
-      if (fullList.length < 50 && Array.isArray(contextPlaces) && contextPlaces.length > 0) {
-        const backendIds = new Set(fullList.map(p => String(p.id)));
-        const fallbackItems = contextPlaces
-          .filter(p => !backendIds.has(String(p.id)))
-          .map(p => ({ ...p, status: p.status || 'ACTIVE' }));
-        fullList = [...fullList, ...fallbackItems];
-      }
+      const fullList = Array.isArray(allRes) ? allRes : [];
 
       setPendingPlaces(pendingList);
       setAllPlaces(fullList);
@@ -100,7 +91,7 @@ export const AdminPlacesPage = () => {
       }
 
       if (isManual) {
-        toast.success(`Đã đồng bộ ${fullList.length} địa điểm thời gian thực!`);
+        toast.success(`Đã đồng bộ ${fullList.length} địa điểm từ CSDL MySQL!`);
       }
     } catch (err) {
       console.error('Error fetching admin places:', err);
@@ -108,7 +99,7 @@ export const AdminPlacesPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedPlace, contextPlaces, toast]);
+  }, [selectedPlace, toast]);
 
   useEffect(() => {
     loadData();

@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { notificationApi, userApi, placeApi, itineraryApi, authApi } from '../services/api';
-import officialDestinations from '../data/official_destinations.json';
 
 const DEFAULT_APP_STATE = {
   portalMode: 'user',
@@ -175,37 +174,29 @@ export const AppProvider = ({ children }) => {
     setIsAIGeneratorOpen(true);
   };
 
-  // Data States
-  const [destinations, setDestinations] = useState(officialDestinations || []);
+  // Data States (100% Database Driven - Single Source of Truth)
+  const [destinations, setDestinations] = useState([]);
   const [posts, setPosts] = useState([]);
   const [itineraries, setItineraries] = useState([]);
   const [pendingPlaces, setPendingPlaces] = useState([]);
-  const [places, setPlaces] = useState(() => {
-    return (officialDestinations || []).map((item, idx) => ({
-      ...item,
-      id: item.id || `official-${idx + 1}`,
-      isVerifiedHost: true
-    }));
-  });
+  const [places, setPlaces] = useState([]);
   const [users, setUsers] = useState([]);
   const [reports, setReports] = useState([]);
   const [stats, setStats] = useState({});
 
-  // Fetch places from backend on mount (merges remote places with official database)
+  // Fetch places from backend database via RESTful API
   const fetchPlaces = useCallback(async (filters = {}) => {
     try {
       const data = await placeApi.getPlaces(filters);
-      if (data && Array.isArray(data) && data.length > 0) {
-        setPlaces(prev => {
-          const backendIds = new Set(data.map(d => String(d.id)));
-          const remainingOfficial = (officialDestinations || [])
-            .map((item, idx) => ({ ...item, id: item.id || `official-${idx + 1}`, isVerifiedHost: true }))
-            .filter(item => !backendIds.has(String(item.id)));
-          return [...data, ...remainingOfficial];
-        });
+      if (Array.isArray(data)) {
+        setPlaces(data);
+        // Synchronize distinct destination cities directly from database records
+        const distinctCities = Array.from(new Set(data.map(p => p.city).filter(Boolean)));
+        setDestinations(distinctCities.map(city => ({ name: city, destination: city })));
       }
     } catch (err) {
-      console.warn('Using official curated places dataset:', err);
+      console.warn('API error fetching places from database:', err.message);
+      setPlaces([]);
     }
   }, []);
 
