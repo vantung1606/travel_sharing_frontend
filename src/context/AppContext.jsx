@@ -177,7 +177,14 @@ export const AppProvider = ({ children }) => {
   // Data States (100% Database Driven - Single Source of Truth)
   const [destinations, setDestinations] = useState([]);
   const [posts, setPosts] = useState([]);
-  const [itineraries, setItineraries] = useState([]);
+  const [itineraries, setItineraries] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('wayfare_my_itineraries_cache');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
   const [pendingPlaces, setPendingPlaces] = useState([]);
   const [places, setPlaces] = useState(() => {
     try {
@@ -565,6 +572,11 @@ export const AppProvider = ({ children }) => {
       if (data && Array.isArray(data)) {
         const mapped = data.map(mapBackendItineraryToFrontend).filter(Boolean);
         setItineraries(mapped);
+        try {
+          sessionStorage.setItem('wayfare_my_itineraries_cache', JSON.stringify(mapped));
+        } catch {
+          // Ignore storage quota
+        }
       } else {
         setItineraries([]);
       }

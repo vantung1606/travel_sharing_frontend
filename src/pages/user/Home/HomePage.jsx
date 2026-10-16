@@ -275,17 +275,31 @@ export const HomePage = () => {
     }
   ];
 
-  // Dynamic Backend Data States
-  const [homeStats, setHomeStats] = useState({
-    totalItineraries: 128,
-    totalPlaces: 84,
-    totalPosts: 320,
-    totalUsers: 1450,
-    totalLikes: 5240,
-    totalComments: 1890
+  // Dynamic Backend Data States (SWR Instant Hydration)
+  const [homeStats, setHomeStats] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('wayfare_home_stats_cache');
+      return cached ? JSON.parse(cached) : {
+        totalItineraries: 128,
+        totalPlaces: 84,
+        totalPosts: 320,
+        totalUsers: 1450,
+        totalLikes: 5240,
+        totalComments: 1890
+      };
+    } catch {
+      return { totalItineraries: 128, totalPlaces: 84, totalPosts: 320, totalUsers: 1450, totalLikes: 5240, totalComments: 1890 };
+    }
   });
   const [featuredTours, setFeaturedTours] = useState(curatedTours);
-  const [communityPosts, setCommunityPosts] = useState([]);
+  const [communityPosts, setCommunityPosts] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('wayfare_home_community_cache') || sessionStorage.getItem('wayfare_community_posts_cache');
+      return cached ? JSON.parse(cached).slice(0, 4) : [];
+    } catch {
+      return [];
+    }
+  });
   const [isLoadingCommunity, setIsLoadingCommunity] = useState(false);
   const [trendingDestinations, setTrendingDestinations] = useState([
     { label: '🌸 Đà Lạt sương mù', val: 'Đà Lạt' },
@@ -300,7 +314,12 @@ export const HomePage = () => {
   // 1. Fetch live platform stats & destinations on mount
   useEffect(() => {
     homeApi.getStats().then((data) => {
-      if (data) setHomeStats(data);
+      if (data) {
+        setHomeStats(data);
+        try {
+          sessionStorage.setItem('wayfare_home_stats_cache', JSON.stringify(data));
+        } catch {}
+      }
     });
 
     homeApi.getTrendingDestinations().then((dests) => {
@@ -327,6 +346,9 @@ export const HomePage = () => {
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
           setCommunityPosts(data);
+          try {
+            sessionStorage.setItem('wayfare_home_community_cache', JSON.stringify(data));
+          } catch {}
         }
       })
       .finally(() => setIsLoadingCommunity(false));

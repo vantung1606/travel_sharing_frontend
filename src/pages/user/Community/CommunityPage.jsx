@@ -176,9 +176,23 @@ export const CommunityPage = () => {
     navigate(`/messages?${params}`);
   };
 
-  // Feed State
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Feed State (SWR Instant Hydration)
+  const [posts, setPosts] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('wayfare_community_posts_cache');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [loading, setLoading] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('wayfare_community_posts_cache');
+      return !cached;
+    } catch {
+      return true;
+    }
+  });
   const [feedScope, setFeedScope] = useState('all'); // 'all' | 'following' | 'saved'
   const [topicFilter, setTopicFilter] = useState('Tất cả'); // 'Tất cả' | 'video' | 'itinerary' | 'food' | 'adventure' | 'beach'
   const [selectedHashtag, setSelectedHashtag] = useState('all'); // 'all' | 'KinhNghiem' | 'ReviewAmThuc' ...
@@ -546,6 +560,13 @@ export const CommunityPage = () => {
 
       if (Array.isArray(data) && data.length > 0) {
         setPosts(data);
+        if (feedScope === 'all' && !searchQuery) {
+          try {
+            sessionStorage.setItem('wayfare_community_posts_cache', JSON.stringify(data));
+          } catch {
+            // Ignore storage quota
+          }
+        }
         // Synchronize bookmarked IDs from posts
         setBookmarkedPostIds(prev => {
           const next = new Set(prev);
