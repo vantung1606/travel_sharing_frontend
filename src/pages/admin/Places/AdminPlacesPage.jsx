@@ -274,7 +274,7 @@ export const AdminPlacesPage = () => {
             </span>
           </div>
           <p className="text-xs text-slate-600">
-            Hệ thống đang quản lý <strong className="text-slate-900 font-bold">{allPlaces.length}</strong> cơ sở du lịch, trong đó có <strong className="text-amber-600 font-bold">{pendingPlaces.length}</strong> yêu cầu gửi lên đang chờ kiểm duyệt.
+            Hệ thống đang quản lý <strong className="text-slate-900 font-bold">{allPlaces.length}</strong> địa điểm du lịch, trong đó có <strong className="text-amber-600 font-bold">{pendingPlaces.length}</strong> yêu cầu gửi lên đang chờ kiểm duyệt.
           </p>
         </div>
 
@@ -322,7 +322,7 @@ export const AdminPlacesPage = () => {
             )}
           </div>
           <div>
-            <span className="text-xs text-slate-500 font-semibold block">Cơ sở chờ phê duyệt</span>
+            <span className="text-xs text-slate-500 font-semibold block">Địa điểm chờ phê duyệt</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="font-display text-2xl font-extrabold text-amber-600">{pendingPlaces.length}</span>
               <span className="text-xs text-slate-400 font-medium">yêu cầu mới</span>
@@ -475,7 +475,7 @@ export const AdminPlacesPage = () => {
         <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col space-y-4 p-5">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <span className="font-bold text-sm text-slate-900">
-              Danh sách cơ sở ({filteredPlaces.length})
+              Danh sách địa điểm ({filteredPlaces.length})
             </span>
             <span className="text-xs text-slate-400">
               Nhấp vào một dòng để xem chi tiết bên phải
@@ -486,7 +486,7 @@ export const AdminPlacesPage = () => {
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-100 uppercase tracking-wider">
                 <tr>
-                  <th className="py-3.5 px-4">Tên Cơ Sở / Địa Điểm</th>
+                  <th className="py-3.5 px-4">Tên Địa Điểm</th>
                   <th className="py-3.5 px-4">Tỉnh / Thành</th>
                   <th className="py-3.5 px-4">Đánh Giá</th>
                   <th className="py-3.5 px-4">Trạng Thái</th>
@@ -673,7 +673,7 @@ export const AdminPlacesPage = () => {
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <span className="font-bold text-sm text-slate-900 flex items-center gap-2">
               <Eye className="w-4 h-4 text-sky-600" />
-              Chi Tiết Cơ Sở / Điểm Đến
+              Chi Tiết Địa Điểm
             </span>
             {selectedPlace && (
               <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
@@ -854,10 +854,10 @@ export const AdminPlacesPage = () => {
             <div className="flex items-start justify-between border-b border-slate-100 pb-3">
               <div>
                 <span className="text-[11px] font-bold text-sky-600 uppercase tracking-wider block">
-                  Cơ sở dữ liệu Du lịch
+                  Quản lý Địa điểm Du lịch
                 </span>
                 <h3 className="font-display font-bold text-lg text-slate-900 mt-0.5">
-                  Thêm mới Địa điểm / Tọa độ Check-in
+                  Thêm mới Địa điểm
                 </h3>
               </div>
               <button
@@ -873,7 +873,7 @@ export const AdminPlacesPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {/* Name */}
                 <div className="sm:col-span-2">
-                  <label className="font-bold text-slate-700 block mb-1">Tên địa điểm / Cơ sở *</label>
+                  <label className="font-bold text-slate-700 block mb-1">Tên địa điểm *</label>
                   <input
                     type="text"
                     required
@@ -1067,9 +1067,9 @@ export const AdminPlacesPage = () => {
               >
                 <option value="Thông tin địa chỉ hoặc định vị chưa chính xác">Thông tin địa chỉ hoặc định vị chưa chính xác</option>
                 <option value="Hình ảnh không rõ ràng hoặc vi phạm tiêu chuẩn cộng đồng">Hình ảnh không rõ ràng hoặc vi phạm tiêu chuẩn</option>
-                <option value="Địa điểm bị trùng lặp với cơ sở đã có trong hệ thống">Địa điểm bị trùng lặp với cơ sở đã có</option>
+                <option value="Địa điểm bị trùng lặp với địa điểm đã có trong hệ thống">Địa điểm bị trùng lặp với địa điểm đã có</option>
                 <option value="Thiếu thông tin liên hệ hoặc giờ hoạt động">Thiếu thông tin liên hệ hoặc giờ hoạt động</option>
-                <option value="Cơ sở không còn hoạt động hoặc thông tin sai lệch">Cơ sở không còn hoạt động hoặc thông tin sai lệch</option>
+                <option value="Địa điểm không còn hoạt động hoặc thông tin sai lệch">Địa điểm không còn hoạt động hoặc thông tin sai lệch</option>
               </select>
 
               <textarea

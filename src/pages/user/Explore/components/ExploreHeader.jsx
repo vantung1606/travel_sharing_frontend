@@ -76,7 +76,7 @@ export const ExploreHeader = ({
             className="w-full sm:w-auto px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow-xs hover:shadow-sm transition-all cursor-pointer"
           >
             <PlusCircle className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">+ Đăng điểm</span>
+            <span className="truncate">+ Đăng địa điểm</span>
           </button>
         </div>
       </div>

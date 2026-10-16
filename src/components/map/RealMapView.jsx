@@ -491,11 +491,11 @@ export const RealMapView = ({
                     </div>
                   )}
 
-                  {/* Chủ cơ sở / Đăng bởi */}
+                  {/* Người đóng góp / Đăng bởi */}
                   {selectedPlace.hostName && (
                     <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
                       <CheckCircle2 className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-                      <span>Cơ sở đối tác: <strong className="text-slate-700 dark:text-slate-200">{selectedPlace.hostName}</strong></span>
+                      <span>Người đóng góp: <strong className="text-slate-700 dark:text-slate-200">{selectedPlace.hostName}</strong></span>
                     </div>
                   )}
                 </div>

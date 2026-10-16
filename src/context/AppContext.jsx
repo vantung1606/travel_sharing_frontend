@@ -204,15 +204,19 @@ export const AppProvider = ({ children }) => {
     fetchPlaces();
   }, [fetchPlaces]);
 
-  // Host / User adds new place
+  // User contributes a new place (strictly requires admin approval before public listing)
   const addNewPlace = async (placeData) => {
     const activeEmail = (currentUser?.email) || '';
     if (!activeEmail) {
-      throw new Error('Vui lòng đăng nhập để đề xuất hoặc thêm địa điểm mới!');
+      throw new Error('Vui lòng đăng nhập để gửi đề xuất địa điểm mới!');
     }
     const created = await placeApi.createPlace(placeData, activeEmail);
     if (created) {
-      setPlaces(prev => [created, ...prev]);
+      // Chỉ bổ sung vào danh sách hiển thị nếu địa điểm đã ACTIVE (ví dụ admin tạo).
+      // Đối với người dùng thông thường, status là PENDING_APPROVAL nên không hiển thị công khai cho đến khi Admin duyệt.
+      if (created.status === 'ACTIVE') {
+        setPlaces(prev => [created, ...prev]);
+      }
       return created;
     }
     throw new Error('Không nhận được dữ liệu địa điểm từ máy chủ.');

@@ -82,22 +82,22 @@ export const ExplorePage = () => {
   const [isAddToTripModalOpen, setIsAddToTripModalOpen] = useState(false);
   const [isAddPlaceModalOpen, setIsAddPlaceModalOpen] = useState(false);
   const [isSubmittingPlace, setIsSubmittingPlace] = useState(false);
-  const [placeTypeTab, setPlaceTypeTab] = useState('spot');
-  const [newPlaceForm, setNewPlaceForm] = useState({
+  const defaultPlaceForm = {
     name: '',
-    categoryName: 'Quán Cafe & Săn Mây',
+    categoryName: 'Danh Lam & Thắng Cảnh',
     city: 'Đà Lạt',
     address: '',
     latitude: '',
     longitude: '',
     phoneNumber: '',
     openHours: '07:00 - 22:00',
-    priceRange: '35.000đ - 85.000đ',
+    priceRange: 'Miễn phí tham quan',
     ticketPrice: '',
-    amenities: ['Wifi tốc độ cao', 'Bãi đỗ xe ô tô'],
+    amenities: ['Wifi miễn phí', 'Bãi đỗ xe ô tô'],
     coverImageUrl: '',
     description: ''
-  });
+  };
+  const [newPlaceForm, setNewPlaceForm] = useState(defaultPlaceForm);
 
   const availableAmenityOptions = [
     'Wifi tốc độ cao',
@@ -416,11 +416,15 @@ export const ExplorePage = () => {
     setIsAddToTripModalOpen(false);
   };
 
-  // Submit New Place Form
+  // Submit New Place Form (100% Pending Approval Moderation)
   const handleAddPlaceSubmit = async (e) => {
     e.preventDefault();
     if (!newPlaceForm.name.trim()) {
-      toast.error('Vui lòng nhập tên địa điểm hoặc cơ sở kinh doanh');
+      toast.error('Vui lòng nhập tên địa điểm!');
+      return;
+    }
+    if (!newPlaceForm.address.trim()) {
+      toast.error('Vui lòng nhập địa chỉ cụ thể của địa điểm!');
       return;
     }
     setIsSubmittingPlace(true);
@@ -428,26 +432,25 @@ export const ExplorePage = () => {
       const payload = {
         name: newPlaceForm.name.trim(),
         categoryName: newPlaceForm.categoryName,
-        city: newPlaceForm.city || 'Đà Lạt',
-        address: newPlaceForm.address,
+        city: newPlaceForm.city ? newPlaceForm.city.trim() : 'Đà Lạt',
+        address: newPlaceForm.address.trim(),
         latitude: newPlaceForm.latitude ? parseFloat(newPlaceForm.latitude) : null,
         longitude: newPlaceForm.longitude ? parseFloat(newPlaceForm.longitude) : null,
-        phoneNumber: newPlaceForm.phoneNumber,
+        phoneNumber: newPlaceForm.phoneNumber ? newPlaceForm.phoneNumber.trim() : '',
         openHours: newPlaceForm.openHours || '07:00 - 22:00',
-        priceRange: newPlaceForm.priceRange || '35.000đ - 85.000đ',
+        priceRange: newPlaceForm.priceRange || 'Miễn phí tham quan',
         ticketPrice: newPlaceForm.ticketPrice ? parseFloat(newPlaceForm.ticketPrice) : 0,
         amenities: newPlaceForm.amenities.join(', '),
-        coverImageUrl: newPlaceForm.coverImageUrl || 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
-        description: newPlaceForm.description
+        coverImageUrl: newPlaceForm.coverImageUrl.trim() || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
+        description: newPlaceForm.description.trim()
       };
 
       const created = await addNewPlace(payload);
-      toast.success(`Đã gửi yêu cầu đăng ký "${created.name}"! Vui lòng chờ Ban Quản Trị duyệt trước khi xuất hiện trên bản đồ 🎉`);
+      toast.success(`Đã gửi địa điểm "${created.name}" thành công! Vui lòng chờ Ban Quản Trị kiểm duyệt trước khi hiển thị trên hệ thống 🎉`);
       setIsAddPlaceModalOpen(false);
-      setExploreLayer('spots');
-      setActiveItem(created);
+      setNewPlaceForm(defaultPlaceForm);
     } catch (err) {
-      toast.error('Lỗi khi đăng địa điểm: ' + err.message);
+      toast.error('Lỗi khi gửi duyệt địa điểm: ' + err.message);
     } finally {
       setIsSubmittingPlace(false);
     }
@@ -741,7 +744,7 @@ export const ExplorePage = () => {
       <div className="flex items-center justify-between text-xs text-slate-500 font-medium px-1">
         <span>
           Tìm thấy <strong className="text-slate-900 font-bold">{filteredItems.length}</strong>{' '}
-          {exploreLayer === 'spots' ? 'tọa độ & cơ sở bản địa' : 'tỉnh thành & điểm đến'}
+          {exploreLayer === 'spots' ? 'địa điểm du lịch' : 'tỉnh thành & điểm đến'}
           {searchQuery && ` cho từ khóa "${searchQuery}"`}
           {selectedRegion !== 'Tất cả' && ` tại ${selectedRegion}`}
         </span>
@@ -772,9 +775,9 @@ export const ExplorePage = () => {
                 </p>
                 <button
                   onClick={() => setIsAddPlaceModalOpen(true)}
-                  className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer"
+                  className="px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer"
                 >
-                  + Đăng Tọa Độ Mới
+                  + Đăng Địa Điểm Mới
                 </button>
               </div>
             ) : (
@@ -944,8 +947,6 @@ export const ExplorePage = () => {
       <AddPlaceModal
         isOpen={isAddPlaceModalOpen}
         onClose={() => setIsAddPlaceModalOpen(false)}
-        placeTypeTab={placeTypeTab}
-        setPlaceTypeTab={setPlaceTypeTab}
         newPlaceForm={newPlaceForm}
         setNewPlaceForm={setNewPlaceForm}
         availableAmenityOptions={availableAmenityOptions}
