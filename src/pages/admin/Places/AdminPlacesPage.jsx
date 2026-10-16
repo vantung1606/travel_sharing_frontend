@@ -19,11 +19,27 @@ export const AdminPlacesPage = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   
-  // Data States
-  const [pendingPlaces, setPendingPlaces] = useState([]);
-  const [allPlaces, setAllPlaces] = useState([]);
+  // Data States with Instant SWR Cache Hydration
+  const [pendingPlaces, setPendingPlaces] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('wayfare_admin_pending_places');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
+  const [allPlaces, setAllPlaces] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('wayfare_admin_all_places');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
   const [selectedPlace, setSelectedPlace] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    return !sessionStorage.getItem('wayfare_admin_all_places');
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Pagination State
@@ -66,9 +82,11 @@ export const AdminPlacesPage = () => {
     'Khu vui chơi giải trí'
   ];
 
-  // Fetch real data directly from backend database (Single Source of Truth)
+  // Fetch real data directly from backend database (Single Source of Truth + SWR)
   const loadData = useCallback(async (isManual = false) => {
-    setIsLoading(true);
+    if (isManual || allPlaces.length === 0) {
+      setIsLoading(true);
+    }
     try {
       const [pendingRes, allRes] = await Promise.all([
         placeApi.getPendingPlaces().catch(() => []),
@@ -80,6 +98,12 @@ export const AdminPlacesPage = () => {
 
       setPendingPlaces(pendingList);
       setAllPlaces(fullList);
+      try {
+        sessionStorage.setItem('wayfare_admin_pending_places', JSON.stringify(pendingList));
+        sessionStorage.setItem('wayfare_admin_all_places', JSON.stringify(fullList));
+      } catch {
+        // ignore
+      }
 
       // Preserve or set selected place
       if (selectedPlace) {

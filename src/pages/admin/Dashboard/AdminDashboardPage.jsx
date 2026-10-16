@@ -13,8 +13,8 @@ export const AdminDashboardPage = () => {
   const toast = useToast();
   const { currentUser, setAdminTab } = useApp();
 
-  // Core Data States
-  const [stats, setStats] = useState({
+  // Core Data States with SWR Instant Hydration
+  const initialStatsObj = {
     totalUsers: 0,
     newUsersThisMonth: 0,
     totalPosts: 0,
@@ -30,15 +30,38 @@ export const AdminDashboardPage = () => {
     postGrowth: [],
     topDestinations: [],
     topPlaces: []
+  };
+
+  const [stats, setStats] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('wayfare_admin_stats');
+      return cached ? JSON.parse(cached) : initialStatsObj;
+    } catch {
+      return initialStatsObj;
+    }
   });
 
-  const [itinerariesList, setItinerariesList] = useState([]);
+  const [itinerariesList, setItinerariesList] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('wayfare_admin_itineraries');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
   const [usersList, setUsersList] = useState([]);
-  const [pendingReports, setPendingReports] = useState([]);
+  const [pendingReports, setPendingReports] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('wayfare_admin_reports');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
   const [recentLogs, setRecentLogs] = useState([]);
 
   // UI Control States
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !sessionStorage.getItem('wayfare_admin_stats'));
   const [refreshing, setRefreshing] = useState(false);
   const [chartMetric, setChartMetric] = useState('users'); // 'users' | 'posts'
   const [topTab, setTopTab] = useState('destinations'); // 'destinations' | 'places'
@@ -51,10 +74,10 @@ export const AdminDashboardPage = () => {
   // Quick View Modal
   const [selectedItinerary, setSelectedItinerary] = useState(null);
 
-  // Load All Dashboard Data in Parallel
+  // Load All Dashboard Data in Parallel (Single Source of Truth + SWR)
   const loadDashboardData = async (isManual = false) => {
     if (isManual) setRefreshing(true);
-    else setLoading(true);
+    else if (!sessionStorage.getItem('wayfare_admin_stats')) setLoading(true);
 
     try {
       const [fetchedStats, fetchedItins, fetchedReports, fetchedLogs, fetchedUsers] = await Promise.all([
@@ -67,12 +90,27 @@ export const AdminDashboardPage = () => {
 
       if (fetchedStats) {
         setStats(fetchedStats);
+        try {
+          sessionStorage.setItem('wayfare_admin_stats', JSON.stringify(fetchedStats));
+        } catch {
+          // ignore
+        }
       }
       if (Array.isArray(fetchedItins)) {
         setItinerariesList(fetchedItins);
+        try {
+          sessionStorage.setItem('wayfare_admin_itineraries', JSON.stringify(fetchedItins));
+        } catch {
+          // ignore
+        }
       }
       if (Array.isArray(fetchedReports)) {
         setPendingReports(fetchedReports);
+        try {
+          sessionStorage.setItem('wayfare_admin_reports', JSON.stringify(fetchedReports));
+        } catch {
+          // ignore
+        }
       }
       if (fetchedLogs && Array.isArray(fetchedLogs.content)) {
         setRecentLogs(fetchedLogs.content);

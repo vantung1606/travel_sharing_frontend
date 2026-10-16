@@ -179,24 +179,35 @@ export const AppProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
   const [itineraries, setItineraries] = useState([]);
   const [pendingPlaces, setPendingPlaces] = useState([]);
-  const [places, setPlaces] = useState([]);
+  const [places, setPlaces] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('wayfare_places_cache');
+      return cached ? JSON.parse(cached) : [];
+    } catch {
+      return [];
+    }
+  });
   const [users, setUsers] = useState([]);
   const [reports, setReports] = useState([]);
   const [stats, setStats] = useState({});
 
-  // Fetch places from backend database via RESTful API
+  // Fetch places from backend database via RESTful API (SWR: Fast local hydration + background revalidation)
   const fetchPlaces = useCallback(async (filters = {}) => {
     try {
       const data = await placeApi.getPlaces(filters);
       if (Array.isArray(data)) {
         setPlaces(data);
+        try {
+          sessionStorage.setItem('wayfare_places_cache', JSON.stringify(data));
+        } catch {
+          // Ignore quota if any
+        }
         // Synchronize distinct destination cities directly from database records
         const distinctCities = Array.from(new Set(data.map(p => p.city).filter(Boolean)));
         setDestinations(distinctCities.map(city => ({ name: city, destination: city })));
       }
     } catch (err) {
       console.warn('API error fetching places from database:', err.message);
-      setPlaces([]);
     }
   }, []);
 
