@@ -14,7 +14,7 @@ export const AdminPlacesPage = () => {
   const { currentUser } = useApp();
 
   // Tab & Filter States
-  const [activeTab, setActiveTab] = useState('Chờ duyệt'); // 'Chờ duyệt' | 'Đang hoạt động' | 'Tất cả'
+  const [activeTab, setActiveTab] = useState('Đang hoạt động'); // 'Đang hoạt động' | 'Chờ duyệt' | 'Tất cả'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -400,8 +400,8 @@ export const AdminPlacesPage = () => {
         {/* Status Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
           {[
-            { label: 'Chờ duyệt', count: pendingPlaces.length, badgeBg: 'bg-amber-100 text-amber-800' },
             { label: 'Đang hoạt động', count: totalActive, badgeBg: 'bg-emerald-100 text-emerald-800' },
+            { label: 'Chờ duyệt', count: pendingPlaces.length, badgeBg: 'bg-amber-100 text-amber-800' },
             { label: 'Tất cả', count: allPlaces.length, badgeBg: 'bg-slate-100 text-slate-700' }
           ].map(tab => (
             <button
