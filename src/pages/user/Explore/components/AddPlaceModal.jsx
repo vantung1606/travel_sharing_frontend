@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
-  X, Navigation, MapPin, Sparkles, Send, Image as ImageIcon, 
-  ChevronDown, ChevronUp, Clock, Check, Info, Compass
+  X, Navigation, MapPin, Send, Image as ImageIcon, 
+  ChevronDown, ChevronUp, Clock, Check, Compass,
+  UploadCloud, Loader2, Trash2, RefreshCw, AlertCircle
 } from 'lucide-react';
+import { uploadApi } from '../../../../services/api';
 
 const POPULAR_CITIES = ['Đà Lạt', 'Đà Nẵng', 'Hà Giang', 'Hội An', 'Phú Quốc', 'Ninh Bình', 'Sapa', 'Quy Nhơn'];
 
@@ -16,15 +18,6 @@ const CATEGORY_ITEMS = [
   { id: 'Trải Nghiệm & Hoạt Động', label: 'Cắm Trại & Phượt', icon: '🏕️' }
 ];
 
-const CURATED_IMAGES = [
-  { label: 'Núi Rừng', url: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80' },
-  { label: 'Biển Đảo', url: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=800&q=80' },
-  { label: 'Phố Cổ', url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80' },
-  { label: 'Cafe Mây', url: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80' },
-  { label: 'Resort', url: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80' },
-  { label: 'Ẩm Thực', url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80' }
-];
-
 export const AddPlaceModal = ({
   isOpen = false,
   onClose = () => {},
@@ -35,11 +28,76 @@ export const AddPlaceModal = ({
   isSubmitting = false
 }) => {
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [showCustomUrlInput, setShowCustomUrlInput] = useState(false);
+  const [showUrlFallback, setShowUrlFallback] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+
+  const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
 
-  const currentCover = newPlaceForm.coverImageUrl || CURATED_IMAGES[0].url;
+  // Handle Local File Upload from device
+  const handleFileSelected = async (file) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Vui lòng chọn file hình ảnh hợp lệ (JPG, PNG, WebP)!');
+      return;
+    }
+
+    if (file.size > 15 * 1024 * 1024) {
+      setUploadError('Dung lượng ảnh tối đa 15MB!');
+      return;
+    }
+
+    setUploadError('');
+    setIsUploading(true);
+
+    // Instant local preview so user sees it right away
+    const localUrl = URL.createObjectURL(file);
+    setNewPlaceForm(prev => ({ ...prev, coverImageUrl: localUrl }));
+
+    try {
+      const serverCdnUrl = await uploadApi.uploadSingle(file);
+      if (serverCdnUrl) {
+        setNewPlaceForm(prev => ({ ...prev, coverImageUrl: serverCdnUrl }));
+      }
+    } catch (err) {
+      console.error('Lỗi tải ảnh lên máy chủ:', err);
+      setUploadError('Không thể tải ảnh lên hệ thống: ' + (err.message || 'Lỗi kết nối'));
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const onFileInputChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) handleFileSelected(file);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFileSelected(file);
+  };
+
+  const handleClearImage = () => {
+    setNewPlaceForm(prev => ({ ...prev, coverImageUrl: '' }));
+    setUploadError('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-md animate-fade-in overflow-y-auto">
@@ -47,7 +105,6 @@ export const AddPlaceModal = ({
         
         {/* Header with Visual Banner */}
         <div className="relative p-5 sm:p-6 bg-gradient-to-br from-sky-600 via-sky-700 to-indigo-800 text-white shrink-0 overflow-hidden">
-          {/* Subtle Background Glow */}
           <div className="absolute top-0 right-0 -mr-16 -mt-16 w-56 h-56 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
           
           <div className="relative flex items-start justify-between">
@@ -83,7 +140,128 @@ export const AddPlaceModal = ({
         {/* Clean, Streamlined Form Body */}
         <form onSubmit={onSubmit} className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 text-xs">
           
-          {/* 1. Tên Địa Điểm */}
+          {/* 1. Tải Ảnh Từ Máy / Thiết Bị (Direct Device Upload) */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                <ImageIcon className="w-4 h-4 text-sky-600" />
+                <span>Ảnh địa điểm thực tế</span>
+                <span className="text-slate-400 font-normal text-[11px]">(tải trực tiếp từ máy của bạn)</span>
+              </label>
+
+              <button
+                type="button"
+                onClick={() => setShowUrlFallback(!showUrlFallback)}
+                className="text-[11px] text-sky-600 hover:text-sky-700 font-bold hover:underline cursor-pointer"
+              >
+                {showUrlFallback ? 'Ẩn ô dán link' : 'Hoặc dán URL ảnh'}
+              </button>
+            </div>
+
+            {/* Hidden File Input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={onFileInputChange}
+              className="hidden"
+            />
+
+            {/* Case A: Image is Selected/Uploaded -> Show Preview with Actions */}
+            {newPlaceForm.coverImageUrl ? (
+              <div className="relative h-44 sm:h-48 rounded-2xl overflow-hidden border border-slate-200 group shadow-sm bg-slate-900">
+                <img
+                  src={newPlaceForm.coverImageUrl}
+                  alt="Preview"
+                  className={`w-full h-full object-cover transition-all duration-300 ${isUploading ? 'opacity-50 blur-xs scale-102' : 'group-hover:scale-105'}`}
+                />
+
+                {/* Loading state overlay */}
+                {isUploading && (
+                  <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-white">
+                    <Loader2 className="w-6 h-6 animate-spin text-sky-400" />
+                    <span className="text-xs font-bold tracking-wide">Đang tải ảnh lên hệ thống...</span>
+                  </div>
+                )}
+
+                {/* Bottom Bar with Actions */}
+                {!isUploading && (
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end justify-between p-3.5">
+                    <span className="text-white text-xs font-bold drop-shadow-sm flex items-center gap-1.5">
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      Ảnh đã sẵn sàng
+                    </span>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-white/20 shadow-xs"
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                        <span>Đổi ảnh khác</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleClearImage}
+                        className="p-1.5 rounded-xl bg-rose-600/80 hover:bg-rose-600 backdrop-blur-md text-white transition-all cursor-pointer shadow-xs"
+                        title="Xóa ảnh"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Case B: No Image -> Clean Drag & Drop Upload Zone */
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-2 group ${
+                  isDragging
+                    ? 'border-sky-500 bg-sky-50/80 scale-[1.01]'
+                    : 'border-slate-300 hover:border-sky-400 hover:bg-sky-50/40 bg-slate-50/50'
+                }`}
+              >
+                <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-sky-600 group-hover:text-white transition-all shadow-xs">
+                  <UploadCloud className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="font-bold text-slate-800 text-xs group-hover:text-sky-600 transition-colors">
+                    Nhấp để tải ảnh từ máy tính / điện thoại
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-0.5">
+                    Hoặc kéo thả file ảnh vào đây (Hỗ trợ JPG, PNG, WebP)
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Error Message if upload fails */}
+            {uploadError && (
+              <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{uploadError}</span>
+              </div>
+            )}
+
+            {/* URL Fallback Input (Optional) */}
+            {showUrlFallback && (
+              <input
+                type="url"
+                placeholder="Dán link ảnh từ Internet: https://..."
+                value={newPlaceForm.coverImageUrl}
+                onChange={(e) => setNewPlaceForm(prev => ({ ...prev, coverImageUrl: e.target.value }))}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-sky-500 text-slate-800 text-xs outline-none"
+              />
+            )}
+          </div>
+
+          {/* 2. Tên Địa Điểm */}
           <div className="space-y-1.5">
             <label className="font-bold text-slate-800 text-xs flex items-center gap-1">
               <span>Tên địa điểm</span>
@@ -99,7 +277,7 @@ export const AddPlaceModal = ({
             />
           </div>
 
-          {/* 2. Danh Mục Trải Nghiệm (Visual Chip Badges) */}
+          {/* 3. Danh Mục Trải Nghiệm (Visual Chip Badges) */}
           <div className="space-y-2">
             <label className="font-bold text-slate-800 text-xs">
               Danh mục trải nghiệm
@@ -126,7 +304,7 @@ export const AddPlaceModal = ({
             </div>
           </div>
 
-          {/* 3. Tỉnh Thành & Địa Chỉ Cụ Thể */}
+          {/* 4. Tỉnh Thành & Địa Chỉ Cụ Thể */}
           <div className="space-y-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
             {/* Tỉnh thành chọn nhanh */}
             <div className="space-y-1.5">
@@ -136,7 +314,7 @@ export const AddPlaceModal = ({
                   <span>Tỉnh / Thành phố</span>
                   <span className="text-rose-500 font-bold">*</span>
                 </label>
-                <span className="text-[11px] text-slate-400">Chọn nhanh hoặc tự nhập:</span>
+                <span className="text-[11px] text-slate-400">Chọn nhanh hoặc tự gõ:</span>
               </div>
 
               {/* Quick City Chips */}
@@ -204,78 +382,6 @@ export const AddPlaceModal = ({
                 <span>📍 Ghim vị trí hiện tại</span>
               </button>
             </div>
-          </div>
-
-          {/* 4. Chọn Ảnh Nổi Bật (Visual Card + Quick Curated Samples) */}
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <label className="font-bold text-slate-800 text-xs flex items-center gap-1.5">
-                <ImageIcon className="w-3.5 h-3.5 text-sky-600" />
-                <span>Ảnh đại diện địa điểm</span>
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowCustomUrlInput(!showCustomUrlInput)}
-                className="text-[11px] text-sky-600 hover:text-sky-700 font-bold hover:underline cursor-pointer"
-              >
-                {showCustomUrlInput ? 'Ẩn ô dán link ảnh' : 'Dán link ảnh riêng'}
-              </button>
-            </div>
-
-            {/* Live Preview Card */}
-            <div className="relative h-36 sm:h-40 rounded-2xl overflow-hidden border border-slate-200 group shadow-xs">
-              <img
-                src={currentCover}
-                alt="Preview"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                onError={(e) => {
-                  e.target.src = CURATED_IMAGES[0].url;
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent flex items-end p-3">
-                <span className="text-white text-xs font-bold drop-shadow-sm flex items-center gap-1.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                  Ảnh đại diện hiển thị trên bài viết
-                </span>
-              </div>
-            </div>
-
-            {/* Quick 1-Click Curated Photos */}
-            <div className="space-y-1">
-              <span className="text-[11px] text-slate-400">Hoặc chọn nhanh ảnh mẫu chất lượng cao:</span>
-              <div className="grid grid-cols-6 gap-2">
-                {CURATED_IMAGES.map((img, idx) => {
-                  const isCurActive = newPlaceForm.coverImageUrl === img.url;
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setNewPlaceForm(prev => ({ ...prev, coverImageUrl: img.url }))}
-                      className={`relative h-12 rounded-xl overflow-hidden border-2 transition-all cursor-pointer group ${
-                        isCurActive ? 'border-sky-500 ring-2 ring-sky-500/30 scale-105' : 'border-transparent opacity-80 hover:opacity-100'
-                      }`}
-                    >
-                      <img src={img.url} alt={img.label} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent"></div>
-                      <span className="absolute bottom-0 inset-x-0 bg-black/60 text-[9px] text-white font-medium text-center truncate py-0.5">
-                        {img.label}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Custom URL Input Field (Collapsible) */}
-            {showCustomUrlInput && (
-              <input
-                type="url"
-                placeholder="Dán đường dẫn ảnh: https://images.unsplash.com/..."
-                value={newPlaceForm.coverImageUrl}
-                onChange={(e) => setNewPlaceForm(prev => ({ ...prev, coverImageUrl: e.target.value }))}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-sky-500 text-slate-800 text-xs outline-none"
-              />
-            )}
           </div>
 
           {/* 5. Cảm Nhận & Mô Tả Ngắn */}
@@ -359,11 +465,11 @@ export const AddPlaceModal = ({
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isUploading}
               className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-600 via-sky-700 to-indigo-700 hover:from-sky-700 hover:to-indigo-800 text-white font-bold text-xs shadow-lg shadow-sky-600/25 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
             >
-              {isSubmitting ? (
-                <span>Đang gửi thông tin...</span>
+              {isSubmitting || isUploading ? (
+                <span>{isUploading ? 'Đang tải ảnh...' : 'Đang gửi thông tin...'}</span>
               ) : (
                 <>
                   <Send className="w-3.5 h-3.5" />
