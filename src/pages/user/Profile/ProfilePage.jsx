@@ -285,9 +285,22 @@ export const ProfilePage = () => {
   ];
 
   // ─── TIER & AVATAR FRAME CALCULATION (Prestige Honor System) ─────────
-  const destinationsCount = typeof currentUser?.destinationsCount === 'number' 
-    ? currentUser.destinationsCount 
-    : (itinsCount > 0 ? Math.min(itinsCount * 2, 25) : 0);
+  const dynamicDestinationsCount = React.useMemo(() => {
+    if (typeof currentUser?.destinationsCount === 'number') {
+      return currentUser.destinationsCount;
+    }
+    const uniqueDests = new Set();
+    displayItineraries.forEach(i => {
+      if (i.destination && i.destination.trim()) uniqueDests.add(i.destination.trim().toLowerCase());
+    });
+    displayPosts.forEach(p => {
+      const loc = p.locationTag || p.locationName || p.location;
+      if (loc && loc.trim()) uniqueDests.add(loc.trim().toLowerCase());
+    });
+    return uniqueDests.size;
+  }, [currentUser?.destinationsCount, displayItineraries, displayPosts]);
+
+  const destinationsCount = dynamicDestinationsCount;
   const userTotalXP = calculateUserXP({
     itinsCount,
     postsCount,
@@ -532,7 +545,7 @@ export const ProfilePage = () => {
             >
               <span className="text-slate-400 block text-[11px] font-semibold group-hover:text-sky-700">Điểm Đến Đã Ghé</span>
               <span className="font-display font-extrabold text-xl text-slate-900 mt-0.5 block flex items-center gap-1 group-hover:scale-105 transition-transform">
-                {currentUser.destinationsCount || 24} <MapPin className="w-4 h-4 text-sky-600" />
+                {dynamicDestinationsCount} <MapPin className="w-4 h-4 text-sky-600" />
               </span>
               <span className="text-[10px] text-sky-600 font-semibold group-hover:underline">Bản đồ dấu chân &rarr;</span>
             </div>
