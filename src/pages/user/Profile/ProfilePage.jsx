@@ -6,7 +6,7 @@ import { PostDetailModal } from '../../../components/community/PostDetailModal';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { TravelPassportCardModal } from '../../../components/profile/TravelPassportCardModal';
 import { useToast } from '../../../components/common/Toast';
-import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass, Phone, CheckCircle2, ChevronLeft, ChevronRight, Crown } from 'lucide-react';
+import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass, Phone, CheckCircle2, ChevronLeft, ChevronRight, Crown, Trash2 } from 'lucide-react';
 import { TierPromotionModal } from '../../../components/common/TierPromotionModal';
 import { TIERS, calculateUserXP, getUserTier, getNextTier, calculateTierProgress, checkTierPromotion } from '../../../utils/tierSystem';
 
@@ -79,7 +79,7 @@ export const ProfilePage = () => {
   // Modals & cloning state
   const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
   const [selectedItineraryForModal, setSelectedItineraryForModal] = useState(null);
-  const [cloningItinId, setCloningItinId] = useState(null);
+
 
   // Follow State & Modal
   const [followModalState, setFollowModalState] = useState({ isOpen: false, tab: 'following' });
@@ -144,19 +144,17 @@ export const ProfilePage = () => {
     };
   }, [myUserId, currentUser?.email]);
 
-  const handleCloneItinerary = async (itin) => {
+  const handleDeleteItinerary = async (itin) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa chuyến đi "${itin.title}" khỏi kho cá nhân của bạn không?`)) {
+      return;
+    }
     try {
-      setCloningItinId(itin.id);
-      const cloned = await itineraryApi.cloneItinerary(itin.id, currentUser?.email);
-      if (cloned) {
-        setItineraries(prev => [cloned, ...prev]);
-        toast.showSuccess(`Đã sao chép lịch trình "${itin.title}" vào kho của bạn! 🎉`);
-        loadFullProfile();
-      }
+      await itineraryApi.deleteItinerary(itin.id, currentUser?.email);
+      setItineraries(prev => prev.filter(i => i.id !== itin.id));
+      toast.showSuccess(`Đã xóa chuyến đi "${itin.title}" thành công.`);
+      loadFullProfile();
     } catch (err) {
-      toast.showError('Không thể sao chép: ' + (err.message || 'Lỗi kết nối'));
-    } finally {
-      setCloningItinId(null);
+      toast.showError('Không thể xóa: ' + (err.message || 'Lỗi kết nối'));
     }
   };
 
@@ -766,20 +764,14 @@ export const ProfilePage = () => {
                         className="flex-1 py-2 px-3 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs"
                       >
                         <Eye className="w-3.5 h-3.5" />
-                        <span>Xem chi tiết</span>
+                        <span>Xem chi tiết lộ trình</span>
                       </button>
                       <button
-                        onClick={() => handleCloneItinerary(itin)}
-                        disabled={cloningItinId === itin.id}
-                        className="py-2 px-3 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
-                        title="Sao chép lịch trình"
+                        onClick={() => handleDeleteItinerary(itin)}
+                        className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold transition-all flex items-center justify-center cursor-pointer shadow-2xs"
+                        title="Xóa lịch trình khỏi kho cá nhân"
                       >
-                        {cloningItinId === itin.id ? (
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        ) : (
-                          <Copy className="w-3.5 h-3.5" />
-                        )}
-                        <span className="hidden sm:inline">Sao chép</span>
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
