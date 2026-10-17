@@ -57,10 +57,10 @@ export const aiService = {
   async generateText({ prompt, systemPrompt, model = DEFAULT_MODEL, temperature = 0.3, maxTokens = 8192, responseMimeType = 'application/json' }) {
     const key = this.getApiKey();
     const endpoint = this.getApiEndpoint();
-    
-    // Mặc định ưu tiên gemini-3.8-flash
+
+    // Mặc định ưu tiên gemini-3.8-flash. Tuyệt đối không dùng gemini-1.5-flash đã bị deprecated/404
     let targetModel = model || DEFAULT_MODEL;
-    if (!targetModel.startsWith('gemini-')) {
+    if (!targetModel.startsWith('gemini-') || targetModel === 'gemini-1.5-flash' || targetModel.includes('1.5-flash')) {
       targetModel = DEFAULT_MODEL;
     }
 
