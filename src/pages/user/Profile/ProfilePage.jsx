@@ -537,7 +537,7 @@ export const ProfilePage = () => {
             </div>
 
             <div className="p-2 border-l border-slate-200/80">
-              <span className="text-slate-400 block text-[11px] font-semibold">Lịch Trình AI Đã Tạo</span>
+              <span className="text-slate-400 block text-[11px] font-semibold">Lịch Trình Đã Tạo</span>
               <span className="font-display font-extrabold text-xl text-sky-700 mt-0.5 block flex items-center gap-1">
                 {displayItineraries.length} <Sparkles className="w-4 h-4 text-amber-500" />
               </span>
@@ -611,7 +611,7 @@ export const ProfilePage = () => {
             className="flex-1 flex items-center gap-1.5 sm:gap-2 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-300 hover:scrollbar-thumb-slate-400 scrollbar-track-transparent py-2.5"
           >
             {[
-              { id: 'itineraries', label: 'Lịch Trình AI Của Tôi', count: displayItineraries.length, icon: Route },
+              { id: 'itineraries', label: 'Lịch Trình Của Tôi', count: displayItineraries.length, icon: Route },
               { id: 'posts', label: 'Bài Viết & Review', count: displayPosts.length, icon: Globe },
               { id: 'ai-dna', label: 'Gu Du Lịch & AI DNA', badge: 'AI', icon: Sparkles },
               { id: 'saved', label: 'Địa Điểm Đã Lưu', count: savedPlaces.length, icon: Bookmark },
