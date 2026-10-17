@@ -4,7 +4,6 @@ import { userApi, itineraryApi, uploadApi } from '../../../services/api';
 import { FollowListModal } from '../../../components/community/FollowListModal';
 import { PostDetailModal } from '../../../components/community/PostDetailModal';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
-import { TravelFootprintSection } from '../../../components/profile/TravelFootprintSection';
 import { TravelPassportCardModal } from '../../../components/profile/TravelPassportCardModal';
 import { useToast } from '../../../components/common/Toast';
 import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass, Phone, CheckCircle2, ChevronLeft, ChevronRight, Crown } from 'lucide-react';
@@ -15,7 +14,7 @@ export const ProfilePage = () => {
   const { currentUser, updateCurrentUser, itineraries, posts, destinations, savedPlaces = [], toggleSavePlace = () => {}, setIsAIGeneratorOpen, setUserTab, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
   const toast = useToast();
 
-  const [activeTab, setActiveTab] = useState('itineraries'); // 'itineraries' | 'posts' | 'footprint' | 'ai-dna' | 'saved' | 'badges'
+  const [activeTab, setActiveTab] = useState('itineraries'); // 'itineraries' | 'posts' | 'ai-dna' | 'saved' | 'badges'
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isPassportModalOpen, setIsPassportModalOpen] = useState(false);
   const [promotionData, setPromotionData] = useState(null);
@@ -285,27 +284,14 @@ export const ProfilePage = () => {
   ];
 
   // ─── TIER & AVATAR FRAME CALCULATION (Prestige Honor System) ─────────
-  const dynamicDestinationsCount = React.useMemo(() => {
-    if (typeof currentUser?.destinationsCount === 'number') {
-      return currentUser.destinationsCount;
-    }
-    const uniqueDests = new Set();
-    displayItineraries.forEach(i => {
-      if (i.destination && i.destination.trim()) uniqueDests.add(i.destination.trim().toLowerCase());
-    });
-    displayPosts.forEach(p => {
-      const loc = p.locationTag || p.locationName || p.location;
-      if (loc && loc.trim()) uniqueDests.add(loc.trim().toLowerCase());
-    });
-    return uniqueDests.size;
-  }, [currentUser?.destinationsCount, displayItineraries, displayPosts]);
+  const totalLikesReceived = React.useMemo(() => {
+    return displayPosts.reduce((acc, p) => acc + (p.likeCount ?? p.likesCount ?? 0), 0);
+  }, [displayPosts]);
 
-  const destinationsCount = dynamicDestinationsCount;
   const userTotalXP = calculateUserXP({
     itinsCount,
     postsCount,
-    followersCount: activeFollowersCount,
-    destinationsCount
+    followersCount: activeFollowersCount
   });
 
   const currentTier = getUserTier({
@@ -539,15 +525,15 @@ export const ProfilePage = () => {
           {/* Key Travel Metrics Bento Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
             <div
-              onClick={() => setActiveTab('footprint')}
-              className="p-2 cursor-pointer hover:bg-sky-100/60 rounded-xl transition-colors group"
-              title="Bấm để xem Bản đồ Dấu Chân Du Lịch 63 Tỉnh Thành"
+              onClick={() => setActiveTab('posts')}
+              className="p-2 cursor-pointer hover:bg-rose-50/60 rounded-xl transition-colors group"
+              title="Tổng lượt thích các bài viết từ cộng đồng du lịch"
             >
-              <span className="text-slate-400 block text-[11px] font-semibold group-hover:text-sky-700">Điểm Đến Đã Ghé</span>
-              <span className="font-display font-extrabold text-xl text-slate-900 mt-0.5 block flex items-center gap-1 group-hover:scale-105 transition-transform">
-                {dynamicDestinationsCount} <MapPin className="w-4 h-4 text-sky-600" />
+              <span className="text-slate-400 block text-[11px] font-semibold group-hover:text-rose-700">Lượt Thích Nhận Được</span>
+              <span className="font-display font-extrabold text-xl text-rose-600 mt-0.5 block flex items-center gap-1 group-hover:scale-105 transition-transform">
+                {totalLikesReceived} <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
               </span>
-              <span className="text-[10px] text-sky-600 font-semibold group-hover:underline">Bản đồ dấu chân &rarr;</span>
+              <span className="text-[10px] text-rose-500 font-semibold group-hover:underline">Tương tác bài viết &rarr;</span>
             </div>
 
             <div className="p-2 border-l border-slate-200/80">
@@ -627,8 +613,7 @@ export const ProfilePage = () => {
             {[
               { id: 'itineraries', label: 'Lịch Trình AI Của Tôi', count: displayItineraries.length, icon: Route },
               { id: 'posts', label: 'Bài Viết & Review', count: displayPosts.length, icon: Globe },
-              { id: 'footprint', label: 'Dấu Chân Du Lịch', badge: 'Mới', icon: Compass },
-              { id: 'ai-dna', label: 'Gu Du Lịch & AI DNA', icon: Sparkles },
+              { id: 'ai-dna', label: 'Gu Du Lịch & AI DNA', badge: 'AI', icon: Sparkles },
               { id: 'saved', label: 'Địa Điểm Đã Lưu', count: savedPlaces.length, icon: Bookmark },
               { id: 'badges', label: 'Huy Hiệu & Khung Avatar', count: achievements.length, icon: Award }
             ].map(tab => {
@@ -1056,9 +1041,9 @@ export const ProfilePage = () => {
             </div>
 
             <div className="p-4 rounded-2xl bg-purple-50/70 border border-purple-100 space-y-1">
-              <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider block">Mục tiêu năm 2026</span>
-              <span className="font-bold text-slate-900 text-sm block">🇻🇳 {destinationsCount}/63 Tỉnh Thành</span>
-              <p className="text-[11px] text-slate-500">Đã đánh dấu trên Bản đồ ({Math.round((destinationsCount / 63) * 100)}% Việt Nam)</p>
+              <span className="text-[11px] font-bold text-purple-700 uppercase tracking-wider block">Đóng góp cộng đồng</span>
+              <span className="font-bold text-slate-900 text-sm block">🌟 {displayPosts.length} Bài viết • {displayItineraries.length} Tour</span>
+              <p className="text-[11px] text-slate-500">{totalLikesReceived} lượt thích từ bạn bè du khách</p>
             </div>
           </div>
 
@@ -1212,7 +1197,7 @@ export const ProfilePage = () => {
               </div>
 
               {/* Scoring Formula Info */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-[11px] text-slate-300/90 font-medium">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 text-[11px] text-slate-300/90 font-medium">
                 <div className="bg-white/5 rounded-xl p-2 border border-white/5">
                   <span className="text-sky-300 font-bold block">Tour đã tạo:</span>
                   <span>{itinsCount} × 60 XP = {itinsCount * 60} XP</span>
@@ -1224,10 +1209,6 @@ export const ProfilePage = () => {
                 <div className="bg-white/5 rounded-xl p-2 border border-white/5">
                   <span className="text-indigo-300 font-bold block">Người theo dõi:</span>
                   <span>{activeFollowersCount} × 15 XP = {activeFollowersCount * 15} XP</span>
-                </div>
-                <div className="bg-white/5 rounded-xl p-2 border border-white/5">
-                  <span className="text-amber-300 font-bold block">Tỉnh thành ghé:</span>
-                  <span>{destinationsCount} × 25 XP = {destinationsCount * 25} XP</span>
                 </div>
               </div>
             </div>
@@ -1350,16 +1331,6 @@ export const ProfilePage = () => {
           </div>
 
         </div>
-      )}
-
-      {/* TAB 6: TRAVEL FOOTPRINT MAP (63 Tỉnh Thành Việt Nam) */}
-      {activeTab === 'footprint' && (
-        <TravelFootprintSection
-          posts={displayPosts}
-          itineraries={displayItineraries}
-          userId={currentUser?.id}
-          userName={currentUser?.name || 'Bạn'}
-        />
       )}
 
       {/* ========================================================= */}

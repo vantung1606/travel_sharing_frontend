@@ -17,7 +17,7 @@ export const TravelPassportCardModal = ({ user, profileData, onClose }) => {
   };
 
   const memberRank = profileData?.rank || profileData?.role || 'Wanderer Gold';
-  const placesCount = profileData?.destinationsCount || user?.destinationsCount || 24;
+  const followersCount = profileData?.followersCount || user?.followersCount || 0;
   const itinsCount = profileData?.itineraries?.length || 0;
   const postsCount = profileData?.posts?.length || 0;
 
@@ -91,8 +91,8 @@ export const TravelPassportCardModal = ({ user, profileData, onClose }) => {
             {/* Passport Mini Stats Grid */}
             <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/10 text-center">
               <div className="bg-white/5 rounded-xl p-2 border border-white/5">
-                <span className="block text-[10px] text-slate-400 font-medium">Tỉnh thành</span>
-                <span className="font-extrabold text-xs text-sky-300 mt-0.5 block">{placesCount} / 63</span>
+                <span className="block text-[10px] text-slate-400 font-medium">Theo dõi</span>
+                <span className="font-extrabold text-xs text-sky-300 mt-0.5 block">{followersCount} người</span>
               </div>
               <div className="bg-white/5 rounded-xl p-2 border border-white/5">
                 <span className="block text-[10px] text-slate-400 font-medium">Lịch trình</span>

@@ -106,13 +106,7 @@ export const calculateUserXP = (user) => {
     0
   );
 
-  const destinationsCount = Number(
-    typeof user.destinationsCount === 'number' 
-      ? user.destinationsCount 
-      : (itinsCount > 0 ? Math.min(itinsCount * 2, 25) : 0)
-  );
-
-  return (itinsCount * 60) + (postsCount * 40) + (followersCount * 15) + (destinationsCount * 25);
+  return (itinsCount * 60) + (postsCount * 40) + (followersCount * 15);
 };
 
 /**
