@@ -1114,6 +1114,19 @@ export const CommunityPage = () => {
       return;
     }
 
+    if (
+      (post.authorId && currentUser?.id && post.authorId === currentUser.id) ||
+      (post.authorEmail && currentUser?.email && post.authorEmail === currentUser.email) ||
+      (post.userId && currentUser?.id && post.userId === currentUser.id)
+    ) {
+      toast.showWarning('Bạn là tác giả của bài viết/lịch trình này nên không thể tự sao chép!');
+      return;
+    }
+
+    if (!window.confirm(`Bạn có chắc chắn muốn sao chép lịch trình "${post.itineraryTitle || 'Lịch trình'}" vào kho chuyến đi của bạn không?`)) {
+      return;
+    }
+
     try {
       setCloningPostId(post.id);
       const result = await postApi.cloneItinerary(post.id);

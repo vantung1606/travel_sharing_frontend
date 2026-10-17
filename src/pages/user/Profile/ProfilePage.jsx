@@ -745,7 +745,7 @@ export const ProfilePage = () => {
                         className="font-bold text-base text-slate-900 group-hover:text-sky-600 transition-colors line-clamp-2 leading-snug cursor-pointer"
                         title={itin.title}
                       >
-                        {(itin.title || '').replace(/^\[Sao chép\]\s*/i, '')}
+                        {itin.title}
                       </h4>
                       <div className="flex items-center justify-between text-xs pt-1">
                         <span className="text-slate-400 font-medium">Chi phí dự kiến:</span>

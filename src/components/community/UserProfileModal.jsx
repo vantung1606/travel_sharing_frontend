@@ -90,8 +90,26 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
     }
   };
 
+  const isOwnProfile = Boolean(
+    currentUser?.id && (userId === currentUser.id || profile?.id === currentUser.id || profile?.userId === currentUser.id)
+  );
+
   const handleCloneItinerary = async (itin) => {
     if (!requireAuth('sao chép lịch trình')) return;
+
+    if (
+      isOwnProfile ||
+      (itin.creatorId && currentUser?.id && itin.creatorId === currentUser.id) ||
+      (itin.creatorEmail && currentUser?.email && itin.creatorEmail === currentUser.email)
+    ) {
+      toast.showWarning('Bạn là tác giả của lịch trình này nên không thể tự sao chép!');
+      return;
+    }
+
+    if (!window.confirm(`Bạn có chắc chắn muốn sao chép lịch trình "${itin.title}" vào kho của bạn không?`)) {
+      return;
+    }
+
     try {
       setCloningItinId(itin.id);
       const cloned = await itineraryApi.cloneItinerary(itin.id, currentUser?.email);
@@ -635,18 +653,20 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                                 <Eye className="w-3.5 h-3.5" />
                                 <span>Xem chi tiết</span>
                               </button>
-                              <button
-                                onClick={() => handleCloneItinerary(itin)}
-                                disabled={cloningItinId === itin.id}
-                                className="py-2 px-3 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
-                              >
-                                {cloningItinId === itin.id ? (
-                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                ) : (
-                                  <Copy className="w-3.5 h-3.5" />
-                                )}
-                                <span className="hidden sm:inline">Sao chép</span>
-                              </button>
+                              {(!isOwnProfile && itin.creatorId !== currentUser?.id) && (
+                                <button
+                                  onClick={() => handleCloneItinerary(itin)}
+                                  disabled={cloningItinId === itin.id}
+                                  className="py-2 px-3 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
+                                >
+                                  {cloningItinId === itin.id ? (
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  ) : (
+                                    <Copy className="w-3.5 h-3.5" />
+                                  )}
+                                  <span className="hidden sm:inline">Sao chép</span>
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>

@@ -441,6 +441,19 @@ export const HomePage = () => {
       return;
     }
 
+    if (
+      (tour.creatorId && currentUser?.id && tour.creatorId === currentUser.id) ||
+      (tour.creatorEmail && currentUser?.email && tour.creatorEmail === currentUser.email) ||
+      (tour.userId && currentUser?.id && tour.userId === currentUser.id)
+    ) {
+      toast.error('Bạn là tác giả của lịch trình này nên không thể tự sao chép!');
+      return;
+    }
+
+    if (!window.confirm(`Bạn có chắc chắn muốn sao chép chuyến đi "${tour.title}" vào kho của bạn không?`)) {
+      return;
+    }
+
     try {
       if (tour.id && typeof tour.id === 'number') {
         await itineraryApi.cloneItinerary(tour.id, currentUser?.email);
