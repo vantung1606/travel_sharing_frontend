@@ -3,7 +3,7 @@
  */
 const GEMINI_API_KEY = import.meta.env?.VITE_GEMINI_API_KEY || '';
 const GEMINI_API_URL = import.meta.env?.VITE_GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta';
-const DEFAULT_MODEL = 'gemini-1.5-flash';
+const DEFAULT_MODEL = 'gemini-3.8-flash';
 
 export const aiService = {
   getApiKey() {
@@ -57,12 +57,12 @@ export const aiService = {
   async generateText({ prompt, systemPrompt, model = DEFAULT_MODEL, temperature = 0.3, maxTokens = 8192, responseMimeType = 'application/json' }) {
     const key = this.getApiKey();
     const endpoint = this.getApiEndpoint();
-    // Google Gemini v1beta valid models: gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash, gemini-2.5-flash
+    
+    // Mặc định ưu tiên gemini-3.8-flash
     let targetModel = model || DEFAULT_MODEL;
-    if (targetModel.includes('3.') || !targetModel.startsWith('gemini-')) {
+    if (!targetModel.startsWith('gemini-')) {
       targetModel = DEFAULT_MODEL;
     }
-    const url = `${endpoint}/models/${targetModel}:generateContent?key=${key}`;
 
     const payload = {
       contents: [{ parts: [{ text: prompt }] }],
@@ -79,11 +79,22 @@ export const aiService = {
       };
     }
 
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
+    const executeCall = async (modelName) => {
+      const url = `${endpoint}/models/${modelName}:generateContent?key=${key}`;
+      return await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    };
+
+    let res = await executeCall(targetModel);
+
+    // Tự động fallback sang gemini-3.8-flash nếu model truyền vào bị 404 Not Found
+    if (res.status === 404 && targetModel !== DEFAULT_MODEL) {
+      console.warn(`[WanderAI] Model ${targetModel} không khả dụng (404), tự động chuyển sang ${DEFAULT_MODEL}...`);
+      res = await executeCall(DEFAULT_MODEL);
+    }
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));

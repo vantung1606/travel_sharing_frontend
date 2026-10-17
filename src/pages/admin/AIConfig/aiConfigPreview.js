@@ -3,12 +3,27 @@ export const DRAFT_KEY = 'wayfare_a06_ai_config_v2';
 
 export const MODELS = [
   {
-    id: 'gemini-3.6-flash',
-    name: 'Google Gemini 3.6 Flash (Khuyên dùng)',
-    shortName: 'Gemini 3.6 Flash',
+    id: 'gemini-3.8-flash',
+    name: 'Google Gemini 3.8 Flash (Khuyên dùng)',
+    shortName: 'Gemini 3.8 Flash',
     provider: 'Google AI',
     description: 'Thế hệ mới nhất từ Google AI, tốc độ siêu tốc (< 0.5s), thông minh và tối ưu hoá cho toàn bộ tác vụ du lịch.',
     isDefault: true
+  },
+  {
+    id: 'gemini-3.6-flash',
+    name: 'Google Gemini 3.6 Flash',
+    shortName: 'Gemini 3.6 Flash',
+    provider: 'Google AI',
+    description: 'Bản Flash tiêu chuẩn, tốc độ cao và phản hồi ổn định.',
+    isDefault: false
+  },
+  {
+    id: 'gemini-2.5-flash',
+    name: 'Google Gemini 2.5 Flash',
+    shortName: 'Gemini 2.5 Flash',
+    provider: 'Google AI',
+    description: 'Độ ổn định cao, tối ưu logic tính toán chi phí và xử lý đa ngôn ngữ quốc tế.'
   },
   {
     id: 'gemini-1.5-pro',
@@ -17,13 +32,6 @@ export const MODELS = [
     provider: 'Google AI',
     description: 'Khuyên dùng cho Itinerary dài, context window 1M tokens, đa phương thức đọc ảnh & phân tích tài liệu hành trình.',
     isDefault: false
-  },
-  {
-    id: 'gemini-1.5-flash',
-    name: 'Google Gemini 1.5 Flash',
-    shortName: 'Gemini 1.5 Flash',
-    provider: 'Google AI',
-    description: 'Tối ưu tốc độ cao (< 0.6s), tiết kiệm token, phù hợp hỏi đáp nhanh và gợi ý ẩm thực điểm đến.'
   },
   {
     id: 'gpt-4o-mini',
@@ -42,7 +50,7 @@ export const MODELS = [
 ];
 
 export const DEFAULT_CONFIG = {
-  model: 'gemini-3.6-flash',
+  model: 'gemini-3.8-flash',
   temperature: 0.40,
   maxTokens: 4096,
   topP: 0.95,
@@ -201,10 +209,10 @@ export async function testGeminiConnection(apiKey, apiEndpoint) {
 /**
  * Call Gemini Generate Content
  */
-export async function callGeminiGenerate({ apiKey, apiEndpoint, prompt, systemPrompt, model = 'gemini-3.6-flash', temperature = 0.4, maxTokens = 2048 }) {
+export async function callGeminiGenerate({ apiKey, apiEndpoint, prompt, systemPrompt, model = 'gemini-3.8-flash', temperature = 0.4, maxTokens = 2048 }) {
   const keyToUse = (apiKey || DEFAULT_CONFIG.apiKey || '').trim();
   const endpoint = (apiEndpoint || DEFAULT_CONFIG.apiEndpoint || 'https://generativelanguage.googleapis.com/v1beta').replace(/\/+$/, '');
-  const targetModel = model.includes('gemini') ? model : 'gemini-3.6-flash';
+  const targetModel = model.includes('gemini') ? model : 'gemini-3.8-flash';
   const url = `${endpoint}/models/${targetModel}:generateContent?key=${keyToUse}`;
 
   const payload = {
