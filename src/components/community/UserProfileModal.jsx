@@ -91,17 +91,29 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   };
 
   const isOwnProfile = Boolean(
-    currentUser?.id && (userId === currentUser.id || profile?.id === currentUser.id || profile?.userId === currentUser.id)
+    currentUser && (
+      (userId && currentUser.id && String(userId) === String(currentUser.id)) ||
+      (profile?.id && currentUser.id && String(profile.id) === String(currentUser.id)) ||
+      (profile?.userId && currentUser.id && String(profile.userId) === String(currentUser.id)) ||
+      (profile?.email && currentUser.email && profile.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+      (profile?.username && currentUser.username && profile.username.toLowerCase() === currentUser.username.toLowerCase()) ||
+      (profile?.fullName && (currentUser.name || currentUser.fullName) && profile.fullName.trim().toLowerCase() === (currentUser.name || currentUser.fullName).trim().toLowerCase())
+    )
   );
 
   const handleCloneItinerary = async (itin) => {
     if (!requireAuth('sao chép lịch trình')) return;
 
-    if (
+    const isOwner = Boolean(
       isOwnProfile ||
-      (itin.creatorId && currentUser?.id && itin.creatorId === currentUser.id) ||
-      (itin.creatorEmail && currentUser?.email && itin.creatorEmail === currentUser.email)
-    ) {
+      (itin.creatorId && currentUser?.id && String(itin.creatorId) === String(currentUser.id)) ||
+      (itin.userId && currentUser?.id && String(itin.userId) === String(currentUser.id)) ||
+      (itin.creatorEmail && currentUser?.email && itin.creatorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+      (itin.userEmail && currentUser?.email && itin.userEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+      (itin.creatorName && (currentUser?.name || currentUser?.fullName) && itin.creatorName.trim().toLowerCase() === (currentUser.name || currentUser.fullName).trim().toLowerCase())
+    );
+
+    if (isOwner) {
       toast.showWarning('Bạn là tác giả của lịch trình này nên không thể tự sao chép!');
       return;
     }
@@ -653,20 +665,33 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                                 <Eye className="w-3.5 h-3.5" />
                                 <span>Xem chi tiết</span>
                               </button>
-                              {(!isOwnProfile && (!itin.creatorId || String(itin.creatorId) !== String(currentUser?.id)) && (!itin.creatorEmail || itin.creatorEmail.toLowerCase() !== (currentUser?.email || '').toLowerCase())) && (
-                                <button
-                                  onClick={() => handleCloneItinerary(itin)}
-                                  disabled={cloningItinId === itin.id}
-                                  className="py-2 px-3 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
-                                >
-                                  {cloningItinId === itin.id ? (
-                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                  ) : (
-                                    <Copy className="w-3.5 h-3.5" />
-                                  )}
-                                  <span className="hidden sm:inline">Sao chép</span>
-                                </button>
-                              )}
+                              {(() => {
+                                const isItinOwner = Boolean(
+                                  isOwnProfile ||
+                                  (currentUser?.id && itin.creatorId && String(itin.creatorId) === String(currentUser.id)) ||
+                                  (currentUser?.id && itin.userId && String(itin.userId) === String(currentUser.id)) ||
+                                  (currentUser?.email && itin.creatorEmail && itin.creatorEmail.toLowerCase() === (currentUser.email || '').toLowerCase()) ||
+                                  (currentUser?.email && itin.userEmail && itin.userEmail.toLowerCase() === (currentUser.email || '').toLowerCase()) ||
+                                  ((currentUser?.name || currentUser?.fullName) && itin.creatorName && itin.creatorName.trim().toLowerCase() === (currentUser.name || currentUser.fullName).trim().toLowerCase())
+                                );
+
+                                if (isItinOwner) return null;
+
+                                return (
+                                  <button
+                                    onClick={() => handleCloneItinerary(itin)}
+                                    disabled={cloningItinId === itin.id}
+                                    className="py-2 px-3 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
+                                  >
+                                    {cloningItinId === itin.id ? (
+                                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                      <Copy className="w-3.5 h-3.5" />
+                                    )}
+                                    <span className="hidden sm:inline">Sao chép</span>
+                                  </button>
+                                );
+                              })()}
                             </div>
                           </div>
                         </div>
