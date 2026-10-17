@@ -1350,29 +1350,35 @@ export const HomePage = () => {
                         {tour.price}
                       </span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleCopyTour(tour);
-                      }}
-                      className={`w-full sm:w-auto px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-full text-[10px] sm:text-xs font-bold transition-all border flex items-center justify-center gap-1 cursor-pointer hover:scale-102 active:scale-95 ${savedTours[tour.id]
-                        ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
-                        : 'bg-sky-50 hover:bg-sky-600 hover:text-white text-sky-800 border-sky-200'
-                        }`}
-                    >
-                      {savedTours[tour.id] ? (
-                        <>
-                          <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                          <span>Đã lưu</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                          <span>Sao chép</span>
-                        </>
-                      )}
-                    </button>
+                    {!Boolean(
+                      (tour.creatorId && currentUser?.id && String(tour.creatorId) === String(currentUser.id)) ||
+                      (tour.creatorEmail && currentUser?.email && tour.creatorEmail.toLowerCase() === (currentUser.email || '').toLowerCase()) ||
+                      (tour.userId && currentUser?.id && String(tour.userId) === String(currentUser.id))
+                    ) && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCopyTour(tour);
+                        }}
+                        className={`w-full sm:w-auto px-2 sm:px-3.5 py-1 sm:py-1.5 rounded-lg sm:rounded-full text-[10px] sm:text-xs font-bold transition-all border flex items-center justify-center gap-1 cursor-pointer hover:scale-102 active:scale-95 ${savedTours[tour.id]
+                          ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
+                          : 'bg-sky-50 hover:bg-sky-600 hover:text-white text-sky-800 border-sky-200'
+                          }`}
+                      >
+                        {savedTours[tour.id] ? (
+                          <>
+                            <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                            <span>Đã lưu</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                            <span>Sao chép</span>
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

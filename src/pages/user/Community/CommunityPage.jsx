@@ -2745,25 +2745,33 @@ export const CommunityPage = () => {
                           <span>Xem chi tiết</span>
                         </button>
 
-                        {/* Action 2: 1-Click Clone to My Itineraries */}
-                        <button
-                          type="button"
-                          onClick={() => handleCloneItinerary(post)}
-                          disabled={cloningPostId === post.id}
-                          className="flex-1 py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-md shadow-sky-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 whitespace-nowrap"
-                        >
-                          {cloningPostId === post.id ? (
-                            <>
-                              <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
-                              <span>Đang chép...</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-                              <span>Sao chép Tour</span>
-                            </>
-                          )}
-                        </button>
+                        {/* Action 2: 1-Click Clone to My Itineraries (Chính chủ thì ẩn đi) */}
+                        {!Boolean(
+                          (post.authorId && currentUser?.id && String(post.authorId) === String(currentUser.id)) ||
+                          (post.authorEmail && currentUser?.email && post.authorEmail.toLowerCase() === (currentUser.email || '').toLowerCase()) ||
+                          (post.userId && currentUser?.id && String(post.userId) === String(currentUser.id)) ||
+                          (post.author?.id && currentUser?.id && String(post.author.id) === String(currentUser.id)) ||
+                          (post.author?.email && currentUser?.email && post.author.email.toLowerCase() === (currentUser.email || '').toLowerCase())
+                        ) && (
+                          <button
+                            type="button"
+                            onClick={() => handleCloneItinerary(post)}
+                            disabled={cloningPostId === post.id}
+                            className="flex-1 py-2 px-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-md shadow-sky-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 whitespace-nowrap"
+                          >
+                            {cloningPostId === post.id ? (
+                              <>
+                                <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
+                                <span>Đang chép...</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                                <span>Sao chép Tour</span>
+                              </>
+                            )}
+                          </button>
+                        )}
                       </div>
                     </div>
                   )}

@@ -653,7 +653,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                                 <Eye className="w-3.5 h-3.5" />
                                 <span>Xem chi tiết</span>
                               </button>
-                              {(!isOwnProfile && itin.creatorId !== currentUser?.id) && (
+                              {(!isOwnProfile && (!itin.creatorId || String(itin.creatorId) !== String(currentUser?.id)) && (!itin.creatorEmail || itin.creatorEmail.toLowerCase() !== (currentUser?.email || '').toLowerCase())) && (
                                 <button
                                   onClick={() => handleCloneItinerary(itin)}
                                   disabled={cloningItinId === itin.id}
