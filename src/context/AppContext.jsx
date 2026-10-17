@@ -537,7 +537,7 @@ export const AppProvider = ({ children }) => {
       isAiGenerated: Boolean(item.isAiGenerated),
       countdown: item.startDate ? `Khởi hành ${item.startDate}` : 'Sắp khởi hành',
       departureDate: item.startDate ? `${item.startDate}${item.endDate ? ' – ' + item.endDate : ''}` : 'Khởi hành trong tháng tới',
-      groupType: 'Nhóm bạn / Cặp đôi',
+      groupType: item.groupType || 'Cá nhân',
       placesCount: places.length > 0 ? places.length : (daysCount * 3),
       placesList: places.length > 0 ? places : [item.destination + ' City Tour'],
       budgetPerPerson: item.budgetTotal ? Math.round(Number(item.budgetTotal) / 2) : 0,
@@ -605,6 +605,7 @@ export const AppProvider = ({ children }) => {
       coverImageUrl: itineraryObj.coverImage || itineraryObj.coverImageUrl || null,
       isAiGenerated: Boolean(itineraryObj.isAiGenerated ?? true),
       status: (itineraryObj.status || 'ACTIVE').toUpperCase(),
+      groupType: itineraryObj.groupType || 'Cá nhân',
       details: (itineraryObj.days || []).flatMap(day =>
         (day.activities || []).map((act, idx) => ({
           dayNumber: day.dayNumber || 1,

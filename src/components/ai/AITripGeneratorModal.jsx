@@ -49,8 +49,7 @@ export const AITripGeneratorModal = () => {
   const toast = useToast();
 
   // Core Trip Parameters
-  const [destination, setDestination] = useState('Đà Nẵng - Hội An, Việt Nam');
-  const [daysCount, setDaysCount] = useState(3);
+  const [destination, setDestination] = useState('Đà Nẵng, Việt Nam');
 
   // Sync initial destination when triggered from specific spot or place
   useEffect(() => {
@@ -62,29 +61,45 @@ export const AITripGeneratorModal = () => {
     }
   }, [isAIGeneratorOpen, aiGeneratorInitialData]);
 
-  // Default start date: today + 5 days
+  // Default start date: today + 2 days, end date: today + 4 days
   const defaultStartDate = useMemo(() => {
     const d = new Date();
-    d.setDate(d.getDate() + 5);
+    d.setDate(d.getDate() + 2);
+    return d.toISOString().split('T')[0];
+  }, []);
+
+  const defaultEndDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 4);
     return d.toISOString().split('T')[0];
   }, []);
 
   const [startDate, setStartDate] = useState(defaultStartDate);
+  const [endDate, setEndDate] = useState(defaultEndDate);
 
-  // Calculated End Date
-  const endDateDisplay = useMemo(() => {
-    try {
-      const parts = startDate.split('-');
-      const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-      d.setDate(d.getDate() + (daysCount - 1));
-      const dd = String(d.getDate()).padStart(2, '0');
-      const mm = String(d.getMonth() + 1).padStart(2, '0');
-      const yyyy = d.getFullYear();
-      return `${dd}/${mm}/${yyyy}`;
-    } catch {
-      return '20/05/2026';
+  // Tự động tính toán số ngày giữa ngày bắt đầu và ngày kết thúc
+  const daysCount = useMemo(() => {
+    if (!startDate || !endDate) return 1;
+    const s = new Date(startDate);
+    const e = new Date(endDate);
+    const diff = Math.round((e.getTime() - s.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    return Math.max(1, diff);
+  }, [startDate, endDate]);
+
+  const handleStartDateChange = (val) => {
+    setStartDate(val);
+    if (endDate && new Date(val) > new Date(endDate)) {
+      setEndDate(val);
     }
-  }, [startDate, daysCount]);
+  };
+
+  const handleEndDateChange = (val) => {
+    if (startDate && new Date(val) < new Date(startDate)) {
+      setEndDate(startDate);
+    } else {
+      setEndDate(val);
+    }
+  };
 
   // Companions
   const [companion, setCompanion] = useState('couple');
@@ -98,7 +113,6 @@ export const AITripGeneratorModal = () => {
 
   // Personalization & AI Tuning
   const [selectedInterests, setSelectedInterests] = useState(['checkin', 'food', 'culture']);
-  const [pacing, setPacing] = useState('balanced');
   const [accommodation, setAccommodation] = useState('Khách sạn 3 sao tiện nghi, trung tâm');
   const [diningStyle, setDiningStyle] = useState('Quán ăn bản địa chuẩn vị & nổi tiếng');
   const [customPrompt, setCustomPrompt] = useState('');
@@ -347,11 +361,11 @@ export const AITripGeneratorModal = () => {
 
   const getCompanionLabel = () => {
     switch (companion) {
-      case 'solo': return 'Đi một mình (Solo)';
-      case 'couple': return 'Cặp đôi / Trăng mật';
-      case 'friends': return 'Nhóm bạn thân';
-      case 'family': return 'Gia đình nhiều thế hệ';
-      default: return 'Cặp đôi';
+      case 'solo': return 'Cá nhân (Solo)';
+      case 'couple': return 'Cặp đôi';
+      case 'friends': return 'Bạn bè';
+      case 'family': return 'Gia đình';
+      default: return 'Cá nhân (Solo)';
     }
   };
 
@@ -362,15 +376,6 @@ export const AITripGeneratorModal = () => {
       case 'taxi': return 'Taxi & Grab';
       case 'bus': return 'Xe khách / Tour ghép';
       default: return 'Taxi & Grab';
-    }
-  };
-
-  const getPacingLabel = () => {
-    switch (pacing) {
-      case 'relaxed': return 'Thong thả (2-3 điểm/ngày)';
-      case 'balanced': return 'Cân bằng ✨ (3-4 điểm/ngày)';
-      case 'max': return 'Khám phá tối đa (5-6 điểm/ngày)';
-      default: return 'Cân bằng';
     }
   };
 
@@ -388,7 +393,6 @@ export const AITripGeneratorModal = () => {
   // Helper tạo đối tượng Lịch Trình từ kết quả phân tích AI thực tế
   const buildItineraryFromAI = (parsedAI, isDraft = false) => {
     const companionText = getCompanionLabel();
-    const pacingText = getPacingLabel();
     const budgetVal = budgetTier === 1 ? 3000000 : budgetTier === 2 ? 5500000 : budgetTier === 3 ? 9000000 : 16000000;
     const styleText = selectedInterests
       .map(id => INTEREST_OPTIONS.find(o => o.id === id)?.label)
@@ -433,10 +437,12 @@ export const AITripGeneratorModal = () => {
       coverImage: getDestinationCover(destination),
       duration: `${daysCount}N${Math.max(1, daysCount - 1)}Đ`,
       daysCount: daysCount,
+      startDate: startDate,
+      endDate: endDate,
       status: isDraft ? 'drafts' : 'upcoming',
       isAiGenerated: true,
       countdown: isDraft ? 'Bản nháp AI nghiên cứu' : `Sắp khởi hành • Khởi hành ${startDate.split('-').reverse().join('/')}`,
-      departureDate: `${startDate.split('-').reverse().join('/')} – ${endDateDisplay}`,
+      departureDate: `${startDate.split('-').reverse().join('/')} – ${endDate.split('-').reverse().join('/')}`,
       groupType: companionText,
       placesCount: finalDays.reduce((acc, d) => acc + (d.activities?.length || 3), 0),
       placesList: finalPlacesList.length > 0 ? finalPlacesList : [`Trung tâm ${destination}`, 'Khu danh lam thắng cảnh', 'Phố ẩm thực bản địa'],
@@ -444,7 +450,6 @@ export const AITripGeneratorModal = () => {
       totalBudget: budgetVal * (companion === 'solo' ? 1 : companion === 'couple' ? 2 : companion === 'friends' ? 4 : 5),
       budgetProgress: isDraft ? 15 : 45,
       budgetNote: `Ngân sách: ${getBudgetLabel()} • ${includeFlight ? 'Đã gồm vé khứ hồi' : 'Chưa gồm vé máy bay'}`,
-      pace: pacingText,
       style: styleText || 'Trải nghiệm du lịch toàn diện',
       aiTipNote: parsedAI.summaryTip || `Lời khuyên WanderAI: Lịch trình ${destination} đã được AI phân tích tọa độ địa lý, ưu tiên các món ngon chuẩn vị ${diningStyle} và danh lam thắng cảnh tiêu biểu.`,
       days: finalDays
@@ -526,7 +531,6 @@ Thông tin chuyến đi:
 - Phương tiện: ${getTransitLabel()}
 - Ngân sách: ${getBudgetLabel()}
 - Gu trải nghiệm: ${selectedInterests.join(', ')}
-- Nhịp độ: ${getPacingLabel()}
 - Lưu trú: ${accommodation}
 - Ẩm thực: ${diningStyle}
 ${customPrompt ? `- Yêu cầu thêm: ${customPrompt}` : ''}
@@ -734,89 +738,42 @@ QUY TẮC BẮT BUỘC:
             </div>
           </div>
 
-          {/* 2. Thời gian chuyến đi & Ngày khởi hành */}
+          {/* 2. Thời gian chuyến đi: Ngày bắt đầu, Ngày kết thúc & Ô tính ngày tự động */}
           <div className="space-y-2.5 pt-2 border-t border-slate-100">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-sky-600" />
-                <span>Thời lượng chuyến đi</span>
+                <span>Thời gian hành trình</span>
               </label>
-              <span className="text-xs font-bold text-sky-600">
-                {daysCount} ngày {daysCount > 1 ? `(${daysCount}N${daysCount - 1}Đ)` : '(Trong ngày)'}
-              </span>
-            </div>
-
-            {/* Stepper + Flexible Days Control */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setDaysCount(prev => Math.max(1, prev - 1))}
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-base flex items-center justify-center transition-colors cursor-pointer select-none active:scale-95 shrink-0"
-                title="Giảm 1 ngày"
-              >
-                -
-              </button>
-
-              <div className="flex-1 flex items-center justify-center gap-2 py-1.5 px-3 rounded-xl bg-sky-50 border border-sky-200 text-sky-900 font-extrabold text-xs sm:text-sm">
+              {/* Ô đếm số ngày khi nhập tự động */}
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-800 font-extrabold text-xs">
                 <span>{daysCount} Ngày</span>
-                <span className="text-[11px] sm:text-xs text-sky-600 font-semibold">
-                  {daysCount > 1 ? `• ${daysCount}N${daysCount - 1}Đ` : '• Đi về trong ngày'}
+                <span className="text-[11px] text-sky-600 font-semibold">
+                  {daysCount > 1 ? `(${daysCount}N${daysCount - 1}Đ)` : '(Đi về trong ngày)'}
                 </span>
               </div>
-
-              <button
-                type="button"
-                onClick={() => setDaysCount(prev => Math.min(30, prev + 1))}
-                className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-extrabold text-base flex items-center justify-center transition-colors cursor-pointer select-none active:scale-95 shrink-0"
-                title="Tăng 1 ngày"
-              >
-                +
-              </button>
             </div>
 
-            {/* Quick Presets (Từ 2 ngày đến 14 ngày & 1 tháng) */}
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] font-bold text-slate-400 mr-0.5">Chọn nhanh:</span>
-              {[
-                { days: 2, label: '2N1Đ' },
-                { days: 3, label: '3N2Đ' },
-                { days: 4, label: '4N3Đ' },
-                { days: 5, label: '5N4Đ' },
-                { days: 7, label: '7N6Đ (1 tuần)' },
-                { days: 10, label: '10 Ngày' },
-                { days: 14, label: '14 Ngày (2 tuần)' }
-              ].map(item => (
-                <button
-                  key={item.days}
-                  type="button"
-                  onClick={() => handleSelectDuration(item.days)}
-                  className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${daysCount === item.days
-                      ? 'bg-sky-600 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
-                    }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-
-            {/* Start Date & End Date auto-calc */}
-            <div className="grid grid-cols-2 gap-3 pt-1">
+            {/* Start Date & End Date Inputs */}
+            <div className="grid grid-cols-2 gap-3 pt-0.5">
               <div>
                 <span className="text-[11px] font-semibold text-slate-500 block mb-1">Ngày bắt đầu</span>
                 <input
                   type="date"
                   value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  onChange={(e) => handleStartDateChange(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                 />
               </div>
               <div>
                 <span className="text-[11px] font-semibold text-slate-500 block mb-1">Ngày kết thúc</span>
-                <div className="px-3 py-2 rounded-xl bg-slate-100 text-slate-800 text-xs font-bold flex items-center justify-between border border-slate-200/60">
-                  <span>{endDateDisplay}</span>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                </div>
+                <input
+                  type="date"
+                  value={endDate}
+                  min={startDate}
+                  onChange={(e) => handleEndDateChange(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                />
               </div>
             </div>
           </div>
@@ -831,9 +788,9 @@ QUY TẮC BẮT BUỘC:
               </label>
               <div className="grid grid-cols-2 gap-1.5">
                 {[
-                  { id: 'solo', label: '1 mình', icon: User },
+                  { id: 'solo', label: 'Cá nhân', icon: User },
                   { id: 'couple', label: 'Cặp đôi', icon: Heart },
-                  { id: 'friends', label: 'Nhóm bạn', icon: Users },
+                  { id: 'friends', label: 'Bạn bè', icon: Users },
                   { id: 'family', label: 'Gia đình', icon: Home }
                 ].map(item => {
                   const isSelected = companion === item.id;
