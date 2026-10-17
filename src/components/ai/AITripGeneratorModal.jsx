@@ -538,7 +538,7 @@ ${customPrompt ? `- Yêu cầu thêm: ${customPrompt}` : ''}
 QUY TẮC BẮT BUỘC:
 1. Nghiên cứu chính xác các địa điểm, quán ăn có thật 100% tại "${destination}". Tuyệt đối không dùng văn mẫu chung chung.
 2. Mỗi ngày có 3-4 hoạt động sắp xếp từ sáng đến tối.
-3. BẮT BUỘC cung cấp "location" (tên ngắn gọn của địa danh/quán ăn), "address" (địa chỉ cụ thể), và "lat", "lng" (tọa độ GPS thực tế có thật của địa điểm đó tại Việt Nam) để đồng bộ chính xác trên bản đồ và Google Maps.
+3. BẮT BUỘC VỀ ĐỊA CHỈ: Cung cấp "location" (tên ngắn gọn của địa danh/quán ăn), "address" (ĐỊA CHỈ CỤ THỂ CHI TIẾT CÓ THẬT gồm số nhà/tên đường, xã/phường, quận/huyện tại ${destination}. Tuyệt đối KHÔNG chỉ ghi tên tỉnh thành chung chung), và "lat", "lng" (tọa độ GPS thực tế có thật của địa điểm đó tại Việt Nam) để đồng bộ chính xác trên bản đồ và Google Maps.
 4. Trả về DUY NHẤT một chuỗi JSON hợp lệ theo định dạng:
 {
   "summaryTip": "Mẹo du lịch bản địa ngắn gọn...",
