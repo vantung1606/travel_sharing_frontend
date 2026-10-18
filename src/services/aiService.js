@@ -1,3 +1,5 @@
+import { BASE_URL, getAuthHeader } from './api';
+
 /**
  * WanderAI Core Service - Google Gemini Integration
  */
@@ -52,18 +54,57 @@ export const aiService = {
   },
 
   /**
-   * Ask Gemini to generate content
+   * Ask Gemini to generate content via Backend AI Proxy (Secure)
    */
   async generateText({ prompt, systemPrompt, model = DEFAULT_MODEL, temperature = 0.3, maxTokens = 8192, responseMimeType = 'application/json' }) {
-    const key = this.getApiKey();
-    const endpoint = this.getApiEndpoint();
-
-    // Mặc định ưu tiên gemini-3.8-flash. Tuyệt đối không dùng gemini-1.5-flash đã bị deprecated/404
     let targetModel = model || DEFAULT_MODEL;
     if (!targetModel.startsWith('gemini-') || targetModel === 'gemini-1.5-flash' || targetModel.includes('1.5-flash')) {
       targetModel = DEFAULT_MODEL;
     }
 
+    // 1. ƯU TIÊN GỌI QUA BACKEND AI PROXY (Bảo mật tuyệt đối, không lộ API key ra client)
+    try {
+      const backendRes = await fetch(`${BASE_URL}/ai/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        },
+        body: JSON.stringify({
+          prompt,
+          systemPrompt,
+          model: targetModel,
+          temperature: Number(temperature) || 0.3,
+          maxTokens: Number(maxTokens) || 8192,
+          responseMimeType
+        })
+      });
+
+      if (backendRes.status === 429) {
+        const errData = await backendRes.json().catch(() => ({}));
+        throw new Error(errData.message || 'Hệ thống AI đang bận hoặc vượt quá giới hạn gọi (20 req/phút). Vui lòng thử lại sau giây lát!');
+      }
+
+      if (backendRes.ok) {
+        const data = await backendRes.json();
+        if (data.success && data.data?.text) {
+          return data.data.text;
+        }
+      }
+    } catch (proxyError) {
+      if (proxyError.message.includes('vượt quá giới hạn')) {
+        throw proxyError;
+      }
+      console.warn('[WanderAI] Backend AI proxy request failed, checking client fallback:', proxyError.message);
+    }
+
+    // 2. Client Fallback: Chỉ dùng khi Admin nhập API Key trực tiếp trên giao diện Cấu hình AI
+    const customKey = this.getApiKey();
+    if (!customKey) {
+      throw new Error('Tính năng AI hiện chưa khả dụng. Vui lòng thử lại sau hoặc liên hệ Quản trị viên!');
+    }
+
+    const endpoint = this.getApiEndpoint();
     const payload = {
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
@@ -80,7 +121,7 @@ export const aiService = {
     }
 
     const executeCall = async (modelName) => {
-      const url = `${endpoint}/models/${modelName}:generateContent?key=${key}`;
+      const url = `${endpoint}/models/${modelName}:generateContent?key=${customKey}`;
       return await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -89,8 +130,6 @@ export const aiService = {
     };
 
     let res = await executeCall(targetModel);
-
-    // Tự động fallback sang gemini-3.8-flash nếu model truyền vào bị 404 Not Found
     if (res.status === 404 && targetModel !== DEFAULT_MODEL) {
       console.warn(`[WanderAI] Model ${targetModel} không khả dụng (404), tự động chuyển sang ${DEFAULT_MODEL}...`);
       res = await executeCall(DEFAULT_MODEL);
