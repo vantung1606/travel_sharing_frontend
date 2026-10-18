@@ -29,6 +29,10 @@ export const ExplorePage = () => {
   const {
     destinations = [],
     places = [],
+    placesTotal = 0,
+    hasMorePlaces = false,
+    loadMorePlaces = () => {},
+    loadingMorePlaces = false,
     addNewPlace,
     setIsAIGeneratorOpen,
     openAIGeneratorWithItem,
@@ -711,7 +715,7 @@ export const ExplorePage = () => {
       
       {/* 1. COMPACT DISCOVERY HEADER */}
       <ExploreHeader
-        placesCount={places.length}
+        placesCount={placesTotal || places.length}
         destinationsCount={destinations.length}
         userCoords={userCoords}
         isLocating={isLocating}
@@ -725,7 +729,7 @@ export const ExplorePage = () => {
       <ExploreFilterBar
         exploreLayer={exploreLayer}
         setExploreLayer={setExploreLayer}
-        placesCount={places.length}
+        placesCount={placesTotal || places.length}
         destinationsCount={destinations.length}
         savedCount={savedPlaces.length}
         searchQuery={searchQuery}
@@ -758,6 +762,30 @@ export const ExplorePage = () => {
           </button>
         )}
       </div>
+
+      {/* 3.1 PHÂN TRANG ĐỊA ĐIỂM (tải dần từ server để giảm payload ban đầu) */}
+      {exploreLayer === 'spots' && hasMorePlaces && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-sky-100 bg-sky-50/70 px-4 py-3">
+          <span className="text-xs text-slate-600 text-center sm:text-left">
+            Đang hiển thị <strong className="text-slate-900 font-bold">{places.length}</strong> / {placesTotal} địa điểm.
+            {searchQuery && ' Kết quả tìm kiếm chỉ tính trên các địa điểm đã tải.'}
+          </span>
+          <button
+            onClick={loadMorePlaces}
+            disabled={loadingMorePlaces}
+            className="shrink-0 inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+          >
+            {loadingMorePlaces ? (
+              <>
+                <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+                Đang tải...
+              </>
+            ) : (
+              'Tải thêm địa điểm'
+            )}
+          </button>
+        </div>
+      )}
 
       {/* 4. MAIN CONTENT VIEW DISPLAY */}
       {/* ─── A. SPLIT VIEW (Cards Left + Interactive Map Right) ─── */}

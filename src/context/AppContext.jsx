@@ -194,6 +194,12 @@ export const AppProvider = ({ children }) => {
       return [];
     }
   });
+  // Trạng thái phân trang phía server cho danh sách địa điểm
+  const PLACES_PAGE_SIZE = 100;
+  const [placesTotal, setPlacesTotal] = useState(0);
+  const [hasMorePlaces, setHasMorePlaces] = useState(false);
+  const [placesPage, setPlacesPage] = useState(0);
+  const [loadingMorePlaces, setLoadingMorePlaces] = useState(false);
   const [users, setUsers] = useState([]);
   const [reports, setReports] = useState([]);
   const [stats, setStats] = useState({});
@@ -218,9 +224,71 @@ export const AppProvider = ({ children }) => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchPlaces();
+  // Đồng bộ danh sách tỉnh thành từ dữ liệu địa điểm đang có
+  const syncDestinationsFromPlaces = (items) => {
+    const distinctCities = Array.from(new Set((items || []).map(p => p.city).filter(Boolean)));
+    setDestinations(distinctCities.map(city => ({ name: city, destination: city })));
+  };
+
+  // Tải trang địa điểm đầu tiên (100 địa điểm) thay vì tải toàn bộ 565 địa điểm (~470KB)
+  const fetchInitialPlaces = useCallback(async () => {
+    try {
+      const result = await placeApi.getPlacesPaged({ page: 0, size: PLACES_PAGE_SIZE });
+      if (result && Array.isArray(result.items)) {
+        setPlaces(result.items);
+        setPlacesTotal(result.totalElements || result.items.length);
+        setHasMorePlaces(Boolean(result.hasNext));
+        setPlacesPage(0);
+        syncDestinationsFromPlaces(result.items);
+        try {
+          sessionStorage.setItem('wayfare_places_cache', JSON.stringify(result.items));
+        } catch {
+          // Ignore quota if any
+        }
+        return;
+      }
+      // Fallback: nếu API phân trang không khả dụng thì dùng cách tải toàn bộ như cũ
+      await fetchPlaces();
+    } catch (err) {
+      console.warn('API error fetching initial places:', err.message);
+      await fetchPlaces();
+    }
   }, [fetchPlaces]);
+
+  // Tải thêm một trang địa điểm (nối vào danh sách hiện tại, chống trùng theo id)
+  const loadMorePlaces = useCallback(async () => {
+    if (loadingMorePlaces || !hasMorePlaces) return;
+    setLoadingMorePlaces(true);
+    try {
+      const nextPage = placesPage + 1;
+      const result = await placeApi.getPlacesPaged({ page: nextPage, size: PLACES_PAGE_SIZE });
+      if (result && Array.isArray(result.items)) {
+        setPlaces(prev => {
+          const seen = new Set(prev.map(p => p.id));
+          const merged = [...prev, ...result.items.filter(p => !seen.has(p.id))];
+          syncDestinationsFromPlaces(merged);
+          try {
+            sessionStorage.setItem('wayfare_places_cache', JSON.stringify(merged));
+          } catch {
+            // Ignore quota if any
+          }
+          return merged;
+        });
+        setPlacesPage(nextPage);
+        setPlacesTotal(result.totalElements || 0);
+        setHasMorePlaces(Boolean(result.hasNext));
+      }
+    } catch (err) {
+      console.warn('API error loading more places:', err.message);
+    } finally {
+      setLoadingMorePlaces(false);
+    }
+  }, [loadingMorePlaces, hasMorePlaces, placesPage]);
+
+  useEffect(() => {
+    fetchInitialPlaces();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // User contributes a new place (strictly requires admin approval before public listing)
   const addNewPlace = async (placeData) => {
@@ -834,6 +902,10 @@ export const AppProvider = ({ children }) => {
         places,
         setPlaces,
         fetchPlaces,
+        placesTotal,
+        hasMorePlaces,
+        loadMorePlaces,
+        loadingMorePlaces,
         addNewPlace,
         posts,
         itineraries,

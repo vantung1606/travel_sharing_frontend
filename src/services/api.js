@@ -1375,6 +1375,35 @@ export const placeApi = {
     }
   },
 
+  /**
+   * Lấy địa điểm có phân trang phía server.
+   * Trả về { items, page, size, totalElements, totalPages, hasNext } hoặc null nếu lỗi.
+   */
+  async getPlacesPaged({ page = 0, size = 50, city, category, status, keyword } = {}) {
+    try {
+      const params = new URLSearchParams();
+      params.append('page', String(Math.max(page, 0)));
+      params.append('size', String(Math.max(size, 1)));
+      if (city && city !== 'Tất cả') params.append('city', city);
+      if (category && category !== 'Tất cả') params.append('category', category);
+      if (status && status !== 'Tất cả') params.append('status', status);
+      if (keyword) params.append('keyword', keyword);
+
+      const res = await fetch(`${BASE_URL}/places?${params.toString()}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || null;
+    } catch (err) {
+      console.warn('API error fetching paged places:', err.message);
+      return null;
+    }
+  },
+
   async getPlaceById(id) {
     try {
       const res = await fetch(`${BASE_URL}/places/${id}`, {

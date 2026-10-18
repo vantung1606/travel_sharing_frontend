@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { ToastProvider, useToast } from './components/common/Toast';
@@ -13,24 +13,34 @@ import { AuthModal } from './components/auth/AuthModal';
 import { FloatingChatWidget } from './components/common/FloatingChatWidget';
 import { PageTitleManager, AdminRouteGuard, UserAuthGuard } from './components/common/RouteGuards';
 
-// User Pages
-import { HomePage } from './pages/user/Home/HomePage';
-import { ExplorePage } from './pages/user/Explore/ExplorePage';
-import { CommunityPage } from './pages/user/Community/CommunityPage';
-import { ItineraryManagerPage } from './pages/user/Itineraries/ItineraryManagerPage';
-import { MessagesPage } from './pages/user/Messages/MessagesPage';
-import { ProfilePage } from './pages/user/Profile/ProfilePage';
-import { NotificationsPage } from './pages/user/Notifications/NotificationsPage';
+// User Pages - lazy loaded để tách bundle theo route (giảm thời gian tải trang đầu)
+const HomePage = lazy(() => import('./pages/user/Home/HomePage').then(m => ({ default: m.HomePage })));
+const ExplorePage = lazy(() => import('./pages/user/Explore/ExplorePage').then(m => ({ default: m.ExplorePage })));
+const CommunityPage = lazy(() => import('./pages/user/Community/CommunityPage').then(m => ({ default: m.CommunityPage })));
+const ItineraryManagerPage = lazy(() => import('./pages/user/Itineraries/ItineraryManagerPage').then(m => ({ default: m.ItineraryManagerPage })));
+const MessagesPage = lazy(() => import('./pages/user/Messages/MessagesPage').then(m => ({ default: m.MessagesPage })));
+const ProfilePage = lazy(() => import('./pages/user/Profile/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const NotificationsPage = lazy(() => import('./pages/user/Notifications/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
 
-// Admin Pages
-import { AdminDashboardPage } from './pages/admin/Dashboard/AdminDashboardPage';
-import { AdminPlacesPage } from './pages/admin/Places/AdminPlacesPage';
-import { AdminUsersPage } from './pages/admin/Users/AdminUsersPage';
-import { AdminReportsPage } from './pages/admin/Reports/AdminReportsPage';
-import { AdminRevenuePage } from './pages/admin/Revenue/AdminRevenuePage';
-import { AdminStatisticsPage } from './pages/admin/Statistics/AdminStatisticsPage';
-import { AdminAuditLogsPage } from './pages/admin/AuditLogs/AdminAuditLogsPage';
-import { AdminAIConfigPage } from './pages/admin/AIConfig/AdminAIConfigPage';
+// Admin Pages - lazy loaded, chỉ tải khi vào khu vực /admin
+const AdminDashboardPage = lazy(() => import('./pages/admin/Dashboard/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })));
+const AdminPlacesPage = lazy(() => import('./pages/admin/Places/AdminPlacesPage').then(m => ({ default: m.AdminPlacesPage })));
+const AdminUsersPage = lazy(() => import('./pages/admin/Users/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
+const AdminReportsPage = lazy(() => import('./pages/admin/Reports/AdminReportsPage').then(m => ({ default: m.AdminReportsPage })));
+const AdminRevenuePage = lazy(() => import('./pages/admin/Revenue/AdminRevenuePage').then(m => ({ default: m.AdminRevenuePage })));
+const AdminStatisticsPage = lazy(() => import('./pages/admin/Statistics/AdminStatisticsPage').then(m => ({ default: m.AdminStatisticsPage })));
+const AdminAuditLogsPage = lazy(() => import('./pages/admin/AuditLogs/AdminAuditLogsPage').then(m => ({ default: m.AdminAuditLogsPage })));
+const AdminAIConfigPage = lazy(() => import('./pages/admin/AIConfig/AdminAIConfigPage').then(m => ({ default: m.AdminAIConfigPage })));
+
+// Fallback hiển thị trong lúc tải chunk của route
+const RouteLoadingFallback = () => (
+  <div className="flex min-h-[50vh] w-full items-center justify-center">
+    <div className="flex flex-col items-center gap-3">
+      <div className="h-9 w-9 animate-spin rounded-full border-[3px] border-sky-200 border-t-sky-600" />
+      <span className="text-xs font-semibold text-slate-500">Đang tải trang...</span>
+    </div>
+  </div>
+);
 
 const AppContent = () => {
   const location = useLocation();
@@ -89,7 +99,8 @@ const AppContent = () => {
           <Navbar />
 
           <main className="flex-1">
-            <Routes>
+            <Suspense fallback={<RouteLoadingFallback />}>
+              <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/home" element={<Navigate to="/" replace />} />
               <Route path="/explore" element={<ExplorePage />} />
@@ -132,7 +143,8 @@ const AppContent = () => {
 
               {/* Catch-all redirect */}
               <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+              </Routes>
+            </Suspense>
           </main>
 
           <BottomNav />
@@ -153,18 +165,20 @@ const AppContent = () => {
             {/* Admin Workspace Content */}
             <div className="min-w-0 md:pl-[260px] pt-16 min-h-screen">
               <main className="min-w-0 p-4 sm:p-6 lg:p-8 bg-[#faf8ff] min-h-[calc(100vh-64px)]">
-                <Routes>
-                  <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-                  <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-                  <Route path="/admin/places" element={<AdminPlacesPage />} />
-                  <Route path="/admin/users" element={<AdminUsersPage />} />
-                  <Route path="/admin/reports" element={<AdminReportsPage />} />
-                  <Route path="/admin/analytics" element={<AdminStatisticsPage />} />
-                  <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
-                  <Route path="/admin/revenue" element={<AdminRevenuePage />} />
-                  <Route path="/admin/ai-config" element={<AdminAIConfigPage />} />
-                  <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
-                </Routes>
+                <Suspense fallback={<RouteLoadingFallback />}>
+                  <Routes>
+                    <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+                    <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+                    <Route path="/admin/places" element={<AdminPlacesPage />} />
+                    <Route path="/admin/users" element={<AdminUsersPage />} />
+                    <Route path="/admin/reports" element={<AdminReportsPage />} />
+                    <Route path="/admin/analytics" element={<AdminStatisticsPage />} />
+                    <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
+                    <Route path="/admin/revenue" element={<AdminRevenuePage />} />
+                    <Route path="/admin/ai-config" element={<AdminAIConfigPage />} />
+                    <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
+                  </Routes>
+                </Suspense>
               </main>
             </div>
           </div>
