@@ -102,10 +102,13 @@ export const AdminRouteGuard = ({ children }) => {
           </div>
           <div className="pt-2 flex flex-col gap-2.5">
             <button
-              onClick={handleQuickAdminLogin}
+              onClick={() => {
+                setAuthMode('login');
+                setIsAuthModalOpen(true);
+              }}
               className="w-full py-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
             >
-              ⚡ Chuyển sang Tài khoản Quản Trị Viên
+              ⚡ Đăng nhập bằng Tài khoản Quản Trị Viên
             </button>
             <button
               onClick={() => navigate('/')}
