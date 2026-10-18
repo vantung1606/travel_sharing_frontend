@@ -25,6 +25,29 @@ export function getAuthHeader() {
   return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
 
+// Global fetch wrapper with 401 Unauthorized handling
+const nativeFetch = typeof window !== 'undefined' ? window.fetch.bind(window) : globalThis.fetch.bind(globalThis);
+const fetch = async (url, options) => {
+  const response = await nativeFetch(url, options);
+  if (response.status === 401) {
+    const urlStr = typeof url === 'string' ? url : (url?.url || '');
+    if (!urlStr.includes('/auth/login') && !urlStr.includes('/auth/register')) {
+      console.warn('[Wayfare API] 401 Unauthorized detected from endpoint:', urlStr);
+      try {
+        localStorage.removeItem('wayfare_user');
+        localStorage.removeItem('wayfare_auth');
+        localStorage.removeItem('token');
+      } catch (e) {
+        console.warn('Could not clean auth storage on 401', e);
+      }
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('wayfare:unauthorized', { detail: { endpoint: urlStr } }));
+      }
+    }
+  }
+  return response;
+};
+
 export const authApi = {
   // Login API Call
   async login(email, password) {

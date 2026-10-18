@@ -405,6 +405,27 @@ export const AppProvider = ({ children }) => {
     });
   };
 
+  // Tự động bắt sự kiện 401 Unauthorized từ API client: reset session và hiển thị modal đăng nhập
+  useEffect(() => {
+    const onUnauthorized = (event) => {
+      console.warn('[AppContext] Handling 401 Unauthorized event:', event?.detail);
+      setIsLoggedIn(false);
+      setCurrentUser(GUEST_USER);
+      setPortalMode('user');
+      setUserTab('home');
+      try {
+        localStorage.removeItem('wayfare_auth');
+        localStorage.removeItem('wayfare_user');
+        localStorage.removeItem('token');
+      } catch {}
+      setAuthMode('login');
+      setIsAuthModalOpen(true);
+    };
+
+    window.addEventListener('wayfare:unauthorized', onUnauthorized);
+    return () => window.removeEventListener('wayfare:unauthorized', onUnauthorized);
+  }, []);
+
   // Auto-sync profile ID and details with backend if missing or on reload
   useEffect(() => {
     if (!isLoggedIn || !currentUser?.email) return;
