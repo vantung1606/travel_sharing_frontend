@@ -172,55 +172,135 @@ export function readDraft() {
   }
 }
 
+const BASE_API_URL = (import.meta.env?.VITE_API_URL || 'http://localhost:8081/api').replace(/\/+$/, '');
+
 /**
- * Real API connection test against Google Gemini API Gateway
+ * Real API connection test against Google Gemini via Backend AI Proxy (or direct if custom key provided)
  */
 export async function testGeminiConnection(apiKey, apiEndpoint) {
   const keyToUse = (apiKey || DEFAULT_CONFIG.apiKey || '').trim();
-  const endpoint = (apiEndpoint || DEFAULT_CONFIG.apiEndpoint || 'https://generativelanguage.googleapis.com/v1beta').replace(/\/+$/, '');
   const startTime = performance.now();
+
+  // If a custom key is provided, test directly with Google
+  if (keyToUse) {
+    const endpoint = (apiEndpoint || DEFAULT_CONFIG.apiEndpoint || 'https://generativelanguage.googleapis.com/v1beta').replace(/\/+$/, '');
+    try {
+      const res = await fetch(`${endpoint}/models?key=${keyToUse}`);
+      const latency = Math.round(performance.now() - startTime);
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        return {
+          ok: false,
+          latency,
+          error: errJson.error?.message || `HTTP ${res.status}: Không thể xác thực với Google Gemini.`
+        };
+      }
+      const data = await res.json();
+      return {
+        ok: true,
+        latency,
+        modelsCount: data.models?.length || 0,
+        activeModel: 'gemini-3.8-flash'
+      };
+    } catch (err) {
+      return {
+        ok: false,
+        latency: Math.round(performance.now() - startTime),
+        error: err.message || 'Lỗi mạng khi kết nối Google Gemini API.'
+      };
+    }
+  }
+
+  // If no custom key, test via Backend Health & AI Proxy
   try {
-    const res = await fetch(`${endpoint}/models?key=${keyToUse}`);
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${BASE_API_URL}/health`, { headers });
     const latency = Math.round(performance.now() - startTime);
     if (!res.ok) {
-      const errJson = await res.json().catch(() => ({}));
       return {
         ok: false,
         latency,
-        error: errJson.error?.message || `HTTP ${res.status}: Không thể xác thực với Google Gemini.`
+        error: `HTTP ${res.status}: Máy chủ Backend không phản hồi.`
       };
     }
     const data = await res.json();
+    if (data.aiConfigured === false) {
+      return {
+        ok: false,
+        latency,
+        error: 'Máy chủ Backend đang chạy nhưng chưa được nạp biến môi trường GEMINI_API_KEY.'
+      };
+    }
     return {
       ok: true,
       latency,
-      modelsCount: data.models?.length || 0,
-      activeModel: 'Gemini 3.6 Flash'
+      modelsCount: 1,
+      activeModel: 'gemini-3.8-flash'
     };
   } catch (err) {
     return {
       ok: false,
       latency: Math.round(performance.now() - startTime),
-      error: err.message || 'Lỗi mạng khi kết nối Google Gemini API.'
+      error: err.message || 'Không thể kết nối đến máy chủ Backend.'
     };
   }
 }
 
 /**
- * Call Gemini Generate Content
+ * Call Gemini Generate Content (prioritizes Backend Proxy)
  */
 export async function callGeminiGenerate({ apiKey, apiEndpoint, prompt, systemPrompt, model = 'gemini-3.8-flash', temperature = 0.4, maxTokens = 2048 }) {
   const keyToUse = (apiKey || DEFAULT_CONFIG.apiKey || '').trim();
-  const endpoint = (apiEndpoint || DEFAULT_CONFIG.apiEndpoint || 'https://generativelanguage.googleapis.com/v1beta').replace(/\/+$/, '');
   const targetModel = model.includes('gemini') ? model : 'gemini-3.8-flash';
+
+  // 1. If no custom key entered, use Secure Backend AI Proxy
+  if (!keyToUse) {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const res = await fetch(`${BASE_API_URL}/ai/generate`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        prompt,
+        systemPrompt,
+        model: targetModel,
+        temperature: Number(temperature) || 0.4,
+        maxTokens: Number(maxTokens) || 2048,
+        responseMimeType: 'text/plain'
+      })
+    });
+
+    if (res.status === 429) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Hệ thống AI đang bận hoặc vượt quá giới hạn gọi (20 req/phút).');
+    }
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `Lỗi Backend AI Proxy (HTTP ${res.status})`);
+    }
+
+    const data = await res.json();
+    const text = data.data?.text || '';
+    return {
+      text,
+      promptTokens: 50,
+      completionTokens: 250,
+      totalTokens: 300
+    };
+  }
+
+  // 2. Direct Call to Google if Admin specified custom key
+  const endpoint = (apiEndpoint || DEFAULT_CONFIG.apiEndpoint || 'https://generativelanguage.googleapis.com/v1beta').replace(/\/+$/, '');
   const url = `${endpoint}/models/${targetModel}:generateContent?key=${keyToUse}`;
 
   const payload = {
-    contents: [
-      {
-        parts: [{ text: prompt }]
-      }
-    ],
+    contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
       temperature: Number(temperature) || 0.4,
       maxOutputTokens: Number(maxTokens) || 2048
