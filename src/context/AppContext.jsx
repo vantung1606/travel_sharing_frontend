@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { notificationApi, userApi, placeApi, itineraryApi, authApi } from '../services/api';
 
@@ -284,6 +284,47 @@ export const AppProvider = ({ children }) => {
       setLoadingMorePlaces(false);
     }
   }, [loadingMorePlaces, hasMorePlaces, placesPage]);
+
+  // Tải toàn bộ địa điểm (dùng khi tìm kiếm để kết quả không bị giới hạn trong các trang đã tải).
+  // Chỉ tải một lần cho mỗi phiên; sau đó hasMorePlaces = false.
+  const fetchingAllPlacesRef = useRef(false);
+  const fetchAllPlaces = useCallback(async () => {
+    if (fetchingAllPlacesRef.current) return;
+    fetchingAllPlacesRef.current = true;
+    setLoadingMorePlaces(true);
+    try {
+      const pageSize = 200;
+      let page = 0;
+      let more = true;
+      let aggregated = [];
+      let total = 0;
+      while (more && page < 20) {
+        const result = await placeApi.getPlacesPaged({ page, size: pageSize });
+        if (!result || !Array.isArray(result.items)) break;
+        aggregated = aggregated.concat(result.items);
+        total = result.totalElements || aggregated.length;
+        more = Boolean(result.hasNext);
+        page += 1;
+      }
+      if (aggregated.length > 0) {
+        setPlaces(aggregated);
+        setPlacesTotal(total);
+        setHasMorePlaces(false);
+        setPlacesPage(Math.max(page - 1, 0));
+        syncDestinationsFromPlaces(aggregated);
+        try {
+          sessionStorage.setItem('wayfare_places_cache', JSON.stringify(aggregated));
+        } catch {
+          // Ignore quota if any
+        }
+      }
+    } catch (err) {
+      console.warn('API error fetching all places:', err.message);
+    } finally {
+      setLoadingMorePlaces(false);
+      fetchingAllPlacesRef.current = false;
+    }
+  }, []);
 
   useEffect(() => {
     fetchInitialPlaces();
@@ -906,6 +947,7 @@ export const AppProvider = ({ children }) => {
         hasMorePlaces,
         loadMorePlaces,
         loadingMorePlaces,
+        fetchAllPlaces,
         addNewPlace,
         posts,
         itineraries,
