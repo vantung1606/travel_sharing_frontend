@@ -11,7 +11,6 @@ import { Footer } from './components/common/Footer';
 import { AITripGeneratorModal } from './components/ai/AITripGeneratorModal';
 import { AuthModal } from './components/auth/AuthModal';
 import { FloatingChatWidget } from './components/common/FloatingChatWidget';
-import { WaterRippleCanvas } from './components/common/WaterRippleCanvas';
 import { PageTitleManager, AdminRouteGuard, UserAuthGuard } from './components/common/RouteGuards';
 
 // User Pages
@@ -176,7 +175,6 @@ const AppContent = () => {
       <AITripGeneratorModal />
       <AuthModal />
       {!isAdminPath && <FloatingChatWidget />}
-      <WaterRippleCanvas />
     </div>
   );
 };
