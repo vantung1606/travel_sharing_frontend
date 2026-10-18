@@ -33,6 +33,7 @@ export const ExplorePage = () => {
     hasMorePlaces = false,
     loadMorePlaces = () => {},
     loadingMorePlaces = false,
+    fetchAllPlaces = () => {},
     addNewPlace,
     setIsAIGeneratorOpen,
     openAIGeneratorWithItem,
@@ -63,6 +64,16 @@ export const ExplorePage = () => {
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = viewMode === 'grid' ? 12 : 8;
+
+  // Khi người dùng tìm kiếm, tải nốt các trang còn lại để kết quả không bị giới hạn
+  // trong 100 địa điểm đầu tiên (giữ nguyên hành vi tìm kiếm trên toàn bộ dữ liệu).
+  useEffect(() => {
+    if (!searchQuery.trim() || !hasMorePlaces) return undefined;
+    const timer = setTimeout(() => {
+      fetchAllPlaces();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery, hasMorePlaces, fetchAllPlaces]);
 
   // 4. User GPS Coordinates for Radar
   const [userCoords, setUserCoords] = useState(null);
