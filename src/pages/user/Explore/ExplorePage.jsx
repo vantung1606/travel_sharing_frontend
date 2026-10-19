@@ -513,11 +513,11 @@ export const ExplorePage = () => {
   };
 
   // Unified items list based on active tab
+  const spotSource = remotePool !== null ? remotePool : (places || []);
   const unifiedItems = useMemo(() => {
     if (exploreLayer === 'spots') {
       // Khi đang tìm kiếm / lọc tỉnh: dùng kết quả TRUY VẤN SERVER (toàn bộ 565),
       // còn không thì dùng pool tải dần theo trang như thường lệ.
-      const spotSource = remotePool !== null ? remotePool : (places || []);
       return spotSource.map(p => ({
         id: `spot-${p.id}`,
         rawId: p.id,
@@ -577,6 +577,16 @@ export const ExplorePage = () => {
       amenities: d.specialties || (typeof d.amenities === 'string' ? d.amenities.split(',').map(s => s.trim()) : d.amenities) || []
     }));
   }, [exploreLayer, places, destinations, savedPlaces, remotePool]);
+
+  // Thống kê THẬT từ dữ liệu đang có (places đã lưu + pool truy vấn server)
+  const provincesCount = useMemo(
+    () => new Set(
+      (remotePool !== null ? remotePool : (places || []))
+        .map(p => p.city)
+        .filter(Boolean)
+    ).size,
+    [places, remotePool]
+  );
 
   // Danh sách tỉnh thành THẬT từ dữ liệu đã tải (xếp theo số lượng địa điểm)
   const cityOptions = useMemo(() => {
@@ -805,6 +815,7 @@ export const ExplorePage = () => {
       {/* 1. COMPACT DISCOVERY HEADER */}
       <ExploreHeader
         placesCount={placesTotal || places.length}
+        provincesCount={provincesCount}
         destinationsCount={destinations.length}
         userCoords={userCoords}
         isLocating={isLocating}
