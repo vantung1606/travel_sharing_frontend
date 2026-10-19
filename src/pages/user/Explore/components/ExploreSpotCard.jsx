@@ -1,6 +1,18 @@
 import React from 'react';
 import { Star, MapPin, Navigation, Heart, Plus, Compass } from 'lucide-react';
 import { getEstimatedWeatherByCity } from '../../../../utils/weatherUtils';
+import { pickFallbackImage, SHARED_PLACEHOLDER_IMAGE } from '../../../../utils/placeImages';
+
+// Ảnh lỗi (404 do sai mã hoá '%') tự đổi sang ảnh thật dự phòng từ kho Wayfare
+const handleImageError = (e, item) => {
+  const img = e.currentTarget;
+  const fallback = pickFallbackImage(item?.rawId ?? 0);
+  if (img.src !== fallback) {
+    img.src = fallback;
+  } else {
+    img.src = SHARED_PLACEHOLDER_IMAGE;
+  }
+};
 
 // Chuẩn hóa hiển thị giá ngắn gọn, thẩm mỹ, không bao giờ bị vỡ dòng
 const formatShortPrice = (priceStr = '') => {
@@ -37,6 +49,7 @@ export const ExploreSpotCard = ({
         <img
           src={item.image}
           alt={item.name}
+          onError={(e) => handleImageError(e, item)}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-95"
           loading="lazy"
         />
@@ -92,11 +105,13 @@ export const ExploreSpotCard = ({
               {item.region && <span className="text-slate-400 font-normal shrink-0">• {item.region}</span>}
             </span>
 
-            <div className="flex items-center gap-1 font-black text-amber-600 bg-amber-50 px-1.5 sm:px-2 py-0.5 rounded-lg border border-amber-200/60 shrink-0">
-              <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-amber-400 text-amber-400" />
-              <span>{item.rating || '4.9'}</span>
-              <span className="text-[10px] text-slate-400 font-normal">({item.reviewsCount || 120})</span>
-            </div>
+            {item.rating && item.reviewsCount > 0 ? (
+              <div className="flex items-center gap-1 font-black text-amber-600 bg-amber-50 px-1.5 sm:px-2 py-0.5 rounded-lg border border-amber-200/60 shrink-0">
+                <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-amber-400 text-amber-400" />
+                <span>{item.rating}</span>
+                <span className="text-[10px] text-slate-400 font-normal">({item.reviewsCount})</span>
+              </div>
+            ) : null}
           </div>
 
           {/* Place Title */}
