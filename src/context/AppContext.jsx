@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { notificationApi, userApi, placeApi, itineraryApi, authApi } from '../services/api';
+import { notificationApi, userApi, placeApi, itineraryApi, authApi, savedPlaceApi } from '../services/api';
+import { mapApiSpot } from '../utils/placeMap';
 
 const DEFAULT_APP_STATE = {
   portalMode: 'user',
@@ -361,24 +362,27 @@ export const AppProvider = ({ children }) => {
 
   const toggleSavePlace = (place) => {
     if (!place) return false;
-    let isSavedNow = false;
-    setSavedPlaces(prev => {
-      const exists = prev.some(p => p.id === place.id || p.name === place.name);
-      let next;
-      if (exists) {
-        next = prev.filter(p => p.id !== place.id && p.name !== place.name);
-        isSavedNow = false;
-      } else {
-        next = [place, ...prev];
-        isSavedNow = true;
-      }
-      try {
-        localStorage.setItem('wayfare_saved_places', JSON.stringify(next));
-      } catch (e) {
-        console.warn('Failed to persist saved places:', e);
-      }
-      return next;
-    });
+    const exists = savedPlaces.some(p => p.id === place.id || p.name === place.name);
+    const isSavedNow = !exists;
+    const next = exists
+      ? savedPlaces.filter(p => p.id !== place.id && p.name !== place.name)
+      : [place, ...savedPlaces];
+    setSavedPlaces(next);
+    try {
+      localStorage.setItem('wayfare_saved_places', JSON.stringify(next));
+    } catch (e) {
+      console.warn('Failed to persist saved places:', e);
+    }
+
+    // Đồng bộ lên SERVER (bảng saved_places) khi đã đăng nhập — web & mobile
+    // cùng 1 danh sách. Guest thì vẫn giữ lưu theo thiết bị như trước.
+    const placeId = Number(place.rawId);
+    if (currentUser?.email && Number.isFinite(placeId) && placeId > 0) {
+      const syncCall = isSavedNow ? savedPlaceApi.addSavedPlace : savedPlaceApi.removeSavedPlace;
+      syncCall(placeId).catch(err => {
+        console.warn('Wishlist server sync failed:', err?.message || err);
+      });
+    }
     return isSavedNow;
   };
 
@@ -432,6 +436,33 @@ export const AppProvider = ({ children }) => {
     }
     return GUEST_USER;
   });
+
+  // HYDRATION wishlist: khi đăng nhập, kéo danh sách yêu thích từ SERVER về
+  // merge với danh sách local (union theo placeId) — thứ đã lưu khi offline
+  // vẫn giữ, những gì lưu từ app mobile/website khác cũng xuất hiện.
+  useEffect(() => {
+    if (!currentUser?.email) return undefined;
+    let alive = true;
+    savedPlaceApi.getSavedPlaces().then(list => {
+      if (!alive || !Array.isArray(list) || list.length === 0) return;
+      const mapped = list.map(p => mapApiSpot(p)).filter(Boolean);
+      if (mapped.length === 0) return;
+      setSavedPlaces(prev => {
+        const serverIds = new Set(mapped.map(m => m.rawId));
+        const localOnly = prev.filter(p => !serverIds.has(Number(p.rawId)) && !serverIds.has(p.rawId));
+        const merged = [...mapped, ...localOnly];
+        try {
+          localStorage.setItem('wayfare_saved_places', JSON.stringify(merged));
+        } catch (e) {
+          console.warn('Failed to persist merged saved places:', e);
+        }
+        return merged;
+      });
+    }).catch(err => {
+      console.warn('Wishlist hydration failed:', err?.message || err);
+    });
+    return () => { alive = false; };
+  }, [currentUser?.email]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Clean Login: ĐẢM BẢO CÁCH LY TUYỆT ĐỐI GIỮA CÁC USER, KHÔNG ĐÈ DỮ LIỆU CŨ SANG USER MỚI
   const login = (userData) => {

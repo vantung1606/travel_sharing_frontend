@@ -8,34 +8,8 @@ import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { RealMapView } from '../../../components/map/RealMapView';
 import { fetchLiveWeather } from '../../../utils/weatherUtils';
-import { resolvePlaceImage, pickFallbackImage, SHARED_PLACEHOLDER_IMAGE } from '../../../utils/placeImages';
-
-// Map API place (tên trường CSDL) sang item card — đối chiếu 1:1 với ExplorePage.unifiedItems
-const mapApiPlace = (p) => ({
-  id: `spot-${p.id}`,
-  rawId: p.id,
-  isLocalSpot: true,
-  name: p.name,
-  category: p.categoryName || 'Tọa độ bản địa',
-  city: p.city || 'Việt Nam',
-  address: p.address,
-  image: resolvePlaceImage(p),
-  latitude: p.latitude,
-  longitude: p.longitude,
-  rating: p.averageRating ? Number(p.averageRating).toFixed(1) : null,
-  reviewsCount: p.reviewCount || 0,
-  phoneNumber: p.phoneNumber,
-  openHours: p.openHours || null,
-  priceEstimate: p.priceRange || (p.ticketPrice ? `${Number(p.ticketPrice).toLocaleString()}đ` : 'Miễn phí'),
-  ticketPrice: p.ticketPrice,
-  amenities: p.amenities ? p.amenities.split(',').map(s => s.trim()) : [],
-  isVerifiedHost: p.isVerifiedHost,
-  ownerName: p.ownerName,
-  ownerHandle: p.ownerHandle,
-  ownerAvatar: p.ownerAvatar,
-  tagline: p.description,
-  description: p.description
-});
+import { mapApiSpot } from '../../../utils/placeMap';
+import { pickFallbackImage, SHARED_PLACEHOLDER_IMAGE } from '../../../utils/placeImages';
 
 export const PlaceDetailPage = () => {
   const { placeId } = useParams();
@@ -55,7 +29,7 @@ export const PlaceDetailPage = () => {
     setLoading(true);
     placeApi.getPlaceById(placeId).then((p) => {
       if (!alive) return;
-      setPlace(p ? mapApiPlace(p) : null);
+      setPlace(p ? mapApiSpot(p) : null);
       setLoading(false);
     }).catch(() => {
       if (alive) { setPlace(null); setLoading(false); }
