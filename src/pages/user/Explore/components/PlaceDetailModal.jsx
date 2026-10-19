@@ -2,6 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { X, Star, Phone, CheckCircle2, ExternalLink, Copy, Calendar, Sparkles, Send, MapPin, CloudSun, Wind, Droplets, Compass } from 'lucide-react';
 import { RealMapView } from '../../../../components/map/RealMapView';
 import { fetchLiveWeather, getEstimatedWeatherByCity } from '../../../../utils/weatherUtils';
+import { pickFallbackImage, SHARED_PLACEHOLDER_IMAGE } from '../../../../utils/placeImages';
+
+// Ảnh lỗi (404 do sai mã hoá '%') tự đổi sang ảnh thật dự phòng từ kho Wayfare
+const handleImageError = (e, item) => {
+  const img = e.currentTarget;
+  const fallback = pickFallbackImage(item?.rawId ?? 0);
+  if (img.src !== fallback) {
+    img.src = fallback;
+  } else {
+    img.src = SHARED_PLACEHOLDER_IMAGE;
+  }
+};
 
 export const PlaceDetailModal = ({
   item,
@@ -58,6 +70,7 @@ export const PlaceDetailModal = ({
           <img
             src={item.image}
             alt={item.name}
+            onError={(e) => handleImageError(e, item)}
             className="w-full h-full object-cover opacity-90"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-black/30" />
@@ -80,10 +93,12 @@ export const PlaceDetailModal = ({
                 <MapPin className="w-3 h-3 text-sky-300" />
                 <span>{item.city}</span>
               </span>
-              <div className="flex items-center gap-1 text-amber-300 font-bold text-xs bg-black/40 px-2 py-0.5 rounded-lg backdrop-blur-md">
-                <Star className="w-3.5 h-3.5 fill-current" />
-                <span>{item.rating || '4.9'}</span>
-              </div>
+              {item.rating && item.reviewsCount > 0 ? (
+                <div className="flex items-center gap-1 text-amber-300 font-bold text-xs bg-black/40 px-2 py-0.5 rounded-lg backdrop-blur-md">
+                  <Star className="w-3.5 h-3.5 fill-current" />
+                  <span>{item.rating}</span>
+                </div>
+              ) : null}
             </div>
 
             <h2 className="font-display font-extrabold text-xl sm:text-3xl text-white tracking-tight">
@@ -145,7 +160,7 @@ export const PlaceDetailModal = ({
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
               <div>
                 <span className="block text-[10px] text-slate-400 font-semibold">Giờ mở cửa</span>
-                <span className="font-bold text-slate-800 text-xs">{item.openHours || '07:00 - 18:00'}</span>
+                <span className="font-bold text-slate-800 text-xs">{item.openHours || 'Chưa cập nhật'}</span>
               </div>
               <div>
                 <span className="block text-[10px] text-slate-400 font-semibold">Chi phí dự kiến</span>
@@ -188,7 +203,11 @@ export const PlaceDetailModal = ({
             <div className="pt-4 border-t border-slate-100 space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="font-bold text-xs text-slate-900">Đánh giá từ du khách ({reviews.length})</h4>
-                <span className="text-amber-500 font-bold">★ {item.rating || '5.0'}</span>
+                {item.rating && item.reviewsCount > 0 ? (
+                  <span className="text-amber-500 font-bold">★ {item.rating}</span>
+                ) : (
+                  <span className="text-slate-400 font-medium">Mới · chưa có đánh giá</span>
+                )}
               </div>
 
               {/* Review Input */}

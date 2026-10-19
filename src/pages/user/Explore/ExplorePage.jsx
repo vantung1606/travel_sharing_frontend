@@ -2,6 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { RealMapView } from '../../../components/map/RealMapView';
+import { reviewApi } from '../../../services/api';
+import { resolvePlaceImage, fixImageUrl, pickFallbackImage } from '../../../utils/placeImages';
 import { Compass, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Subcomponents
@@ -23,6 +25,30 @@ const removeVietnameseTones = (str = '') => {
     .replace(/Đ/g, 'D')
     .toLowerCase()
     .trim();
+};
+
+// Chuyển giá CSDL (vd "Vé vào cổng: 50.000đ - 100.000đ", "Miễn phí") thành số VND để lọc ngân sách
+const parsePriceVND = (item = {}) => {
+  if (item.ticketPrice !== undefined && item.ticketPrice !== null && item.ticketPrice !== '') {
+    return Number(item.ticketPrice) || 0;
+  }
+  const text = String(item.priceRange || item.priceEstimate || '').replace(/\s/g, '');
+  if (!text || /miễnphí/i.test(text)) return 0;
+  const numbers = (text.match(/[\d.,]+/g) || [])
+    .map(n => Number(n.replace(/[.,]/g, '')))
+    .filter(n => !Number.isNaN(n));
+  return numbers.length ? Math.min(...numbers) : 0;
+};
+
+// Khớp khoảng giá với bộ lọc ngân sách trong ExploreFilterDrawer
+const matchBudget = (priceVND, budget) => {
+  switch (budget) {
+    case 'under50k': return priceVND < 50000;
+    case '50k-200k': return priceVND >= 50000 && priceVND <= 200000;
+    case '200k-1m': return priceVND > 200000 && priceVND <= 1000000;
+    case 'above1m': return priceVND > 1000000;
+    default: return true;
+  }
 };
 
 export const ExplorePage = () => {
@@ -137,15 +163,18 @@ export const ExplorePage = () => {
   const regions = ['Tất cả', 'Miền Bắc', 'Miền Trung', 'Miền Nam', 'Tây Nguyên'];
 
   // Categories adapt to currently selected layer
+  // Chuỗi chip phải ĐÚNG categoryName trong CSDL (bấm mới có kết quả):
+  // Núi Rừng & Mây Ngàn (496), Di Sản & Phố Cổ (42), Biển Đảo & Nghỉ Dưỡng (13),
+  // Danh Lam & Thắng Cảnh (7), Quán Cafe & Săn Mây (1).
   const currentCategories = useMemo(() => {
     if (exploreLayer === 'spots') {
       return [
         'Tất cả',
-        'Cà Phê',
-        'Homestay & Nghỉ Dưỡng',
-        'Ẩm Thực & Đặc Sản',
-        'Trải Nghiệm & Hoạt Động',
-        'Danh Lam & Thắng Cảnh'
+        'Núi Rừng & Mây Ngàn',
+        'Di Sản & Phố Cổ',
+        'Biển Đảo & Nghỉ Dưỡng',
+        'Danh Lam & Thắng Cảnh',
+        'Quán Cafe & Săn Mây'
       ];
     }
     return [
@@ -483,21 +512,21 @@ export const ExplorePage = () => {
         city: p.city || 'Việt Nam',
         region: getRegionByCity(p.city),
         address: p.address,
-        image: p.coverImageUrl || 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
+        image: resolvePlaceImage(p),
         latitude: p.latitude,
         longitude: p.longitude,
-        rating: p.averageRating ? Number(p.averageRating).toFixed(1) : '5.0',
-        reviewsCount: p.reviewCount || 1,
+        rating: p.averageRating ? Number(p.averageRating).toFixed(1) : null,
+        reviewsCount: p.reviewCount || 0,
         phoneNumber: p.phoneNumber,
-        openHours: p.openHours || '07:00 - 22:00',
+        openHours: p.openHours || null,
         priceEstimate: p.priceRange || (p.ticketPrice ? `${Number(p.ticketPrice).toLocaleString()}đ` : 'Miễn phí'),
+        ticketPrice: p.ticketPrice,
         amenities: p.amenities ? p.amenities.split(',').map(s => s.trim()) : [],
         isVerifiedHost: p.isVerifiedHost,
         ownerName: p.ownerName,
         ownerHandle: p.ownerHandle,
         ownerAvatar: p.ownerAvatar,
-        tagline: p.description || 'Tọa độ check-in & trải nghiệm do người dùng và cơ sở bản địa chia sẻ.',
-        weather: 'Mát mẻ 22°C'
+        tagline: p.description || 'Tọa độ check-in & trải nghiệm do người dùng và cơ sở bản địa chia sẻ.'
       }));
     }
 
@@ -509,10 +538,10 @@ export const ExplorePage = () => {
         rawId: p.rawId || p.id || idx,
         isLocalSpot: p.isLocalSpot !== undefined ? p.isLocalSpot : true,
         region: p.region || getRegionByCity(p.name || p.city),
-        image: p.image || p.coverImageUrl || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
+        image: resolvePlaceImage({ ...p, id: p.rawId || idx }),
         category: p.categoryName || p.category || 'Tọa độ yêu thích',
-        rating: p.averageRating || p.rating || '4.9',
-        reviewsCount: p.reviewCount || p.reviewsCount || 120,
+        rating: p.averageRating || p.rating || null,
+        reviewsCount: p.reviewCount || p.reviewsCount || 0,
         amenities: p.specialties || (typeof p.amenities === 'string' ? p.amenities.split(',').map(s => s.trim()) : p.amenities) || []
       }));
     }
@@ -526,10 +555,10 @@ export const ExplorePage = () => {
       region: d.region || getRegionByCity(d.name || d.city),
       latitude: d.latitude || d.coordinates?.lat,
       longitude: d.longitude || d.coordinates?.lng,
-      image: d.image || d.coverImageUrl || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80',
-      category: d.categoryName || d.category || 'Danh Lam & Thắng Cảnh',
-      rating: d.averageRating || d.rating || '4.9',
-      reviewsCount: d.reviewCount || d.reviewsCount || 88,
+      image: resolvePlaceImage({ ...d, id: d.id || index }),
+      category: d.categoryName || d.category || 'Điểm đến',
+      rating: d.averageRating || d.rating || null,
+      reviewsCount: d.reviewCount || d.reviewsCount || 0,
       amenities: d.specialties || (typeof d.amenities === 'string' ? d.amenities.split(',').map(s => s.trim()) : d.amenities) || []
     }));
   }, [exploreLayer, places, destinations, savedPlaces]);
@@ -568,6 +597,9 @@ export const ExplorePage = () => {
           selectedCategory === 'Tất cả' ||
           item.category?.toLowerCase().includes(selectedCategory.toLowerCase());
 
+        // Budget (Khoảng giá dự kiến)
+        if (!matchBudget(parsePriceVND(item), selectedBudget)) return false;
+
         return matchesSearch && matchesRegion && matchesCategory;
       })
       .map(item => {
@@ -590,7 +622,7 @@ export const ExplorePage = () => {
         }
         return 0;
       });
-  }, [unifiedItems, searchQuery, selectedRegion, selectedCategory, sortBy, userCoords]);
+  }, [unifiedItems, searchQuery, selectedRegion, selectedCategory, selectedBudget, sortBy, userCoords]);
 
   // Reset page when any filter criteria changes
   useEffect(() => {
