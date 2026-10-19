@@ -2,8 +2,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { RealMapView } from '../../../components/map/RealMapView';
-import { reviewApi } from '../../../services/api';
+import { reviewApi, itineraryApi } from '../../../services/api';
 import { resolvePlaceImage, fixImageUrl, pickFallbackImage } from '../../../utils/placeImages';
+import { fetchLiveWeatherBatch } from '../../../utils/weatherUtils';
 import { Compass, ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Subcomponents
@@ -61,11 +62,11 @@ export const ExplorePage = () => {
     loadingMorePlaces = false,
     fetchAllPlaces = () => {},
     addNewPlace,
+    addPlaceToItinerary = async () => {},
     setIsAIGeneratorOpen,
     openAIGeneratorWithItem,
     currentUser,
     itineraries = [],
-    setItineraries = () => {},
     savedPlaces = [],
     toggleSavePlace = () => {},
     isPlaceSaved = () => false
@@ -118,6 +119,9 @@ export const ExplorePage = () => {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  // 7.1 Thời tiết THẬT cho các card đang hiển thị (Open-Meteo, 1 request batch)
+  const [weatherByPoint, setWeatherByPoint] = useState({});
 
   // 8. Modals
   const [isAddToTripModalOpen, setIsAddToTripModalOpen] = useState(false);
@@ -271,7 +275,6 @@ export const ExplorePage = () => {
       return;
     }
     setIsLocating(true);
-    toast.info('Đang bật radar định vị GPS quanh bạn... 🛰️');
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setUserCoords({
@@ -280,7 +283,6 @@ export const ExplorePage = () => {
         });
         setIsLocating(false);
         setSortBy('nearest');
-        toast.success('Đã xác định vị trí! Tự động sắp xếp các điểm gần bạn nhất 📍');
       },
       (err) => {
         setIsLocating(false);
@@ -318,22 +320,10 @@ export const ExplorePage = () => {
   }, []);
 
   // Toggle Save Wishlist (persists into localStorage & syncs across app)
+  // Icon tim tự cập nhật ngay trên card -> không cần toast
   const handleToggleSave = (item, e) => {
     e?.stopPropagation();
-    const isSavedNow = toggleSavePlace(item);
-    if (isSavedNow) {
-      toast.success(
-        <div>
-          <p className="font-bold">Đã lưu "{item.name}"! ❤️</p>
-          <p className="text-[11px] text-slate-200 font-normal mt-0.5">
-            Xem tại tab <b>"Địa điểm đã lưu"</b> hoặc trong Trang cá nhân.
-          </p>
-        </div>,
-        { duration: 4000 }
-      );
-    } else {
-      toast.info(`Đã gỡ "${item.name}" khỏi danh sách yêu thích.`);
-    }
+    toggleSavePlace(item);
   };
 
   // Copy GPS
@@ -370,7 +360,6 @@ export const ExplorePage = () => {
     } else {
       setIsAIGeneratorOpen(true);
     }
-    toast.success(`Đã kết nối AI Travel Planner với "${item.name}"! ✨`);
   };
 
   // Smart Transition: Explore Spots in a specific City (from Destination Card)
@@ -378,7 +367,6 @@ export const ExplorePage = () => {
     setExploreLayer('spots');
     setSearchQuery(cityName);
     setSelectedCategory('Tất cả');
-    toast.info(`Đang hiển thị các tọa độ quán xá & lưu trú tại ${cityName} 📍`);
   };
 
   // Load reviews when detailModalItem opens
@@ -423,41 +411,44 @@ export const ExplorePage = () => {
     }
   };
 
-  // Add Place to Existing Itinerary
-  const handleAddToTrip = (itin) => {
+  // Add Place to Existing Itinerary — GHI VÀO DB THẬT (POST /itineraries/{id}/details)
+  const handleAddToTrip = async (itin) => {
     const targetItem = detailModalItem || activeItem;
     if (!itin || !targetItem) return;
-    const newActivity = {
-      time: '14:30 – 16:30',
-      category: targetItem.category || 'Điểm tham quan',
-      title: targetItem.name,
-      location: targetItem.name,
-      address: targetItem.address || `${targetItem.city}, Việt Nam`,
-      note: targetItem.tagline || targetItem.description || 'Được thêm từ trang Khám phá.',
-      cost: targetItem.priceEstimate || 'Miễn phí',
-      image: targetItem.image
+
+    // Cần đăng nhập — lịch trình chỉnh sửa thuốc bài chạy qua server
+    if (!currentUser?.email || /^itin-|^-/.test(String(itin.id))) {
+      toast.info('Vui lòng đăng nhập bằng tài khoản có lịch trình trên hệ thống để thêm điểm dừng nhé!');
+      setIsAddToTripModalOpen(false);
+      return;
+    }
+
+    const dayNumber = Number(itin.daysCount) || 1;
+    // visitOrder = số điểm dừng đã có của ngày đó + 1
+    const currentDayActivities = (itin.days || []).find(d => d.dayNumber === dayNumber)?.activities || [];
+    const visitOrder = currentDayActivities.length + 1;
+    const cost = Number(targetItem.ticketPrice) || null;
+
+    const detail = {
+      placeId: Number(targetItem.rawId) || null,
+      locationName: targetItem.name,
+      locationAddress: targetItem.address || `${targetItem.city}, Việt Nam`,
+      category: targetItem.category || 'Khám phá',
+      dayNumber,
+      visitOrder,
+      startTime: '09:00:00',
+      estimatedCost: cost,
+      note: (targetItem.tagline || targetItem.description || '').slice(0, 500)
     };
 
-    const updatedDays = (itin.days || []).map((day, idx) => {
-      if (idx === 0) {
-        return {
-          ...day,
-          activities: [...(day.activities || []), newActivity]
-        };
-      }
-      return day;
-    });
-
-    const updatedItin = {
-      ...itin,
-      days: updatedDays,
-      placesCount: (itin.placesCount || 0) + 1,
-      placesList: [...(itin.placesList || []), targetItem.name]
-    };
-
-    setItineraries(prev => prev.map(item => item.id === itin.id ? updatedItin : item));
-    toast.success(`Đã thêm "${targetItem.name}" vào lịch trình "${itin.title}"! 🚀`);
-    setIsAddToTripModalOpen(false);
+    try {
+      await addPlaceToItinerary(itin.id, detail, currentUser.email);
+      toast.success(`Đã thêm "${targetItem.name}" vào lịch trình "${itin.title}"! 🚀`);
+    } catch (err) {
+      toast.error('Lỗi khi thêm vào lịch trình: ' + err.message);
+    } finally {
+      setIsAddToTripModalOpen(false);
+    }
   };
 
   // Submit New Place Form (100% Pending Approval Moderation)
@@ -636,6 +627,23 @@ export const ExplorePage = () => {
     return filteredItems.slice(start, start + itemsPerPage);
   }, [filteredItems, currentPage, itemsPerPage]);
 
+  // Thời tiết THẬT theo toạ độ GPS cho các card trên trang hiện tại
+  // (open-meteo nhận list toạ độ -> chỉ 1 HTTP request cho cả trang)
+  useEffect(() => {
+    if (exploreLayer !== 'spots') return;
+    const points = paginatedItems
+      .filter(it => it.isLocalSpot && it.latitude && it.longitude)
+      .map(it => ({ lat: it.latitude, lng: it.longitude }));
+    if (!points.length) return;
+    let alive = true;
+    fetchLiveWeatherBatch(points).then(res => {
+      if (alive && res && Object.keys(res).length) {
+        setWeatherByPoint(prev => ({ ...prev, ...res }));
+      }
+    });
+    return () => { alive = false; };
+  }, [paginatedItems, exploreLayer]);
+
   const generatePageNumbers = (current, total) => {
     if (total <= 7) {
       return Array.from({ length: total }, (_, i) => i + 1);
@@ -743,14 +751,12 @@ export const ExplorePage = () => {
     setSelectedRegion('Tất cả');
     setSelectedBudget('all');
     setSortBy('popular');
-    toast.info('Đã đặt lại tất cả bộ lọc');
   };
 
   // Quick City & Weather Filter
   const handleQuickFilterCity = (cityName) => {
     setSearchQuery(cityName);
     setSelectedCategory('Tất cả');
-    toast.info(`Đang hiển thị điểm đến & thời tiết tại ${cityName} 🌤️`);
   };
 
   return (
@@ -871,6 +877,7 @@ export const ExplorePage = () => {
                           item={item}
                           isActive={activeItem?.id === item.id}
                           isSaved={isPlaceSaved(item.id)}
+                          liveWeather={weatherByPoint[`${Number(item.latitude).toFixed(2)},${Number(item.longitude).toFixed(2)}`]}
                           onSelect={setActiveItem}
                           onToggleSave={handleToggleSave}
                           onOpenDetail={setDetailModalItem}
@@ -937,6 +944,7 @@ export const ExplorePage = () => {
                         item={item}
                         isActive={activeItem?.id === item.id}
                         isSaved={isPlaceSaved(item.id)}
+                        liveWeather={weatherByPoint[`${Number(item.latitude).toFixed(2)},${Number(item.longitude).toFixed(2)}`]}
                         onSelect={setActiveItem}
                         onToggleSave={handleToggleSave}
                         onOpenDetail={setDetailModalItem}

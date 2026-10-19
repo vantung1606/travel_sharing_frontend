@@ -1,6 +1,5 @@
 import React from 'react';
 import { Star, MapPin, Navigation, Heart, Plus, Compass } from 'lucide-react';
-import { getEstimatedWeatherByCity } from '../../../../utils/weatherUtils';
 import { pickFallbackImage, SHARED_PLACEHOLDER_IMAGE } from '../../../../utils/placeImages';
 
 // Ảnh lỗi (404 do sai mã hoá '%') tự đổi sang ảnh thật dự phòng từ kho Wayfare
@@ -30,12 +29,15 @@ export const ExploreSpotCard = ({
   item,
   isActive = false,
   isSaved = false,
+  liveWeather = null,
   onSelect = () => {},
   onToggleSave = () => {},
   onOpenDetail = () => {},
   onAddToTrip = () => {}
 }) => {
-  const weather = getEstimatedWeatherByCity(item.city || item.name);
+  // Thời tiết THẬT theo toạ độ GPS (prop từ ExplorePage, batch Open-Meteo).
+  // Không có dữ liệu thật -> KHÔNG hiện chip (tuyệt đối không ước lượng).
+  const weather = liveWeather;
   const priceInfo = formatShortPrice(item.priceEstimate || item.priceRange);
 
   return (
@@ -76,13 +78,15 @@ export const ExploreSpotCard = ({
           </button>
         </div>
 
-        {/* Bottom Badges on Image: Weather Vibe + GPS */}
+        {/* Bottom Badges on Image: Real Weather + GPS (chỉ hiện khi có dữ liệu thật) */}
         <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white pointer-events-none">
-          {/* Weather Tag */}
-          <span className="px-2 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[9px] sm:text-[10px] font-semibold text-sky-200 flex items-center gap-1 border border-sky-400/25 shadow-xs">
-            <span>{weather.icon}</span>
-            <span>{weather.temp}°C • {weather.label}</span>
-          </span>
+          {/* Weather Tag — từ Open-Meteo theo toạ độ GPS của địa điểm */}
+          {weather && (
+            <span className="px-2 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[9px] sm:text-[10px] font-semibold text-sky-200 flex items-center gap-1 border border-sky-400/25 shadow-xs">
+              <span>{weather.icon}</span>
+              <span>{weather.temp}°C • {weather.label}</span>
+            </span>
+          )}
 
           {/* GPS Distance (if radar active) */}
           {item.distanceKm && (

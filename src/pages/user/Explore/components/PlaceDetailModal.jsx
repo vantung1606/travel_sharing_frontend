@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Star, Phone, CheckCircle2, ExternalLink, Copy, Calendar, Sparkles, Send, MapPin, CloudSun, Wind, Droplets, Compass } from 'lucide-react';
 import { RealMapView } from '../../../../components/map/RealMapView';
-import { fetchLiveWeather, getEstimatedWeatherByCity } from '../../../../utils/weatherUtils';
+import { fetchLiveWeather } from '../../../../utils/weatherUtils';
 import { pickFallbackImage, SHARED_PLACEHOLDER_IMAGE } from '../../../../utils/placeImages';
 
 // Ảnh lỗi (404 do sai mã hoá '%') tự đổi sang ảnh thật dự phòng từ kho Wayfare
@@ -33,29 +33,33 @@ export const PlaceDetailModal = ({
 }) => {
   const [liveWeather, setLiveWeather] = useState(null);
   const [isWeatherLoading, setIsWeatherLoading] = useState(false);
+  const [weatherUnavailable, setWeatherUnavailable] = useState(false);
 
-  // Tự động kéo thời tiết thực tế từ Open-Meteo theo tọa độ GPS của địa điểm
+  // Tự động kéo thời tiết thực tế từ Open-Meteo theo tọa độ GPS của địa điểm.
+  // Không toạ độ / API lỗi -> báo thẳng người dùng, KHÔNG ước lượng theo tên thành phố.
   useEffect(() => {
     if (!item) return;
     const lat = item.latitude || item.coordinates?.lat;
     const lng = item.longitude || item.coordinates?.lng;
 
+    setWeatherUnavailable(false);
+    setLiveWeather(null);
+
     if (lat && lng) {
+      const key = `${Number(lat).toFixed(2)},${Number(lng).toFixed(2)}`;
       setIsWeatherLoading(true);
       fetchLiveWeather(lat, lng)
         .then((data) => {
           if (data) {
             setLiveWeather(data);
           } else {
-            setLiveWeather(getEstimatedWeatherByCity(item.city || item.name));
+            setWeatherUnavailable(true);
           }
         })
-        .catch(() => {
-          setLiveWeather(getEstimatedWeatherByCity(item.city || item.name));
-        })
+        .catch(() => setWeatherUnavailable(true))
         .finally(() => setIsWeatherLoading(false));
     } else {
-      setLiveWeather(getEstimatedWeatherByCity(item.city || item.name));
+      setWeatherUnavailable(true);
     }
   }, [item]);
 
@@ -137,7 +141,6 @@ export const PlaceDetailModal = ({
                       <p className="text-[11px] text-slate-600 font-medium">{liveWeather.vibe}</p>
                     </div>
                   </div>
-
                   <div className="space-y-1 text-right text-[11px] text-slate-500 font-medium">
                     <div className="flex items-center justify-end gap-1">
                       <Droplets className="w-3 h-3 text-sky-500" />
@@ -150,6 +153,10 @@ export const PlaceDetailModal = ({
                       </div>
                     )}
                   </div>
+                </div>
+              ) : weatherUnavailable ? (
+                <div className="py-2 text-slate-500 text-center text-[11px]">
+                  📍 Địa điểm chưa có toạ độ GPS nên không kiểm tra được thời tiết thực tế
                 </div>
               ) : (
                 <div className="py-2 text-slate-400 text-center">Đang kiểm tra dữ liệu thời tiết...</div>

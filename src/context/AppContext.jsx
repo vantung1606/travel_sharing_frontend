@@ -761,6 +761,19 @@ export const AppProvider = ({ children }) => {
     return itineraryObj;
   };
 
+  // Thêm 1 điểm dừng chân vào lịch trình có sẵn (API thật: POST /itineraries/{id}/details)
+  // rồi đồng bộ lại state từ server để mọi trang đều nhìn thấy.
+  const addPlaceToItinerary = async (itineraryId, detail, email) => {
+    const activeEmail = email || currentUser?.email || '';
+    if (!activeEmail) {
+      throw new Error('Vui lòng đăng nhập để lưu điểm dừng vào lịch trình!');
+    }
+    const created = await itineraryApi.addItineraryDetail(itineraryId, detail, activeEmail);
+    // Nạp lại từ server (nguồn sự thật) để placesCount/placesList/days chuẩn
+    await fetchItineraries(activeEmail);
+    return created;
+  };
+
   const deleteItineraryFromBackend = async (id, email) => {
     try {
       const activeEmail = email || currentUser?.email || '';
@@ -985,6 +998,7 @@ export const AppProvider = ({ children }) => {
         fetchNotifications,
         fetchItineraries,
         saveItineraryToBackend,
+        addPlaceToItinerary,
         deleteItineraryFromBackend,
         createManualItinerary,
         savedPlaces,

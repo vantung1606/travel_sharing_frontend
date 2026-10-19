@@ -1,5 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Compass, Navigation, PlusCircle, CloudSun } from 'lucide-react';
+import { fetchLiveWeatherBatch } from '../../../../utils/weatherUtils';
+
+// Tọa độ TRUNG TÂM các thành phố (địa lý cố định — không phải dữ liệu ảo)
+const WEATHER_STATIONS = [
+  { city: 'Đà Lạt', lat: 11.94, lng: 108.44 },
+  { city: 'Sa Pa', lat: 22.34, lng: 103.84 },
+  { city: 'Phú Quốc', lat: 10.29, lng: 103.96 },
+  { city: 'Đà Nẵng', lat: 16.05, lng: 108.2 },
+  { city: 'Hà Giang', lat: 22.82, lng: 104.98 },
+  { city: 'Ninh Bình', lat: 20.25, lng: 105.97 }
+];
 
 export const ExploreHeader = ({
   placesCount = 0,
@@ -11,15 +22,22 @@ export const ExploreHeader = ({
   onOpenAIGenerator = () => {},
   onQuickFilterCity = () => {}
 }) => {
-  // Trạm thời tiết du lịch nhanh của các vùng đất tiêu biểu
-  const weatherTickers = [
-    { city: 'Đà Lạt', temp: '18°C', icon: '🌫️', status: 'Se lạnh săn mây' },
-    { city: 'Sa Pa', temp: '16°C', icon: '⛅', status: 'Sương mù mây ngàn' },
-    { city: 'Phú Quốc', temp: '29°C', icon: '☀️', status: 'Nắng ấm biển êm' },
-    { city: 'Đà Nẵng', temp: '26°C', icon: '🌤️', status: 'Gió biển dễ chịu' },
-    { city: 'Hà Giang', temp: '21°C', icon: '🌾', status: 'Mát mẻ view đèo' },
-    { city: 'Ninh Bình', temp: '23°C', icon: '🛶', status: 'Non nước thanh bình' }
-  ];
+  // Trạm thời tiết DU LỊCH THẬT (Open-Meteo, 1 request batch cho cả 6 trạm)
+  const [stations, setStations] = useState(() =>
+    WEATHER_STATIONS.map(s => ({ ...s, temp: null, label: null, icon: null }))
+  );
+
+  useEffect(() => {
+    let alive = true;
+    fetchLiveWeatherBatch(WEATHER_STATIONS).then((res) => {
+      if (!alive) return;
+      setStations(s => s.map(st => {
+        const r = res[`${st.lat.toFixed(2)},${st.lng.toFixed(2)}`];
+        return r ? { ...st, temp: `${r.temp}°C`, label: r.label, icon: r.icon } : st;
+      }));
+    });
+    return () => { alive = false; };
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -94,16 +112,23 @@ export const ExploreHeader = ({
           <CloudSun className="w-3.5 h-3.5 text-sky-500 shrink-0" />
           <span className="hidden sm:inline">Thời tiết:</span>
         </span>
-        {weatherTickers.map((station) => (
+        {stations.map((station) => (
           <button
             key={station.city}
             onClick={() => onQuickFilterCity(station.city)}
+            disabled={!station.temp}
             className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg sm:rounded-xl bg-white hover:bg-sky-50 border border-slate-200/80 hover:border-sky-300 shadow-2xs text-[11px] sm:text-xs font-semibold flex items-center gap-1 shrink-0 transition-all cursor-pointer group"
           >
-            <span className="text-xs sm:text-sm select-none">{station.icon}</span>
+            <span className="text-xs sm:text-sm select-none">{station.icon || '☁️'}</span>
             <span className="font-bold text-slate-700 group-hover:text-sky-600 transition-colors">{station.city}</span>
-            <span className="font-extrabold text-sky-700 text-[11px] sm:text-xs">{station.temp}</span>
-            <span className="text-[10px] text-slate-400 hidden lg:inline">• {station.status}</span>
+            {station.temp ? (
+              <span className="font-extrabold text-sky-700 text-[11px] sm:text-xs">{station.temp}</span>
+            ) : (
+              <span className="text-[10px] text-slate-400 animate-pulse">...</span>
+            )}
+            {station.label && (
+              <span className="text-[10px] text-slate-400 hidden lg:inline">• {station.label}</span>
+            )}
           </button>
         ))}
       </div>
