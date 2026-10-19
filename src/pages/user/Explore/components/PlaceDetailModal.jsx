@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { X, Star, Phone, CheckCircle2, ExternalLink, Copy, Calendar, Sparkles, Send, MapPin, CloudSun, Wind, Droplets, Compass } from 'lucide-react';
 import { RealMapView } from '../../../../components/map/RealMapView';
 import { fetchLiveWeather } from '../../../../utils/weatherUtils';
@@ -278,6 +279,34 @@ export const PlaceDetailModal = ({
                   </button>
                 </div>
               </form>
+
+              {/* Danh sách đánh giá THẬT từ GET /places/{id}/reviews */}
+              {reviews.length > 0 ? (
+                <div className="space-y-2.5 pt-1">
+                  {reviews.slice(0, 10).map((r) => (
+                    <div key={r.id || r.authorHandle} className="flex gap-2.5 items-start">
+                      <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-black text-slate-500">
+                        {r.authorAvatar ? (
+                          <img src={r.authorAvatar} alt={r.authorName} className="w-full h-full object-cover" />
+                        ) : (
+                          (r.authorName || 'W')[0]
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[11px] font-bold text-slate-800">{r.authorName || 'Du khách'}</span>
+                          <span className="text-[10px] font-bold text-amber-600">{'★'.repeat(r.rating || 0)}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-600 leading-relaxed">{r.comment}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                (item.rating && item.reviewsCount > 0) ? null : (
+                  <p className="text-[11px] text-slate-400 font-medium">Chưa có đánh giá nào — hãy là người đầu tiên chia sẻ trải nghiệm nhé!</p>
+                )
+              )}
             </div>
 
           </div>
@@ -341,6 +370,14 @@ export const PlaceDetailModal = ({
                 <Sparkles className="w-3.5 h-3.5 text-amber-200" />
                 <span>Lập Tour AI Với Điểm Này</span>
               </button>
+
+              <Link
+                to={`/places/${item.rawId}`}
+                className="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-sky-300" />
+                <span>Xem Trang Chi Tiết Để Chia Sẻ</span>
+              </Link>
             </div>
           </div>
 

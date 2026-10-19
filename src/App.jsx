@@ -16,6 +16,7 @@ import { PageTitleManager, AdminRouteGuard, UserAuthGuard } from './components/c
 // User Pages - lazy loaded để tách bundle theo route (giảm thời gian tải trang đầu)
 const HomePage = lazy(() => import('./pages/user/Home/HomePage').then(m => ({ default: m.HomePage })));
 const ExplorePage = lazy(() => import('./pages/user/Explore/ExplorePage').then(m => ({ default: m.ExplorePage })));
+const PlaceDetailPage = lazy(() => import('./pages/user/Explore/PlaceDetailPage'));
 const CommunityPage = lazy(() => import('./pages/user/Community/CommunityPage').then(m => ({ default: m.CommunityPage })));
 const ItineraryManagerPage = lazy(() => import('./pages/user/Itineraries/ItineraryManagerPage').then(m => ({ default: m.ItineraryManagerPage })));
 const MessagesPage = lazy(() => import('./pages/user/Messages/MessagesPage').then(m => ({ default: m.MessagesPage })));
@@ -104,6 +105,7 @@ const AppContent = () => {
               <Route path="/" element={<HomePage />} />
               <Route path="/home" element={<Navigate to="/" replace />} />
               <Route path="/explore" element={<ExplorePage />} />
+              <Route path="/places/:placeId" element={<PlaceDetailPage />} />
               <Route path="/community" element={<CommunityPage />} />
               <Route path="/ai-planner" element={<Navigate to="/itineraries" replace />} />
               

@@ -30,7 +30,9 @@ export const PageTitleManager = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const currentTitle = PAGE_TITLES[location.pathname] || 'Wayfare - Authentic Travel Stories';
+    const currentTitle = PAGE_TITLES[location.pathname]
+      || (location.pathname.startsWith('/places/') ? 'Wayfare - Địa điểm du lịch chi tiết & Chia sẻ Check-in' : null)
+      || 'Wayfare - Authentic Travel Stories';
     document.title = currentTitle;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location.pathname]);
