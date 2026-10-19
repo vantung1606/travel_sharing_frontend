@@ -1,0 +1,321 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import {
+  Star, MapPin, Copy, ExternalLink, Calendar, ArrowLeft, CheckCircle2, Phone,
+} from 'lucide-react';
+import { placeApi, reviewApi } from '../../../services/api';
+import { useApp } from '../../../context/AppContext';
+import { useToast } from '../../../components/common/Toast';
+import { RealMapView } from '../../../components/map/RealMapView';
+import { fetchLiveWeather } from '../../../utils/weatherUtils';
+import { resolvePlaceImage, pickFallbackImage, SHARED_PLACEHOLDER_IMAGE } from '../../../utils/placeImages';
+
+// Map API place (tên trường CSDL) sang item card — đối chiếu 1:1 với ExplorePage.unifiedItems
+const mapApiPlace = (p) => ({
+  id: `spot-${p.id}`,
+  rawId: p.id,
+  isLocalSpot: true,
+  name: p.name,
+  category: p.categoryName || 'Tọa độ bản địa',
+  city: p.city || 'Việt Nam',
+  address: p.address,
+  image: resolvePlaceImage(p),
+  latitude: p.latitude,
+  longitude: p.longitude,
+  rating: p.averageRating ? Number(p.averageRating).toFixed(1) : null,
+  reviewsCount: p.reviewCount || 0,
+  phoneNumber: p.phoneNumber,
+  openHours: p.openHours || null,
+  priceEstimate: p.priceRange || (p.ticketPrice ? `${Number(p.ticketPrice).toLocaleString()}đ` : 'Miễn phí'),
+  ticketPrice: p.ticketPrice,
+  amenities: p.amenities ? p.amenities.split(',').map(s => s.trim()) : [],
+  isVerifiedHost: p.isVerifiedHost,
+  ownerName: p.ownerName,
+  ownerHandle: p.ownerHandle,
+  ownerAvatar: p.ownerAvatar,
+  tagline: p.description,
+  description: p.description
+});
+
+export const PlaceDetailPage = () => {
+  const { placeId } = useParams();
+  const navigate = useNavigate();
+  const { currentUser } = useApp();
+  const toast = useToast();
+
+  const [place, setPlace] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState([]);
+  const [liveWeather, setLiveWeather] = useState(null);
+  const [isWeatherLoading, setIsWeatherLoading] = useState(false);
+  const [weatherUnavailable, setWeatherUnavailable] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    setLoading(true);
+    placeApi.getPlaceById(placeId).then((p) => {
+      if (!alive) return;
+      setPlace(p ? mapApiPlace(p) : null);
+      setLoading(false);
+    }).catch(() => {
+      if (alive) { setPlace(null); setLoading(false); }
+    });
+    reviewApi.getReviews(placeId).then(list => {
+      if (alive) setReviews(list || []);
+    }).catch(() => {});
+    return () => { alive = false; };
+  }, [placeId]);
+
+  // Thời tiết THẬT theo tọa độ (Open-Meteo) — như modal chi tiết
+  useEffect(() => {
+    if (!place?.latitude || !place?.longitude) { setWeatherUnavailable(true); return; }
+    setWeatherUnavailable(false);
+    setIsWeatherLoading(true);
+    fetchLiveWeather(place.latitude, place.longitude)
+      .then(data => {
+        if (data) setLiveWeather(data); else setWeatherUnavailable(true);
+      })
+      .catch(() => setWeatherUnavailable(true))
+      .finally(() => setIsWeatherLoading(false));
+  }, [place?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleCopyGPS = () => {
+    if (!place?.latitude || !place?.longitude) return;
+    const text = `${place.latitude}, ${place.longitude}`;
+    navigator.clipboard.writeText(text);
+    toast.success(`Đã sao chép GPS "${place.name}": ${text}`);
+  };
+
+  const handleShareLink = () => {
+    const url = `${window.location.origin}/places/${place.rawId}`;
+    navigator.clipboard.writeText(url);
+    toast.success(<div><p className="font-bold">Đã sao chép link chia sẻ!</p><p className="text-[11px] text-slate-200 font-normal mt-0.5">{url}</p></div>);
+  };
+
+  const handleImageError = (e) => {
+    const img = e.currentTarget;
+    const fallback = pickFallbackImage(place?.rawId ?? 0);
+    if (img.src !== fallback) img.src = fallback;
+    else img.src = SHARED_PLACEHOLDER_IMAGE;
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-slate-500 font-semibold animate-pulse">Đang tải địa điểm...</div>
+      </div>
+    );
+  }
+
+  if (!place) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-3 text-center px-4">
+        <MapPin className="w-12 h-12 text-slate-300" />
+        <h2 className="font-bold text-slate-900">Không tìm thấy địa điểm #{placeId}</h2>
+        <Link to="/explore" className="text-sky-600 font-bold hover:underline">← Về trang Khám phá</Link>
+      </div>
+    );
+  }
+
+  const mapUrl = place.latitude && place.longitude
+    ? `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.city)}`;
+
+  return (
+    <div className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+      {/* Breadcrumb + Back */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+          <Link to="/" className="hover:text-sky-600 transition-colors flex items-center gap-1 text-slate-500">
+            <ArrowLeft className="w-3.5 h-3.5" /> Trang chủ
+          </Link>
+          <span>/</span>
+          <Link to="/explore" className="hover:text-sky-600 transition-colors text-slate-500">Khám phá</Link>
+          <span>/</span>
+          <span className="text-slate-800 font-bold truncate max-w-[220px]">{place.name}</span>
+        </div>
+        <button
+          onClick={handleShareLink}
+          className="px-3.5 py-1.5 rounded-xl bg-sky-50 border border-sky-200 text-sky-700 text-xs font-bold flex items-center gap-1.5 hover:bg-sky-100 transition cursor-pointer shadow-2xs"
+        >
+          <ExternalLink className="w-3.5 h-3.5" /> Chia sẻ link
+        </button>
+      </div>
+
+      {/* Hero */}
+      <div className="relative h-56 sm:h-80 rounded-3xl overflow-hidden border border-slate-200 shadow-sm bg-slate-900">
+        <img src={place.image} alt={place.name} onError={handleImageError} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
+        <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-end justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap mb-1">
+              <span className="px-2.5 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[10px] font-bold text-white border border-white/15">{place.category}</span>
+              {place.isVerifiedHost && (
+                <span className="px-2 py-0.5 rounded-full bg-sky-500 text-[10px] font-bold text-white flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" /> Đã xác thực
+                </span>
+              )}
+              <span className="text-[11px] font-bold text-sky-200 flex items-center gap-1">
+                <MapPin className="w-3 h-3" /> {place.city}
+              </span>
+            </div>
+            <h1 className="font-display text-2xl sm:text-3xl font-black text-white truncate">{place.name}</h1>
+          </div>
+          {place.rating && place.reviewsCount > 0 ? (
+            <div className="flex items-center gap-1.5 bg-amber-50/95 backdrop-blur px-3 py-1.5 rounded-xl border border-amber-200 shrink-0">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span className="font-black text-amber-700 text-sm">{place.rating}</span>
+              <span className="text-[11px] text-slate-500 font-semibold">({place.reviewsCount} đánh giá)</span>
+            </div>
+          ) : (
+            <span className="text-[11px] text-white/80 font-semibold bg-slate-950/60 px-3 py-1.5 rounded-xl border border-white/10">Mới · chưa có đánh giá</span>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left column */}
+        <div className="lg:col-span-7 space-y-5">
+          {/* Quick specs */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+            <div>
+              <span className="block text-[10px] text-slate-400 font-semibold">Giờ mở cửa</span>
+              <span className="font-bold text-slate-800 text-xs">{place.openHours || 'Chưa cập nhật'}</span>
+            </div>
+            <div>
+              <span className="block text-[10px] text-slate-400 font-semibold">Chi phí dự kiến</span>
+              <span className="font-bold text-sky-700 text-xs">{place.priceEstimate || 'Miễn phí'}</span>
+            </div>
+            <div>
+              <span className="block text-[10px] text-slate-400 font-semibold">GPS</span>
+              <span className="font-bold text-slate-800 text-xs">
+                {place.latitude && place.longitude ? `${place.latitude}, ${place.longitude}` : 'Chưa cập nhật'}
+              </span>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="space-y-1.5">
+            <h4 className="font-bold text-sm text-slate-900">Giới thiệu & Điểm đặc sắc</h4>
+            <p className="text-slate-600 leading-relaxed text-xs">{place.description || 'Chưa có mô tả chi tiết.'}</p>
+            {place.address && <p className="text-slate-500 italic text-[11px] pt-1">📍 Địa chỉ: {place.address}</p>}
+            {place.phoneNumber && (
+              <p className="text-slate-500 text-[11px] flex items-center gap-1">
+                <Phone className="w-3 h-3" /> {place.phoneNumber}
+              </p>
+            )}
+            {(place.ownerName || place.isVerifiedHost) && (
+              <div className="flex items-center gap-2 pt-2">
+                <span className="w-7 h-7 rounded-full bg-sky-100 border border-sky-200 flex items-center justify-center font-black text-sky-700 text-[11px] shrink-0 overflow-hidden">
+                  {place.ownerAvatar ? (
+                    <img src={place.ownerAvatar} alt={place.ownerName} className="w-full h-full object-cover" />
+                  ) : (
+                    (place.ownerName || place.city || 'W')[0]
+                  )}
+                </span>
+                <span className="text-[11px] text-slate-500 min-w-0">
+                  Được chia sẻ bởi{' '}
+                  <strong className="text-slate-800 font-bold">
+                    {place.ownerName || 'cộng đồng Wayfare'}
+                    {place.ownerHandle ? ` (@${place.ownerHandle})` : ''}
+                  </strong>
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Amenities */}
+          {place.amenities.length > 0 && (
+            <div className="space-y-1.5">
+              <h4 className="font-bold text-xs text-slate-800">Trải nghiệm & Điểm nổi bật</h4>
+              <div className="flex flex-wrap gap-1.5">
+                {place.amenities.map((a, i) => (
+                  <span key={i} className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-medium text-[11px]">✓ {a}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Reviews — THẬT từ bảng reviews (GET /places/{id}/reviews) */}
+          {reviews.length > 0 ? (
+            <div className="space-y-2.5 pt-2 border-t border-slate-100">
+              <h4 className="font-bold text-xs text-slate-900">Đánh giá từ du khách ({reviews.length})</h4>
+              {reviews.slice(0, 10).map((r) => (
+                <div key={r.id || r.authorHandle} className="flex gap-2.5 items-start">
+                  <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-black text-slate-500">
+                    {r.authorAvatar ? (
+                      <img src={r.authorAvatar} alt={r.authorName} className="w-full h-full object-cover" />
+                    ) : (
+                      (r.authorName || 'W')[0]
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-[11px] font-bold text-slate-800">{r.authorName || 'Du khách'}</span>
+                      <span className="text-[10px] font-bold text-amber-600">{'★'.repeat(r.rating || 0)}</span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 leading-relaxed">{r.comment}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-400 font-semibold">Mới · chưa có đánh giá nào từ du khách</div>
+          )}
+        </div>
+
+        {/* Right column: weather + map + actions */}
+        <div className="lg:col-span-5 space-y-4">
+          {/* Weather card — chỉ JSON Open-Meteo thật */}
+          <div className="p-4 rounded-2xl border border-sky-100 bg-sky-50/70 space-y-1">
+            <h3 className="font-display font-bold text-sm text-sky-900">Thời tiết điều hành</h3>
+            {liveWeather ? (
+              <div className="flex items-center gap-3">
+                <span className="text-3xl select-none">{liveWeather.icon}</span>
+                <div>
+                  <div className="text-xl font-extrabold text-slate-900">
+                    {liveWeather.temp}°C <span className="text-xs font-semibold text-slate-500">({liveWeather.label})</span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 font-medium">{liveWeather.vibe}</p>
+                </div>
+              </div>
+            ) : weatherUnavailable ? (
+              <div className="py-2 text-slate-500 text-center text-[11px]">📍 Địa điểm chưa có tọa độ GPS nên không kiểm tra được thời tiết thực tế</div>
+            ) : (
+              <div className="py-2 text-slate-400 text-center">Đang kiểm tra dữ liệu thời tiết...</div>
+            )}
+          </div>
+
+          {/* Map card */}
+          <div className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm h-[300px]">
+            <RealMapView
+              items={[place]}
+              activeItem={place}
+              className="w-full h-full"
+            />
+          </div>
+
+          {/* Action buttons */}
+          <div className="space-y-2">
+            <a href={mapUrl} target="_blank" rel="noreferrer" className="w-full flex items-center justify-center gap-2 bg-sky-50 border border-sky-200 rounded-xl h-11 font-bold text-sky-700 text-xs hover:bg-sky-100 transition">
+              <MapPin className="w-4 h-4" /> Xem Google Maps
+            </a>
+            {place.latitude && place.longitude && (
+              <button onClick={handleCopyGPS} className="w-full flex items-center justify-center gap-2 bg-slate-50 border border-slate-200 rounded-xl h-11 font-bold text-slate-600 text-xs hover:bg-slate-100 transition cursor-pointer">
+                <Copy className="w-4 h-4" /> Copy GPS
+              </button>
+            )}
+            <button
+              onClick={() => navigate('/explore')}
+              className="w-full flex items-center justify-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl h-11 font-bold text-emerald-700 text-xs hover:bg-emerald-100 transition cursor-pointer"
+            >
+              <Calendar className="w-4 h-4" /> Khám phá thêm tại đây
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PlaceDetailPage;
