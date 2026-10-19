@@ -282,6 +282,29 @@ export const itineraryApi = {
     return res.data;
   },
 
+  /**
+   * Thêm một điểm dừng chân vào lịch trình có sẵn (đúng hợp đồng backend /
+   * đối ứng mobile: POST /itineraries/{id}/details). Trả về ItineraryDetailItem.
+   */
+  async addItineraryDetail(id, detail, email) {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user?.email || '';
+    const response = await fetch(`${BASE_URL}/itineraries/${id}/details?email=${encodeURIComponent(userEmail)}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(detail)
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    const res = await response.json();
+    return res.data;
+  },
+
   async deleteItinerary(id, email) {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
     const userEmail = email || user?.email || '';

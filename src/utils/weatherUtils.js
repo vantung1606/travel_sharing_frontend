@@ -19,6 +19,7 @@ export const parseWeatherCode = (code) => {
 
 // Gợi ý thời tiết theo địa danh / vùng miền nếu chưa có tọa độ GPS
 export const getEstimatedWeatherByCity = (cityName = '') => {
+  // (giữ lại cho các trang cũ chưa sửa — trang Khám phá đã thay hết bằng thời tiết THẬT)
   const c = String(cityName).toLowerCase();
   if (c.includes('đà lạt') || c.includes('lâm đồng') || c.includes('măng đen')) {
     return { temp: 18, label: 'Se lạnh, sương mai', icon: '🌫️', humidity: 85, vibe: 'Lý tưởng săn mây & thưởng trà' };
@@ -76,4 +77,63 @@ export const fetchLiveWeather = async (lat, lng) => {
     console.warn('Could not fetch Open-Meteo weather:', err);
     return null;
   }
+};
+
+/**
+ * Lấy thời tiết THẬT cho NHIỀU điểm trong MỘT request.
+ * Open-Meteo hỗ trợ list tọa độ: ?latitude=a,b,c&longitude=x,y,z -> trả về mảng
+ * kết quả đúng theo thứ tự đầu vào. Trả về { "lat,lng": result }.
+ */
+export const fetchLiveWeatherBatch = async (points = []) => {
+  const clean = (points || [])
+    .filter(p => p && p.lat != null && p.lng != null)
+    .map(p => ({
+      key: `${Number(p.lat).toFixed(2)},${Number(p.lng).toFixed(2)}`,
+      lat: Number(p.lat).toFixed(2),
+      lng: Number(p.lng).toFixed(2)
+    }));
+
+  const results = {};
+  const now = Date.now();
+  const missing = [];
+  clean.forEach(p => {
+    if (results[p.key]) return;
+    const cached = weatherCache.get(p.key);
+    if (cached && now - cached.timestamp < 15 * 60 * 1000) {
+      results[p.key] = cached.data;
+    } else {
+      missing.push(p);
+    }
+  });
+  if (!missing.length) return results;
+
+  try {
+    const lat = missing.map(m => m.lat).join(',');
+    const lng = missing.map(m => m.lng).join(',');
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,weather_code&timezone=auto`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : [data];
+
+    list.forEach((entry, i) => {
+      const cur = entry && entry.current;
+      const p = missing[i];
+      if (!cur || !p) return;
+      const parsed = parseWeatherCode(cur.weather_code);
+      const result = {
+        temp: Math.round(cur.temperature_2m),
+        humidity: cur.relative_humidity_2m,
+        label: parsed.label,
+        icon: parsed.icon,
+        vibe: parsed.vibe,
+        updatedAt: cur.time
+      };
+      weatherCache.set(p.key, { data: result, timestamp: now });
+      results[p.key] = result;
+    });
+  } catch (err) {
+    console.warn('Could not fetch batch weather:', err);
+  }
+  return results;
 };
