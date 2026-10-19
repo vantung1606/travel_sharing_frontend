@@ -190,6 +190,30 @@ export const PlaceDetailModal = ({
                   📍 Địa chỉ: {item.address}
                 </p>
               )}
+              {/* Người chia sẻ địa điểm (dữ liệu thật: ownerName/isVerifiedHost từ server) */}
+              {(item.ownerName || item.isVerifiedHost) && (
+                <div className="flex items-center gap-2 pt-2">
+                  <span className="w-7 h-7 rounded-full bg-sky-100 border border-sky-200 flex items-center justify-center font-black text-sky-700 text-[11px] shrink-0 overflow-hidden">
+                    {item.ownerAvatar ? (
+                      <img src={item.ownerAvatar} alt={item.ownerName} className="w-full h-full object-cover" />
+                    ) : (
+                      (item.ownerName || item.city || 'W')[0]
+                    )}
+                  </span>
+                  <span className="text-[11px] text-slate-500 min-w-0">
+                    Được chia sẻ bởi{' '}
+                    <strong className="text-slate-800 font-bold">
+                      {item.ownerName || 'cộng đồng Wayfare'}
+                      {item.ownerHandle ? ` (@${item.ownerHandle})` : ''}
+                    </strong>
+                    {item.isVerifiedHost && (
+                      <span className="ml-1.5 inline-flex items-center gap-0.5 text-sky-600 font-bold whitespace-nowrap">
+                        ✓ Đã xác thực
+                      </span>
+                    )}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Amenities / Specialties */}

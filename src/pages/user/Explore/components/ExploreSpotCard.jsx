@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, MapPin, Navigation, Heart, Plus, Compass } from 'lucide-react';
+import { Star, MapPin, Navigation, Heart, Plus, Compass, BadgeCheck } from 'lucide-react';
 import { pickFallbackImage, SHARED_PLACEHOLDER_IMAGE } from '../../../../utils/placeImages';
 
 // Ảnh lỗi (404 do sai mã hoá '%') tự đổi sang ảnh thật dự phòng từ kho Wayfare
@@ -59,10 +59,20 @@ export const ExploreSpotCard = ({
 
         {/* Top Badges Row */}
         <div className="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none">
-          {/* Category Pill Tag */}
-          <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[9px] sm:text-[10px] font-bold text-white shadow-xs border border-white/15 tracking-wide">
-            {item.category}
-          </span>
+          {/* Category Pill Tag + Badge xác thực (dữ liệu thật: isVerifiedHost từ server) */}
+          <div className="flex items-center gap-1 min-w-0">
+            <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[9px] sm:text-[10px] font-bold text-white shadow-xs border border-white/15 tracking-wide">
+              {item.category}
+            </span>
+            {item.isVerifiedHost && (
+              <span
+                title="Cơ sở / người đăng đã được xác thực"
+                className="w-5 sm:w-6 h-5 sm:h-6 rounded-full bg-sky-500 flex items-center justify-center shadow-xs border border-white/25 shrink-0"
+              >
+                <BadgeCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-white" />
+              </span>
+            )}
+          </div>
 
           {/* Wishlist Heart Button (pointer-events-auto) */}
           <button

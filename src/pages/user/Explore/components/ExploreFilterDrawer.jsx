@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Check, RotateCcw, SlidersHorizontal, MapPin, DollarSign, ArrowDownUp } from 'lucide-react';
+import { X, Check, RotateCcw, SlidersHorizontal, MapPin, Building2, DollarSign, ArrowDownUp } from 'lucide-react';
 
 export const ExploreFilterDrawer = ({
   isOpen = false,
@@ -7,6 +7,9 @@ export const ExploreFilterDrawer = ({
   regions = [],
   selectedRegion = 'Tất cả',
   setSelectedRegion = () => {},
+  cities = ['Tất cả'],
+  selectedCity = 'Tất cả',
+  setSelectedCity = () => {},
   sortBy = 'popular',
   setSortBy = () => {},
   selectedBudget = 'all',
@@ -52,6 +55,36 @@ export const ExploreFilterDrawer = ({
 
         {/* Drawer Body - Scrollable */}
         <div className="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+          {/* 0. Filter: City (chọn tỉnh → truy vấn trực tiếp server /places?city=) */}
+          <div className="space-y-3">
+            <label className="font-bold text-slate-900 flex items-center gap-1.5 text-sm">
+              <Building2 className="w-4 h-4 text-sky-600" />
+              <span>Tỉnh thành</span>
+            </label>
+            <div className="grid grid-cols-2 gap-2 max-h-44 overflow-y-auto pr-1">
+              {cities.map((c) => {
+                const isSelected = selectedCity === c;
+                return (
+                  <button
+                    key={c}
+                    onClick={() => setSelectedCity(c)}
+                    className={`p-2.5 rounded-xl font-bold flex items-center justify-between border transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-sky-50 text-sky-800 border-sky-300 ring-1 ring-sky-300'
+                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    <span className="truncate">{c}</span>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-sky-600 shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[10px] text-slate-400 leading-relaxed">
+              Bấm 1 tỉnh → hệ thống truy vấn thẳng server theo toạ độ bản đồ, không cần tải hết danh sách.
+            </p>
+          </div>
+
           {/* 1. Filter: Region */}
           <div className="space-y-3">
             <label className="font-bold text-slate-900 flex items-center gap-1.5 text-sm">

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { RealMapView } from '../../../components/map/RealMapView';
-import { reviewApi, itineraryApi } from '../../../services/api';
+import { reviewApi, itineraryApi, placeApi } from '../../../services/api';
 import { resolvePlaceImage, fixImageUrl, pickFallbackImage } from '../../../utils/placeImages';
 import { fetchLiveWeatherBatch } from '../../../utils/weatherUtils';
 import { Compass, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -60,7 +60,6 @@ export const ExplorePage = () => {
     hasMorePlaces = false,
     loadMorePlaces = () => {},
     loadingMorePlaces = false,
-    fetchAllPlaces = () => {},
     addNewPlace,
     addPlaceToItinerary = async () => {},
     setIsAIGeneratorOpen,
@@ -84,6 +83,7 @@ export const ExplorePage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [selectedRegion, setSelectedRegion] = useState('Tất cả');
+  const [selectedCity, setSelectedCity] = useState('Tất cả');
   const [selectedBudget, setSelectedBudget] = useState('all');
   const [sortBy, setSortBy] = useState('popular'); // 'popular' | 'rating' | 'nearest'
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
@@ -92,15 +92,36 @@ export const ExplorePage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = viewMode === 'grid' ? 12 : 8;
 
-  // Khi người dùng tìm kiếm, tải nốt các trang còn lại để kết quả không bị giới hạn
-  // trong 100 địa điểm đầu tiên (giữ nguyên hành vi tìm kiếm trên toàn bộ dữ liệu).
+  // 3.1 Tìm kiếm & lọc tỉnh thành chạy TRỰC TIẾP trên server (/places?keyword=&city=)
+  // thay vì tải cả 565 bản ghi về client như trước. remotePool = kết quả server.
+  const [remotePool, setRemotePool] = useState(null);
+  const [isRemoteSearching, setIsRemoteSearching] = useState(false);
+
   useEffect(() => {
-    if (!searchQuery.trim() || !hasMorePlaces) return undefined;
+    if (exploreLayer !== 'spots') return undefined;
+    const kw = searchQuery.trim();
+    const city = selectedCity !== 'Tất cả' ? selectedCity : '';
+    if (!kw && !city) {
+      setRemotePool(null);
+      setIsRemoteSearching(false);
+      return undefined;
+    }
+    let alive = true;
+    setIsRemoteSearching(true);
     const timer = setTimeout(() => {
-      fetchAllPlaces();
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [searchQuery, hasMorePlaces, fetchAllPlaces]);
+      placeApi
+        .getPlaces({ keyword: kw || undefined, city: city || undefined })
+        .then(res => {
+          if (!alive) return;
+          setRemotePool(res || []);
+          setIsRemoteSearching(false);
+        });
+    }, 450);
+    return () => {
+      alive = false;
+      clearTimeout(timer);
+    };
+  }, [searchQuery, selectedCity, exploreLayer]);
 
   // 4. User GPS Coordinates for Radar
   const [userCoords, setUserCoords] = useState(null);
@@ -494,7 +515,10 @@ export const ExplorePage = () => {
   // Unified items list based on active tab
   const unifiedItems = useMemo(() => {
     if (exploreLayer === 'spots') {
-      return (places || []).map(p => ({
+      // Khi đang tìm kiếm / lọc tỉnh: dùng kết quả TRUY VẤN SERVER (toàn bộ 565),
+      // còn không thì dùng pool tải dần theo trang như thường lệ.
+      const spotSource = remotePool !== null ? remotePool : (places || []);
+      return spotSource.map(p => ({
         id: `spot-${p.id}`,
         rawId: p.id,
         isLocalSpot: true,
@@ -552,7 +576,22 @@ export const ExplorePage = () => {
       reviewsCount: d.reviewCount || d.reviewsCount || 0,
       amenities: d.specialties || (typeof d.amenities === 'string' ? d.amenities.split(',').map(s => s.trim()) : d.amenities) || []
     }));
-  }, [exploreLayer, places, destinations, savedPlaces]);
+  }, [exploreLayer, places, destinations, savedPlaces, remotePool]);
+
+  // Danh sách tỉnh thành THẬT từ dữ liệu đã tải (xếp theo số lượng địa điểm)
+  const cityOptions = useMemo(() => {
+    const counts = new Map();
+    (places || []).forEach(p => {
+      const c = p.city;
+      if (c) counts.set(c, (counts.get(c) || 0) + 1);
+    });
+    return [
+      'Tất cả',
+      ...[...counts.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .map(e => e[0])
+    ];
+  }, [places]);
 
   // Filter & Sort Items
   const filteredItems = useMemo(() => {
@@ -749,6 +788,7 @@ export const ExplorePage = () => {
     setSearchQuery('');
     setSelectedCategory('Tất cả');
     setSelectedRegion('Tất cả');
+    setSelectedCity('Tất cả');
     setSelectedBudget('all');
     setSortBy('popular');
   };
@@ -813,11 +853,28 @@ export const ExplorePage = () => {
       </div>
 
       {/* 3.1 PHÂN TRANG ĐỊA ĐIỂM (tải dần từ server để giảm payload ban đầu) */}
-      {exploreLayer === 'spots' && hasMorePlaces && (
+      {exploreLayer === 'spots' && remotePool !== null && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-emerald-100 bg-emerald-50/70 px-4 py-3">
+          <span className="text-xs text-slate-600 text-center sm:text-left">
+            {isRemoteSearching && !remotePool.length ? 'Đang hỏi server...' : (
+              <>
+                Tìm thấy <strong className="text-slate-900 font-bold">{remotePool.length}</strong> địa điểm trên toàn bộ hệ thống (từ server).
+                {!remotePool.length && ' Không có kết quả phù hợp — thử từ khoá khác.'}
+              </>
+            )}
+          </span>
+          <button
+            onClick={() => { setSearchQuery(''); setSelectedCity('Tất cả'); }}
+            className="shrink-0 rounded-lg border border-emerald-200 bg-white px-4 py-2 text-xs font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-50 cursor-pointer"
+          >
+            Nhìn lại toàn bộ địa điểm
+          </button>
+        </div>
+      )}
+      {exploreLayer === 'spots' && remotePool === null && hasMorePlaces && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-sky-100 bg-sky-50/70 px-4 py-3">
           <span className="text-xs text-slate-600 text-center sm:text-left">
             Đang hiển thị <strong className="text-slate-900 font-bold">{places.length}</strong> / {placesTotal} địa điểm.
-            {searchQuery && ' Kết quả tìm kiếm chỉ tính trên các địa điểm đã tải.'}
           </span>
           <button
             onClick={loadMorePlaces}
@@ -988,6 +1045,9 @@ export const ExplorePage = () => {
         regions={regions}
         selectedRegion={selectedRegion}
         setSelectedRegion={setSelectedRegion}
+        cities={cityOptions}
+        selectedCity={selectedCity}
+        setSelectedCity={setSelectedCity}
         sortBy={sortBy}
         setSortBy={setSortBy}
         selectedBudget={selectedBudget}
