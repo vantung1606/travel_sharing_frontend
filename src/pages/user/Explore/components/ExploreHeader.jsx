@@ -14,6 +14,7 @@ const WEATHER_STATIONS = [
 
 export const ExploreHeader = ({
   placesCount = 0,
+  provincesCount = 0,
   destinationsCount = 0,
   userCoords = null,
   isLocating = false,
@@ -53,14 +54,30 @@ export const ExploreHeader = ({
 
       {/* 2. Minimalist Header Row (Phong cách Airbnb/Google Travel: Không banner cồng kềnh, đẩy nội dung lên ngay) */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-1">
-        {/* Left: Clean Heading & Subtitle */}
+        {/* Left: Clean Heading & Subtitle                       — thống kê THẬT từ server, không dùng số cứng */}
         <div>
           <h1 className="font-display text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
             Khám Phá Điểm Đến
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-            Theo dõi thời tiết thực tế & tọa độ du lịch trên khắp 63 tỉnh thành Việt Nam
+            Theo dõi thời tiết thực tế & tọa độ du lịch của cộng đồng Wayfare
           </p>
+          <div className="flex flex-wrap items-center gap-1.5 mt-2">
+            <span className="px-2 py-0.5 rounded-lg bg-sky-50 border border-sky-200/70 text-[10px] sm:text-[11px] font-bold text-sky-700">
+              {placesCount} địa điểm
+            </span>
+            <span className="px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200/70 text-[10px] sm:text-[11px] font-bold text-emerald-700">
+              {provincesCount} tỉnh thành
+            </span>
+            {destinationsCount > 0 && (
+              <span className="px-2 py-0.5 rounded-lg bg-violet-50 border border-violet-200/70 text-[10px] sm:text-[11px] font-bold text-violet-700">
+                {destinationsCount} danh mục tỉnh
+              </span>
+            )}
+            {placesCount > 0 && (provincesCount === 0 || destinationsCount === 0) && (
+              <span className="animate-pulse text-[10px] text-slate-400">đang tải thống kê...</span>
+            )}
+          </div>
         </div>
 
         {/* Right: Quick Action Buttons - 3 columns grid on mobile so they fit in 1 neat row */}
