@@ -4,6 +4,7 @@ import { useToast } from '../../../components/common/Toast';
 import { RealMapView } from '../../../components/map/RealMapView';
 import { reviewApi, itineraryApi, placeApi } from '../../../services/api';
 import { resolvePlaceImage, fixImageUrl, pickFallbackImage } from '../../../utils/placeImages';
+import { mapApiSpot } from '../../../utils/placeMap';
 import { fetchLiveWeatherBatch } from '../../../utils/weatherUtils';
 import { Compass, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -519,30 +520,9 @@ export const ExplorePage = () => {
       // Khi đang tìm kiếm / lọc tỉnh: dùng kết quả TRUY VẤN SERVER (toàn bộ 565),
       // còn không thì dùng pool tải dần theo trang như thường lệ.
       return spotSource.map(p => ({
-        id: `spot-${p.id}`,
-        rawId: p.id,
-        isLocalSpot: true,
-        name: p.name,
-        category: p.categoryName || 'Tọa độ bản địa',
-        city: p.city || 'Việt Nam',
+        ...mapApiSpot(p),
         region: getRegionByCity(p.city),
-        address: p.address,
-        image: resolvePlaceImage(p),
-        latitude: p.latitude,
-        longitude: p.longitude,
-        rating: p.averageRating ? Number(p.averageRating).toFixed(1) : null,
-        reviewsCount: p.reviewCount || 0,
-        phoneNumber: p.phoneNumber,
-        openHours: p.openHours || null,
-        priceEstimate: p.priceRange || (p.ticketPrice ? `${Number(p.ticketPrice).toLocaleString()}đ` : 'Miễn phí'),
-        ticketPrice: p.ticketPrice,
-        amenities: p.amenities ? p.amenities.split(',').map(s => s.trim()) : [],
-        isVerifiedHost: p.isVerifiedHost,
-        ownerName: p.ownerName,
-        ownerHandle: p.ownerHandle,
-        ownerAvatar: p.ownerAvatar,
-        tagline: p.description || 'Tọa độ check-in & trải nghiệm do người dùng và cơ sở bản địa chia sẻ.'
-      }));
+      })).filter(Boolean);
     }
 
     // Saved Wishlist Items

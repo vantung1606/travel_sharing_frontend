@@ -1579,6 +1579,64 @@ export const placeApi = {
   }
 };
 
+/**
+ * Danh sách "muốn đi" (wishlist) lưu TRÊN SERVER — web & app mobile cùng
+ * người dùng chia sẻ đúng 1 danh sách thay vì lưu rải rác theo thiết bị.
+ * Cả 3 hàm yêu cầu đã đăng nhập (JWT); guest thì client tự fallback local.
+ */
+export const savedPlaceApi = {
+  async getSavedPlaces() {
+    try {
+      const res = await fetch(`${BASE_URL}/users/saved-places`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return Array.isArray(json.data) ? json.data : [];
+    } catch (err) {
+      console.warn('API error fetching saved places:', err.message);
+      return null;
+    }
+  },
+
+  async addSavedPlace(placeId) {
+    try {
+      const res = await fetch(`${BASE_URL}/users/saved-places/${placeId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      return true;
+    } catch (err) {
+      console.warn(`API error saving place #${placeId}:`, err.message);
+      throw err;
+    }
+  },
+
+  async removeSavedPlace(placeId) {
+    try {
+      const res = await fetch(`${BASE_URL}/users/saved-places/${placeId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      return true;
+    } catch (err) {
+      console.warn(`API error removing place #${placeId}:`, err.message);
+      throw err;
+    }
+  }
+};
+
 export const reviewApi = {
   async getReviews(placeId) {
     try {
