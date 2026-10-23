@@ -213,8 +213,9 @@ export const AdminReportsPage = () => {
 
   // Filtered lists based on search
   const filteredReports = reports.filter(r => {
-    if (pendingSubFilter === 'ai_pending' && r.status !== 'PENDING_REVIEW') return false;
-    if (pendingSubFilter === 'user_reported' && r.status === 'PENDING_REVIEW') return false;
+    const isAi = r.flagSource === 'AI' || r.isAiPending || r.status === 'PENDING_REVIEW';
+    if (pendingSubFilter === 'ai_pending' && !isAi) return false;
+    if (pendingSubFilter === 'user_reported' && isAi) return false;
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -473,7 +474,7 @@ export const AdminReportsPage = () => {
                   pendingSubFilter === 'ai_pending' ? 'bg-white text-amber-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                Chờ AI duyệt ({reports.filter(r => r.status === 'PENDING_REVIEW').length})
+                Chờ AI duyệt ({reports.filter(r => r.flagSource === 'AI' || r.isAiPending || r.status === 'PENDING_REVIEW').length})
               </button>
               <button
                 type="button"
@@ -482,7 +483,7 @@ export const AdminReportsPage = () => {
                   pendingSubFilter === 'user_reported' ? 'bg-white text-rose-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                Báo cáo vi phạm ({reports.filter(r => r.status !== 'PENDING_REVIEW').length})
+                Báo cáo vi phạm ({reports.filter(r => !(r.flagSource === 'AI' || r.isAiPending || r.status === 'PENDING_REVIEW')).length})
               </button>
             </div>
           </div>
@@ -500,7 +501,7 @@ export const AdminReportsPage = () => {
             </div>
           ) : (
             filteredReports.map(report => {
-              const isAiPending = report.status === 'PENDING_REVIEW';
+              const isAiPending = report.flagSource === 'AI' || report.isAiPending || report.status === 'PENDING_REVIEW';
               return (
                 <article
                   key={report.id}
@@ -582,10 +583,10 @@ export const AdminReportsPage = () => {
                           )}
                           <div>
                             <strong className="font-bold text-slate-900">
-                              {isAiPending ? 'Đánh giá AI & Lý do giữ bài: ' : 'Lý do báo cáo & Cảnh báo: '}
+                              {isAiPending ? 'Đánh giá AI & Lý do giữ bài: ' : 'Lý do báo cáo từ cộng đồng: '}
                             </strong>
-                            <span className="text-slate-600">{report.reportReason || report.aiFlagReason}</span>
-                            {report.reporterName && (
+                            <span className="text-slate-600">{isAiPending ? (report.aiFlagReason || report.reportReason) : (report.reportReason || report.aiFlagReason)}</span>
+                            {!isAiPending && report.reporterName && (
                               <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
                                 <span className="font-semibold text-slate-700">Người gửi báo cáo:</span>
                                 <span className="font-bold text-rose-600">{report.reporterName}</span>
@@ -860,7 +861,7 @@ export const AdminReportsPage = () => {
               </p>
             </div>
 
-            {selectedPostModal.status !== 'PENDING_REVIEW' && selectedPostModal.reportReason && (
+            {!(selectedPostModal.flagSource === 'AI' || selectedPostModal.isAiPending || selectedPostModal.status === 'PENDING_REVIEW') && selectedPostModal.reportReason && (
               <div className="p-3 bg-rose-50 rounded-2xl border border-rose-200/60 text-xs text-rose-900 space-y-1">
                 <div className="flex items-center justify-between font-bold">
                   <span className="flex items-center gap-1 text-rose-700">
@@ -892,7 +893,7 @@ export const AdminReportsPage = () => {
                     <RefreshCw className="w-3.5 h-3.5" />
                     <span>Bỏ ẩn (Đưa về chờ duyệt)</span>
                   </button>
-                ) : selectedPostModal.status === 'PENDING_REVIEW' ? (
+                ) : (selectedPostModal.flagSource === 'AI' || selectedPostModal.isAiPending || selectedPostModal.status === 'PENDING_REVIEW') ? (
                   /* 2. Bài viết mới bị AI giữ lại -> Duyệt xuất bản hoặc Tạm ẩn */
                   <>
                     <button
