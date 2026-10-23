@@ -5,7 +5,7 @@ import { BASE_URL, getAuthHeader } from './api';
  */
 const GEMINI_API_KEY = import.meta.env?.VITE_GEMINI_API_KEY || '';
 const GEMINI_API_URL = import.meta.env?.VITE_GEMINI_API_URL || 'https://generativelanguage.googleapis.com/v1beta';
-const DEFAULT_MODEL = 'gemini-3.8-flash';
+const DEFAULT_MODEL = 'gemini-2.5-flash';
 
 export const aiService = {
   getApiKey() {
@@ -58,7 +58,7 @@ export const aiService = {
    */
   async generateText({ prompt, systemPrompt, model = DEFAULT_MODEL, temperature = 0.3, maxTokens = 8192, responseMimeType = 'application/json' }) {
     let targetModel = model || DEFAULT_MODEL;
-    if (!targetModel.startsWith('gemini-') || targetModel === 'gemini-1.5-flash' || targetModel.includes('1.5-flash')) {
+    if (!targetModel.startsWith('gemini-') || targetModel.includes('3.8')) {
       targetModel = DEFAULT_MODEL;
     }
 
