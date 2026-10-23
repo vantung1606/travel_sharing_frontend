@@ -43,7 +43,7 @@ const REPORT_REASONS = [
   }
 ];
 
-export const ReportPostModal = ({ post, onClose, onReportSubmitted }) => {
+export const ReportPostModal = ({ post, onClose, onReportSubmitted, onReportSuccess }) => {
   const [selectedReason, setSelectedReason] = useState(REPORT_REASONS[0].id);
   const [details, setDetails] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -74,6 +74,9 @@ export const ReportPostModal = ({ post, onClose, onReportSubmitted }) => {
       toast.showSuccess('Đã gửi báo cáo vi phạm thành công! Ban Quản Trị sẽ xem xét và xử lý bài viết này.');
       if (typeof onReportSubmitted === 'function') {
         onReportSubmitted(post.id);
+      }
+      if (typeof onReportSuccess === 'function') {
+        onReportSuccess(post.id);
       }
       onClose();
     } catch (err) {

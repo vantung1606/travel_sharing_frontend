@@ -3819,10 +3819,13 @@ export const CommunityPage = () => {
         <ReportPostModal
           post={postToReport}
           onClose={() => setPostToReport(null)}
-          onReportSuccess={() => {
-            if (postToReport?.id) {
-              setHiddenPostIds(prev => new Set(prev).add(Number(postToReport.id)));
+          onReportSuccess={(reportedPostId) => {
+            const targetId = reportedPostId || postToReport?.id;
+            if (targetId) {
+              setHiddenPostIds(prev => new Set(prev).add(Number(targetId)));
+              setPosts(prev => prev.map(p => Number(p.id) === Number(targetId) ? { ...p, status: 'PENDING_REPORT', reportsCount: (p.reportsCount || 0) + 1 } : p));
             }
+            setSelectedPostForDetail(null);
           }}
         />
       )}

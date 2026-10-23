@@ -550,6 +550,13 @@ export const AdminReportsPage = () => {
                               {isAiPending ? 'Đánh giá AI & Lý do giữ bài: ' : 'Lý do báo cáo & Cảnh báo: '}
                             </strong>
                             <span className="text-slate-600">{report.reportReason || report.aiFlagReason}</span>
+                            {report.reporterName && (
+                              <p className="text-[11px] text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
+                                <span className="font-semibold text-slate-700">Người gửi báo cáo:</span>
+                                <span className="font-bold text-rose-600">{report.reporterName}</span>
+                                {report.reporterEmail && <span className="text-slate-400">({report.reporterEmail})</span>}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -804,6 +811,25 @@ export const AdminReportsPage = () => {
                 {selectedPostModal.aiFlagReason || 'Nội dung phù hợp quy chuẩn cộng đồng Wayfare.'}
               </p>
             </div>
+
+            {selectedPostModal.status !== 'PENDING_REVIEW' && selectedPostModal.reportReason && (
+              <div className="p-3 bg-rose-50 rounded-2xl border border-rose-200/60 text-xs text-rose-900 space-y-1">
+                <div className="flex items-center justify-between font-bold">
+                  <span className="flex items-center gap-1 text-rose-700">
+                    <AlertTriangle className="w-3.5 h-3.5 text-rose-600" /> Lý do báo cáo từ người dùng
+                  </span>
+                  <span className="text-[11px] font-semibold text-rose-600">{selectedPostModal.reportsCount || 1} lượt báo cáo</span>
+                </div>
+                <p className="text-[11px] text-slate-700 leading-relaxed font-medium">
+                  {selectedPostModal.reportReason}
+                </p>
+                {selectedPostModal.reporterName && (
+                  <p className="text-[10px] text-slate-500 pt-0.5">
+                    Người gửi báo cáo: <strong className="text-slate-800">{selectedPostModal.reporterName}</strong> {selectedPostModal.reporterEmail && `(${selectedPostModal.reporterEmail})`}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
               <div className="flex flex-wrap items-center gap-2">
