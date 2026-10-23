@@ -117,6 +117,9 @@ export const AdminDashboardPage = () => {
       }
       if (Array.isArray(fetchedUsers)) {
         setUsersList(fetchedUsers);
+      } else if (fetchedUsers && Array.isArray(fetchedUsers.content)) {
+        // getUsers nay trả Page<UserDto> phân trang server-side
+        setUsersList(fetchedUsers.content);
       }
 
       if (isManual) {

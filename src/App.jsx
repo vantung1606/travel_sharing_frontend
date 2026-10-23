@@ -28,10 +28,9 @@ const AdminDashboardPage = lazy(() => import('./pages/admin/Dashboard/AdminDashb
 const AdminPlacesPage = lazy(() => import('./pages/admin/Places/AdminPlacesPage').then(m => ({ default: m.AdminPlacesPage })));
 const AdminUsersPage = lazy(() => import('./pages/admin/Users/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
 const AdminReportsPage = lazy(() => import('./pages/admin/Reports/AdminReportsPage').then(m => ({ default: m.AdminReportsPage })));
-const AdminRevenuePage = lazy(() => import('./pages/admin/Revenue/AdminRevenuePage').then(m => ({ default: m.AdminRevenuePage })));
+const AdminReviewsPage = lazy(() => import('./pages/admin/Reviews/AdminReviewsPage').then(m => ({ default: m.AdminReviewsPage })));
 const AdminStatisticsPage = lazy(() => import('./pages/admin/Statistics/AdminStatisticsPage').then(m => ({ default: m.AdminStatisticsPage })));
 const AdminAuditLogsPage = lazy(() => import('./pages/admin/AuditLogs/AdminAuditLogsPage').then(m => ({ default: m.AdminAuditLogsPage })));
-const AdminAIConfigPage = lazy(() => import('./pages/admin/AIConfig/AdminAIConfigPage').then(m => ({ default: m.AdminAIConfigPage })));
 
 // Fallback hiển thị trong lúc tải chunk của route
 const RouteLoadingFallback = () => (
@@ -174,10 +173,9 @@ const AppContent = () => {
                     <Route path="/admin/places" element={<AdminPlacesPage />} />
                     <Route path="/admin/users" element={<AdminUsersPage />} />
                     <Route path="/admin/reports" element={<AdminReportsPage />} />
+                    <Route path="/admin/reviews" element={<AdminReviewsPage />} />
                     <Route path="/admin/analytics" element={<AdminStatisticsPage />} />
                     <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
-                    <Route path="/admin/revenue" element={<AdminRevenuePage />} />
-                    <Route path="/admin/ai-config" element={<AdminAIConfigPage />} />
                     <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
                   </Routes>
                 </Suspense>

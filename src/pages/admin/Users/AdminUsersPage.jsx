@@ -14,10 +14,21 @@ export const AdminUsersPage = () => {
     activeUsers: 0,
     lockedUsers: 0,
     adminCount: 0,
+    moderatorCount: 0,
     newUsersToday: 0
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+
+  // Server-side pagination (backend trả Page<UserDto>)
+  const [pageNum, setPageNum] = useState(0);
+  const [pagination, setPagination] = useState({ totalElements: 0, totalPages: 1, number: 0 });
+
+  // Thống kê hoạt động THẬT của người dùng đang xét duyệt
+  const [activitySummary, setActivitySummary] = useState(null);
+
+  // Modal: mật khẩu tạm sau khi đặt lại (hiển thị 1 lần duy nhất)
+  const [resetPasswordResult, setResetPasswordResult] = useState(null);
 
   // Filters & Tabs
   const [activeTab, setActiveTab] = useState('Tất cả tài khoản');
@@ -48,26 +59,33 @@ export const AdminUsersPage = () => {
     role: 'ROLE_USER'
   });
 
-  // Load Real Data from Backend
-  const loadData = async (isManualRefresh = false) => {
+  // Load Real Data from Backend — phân trang server-side (Page<UserDto>)
+  const loadData = async (isManualRefresh = false, targetPage = pageNum) => {
     if (isManualRefresh) setRefreshing(true);
     else setLoading(true);
 
     try {
-      const [fetchedUsers, fetchedMetrics] = await Promise.all([
-        adminUserApi.getUsers(),
+      const [fetchedPage, fetchedMetrics] = await Promise.all([
+        adminUserApi.getUsers({ page: targetPage, size: 20 }),
         adminUserApi.getUserMetrics()
       ]);
 
-      const usersArr = Array.isArray(fetchedUsers) ? fetchedUsers : [];
+      const usersArr = Array.isArray(fetchedPage) ? fetchedPage : (fetchedPage.content || []);
       setUsersList(usersArr);
+      if (!Array.isArray(fetchedPage)) {
+        setPagination({
+          totalElements: fetchedPage.totalElements || 0,
+          totalPages: fetchedPage.totalPages || 1,
+          number: fetchedPage.number || 0
+        });
+      }
       if (fetchedMetrics) {
         setMetrics(fetchedMetrics);
       }
 
-      // Default selected audit user to first locked or high risk user, or first user in list
+      // Default selected audit user to first locked user, or first user in list
       if (!selectedAuditUser && usersArr.length > 0) {
-        const priorityUser = usersArr.find(u => u.status === 'LOCKED' || (u.riskScore && u.riskScore > 50)) || usersArr[0];
+        const priorityUser = usersArr.find(u => u.status === 'LOCKED') || usersArr[0];
         setSelectedAuditUser(priorityUser);
       } else if (selectedAuditUser && usersArr.length > 0) {
         // Keep updated state for current audit user
@@ -89,7 +107,42 @@ export const AdminUsersPage = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [pageNum]);
+
+  // Fetch thống kê hoạt động THẬT mỗi khi chọn người dùng trong bảng
+  useEffect(() => {
+    if (!selectedAuditUser || !selectedAuditUser.id) return undefined;
+    let cancelled = false;
+    setActivitySummary(null);
+    adminUserApi.getUserActivity(selectedAuditUser.id).then(summary => {
+      if (!cancelled && summary) setActivitySummary(summary);
+    }).catch(() => {/* im lặng — panel hiển thị "—" */});
+    return () => { cancelled = true; };
+  }, [selectedAuditUser?.id]);
+
+  // Đặt lại mật khẩu — mật khẩu tạm chỉ hiển thị MỘT LẦN qua modal
+  const handleResetPassword = async (user) => {
+    try {
+      const result = await adminUserApi.resetPassword(user.id);
+      setResetPasswordResult(result);
+    } catch (err) {
+      toast.error('Đặt lại mật khẩu thất bại: ' + err.message);
+    }
+  };
+
+  // Cấp / gỡ badge "Xác thực" cho người dùng
+  const handleToggleVerified = async (user) => {
+    try {
+      const updated = await adminUserApi.setUserVerified(user.id, !user.isVerified);
+      setUsersList(prev => prev.map(u => (u.id === updated.id ? updated : u)));
+      if (selectedAuditUser?.id === updated.id) setSelectedAuditUser(updated);
+      toast.success(!user.isVerified
+        ? 'Đã cấp badge Xác thực cho ' + (user.fullName || user.email)
+        : 'Đã gỡ badge Xác thực của ' + (user.fullName || user.email));
+    } catch (err) {
+      toast.error('Cập nhật badge xác thực thất bại: ' + err.message);
+    }
+  };
 
   // Filtered Users
   const filteredUsers = useMemo(() => {
@@ -98,8 +151,6 @@ export const AdminUsersPage = () => {
       if (activeTab === 'Phân quyền & Ban quản trị') {
         const isStaff = user.roles && user.roles.some(r => r === 'ROLE_ADMIN' || r === 'ROLE_MODERATOR' || r === 'ROLE_GUIDE');
         if (!isStaff) return false;
-      } else if (activeTab === 'Báo cáo vi phạm & Rủi ro cao') {
-        if ((user.riskScore || 0) < 50 && user.status !== 'LOCKED') return false;
       } else if (activeTab === 'Tài khoản tạm khóa / Ban') {
         if (user.status !== 'LOCKED') return false;
       }
@@ -128,13 +179,6 @@ export const AdminUsersPage = () => {
       return true;
     });
   }, [usersList, activeTab, roleFilter, statusFilter, searchUser]);
-
-  // Average Trust Score
-  const avgTrustScore = useMemo(() => {
-    if (usersList.length === 0) return '95.0';
-    const sum = usersList.reduce((acc, u) => acc + (u.trustScore || 85), 0);
-    return (sum / usersList.length).toFixed(1);
-  }, [usersList]);
 
   // Handlers
   const handleToggleStatus = async (user) => {
@@ -238,7 +282,7 @@ export const AdminUsersPage = () => {
       toast.info('Không có dữ liệu để xuất CSV');
       return;
     }
-    const headers = ['ID', 'Ho Ten', 'Email', 'Handle', 'Vai Tro', 'Trang Thai', 'Chuyen Di', 'Trust Score', 'Risk Score'];
+    const headers = ['ID', 'Ho Ten', 'Email', 'Handle', 'Vai Tro', 'Trang Thai', 'Chuyen Di', 'Danh Gia', 'Da Xac Thuc'];
     const rows = usersList.map(u => [
       u.id,
       `"${u.fullName || ''}"`,
@@ -247,8 +291,8 @@ export const AdminUsersPage = () => {
       `"${(u.roles || []).join(', ')}"`,
       u.status || 'ACTIVE',
       u.tripsCount || 0,
-      u.trustScore || 0,
-      u.riskScore || 0
+      u.reviewsCount || 0,
+      u.isVerified ? 'YES' : 'NO'
     ]);
 
     const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' 
@@ -433,7 +477,7 @@ export const AdminUsersPage = () => {
           </div>
           <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold">
             <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">ROLE_ADMIN (Super Admin)</span>
-            <span className="px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">ROLE_USER (Thành viên)</span>
+            <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">ROLE_MODERATOR (Kiểm duyệt)</span>
           </div>
         </div>
 
@@ -451,11 +495,7 @@ export const AdminUsersPage = () => {
             </div>
           </div>
           <div className="flex items-center gap-2 text-[11px] text-slate-600 font-semibold">
-            <span className="text-amber-600 font-bold">WanderAI Scan</span>
-            <span>•</span>
-            <span>Chống Spam</span>
-            <span>•</span>
-            <span>Bảo vệ Tour</span>
+            <span className="text-slate-500">Khóa tài khoản ngay trong trang này — trạng thái đồng bộ với backend</span>
           </div>
         </div>
 
@@ -463,9 +503,9 @@ export const AdminUsersPage = () => {
         <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-[11px] text-slate-400 font-extrabold uppercase tracking-wider block">AI Trust Score Trung Bình</span>
+              <span className="text-[11px] text-slate-400 font-extrabold uppercase tracking-wider block">Tài khoản mới hôm nay</span>
               <div className="font-display font-extrabold text-2xl text-sky-600 mt-1 flex items-baseline gap-1">
-                {avgTrustScore} <span className="text-xs text-slate-400 font-normal">/ 100</span>
+                {metrics.newUsersToday} <span className="text-xs text-slate-400 font-normal">đăng ký</span>
               </div>
             </div>
             <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center">
@@ -473,9 +513,9 @@ export const AdminUsersPage = () => {
             </div>
           </div>
           <div className="flex items-center justify-between text-xs">
-            <span className="text-slate-500 font-semibold">Độ tin cậy:</span>
+            <span className="text-slate-500 font-semibold">Điều phối viên:</span>
             <span className="text-sky-600 font-bold flex items-center gap-1">
-              <Sparkles className="w-3.5 h-3.5" /> Chuẩn WanderAI
+              <Sparkles className="w-3.5 h-3.5" /> {metrics.moderatorCount || 0} MODERATOR
             </span>
           </div>
         </div>
@@ -486,9 +526,8 @@ export const AdminUsersPage = () => {
       <div className="flex items-center justify-between overflow-x-auto pb-1 text-xs font-bold">
         <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-full">
           {[
-            { label: 'Tất cả tài khoản', count: usersList.length },
+            { label: 'Tất cả tài khoản', count: pagination.totalElements || usersList.length },
             { label: 'Phân quyền & Ban quản trị', count: metrics.adminCount },
-            { label: 'Báo cáo vi phạm & Rủi ro cao', count: usersList.filter(u => (u.riskScore || 0) >= 50).length, isUrgent: true },
             { label: 'Tài khoản tạm khóa / Ban', count: metrics.lockedUsers }
           ].map(t => (
             <button
@@ -609,7 +648,7 @@ export const AdminUsersPage = () => {
                     <th className="py-3 px-4">Người dùng & Danh hiệu</th>
                     <th className="py-3 px-4">Vai trò & Cấp phép</th>
                     <th className="py-3 px-4 text-center">Hoạt động</th>
-                    <th className="py-3 px-4 text-center">AI Trust</th>
+                    <th className="py-3 px-4 text-center">Đánh giá</th>
                     <th className="py-3 px-4">Trạng thái</th>
                     <th className="py-3 px-4 text-right">Tác vụ</th>
                   </tr>
@@ -678,19 +717,13 @@ export const AdminUsersPage = () => {
                           {/* Activity */}
                           <td className="py-3.5 px-4 text-center">
                             <div className="font-bold text-slate-900">{user.tripsCount || 0} chuyến đi</div>
-                            <span className="text-slate-400 text-[11px]">{user.postsCount || 0} bài review</span>
+                            <span className="text-slate-400 text-[11px]">{user.postsCount || 0} bài viết</span>
                           </td>
 
-                          {/* AI Trust Score */}
+                          {/* Đánh giá thật (trước đây là cột "AI Trust" số ảo) */}
                           <td className="py-3.5 px-4 text-center">
-                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full font-bold ${
-                              (user.trustScore || 80) >= 80 
-                                ? 'bg-sky-100 text-sky-800' 
-                                : (user.trustScore || 80) >= 50 
-                                  ? 'bg-amber-100 text-amber-800' 
-                                  : 'bg-rose-100 text-rose-800'
-                            }`}>
-                              <BadgeCheck className="w-3.5 h-3.5" /> {user.trustScore || 85}/100
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 font-bold">
+                              <Award className="w-3.5 h-3.5" /> {user.reviewsCount || 0} đánh giá
                             </span>
                           </td>
 
@@ -751,17 +784,25 @@ export const AdminUsersPage = () => {
               </table>
             </div>
 
-            {/* Pagination Controls */}
+            {/* Pagination Controls — server-side thật (bỏ dãy nút trang tĩnh ảo) */}
             <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-semibold">
               <div>
-                Hiển thị <strong className="text-slate-900">1 - {filteredUsers.length}</strong> trên tổng số <strong className="text-slate-900">{metrics.totalUsers}</strong> tài khoản
+                Hiển thị <strong className="text-slate-900">{pagination.totalElements === 0 ? 0 : pagination.number * 20 + 1} - {pagination.number * 20 + usersList.length}</strong> trên tổng số <strong className="text-slate-900">{pagination.totalElements}</strong> tài khoản (server-side)
               </div>
               <div className="flex items-center gap-1">
-                <button className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-400 disabled:opacity-40" disabled>
+                <button
+                  onClick={() => setPageNum(p => Math.max(0, p - 1))}
+                  disabled={pagination.number === 0}
+                  className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <button className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold">1</button>
-                <button className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-700 disabled:opacity-40" disabled>
+                <button className="w-8 h-8 rounded-full bg-sky-600 text-white font-bold">{pagination.number + 1}</button>
+                <button
+                  onClick={() => setPageNum(p => p + 1)}
+                  disabled={pagination.number >= pagination.totalPages - 1}
+                  className="w-8 h-8 rounded-full bg-white border border-slate-200 flex items-center justify-center text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer"
+                >
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -826,40 +867,45 @@ export const AdminUsersPage = () => {
                           <CheckCircle2 className="w-3.5 h-3.5" /> Hoạt động hợp lệ
                         </span>
                       )}
-                      <span className="text-slate-400">• Trust: {selectedAuditUser.trustScore || 85}%</span>
+                      <span className="text-slate-400 font-bold flex items-center gap-0.5">
+                        • {selectedAuditUser.isVerified ? (
+                          <><BadgeCheck className="w-3.5 h-3.5 text-sky-500" /> Đã xác thực</>
+                        ) : (
+                          'Chưa xác thực'
+                        )}
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                {/* AI Risk Analysis Engine */}
-                <div className={`p-4 rounded-2xl border space-y-2 ${
-                  (selectedAuditUser.riskScore || 0) >= 50 
-                    ? 'bg-amber-50 border-amber-200/60' 
-                    : 'bg-sky-50 border-sky-200/60'
-                }`}>
+                {/* Thống kê hoạt động THẬT (trước đây là "WanderAI Security Shield" điểm số ảo) */}
+                <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200/60 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-900 flex items-center gap-1">
-                      <Sparkles className="w-4 h-4 text-sky-600" /> WanderAI Security Shield
+                      <Sparkles className="w-4 h-4 text-sky-600" /> Hoạt động thực tế
                     </span>
-                    <span className={`text-xs font-extrabold ${
-                      (selectedAuditUser.riskScore || 0) >= 50 ? 'text-amber-700' : 'text-sky-700'
-                    }`}>
-                      Mức rủi ro: {selectedAuditUser.riskScore || 12}%
+                    <span className="text-xs font-extrabold text-sky-700">
+                      {activitySummary ? 'Cập nhật mới nhất' : 'Đang tải…'}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-700 leading-relaxed">
-                    {selectedAuditUser.riskScore >= 50 
-                      ? 'Phát hiện hành vi gửi liên kết quảng bá bất thường hoặc tỷ lệ nội dung trùng lặp cao. Hệ thống khuyến nghị giám sát chặt chẽ.'
-                      : 'Hồ sơ người dùng trong sạch, tương tác du lịch tự nhiên, các lịch trình chia sẻ đạt tiêu chuẩn an toàn cộng đồng.'}
+                  <div className="grid grid-cols-3 gap-2 pt-1">
+                    {[
+                      { label: 'Bài viết', value: activitySummary?.posts },
+                      { label: 'Lịch trình', value: activitySummary?.trips },
+                      { label: 'Đánh giá', value: activitySummary?.reviews },
+                      { label: 'Muốn đi', value: activitySummary?.savedPlaces },
+                      { label: 'Follower', value: activitySummary?.followers },
+                      { label: 'Following', value: activitySummary?.following }
+                    ].map(item => (
+                      <div key={item.label} className="p-2 rounded-xl bg-white/80 border border-sky-100 text-center">
+                        <div className="font-extrabold text-sm text-slate-900">{item.value ?? '—'}</div>
+                        <div className="text-[10px] text-slate-500 font-bold">{item.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-slate-700 leading-relaxed pt-1">
+                    Số liệu được truy vấn trực tiếp từ cơ sở dữ liệu theo thời gian thực.
                   </p>
-                  <div className="w-full bg-slate-200/80 rounded-full h-1.5 overflow-hidden">
-                    <div 
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        (selectedAuditUser.riskScore || 0) >= 50 ? 'bg-amber-600' : 'bg-sky-600'
-                      }`} 
-                      style={{ width: `${selectedAuditUser.riskScore || 12}%` }}
-                    ></div>
-                  </div>
                 </div>
 
                 {/* Extra Profile Details */}
@@ -887,19 +933,7 @@ export const AdminUsersPage = () => {
                   </div>
                 </div>
 
-                {/* Mod Note Area */}
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                    Ghi chú kiểm duyệt nội bộ
-                  </label>
-                  <textarea
-                    defaultValue={selectedAuditUser.status === 'LOCKED' ? 'Tài khoản đang bị khóa do vi phạm chính sách spam.' : 'Tài khoản thành viên hoạt động tích cực.'}
-                    rows={2}
-                    className="w-full p-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-800 outline-none focus:ring-2 focus:ring-sky-500/20 resize-none"
-                  />
-                </div>
-
-                {/* Action Buttons */}
+                {/* Hành động quản trị thực (thay khối "Ghi chú kiểm duyệt" chỉ lưu toast ảo) */}
                 <div className="space-y-2 pt-1">
                   <button
                     onClick={() => handleToggleStatus(selectedAuditUser)}
@@ -927,12 +961,23 @@ export const AdminUsersPage = () => {
                       <UserCog className="w-3.5 h-3.5 text-purple-600" /> Phân quyền
                     </button>
                     <button
-                      onClick={() => toast.info('Đã lưu ghi chú kiểm duyệt cho tài khoản này!')}
-                      className="py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-xs transition-colors cursor-pointer"
+                      onClick={() => handleResetPassword(selectedAuditUser)}
+                      className="py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      Lưu ghi chú
+                      <Lock className="w-3.5 h-3.5 text-sky-600" /> Reset mật khẩu
                     </button>
                   </div>
+                  <button
+                    onClick={() => handleToggleVerified(selectedAuditUser)}
+                    className={`w-full py-2 rounded-xl font-bold text-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer ${
+                      selectedAuditUser.isVerified
+                        ? 'bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <BadgeCheck className={`w-3.5 h-3.5 ${selectedAuditUser.isVerified ? 'text-emerald-600' : 'text-slate-400'}`} />
+                    {selectedAuditUser.isVerified ? 'Đã xác thực — nhấn để gỡ badge' : 'Chưa xác thực — nhấn để cấp badge'}
+                  </button>
                 </div>
               </>
             ) : (
@@ -979,6 +1024,7 @@ export const AdminUsersPage = () => {
               <div className="space-y-2">
                 {[
                   { role: 'ROLE_ADMIN', title: 'Quản trị viên (Super Admin)', desc: 'Toàn quyền cấu hình hệ thống, quản trị người dùng, duyệt địa điểm và kiểm duyệt báo cáo vi phạm.' },
+                  { role: 'ROLE_MODERATOR', title: 'Kiểm duyệt viên (Moderator)', desc: 'Kiểm duyệt bài viết, đánh giá và địa điểm chờ duyệt. KHÔNG có quyền quản trị người dùng & hệ thống.' },
                   { role: 'ROLE_USER', title: 'Người dùng tiêu chuẩn (Wanderer User)', desc: 'Tạo lịch trình du lịch cá nhân, chia sẻ bài viết, đánh giá địa điểm và tham gia cộng đồng.' }
                 ].map((item) => (
                   <label
@@ -1003,6 +1049,8 @@ export const AdminUsersPage = () => {
                         <span>{item.title}</span>
                         {item.role === 'ROLE_ADMIN' ? (
                           <span className="px-1.5 py-0.2 rounded bg-purple-100 text-purple-700 text-[10px] font-mono">ROLE_ADMIN</span>
+                        ) : item.role === 'ROLE_MODERATOR' ? (
+                          <span className="px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-700 text-[10px] font-mono">ROLE_MODERATOR</span>
                         ) : (
                           <span className="px-1.5 py-0.2 rounded bg-sky-100 text-sky-700 text-[10px] font-mono">ROLE_USER</span>
                         )}
@@ -1146,6 +1194,44 @@ export const AdminUsersPage = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: MẬT KHẨU TẠM SAU KHI RESET — chỉ hiển thị 1 lần duy nhất */}
+      {resetPasswordResult && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="w-11 h-11 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center">
+              <Lock className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-slate-900 text-sm">Đã đặt lại mật khẩu</h3>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                Mật khẩu tạm dưới đây chỉ hiển thị <b>một lần duy nhất</b>. Vui lòng sao chép và gửi trực tiếp cho
+                người dùng <b>{resetPasswordResult.email}</b> qua kênh liên lạc riêng. Hệ thống chỉ lưu dạng mã hóa.
+              </p>
+            </div>
+            <div className="p-3 rounded-2xl bg-slate-900 text-center">
+              <span className="font-mono font-extrabold text-emerald-400 text-lg tracking-widest select-all">{resetPasswordResult.tempPassword}</span>
+            </div>
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(resetPasswordResult.tempPassword);
+                  toast.success('Đã sao chép mật khẩu tạm');
+                }}
+                className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 cursor-pointer"
+              >
+                Sao chép
+              </button>
+              <button
+                onClick={() => setResetPasswordResult(null)}
+                className="px-5 py-2 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white shadow-md cursor-pointer"
+              >
+                Tôi đã lưu mật khẩu
+              </button>
+            </div>
           </div>
         </div>
       )}

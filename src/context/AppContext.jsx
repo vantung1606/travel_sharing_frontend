@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { notificationApi, userApi, placeApi, itineraryApi, authApi, savedPlaceApi } from '../services/api';
+import { notificationApi, userApi, placeApi, itineraryApi, authApi, savedPlaceApi, adminReviewApi, adminReportApi } from '../services/api';
 import { mapApiSpot } from '../utils/placeMap';
 
 const DEFAULT_APP_STATE = {
@@ -123,10 +123,9 @@ export const AppProvider = ({ children }) => {
     if (p.startsWith('/admin/places')) return 'places';
     if (p.startsWith('/admin/users')) return 'users';
     if (p.startsWith('/admin/reports')) return 'reports';
+    if (p.startsWith('/admin/reviews')) return 'reviews';
     if (p.startsWith('/admin/analytics')) return 'analytics';
     if (p.startsWith('/admin/audit-logs')) return 'audit-logs';
-    if (p.startsWith('/admin/revenue')) return 'revenue';
-    if (p.startsWith('/admin/ai-config')) return 'ai-config';
     return 'dashboard';
   }, [location.pathname]);
 
@@ -134,12 +133,11 @@ export const AppProvider = ({ children }) => {
     const pathMap = {
       dashboard: '/admin/dashboard',
       places: '/admin/places',
+      reviews: '/admin/reviews',
       users: '/admin/users',
       reports: '/admin/reports',
       analytics: '/admin/analytics',
-      'audit-logs': '/admin/audit-logs',
-      revenue: '/admin/revenue',
-      'ai-config': '/admin/ai-config'
+      'audit-logs': '/admin/audit-logs'
     };
     navigate(pathMap[tabId] || '/admin/dashboard');
   };
@@ -942,18 +940,47 @@ export const AppProvider = ({ children }) => {
   // Admin Actions
   const approvePlace = (placeId) => {
     setPendingPlaces(prev => prev.filter(p => p.id !== placeId));
-    setStats(prev => ({ ...prev, pendingCheckins: Math.max(0, prev.pendingCheckins - 1) }));
+    setStats(prev => ({ ...prev, pendingPlaces: Math.max(0, (prev.pendingPlaces || 1) - 1) }));
   };
 
   const rejectPlace = (placeId) => {
     setPendingPlaces(prev => prev.filter(p => p.id !== placeId));
-    setStats(prev => ({ ...prev, pendingCheckins: Math.max(0, prev.pendingCheckins - 1) }));
+    setStats(prev => ({ ...prev, pendingPlaces: Math.max(0, (prev.pendingPlaces || 1) - 1) }));
   };
 
   const resolveReport = (reportId) => {
     setReports(prev => prev.filter(r => r.id !== reportId));
-    setStats(prev => ({ ...prev, reportedContent: Math.max(0, prev.reportedContent - 1) }));
+    setStats(prev => ({ ...prev, reportedContent: Math.max(0, (prev.reportedContent || 1) - 1) }));
   };
+
+  // Badge thật cho sidebar admin: địa điểm chờ duyệt / đánh giá đã ẩn / báo cáo chờ xử lý.
+  // Trước đây các badge này là số ảo (pendingCheckins không bao giờ được nạp từ backend).
+  useEffect(() => {
+    if (!location.pathname.startsWith('/admin')) return undefined;
+    let cancelled = false;
+    const loadAdminBadges = async () => {
+      try {
+        const [pendingList, reviewMetrics, reportMetrics] = await Promise.all([
+          placeApi.getPendingPlaces(),
+          adminReviewApi.getMetrics(),
+          adminReportApi.getMetrics()
+        ]);
+        if (cancelled) return undefined;
+        setStats(prev => ({
+          ...prev,
+          pendingPlaces: Array.isArray(pendingList) ? pendingList.length : (prev.pendingPlaces || 0),
+          hiddenReviews: reviewMetrics?.hiddenReviews ?? (prev.hiddenReviews || 0),
+          reportedContent: reportMetrics?.pendingReportsCount ?? (prev.reportedContent || 0)
+        }));
+      } catch {
+        /* badge tạm giữ giá trị cũ nếu mạng chập chờn */
+      }
+      return undefined;
+    };
+    loadAdminBadges();
+    const refreshTimer = setInterval(loadAdminBadges, 60000);
+    return () => { cancelled = true; clearInterval(refreshTimer); };
+  }, [location.pathname]);
 
   const toggleUserStatus = (userId) => {
     setUsers(prev =>

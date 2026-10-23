@@ -219,6 +219,7 @@ export const NotificationsPage = () => {
         setUserTab('explore');
       } else if (item.targetUrl.includes('ai-config')) {
         setPortalMode('admin');
+        window.location.href = '/admin/audit-logs';
       } else if (item.targetUrl.includes('admin/reports') || item.targetUrl.includes('reports')) {
         setPortalMode('admin');
         window.location.href = '/admin/reports';

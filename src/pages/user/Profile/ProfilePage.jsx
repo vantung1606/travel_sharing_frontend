@@ -1042,7 +1042,7 @@ export const ProfilePage = () => {
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
             <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
               <Zap className="w-4 h-4 text-amber-500" />
-              <span>Ghi chú riêng của bạn dành cho AI Engine</span>
+              <span>Giới thiệu bản thân (đầu vào cho gợi ý du lịch cá nhân hóa)</span>
             </h4>
             <p className="text-xs text-slate-600 leading-relaxed bg-white p-3 rounded-xl border border-slate-200">
               "{profileData?.bio || currentUser?.bio || "Thường đi du lịch trải nghiệm tự túc, thích chụp ảnh và khám phá ẩm thực bản địa độc đáo."}"

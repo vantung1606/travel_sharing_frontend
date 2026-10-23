@@ -122,6 +122,7 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
         setUserTab('explore');
       } else if (item.targetUrl.includes('ai-config')) {
         setPortalMode('admin');
+        window.location.href = '/admin/audit-logs';
       } else {
         setPortalMode('user');
         setUserTab('notifications');

@@ -419,13 +419,89 @@ export const homeApi = {
 };
 
 // ─── Admin Users & RBAC API (A03) ─────────────────────────────────────────────
+// ═══ Admin Reviews Moderation API (Kiểm duyệt đánh giá địa điểm) ═══
+export const adminReviewApi = {
+  async getReviews({ keyword, placeId, rating, visibility, page = 0, size = 20 } = {}) {
+    try {
+      const params = new URLSearchParams();
+      if (keyword) params.append('keyword', keyword);
+      if (placeId) params.append('placeId', placeId);
+      if (rating) params.append('rating', rating);
+      if (visibility && visibility !== 'all') params.append('visibility', visibility);
+      params.append('page', page);
+      params.append('size', size);
+
+      const response = await fetch(`${BASE_URL}/admin/reviews?${params.toString()}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const result = await response.json();
+      const pageData = result.data || {};
+      return {
+        content: pageData.content || [],
+        totalElements: pageData.totalElements ?? 0,
+        totalPages: pageData.totalPages ?? 1,
+        number: pageData.number ?? 0
+      };
+    } catch (error) {
+      console.warn('Admin reviews API unavailable:', error.message);
+      return { content: [], totalElements: 0, totalPages: 1, number: 0 };
+    }
+  },
+
+  async getMetrics() {
+    try {
+      const response = await fetch(`${BASE_URL}/admin/reviews/metrics`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const result = await response.json();
+      return result.data || {};
+    } catch (error) {
+      console.warn('Admin reviews metrics unavailable:', error.message);
+      return {};
+    }
+  },
+
+  async hideReview(id) {
+    const response = await fetch(`${BASE_URL}/admin/reviews/${id}/hide`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return (await response.json()).data;
+  },
+
+  async unhideReview(id) {
+    const response = await fetch(`${BASE_URL}/admin/reviews/${id}/unhide`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return (await response.json()).data;
+  },
+
+  async deleteReview(id) {
+    const response = await fetch(`${BASE_URL}/admin/reviews/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return true;
+  }
+};
+
 export const adminUserApi = {
-  async getUsers({ keyword = '', role = '', status = '' } = {}) {
+  async getUsers({ keyword = '', role = '', status = '', page, size } = {}) {
     try {
       const params = new URLSearchParams();
       if (keyword) params.append('keyword', keyword);
       if (role && role !== 'all') params.append('role', role);
       if (status && status !== 'all') params.append('status', status);
+      if (page !== undefined && page !== null) params.append('page', page);
+      if (size !== undefined && size !== null) params.append('size', size);
 
       const response = await fetch(`${BASE_URL}/admin/users?${params.toString()}`, {
         method: 'GET',
@@ -438,10 +514,70 @@ export const adminUserApi = {
         throw new Error(`HTTP ${response.status}`);
       }
       const result = await response.json();
-      return result.data || [];
+      // Backend trả Page<UserDto> (phân trang server-side) — giữ tương thích
+      // trường hợp trả danh sách thuần (includeAll).
+      if (Array.isArray(result.data)) {
+        return { content: result.data, totalElements: result.data.length, totalPages: 1, number: 0 };
+      }
+      const pageData = result.data || {};
+      return {
+        content: pageData.content || [],
+        totalElements: pageData.totalElements ?? (pageData.content || []).length,
+        totalPages: pageData.totalPages ?? 1,
+        number: pageData.number ?? 0
+      };
     } catch (error) {
       console.warn('Admin users API unavailable:', error.message);
-      return [];
+      return { content: [], totalElements: 0, totalPages: 1, number: 0 };
+    }
+  },
+
+  // Cấp / gỡ badge "Xác thực" cho người dùng
+  async setUserVerified(userId, verified) {
+    try {
+      const response = await fetch(`${BASE_URL}/admin/users/${userId}/verified`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+        body: JSON.stringify({ verified })
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Set user verified failed:', error.message);
+      throw error;
+    }
+  },
+
+  // Đặt lại mật khẩu — trả về { userId, email, tempPassword } (hiển thị 1 lần)
+  async resetPassword(userId) {
+    try {
+      const response = await fetch(`${BASE_URL}/admin/users/${userId}/reset-password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
+      console.error('Reset password failed:', error.message);
+      throw error;
+    }
+  },
+
+  // Thống kê hoạt động thật của người dùng (posts/trips/reviews/saved/follows)
+  async getUserActivity(userId) {
+    try {
+      const response = await fetch(`${BASE_URL}/admin/users/${userId}/activity`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const result = await response.json();
+      return result.data || {};
+    } catch (error) {
+      console.warn('User activity API unavailable:', error.message);
+      return {};
     }
   },
 
@@ -1536,6 +1672,24 @@ export const placeApi = {
       return json.data;
     } catch (err) {
       console.error(`API error approving place #${id}:`, err.message);
+      throw err;
+    }
+  },
+
+  async setPlaceVerified(id, verified) {
+    try {
+      const res = await fetch(`${BASE_URL}/places/admin/${id}/verified?verified=${verified}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      console.error(`API error setting verified for place #${id}:`, err.message);
       throw err;
     }
   },
