@@ -32,9 +32,6 @@ const ensureConnection = () => {
   source = new EventSource(STREAM_URL);
   source.addEventListener('comment', dispatch);
   source.addEventListener('like', dispatch);
-  source.addEventListener('connected', () => console.info('[Realtime] Community stream connected'));
-  // EventSource auto-reconnects on network errors; we only log here.
-  source.onerror = () => console.warn('[Realtime] Community stream interrupted, browser will retry...');
 };
 
 const closeIfIdle = () => {

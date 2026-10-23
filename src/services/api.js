@@ -883,21 +883,22 @@ export const notificationApi = {
     if (!email) {
       return { isBackend: true, data: [] };
     }
-    const response = await fetch(`${BASE_URL}/notifications?email=${encodeURIComponent(email)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader()
-      }
-    });
-    if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+    try {
+      const response = await fetch(`${BASE_URL}/notifications?email=${encodeURIComponent(email)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) {
         return { isBackend: true, data: [] };
       }
-      throw new Error(`Lỗi lấy thông báo: HTTP ${response.status}`);
+      const data = await response.json();
+      return { isBackend: true, data: Array.isArray(data) ? data : [] };
+    } catch {
+      return { isBackend: true, data: [] };
     }
-    const data = await response.json();
-    return { isBackend: true, data: Array.isArray(data) ? data : [] };
   },
 
   // Get unread notification count
@@ -905,22 +906,23 @@ export const notificationApi = {
     if (!email) {
       return { isBackend: true, count: 0 };
     }
-    const response = await fetch(`${BASE_URL}/notifications/unread-count?email=${encodeURIComponent(email)}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...getAuthHeader()
-      }
-    });
-    if (!response.ok) {
-      if (response.status === 401 || response.status === 403) {
+    try {
+      const response = await fetch(`${BASE_URL}/notifications/unread-count?email=${encodeURIComponent(email)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) {
         return { isBackend: true, count: 0 };
       }
-      throw new Error(`HTTP error ${response.status}`);
+      const data = await response.json();
+      const count = typeof data.unreadCount === 'number' ? data.unreadCount : (typeof data.count === 'number' ? data.count : 0);
+      return { isBackend: true, count };
+    } catch {
+      return { isBackend: true, count: 0 };
     }
-    const data = await response.json();
-    const count = typeof data.unreadCount === 'number' ? data.unreadCount : (typeof data.count === 'number' ? data.count : 0);
-    return { isBackend: true, count };
   },
 
   // Mark a single notification as read
