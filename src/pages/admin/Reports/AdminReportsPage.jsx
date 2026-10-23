@@ -561,7 +561,7 @@ export const AdminReportsPage = () => {
 
                     {/* Admin Action Buttons */}
                     <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <button
                           type="button"
                           onClick={() => setSelectedPostModal(report)}
@@ -582,14 +582,14 @@ export const AdminReportsPage = () => {
                           <button
                             type="button"
                             onClick={() => handleDismissReport(report.id, report.title)}
-                            className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors cursor-pointer"
+                            className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
                           >
                             Bác bỏ báo cáo
                           </button>
                         )}
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <button
                           type="button"
                           onClick={() => setConfirmModal({ type: 'hide', post: report })}
@@ -600,20 +600,21 @@ export const AdminReportsPage = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => setConfirmModal({ type: isAiPending ? 'delete' : 'ban', post: report })}
-                          className="px-3.5 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                          onClick={() => setConfirmModal({ type: 'ban', post: report })}
+                          className="px-3.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                          title="Gỡ bài và khóa tài khoản vi phạm"
                         >
-                          {isAiPending ? (
-                            <>
-                              <Trash2 className="w-3.5 h-3.5" />
-                              <span>Xóa bài viết</span>
-                            </>
-                          ) : (
-                            <>
-                              <UserX className="w-3.5 h-3.5" />
-                              <span>Khóa bài & Cảnh cáo</span>
-                            </>
-                          )}
+                          <UserX className="w-3.5 h-3.5" />
+                          <span>Khóa bài</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmModal({ type: 'delete', post: report })}
+                          className="px-3.5 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                          title="Xóa vĩnh viễn bài viết khỏi hệ thống"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Xóa bài viết</span>
                         </button>
                       </div>
                     </div>
@@ -814,13 +815,15 @@ export const AdminReportsPage = () => {
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Duyệt xuất bản</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => handleDismissReport(selectedPostModal.id, selectedPostModal.title)}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
-                >
-                  Bỏ qua (Hợp lệ)
-                </button>
+                {selectedPostModal.status !== 'PENDING_REVIEW' && (
+                  <button
+                    type="button"
+                    onClick={() => handleDismissReport(selectedPostModal.id, selectedPostModal.title)}
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                  >
+                    Bác bỏ báo cáo
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => setConfirmModal({ type: 'hide', post: selectedPostModal })}
@@ -832,10 +835,20 @@ export const AdminReportsPage = () => {
                 <button
                   type="button"
                   onClick={() => setConfirmModal({ type: 'ban', post: selectedPostModal })}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Gỡ bài và khóa tài khoản vi phạm"
                 >
                   <UserX className="w-3.5 h-3.5" />
                   <span>Khóa bài & Cảnh cáo</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmModal({ type: 'delete', post: selectedPostModal })}
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                  title="Xóa vĩnh viễn bài viết khỏi hệ thống"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Xóa bài viết</span>
                 </button>
               </div>
               <button
