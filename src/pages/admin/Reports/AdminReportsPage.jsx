@@ -6,6 +6,7 @@ import { AlertTriangle, Flame, ShieldAlert, Search, Filter, Download, CheckCircl
 export const AdminReportsPage = () => {
   const toast = useToast();
   const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'all' | 'hidden' | 'audit'
+  const [pendingSubFilter, setPendingSubFilter] = useState('all'); // 'all' | 'ai_pending' | 'user_reported'
   const [searchQuery, setSearchQuery] = useState('');
 
   // Real Database States
@@ -177,6 +178,8 @@ export const AdminReportsPage = () => {
 
   // Filtered lists based on search
   const filteredReports = reports.filter(r => {
+    if (pendingSubFilter === 'ai_pending' && r.status !== 'PENDING_REVIEW') return false;
+    if (pendingSubFilter === 'user_reported' && r.status === 'PENDING_REVIEW') return false;
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -354,7 +357,7 @@ export const AdminReportsPage = () => {
           {metrics.pendingReportsCount > 0 && (
             <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
           )}
-          <span>Chờ xử lý báo cáo</span>
+          <span>Chờ duyệt & Báo cáo</span>
           <span className="px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 text-[10px]">
             {metrics.pendingReportsCount}
           </span>
@@ -404,153 +407,220 @@ export const AdminReportsPage = () => {
       {/* 4. Tab Content */}
       {activeTab === 'pending' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-rose-500" />
-              <h2 className="font-display font-extrabold text-lg text-slate-900">
-                Danh sách báo cáo trọng điểm cần xử lý ngay
-              </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200/80">
+            <div className="flex items-center gap-2.5">
+              <ShieldAlert className="w-5 h-5 text-amber-500 shrink-0" />
+              <div>
+                <h2 className="font-display font-extrabold text-base text-slate-900">
+                  Hàng đợi kiểm duyệt bài viết & Xử lý khiếu nại
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Xem xét bài viết người dùng mới đăng bị AI giữ lại chờ duyệt hoặc khiếu nại từ cộng đồng
+                </p>
+              </div>
             </div>
-            <span className="text-xs text-slate-400">Ưu tiên xử lý</span>
+
+            {/* Sub Filter Pills */}
+            <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl shrink-0">
+              <button
+                type="button"
+                onClick={() => setPendingSubFilter('all')}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  pendingSubFilter === 'all' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Tất cả ({reports.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setPendingSubFilter('ai_pending')}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  pendingSubFilter === 'ai_pending' ? 'bg-white text-amber-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Chờ AI duyệt ({reports.filter(r => r.status === 'PENDING_REVIEW').length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setPendingSubFilter('user_reported')}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                  pendingSubFilter === 'user_reported' ? 'bg-white text-rose-700 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Báo cáo vi phạm ({reports.filter(r => r.status !== 'PENDING_REVIEW').length})
+              </button>
+            </div>
           </div>
 
           {loading ? (
             <div className="bg-white rounded-2xl p-12 text-center border border-slate-200/80">
               <RefreshCw className="w-8 h-8 text-sky-500 animate-spin mx-auto mb-2" />
-              <p className="text-xs text-slate-500">Đang tải danh sách báo cáo từ máy chủ...</p>
+              <p className="text-xs text-slate-500">Đang tải danh sách bài viết từ máy chủ...</p>
             </div>
           ) : filteredReports.length === 0 ? (
             <div className="bg-white rounded-2xl p-12 text-center border border-slate-200/80">
               <CheckCircle2 className="w-12 h-12 text-sky-500 mx-auto mb-3" />
-              <h3 className="font-bold text-base text-slate-800">Không còn báo cáo vi phạm nào!</h3>
-              <p className="text-xs text-slate-400 mt-1">Tất cả bài viết báo cáo đã được ban quản trị xử lý sạch sẽ.</p>
+              <h3 className="font-bold text-base text-slate-800">Không có bài viết nào cần duyệt!</h3>
+              <p className="text-xs text-slate-400 mt-1">Tất cả bài viết và báo cáo vi phạm đã được xử lý sạch sẽ.</p>
             </div>
           ) : (
-            filteredReports.map(report => (
-              <article
-                key={report.id}
-                className="bg-white rounded-2xl p-5 sm:p-6 shadow-xs border border-slate-200/80 hover:shadow-md transition-shadow relative flex flex-col md:flex-row gap-6 overflow-hidden"
-              >
-                {/* Left Accent Bar */}
-                <div className={`absolute top-0 left-0 bottom-0 w-1.5 rounded-l-2xl ${
-                  report.categoryType === 'error' ? 'bg-rose-500' : report.categoryType === 'warning' ? 'bg-amber-500' : 'bg-sky-500'
-                }`}></div>
+            filteredReports.map(report => {
+              const isAiPending = report.status === 'PENDING_REVIEW';
+              return (
+                <article
+                  key={report.id}
+                  className="bg-white rounded-2xl p-5 sm:p-6 shadow-xs border border-slate-200/80 hover:shadow-md transition-shadow relative flex flex-col md:flex-row gap-6 overflow-hidden"
+                >
+                  {/* Left Accent Bar */}
+                  <div className={`absolute top-0 left-0 bottom-0 w-1.5 rounded-l-2xl ${
+                    isAiPending ? 'bg-amber-500' : report.categoryType === 'error' ? 'bg-rose-500' : 'bg-sky-500'
+                  }`}></div>
 
-                {/* Image Preview */}
-                <div className="w-full md:w-64 lg:w-72 shrink-0">
-                  <div className="relative rounded-xl overflow-hidden w-full h-48 md:h-full min-h-[190px] max-h-[280px] bg-slate-100">
-                    <img 
-                      src={report.imageUrl} 
-                      alt={report.title} 
-                      className="w-full h-full object-cover block" 
-                      onError={(e) => {
-                        e.target.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
-                      }}
-                    />
-                    <span className="absolute top-2 left-2 px-2.5 py-1 rounded-full bg-rose-600 text-white font-extrabold text-[10px] flex items-center gap-1 shadow-sm z-10">
-                      <Flame className="w-3 h-3" />
-                      <span>{report.badgeText || (report.reportsCount + ' Lượt báo cáo')}</span>
-                    </span>
-                    {report.locationTag && (
-                      <span className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-slate-950/80 text-white font-bold text-[10px] backdrop-blur-md z-10">
-                        {report.locationTag}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Report Content Details */}
-                <div className="flex-1 min-w-0 flex flex-col justify-between space-y-4">
-                  <div>
-                    <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2.5 py-0.5 rounded-full font-extrabold text-[10px] ${
-                          report.categoryType === 'error'
-                            ? 'bg-rose-100 text-rose-700'
-                            : report.categoryType === 'warning'
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-sky-100 text-sky-800'
-                        }`}>
-                          {report.category}
+                  {/* Image Preview */}
+                  <div className="w-full md:w-64 lg:w-72 shrink-0">
+                    <div className="relative rounded-xl overflow-hidden w-full h-48 md:h-full min-h-[190px] max-h-[280px] bg-slate-100">
+                      <img 
+                        src={report.imageUrl} 
+                        alt={report.title} 
+                        className="w-full h-full object-cover block" 
+                        onError={(e) => {
+                          e.target.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
+                        }}
+                      />
+                      {isAiPending ? (
+                        <span className="absolute top-2 left-2 px-2.5 py-1 rounded-full bg-amber-500 text-white font-extrabold text-[10px] flex items-center gap-1 shadow-sm z-10">
+                          <Sparkles className="w-3 h-3" />
+                          <span>AI Gắn Cờ - Chờ Duyệt</span>
                         </span>
-                        <span className="text-xs font-mono text-slate-400">Mã bài: #{report.postCode || report.id}</span>
+                      ) : (
+                        <span className="absolute top-2 left-2 px-2.5 py-1 rounded-full bg-rose-600 text-white font-extrabold text-[10px] flex items-center gap-1 shadow-sm z-10">
+                          <Flame className="w-3 h-3" />
+                          <span>{report.badgeText || (report.reportsCount + ' Lượt báo cáo')}</span>
+                        </span>
+                      )}
+                      {report.locationTag && (
+                        <span className="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-slate-950/80 text-white font-bold text-[10px] backdrop-blur-md z-10">
+                          {report.locationTag}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Report Content Details */}
+                  <div className="flex-1 min-w-0 flex flex-col justify-between space-y-4">
+                    <div>
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2.5 py-0.5 rounded-full font-extrabold text-[10px] ${
+                            isAiPending
+                              ? 'bg-amber-100 text-amber-800'
+                              : report.categoryType === 'error'
+                                ? 'bg-rose-100 text-rose-700'
+                                : 'bg-sky-100 text-sky-800'
+                          }`}>
+                            {report.category}
+                          </span>
+                          <span className="text-xs font-mono text-slate-400">Mã bài: #{report.postCode || report.id}</span>
+                        </div>
+                        <span className="text-xs text-slate-400">{report.timeAgo}</span>
                       </div>
-                      <span className="text-xs text-slate-400">{report.timeAgo}</span>
-                    </div>
 
-                    <h3 className="font-display font-extrabold text-base text-slate-900 mb-2">
-                      {report.title}
-                    </h3>
+                      <h3 className="font-display font-extrabold text-base text-slate-900 mb-2">
+                        {report.title}
+                      </h3>
 
-                    {/* Author Meta */}
-                    <div className="flex items-center gap-2 mb-3 text-xs text-slate-600">
-                      <span className="font-bold text-slate-900">{report.authorName}</span>
-                      <span className="text-slate-400">{report.authorHandle}</span>
-                      <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                      <span className="text-slate-500 font-medium">{report.authorAccountAge}</span>
-                    </div>
+                      {/* Author Meta */}
+                      <div className="flex items-center gap-2 mb-3 text-xs text-slate-600">
+                        <span className="font-bold text-slate-900">{report.authorName}</span>
+                        <span className="text-slate-400">{report.authorHandle}</span>
+                        <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                        <span className="text-slate-500 font-medium">{report.authorAccountAge}</span>
+                      </div>
 
-                    {/* Flag Reason Detail Box */}
-                    <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 mb-3 space-y-1">
-                      <div className="flex items-start gap-2 text-xs">
-                        <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
-                        <div>
-                          <strong className="font-bold text-slate-900">Lý do báo cáo & Cảnh báo AI: </strong>
-                          <span className="text-slate-600">{report.reportReason || report.aiFlagReason}</span>
+                      {/* Flag Reason Detail Box */}
+                      <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 mb-3 space-y-1">
+                        <div className="flex items-start gap-2 text-xs">
+                          {isAiPending ? (
+                            <Sparkles className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                          ) : (
+                            <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                          )}
+                          <div>
+                            <strong className="font-bold text-slate-900">
+                              {isAiPending ? 'Đánh giá AI & Lý do giữ bài: ' : 'Lý do báo cáo & Cảnh báo: '}
+                            </strong>
+                            <span className="text-slate-600">{report.reportReason || report.aiFlagReason}</span>
+                          </div>
                         </div>
                       </div>
+
+                      <p className="text-xs text-slate-600 line-clamp-2 italic">
+                        "{report.snippet}"
+                      </p>
                     </div>
 
-                    <p className="text-xs text-slate-600 line-clamp-2 italic">
-                      "{report.snippet}"
-                    </p>
+                    {/* Admin Action Buttons */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedPostModal(report)}
+                          className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Xem toàn bộ</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleApprovePost(report.id, report.title)}
+                          className="px-3.5 py-1.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Duyệt xuất bản</span>
+                        </button>
+                        {!isAiPending && (
+                          <button
+                            type="button"
+                            onClick={() => handleDismissReport(report.id, report.title)}
+                            className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors cursor-pointer"
+                          >
+                            Bác bỏ báo cáo
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setConfirmModal({ type: 'hide', post: report })}
+                          className="px-3.5 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <EyeOff className="w-3.5 h-3.5" />
+                          <span>Tạm ẩn bài</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmModal({ type: isAiPending ? 'delete' : 'ban', post: report })}
+                          className="px-3.5 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                        >
+                          {isAiPending ? (
+                            <>
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Xóa bài viết</span>
+                            </>
+                          ) : (
+                            <>
+                              <UserX className="w-3.5 h-3.5" />
+                              <span>Khóa bài & Cảnh cáo</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
                   </div>
-
-                  {/* Admin Action Buttons */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setSelectedPostModal(report)}
-                        className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                      >
-                        <Eye className="w-3.5 h-3.5" />
-                        <span>Xem toàn bộ</span>
-                      </button>
-                      <button
-                        onClick={() => handleApprovePost(report.id, report.title)}
-                        className="px-3.5 py-1.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        <span>Duyệt xuất bản</span>
-                      </button>
-                      <button
-                        onClick={() => handleDismissReport(report.id, report.title)}
-                        className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs transition-colors cursor-pointer"
-                      >
-                        Bỏ qua (Hợp lệ)
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => setConfirmModal({ type: 'hide', post: report })}
-                        className="px-3.5 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                      >
-                        <EyeOff className="w-3.5 h-3.5" />
-                        <span>Tạm ẩn bài</span>
-                      </button>
-                      <button
-                        onClick={() => setConfirmModal({ type: 'ban', post: report })}
-                        className="px-3.5 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                      >
-                        <UserX className="w-3.5 h-3.5" />
-                        <span>Khóa bài & Cảnh cáo</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))
+                </article>
+              );
+            })
           )}
         </div>
       )}
