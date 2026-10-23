@@ -1422,8 +1422,12 @@ export const userApi = {
 
   async getFollowingIds(email) {
     try {
+      const token = getAuthToken();
       const user = getStoredUser() || {};
       const userEmail = email || user.email || '';
+      if (!token && !userEmail) {
+        return [];
+      }
       const qs = userEmail ? `?email=${encodeURIComponent(userEmail)}` : '';
       const res = await fetch(`${BASE_URL}/users/following/ids${qs}`, {
         headers: {
@@ -1431,7 +1435,9 @@ export const userApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) {
+        return [];
+      }
       const json = await res.json();
       return json.data || [];
     } catch (err) {
