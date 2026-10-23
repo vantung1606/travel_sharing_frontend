@@ -131,13 +131,14 @@ export const AdminReportsPage = () => {
     try {
       await adminReportApi.unhidePost(id);
       await loadData();
-      toast.success(`Đã khôi phục hiển thị (bỏ ẩn) bài viết #${id} lên Cộng đồng thành công!`);
+      toast.success(`Đã chuyển bài viết #${id} quay trở lại hàng đợi chờ duyệt thành công!`);
       if (selectedPostModal && selectedPostModal.id === id) {
         setSelectedPostModal(null);
       }
       setConfirmModal(null);
+      setActiveTab('pending');
     } catch (err) {
-      toast.error('Lỗi khi khôi phục hiển thị bài viết: ' + err.message);
+      toast.error('Lỗi khi chuyển bài viết về chờ duyệt: ' + err.message);
     }
   };
 
@@ -730,8 +731,8 @@ export const AdminReportsPage = () => {
                         {art.status === 'HIDDEN' || art.status === 'REMOVED' ? (
                           <button
                             onClick={() => setConfirmModal({ type: 'unhide', post: art })}
-                            className="p-1.5 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer mr-1"
-                            title="Khôi phục hiển thị (Bỏ ẩn bài viết)"
+                            className="p-1.5 rounded-lg text-sky-600 hover:text-sky-700 hover:bg-sky-50 transition-colors cursor-pointer mr-1"
+                            title="Bỏ ẩn (Đưa về hàng đợi chờ duyệt)"
                           >
                             <RefreshCw className="w-4 h-4" />
                           </button>
@@ -874,16 +875,16 @@ export const AdminReportsPage = () => {
 
             <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
               <div className="flex flex-wrap items-center gap-2">
-                {/* 1. Nếu bài viết đang bị ẩn/gỡ -> Chỉ có hành động Bỏ ẩn (Khôi phục hiển thị) */}
+                {/* 1. Nếu bài viết đang bị ẩn/gỡ -> Có hành động Bỏ ẩn (Đưa về hàng đợi chờ duyệt) */}
                 {selectedPostModal.status === 'HIDDEN' || selectedPostModal.status === 'REMOVED' ? (
                   <button
                     type="button"
                     onClick={() => setConfirmModal({ type: 'unhide', post: selectedPostModal })}
-                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                    title="Khôi phục hiển thị (bỏ ẩn) bài viết lên Cộng đồng"
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                    title="Bỏ ẩn và chuyển bài viết quay trở lại hàng đợi chờ duyệt"
                   >
                     <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Khôi phục hiển thị (Bỏ ẩn)</span>
+                    <span>Bỏ ẩn (Đưa về chờ duyệt)</span>
                   </button>
                 ) : selectedPostModal.status === 'PENDING_REVIEW' ? (
                   /* 2. Bài viết mới bị AI giữ lại -> Duyệt xuất bản hoặc Tạm ẩn */
@@ -975,7 +976,7 @@ export const AdminReportsPage = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-display font-extrabold text-base text-slate-900 mb-1">
-                  {confirmModal.type === 'unhide' && 'Xác nhận Khôi phục hiển thị (Bỏ ẩn bài)'}
+                  {confirmModal.type === 'unhide' && 'Xác nhận Bỏ ẩn (Đưa về hàng đợi chờ duyệt)'}
                   {confirmModal.type === 'hide' && 'Xác nhận Tạm ẩn bài viết'}
                   {confirmModal.type === 'delete' && 'Xác nhận Xóa bài viết vĩnh viễn'}
                   {confirmModal.type === 'ban' && 'Xác nhận Khóa bài & Cảnh cáo'}
@@ -983,7 +984,7 @@ export const AdminReportsPage = () => {
                 <p className="text-xs text-slate-500 leading-relaxed">
                   {confirmModal.type === 'unhide' && (
                     <>
-                      Bài viết <strong className="text-slate-800">#{confirmModal.post?.id}</strong> sẽ được bỏ ẩn và hiển thị trở lại bình thường trên Cộng đồng Wayfare. Tác giả sẽ nhận được thông báo khôi phục bài viết.
+                      Bài viết <strong className="text-slate-800">#{confirmModal.post?.id}</strong> sẽ được bỏ ẩn và chuyển quay trở lại trang <strong className="text-slate-800">Chờ duyệt & Báo cáo</strong> để quản trị viên xem xét phê duyệt xuất bản.
                     </>
                   )}
                   {confirmModal.type === 'hide' && (
@@ -1028,13 +1029,13 @@ export const AdminReportsPage = () => {
                 }}
                 className={`px-4 py-2 rounded-xl text-xs font-bold text-white transition-colors cursor-pointer shadow-xs ${
                   confirmModal.type === 'unhide'
-                    ? 'bg-emerald-600 hover:bg-emerald-700'
+                    ? 'bg-sky-600 hover:bg-sky-700'
                     : confirmModal.type === 'hide'
                       ? 'bg-amber-600 hover:bg-amber-700'
                       : 'bg-rose-600 hover:bg-rose-700'
                 }`}
               >
-                {confirmModal.type === 'unhide' && 'Khôi phục hiển thị'}
+                {confirmModal.type === 'unhide' && 'Đưa về chờ duyệt'}
                 {confirmModal.type === 'hide' && 'Xác nhận Ẩn bài'}
                 {confirmModal.type === 'delete' && 'Xóa vĩnh viễn'}
                 {confirmModal.type === 'ban' && 'Khóa bài & Cảnh cáo'}
