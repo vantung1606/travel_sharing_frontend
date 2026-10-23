@@ -3,6 +3,19 @@ import { useToast } from '../../../components/common/Toast';
 import { adminReportApi, auditLogApi } from '../../../services/api';
 import { AlertTriangle, Flame, ShieldAlert, Search, Filter, Download, CheckCircle2, Eye, EyeOff, UserX, Trash2, RefreshCw, TrendingUp, FileText, ShieldCheck, Bot, History, X, MapPin, Sparkles } from 'lucide-react';
 
+// Helper to sanitize media image URLs and prevent Mixed Content on production HTTPS
+const getSafeImageUrl = (url) => {
+  if (!url) return 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
+  if (url.startsWith('http://localhost:8081') || url.startsWith('http://localhost:')) {
+    const backendHost = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/api\/?$/, '');
+    if (backendHost && !backendHost.includes('localhost')) {
+      return url.replace(/^http:\/\/localhost(:\d+)?/, backendHost);
+    }
+    return 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
+  }
+  return url;
+};
+
 export const AdminReportsPage = () => {
   const toast = useToast();
   const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'all' | 'hidden' | 'audit'
@@ -35,10 +48,11 @@ export const AdminReportsPage = () => {
     else setLoading(true);
 
     try {
+      const targetStatus = activeTab === 'pending' ? 'all' : activeTab;
       const [metricsData, pendingReportsData, allArticlesData, logsData] = await Promise.all([
         adminReportApi.getMetrics(),
         adminReportApi.getPendingReports(searchQuery),
-        adminReportApi.getAllArticles({ keyword: searchQuery, status: activeTab }),
+        adminReportApi.getAllArticles({ keyword: searchQuery, status: targetStatus }),
         auditLogApi.getLogs({ size: 25 }).catch(() => null)
       ]);
 
@@ -479,14 +493,14 @@ export const AdminReportsPage = () => {
                   {/* Image Preview */}
                   <div className="w-full md:w-64 lg:w-72 shrink-0">
                     <div className="relative rounded-xl overflow-hidden w-full h-48 md:h-full min-h-[190px] max-h-[280px] bg-slate-100">
-                      <img 
-                        src={report.imageUrl} 
-                        alt={report.title} 
-                        className="w-full h-full object-cover block" 
-                        onError={(e) => {
-                          e.target.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
-                        }}
-                      />
+                        <img 
+                          src={getSafeImageUrl(report.imageUrl)} 
+                          alt={report.title} 
+                          className="w-full h-full object-cover block" 
+                          onError={(e) => {
+                            e.target.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80';
+                          }}
+                        />
                       {isAiPending ? (
                         <span className="absolute top-2 left-2 px-2.5 py-1 rounded-full bg-amber-500 text-white font-extrabold text-[10px] flex items-center gap-1 shadow-sm z-10">
                           <Sparkles className="w-3 h-3" />
@@ -566,7 +580,7 @@ export const AdminReportsPage = () => {
                       </p>
                     </div>
 
-                    {/* Admin Action Buttons */}
+                    {/* Admin Action Buttons (3 Clear Actions: Duyệt / Tạm ẩn / Xóa vĩnh viễn) */}
                     <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
                       <div className="flex flex-wrap items-center gap-2">
                         <button
@@ -577,21 +591,25 @@ export const AdminReportsPage = () => {
                           <Eye className="w-3.5 h-3.5" />
                           <span>Xem toàn bộ</span>
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => handleApprovePost(report.id, report.title)}
-                          className="px-3.5 py-1.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>Duyệt xuất bản</span>
-                        </button>
-                        {!isAiPending && (
+                        {isAiPending ? (
+                          <button
+                            type="button"
+                            onClick={() => handleApprovePost(report.id, report.title)}
+                            className="px-3.5 py-1.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                            title="Phê duyệt bài viết để hiển thị công khai trên cộng đồng"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Duyệt xuất bản</span>
+                          </button>
+                        ) : (
                           <button
                             type="button"
                             onClick={() => handleDismissReport(report.id, report.title)}
-                            className="px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                            className="px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                            title="Bác bỏ báo cáo và giữ lại bài viết hợp lệ"
                           >
-                            Bác bỏ báo cáo
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            <span>Bác bỏ báo cáo (Hợp lệ)</span>
                           </button>
                         )}
                       </div>
@@ -600,28 +618,20 @@ export const AdminReportsPage = () => {
                         <button
                           type="button"
                           onClick={() => setConfirmModal({ type: 'hide', post: report })}
-                          className="px-3.5 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                          className="px-3.5 py-1.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                          title="Tạm thời ẩn bài viết khỏi cộng đồng"
                         >
                           <EyeOff className="w-3.5 h-3.5" />
                           <span>Tạm ẩn bài</span>
                         </button>
                         <button
                           type="button"
-                          onClick={() => setConfirmModal({ type: 'ban', post: report })}
-                          className="px-3.5 py-1.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-                          title="Gỡ bài và khóa tài khoản vi phạm"
-                        >
-                          <UserX className="w-3.5 h-3.5" />
-                          <span>Khóa bài</span>
-                        </button>
-                        <button
-                          type="button"
                           onClick={() => setConfirmModal({ type: 'delete', post: report })}
                           className="px-3.5 py-1.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                          title="Xóa vĩnh viễn bài viết khỏi hệ thống"
+                          title="Xóa vĩnh viễn bài viết khỏi hệ thống CSDL"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
-                          <span>Xóa bài viết</span>
+                          <span>Xóa vĩnh viễn</span>
                         </button>
                       </div>
                     </div>
@@ -777,7 +787,7 @@ export const AdminReportsPage = () => {
 
             {selectedPostModal.imageUrl && (
               <img 
-                src={selectedPostModal.imageUrl} 
+                src={getSafeImageUrl(selectedPostModal.imageUrl)} 
                 alt={selectedPostModal.title}
                 className="w-full h-56 object-cover rounded-2xl border border-slate-200"
               />
@@ -833,39 +843,34 @@ export const AdminReportsPage = () => {
 
             <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
               <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleApprovePost(selectedPostModal.id, selectedPostModal.title)}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Duyệt xuất bản</span>
-                </button>
-                {selectedPostModal.status !== 'PENDING_REVIEW' && (
+                {selectedPostModal.status === 'PENDING_REVIEW' ? (
+                  <button
+                    type="button"
+                    onClick={() => handleApprovePost(selectedPostModal.id, selectedPostModal.title)}
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                    title="Phê duyệt bài viết để công khai trên cộng đồng"
+                  >
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>Duyệt xuất bản</span>
+                  </button>
+                ) : (
                   <button
                     type="button"
                     onClick={() => handleDismissReport(selectedPostModal.id, selectedPostModal.title)}
-                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                    title="Bác bỏ báo cáo và giữ lại bài viết hợp lệ"
                   >
-                    Bác bỏ báo cáo
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Bác bỏ báo cáo (Hợp lệ)</span>
                   </button>
                 )}
                 <button
                   type="button"
                   onClick={() => setConfirmModal({ type: 'hide', post: selectedPostModal })}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80 flex items-center gap-1.5 transition-colors cursor-pointer"
                 >
                   <EyeOff className="w-3.5 h-3.5" />
                   <span>Tạm ẩn bài</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirmModal({ type: 'ban', post: selectedPostModal })}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 flex items-center gap-1.5 transition-colors cursor-pointer"
-                  title="Gỡ bài và khóa tài khoản vi phạm"
-                >
-                  <UserX className="w-3.5 h-3.5" />
-                  <span>Khóa bài & Cảnh cáo</span>
                 </button>
                 <button
                   type="button"
@@ -874,13 +879,13 @@ export const AdminReportsPage = () => {
                   title="Xóa vĩnh viễn bài viết khỏi hệ thống"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
-                  <span>Xóa bài viết</span>
+                  <span>Xóa vĩnh viễn</span>
                 </button>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedPostModal(null)}
-                className="px-4 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 cursor-pointer"
+                className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer"
               >
                 Đóng
               </button>

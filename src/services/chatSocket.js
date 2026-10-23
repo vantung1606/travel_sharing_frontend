@@ -250,4 +250,24 @@ class ChatSocketService {
 }
 
 export const chatSocket = new ChatSocketService();
+
+// Cleanly handle browser Back-Forward Cache (bfcache) to prevent WebSocket connection error on page transition
+if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', () => {
+    try {
+      if (chatSocket.client && chatSocket.client.active) {
+        chatSocket.client.deactivate();
+      }
+    } catch (_) {}
+  });
+
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+      try {
+        chatSocket.connect();
+      } catch (_) {}
+    }
+  });
+}
+
 export default chatSocket;
