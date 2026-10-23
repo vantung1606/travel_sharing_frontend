@@ -19,10 +19,9 @@ export const PAGE_TITLES = {
   '/admin/places': 'Wayfare Admin - Quản lý Điểm đến & Kiểm duyệt Check-in',
   '/admin/users': 'Wayfare Admin - Quản lý Người dùng & Phân quyền RBAC',
   '/admin/reports': 'Wayfare Admin - Kiểm duyệt Vi phạm & Báo cáo Spam',
+  '/admin/reviews': 'Wayfare Admin - Kiểm duyệt Đánh giá Du khách',
   '/admin/analytics': 'Wayfare Admin - Thống kê & Phân tích Tăng trưởng',
-  '/admin/audit-logs': 'Wayfare Admin - Nhật ký Hệ thống & Hoạt động (Audit Logs)',
-  '/admin/revenue': 'Wayfare Admin - Quản lý Doanh thu, Hoa hồng & Đặt cọc',
-  '/admin/ai-config': 'Wayfare Admin - Cấu hình Hệ thống AI & Gemini Gateway'
+  '/admin/audit-logs': 'Wayfare Admin - Nhật ký Hệ thống & Hoạt động (Audit Logs)'
 };
 
 // Component that dynamically syncs document.title on every URL change

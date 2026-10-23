@@ -488,8 +488,6 @@ export const AdminReportsPage = () => {
                       <span className="text-slate-400">{report.authorHandle}</span>
                       <span className="w-1 h-1 rounded-full bg-slate-300"></span>
                       <span className="text-slate-500 font-medium">{report.authorAccountAge}</span>
-                      <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                      <span className="text-sky-600 font-semibold">Trust: {report.authorTrustScore || 80}/100</span>
                     </div>
 
                     {/* Flag Reason Detail Box */}

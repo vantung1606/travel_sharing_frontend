@@ -156,6 +156,23 @@ export const AdminPlacesPage = () => {
     }
   };
 
+  // Quy trình Badge "Xác thực": cấp/gỡ cờ is_verified_host ngay từ bảng (PHẦN P1)
+  const handleToggleVerified = async (place) => {
+    setIsSubmitting(true);
+    try {
+      const updated = await placeApi.setPlaceVerified(place.id, !place.isVerifiedHost);
+      toast.success(updated?.isVerifiedHost
+        ? `Đã cấp badge Xác thực cho "${updated.name}".`
+        : `Đã gỡ badge Xác thực của "${updated.name}".`);
+      setAllPlaces(prev => prev.map(x => (x.id === updated.id ? { ...x, isVerifiedHost: updated.isVerifiedHost } : x)));
+      setPendingPlaces(prev => prev.map(x => (x.id === updated.id ? { ...x, isVerifiedHost: updated.isVerifiedHost } : x)));
+    } catch (err) {
+      toast.error('Lỗi cập nhật badge Xác thực: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Handle Submit Reject from Modal
   const confirmReject = async () => {
     if (!rejectModalData) return;
@@ -581,7 +598,7 @@ export const AdminPlacesPage = () => {
                                 </span>
                                 {p.isVerifiedHost && (
                                   <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold">
-                                    Host uy tín
+                                    Đã xác thực
                                   </span>
                                 )}
                               </div>
@@ -643,6 +660,19 @@ export const AdminPlacesPage = () => {
                                 </button>
                               </>
                             )}
+                            <button
+                              type="button"
+                              onClick={() => handleToggleVerified(p)}
+                              disabled={isSubmitting}
+                              className={`p-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-40 ${
+                                p.isVerifiedHost
+                                  ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+                                  : 'bg-slate-100 text-slate-500 hover:bg-emerald-600 hover:text-white'
+                              }`}
+                              title={p.isVerifiedHost ? 'Gỡ badge Xác thực' : 'Cấp badge Xác thực'}
+                            >
+                              <ShieldCheck className="w-3.5 h-3.5" />
+                            </button>
                             <button
                               type="button"
                               onClick={() => setDeleteModalData({ id: p.id, name: p.name })}

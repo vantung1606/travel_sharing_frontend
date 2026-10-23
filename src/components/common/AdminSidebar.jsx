@@ -1,6 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
-import { LayoutDashboard, MapPin, Users, BarChart3, Cpu, LogOut, MessageSquare, DollarSign, History } from 'lucide-react';
+import { LayoutDashboard, MapPin, Users, BarChart3, LogOut, MessageSquare, History, Star } from 'lucide-react';
 
 
 export const AdminSidebar = ({ onNavigate }) => {
@@ -8,13 +8,12 @@ export const AdminSidebar = ({ onNavigate }) => {
 
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard tổng quan', icon: LayoutDashboard },
-    { id: 'places', label: 'Địa điểm & Check-in', icon: MapPin, badge: stats.pendingCheckins },
-    { id: 'users', label: 'Người dùng & Phân quyền', icon: Users, badge: stats.reportedContent },
-    { id: 'reports', label: 'Bài viết & Báo cáo', icon: MessageSquare },
+    { id: 'places', label: 'Địa điểm', icon: MapPin, badge: stats.pendingPlaces },
+    { id: 'reviews', label: 'Đánh giá', icon: Star, badge: stats.hiddenReviews },
+    { id: 'users', label: 'Người dùng & Phân quyền', icon: Users },
+    { id: 'reports', label: 'Bài viết & Báo cáo', icon: MessageSquare, badge: stats.reportedContent },
     { id: 'analytics', label: 'Thống kê hệ thống', icon: BarChart3 },
-    { id: 'audit-logs', label: 'Nhật ký hệ thống', icon: History },
-    { id: 'revenue', label: 'Mô hình Doanh thu', icon: DollarSign, isDev: true },
-    { id: 'ai-config', label: 'Cấu hình Hệ thống AI', icon: Cpu }
+    { id: 'audit-logs', label: 'Nhật ký hệ thống', icon: History }
   ];
 
   return (
@@ -35,19 +34,8 @@ export const AdminSidebar = ({ onNavigate }) => {
           </span>
         </div>
 
-        {/* AI Engine Status Banner */}
-        <div className="px-4 py-3">
-          <div className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs">
-            <span className="text-slate-300 text-[11px] font-semibold flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse"></span>
-              AI Engine Status
-            </span>
-            <span className="text-sky-400 font-extrabold text-[11px]">99.9%</span>
-          </div>
-        </div>
-
         {/* Navigation Menu */}
-        <nav className="px-3 space-y-1 mt-1">
+        <nav className="px-3 space-y-1 mt-2">
           {menuItems.map(item => {
             const Icon = item.icon;
             const active = adminTab === item.id;
@@ -69,11 +57,6 @@ export const AdminSidebar = ({ onNavigate }) => {
                 {item.badge > 0 && (
                   <span className="px-2 py-0.5 text-[10px] font-extrabold rounded-full bg-amber-500 text-slate-950">
                     {item.badge}
-                  </span>
-                )}
-                {item.isDev && (
-                  <span className="px-2 py-0.5 text-[9px] font-extrabold rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">
-                    Đang phát triển
                   </span>
                 )}
               </button>
