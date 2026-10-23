@@ -2,8 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useToast } from '../common/Toast';
-import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers } from 'lucide-react';
+import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2 } from 'lucide-react';
 import { ItineraryExportModal } from './ItineraryExportModal';
+import { itineraryApi } from '../../services/api';
 
 // Tọa độ trung tâm các tỉnh/thành phố du lịch chính tại Việt Nam
 const VIETNAM_COORDINATES = {
@@ -267,7 +268,7 @@ const createNumberedMarkerIcon = (num, isHighlighted) => {
   });
 };
 
-export const ItineraryDetailModal = ({ itinerary, onClose }) => {
+export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
   const toast = useToast();
   // 'all' hoặc index 0, 1, 2...
   const [activeTab, setActiveTab] = useState('all');
@@ -278,6 +279,15 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
   const [mapLayer, setMapLayer] = useState('standard'); // 'standard' | 'satellite' | 'topo'
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
 
+  // Quản lý thêm hoạt động tự điền
+  const [addingDayNumber, setAddingDayNumber] = useState(null);
+  const [newActTime, setNewActTime] = useState('');
+  const [newActTitle, setNewActTitle] = useState('');
+  const [newActLocation, setNewActLocation] = useState('');
+  const [newActCategory, setNewActCategory] = useState('Tham quan');
+  const [newActCost, setNewActCost] = useState('');
+  const [newActNote, setNewActNote] = useState('');
+
   // Checklist chuẩn bị hành trang cơ bản
   const [checklist, setChecklist] = useState([
     { id: 1, text: 'CCCD / Hộ chiếu bản gốc còn hạn', done: true },
@@ -286,34 +296,128 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
     { id: 4, text: 'Thuốc cá nhân cơ bản (dị ứng, đau đầu, tiêu hóa)', done: false }
   ]);
 
-  const days = itinerary?.days && itinerary.days.length > 0 ? itinerary.days : [
-    {
-      dayNumber: 1,
-      title: 'Ngày 1: Khám phá các điểm dừng chân nổi bật',
-      activities: [
-        {
-          time: '08:30 – 10:30',
-          category: 'Tham quan danh thắng',
-          title: `Khám phá trung tâm ${itinerary.destination || 'Điểm đến'}`,
-          location: `${itinerary.destination || 'Trung tâm'}`,
-          address: `Khu trung tâm ${itinerary.destination || 'Điểm đến'}, Việt Nam`,
-          note: 'Dạo quanh các điểm nhấn văn hóa, kiến trúc và cảnh quan nổi bật.',
-          cost: '100.000đ/người',
-          transit: 'Di chuyển nội đô: ~15 phút'
-        },
-        {
-          time: '11:30 – 13:00',
-          category: 'Ẩm thực bản địa',
-          title: `Thưởng thức đặc sản truyền thống`,
-          location: `Quán ăn đặc sản địa phương`,
-          address: `Khu ẩm thực ${itinerary.destination || 'Điểm đến'}, Việt Nam`,
-          note: 'Trải nghiệm văn hóa ẩm thực đậm đà bản sắc địa phương.',
-          cost: '120.000đ/người',
-          transit: 'Di chuyển: ~10 phút'
-        }
-      ]
+  // Quản lý danh sách ngày linh hoạt (tôn trọng 100% dữ liệu người dùng tự nhập)
+  const [currentDays, setCurrentDays] = useState(() => {
+    if (itinerary?.days && itinerary.days.length > 0) {
+      return itinerary.days;
     }
-  ];
+    const daysCount = itinerary?.daysCount || 1;
+    return Array.from({ length: daysCount }).map((_, i) => ({
+      dayNumber: i + 1,
+      title: `Ngày ${i + 1}: Kế hoạch khám phá ${itinerary?.destination || 'Điểm đến'}`,
+      activities: []
+    }));
+  });
+
+  useEffect(() => {
+    if (itinerary?.days) {
+      setCurrentDays(itinerary.days);
+    }
+  }, [itinerary]);
+
+  const days = currentDays;
+
+  // Thêm hoạt động vào ngày cụ thể
+  const handleSaveNewActivity = async (targetDayNumber) => {
+    if (!newActTitle.trim()) {
+      toast.showWarning('Vui lòng nhập tên hoạt động hoặc điểm dừng chân!');
+      return;
+    }
+
+    const createdActivity = {
+      id: Date.now(),
+      time: newActTime.trim() || '08:30',
+      title: newActTitle.trim(),
+      location: newActLocation.trim() || newActTitle.trim(),
+      address: newActLocation.trim()
+        ? `${newActLocation.trim()}, ${itinerary?.destination || 'Việt Nam'}`
+        : `${itinerary?.destination || 'Việt Nam'}, Việt Nam`,
+      category: newActCategory || 'Tham quan',
+      cost: newActCost.trim() || 'Theo chi tiêu',
+      note: newActNote.trim() || ''
+    };
+
+    const updatedDays = currentDays.map(d => {
+      const dNum = d.dayNumber || 1;
+      if (dNum === targetDayNumber) {
+        return {
+          ...d,
+          activities: [...(d.activities || []), createdActivity]
+        };
+      }
+      return d;
+    });
+
+    setCurrentDays(updatedDays);
+    setAddingDayNumber(null);
+    setNewActTime('');
+    setNewActTitle('');
+    setNewActLocation('');
+    setNewActCost('');
+    setNewActNote('');
+
+    toast.showSuccess(`Đã thêm "${createdActivity.title}" vào Ngày ${targetDayNumber}! 🎉`);
+
+    const updatedItin = {
+      ...itinerary,
+      days: updatedDays,
+      placesCount: updatedDays.reduce((acc, d) => acc + (d.activities?.length || 0), 0)
+    };
+    onUpdate?.(updatedItin);
+
+    // Đồng bộ lên backend nếu lịch trình đã có ID trên MySQL
+    try {
+      if (itinerary?.id && typeof itinerary.id === 'number') {
+        const timeFormatted = createdActivity.time.includes(':')
+          ? (createdActivity.time.length === 5 ? `${createdActivity.time}:00` : createdActivity.time)
+          : '08:30:00';
+        await itineraryApi.addItineraryDetail(itinerary.id, {
+          dayNumber: targetDayNumber,
+          startTime: timeFormatted,
+          locationName: createdActivity.title,
+          locationAddress: createdActivity.address,
+          category: createdActivity.category,
+          estimatedCost: parseInt(createdActivity.cost.replace(/\D/g, '')) || 0,
+          note: createdActivity.note
+        });
+      }
+    } catch (e) {
+      console.warn('Backend sync detail warning:', e.message);
+    }
+  };
+
+  // Xóa hoạt động khỏi ngày
+  const handleDeleteActivity = async (targetDayNumber, actIndex, activity) => {
+    const updatedDays = currentDays.map(d => {
+      const dNum = d.dayNumber || 1;
+      if (dNum === targetDayNumber) {
+        return {
+          ...d,
+          activities: (d.activities || []).filter((_, idx) => idx !== actIndex)
+        };
+      }
+      return d;
+    });
+
+    setCurrentDays(updatedDays);
+    toast.showSuccess(`Đã xóa hoạt động "${activity.title}".`);
+
+    const updatedItin = {
+      ...itinerary,
+      days: updatedDays,
+      placesCount: updatedDays.reduce((acc, d) => acc + (d.activities?.length || 0), 0)
+    };
+    onUpdate?.(updatedItin);
+
+    // Đồng bộ xóa lên backend nếu activity có ID số
+    try {
+      if (activity?.id && typeof activity.id === 'number') {
+        await itineraryApi.deleteItineraryDetail(activity.id);
+      }
+    } catch (e) {
+      console.warn('Backend delete detail warning:', e.message);
+    }
+  };
 
   // Chuẩn hóa tên điểm đến viết hoa lịch sự
   const formatDestination = (str) => {
@@ -660,89 +764,251 @@ export const ItineraryDetailModal = ({ itinerary, onClose }) => {
 
                 {/* Danh sách hoạt động trong ngày */}
                 <div className="space-y-3 sm:space-y-3.5">
-                  {dayItem.activities && dayItem.activities.map((act, actIdx) => {
-                    // Tìm điểm map tương ứng để lấy tọa độ chuẩn
-                    const matchedPt = mapPoints.find(p => p.dayNumber === (dayItem.dayNumber || dayIdx + 1) && (p.title === act.title || p.location === act.location));
-                    const cleanPlaceName = getCleanPlaceName(act.location || act.title);
+                  {(!dayItem.activities || dayItem.activities.length === 0) ? (
+                    <div className="p-6 rounded-2xl bg-white border-2 border-dashed border-slate-200 text-center space-y-2">
+                      <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto">
+                        <Calendar className="w-5 h-5" />
+                      </div>
+                      <p className="text-xs font-bold text-slate-700">Chưa có mốc giờ / hoạt động nào trong Ngày {dayItem.dayNumber || dayIdx + 1}</p>
+                      <p className="text-[11px] text-slate-400">Bạn có thể tự tay thêm hoạt động và điểm dừng chân bất kỳ lúc nào.</p>
+                      {addingDayNumber !== (dayItem.dayNumber || dayIdx + 1) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAddingDayNumber(dayItem.dayNumber || dayIdx + 1);
+                            setNewActTime('');
+                            setNewActTitle('');
+                            setNewActLocation('');
+                            setNewActCost('');
+                            setNewActNote('');
+                          }}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-xs transition-all cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>+ Thêm hoạt động đầu tiên</span>
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    dayItem.activities.map((act, actIdx) => {
+                      // Tìm điểm map tương ứng để lấy tọa độ chuẩn
+                      const matchedPt = mapPoints.find(p => p.dayNumber === (dayItem.dayNumber || dayIdx + 1) && (p.title === act.title || p.location === act.location));
+                      const cleanPlaceName = getCleanPlaceName(act.location || act.title);
 
-                    // Ưu tiên liên kết Google Maps theo tọa độ chính xác hoặc địa danh sạch có thật
-                    const mapQueryUrl = matchedPt?.isExact
-                      ? `https://www.google.com/maps/search/?api=1&query=${matchedPt.lat},${matchedPt.lng}`
-                      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${cleanPlaceName}, ${act.address || destinationName}`)}`;
+                      // Ưu tiên liên kết Google Maps theo tọa độ chính xác hoặc địa danh sạch có thật
+                      const mapQueryUrl = matchedPt?.isExact
+                        ? `https://www.google.com/maps/search/?api=1&query=${matchedPt.lat},${matchedPt.lng}`
+                        : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${cleanPlaceName}, ${act.address || destinationName}`)}`;
 
-                    return (
-                      <div
-                        key={actIdx}
-                        className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2.5 sm:space-y-3 hover:border-slate-300 transition-colors"
-                      >
-                        {/* Hàng 1: Thời gian & Danh mục */}
-                        <div className="flex items-center justify-between gap-2 flex-wrap">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 rounded-lg bg-slate-100 text-slate-800 text-[11px] sm:text-xs font-bold font-mono">
-                            <Clock className="w-3.5 h-3.5 text-slate-500" />
-                            <span>{act.time || '08:00 – 10:00'}</span>
-                          </span>
+                      return (
+                        <div
+                          key={act.id || actIdx}
+                          className="bg-white p-3.5 sm:p-5 rounded-2xl border border-slate-200/90 shadow-2xs space-y-2.5 sm:space-y-3 hover:border-slate-300 transition-colors"
+                        >
+                          {/* Hàng 1: Thời gian & Danh mục & Nút xóa */}
+                          <div className="flex items-center justify-between gap-2 flex-wrap">
+                            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 sm:py-1 rounded-lg bg-slate-100 text-slate-800 text-[11px] sm:text-xs font-bold font-mono">
+                              <Clock className="w-3.5 h-3.5 text-slate-500" />
+                              <span>{act.time || '08:00 – 10:00'}</span>
+                            </span>
 
-                          <span className="text-[10px] sm:text-[11px] font-bold text-slate-600 bg-slate-100 px-2 sm:px-2.5 py-0.5 rounded-md">
-                            {act.category || 'Hoạt động trải nghiệm'}
-                          </span>
-                        </div>
-
-                        {/* Hàng 2: Tên hoạt động & địa danh */}
-                        <div>
-                          <h4 className="font-extrabold text-sm sm:text-base text-slate-900 leading-snug">
-                            {act.title}
-                          </h4>
-                        </div>
-
-                        {/* Hàng 3: Địa chỉ cụ thể & Link Google Maps */}
-                        <div className="p-2.5 sm:p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3 text-xs">
-                          <div className="flex items-start gap-2 min-w-0">
-                            <MapPin className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
-                            <div className="min-w-0">
-                              <span className="font-bold text-slate-800 block text-xs">
-                                {act.location || cleanPlaceName || act.title}
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] sm:text-[11px] font-bold text-slate-600 bg-slate-100 px-2 sm:px-2.5 py-0.5 rounded-md">
+                                {act.category || 'Hoạt động trải nghiệm'}
                               </span>
-                              <span className="text-slate-600 text-[11px] sm:text-xs leading-normal block mt-0.5">
-                                {act.address || matchedPt?.address || `${destinationName}, Việt Nam`}
-                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteActivity(dayItem.dayNumber || dayIdx + 1, actIdx, act)}
+                                className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                                title="Xóa hoạt động này"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
                             </div>
                           </div>
 
-                          <a
-                            href={mapQueryUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="self-start sm:self-auto px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-sky-700 text-[11px] sm:text-xs font-bold flex items-center gap-1 shrink-0 border border-slate-200 transition-colors cursor-pointer"
-                            title="Mở chính xác trên Google Maps"
-                          >
-                            <span>Google Maps</span>
-                            <ExternalLink className="w-3 h-3 text-slate-400" />
-                          </a>
-                        </div>
+                          {/* Hàng 2: Tên hoạt động & địa danh */}
+                          <div>
+                            <h4 className="font-extrabold text-sm sm:text-base text-slate-900 leading-snug">
+                              {act.title}
+                            </h4>
+                          </div>
 
-                        {/* Hàng 4: Mô tả chi tiết & Kinh nghiệm */}
-                        {act.note && (
-                          <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed">
-                            {act.note}
-                          </p>
-                        )}
+                          {/* Hàng 3: Địa chỉ cụ thể & Link Google Maps */}
+                          <div className="p-2.5 sm:p-3 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3 text-xs">
+                            <div className="flex items-start gap-2 min-w-0">
+                              <MapPin className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
+                              <div className="min-w-0">
+                                <span className="font-bold text-slate-800 block text-xs">
+                                  {act.location || cleanPlaceName || act.title}
+                                </span>
+                                <span className="text-slate-600 text-[11px] sm:text-xs leading-normal block mt-0.5">
+                                  {act.address || matchedPt?.address || `${destinationName}, Việt Nam`}
+                                </span>
+                              </div>
+                            </div>
 
-                        {/* Hàng 5: Chi phí & Di chuyển */}
-                        <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[11px] sm:text-xs text-slate-500">
-                          <span>
-                            Chi phí: <strong className="text-slate-800">{act.cost || 'Theo thực tế'}</strong>
-                          </span>
+                            <a
+                              href={mapQueryUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="self-start sm:self-auto px-2.5 py-1 rounded-lg bg-white hover:bg-slate-100 text-sky-700 text-[11px] sm:text-xs font-bold flex items-center gap-1 shrink-0 border border-slate-200 transition-colors cursor-pointer"
+                              title="Mở chính xác trên Google Maps"
+                            >
+                              <span>Google Maps</span>
+                              <ExternalLink className="w-3 h-3 text-slate-400" />
+                            </a>
+                          </div>
 
-                          {act.transit && (
-                            <span className="flex items-center gap-1 text-slate-500 font-medium">
-                              <Car className="w-3.5 h-3.5 text-slate-400" />
-                              <span>{act.transit}</span>
-                            </span>
+                          {/* Hàng 4: Mô tả chi tiết & Kinh nghiệm */}
+                          {act.note && (
+                            <p className="text-xs sm:text-[13px] text-slate-600 leading-relaxed">
+                              {act.note}
+                            </p>
                           )}
+
+                          {/* Hàng 5: Chi phí & Di chuyển */}
+                          <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[11px] sm:text-xs text-slate-500">
+                            <span>
+                              Chi phí: <strong className="text-slate-800">{act.cost || 'Theo thực tế'}</strong>
+                            </span>
+
+                            {act.transit && (
+                              <span className="flex items-center gap-1 text-slate-500 font-medium">
+                                <Car className="w-3.5 h-3.5 text-slate-400" />
+                                <span>{act.transit}</span>
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+
+                  {/* Form thêm hoạt động inline */}
+                  {addingDayNumber === (dayItem.dayNumber || dayIdx + 1) ? (
+                    <div className="p-4 rounded-2xl bg-sky-50/70 border border-sky-200 space-y-3 animate-in fade-in duration-150">
+                      <div className="flex items-center justify-between">
+                        <span className="font-extrabold text-xs text-sky-900 flex items-center gap-1.5">
+                          <Plus className="w-4 h-4 text-sky-600" />
+                          <span>Thêm hoạt động mới vào Ngày {dayItem.dayNumber || dayIdx + 1}</span>
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setAddingDayNumber(null)}
+                          className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-white cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-600 block mb-1">Mốc thời gian</label>
+                          <input
+                            type="text"
+                            placeholder="vd: 08:30 - 10:00"
+                            value={newActTime}
+                            onChange={(e) => setNewActTime(e.target.value)}
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold outline-none focus:border-sky-500"
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="text-[10px] font-bold text-slate-600 block mb-1">Tên hoạt động / Điểm đến *</label>
+                          <input
+                            type="text"
+                            placeholder="vd: Tham quan Thác Datanla, Ăn sáng bánh ướt..."
+                            value={newActTitle}
+                            onChange={(e) => setNewActTitle(e.target.value)}
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-900 outline-none focus:border-sky-500"
+                          />
                         </div>
                       </div>
-                    );
-                  })}
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <div className="sm:col-span-2">
+                          <label className="text-[10px] font-bold text-slate-600 block mb-1">Địa chỉ / Vị trí cụ thể</label>
+                          <input
+                            type="text"
+                            placeholder="vd: Đèo Prenn, TP. Đà Lạt"
+                            value={newActLocation}
+                            onChange={(e) => setNewActLocation(e.target.value)}
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-700 outline-none focus:border-sky-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-600 block mb-1">Danh mục</label>
+                          <select
+                            value={newActCategory}
+                            onChange={(e) => setNewActCategory(e.target.value)}
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-700 outline-none focus:border-sky-500 cursor-pointer"
+                          >
+                            <option value="Tham quan">Tham quan danh thắng</option>
+                            <option value="Ẩm thực">Ẩm thực & Cà phê</option>
+                            <option value="Check-in">Check-in chụp ảnh</option>
+                            <option value="Nghỉ ngơi">Nghỉ ngơi & Chill</option>
+                            <option value="Mua sắm">Mua sắm đặc sản</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-600 block mb-1">Ghi chú / Mẹo nhỏ</label>
+                          <input
+                            type="text"
+                            placeholder="vd: Đi buổi sáng vắng, chuẩn bị áo khoác nhẹ..."
+                            value={newActNote}
+                            onChange={(e) => setNewActNote(e.target.value)}
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-700 outline-none focus:border-sky-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[10px] font-bold text-slate-600 block mb-1">Dự tính chi phí</label>
+                          <input
+                            type="text"
+                            placeholder="vd: 50.000đ hoặc Miễn phí"
+                            value={newActCost}
+                            onChange={(e) => setNewActCost(e.target.value)}
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs text-slate-700 outline-none focus:border-sky-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-end gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => setAddingDayNumber(null)}
+                          className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold cursor-pointer"
+                        >
+                          Hủy
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSaveNewActivity(dayItem.dayNumber || dayIdx + 1)}
+                          className="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-xs transition-all cursor-pointer"
+                        >
+                          Lưu hoạt động 🎉
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAddingDayNumber(dayItem.dayNumber || dayIdx + 1);
+                        setNewActTime('');
+                        setNewActTitle('');
+                        setNewActLocation('');
+                        setNewActCost('');
+                        setNewActNote('');
+                      }}
+                      className="w-full py-2.5 rounded-xl bg-sky-50/60 hover:bg-sky-100/70 border border-dashed border-sky-300 text-sky-700 font-extrabold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4 text-sky-600" />
+                      <span>+ Thêm hoạt động vào Ngày {dayItem.dayNumber || dayIdx + 1}</span>
+                    </button>
+                  )}
                 </div>
 
               </div>

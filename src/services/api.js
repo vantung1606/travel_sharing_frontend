@@ -344,6 +344,24 @@ export const itineraryApi = {
     return res.data;
   },
 
+  async deleteItineraryDetail(detailId, email) {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user?.email || '';
+    const response = await fetch(`${BASE_URL}/itineraries/details/${detailId}?email=${encodeURIComponent(userEmail)}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    const res = await response.json();
+    return res.data;
+  },
+
   async deleteItinerary(id, email) {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
     const userEmail = email || user?.email || '';

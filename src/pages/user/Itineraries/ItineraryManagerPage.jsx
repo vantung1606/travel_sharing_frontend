@@ -87,6 +87,86 @@ export const ItineraryManagerPage = () => {
     return Math.max(1, diff);
   }, [manualStartDate, manualEndDate]);
 
+  // Lịch trình chi tiết từng ngày do người dùng tự thiết kế (hoàn toàn không điền sẵn dữ liệu ảo)
+  const [manualDaysSchedule, setManualDaysSchedule] = useState([]);
+
+  // Đồng bộ số ngày khi ngày bắt đầu hoặc kết thúc thay đổi
+  useEffect(() => {
+    setManualDaysSchedule(prev => {
+      const next = [];
+      for (let i = 0; i < manualDaysCount; i++) {
+        const existing = prev[i];
+        if (existing) {
+          next.push(existing);
+        } else {
+          next.push({
+            dayNumber: i + 1,
+            title: '',
+            activities: []
+          });
+        }
+      }
+      return next;
+    });
+  }, [manualDaysCount]);
+
+  const handleAddActivityToDay = (dayIndex) => {
+    setManualDaysSchedule(prev => {
+      const copy = [...prev];
+      const day = copy[dayIndex] || { dayNumber: dayIndex + 1, title: '', activities: [] };
+      const currentActs = day.activities || [];
+      const newAct = {
+        id: Date.now() + Math.random(),
+        time: '',
+        title: '',
+        note: '',
+        cost: '',
+        location: ''
+      };
+      copy[dayIndex] = {
+        ...day,
+        activities: [...currentActs, newAct]
+      };
+      return copy;
+    });
+  };
+
+  const handleUpdateActivityField = (dayIndex, actIndex, field, value) => {
+    setManualDaysSchedule(prev => {
+      const copy = [...prev];
+      const day = copy[dayIndex];
+      if (!day) return prev;
+      const acts = [...(day.activities || [])];
+      acts[actIndex] = {
+        ...acts[actIndex],
+        [field]: value
+      };
+      copy[dayIndex] = { ...day, activities: acts };
+      return copy;
+    });
+  };
+
+  const handleRemoveActivityFromDay = (dayIndex, actIndex) => {
+    setManualDaysSchedule(prev => {
+      const copy = [...prev];
+      const day = copy[dayIndex];
+      if (!day) return prev;
+      const acts = (day.activities || []).filter((_, idx) => idx !== actIndex);
+      copy[dayIndex] = { ...day, activities: acts };
+      return copy;
+    });
+  };
+
+  const handleUpdateDayTitle = (dayIndex, title) => {
+    setManualDaysSchedule(prev => {
+      const copy = [...prev];
+      if (copy[dayIndex]) {
+        copy[dayIndex] = { ...copy[dayIndex], title };
+      }
+      return copy;
+    });
+  };
+
   const handleManualBudgetChange = (e) => {
     const raw = e.target.value.replace(/\D/g, '');
     setManualBudgetFormatted(raw ? Number(raw).toLocaleString('en-US') : '');
@@ -184,6 +264,27 @@ export const ItineraryManagerPage = () => {
     }
 
     const calculatedDays = manualDaysCount;
+
+    // Lấy chính xác dữ liệu do người dùng tự điền, tuyệt đối KHÔNG tự động chèn hoạt động ảo/giả
+    const finalDays = manualDaysSchedule.slice(0, calculatedDays).map((d, i) => ({
+      dayNumber: i + 1,
+      title: d.title?.trim() || `Ngày ${i + 1}: Kế hoạch tại ${manualDest.trim()}`,
+      activities: (d.activities || [])
+        .filter(act => act.title && act.title.trim())
+        .map(act => ({
+          time: act.time?.trim() || '08:00',
+          title: act.title.trim(),
+          location: act.location?.trim() || act.title.trim(),
+          address: act.location?.trim() ? `${act.location.trim()}, ${manualDest.trim()}` : `${manualDest.trim()}, Việt Nam`,
+          note: act.note?.trim() || '',
+          cost: act.cost?.trim() || 'Theo chi tiêu',
+          category: 'Tự lên kế hoạch'
+        }))
+    }));
+
+    const totalPlaces = finalDays.reduce((acc, d) => acc + d.activities.length, 0);
+    const placesList = finalDays.flatMap(d => d.activities.map(a => a.location || a.title)).filter(Boolean);
+
     const newTrip = {
       id: `itin-${Date.now()}`,
       title: manualTitle.trim(),
@@ -198,24 +299,15 @@ export const ItineraryManagerPage = () => {
       countdown: manualStartDate ? `Khởi hành ${manualStartDate.split('-').reverse().join('/')}` : 'Sắp khởi hành',
       departureDate: `${manualStartDate.split('-').reverse().join('/')} – ${manualEndDate.split('-').reverse().join('/')}`,
       groupType: manualGroup,
-      placesCount: calculatedDays * 3,
-      placesList: [manualDest.trim() + ' City Tour'],
+      placesCount: totalPlaces,
+      placesList: placesList.length > 0 ? placesList : [manualDest.trim()],
       budgetPerPerson: Math.round(Number(manualBudget) / 2),
       totalBudget: Number(manualBudget),
-      budgetProgress: 25,
+      budgetProgress: 0,
       budgetNote: `Dự toán: ~${Number(manualBudget).toLocaleString('vi-VN')}đ`,
       style: 'Lịch trình tự thiết kế',
       aiTipNote: manualNote || 'Lịch trình thủ công do bạn tự tạo và quản lý trên Wayfare.',
-      days: Array.from({ length: calculatedDays }).map((_, i) => ({
-        dayNumber: i + 1,
-        title: `Ngày ${i + 1}: Kế hoạch khám phá ${manualDest}`,
-        activities: [
-          { time: '08:30', title: `Bắt đầu hoạt động ngày ${i + 1}`, note: 'Khởi hành tham quan', cost: 'Tùy chi tiêu' },
-          { time: '11:30', title: `Ăn trưa & Thưởng thức ẩm thực địa phương`, note: 'Ghé quán ngon gần điểm đến', cost: '150.000đ' },
-          { time: '14:30', title: `Khám phá & tham quan trải nghiệm`, note: 'Tự do trải nghiệm và chụp ảnh', cost: 'Tùy chi tiêu' },
-          { time: '18:30', title: `Ăn tối và dạo phố đêm`, note: 'Thư giãn ngắm cảnh về đêm', cost: 'Tùy chi tiêu' }
-        ]
-      }))
+      days: finalDays
     };
 
     setIsManualCreateOpen(false);
@@ -225,6 +317,7 @@ export const ItineraryManagerPage = () => {
     setManualTitle('');
     setManualDest('');
     setManualNote('');
+    setManualDaysSchedule([]);
 
     // Persist to MySQL backend database
     if (createManualItinerary) {
@@ -813,6 +906,10 @@ export const ItineraryManagerPage = () => {
         <ItineraryDetailModal
           itinerary={selectedItinerary}
           onClose={() => setSelectedItinerary(null)}
+          onUpdate={(updatedItin) => {
+            setSelectedItinerary(updatedItin);
+            setItineraries(prev => prev.map(item => String(item.id) === String(updatedItin.id) ? updatedItin : item));
+          }}
         />
       )}
 
@@ -968,6 +1065,110 @@ export const ItineraryManagerPage = () => {
                     placeholder="Ví dụ: 5,000,000"
                     className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 font-semibold outline-none focus:bg-white focus:border-sky-500"
                   />
+                </div>
+              </div>
+
+              {/* ─── Lập Lịch Trình Chi Tiết Từng Ngày (Tự điền mốc giờ & địa điểm) ─── */}
+              <div className="space-y-3 pt-3 border-t border-slate-200">
+                <div className="flex items-center justify-between">
+                  <label className="font-extrabold text-slate-800 flex items-center gap-1.5 text-xs sm:text-sm">
+                    <Clock className="w-4 h-4 text-sky-600" />
+                    <span>Thiết kế lịch trình từng ngày ({manualDaysCount} ngày)</span>
+                  </label>
+                  <span className="text-[11px] text-slate-500 font-medium">Tự do điền mốc giờ và hoạt động</span>
+                </div>
+
+                <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                  {manualDaysSchedule.map((dayItem, dayIdx) => (
+                    <div key={dayIdx} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-1 rounded-lg bg-sky-600 text-white font-extrabold text-xs shrink-0">
+                          Ngày {dayIdx + 1}
+                        </span>
+                        <input
+                          type="text"
+                          placeholder={`Tiêu đề ngày ${dayIdx + 1} (vd: Khám phá trung tâm, Check-in đồi chè...)`}
+                          value={dayItem.title || ''}
+                          onChange={(e) => handleUpdateDayTitle(dayIdx, e.target.value)}
+                          className="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800 outline-none focus:border-sky-500"
+                        />
+                      </div>
+
+                      {/* Danh sách hoạt động tự điền của ngày */}
+                      <div className="space-y-2 pl-2 border-l-2 border-sky-300">
+                        {(!dayItem.activities || dayItem.activities.length === 0) ? (
+                          <div className="py-2 px-3 rounded-xl bg-white/70 border border-dashed border-slate-300 text-slate-400 text-xs italic flex items-center justify-between">
+                            <span>Chưa có hoạt động nào trong Ngày {dayIdx + 1}.</span>
+                            <button
+                              type="button"
+                              onClick={() => handleAddActivityToDay(dayIdx)}
+                              className="inline-flex items-center gap-1 text-sky-600 font-bold hover:underline not-italic cursor-pointer"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              <span>+ Thêm mốc giờ</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            {dayItem.activities.map((act, actIdx) => (
+                              <div key={act.id || actIdx} className="p-2.5 rounded-xl bg-white border border-slate-200 shadow-2xs space-y-2 text-xs">
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    placeholder="Giờ (vd: 08:30)"
+                                    value={act.time || ''}
+                                    onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'time', e.target.value)}
+                                    className="w-24 px-2 py-1 rounded-lg border border-slate-200 font-mono text-xs font-bold outline-none focus:border-sky-500"
+                                  />
+                                  <input
+                                    type="text"
+                                    placeholder="Tên hoạt động / Địa điểm (Bắt buộc)"
+                                    value={act.title || ''}
+                                    onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'title', e.target.value)}
+                                    className="flex-1 px-2.5 py-1 rounded-lg border border-slate-200 font-semibold text-xs text-slate-900 outline-none focus:border-sky-500"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveActivityFromDay(dayIdx, actIdx)}
+                                    className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                    title="Xóa hoạt động này"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2">
+                                  <input
+                                    type="text"
+                                    placeholder="Ghi chú (vd: Mua vé trước, ăn sáng quán ngon...)"
+                                    value={act.note || ''}
+                                    onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'note', e.target.value)}
+                                    className="px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] text-slate-600 outline-none focus:border-sky-500"
+                                  />
+                                  <input
+                                    type="text"
+                                    placeholder="Chi phí (vd: 50.000đ)"
+                                    value={act.cost || ''}
+                                    onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'cost', e.target.value)}
+                                    className="px-2.5 py-1 rounded-lg border border-slate-200 text-[11px] text-slate-600 outline-none focus:border-sky-500"
+                                  />
+                                </div>
+                              </div>
+                            ))}
+
+                            <button
+                              type="button"
+                              onClick={() => handleAddActivityToDay(dayIdx)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition-all cursor-pointer border border-sky-200/60"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              <span>+ Thêm mốc giờ cho Ngày {dayIdx + 1}</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
