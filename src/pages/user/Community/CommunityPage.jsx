@@ -2747,9 +2747,18 @@ export const CommunityPage = () => {
                       </button>
 
                       {/* Report / Moderation status */}
-                      <span className="text-[11px] text-slate-400 inline-flex items-center gap-1 whitespace-nowrap shrink-0">
-                        <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                        <span className="hidden md:inline">Đã duyệt</span>
+                      <span className="text-[11px] inline-flex items-center gap-1 whitespace-nowrap shrink-0">
+                        {post.status === 'PENDING_REVIEW' ? (
+                          <>
+                            <ShieldAlert className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                            <span className="text-amber-600 font-bold hidden md:inline">Chờ Admin duyệt</span>
+                          </>
+                        ) : (
+                          <>
+                            <ShieldCheck className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                            <span className="text-slate-400 hidden md:inline">Đã duyệt</span>
+                          </>
+                        )}
                       </span>
                     </div>
                   </div>
