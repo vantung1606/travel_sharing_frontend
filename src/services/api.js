@@ -4,6 +4,45 @@ export const BASE_URL = (() => {
   return envUrl.endsWith('/api') ? envUrl : `${envUrl.replace(/\/$/, '')}/api`;
 })();
 
+export function getBackendBaseUrl() {
+  return BASE_URL.replace(/\/api\/?$/, '');
+}
+
+export function normalizeMediaUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+  if (/^http:\/\/localhost(:\d+)?\/uploads\//i.test(url)) {
+    const backendBase = getBackendBaseUrl();
+    if (!backendBase.includes('localhost')) {
+      return url.replace(/^http:\/\/localhost(:\d+)?/i, backendBase);
+    }
+  }
+  return url;
+}
+
+export function normalizePost(post) {
+  if (!post || typeof post !== 'object') return post;
+  const normalized = { ...post };
+  if (normalized.imageUrl) normalized.imageUrl = normalizeMediaUrl(normalized.imageUrl);
+  if (Array.isArray(normalized.images)) {
+    normalized.images = normalized.images.map(normalizeMediaUrl);
+  }
+  if (Array.isArray(normalized.mediaUrls)) {
+    normalized.mediaUrls = normalized.mediaUrls.map(normalizeMediaUrl);
+  }
+  if (normalized.videoUrl) normalized.videoUrl = normalizeMediaUrl(normalized.videoUrl);
+  if (normalized.authorAvatar) normalized.authorAvatar = normalizeMediaUrl(normalized.authorAvatar);
+  if (normalized.author?.avatar) {
+    normalized.author = { ...normalized.author, avatar: normalizeMediaUrl(normalized.author.avatar) };
+  }
+  if (normalized.author?.avatarUrl) {
+    normalized.author = { ...normalized.author, avatarUrl: normalizeMediaUrl(normalized.author.avatarUrl) };
+  }
+  if (normalized.sharedPost) {
+    normalized.sharedPost = normalizePost(normalized.sharedPost);
+  }
+  return normalized;
+}
+
 // ─── Core Auth & User Storage Helpers ─────────────────────────────────────────
 export function getStoredUser() {
   try {
@@ -1041,7 +1080,8 @@ export const postApi = {
       });
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       const json = await res.json();
-      return json.data || [];
+      const list = json.data || [];
+      return Array.isArray(list) ? list.map(normalizePost) : list;
     } catch (err) {
       console.warn('API error fetching community posts:', err.message);
       return [];
@@ -1063,7 +1103,7 @@ export const postApi = {
       });
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       const json = await res.json();
-      return json.data;
+      return normalizePost(json.data);
     } catch (err) {
       console.warn('API error fetching post detail:', err.message);
       return null;
@@ -1086,7 +1126,7 @@ export const postApi = {
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
-    return json.data;
+    return normalizePost(json.data);
   },
 
   async toggleLike(postId, email = '') {
@@ -1162,7 +1202,8 @@ export const postApi = {
       });
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       const json = await res.json();
-      return json.data || [];
+      const list = json.data || [];
+      return Array.isArray(list) ? list.map(normalizePost) : list;
     } catch (err) {
       console.warn('API error fetching bookmarked posts:', err.message);
       return [];
@@ -1330,6 +1371,7 @@ export const uploadApi = {
   },
 
   async uploadSingle(file) {
+    if (!file) return null;
     const formData = new FormData();
     formData.append('file', file);
     const token = getAuthToken();
@@ -1345,10 +1387,11 @@ export const uploadApi = {
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
-    return json.data;
+    return normalizeMediaUrl(json.data);
   },
 
   async uploadFiles(fileList) {
+    if (!fileList || fileList.length === 0) return [];
     const formData = new FormData();
     for (let i = 0; i < fileList.length; i++) {
       formData.append('files', fileList[i]);
@@ -1366,7 +1409,8 @@ export const uploadApi = {
     });
     const json = await res.json();
     if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
-    return json.data || [];
+    const urls = json.data || [];
+    return Array.isArray(urls) ? urls.map(normalizeMediaUrl) : urls;
   }
 };
 
