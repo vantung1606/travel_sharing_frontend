@@ -18,13 +18,9 @@ const dispatch = (raw) => {
     listeners.forEach((fn) => {
       try {
         fn(event);
-      } catch (err) {
-        console.error('[Realtime] Listener error:', err);
-      }
+      } catch {}
     });
-  } catch (err) {
-    console.warn('[Realtime] Invalid event payload:', err);
-  }
+  } catch {}
 };
 
 const ensureConnection = () => {

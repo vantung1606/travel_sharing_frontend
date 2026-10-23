@@ -48,8 +48,7 @@ export function getStoredUser() {
   try {
     const raw = localStorage.getItem('wayfare_user');
     return raw ? JSON.parse(raw) : null;
-  } catch (e) {
-    console.warn('Error reading wayfare_user from localStorage', e);
+  } catch {
     return null;
   }
 }
@@ -64,21 +63,18 @@ export function getAuthHeader() {
   return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
 
-// Global fetch wrapper with 401 Unauthorized handling
+// Global fetch wrapper with 401/403 Unauthorized handling
 const nativeFetch = typeof window !== 'undefined' ? window.fetch.bind(window) : globalThis.fetch.bind(globalThis);
 const fetch = async (url, options) => {
   const response = await nativeFetch(url, options);
-  if (response.status === 401) {
+  if (response.status === 401 || response.status === 403) {
     const urlStr = typeof url === 'string' ? url : (url?.url || '');
     if (!urlStr.includes('/auth/login') && !urlStr.includes('/auth/register')) {
-      console.warn('[Wayfare API] 401 Unauthorized detected from endpoint:', urlStr);
       try {
         localStorage.removeItem('wayfare_user');
         localStorage.removeItem('wayfare_auth');
         localStorage.removeItem('token');
-      } catch (e) {
-        console.warn('Could not clean auth storage on 401', e);
-      }
+      } catch {}
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('wayfare:unauthorized', { detail: { endpoint: urlStr } }));
       }
@@ -151,12 +147,8 @@ export const authApi = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
-      if (!response.ok) {
-        console.warn('Backend logout response not OK:', response.status);
-      }
-      return true;
-    } catch (error) {
-      console.warn('Backend API connection warning on logout:', error.message);
+      return response.ok;
+    } catch {
       return false;
     }
   },
@@ -214,11 +206,10 @@ export const adminApi = {
           ...getAuthHeader()
         }
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) return [];
       const res = await response.json();
       return res.data || [];
-    } catch (err) {
-      console.warn('Admin getAllItineraries API warning:', err.message);
+    } catch {
       return [];
     }
   }
@@ -235,17 +226,18 @@ export const itineraryApi = {
           ...getAuthHeader()
         }
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) return [];
       const res = await response.json();
       return res.data || [];
-    } catch (err) {
-      console.warn('getAllItineraries API warning:', err.message);
+    } catch {
       return [];
     }
   },
 
   async getMyItineraries(email) {
     try {
+      const token = getAuthToken();
+      if (!token) return [];
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
       const userEmail = email || user?.email || '';
       if (!userEmail) return [];
@@ -256,11 +248,10 @@ export const itineraryApi = {
           ...getAuthHeader()
         }
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) return [];
       const res = await response.json();
       return res.data || [];
-    } catch (err) {
-      console.warn('getMyItineraries API warning:', err.message);
+    } catch {
       return [];
     }
   },
@@ -426,8 +417,7 @@ export const homeApi = {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       return json.data;
-    } catch (err) {
-      console.warn('Home stats API warning:', err.message);
+    } catch {
       return {
         totalItineraries: 128,
         totalPlaces: 84,
@@ -442,11 +432,10 @@ export const homeApi = {
   async getFeaturedItineraries(region = 'all') {
     try {
       const res = await fetch(`${BASE_URL}/home/featured-itineraries?region=${encodeURIComponent(region)}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('Featured itineraries API warning:', err.message);
+    } catch {
       return [];
     }
   },
@@ -454,11 +443,10 @@ export const homeApi = {
   async getCommunityHighlights() {
     try {
       const res = await fetch(`${BASE_URL}/home/community-highlights`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('Community highlights API warning:', err.message);
+    } catch {
       return [];
     }
   },
@@ -466,10 +454,10 @@ export const homeApi = {
   async getTrendingDestinations() {
     try {
       const res = await fetch(`${BASE_URL}/home/trending-destinations`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) return ['Đà Lạt', 'Phú Quốc', 'Sa Pa', 'Đà Nẵng & Hội An', 'Mù Cang Chải', 'Ninh Bình'];
       const json = await res.json();
-      return json.data || [];
-    } catch (err) {
+      return json.data || ['Đà Lạt', 'Phú Quốc', 'Sa Pa', 'Đà Nẵng & Hội An', 'Mù Cang Chải', 'Ninh Bình'];
+    } catch {
       return ['Đà Lạt', 'Phú Quốc', 'Sa Pa', 'Đà Nẵng & Hội An', 'Mù Cang Chải', 'Ninh Bình'];
     }
   }
@@ -492,7 +480,7 @@ export const adminReviewApi = {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) return { content: [], totalElements: 0, totalPages: 1, number: 0 };
       const result = await response.json();
       const pageData = result.data || {};
       return {
@@ -501,8 +489,7 @@ export const adminReviewApi = {
         totalPages: pageData.totalPages ?? 1,
         number: pageData.number ?? 0
       };
-    } catch (error) {
-      console.warn('Admin reviews API unavailable:', error.message);
+    } catch {
       return { content: [], totalElements: 0, totalPages: 1, number: 0 };
     }
   },
@@ -513,11 +500,10 @@ export const adminReviewApi = {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) return {};
       const result = await response.json();
       return result.data || {};
-    } catch (error) {
-      console.warn('Admin reviews metrics unavailable:', error.message);
+    } catch {
       return {};
     }
   },
@@ -583,8 +569,7 @@ export const adminUserApi = {
         totalPages: pageData.totalPages ?? 1,
         number: pageData.number ?? 0
       };
-    } catch (error) {
-      console.warn('Admin users API unavailable:', error.message);
+    } catch {
       return { content: [], totalElements: 0, totalPages: 1, number: 0 };
     }
   },
@@ -601,7 +586,6 @@ export const adminUserApi = {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Set user verified failed:', error.message);
       throw error;
     }
   },
@@ -617,7 +601,6 @@ export const adminUserApi = {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Reset password failed:', error.message);
       throw error;
     }
   },
@@ -629,11 +612,10 @@ export const adminUserApi = {
         method: 'GET',
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) return {};
       const result = await response.json();
       return result.data || {};
-    } catch (error) {
-      console.warn('User activity API unavailable:', error.message);
+    } catch {
       return {};
     }
   },
@@ -648,7 +630,13 @@ export const adminUserApi = {
         }
       });
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
+        return {
+          totalUsers: 0,
+          activeUsers: 0,
+          lockedUsers: 0,
+          adminCount: 0,
+          newUsersToday: 0
+        };
       }
       const result = await response.json();
       return result.data || {
@@ -658,8 +646,7 @@ export const adminUserApi = {
         adminCount: 0,
         newUsersToday: 0
       };
-    } catch (error) {
-      console.warn('Admin user metrics API unavailable:', error.message);
+    } catch {
       return {
         totalUsers: 0,
         activeUsers: 0,
@@ -752,8 +739,7 @@ export const adminReportApi = {
         growthPercent: 12,
         totalArticlesCount: 0
       };
-    } catch (err) {
-      console.warn('Admin report metrics API warning:', err.message);
+    } catch {
       return {
         totalPostsToday: 0,
         pendingReportsCount: 0,
@@ -776,11 +762,10 @@ export const adminReportApi = {
           ...getAuthHeader()
         }
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) return [];
       const res = await response.json();
       return res.data || [];
-    } catch (err) {
-      console.warn('Pending reports API warning:', err.message);
+    } catch {
       return [];
     }
   },
@@ -797,11 +782,10 @@ export const adminReportApi = {
           ...getAuthHeader()
         }
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) return [];
       const res = await response.json();
       return res.data || [];
-    } catch (err) {
-      console.warn('All articles API warning:', err.message);
+    } catch {
       return [];
     }
   },
@@ -880,7 +864,8 @@ const getCurrentUserEmail = () => {
 export const notificationApi = {
   // Fetch list of notifications
   async getNotifications(email = getCurrentUserEmail()) {
-    if (!email) {
+    const token = getAuthToken();
+    if (!token || !email) {
       return { isBackend: true, data: [] };
     }
     try {
@@ -903,7 +888,8 @@ export const notificationApi = {
 
   // Get unread notification count
   async getUnreadCount(email = getCurrentUserEmail()) {
-    if (!email) {
+    const token = getAuthToken();
+    if (!token || !email) {
       return { isBackend: true, count: 0 };
     }
     try {
@@ -1019,11 +1005,10 @@ export const auditLogApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return { content: [], totalElements: 0, totalPages: 0, number: 0 };
       const json = await res.json();
       return json.data;
-    } catch (err) {
-      console.warn('API error fetching audit logs:', err.message);
+    } catch {
       return { content: [], totalElements: 0, totalPages: 0, number: 0 };
     }
   },
@@ -1036,11 +1021,10 @@ export const auditLogApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error fetching audit actions:', err.message);
+    } catch {
       return [];
     }
   },
@@ -1053,11 +1037,10 @@ export const auditLogApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return {};
       const json = await res.json();
       return json.data || {};
-    } catch (err) {
-      console.warn('API error fetching audit stats:', err.message);
+    } catch {
       return {};
     }
   },
@@ -1098,12 +1081,11 @@ export const postApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       const list = json.data || [];
       return Array.isArray(list) ? list.map(normalizePost) : list;
-    } catch (err) {
-      console.warn('API error fetching community posts:', err.message);
+    } catch {
       return [];
     }
   },
@@ -1121,11 +1103,10 @@ export const postApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return null;
       const json = await res.json();
       return normalizePost(json.data);
-    } catch (err) {
-      console.warn('API error fetching post detail:', err.message);
+    } catch {
       return null;
     }
   },
@@ -1187,45 +1168,45 @@ export const postApi = {
 
   async getBookmarkedPostIds(email = '') {
     try {
+      const token = getAuthToken();
+      if (!token) return [];
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
       const userEmail = email || user.email || '';
-      const url = userEmail
-        ? `${BASE_URL}/posts/bookmarked/ids?email=${encodeURIComponent(userEmail)}`
-        : `${BASE_URL}/posts/bookmarked/ids`;
+      if (!userEmail) return [];
+      const url = `${BASE_URL}/posts/bookmarked/ids?email=${encodeURIComponent(userEmail)}`;
       const res = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error fetching bookmarked post IDs:', err.message);
+    } catch {
       return [];
     }
   },
 
   async getBookmarkedPosts(email = '') {
     try {
+      const token = getAuthToken();
+      if (!token) return [];
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
       const userEmail = email || user.email || '';
-      const url = userEmail
-        ? `${BASE_URL}/posts/bookmarked?email=${encodeURIComponent(userEmail)}`
-        : `${BASE_URL}/posts/bookmarked`;
+      if (!userEmail) return [];
+      const url = `${BASE_URL}/posts/bookmarked?email=${encodeURIComponent(userEmail)}`;
       const res = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       const list = json.data || [];
       return Array.isArray(list) ? list.map(normalizePost) : list;
-    } catch (err) {
-      console.warn('API error fetching bookmarked posts:', err.message);
+    } catch {
       return [];
     }
   },
@@ -1238,11 +1219,10 @@ export const postApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error fetching post comments:', err.message);
+    } catch {
       return [];
     }
   },
@@ -1504,14 +1484,15 @@ export const userApi = {
       }
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error fetching following user IDs:', err.message);
+    } catch {
       return [];
     }
   },
 
   async getMyProfile(email) {
     try {
+      const token = getAuthToken();
+      if (!token) return null;
       const user = getStoredUser() || {};
       const userEmail = email || user.email || '';
       const qs = userEmail ? `?email=${encodeURIComponent(userEmail)}` : '';
@@ -1521,11 +1502,10 @@ export const userApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return null;
       const json = await res.json();
       return json.data;
-    } catch (err) {
-      console.warn('API error fetching my profile:', err.message);
+    } catch {
       return null;
     }
   },
@@ -1545,11 +1525,10 @@ export const userApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error fetching following list:', err.message);
+    } catch {
       return [];
     }
   },
@@ -1569,11 +1548,10 @@ export const userApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error fetching followers list:', err.message);
+    } catch {
       return [];
     }
   }
@@ -1595,11 +1573,10 @@ export const placeApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error fetching places:', err.message);
+    } catch {
       return [];
     }
   },
@@ -1624,11 +1601,10 @@ export const placeApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return null;
       const json = await res.json();
       return json.data || null;
-    } catch (err) {
-      console.warn('API error fetching paged places:', err.message);
+    } catch {
       return null;
     }
   },
@@ -1641,11 +1617,10 @@ export const placeApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return null;
       const json = await res.json();
       return json.data;
-    } catch (err) {
-      console.warn(`API error fetching place #${id}:`, err.message);
+    } catch {
       return null;
     }
   },
@@ -1669,26 +1644,27 @@ export const placeApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error('API error creating place:', err.message);
       throw err;
     }
   },
 
   async getMyPlaces(email) {
     try {
+      const token = getAuthToken();
+      if (!token) return [];
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
       const userEmail = email || user?.email || '';
+      if (!userEmail) return [];
       const res = await fetch(`${BASE_URL}/places/my-places?email=${encodeURIComponent(userEmail)}`, {
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error fetching my places:', err.message);
+    } catch {
       return [];
     }
   },
@@ -1706,7 +1682,6 @@ export const placeApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error(`API error updating place #${id} status:`, err.message);
       throw err;
     }
   },
@@ -1719,11 +1694,10 @@ export const placeApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error fetching pending places:', err.message);
+    } catch {
       return [];
     }
   },
@@ -1741,7 +1715,6 @@ export const placeApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error(`API error approving place #${id}:`, err.message);
       throw err;
     }
   },
@@ -1759,7 +1732,6 @@ export const placeApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error(`API error setting verified for place #${id}:`, err.message);
       throw err;
     }
   },
@@ -1777,7 +1749,6 @@ export const placeApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error(`API error rejecting place #${id}:`, err.message);
       throw err;
     }
   },
@@ -1797,7 +1768,6 @@ export const placeApi = {
       const json = await res.json();
       return json;
     } catch (err) {
-      console.error(`API error deleting place #${id}:`, err.message);
       throw err;
     }
   }
@@ -1818,11 +1788,10 @@ export const provinceApi = {
       const res = await fetch(`${BASE_URL}/provinces`, {
         headers: { 'Content-Type': 'application/json' }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return null;
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error fetching provinces:', err.message);
+    } catch {
       return null; // caller dùng fallback hardcode
     }
   },
@@ -1830,15 +1799,16 @@ export const provinceApi = {
   /** Dấu chân của user đang đăng nhập (lưu trên server). Trả về mã VN01..VN34 hoặc [] / null lỗi. */
   async getMyVisited() {
     try {
+      const token = getAuthToken();
+      if (!token) return [];
       const res = await fetch(`${BASE_URL}/provinces/visited`, {
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error fetching visited provinces:', err.message);
-      return null;
+    } catch {
+      return [];
     }
   },
 
@@ -1852,8 +1822,7 @@ export const provinceApi = {
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn('API error saving visited province:', err.message);
+    } catch {
       return null;
     }
   }
@@ -1862,18 +1831,19 @@ export const provinceApi = {
 export const savedPlaceApi = {
   async getSavedPlaces() {
     try {
+      const token = getAuthToken();
+      if (!token) return [];
       const res = await fetch(`${BASE_URL}/users/saved-places`, {
         headers: {
           'Content-Type': 'application/json',
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return Array.isArray(json.data) ? json.data : [];
-    } catch (err) {
-      console.warn('API error fetching saved places:', err.message);
-      return null;
+    } catch {
+      return [];
     }
   },
 
@@ -1889,7 +1859,6 @@ export const savedPlaceApi = {
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       return true;
     } catch (err) {
-      console.warn(`API error saving place #${placeId}:`, err.message);
       throw err;
     }
   },
@@ -1906,7 +1875,6 @@ export const savedPlaceApi = {
       if (!res.ok) throw new Error(`HTTP error ${res.status}`);
       return true;
     } catch (err) {
-      console.warn(`API error removing place #${placeId}:`, err.message);
       throw err;
     }
   }
@@ -1921,11 +1889,10 @@ export const reviewApi = {
           ...getAuthHeader()
         }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.warn(`API error fetching reviews for place #${placeId}:`, err.message);
+    } catch {
       return [];
     }
   },
@@ -1949,7 +1916,6 @@ export const reviewApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error(`API error adding review for place #${placeId}:`, err.message);
       throw err;
     }
   },
@@ -1969,7 +1935,6 @@ export const reviewApi = {
       const json = await res.json();
       return json;
     } catch (err) {
-      console.error(`API error deleting review #${reviewId}:`, err.message);
       throw err;
     }
   }
@@ -1979,33 +1944,37 @@ export const reviewApi = {
 export const chatApi = {
   async getRooms(email) {
     try {
+      const token = getAuthToken();
+      if (!token) return [];
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
       const userEmail = email || user?.email || '';
+      if (!userEmail) return [];
       const res = await fetch(`${BASE_URL}/chat/rooms?email=${encodeURIComponent(userEmail)}`, {
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.error('API error fetching chat rooms:', err);
-      throw err;
+    } catch {
+      return [];
     }
   },
 
   async getRoomMessages(roomId, email) {
     try {
+      const token = getAuthToken();
+      if (!token) return [];
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
       const userEmail = email || user?.email || '';
+      if (!userEmail) return [];
       const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/messages?email=${encodeURIComponent(userEmail)}`, {
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.error(`API error fetching messages for room ${roomId}:`, err);
-      throw err;
+    } catch {
+      return [];
     }
   },
 
@@ -2022,7 +1991,6 @@ export const chatApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error(`API error sending message to room ${roomId}:`, err);
       throw err;
     }
   },
@@ -2039,7 +2007,6 @@ export const chatApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error(`API error opening direct room with user ${targetUserId}:`, err);
       throw err;
     }
   },
@@ -2056,7 +2023,6 @@ export const chatApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error(`API error opening itinerary room ${itineraryId}:`, err);
       throw err;
     }
   },
@@ -2077,7 +2043,6 @@ export const chatApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error('API error creating chat room:', err);
       throw err;
     }
   },
@@ -2096,44 +2061,44 @@ export const chatApi = {
       }
       return true;
     } catch (err) {
-      console.error(`API error deleting room ${roomId}:`, err);
       throw err;
     }
   },
 
   async getAvailableUsers(keyword = '', email) {
     try {
+      const token = getAuthToken();
+      if (!token) return [];
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
       const userEmail = email || user?.email || '';
+      if (!userEmail) return [];
       const qs = keyword ? `&keyword=${encodeURIComponent(keyword)}` : '';
       const res = await fetch(`${BASE_URL}/chat/available-users?email=${encodeURIComponent(userEmail)}${qs}`, {
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
-      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.error('API error fetching available users:', err);
+    } catch {
       return [];
     }
   },
 
   async getRoomMembers(roomId, email) {
     try {
+      const token = getAuthToken();
+      if (!token) return [];
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
       const userEmail = email || user?.email || '';
+      if (!userEmail) return [];
       const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/members?email=${encodeURIComponent(userEmail)}`, {
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
-      if (!res.ok) {
-        const errJson = await res.json().catch(() => null);
-        throw new Error(errJson?.message || `HTTP error ${res.status}`);
-      }
+      if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch (err) {
-      console.error(`API error fetching members for room ${roomId}:`, err);
-      throw err;
+    } catch {
+      return [];
     }
   },
 
@@ -2153,7 +2118,6 @@ export const chatApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error(`API error adding members to room ${roomId}:`, err);
       throw err;
     }
   },
@@ -2173,7 +2137,6 @@ export const chatApi = {
       const json = await res.json();
       return json.data;
     } catch (err) {
-      console.error(`API error removing member ${targetUserId} from room ${roomId}:`, err);
       throw err;
     }
   }

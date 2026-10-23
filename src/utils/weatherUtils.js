@@ -73,8 +73,7 @@ export const fetchLiveWeather = async (lat, lng) => {
 
     weatherCache.set(key, { data: result, timestamp: Date.now() });
     return result;
-  } catch (err) {
-    console.warn('Could not fetch Open-Meteo weather:', err);
+  } catch {
     return null;
   }
 };
@@ -132,8 +131,6 @@ export const fetchLiveWeatherBatch = async (points = []) => {
       weatherCache.set(p.key, { data: result, timestamp: now });
       results[p.key] = result;
     });
-  } catch (err) {
-    console.warn('Could not fetch batch weather:', err);
-  }
+  } catch {}
   return results;
 };

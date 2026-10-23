@@ -38,9 +38,8 @@ class ChatSocketService {
         this.reapplyAllSubscriptions();
         if (onConnected) onConnected();
       },
-      onStompError: (frame) => {
-        console.warn('[STOMP Chat] Lỗi broker:', frame.headers['message']);
-      },
+      onWebSocketError: () => {},
+      onStompError: () => {},
       onWebSocketClose: () => {
         this.isConnected = false;
         // Dọn dẹp con trỏ subscription cũ vì socket đã đóng, broker đã hủy session
@@ -63,16 +62,12 @@ class ChatSocketService {
           try {
             const body = JSON.parse(message.body);
             callbacks.forEach(cb => {
-              try { cb(body); } catch (e) { console.error('[STOMP Chat] Callback err:', e); }
+              try { cb(body); } catch {}
             });
-          } catch (e) {
-            console.warn('[STOMP Chat] Lỗi parse payload:', e);
-          }
+          } catch {}
         });
         this.subscriptions.set(roomId, sub);
-      } catch (e) {
-        console.warn(`[STOMP Chat] Không thể re-subscribe room ${roomId}:`, e);
-      }
+      } catch {}
     }
 
     // 2. Re-subscribe các kênh thông báo
@@ -129,17 +124,13 @@ class ChatSocketService {
             const activeCbs = this.roomCallbacks.get(roomId);
             if (activeCbs) {
               activeCbs.forEach(cb => {
-                try { cb(body); } catch (e) { console.error('[STOMP Chat] Callback err:', e); }
+                try { cb(body); } catch {}
               });
             }
-          } catch (e) {
-            console.warn('[STOMP Chat] Lỗi parse payload:', e);
-          }
+          } catch {}
         });
         this.subscriptions.set(roomId, sub);
-      } catch (e) {
-        console.warn(`[STOMP Chat] Lỗi subscribe room ${roomId}:`, e);
-      }
+      } catch {}
     };
 
     if (this.client && this.client.connected) {

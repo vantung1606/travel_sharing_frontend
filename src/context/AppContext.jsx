@@ -218,8 +218,8 @@ export const AppProvider = ({ children }) => {
         const distinctCities = Array.from(new Set(data.map(p => p.city).filter(Boolean)));
         setDestinations(distinctCities.map(city => ({ name: city, destination: city })));
       }
-    } catch (err) {
-      console.warn('API error fetching places from database:', err.message);
+    } catch {
+      // Ignore background places fetch error
     }
   }, []);
 
@@ -248,8 +248,7 @@ export const AppProvider = ({ children }) => {
       }
       // Fallback: nếu API phân trang không khả dụng thì dùng cách tải toàn bộ như cũ
       await fetchPlaces();
-    } catch (err) {
-      console.warn('API error fetching initial places:', err.message);
+    } catch {
       await fetchPlaces();
     }
   }, [fetchPlaces]);
@@ -277,8 +276,8 @@ export const AppProvider = ({ children }) => {
         setPlacesTotal(result.totalElements || 0);
         setHasMorePlaces(Boolean(result.hasNext));
       }
-    } catch (err) {
-      console.warn('API error loading more places:', err.message);
+    } catch {
+      // Ignore load more places error
     } finally {
       setLoadingMorePlaces(false);
     }
@@ -317,8 +316,8 @@ export const AppProvider = ({ children }) => {
           // Ignore quota if any
         }
       }
-    } catch (err) {
-      console.warn('API error fetching all places:', err.message);
+    } catch {
+      // Ignore fetch all places error
     } finally {
       setLoadingMorePlaces(false);
       fetchingAllPlacesRef.current = false;
@@ -368,8 +367,8 @@ export const AppProvider = ({ children }) => {
     setSavedPlaces(next);
     try {
       localStorage.setItem('wayfare_saved_places', JSON.stringify(next));
-    } catch (e) {
-      console.warn('Failed to persist saved places:', e);
+    } catch {
+      // Ignore storage quota
     }
 
     // Đồng bộ lên SERVER (bảng saved_places) khi đã đăng nhập — web & mobile
@@ -377,9 +376,7 @@ export const AppProvider = ({ children }) => {
     const placeId = Number(place.rawId);
     if (currentUser?.email && Number.isFinite(placeId) && placeId > 0) {
       const syncCall = isSavedNow ? savedPlaceApi.addSavedPlace : savedPlaceApi.removeSavedPlace;
-      syncCall(placeId).catch(err => {
-        console.warn('Wishlist server sync failed:', err?.message || err);
-      });
+      syncCall(placeId).catch(() => {});
     }
     return isSavedNow;
   };
@@ -429,8 +426,8 @@ export const AppProvider = ({ children }) => {
           return parsed;
         }
       }
-    } catch (e) {
-      console.warn('Failed to parse wayfare_user from localStorage', e);
+    } catch {
+      // Ignore corrupted localStorage data
     }
     return GUEST_USER;
   });
@@ -439,7 +436,7 @@ export const AppProvider = ({ children }) => {
   // merge với danh sách local (union theo placeId) — thứ đã lưu khi offline
   // vẫn giữ, những gì lưu từ app mobile/website khác cũng xuất hiện.
   useEffect(() => {
-    if (!currentUser?.email) return undefined;
+    if (!currentUser?.email || !currentUser?.token) return undefined;
     let alive = true;
     savedPlaceApi.getSavedPlaces().then(list => {
       if (!alive || !Array.isArray(list) || list.length === 0) return;
@@ -451,16 +448,16 @@ export const AppProvider = ({ children }) => {
         const merged = [...mapped, ...localOnly];
         try {
           localStorage.setItem('wayfare_saved_places', JSON.stringify(merged));
-        } catch (e) {
-          console.warn('Failed to persist merged saved places:', e);
+        } catch {
+          // Ignore quota error
         }
         return merged;
       });
-    }).catch(err => {
-      console.warn('Wishlist hydration failed:', err?.message || err);
+    }).catch(() => {
+      // Silent error handling
     });
     return () => { alive = false; };
-  }, [currentUser?.email]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentUser?.email, currentUser?.token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Clean Login: ĐẢM BẢO CÁCH LY TUYỆT ĐỐI GIỮA CÁC USER, KHÔNG ĐÈ DỮ LIỆU CŨ SANG USER MỚI
   const login = (userData) => {
@@ -472,8 +469,8 @@ export const AppProvider = ({ children }) => {
       localStorage.removeItem('wayfare_auth');
       localStorage.removeItem('wayfare_portal_mode');
       localStorage.removeItem('token');
-    } catch (e) {
-      console.warn('Could not clean old storage:', e);
+    } catch {
+      // Clean storage safely
     }
 
     // 2. KHỞI TẠO USER MỚI HOÀN TOÀN ĐỘC LẬP TỪ DỮ LIỆU BACKEND
@@ -504,8 +501,8 @@ export const AppProvider = ({ children }) => {
     try {
       localStorage.setItem('wayfare_user', JSON.stringify(freshUser));
       localStorage.setItem('wayfare_auth', 'true');
-    } catch (e) {
-      console.error('Failed to save fresh user to localStorage:', e);
+    } catch {
+      // Ignore localStorage error
     }
   };
 
@@ -513,7 +510,7 @@ export const AppProvider = ({ children }) => {
   const logout = () => {
     const userToLogout = currentUser;
     if (userToLogout?.email) {
-      authApi.logout(userToLogout.email).catch(e => console.warn('Logout API error:', e));
+      authApi.logout(userToLogout.email).catch(() => {});
     }
     setIsLoggedIn(false);
     setCurrentUser(GUEST_USER);
@@ -524,8 +521,8 @@ export const AppProvider = ({ children }) => {
       localStorage.removeItem('wayfare_user');
       localStorage.removeItem('wayfare_portal_mode');
       localStorage.removeItem('token');
-    } catch (e) {
-      console.error('Failed to clear auth from localStorage', e);
+    } catch {
+      // Ignore localStorage error
     }
   };
 
@@ -536,17 +533,16 @@ export const AppProvider = ({ children }) => {
       const updated = { ...prev, ...updates };
       try {
         localStorage.setItem('wayfare_user', JSON.stringify(updated));
-      } catch (e) {
-        console.error('Failed to update wayfare_user in localStorage:', e);
+      } catch {
+        // Ignore localStorage error
       }
       return updated;
     });
   };
 
-  // Tự động bắt sự kiện 401 Unauthorized từ API client: reset session và hiển thị modal đăng nhập
+  // Tự động bắt sự kiện 401/403 từ API client: reset session và hiển thị modal đăng nhập
   useEffect(() => {
-    const onUnauthorized = (event) => {
-      console.warn('[AppContext] Handling 401 Unauthorized event:', event?.detail);
+    const onUnauthorized = () => {
       setIsLoggedIn(false);
       setCurrentUser(GUEST_USER);
       setPortalMode('user');
@@ -566,7 +562,7 @@ export const AppProvider = ({ children }) => {
 
   // Auto-sync profile ID and details with backend if missing or on reload
   useEffect(() => {
-    if (!isLoggedIn || !currentUser?.email) return;
+    if (!isLoggedIn || !currentUser?.email || !currentUser?.token) return;
     userApi
       .getMyProfile(currentUser.email)
       .then(profile => {
@@ -588,15 +584,15 @@ export const AppProvider = ({ children }) => {
             };
             try {
               localStorage.setItem('wayfare_user', JSON.stringify(updated));
-            } catch (e) {
-              console.error(e);
+            } catch {
+              // Ignore localStorage error
             }
             return updated;
           });
         }
       })
-      .catch(err => console.warn('Could not sync user profile with backend:', err));
-  }, [isLoggedIn, currentUser?.email]);
+      .catch(() => {});
+  }, [isLoggedIn, currentUser?.email, currentUser?.token]);
 
   // Notification State - Synced with currentUser
   const [notifications, setNotifications] = useState([]);
@@ -626,8 +622,8 @@ export const AppProvider = ({ children }) => {
         setNotifications(res.data);
         setIsNotificationLiveBackend(res.isBackend);
       }
-    } catch (err) {
-      console.error('Error fetching notifications:', err);
+    } catch {
+      // Ignore background notification fetch errors
     }
   }, [currentUser?.email, isLoggedIn]);
 
@@ -739,8 +735,7 @@ export const AppProvider = ({ children }) => {
       } else {
         setItineraries([]);
       }
-    } catch (err) {
-      console.warn('Failed to fetch itineraries from backend:', err);
+    } catch {
       setItineraries([]);
     }
   }, [currentUser?.email, mapBackendItineraryToFrontend]);
@@ -809,8 +804,8 @@ export const AppProvider = ({ children }) => {
       if (activeEmail && (typeof id === 'number' || !String(id).startsWith('itin-'))) {
         await itineraryApi.deleteItinerary(id, activeEmail);
       }
-    } catch (err) {
-      console.warn('Backend delete itinerary warning:', err.message);
+    } catch {
+      // Ignore network errors on itinerary delete
     }
     setItineraries(prev => prev.filter(item => String(item.id) !== String(id)));
   };
@@ -1072,7 +1067,6 @@ export const AppProvider = ({ children }) => {
 export const useApp = () => {
   const context = useContext(AppContext);
   if (!context) {
-    console.warn('[useApp] Context not found or not initialized yet, falling back to DEFAULT_APP_STATE.');
     return DEFAULT_APP_STATE;
   }
   return context;
