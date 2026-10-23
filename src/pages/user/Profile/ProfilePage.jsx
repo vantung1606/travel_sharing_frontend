@@ -8,6 +8,7 @@ import { TravelPassportCardModal } from '../../../components/profile/TravelPassp
 import { useToast } from '../../../components/common/Toast';
 import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass, Phone, CheckCircle2, ChevronLeft, ChevronRight, Crown, Trash2 } from 'lucide-react';
 import { TierPromotionModal } from '../../../components/common/TierPromotionModal';
+import { TravelFootprintSection } from '../../../components/profile/TravelFootprintSection';
 import { TIERS, calculateUserXP, getUserTier, getNextTier, calculateTierProgress, checkTierPromotion } from '../../../utils/tierSystem';
 
 export const ProfilePage = () => {
@@ -1048,6 +1049,14 @@ export const ProfilePage = () => {
               "{profileData?.bio || currentUser?.bio || "Thường đi du lịch trải nghiệm tự túc, thích chụp ảnh và khám phá ẩm thực bản địa độc đáo."}"
             </p>
           </div>
+
+          {/* Bản đồ dấu chân du lịch — danh mục tỉnh từ server (bảng provinces), check-in lưu DB */}
+          <TravelFootprintSection
+            posts={displayPosts}
+            itineraries={displayItineraries}
+            userId={profileData?.id || currentUser?.id}
+            userName={profileData?.fullName || currentUser?.fullName}
+          />
         </div>
       )}
 

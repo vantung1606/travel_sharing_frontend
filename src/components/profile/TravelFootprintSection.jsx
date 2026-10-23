@@ -18,16 +18,19 @@ import {
   Info
 } from 'lucide-react';
 import { useToast } from '../common/Toast';
+import { provinceApi } from '../../services/api';
+import { useApp } from '../../context/AppContext';
 
-// Danh mục chuẩn 63 Tỉnh Thành Việt Nam theo 4 Vùng Miền
-export const VIETNAM_REGIONS = [
-  { id: 'all', label: 'Toàn quốc', badge: '63 tỉnh thành' },
-  { id: 'north', label: 'Miền Bắc', badge: '25 tỉnh thành' },
-  { id: 'central', label: 'Miền Trung', badge: '14 tỉnh thành' },
-  { id: 'highlands', label: 'Tây Nguyên', badge: '5 tỉnh thành' },
-  { id: 'south', label: 'Miền Nam', badge: '19 tỉnh thành' }
+// Vùng miền for UI pills (tổng số tính ĐỘNG từ danh mục tỉnh server)
+const REGION_META = [
+  { id: 'all', label: 'Toàn quốc' },
+  { id: 'north', label: 'Miền Bắc' },
+  { id: 'central', label: 'Miền Trung' },
+  { id: 'highlands', label: 'Tây Nguyên' },
+  { id: 'south', label: 'Miền Nam' }
 ];
 
+// FALLBACK danh mục 63 tỉnh cũ khi chưa lấy được danh mục từ server /api/provinces
 export const VIETNAM_PROVINCES = [
   // MIỀN BẮC (25)
   { id: 'HN', name: 'Hà Nội', region: 'north', aliases: ['hà nội', 'ha noi', 'hanoi', 'thủ đô'], highlight: 'Hồ Gươm & Phố Cổ' },
@@ -118,6 +121,48 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
     }
   });
 
+  // Danh mục tỉnh thành THẬT từ server (bảng provinces — 34 đơn vị 2025), fallback danh sách cũ
+  const { currentUser } = useApp();
+  const [serverProvinces, setServerProvinces] = useState(null);
+  const [serverVisited, setServerVisited] = useState(null); // mã tỉnh từ DB (user đang đăng nhập)
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const list = await provinceApi.getProvinces();
+      if (alive && Array.isArray(list) && list.length > 0) {
+        setServerProvinces(list.map(p => ({
+          id: p.code,
+          name: p.name,
+          region: p.region,
+          aliases: [...(p.aliases || []), (p.name || '').toLowerCase()],
+          highlight: `Khám phá ${p.name}`
+        })));
+      }
+      // dấu chân lưu DB — chỉ đồng bộ cho profile của chính mình khi đã đăng nhập
+      const me = currentUser?.id != null && Number(userId) === Number(currentUser.id);
+      if (me) {
+        const visited = await provinceApi.getMyVisited();
+        if (alive && Array.isArray(visited)) {
+          setServerVisited(visited);
+        }
+      }
+    })();
+    return () => { alive = false; };
+  }, [userId, currentUser?.id, currentUser?.token]);
+
+  // Danh sách dùng render: server nếu có, không thì fallback hardcode
+  const provinceList = serverProvinces || VIETNAM_PROVINCES;
+
+  // Hợp nhất dấu chân: server DB (ưu tiên khi dùng được) + tự nhận diện từ bài viết
+  const manualVisitedIdsMerged = useMemo(() => {
+    if (Array.isArray(serverVisited)) {
+      const set = new Set([...serverVisited, ...(currentUser?.id != null && Number(userId) === Number(currentUser.id) ? [] : manualVisitedIds)]);
+      return Array.from(set);
+    }
+    return manualVisitedIds;
+  }, [serverVisited, manualVisitedIds, userId, currentUser?.id]);
+
   // Tự động quét từ các bài viết và lịch trình để nhận diện tỉnh thành đã đặt chân tới
   const detectedProvinceIds = useMemo(() => {
     const ids = new Set();
@@ -125,7 +170,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
     const checkTextAgainstProvinces = (text) => {
       if (!text) return;
       const lower = text.toLowerCase();
-      VIETNAM_PROVINCES.forEach(prov => {
+      provinceList.forEach(prov => {
         if (prov.aliases.some(alias => lower.includes(alias))) {
           ids.add(prov.id);
         }
@@ -145,35 +190,48 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
     });
 
     return Array.from(ids);
-  }, [posts, itineraries]);
+  }, [posts, itineraries, provinceList]);
 
   // Hợp nhất các tỉnh được tự động nhận diện và các tỉnh người dùng đánh dấu
   const allVisitedIds = useMemo(() => {
-    const set = new Set([...detectedProvinceIds, ...manualVisitedIds]);
+    const set = new Set([...detectedProvinceIds, ...manualVisitedIdsMerged]);
     return Array.from(set);
-  }, [detectedProvinceIds, manualVisitedIds]);
+  }, [detectedProvinceIds, manualVisitedIdsMerged]);
 
-  // Lưu check-in thủ công vào localStorage
-  const handleToggleCheckin = (provinceId, e) => {
+  // Check-in thủ công: lưu lên SERVER (bảng user_provinces_visited); fallback localStorage khi chưa đăng nhập
+  const handleToggleCheckin = async (provinceId, e) => {
     e?.stopPropagation();
-    let updated;
-    if (manualVisitedIds.includes(provinceId)) {
-      updated = manualVisitedIds.filter(id => id !== provinceId);
-      toast.showInfo?.(`Đã gỡ dấu chân tỉnh thành`);
-    } else {
-      updated = [...manualVisitedIds, provinceId];
-      toast.showSuccess?.(`🎉 Đã thêm dấu chân mới! Tiếp tục khám phá Việt Nam nào!`);
-    }
+    const isAdding = !manualVisitedIdsMerged.includes(provinceId);
+    const updated = isAdding
+      ? [...manualVisitedIdsMerged, provinceId]
+      : manualVisitedIdsMerged.filter(id => id !== provinceId);
+
     setManualVisitedIds(updated);
     try {
       localStorage.setItem(storageKey, JSON.stringify(updated));
     } catch (err) {
       console.warn('Could not save footprint to localStorage:', err);
     }
+
+    if (Array.isArray(serverVisited) || (currentUser?.token && Number(userId) === Number(currentUser.id))) {
+      const res = await provinceApi.setVisited(provinceId, isAdding);
+      if (Array.isArray(res)) {
+        setServerVisited(res);
+        toast.showSuccess?.(isAdding ? '🎉 Đã lưu dấu chân vào tài khoản!' : 'Đã gỡ dấu chân tỉnh thành');
+        return;
+      }
+      toast.showError?.('Không lưu được dấu chân (chưa đăng nhập hoặc lỗi kết nối)');
+    }
+
+    if (isAdding) {
+      toast.showSuccess?.(`🎉 Đã thêm dấu chân mới! Tiếp tục khám phá Việt Nam nào!`);
+    } else {
+      toast.showInfo?.(`Đã gỡ dấu chân tỉnh thành`);
+    }
   };
 
-  // Thống kê tiến độ
-  const totalCount = VIETNAM_PROVINCES.length; // 63
+  // Thống kê tiến độ (tổng cấp đầu động từ danh mục server)
+  const totalCount = provinceList.length;
   const visitedCount = allVisitedIds.length;
   const progressPercent = Math.min(100, Math.round((visitedCount / totalCount) * 100));
 
@@ -186,25 +244,28 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
     return { title: 'Tập Sự Khởi Hành', badge: '🌿 Novice Traveler', color: 'from-slate-600 to-slate-800', level: 1 };
   }, [visitedCount]);
 
-  // Thống kê theo từng miền
+  // Thống kê theo từng miền (tong đếm ĐỘNG từ danh sách hiện tại)
   const regionStats = useMemo(() => {
     const stats = {
-      north: { total: 25, visited: 0 },
-      central: { total: 14, visited: 0 },
-      highlands: { total: 5, visited: 0 },
-      south: { total: 19, visited: 0 }
+      north: { total: 0, visited: 0 },
+      central: { total: 0, visited: 0 },
+      highlands: { total: 0, visited: 0 },
+      south: { total: 0, visited: 0 }
     };
-    VIETNAM_PROVINCES.forEach(p => {
-      if (allVisitedIds.includes(p.id) && stats[p.region]) {
-        stats[p.region].visited += 1;
+    provinceList.forEach(p => {
+      if (stats[p.region]) {
+        stats[p.region].total += 1;
+        if (allVisitedIds.includes(p.id)) {
+          stats[p.region].visited += 1;
+        }
       }
     });
     return stats;
-  }, [allVisitedIds]);
+  }, [allVisitedIds, provinceList]);
 
   // Lọc danh sách tỉnh thành theo tab và tìm kiếm
   const filteredProvinces = useMemo(() => {
-    return VIETNAM_PROVINCES.filter(p => {
+    return provinceList.filter(p => {
       const matchRegion = selectedRegion === 'all' || p.region === selectedRegion;
       const matchQuery =
         !searchQuery.trim() ||
@@ -213,7 +274,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
         p.aliases.some(a => a.includes(searchQuery.toLowerCase()));
       return matchRegion && matchQuery;
     });
-  }, [selectedRegion, searchQuery]);
+  }, [selectedRegion, searchQuery, provinceList]);
 
   // Đếm bài viết & lịch trình liên quan đến một tỉnh
   const getProvinceStories = (prov) => {
@@ -234,7 +295,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
   }, [selectedProvinceForStories, posts, itineraries]);
 
   const handleShareFootprint = () => {
-    const text = `Tôi đã đặt chân đến ${visitedCount}/63 tỉnh thành Việt Nam (${progressPercent}% đất nước) trên Wayfare!`;
+    const text = `Tôi đã đặt chân đến ${visitedCount}/${totalCount} tỉnh thành Việt Nam (${progressPercent}% đất nước) trên Wayfare!`;
     if (navigator.clipboard) {
       navigator.clipboard.writeText(window.location.href);
       toast.showSuccess?.('Đã sao chép liên kết dấu chân du lịch của bạn! 🚀');
@@ -258,7 +319,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
                 <span>Bản Đồ Dấu Chân Du Lịch Việt Nam</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                Hành Trình Khám Phá 63 Tỉnh Thành
+                Hành Trình Khám Phá {totalCount} Tỉnh Thành
               </h2>
               <p className="text-slate-300 text-xs sm:text-sm mt-1 max-w-xl font-normal leading-relaxed">
                 Ghi dấu mọi tọa độ bạn từng đi qua. Kết nối các bài blog, lịch trình AI và chia sẻ cột mốc chinh phục dải đất hình chữ S cùng cộng đồng Wayfare.
@@ -281,7 +342,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
             <div className="md:col-span-5 flex items-center gap-4">
               <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex flex-col items-center justify-center text-white shrink-0 shadow-lg shadow-sky-500/30">
                 <span className="text-2xl sm:text-3xl font-black leading-none">{visitedCount}</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-200 mt-1">/ 63 Tỉnh</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-200 mt-1">/ {totalCount} Tỉnh</span>
               </div>
               <div>
                 <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-black bg-gradient-to-r ${explorerRank.color} text-white shadow-xs`}>
@@ -299,7 +360,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
             <div className="md:col-span-7 space-y-2">
               <div className="flex justify-between items-center text-xs font-bold text-slate-300">
                 <span>Tiến độ khám phá toàn quốc</span>
-                <span className="text-sky-300 font-extrabold">{visitedCount}/63 ({progressPercent}%)</span>
+                <span className="text-sky-300 font-extrabold">{visitedCount}/{totalCount} ({progressPercent}%)</span>
               </div>
               <div className="w-full h-3.5 bg-slate-800/80 rounded-full overflow-hidden p-0.5 border border-white/10">
                 <div
@@ -338,7 +399,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs">
         {/* Region Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
-          {VIETNAM_REGIONS.map(reg => {
+          {REGION_META.map(reg => {
             const isActive = selectedRegion === reg.id;
             return (
               <button
@@ -355,7 +416,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
                   isActive ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'
                 }`}>
                   {reg.id === 'all'
-                    ? `${visitedCount}/63`
+                    ? `${visitedCount}/${totalCount}`
                     : `${regionStats[reg.id]?.visited || 0}/${regionStats[reg.id]?.total || 0}`}
                 </span>
               </button>
@@ -377,7 +438,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
       </div>
 
       {/* ========================================================= */}
-      {/* 63 PROVINCES GRID TILES                                   */}
+      {/* PROVINCES GRID TILES */}
       {/* ========================================================= */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
         {filteredProvinces.map(prov => {

@@ -40,13 +40,28 @@ export const PageTitleManager = () => {
 };
 
 // Protected Route Guard for Admin Portal (/admin/*)
+/* Ranh giới quyền đã khớp backend (SecurityConfig):
+ * - ROLE_ADMIN: toàn bộ /admin/*
+ * - ROLE_MODERATOR ("giám sát"): chỉ kéo moderation — /admin/places, /admin/reviews, /admin/reports
+ * - /admin/dashboard (stats), /admin/users, /admin/analytics, /admin/audit-logs: riêng ADMIN
+ */
+const MODERATOR_ALLOWED_PATHS = ['/admin/places', '/admin/reviews', '/admin/reports'];
+
 export const AdminRouteGuard = ({ children }) => {
   const { isLoggedIn, currentUser, setIsAuthModalOpen, setAuthMode } = useApp();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const isAdmin = isLoggedIn && (
-    Array.isArray(currentUser?.roles) && currentUser.roles.includes('ROLE_ADMIN')
-  );
+  const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
+  const isAdmin = isLoggedIn && roles.includes('ROLE_ADMIN');
+  const isModerator = isLoggedIn && !isAdmin && roles.includes('ROLE_MODERATOR');
+  const restrictedForModerator = isModerator && !MODERATOR_ALLOWED_PATHS.includes(location.pathname);
+
+  useEffect(() => {
+    if (restrictedForModerator) {
+      navigate('/admin/places', { replace: true });
+    }
+  }, [restrictedForModerator, navigate]);
 
   // 1. Not Logged In -> Require Admin Login
   if (!isLoggedIn) {
@@ -84,8 +99,8 @@ export const AdminRouteGuard = ({ children }) => {
     );
   }
 
-  // 2. Logged In but Not Admin -> 403 Forbidden
-  if (!isAdmin) {
+  // 2. Logged In but No Admin/Moderator Role -> 403 Forbidden
+  if (!isAdmin && !isModerator) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-rose-200 shadow-xl text-center space-y-5 animate-in fade-in zoom-in-95">
@@ -123,7 +138,25 @@ export const AdminRouteGuard = ({ children }) => {
     );
   }
 
-  // 3. Authorized Admin
+  // 3. Unauthorized Moderator — trình bày màn hình chuyển hướng
+  if (restrictedForModerator) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-amber-200 shadow-xl text-center space-y-4 animate-in fade-in">
+          <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
+            <ShieldAlert className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900 font-display">Chỉ áp dụng cho Quản Trị Viên</h2>
+          <p className="text-xs text-slate-500">
+            Tài khoản <strong>{currentUser?.email}</strong> mang vai trò <strong>Kiểm duyệt viên (Moderator)</strong> —
+            chỉ truy cập các mục: Địa điểm, Đánh giá, Bài viết &amp; Báo cáo. Quay về khu vực kiểm duyệt...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // 4. Authorized (Admin full / Moderator moderation-only)
   return children;
 };
 
