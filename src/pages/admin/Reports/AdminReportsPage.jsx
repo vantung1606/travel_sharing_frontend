@@ -89,6 +89,7 @@ export const AdminReportsPage = () => {
   // Actions on Reported Posts
   const handleApprovePost = async (id, title = '') => {
     try {
+      setReports(prev => prev.filter(r => r.id !== id));
       await adminReportApi.approvePost(id);
       await loadData();
       toast.success(`Đã phê duyệt xuất bản bài viết #${id} thành công! Hệ thống đã gửi thông báo đến tác giả.`);
@@ -97,11 +98,13 @@ export const AdminReportsPage = () => {
       }
     } catch (err) {
       toast.error('Lỗi khi phê duyệt bài viết: ' + err.message);
+      await loadData();
     }
   };
 
   const handleDismissReport = async (id, title = '') => {
     try {
+      setReports(prev => prev.filter(r => r.id !== id));
       await adminReportApi.dismissReport(id);
       await loadData();
       toast.info(`Đã bác bỏ báo cáo bài viết #${id} (Nội dung hợp lệ). Hệ thống đã gửi thông báo xác nhận đến tác giả.`);
@@ -110,11 +113,13 @@ export const AdminReportsPage = () => {
       }
     } catch (err) {
       toast.error('Lỗi khi bác bỏ báo cáo: ' + err.message);
+      await loadData();
     }
   };
 
   const executeHidePost = async (id, title = '') => {
     try {
+      setReports(prev => prev.filter(r => r.id !== id));
       await adminReportApi.hidePost(id);
       await loadData();
       toast.warning(`Đã tạm ẩn bài viết #${id} khỏi cộng đồng! Hệ thống đã gửi thông báo cảnh báo đến tác giả.`);
@@ -124,6 +129,7 @@ export const AdminReportsPage = () => {
       setConfirmModal(null);
     } catch (err) {
       toast.error('Lỗi khi tạm ẩn bài viết: ' + err.message);
+      await loadData();
     }
   };
 
@@ -684,7 +690,7 @@ export const AdminReportsPage = () => {
                   <th className="py-3 px-4">Mã ID</th>
                   <th className="py-3 px-4">Tiêu đề bài viết</th>
                   <th className="py-3 px-4">Tác giả</th>
-                  <th className="py-3 px-4">Thời gian</th>
+                  <th className="py-3 px-4">{activeTab === 'hidden' ? 'Thời gian ẩn' : 'Thời gian'}</th>
                   <th className="py-3 px-4">Trạng thái AI</th>
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
