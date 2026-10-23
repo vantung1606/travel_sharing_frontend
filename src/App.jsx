@@ -13,24 +13,48 @@ import { AuthModal } from './components/auth/AuthModal';
 import { FloatingChatWidget } from './components/common/FloatingChatWidget';
 import { PageTitleManager, AdminRouteGuard, UserAuthGuard } from './components/common/RouteGuards';
 
+// Resilient lazy import: tự động reload trang 1 lần nếu phát hiện chunk cũ bị 404 sau khi deploy
+const lazyRetry = (componentImport) => {
+  return lazy(async () => {
+    try {
+      return await componentImport();
+    } catch (error) {
+      const errorMsg = error?.message || '';
+      const isChunkError =
+        errorMsg.includes('dynamically imported module') ||
+        errorMsg.includes('Loading chunk') ||
+        errorMsg.includes('Failed to fetch');
+
+      const hasReloaded = typeof window !== 'undefined' && sessionStorage.getItem('chunk_reload_attempted');
+      if (isChunkError && !hasReloaded && typeof window !== 'undefined') {
+        sessionStorage.setItem('chunk_reload_attempted', 'true');
+        console.warn('[Vite Lazy] Stale chunk detected. Auto-reloading to fetch newest version...');
+        window.location.reload();
+        return new Promise(() => {});
+      }
+      throw error;
+    }
+  });
+};
+
 // User Pages - lazy loaded để tách bundle theo route (giảm thời gian tải trang đầu)
-const HomePage = lazy(() => import('./pages/user/Home/HomePage').then(m => ({ default: m.HomePage })));
-const ExplorePage = lazy(() => import('./pages/user/Explore/ExplorePage').then(m => ({ default: m.ExplorePage })));
-const PlaceDetailPage = lazy(() => import('./pages/user/Explore/PlaceDetailPage'));
-const CommunityPage = lazy(() => import('./pages/user/Community/CommunityPage').then(m => ({ default: m.CommunityPage })));
-const ItineraryManagerPage = lazy(() => import('./pages/user/Itineraries/ItineraryManagerPage').then(m => ({ default: m.ItineraryManagerPage })));
-const MessagesPage = lazy(() => import('./pages/user/Messages/MessagesPage').then(m => ({ default: m.MessagesPage })));
-const ProfilePage = lazy(() => import('./pages/user/Profile/ProfilePage').then(m => ({ default: m.ProfilePage })));
-const NotificationsPage = lazy(() => import('./pages/user/Notifications/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
+const HomePage = lazyRetry(() => import('./pages/user/Home/HomePage').then(m => ({ default: m.HomePage })));
+const ExplorePage = lazyRetry(() => import('./pages/user/Explore/ExplorePage').then(m => ({ default: m.ExplorePage })));
+const PlaceDetailPage = lazyRetry(() => import('./pages/user/Explore/PlaceDetailPage'));
+const CommunityPage = lazyRetry(() => import('./pages/user/Community/CommunityPage').then(m => ({ default: m.CommunityPage })));
+const ItineraryManagerPage = lazyRetry(() => import('./pages/user/Itineraries/ItineraryManagerPage').then(m => ({ default: m.ItineraryManagerPage })));
+const MessagesPage = lazyRetry(() => import('./pages/user/Messages/MessagesPage').then(m => ({ default: m.MessagesPage })));
+const ProfilePage = lazyRetry(() => import('./pages/user/Profile/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const NotificationsPage = lazyRetry(() => import('./pages/user/Notifications/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
 
 // Admin Pages - lazy loaded, chỉ tải khi vào khu vực /admin
-const AdminDashboardPage = lazy(() => import('./pages/admin/Dashboard/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })));
-const AdminPlacesPage = lazy(() => import('./pages/admin/Places/AdminPlacesPage').then(m => ({ default: m.AdminPlacesPage })));
-const AdminUsersPage = lazy(() => import('./pages/admin/Users/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
-const AdminReportsPage = lazy(() => import('./pages/admin/Reports/AdminReportsPage').then(m => ({ default: m.AdminReportsPage })));
-const AdminReviewsPage = lazy(() => import('./pages/admin/Reviews/AdminReviewsPage').then(m => ({ default: m.AdminReviewsPage })));
-const AdminStatisticsPage = lazy(() => import('./pages/admin/Statistics/AdminStatisticsPage').then(m => ({ default: m.AdminStatisticsPage })));
-const AdminAuditLogsPage = lazy(() => import('./pages/admin/AuditLogs/AdminAuditLogsPage').then(m => ({ default: m.AdminAuditLogsPage })));
+const AdminDashboardPage = lazyRetry(() => import('./pages/admin/Dashboard/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })));
+const AdminPlacesPage = lazyRetry(() => import('./pages/admin/Places/AdminPlacesPage').then(m => ({ default: m.AdminPlacesPage })));
+const AdminUsersPage = lazyRetry(() => import('./pages/admin/Users/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
+const AdminReportsPage = lazyRetry(() => import('./pages/admin/Reports/AdminReportsPage').then(m => ({ default: m.AdminReportsPage })));
+const AdminReviewsPage = lazyRetry(() => import('./pages/admin/Reviews/AdminReviewsPage').then(m => ({ default: m.AdminReviewsPage })));
+const AdminStatisticsPage = lazyRetry(() => import('./pages/admin/Statistics/AdminStatisticsPage').then(m => ({ default: m.AdminStatisticsPage })));
+const AdminAuditLogsPage = lazyRetry(() => import('./pages/admin/AuditLogs/AdminAuditLogsPage').then(m => ({ default: m.AdminAuditLogsPage })));
 
 // Fallback hiển thị trong lúc tải chunk của route
 const RouteLoadingFallback = () => (
@@ -205,6 +229,21 @@ class GlobalErrorBoundary extends React.Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('[GlobalErrorBoundary] Caught render error:', error, errorInfo);
+    const errorMsg = error?.message || '';
+    const isChunkError =
+      errorMsg.includes('dynamically imported module') ||
+      errorMsg.includes('Loading chunk') ||
+      errorMsg.includes('Failed to fetch') ||
+      error?.name === 'ChunkLoadError';
+
+    if (isChunkError && typeof window !== 'undefined') {
+      const hasReloaded = sessionStorage.getItem('chunk_reload_attempted');
+      if (!hasReloaded) {
+        sessionStorage.setItem('chunk_reload_attempted', 'true');
+        console.warn('[GlobalErrorBoundary] Stale chunk 404 detected. Auto-reloading page once...');
+        window.location.reload();
+      }
+    }
   }
 
   render() {
