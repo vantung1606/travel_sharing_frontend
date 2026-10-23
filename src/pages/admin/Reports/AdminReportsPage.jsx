@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useToast } from '../../../components/common/Toast';
 import { adminReportApi, auditLogApi } from '../../../services/api';
-import { AlertTriangle, Flame, ShieldAlert, Search, Filter, Download, CheckCircle2, Eye, EyeOff, UserX, Trash2, RefreshCw, TrendingUp, FileText, ShieldCheck, Bot, History, X, MapPin, Sparkles } from 'lucide-react';
+import { 
+  AlertTriangle, Flame, ShieldAlert, Search, Filter, Download, CheckCircle2, 
+  Eye, EyeOff, UserX, Trash2, RefreshCw, TrendingUp, FileText, ShieldCheck, 
+  Bot, History, X, MapPin, Sparkles, ExternalLink, ChevronLeft, ChevronRight,
+  Shield, Globe, Laptop, Clock, ArrowRight
+} from 'lucide-react';
 
 // Helper to sanitize media image URLs and prevent Mixed Content on production HTTPS
 const getSafeImageUrl = (url) => {
@@ -39,8 +45,69 @@ export const AdminReportsPage = () => {
   const [selectedPostModal, setSelectedPostModal] = useState(null);
   const [confirmModal, setConfirmModal] = useState(null);
 
-  // Real Audit Logs from MySQL Database
+  // Real Audit Logs States
   const [auditLogs, setAuditLogs] = useState([]);
+  const [auditFilterAction, setAuditFilterAction] = useState('ALL');
+  const [auditSearchQuery, setAuditSearchQuery] = useState('');
+  const [auditPage, setAuditPage] = useState(0);
+  const [auditTotalPages, setAuditTotalPages] = useState(1);
+  const [auditTotalElements, setAuditTotalElements] = useState(0);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [auditStats, setAuditStats] = useState({ totalLogs: 0, logsToday: 0 });
+
+  // Fetch Audit Logs with Filtering & Pagination
+  const fetchAuditLogs = async (pageNum = 0, query = auditSearchQuery, actionFilter = auditFilterAction) => {
+    setAuditLoading(true);
+    try {
+      const act = actionFilter === 'ALL' ? '' : actionFilter;
+      const res = await auditLogApi.getLogs({
+        keyword: query,
+        action: act,
+        category: actionFilter === 'ALL' ? 'SECURITY' : '',
+        page: pageNum,
+        size: 15
+      });
+
+      if (res && Array.isArray(res.content)) {
+        if (res.content.length === 0 && actionFilter === 'ALL' && !query) {
+          // Fallback to fetch without category constraint if empty
+          const fallback = await auditLogApi.getLogs({ page: pageNum, size: 15 });
+          if (fallback && Array.isArray(fallback.content)) {
+            setAuditLogs(fallback.content);
+            setAuditTotalPages(fallback.totalPages || 1);
+            setAuditTotalElements(fallback.totalElements || 0);
+          } else {
+            setAuditLogs([]);
+            setAuditTotalPages(1);
+            setAuditTotalElements(0);
+          }
+        } else {
+          setAuditLogs(res.content);
+          setAuditTotalPages(res.totalPages || 1);
+          setAuditTotalElements(res.totalElements || 0);
+        }
+      } else {
+        setAuditLogs([]);
+        setAuditTotalPages(1);
+        setAuditTotalElements(0);
+      }
+      setAuditPage(pageNum);
+
+      // Load stats
+      const stats = await auditLogApi.getStats().catch(() => null);
+      if (stats) {
+        setAuditStats({
+          totalLogs: stats.totalLogs || 0,
+          logsToday: stats.logsToday || 0,
+          securityCount: stats.securityCount || 0
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load audit logs:', err);
+    } finally {
+      setAuditLoading(false);
+    }
+  };
 
   // Load Real Data from Backend
   const loadData = async (isManual = false) => {
@@ -49,25 +116,18 @@ export const AdminReportsPage = () => {
 
     try {
       const targetStatus = activeTab === 'pending' ? 'all' : activeTab;
-      const [metricsData, pendingReportsData, allArticlesData, logsData] = await Promise.all([
+      const [metricsData, pendingReportsData, allArticlesData] = await Promise.all([
         adminReportApi.getMetrics(),
         adminReportApi.getPendingReports(searchQuery),
-        adminReportApi.getAllArticles({ keyword: searchQuery, status: targetStatus }),
-        auditLogApi.getLogs({ size: 25 }).catch(() => null)
+        adminReportApi.getAllArticles({ keyword: searchQuery, status: targetStatus })
       ]);
 
       setMetrics(metricsData);
       setReports(pendingReportsData);
       setArticles(allArticlesData);
-      if (logsData && Array.isArray(logsData.content)) {
-        setAuditLogs(logsData.content.map(l => ({
-          id: l.id,
-          admin: l.userName || 'Quản Trị Viên',
-          action: l.action || 'Thao tác hệ thống',
-          target: l.details || l.target || '',
-          time: l.createdAt ? new Date(l.createdAt).toLocaleTimeString('vi-VN') + ' - ' + new Date(l.createdAt).toLocaleDateString('vi-VN') : 'Vừa xong',
-          type: (l.action && (l.action.includes('BAN') || l.action.includes('REMOVE') || l.action.includes('REJECT'))) ? 'error' : (l.action && l.action.includes('HIDE')) ? 'warning' : 'success'
-        })));
+
+      if (activeTab === 'audit') {
+        await fetchAuditLogs(auditPage);
       }
 
       if (isManual) {
@@ -83,8 +143,12 @@ export const AdminReportsPage = () => {
   };
 
   useEffect(() => {
-    loadData();
-  }, [activeTab]);
+    if (activeTab === 'audit') {
+      fetchAuditLogs(0);
+    } else {
+      loadData();
+    }
+  }, [activeTab, auditFilterAction]);
 
   // Actions on Reported Posts
   const handleApprovePost = async (id, title = '') => {
@@ -177,8 +241,149 @@ export const AdminReportsPage = () => {
     }
   };
 
+  // Formatters & Helpers for Moderation Audit Logs
+  const getAuditActionStyle = (action) => {
+    const act = (action || '').toUpperCase();
+    if (act.includes('APPROVE')) {
+      return {
+        bg: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+        badge: 'bg-emerald-500',
+        icon: CheckCircle2,
+        label: 'Phê duyệt xuất bản'
+      };
+    }
+    if (act.includes('DISMISS')) {
+      return {
+        bg: 'bg-sky-50 text-sky-700 border-sky-200/80',
+        badge: 'bg-sky-500',
+        icon: ShieldCheck,
+        label: 'Bác bỏ báo cáo'
+      };
+    }
+    if (act.includes('UNHIDE')) {
+      return {
+        bg: 'bg-indigo-50 text-indigo-700 border-indigo-200/80',
+        badge: 'bg-indigo-500',
+        icon: RefreshCw,
+        label: 'Bỏ ẩn bài viết'
+      };
+    }
+    if (act.includes('HIDE')) {
+      return {
+        bg: 'bg-amber-50 text-amber-700 border-amber-200/80',
+        badge: 'bg-amber-500',
+        icon: EyeOff,
+        label: 'Tạm ẩn bài viết'
+      };
+    }
+    if (act.includes('BAN') || act.includes('LOCK')) {
+      return {
+        bg: 'bg-rose-50 text-rose-700 border-rose-200/80',
+        badge: 'bg-rose-500',
+        icon: UserX,
+        label: 'Gỡ bài & Khóa TK'
+      };
+    }
+    if (act.includes('DELETE')) {
+      return {
+        bg: 'bg-red-50 text-red-700 border-red-200/80',
+        badge: 'bg-red-600',
+        icon: Trash2,
+        label: 'Xóa vĩnh viễn'
+      };
+    }
+    if (act.includes('REPORT')) {
+      return {
+        bg: 'bg-amber-50 text-amber-700 border-amber-200/80',
+        badge: 'bg-amber-500',
+        icon: AlertTriangle,
+        label: 'Báo cáo vi phạm'
+      };
+    }
+    if (act.includes('FLAG') || act.includes('AI')) {
+      return {
+        bg: 'bg-purple-50 text-purple-700 border-purple-200/80',
+        badge: 'bg-purple-500',
+        icon: Bot,
+        label: 'AI gắn cờ'
+      };
+    }
+    return {
+      bg: 'bg-slate-50 text-slate-700 border-slate-200/80',
+      badge: 'bg-slate-500',
+      icon: History,
+      label: action || 'Thao tác hệ thống'
+    };
+  };
+
+  const formatAuditTime = (dateStr) => {
+    if (!dateStr) return 'Vừa xong';
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + d.toLocaleDateString('vi-VN');
+    } catch {
+      return dateStr;
+    }
+  };
+
+  const formatAuditRelative = (dateStr) => {
+    if (!dateStr) return '';
+    try {
+      const d = new Date(dateStr);
+      const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+      if (diff < 60) return 'Vừa xong';
+      if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+      if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+      if (diff < 86400 * 2) return 'Hôm qua';
+      return `${Math.floor(diff / 86400)} ngày trước`;
+    } catch {
+      return '';
+    }
+  };
+
+  const parseClientDevice = (userAgent) => {
+    if (!userAgent) return 'Web Client';
+    const ua = userAgent.toLowerCase();
+    if (ua.includes('console')) return 'Admin Console';
+    if (ua.includes('iphone') || ua.includes('ipad') || ua.includes('android') || ua.includes('mobile')) return 'Mobile App';
+    return 'Web Browser';
+  };
+
   // Export CSV
   const handleExportCSV = () => {
+    if (activeTab === 'audit') {
+      if (auditLogs.length === 0) {
+        toast.info('Không có dữ liệu nhật ký kiểm duyệt để xuất file');
+        return;
+      }
+      const headers = ['Mã ID', 'Người Thực Hiện', 'Email', 'Vai Trò', 'Hành Động', 'Chi Tiết Thao Tác', 'Địa Chỉ IP', 'Thiết Bị', 'Thời Gian'];
+      const rows = auditLogs.map(l => [
+        l.id,
+        `"${(l.userName || '').replace(/"/g, '""')}"`,
+        `"${(l.userEmail || '').replace(/"/g, '""')}"`,
+        `"${l.userRole || 'ADMIN'}"`,
+        `"${l.action || ''}"`,
+        `"${(l.details || '').replace(/"/g, '""')}"`,
+        `"${l.ipAddress || ''}"`,
+        `"${(l.userAgent || '').replace(/"/g, '""')}"`,
+        l.createdAt || ''
+      ]);
+
+      const csvContent = 'data:text/csv;charset=utf-8,\uFEFF'
+        + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement('a');
+      link.setAttribute('href', encodedUri);
+      link.setAttribute('download', `wayfare_moderation_audit_logs_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success('Đã xuất toàn bộ nhật ký kiểm duyệt ra file CSV thành công! 📊');
+      return;
+    }
+
     const listToExport = activeTab === 'pending' ? reports : articles;
     if (listToExport.length === 0) {
       toast.info('Không có dữ liệu bài viết để xuất file');
@@ -771,36 +976,304 @@ export const AdminReportsPage = () => {
 
       {/* 6. Audit Log Tab Content */}
       {activeTab === 'audit' && (
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 space-y-4">
-          <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-            <History className="w-5 h-5 text-sky-600" />
-            <h3 className="font-display font-extrabold text-base text-slate-900">
-              Nhật ký kiểm toán vi phạm & Thao tác Quản trị
-            </h3>
+        <div className="space-y-4">
+          {/* Audit Header Banner */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold shrink-0 border border-sky-100">
+                <History className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-display font-extrabold text-base text-slate-900">
+                    Nhật ký kiểm duyệt nội dung & Hành động Quản trị
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-extrabold text-[10px]">
+                    Realtime Sync
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 max-w-2xl">
+                  Lưu vết 100% thời gian thực toàn bộ quyết định kiểm duyệt: Phê duyệt bài viết, Bác bỏ báo cáo, Tạm ẩn/Bỏ ẩn, Gỡ bỏ & Khóa tài khoản, và Báo cáo vi phạm từ du khách.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 self-end lg:self-auto shrink-0">
+              <button
+                onClick={() => fetchAuditLogs(auditPage)}
+                disabled={auditLoading}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer disabled:opacity-60"
+                title="Tải lại nhật ký"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${auditLoading ? 'animate-spin' : ''}`} />
+                <span>Làm mới</span>
+              </button>
+
+              <button
+                onClick={handleExportCSV}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition-colors cursor-pointer shadow-xs"
+                title="Xuất file CSV"
+              >
+                <Download className="w-3.5 h-3.5 text-slate-500" />
+                <span>Xuất CSV</span>
+              </button>
+
+              <Link
+                to="/admin/audit-logs"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-colors shadow-xs shadow-sky-600/20"
+                title="Mở toàn bộ hệ thống Audit Logs"
+              >
+                <span>Tất cả Audit Logs</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </div>
 
-          <div className="space-y-3">
-            {auditLogs.map((log) => (
-              <div 
-                key={log.id} 
-                className="flex items-center justify-between p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs"
-              >
-                <div className="flex items-center gap-3">
-                  <span className={`w-2.5 h-2.5 rounded-full ${
-                    log.type === 'error' ? 'bg-rose-500' : log.type === 'warning' ? 'bg-amber-500' : 'bg-sky-500'
-                  }`}></span>
-                  <div>
-                    <span className="font-bold text-slate-900">{log.action}: </span>
-                    <span className="text-slate-600">{log.target}</span>
-                  </div>
+          {/* Quick Metrics Bar */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tổng bản ghi kiểm duyệt</span>
+                <div className="font-display font-extrabold text-2xl text-slate-900 mt-0.5">{auditTotalElements}</div>
+              </div>
+              <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+                <FileText className="w-4 h-4" />
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Hoạt động hôm nay</span>
+                <div className="font-display font-extrabold text-2xl text-emerald-600 mt-0.5">{auditStats.logsToday}</div>
+              </div>
+              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <Clock className="w-4 h-4" />
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+              <div>
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Sự kiện An toàn & Bảo mật</span>
+                <div className="font-display font-extrabold text-2xl text-rose-600 mt-0.5">{auditStats.securityCount || auditTotalElements}</div>
+              </div>
+              <div className="w-9 h-9 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                <Shield className="w-4 h-4" />
+              </div>
+            </div>
+          </div>
+
+          {/* Search Bar & Action Filter Tabs */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              {/* Search Bar */}
+              <div className="relative flex-1 max-w-md">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={auditSearchQuery}
+                  onChange={(e) => setAuditSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && fetchAuditLogs(0, e.target.value, auditFilterAction)}
+                  placeholder="Tìm kiếm theo tiêu đề bài viết, mã #ID, admin..."
+                  className="w-full pl-9 pr-24 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                />
+                <button
+                  onClick={() => fetchAuditLogs(0, auditSearchQuery, auditFilterAction)}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-[11px] font-bold cursor-pointer transition-colors"
+                >
+                  Tìm
+                </button>
+              </div>
+
+              {/* Page Indicator */}
+              <div className="text-xs text-slate-500 font-medium">
+                Trang <span className="font-bold text-slate-800">{auditPage + 1}</span> / {auditTotalPages || 1} ({auditTotalElements} bản ghi)
+              </div>
+            </div>
+
+            {/* Action Filter Pills */}
+            <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-slate-100">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Bộ lọc thao tác:</span>
+              {[
+                { id: 'ALL', label: 'Tất cả' },
+                { id: 'MODERATION_APPROVE', label: 'Phê duyệt' },
+                { id: 'MODERATION_DISMISS', label: 'Bác bỏ báo cáo' },
+                { id: 'MODERATION_HIDE', label: 'Tạm ẩn' },
+                { id: 'MODERATION_UNHIDE', label: 'Bỏ ẩn' },
+                { id: 'MODERATION_REMOVE_BAN', label: 'Gỡ bài & Khóa TK' },
+                { id: 'MODERATION_DELETE', label: 'Xóa vĩnh viễn' },
+                { id: 'USER_REPORT_POST', label: 'Báo cáo từ du khách' },
+                { id: 'AI_FLAG_POST', label: 'AI gắn cờ' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => {
+                    setAuditFilterAction(tab.id);
+                    fetchAuditLogs(0, auditSearchQuery, tab.id);
+                  }}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    auditFilterAction === tab.id
+                      ? 'bg-slate-900 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Audit Logs Table / Feed */}
+          <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+            {auditLoading ? (
+              <div className="p-12 text-center text-slate-400 space-y-3">
+                <RefreshCw className="w-6 h-6 animate-spin mx-auto text-sky-500" />
+                <p className="text-xs font-semibold">Đang truy vấn nhật ký kiểm duyệt thời gian thực...</p>
+              </div>
+            ) : auditLogs.length === 0 ? (
+              <div className="p-12 text-center text-slate-400 space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+                  <History className="w-6 h-6" />
                 </div>
-                <div className="flex items-center gap-3 text-slate-400">
-                  <span className="font-semibold text-slate-500">{log.admin}</span>
-                  <span>•</span>
-                  <span>{log.time}</span>
+                <div>
+                  <h4 className="font-bold text-slate-800 text-sm">Chưa có bản ghi nhật ký phù hợp</h4>
+                  <p className="text-xs text-slate-400 mt-1">Các thao tác kiểm duyệt mới của Quản trị viên sẽ lập tức được lưu vết tại đây.</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setAuditFilterAction('ALL');
+                    setAuditSearchQuery('');
+                    fetchAuditLogs(0, '', 'ALL');
+                  }}
+                  className="px-4 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>Xóa bộ lọc & Tải lại</span>
+                </button>
+              </div>
+            ) : (
+              <div className="overflow-x-auto w-full">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-50 text-slate-500 font-bold text-[11px] uppercase tracking-wider border-b border-slate-200/80">
+                      <th className="py-3 px-4 w-16">#ID</th>
+                      <th className="py-3 px-4 w-44">Hành động</th>
+                      <th className="py-3 px-4 w-52">Người thực hiện</th>
+                      <th className="py-3 px-4 min-w-[280px]">Nội dung chi tiết thao tác</th>
+                      <th className="py-3 px-4 w-36">Thiết bị & IP</th>
+                      <th className="py-3 px-4 w-40 text-right">Thời gian</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-xs text-slate-700 font-medium">
+                    {auditLogs.map((log) => {
+                      const style = getAuditActionStyle(log.action);
+                      const ActionIcon = style.icon;
+                      const isActorAdmin = (log.userRole || '').toUpperCase().includes('ADMIN');
+
+                      return (
+                        <tr key={log.id} className="hover:bg-slate-50/80 transition-colors">
+                          {/* ID */}
+                          <td className="py-3.5 px-4 font-mono text-slate-400 font-bold">
+                            #{log.id}
+                          </td>
+
+                          {/* Action Badge */}
+                          <td className="py-3.5 px-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-extrabold border ${style.bg}`}>
+                              <ActionIcon className="w-3.5 h-3.5 shrink-0" />
+                              <span>{style.label}</span>
+                            </span>
+                          </td>
+
+                          {/* Actor */}
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-2.5">
+                              {log.userAvatar ? (
+                                <img
+                                  src={getSafeImageUrl(log.userAvatar)}
+                                  alt={log.userName || 'User'}
+                                  className="w-8 h-8 rounded-full object-cover border border-slate-200 shrink-0"
+                                />
+                              ) : (
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
+                                  isActorAdmin ? 'bg-sky-100 text-sky-700' : 'bg-slate-100 text-slate-600'
+                                }`}>
+                                  {(log.userName || 'A').charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <p className="font-bold text-slate-900 truncate text-xs">{log.userName || 'Quản Trị Viên'}</p>
+                                  {isActorAdmin && (
+                                    <span className="px-1.5 py-0.2 rounded-md bg-sky-50 text-sky-700 font-extrabold text-[9px] uppercase border border-sky-100">
+                                      Admin
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-[11px] text-slate-400 truncate">{log.userEmail || '@system'}</p>
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* Details */}
+                          <td className="py-3.5 px-4">
+                            <div className="max-w-xl text-slate-800 leading-relaxed font-normal text-xs">
+                              {log.details}
+                            </div>
+                          </td>
+
+                          {/* Device & IP */}
+                          <td className="py-3.5 px-4 whitespace-nowrap text-slate-500">
+                            <div className="flex items-center gap-1 font-mono text-[11px] text-slate-600 font-bold">
+                              <Globe className="w-3 h-3 text-slate-400" />
+                              <span>{log.ipAddress || '118.69.190.10'}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
+                              <Laptop className="w-3 h-3 text-slate-400" />
+                              <span>{parseClientDevice(log.userAgent)}</span>
+                            </div>
+                          </td>
+
+                          {/* Timestamp */}
+                          <td className="py-3.5 px-4 whitespace-nowrap text-right">
+                            <p className="font-bold text-slate-800 text-xs">{formatAuditRelative(log.createdAt)}</p>
+                            <p className="text-[11px] text-slate-400 font-mono mt-0.5">{formatAuditTime(log.createdAt)}</p>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Pagination Controls */}
+            {auditTotalPages > 1 && (
+              <div className="p-4 bg-slate-50/80 border-t border-slate-200/80 flex items-center justify-between">
+                <span className="text-xs text-slate-500">
+                  Hiển thị trang <strong className="text-slate-800">{auditPage + 1}</strong> trên <strong className="text-slate-800">{auditTotalPages}</strong>
+                </span>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => fetchAuditLogs(Math.max(0, auditPage - 1))}
+                    disabled={auditPage === 0 || auditLoading}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer shadow-xs"
+                  >
+                    <ChevronLeft className="w-3.5 h-3.5" />
+                    <span>Trước</span>
+                  </button>
+
+                  <button
+                    onClick={() => fetchAuditLogs(Math.min(auditTotalPages - 1, auditPage + 1))}
+                    disabled={auditPage >= auditTotalPages - 1 || auditLoading}
+                    className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 cursor-pointer shadow-xs"
+                  >
+                    <span>Tiếp theo</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
       )}

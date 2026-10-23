@@ -138,6 +138,48 @@ export const AdminAuditLogsPage = () => {
         label: 'Khóa / Chặn'
       };
     }
+    if (act.includes('MODERATION_APPROVE')) {
+      return {
+        bg: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800',
+        icon: ShieldCheck,
+        label: 'Duyệt xuất bản'
+      };
+    }
+    if (act.includes('MODERATION_DISMISS')) {
+      return {
+        bg: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800',
+        icon: ShieldCheck,
+        label: 'Bác bỏ báo cáo'
+      };
+    }
+    if (act.includes('MODERATION_HIDE')) {
+      return {
+        bg: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800',
+        icon: AlertTriangle,
+        label: 'Tạm ẩn bài'
+      };
+    }
+    if (act.includes('MODERATION_UNHIDE')) {
+      return {
+        bg: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-800',
+        icon: RefreshCw,
+        label: 'Bỏ ẩn bài'
+      };
+    }
+    if (act.includes('MODERATION_REMOVE_BAN')) {
+      return {
+        bg: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800',
+        icon: AlertTriangle,
+        label: 'Gỡ bài & Khóa TK'
+      };
+    }
+    if (act.includes('MODERATION_DELETE')) {
+      return {
+        bg: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800',
+        icon: AlertTriangle,
+        label: 'Xóa bài viết'
+      };
+    }
     if (act.includes('REPORT') || act.includes('RESOLVE')) {
       return {
         bg: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800',
