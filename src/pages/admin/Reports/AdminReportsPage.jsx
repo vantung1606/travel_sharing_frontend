@@ -127,6 +127,20 @@ export const AdminReportsPage = () => {
     }
   };
 
+  const executeUnhidePost = async (id, title = '') => {
+    try {
+      await adminReportApi.unhidePost(id);
+      await loadData();
+      toast.success(`Đã khôi phục hiển thị (bỏ ẩn) bài viết #${id} lên Cộng đồng thành công!`);
+      if (selectedPostModal && selectedPostModal.id === id) {
+        setSelectedPostModal(null);
+      }
+      setConfirmModal(null);
+    } catch (err) {
+      toast.error('Lỗi khi khôi phục hiển thị bài viết: ' + err.message);
+    }
+  };
+
   const executeBanUser = async (id, authorName, title = '') => {
     try {
       await adminReportApi.removePostAndBanAuthor(id);
@@ -713,10 +727,27 @@ export const AdminReportsPage = () => {
                         >
                           <Eye className="w-4 h-4" />
                         </button>
+                        {art.status === 'HIDDEN' || art.status === 'REMOVED' ? (
+                          <button
+                            onClick={() => setConfirmModal({ type: 'unhide', post: art })}
+                            className="p-1.5 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer mr-1"
+                            title="Khôi phục hiển thị (Bỏ ẩn bài viết)"
+                          >
+                            <RefreshCw className="w-4 h-4" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmModal({ type: 'hide', post: art })}
+                            className="p-1.5 rounded-lg text-amber-500 hover:text-amber-600 hover:bg-amber-50 transition-colors cursor-pointer mr-1"
+                            title="Tạm ẩn bài viết khỏi cộng đồng"
+                          >
+                            <EyeOff className="w-4 h-4" />
+                          </button>
+                        )}
                         <button
                           onClick={() => setConfirmModal({ type: 'delete', post: art })}
                           className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                          title="Xóa bài viết"
+                          title="Xóa bài viết vĩnh viễn"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -843,35 +874,66 @@ export const AdminReportsPage = () => {
 
             <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-slate-100">
               <div className="flex flex-wrap items-center gap-2">
-                {selectedPostModal.status === 'PENDING_REVIEW' ? (
+                {/* 1. Nếu bài viết đang bị ẩn/gỡ -> Chỉ có hành động Bỏ ẩn (Khôi phục hiển thị) */}
+                {selectedPostModal.status === 'HIDDEN' || selectedPostModal.status === 'REMOVED' ? (
                   <button
                     type="button"
-                    onClick={() => handleApprovePost(selectedPostModal.id, selectedPostModal.title)}
-                    className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                    title="Phê duyệt bài viết để công khai trên cộng đồng"
-                  >
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Duyệt xuất bản</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => handleDismissReport(selectedPostModal.id, selectedPostModal.title)}
+                    onClick={() => setConfirmModal({ type: 'unhide', post: selectedPostModal })}
                     className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
-                    title="Bác bỏ báo cáo và giữ lại bài viết hợp lệ"
+                    title="Khôi phục hiển thị (bỏ ẩn) bài viết lên Cộng đồng"
                   >
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    <span>Bác bỏ báo cáo (Hợp lệ)</span>
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Khôi phục hiển thị (Bỏ ẩn)</span>
                   </button>
+                ) : selectedPostModal.status === 'PENDING_REVIEW' ? (
+                  /* 2. Bài viết mới bị AI giữ lại -> Duyệt xuất bản hoặc Tạm ẩn */
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleApprovePost(selectedPostModal.id, selectedPostModal.title)}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-sky-600 hover:bg-sky-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                      title="Phê duyệt bài viết để công khai trên cộng đồng"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Duyệt xuất bản</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmModal({ type: 'hide', post: selectedPostModal })}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80 flex items-center gap-1.5 transition-colors cursor-pointer"
+                      title="Tạm ẩn bài viết"
+                    >
+                      <EyeOff className="w-3.5 h-3.5" />
+                      <span>Tạm ẩn bài</span>
+                    </button>
+                  </>
+                ) : (
+                  /* 3. Bài viết đang công khai (ACTIVE) -> Nếu có báo cáo thì có nút Bác bỏ báo cáo, và có nút Tạm ẩn */
+                  <>
+                    {(selectedPostModal.reportsCount > 0 || selectedPostModal.status === 'PENDING_REPORT') && (
+                      <button
+                        type="button"
+                        onClick={() => handleDismissReport(selectedPostModal.id, selectedPostModal.title)}
+                        className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer"
+                        title="Bác bỏ báo cáo và giữ lại bài viết hợp lệ"
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <span>Bác bỏ báo cáo (Hợp lệ)</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setConfirmModal({ type: 'hide', post: selectedPostModal })}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80 flex items-center gap-1.5 transition-colors cursor-pointer"
+                      title="Tạm ẩn bài viết khỏi cộng đồng"
+                    >
+                      <EyeOff className="w-3.5 h-3.5" />
+                      <span>Tạm ẩn bài</span>
+                    </button>
+                  </>
                 )}
-                <button
-                  type="button"
-                  onClick={() => setConfirmModal({ type: 'hide', post: selectedPostModal })}
-                  className="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/80 flex items-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <EyeOff className="w-3.5 h-3.5" />
-                  <span>Tạm ẩn bài</span>
-                </button>
+
+                {/* Nút Xóa vĩnh viễn luôn có sẵn */}
                 <button
                   type="button"
                   onClick={() => setConfirmModal({ type: 'delete', post: selectedPostModal })}
@@ -900,26 +962,28 @@ export const AdminReportsPage = () => {
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150 border border-slate-100">
             <div className="flex items-start gap-3">
               <div className={`p-3 rounded-2xl shrink-0 ${
-                confirmModal.type === 'ban' 
-                  ? 'bg-rose-50 text-rose-600 border border-rose-100' 
+                confirmModal.type === 'unhide'
+                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
                   : confirmModal.type === 'hide'
                     ? 'bg-amber-50 text-amber-600 border border-amber-100'
                     : 'bg-rose-50 text-rose-600 border border-rose-100'
               }`}>
-                {confirmModal.type === 'ban' && <ShieldAlert className="w-6 h-6" />}
+                {confirmModal.type === 'unhide' && <RefreshCw className="w-6 h-6" />}
                 {confirmModal.type === 'hide' && <EyeOff className="w-6 h-6" />}
                 {confirmModal.type === 'delete' && <Trash2 className="w-6 h-6" />}
+                {confirmModal.type === 'ban' && <ShieldAlert className="w-6 h-6" />}
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-display font-extrabold text-base text-slate-900 mb-1">
-                  {confirmModal.type === 'ban' && 'Xác nhận Khóa bài & Cảnh cáo'}
+                  {confirmModal.type === 'unhide' && 'Xác nhận Khôi phục hiển thị (Bỏ ẩn bài)'}
                   {confirmModal.type === 'hide' && 'Xác nhận Tạm ẩn bài viết'}
                   {confirmModal.type === 'delete' && 'Xác nhận Xóa bài viết vĩnh viễn'}
+                  {confirmModal.type === 'ban' && 'Xác nhận Khóa bài & Cảnh cáo'}
                 </h3>
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  {confirmModal.type === 'ban' && (
+                  {confirmModal.type === 'unhide' && (
                     <>
-                      Bạn có chắc muốn gỡ bài viết <strong className="text-slate-800">#{confirmModal.post?.id}</strong> và tạm khóa tài khoản của tác giả <strong className="text-slate-800">{confirmModal.post?.authorName}</strong>? Hệ thống sẽ gửi thông báo cảnh cáo vi phạm đến người dùng.
+                      Bài viết <strong className="text-slate-800">#{confirmModal.post?.id}</strong> sẽ được bỏ ẩn và hiển thị trở lại bình thường trên Cộng đồng Wayfare. Tác giả sẽ nhận được thông báo khôi phục bài viết.
                     </>
                   )}
                   {confirmModal.type === 'hide' && (
@@ -929,7 +993,12 @@ export const AdminReportsPage = () => {
                   )}
                   {confirmModal.type === 'delete' && (
                     <>
-                      Bài viết <strong className="text-slate-800">#{confirmModal.post?.id}</strong> sẽ bị xóa vĩnh viễn khỏi hệ thống. Thao tác này không thể hoàn tác và hệ thống sẽ gửi thông báo đến tác giả.
+                      Bài viết <strong className="text-slate-800">#{confirmModal.post?.id}</strong> sẽ bị xóa vĩnh viễn khỏi hệ thống CSDL. Thao tác này không thể hoàn tác và hệ thống sẽ gửi thông báo đến tác giả.
+                    </>
+                  )}
+                  {confirmModal.type === 'ban' && (
+                    <>
+                      Bạn có chắc muốn gỡ bài viết <strong className="text-slate-800">#{confirmModal.post?.id}</strong> và tạm khóa tài khoản của tác giả <strong className="text-slate-800">{confirmModal.post?.authorName}</strong>?
                     </>
                   )}
                 </p>
@@ -947,23 +1016,28 @@ export const AdminReportsPage = () => {
               <button
                 type="button"
                 onClick={() => {
-                  if (confirmModal.type === 'ban') {
-                    executeBanUser(confirmModal.post?.id, confirmModal.post?.authorName, confirmModal.post?.title);
+                  if (confirmModal.type === 'unhide') {
+                    executeUnhidePost(confirmModal.post?.id, confirmModal.post?.title);
                   } else if (confirmModal.type === 'hide') {
                     executeHidePost(confirmModal.post?.id, confirmModal.post?.title);
                   } else if (confirmModal.type === 'delete') {
                     executeDeletePost(confirmModal.post?.id, confirmModal.post?.title);
+                  } else if (confirmModal.type === 'ban') {
+                    executeBanUser(confirmModal.post?.id, confirmModal.post?.authorName, confirmModal.post?.title);
                   }
                 }}
                 className={`px-4 py-2 rounded-xl text-xs font-bold text-white transition-colors cursor-pointer shadow-xs ${
-                  confirmModal.type === 'ban' || confirmModal.type === 'delete'
-                    ? 'bg-rose-600 hover:bg-rose-700'
-                    : 'bg-amber-600 hover:bg-amber-700'
+                  confirmModal.type === 'unhide'
+                    ? 'bg-emerald-600 hover:bg-emerald-700'
+                    : confirmModal.type === 'hide'
+                      ? 'bg-amber-600 hover:bg-amber-700'
+                      : 'bg-rose-600 hover:bg-rose-700'
                 }`}
               >
-                {confirmModal.type === 'ban' && 'Khóa bài & Cảnh cáo'}
+                {confirmModal.type === 'unhide' && 'Khôi phục hiển thị'}
                 {confirmModal.type === 'hide' && 'Xác nhận Ẩn bài'}
                 {confirmModal.type === 'delete' && 'Xóa vĩnh viễn'}
+                {confirmModal.type === 'ban' && 'Khóa bài & Cảnh cáo'}
               </button>
             </div>
           </div>

@@ -826,6 +826,18 @@ export const adminReportApi = {
     return await response.json();
   },
 
+  async unhidePost(postId) {
+    const response = await fetch(`${BASE_URL}/admin/reports/${postId}/unhide`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  },
+
   async removePostAndBanAuthor(postId) {
     const response = await fetch(`${BASE_URL}/admin/reports/${postId}/remove-and-ban`, {
       method: 'PUT',
