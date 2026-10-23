@@ -1738,6 +1738,57 @@ export const placeApi = {
  * người dùng chia sẻ đúng 1 danh sách thay vì lưu rải rác theo thiết bị.
  * Cả 3 hàm yêu cầu đã đăng nhập (JWT); guest thì client tự fallback local.
  */
+/**
+ * Danh mục tỉnh thành & dấu chân du lịch (server: bảng provinces + user_provinces_visited).
+ */
+export const provinceApi = {
+  /** Danh mục 34 tỉnh thành (dữ liệu thật trong DB, có alias các tỉnh cũ để nhận diện). */
+  async getProvinces() {
+    try {
+      const res = await fetch(`${BASE_URL}/provinces`, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching provinces:', err.message);
+      return null; // caller dùng fallback hardcode
+    }
+  },
+
+  /** Dấu chân của user đang đăng nhập (lưu trên server). Trả về mã VN01..VN34 hoặc [] / null lỗi. */
+  async getMyVisited() {
+    try {
+      const res = await fetch(`${BASE_URL}/provinces/visited`, {
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error fetching visited provinces:', err.message);
+      return null;
+    }
+  },
+
+  /** Check-in / gỡ dấu chân 1 tỉnh (đồng bộ server). Trả về danh sách mã mới hoặc null lỗi. */
+  async setVisited(provinceCode, visited) {
+    try {
+      const res = await fetch(`${BASE_URL}/provinces/${encodeURIComponent(provinceCode)}/visited?visited=${visited}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data || [];
+    } catch (err) {
+      console.warn('API error saving visited province:', err.message);
+      return null;
+    }
+  }
+};
+
 export const savedPlaceApi = {
   async getSavedPlaces() {
     try {

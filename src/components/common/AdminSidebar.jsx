@@ -6,6 +6,10 @@ import { LayoutDashboard, MapPin, Users, BarChart3, LogOut, MessageSquare, Histo
 export const AdminSidebar = ({ onNavigate }) => {
   const { adminTab, setAdminTab, setPortalMode, stats, currentUser } = useApp();
 
+  const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
+  const isAdminUser = roles.includes('ROLE_ADMIN');
+  const isModeratorUsersOnly = !isAdminUser && roles.includes('ROLE_MODERATOR');
+
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard tổng quan', icon: LayoutDashboard },
     { id: 'places', label: 'Địa điểm', icon: MapPin, badge: stats.pendingPlaces },
@@ -14,7 +18,12 @@ export const AdminSidebar = ({ onNavigate }) => {
     { id: 'reports', label: 'Bài viết & Báo cáo', icon: MessageSquare, badge: stats.reportedContent },
     { id: 'analytics', label: 'Thống kê hệ thống', icon: BarChart3 },
     { id: 'audit-logs', label: 'Nhật ký hệ thống', icon: History }
-  ];
+  ].filter(item => {
+    // Moderator ("giám sát") chỉ thấy các mục kiểm duyệt — khớp backend SecurityConfig
+    return isModeratorUsersOnly
+      ? ['places', 'reviews', 'reports'].includes(item.id)
+      : true;
+  });
 
   return (
     <aside className="fixed left-0 top-0 h-full w-[260px] bg-[#283044] text-[#eef0ff] z-50 flex flex-col justify-between shadow-xl border-r border-slate-700/50 select-none">
@@ -30,7 +39,7 @@ export const AdminSidebar = ({ onNavigate }) => {
             className="h-8 w-auto object-contain"
           />
           <span className="text-[9px] font-extrabold text-sky-300 uppercase tracking-widest px-2 py-0.5 rounded-md bg-sky-900/60 border border-sky-500/30">
-            Admin
+            {isAdminUser ? 'Admin' : 'Moder'}
           </span>
         </div>
 
@@ -82,7 +91,7 @@ export const AdminSidebar = ({ onNavigate }) => {
             )}
             <div className="truncate">
               <p className="font-bold text-xs text-white truncate">{currentUser?.name || 'Quản Trị Viên'}</p>
-              <p className="text-[10px] text-sky-300 font-semibold truncate">Super Admin</p>
+              <p className="text-[10px] text-sky-300 font-semibold truncate">{isAdminUser ? 'Super Admin' : 'Kiểm duyệt viên'}</p>
             </div>
           </div>
 

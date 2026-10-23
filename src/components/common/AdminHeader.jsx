@@ -3,11 +3,13 @@ import { useApp } from '../../context/AppContext';
 import { Search, Plus, Bell, Menu, X, Shield } from 'lucide-react';
 import { AdminSidebar } from './AdminSidebar';
 import { NotificationDropdown } from './NotificationDropdown';
+import { BASE_URL } from '../../services/api';
 
 export const AdminHeader = () => {
   const { setPortalMode, setAdminTab, adminTab, unreadNotificationsCount } = useApp();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [serverHealth, setServerHealth] = useState('checking'); // checking | online | offline
   const mobileDialog = useRef(null);
 
   const ADMIN_TAB_NAMES = {
@@ -29,6 +31,21 @@ export const AdminHeader = () => {
     window.addEventListener('resize', closeOnDesktop);
     return () => { dialog.close(); document.body.style.overflow = overflow; window.removeEventListener('resize', closeOnDesktop); };
   }, [isMobileMenuOpen]);
+
+  // Kiểm tra trạng thái backend thật: GET /health (public) — khỏi indicator hardcode "Server 1: OK"
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/health`, { headers: { 'Content-Type': 'application/json' } });
+        const json = res.ok ? await res.json() : null;
+        if (alive) setServerHealth(res.ok && json?.status === 'UP' ? 'online' : 'offline');
+      } catch {
+        if (alive) setServerHealth('offline');
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
 
   return (
     <>
@@ -74,8 +91,8 @@ export const AdminHeader = () => {
           </button>
 
           <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">
-            <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
-            <span>Server 1: OK</span>
+            <span className={`w-2 h-2 rounded-full ${serverHealth === 'online' ? 'bg-emerald-500' : serverHealth === 'checking' ? 'bg-amber-400' : 'bg-rose-500'} ${serverHealth === 'online' ? 'animate-pulse' : ''}`}></span>
+            <span>{serverHealth === 'online' ? 'Server: Online' : serverHealth === 'checking' ? 'Đang kiểm tra...' : 'Server: Offline'}</span>
           </div>
 
           <div className="relative shrink-0">
