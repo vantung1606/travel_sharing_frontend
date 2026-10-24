@@ -523,16 +523,35 @@ export const HomePage = () => {
           - Cột phải: 4 ảnh xếp đè, phủ kín cột, viền mực mảnh
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="relative w-full overflow-hidden pt-28 pb-28 lg:pt-36 lg:pb-40 bg-[#17130F] text-white">
-        {/* Nền tổng: ảnh mờ nhẹ sau lớp kính tối, phủ toàn hero */}
+        {/* Nền tổng: ảnh thung lũng mây trong lành, rõ nét; tối dần sang trái để chữ đọc được */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <img
-            src="/images/hero/saigon-sunset.jpg"
+            src="/images/hero/nui-may.jpg"
             alt=""
-            className="w-full h-full object-cover scale-110 opacity-[0.32]"
-            style={{ filter: 'blur(20px) saturate(0.95)' }}
+            className="w-full h-full object-cover"
+            style={{ filter: 'saturate(0.98) contrast(1.02) brightness(1.04)' }}
           />
-          <div className="absolute inset-0" style={{ background: 'radial-gradient(125% 95% at 74% 34%, rgba(23,19,15,0.40) 0%, rgba(23,19,15,0.80) 52%, #17130F 100%)' }} />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(118deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 24%, rgba(255,255,255,0) 42%, rgba(255,255,255,0.035) 60%, rgba(255,255,255,0) 78%)' }} />
+
+          {/* Tối dần từ trái sang phải, không chia đôi cứng */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(100deg, rgba(23,19,15,0.95) 0%, rgba(23,19,15,0.88) 28%, rgba(23,19,15,0.58) 56%, rgba(23,19,15,0.22) 84%, rgba(23,19,15,0.12) 100%)',
+            }}
+          />
+
+          {/* Tối trên (thanh menu) và chân hero để hoà vào nền mực */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(180deg, rgba(23,19,15,0.38) 0%, rgba(23,19,15,0) 22%, rgba(23,19,15,0) 55%, rgba(23,19,15,0.78) 100%)',
+            }}
+          />
+
+          {/* Mobile: phủ đều để chữ giữa màn hình vẫn rõ */}
+          <div className="absolute inset-0 bg-[#17130F]/45 lg:hidden" />
         </div>
 
         {/* Content Container Aligned with Navbar Width */}
@@ -633,7 +652,7 @@ export const HomePage = () => {
             {/* Ảnh 4 — ngang, dưới trái, trên cùng */}
             <div className="absolute left-[4%] top-[54%] w-[60%] h-[46%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-40">
               <img
-                src="/images/hero/nui-may.jpg"
+                src="/images/login/travel_banner_2.jpg"
                 alt=""
                 className="w-full h-full object-cover"
                 style={{ filter: 'sepia(0.2) saturate(0.97) contrast(1.02)' }}
