@@ -100,21 +100,21 @@ export const HomePage = () => {
           title: 'Ăn sáng Bánh căn Lệ & Cà phê Tùng',
           cost: '75.000đ',
           desc: 'Quán ăn hoài niệm góc dốc nhỏ, thưởng thức ly cà phê phin đậm đà giữa tiết trời se lạnh.',
-          tagColor: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+          tagColor: 'text-clay-800 bg-clay-50 border-clay-200'
         },
         {
           time: '14:30',
           title: 'Check-in Homestay Nhà Gỗ Thung Lũng & Nghỉ ngơi',
           cost: 'Tối ưu 30%',
           desc: 'Phòng view trọn vẹn đồi thông xanh mát, không khí trong lành yên tĩnh tuyệt đối.',
-          tagColor: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+          tagColor: 'text-clay-800 bg-clay-50 border-clay-200'
         },
         {
           time: '18:30',
           title: 'Lẩu gà lá é Tao Ngộ & Kem bơ Thanh Thảo',
           cost: '280.000đ/2 người',
           desc: 'Hương vị cay nồng lá é trứ danh, nhận ưu đãi độc quyền 10% thành viên Wayfare.',
-          tagColor: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+          tagColor: 'text-clay-800 bg-clay-50 border-clay-200'
         }
       ]
     },
@@ -133,7 +133,7 @@ export const HomePage = () => {
           title: 'Ăn trưa cơm niêu Như Ngọc & Thác Datanla',
           cost: '160.000đ/người',
           desc: 'Thử cảm giác trượt máng nước dài nhất Đông Nam Á xuyên qua cánh rừng thông nguyên sinh.',
-          tagColor: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+          tagColor: 'text-clay-800 bg-clay-50 border-clay-200'
         },
         {
           time: '16:45',
@@ -152,21 +152,21 @@ export const HomePage = () => {
           title: 'Bánh mì xíu mại Hoàng Diệu & Sữa đậu nành nóng',
           cost: '45.000đ',
           desc: 'Bát xíu mại thơm phức béo ngậy kèm bánh mì giòn rụm nạp năng lượng cho buổi sáng.',
-          tagColor: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+          tagColor: 'text-clay-800 bg-clay-50 border-clay-200'
         },
         {
           time: '10:00',
           title: 'Mua quà mứt dâu tây L’angfarm & Chợ đồ len',
           cost: 'Ưu đãi thành viên',
           desc: 'Gợi ý các quầy hàng uy tín có kiểm định nguồn gốc xuất xứ, tránh tình trạng ép giá.',
-          tagColor: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+          tagColor: 'text-clay-800 bg-clay-50 border-clay-200'
         },
         {
           time: '13:00',
           title: 'Check-out Homestay & Xe Limousine ra sân bay Liên Khương',
           cost: '120.000đ/vé',
           desc: 'Xe đón tận nơi đúng giờ, kết thúc chuyến đi thư giãn trọn vẹn không một chút mệt mỏi.',
-          tagColor: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+          tagColor: 'text-clay-800 bg-clay-50 border-clay-200'
         }
       ]
     }
@@ -516,13 +516,13 @@ export const HomePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBF7EE] text-slate-900 selection:bg-emerald-600 selection:text-white pb-20 w-full max-w-full overflow-x-clip -mt-16">
+    <div className="min-h-screen bg-[#F8F4EC] text-slate-900 selection:bg-clay-600 selection:text-white pb-20 w-full max-w-full overflow-x-clip -mt-16">
       {/* ──────────────────────────────────────────────────────────────────────────
           1. HERO SECTION (WARM SAPPHIRE LUXURY - EDITORIAL VIBE)
           - Deep Sapphire canvas blending gently into Warm Ivory page canvas
           - Natural specular lighting
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="relative w-full overflow-hidden pt-28 pb-28 lg:pt-36 lg:pb-40 bg-[#08201C] text-white">
+      <section className="relative w-full overflow-hidden pt-28 pb-28 lg:pt-36 lg:pb-40 bg-[#1E1A15] text-white">
         {/* Cinematic Backdrop with Balanced Contrast */}
         <div className="absolute inset-0 z-0">
           <div
@@ -531,16 +531,11 @@ export const HomePage = () => {
               backgroundImage: `url('https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=2400&q=90')`
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#08201C]/95 via-[#0C302A]/62 to-[#08201C]/90" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#07231E]/88 via-transparent to-[#08201C]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_15%,rgba(217,119,6,0.16),transparent_55%)]" />
-
-          {/* Radiant Subtle Ambient Light */}
-          <div className="absolute -top-12 left-1/3 w-[600px] h-[600px] rounded-full bg-emerald-500/15 blur-[140px] pointer-events-none animate-pulse-slow" />
-          <div className="absolute top-1/4 right-1/4 w-[500px] h-[500px] rounded-full bg-teal-600/12 blur-[130px] pointer-events-none animate-pulse-slow [animation-delay:3.5s]" />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(23,19,15,0.96) 0%, rgba(30,26,21,0.84) 55%, rgba(23,19,15,0.94) 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(15,12,9,0.78) 0%, rgba(15,12,9,0.25) 55%, #17130F 100%)' }} />
 
           {/* Seamless Feathered Transition to Warm Ivory Page Background */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#FBF7EE] via-[#FBF7EE]/40 to-transparent pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none" style={{ background: 'linear-gradient(0deg, #F8F4EC 0%, rgba(248,244,236,0.4) 55%, rgba(248,244,236,0) 100%)' }} />
         </div>
 
         {/* Content Container Aligned with Navbar Width */}
@@ -551,18 +546,17 @@ export const HomePage = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-7 relative z-10 flex flex-col items-center text-center lg:items-start lg:text-left max-w-4xl mx-auto lg:mx-0 space-y-4 sm:space-y-6"
+            className="lg:col-span-8 relative z-10 min-w-0 flex flex-col items-center text-center lg:items-start lg:text-left max-w-4xl mx-auto lg:mx-0 space-y-4 sm:space-y-6"
           >
             {/* Top Pill Accent */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/15 text-emerald-200 text-xs font-semibold shadow-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
+            <div className="inline-flex items-center gap-2.5 pl-3 py-0.5 border-l-2 border-clay-500 rounded-none bg-transparent text-clay-200 text-xs font-semibold tracking-[0.16em]">
               <span>Nền Tảng Lên Lịch Trình Du Lịch Thông Minh</span>
             </div>
 
             {/* Expansive Grand Headline with Harmonious Flow */}
-            <h1 className="font-display text-[clamp(1.9rem,3.4vw,3.6rem)] font-extrabold tracking-[-0.02em] leading-[1.12] text-white drop-shadow-md">
+            <h1 className="font-display text-[clamp(1.9rem,3.4vw,3.6rem)] font-extrabold tracking-[-0.02em] leading-[1.12] text-white">
               Kiến Tạo Chuyến Đi Mơ Ước <br className="hidden sm:inline" />
-              <span className="bg-gradient-to-r from-emerald-200 via-teal-100 to-amber-200 bg-clip-text text-transparent">
+              <span className="text-clay-200">
                 Cùng Wayfare
               </span>{' '}
             </h1>
@@ -582,55 +576,41 @@ export const HomePage = () => {
             >
               <a
                 href="#plan-dock"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 sm:px-8 py-3 sm:py-3.5 rounded-full whitespace-nowrap bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-700 hover:from-emerald-600 hover:to-teal-800 text-white font-extrabold text-xs sm:text-sm md:text-base shadow-[0_12px_28px_rgba(5,150,105,0.32)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-1 ring-white/30 tracking-[0.015em]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 sm:px-8 py-3 sm:py-3.5 rounded-md whitespace-nowrap bg-clay-600 hover:bg-clay-700 text-white font-bold text-xs sm:text-sm md:text-base transition-colors cursor-pointer tracking-[0.015em]"
               >
-                <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-200" />
+                <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-clay-200" />
                 <span>Lên Kế Hoạch Chuyến Đi</span>
-                <span className="px-2 py-0.5 rounded-full bg-black/25 text-[10px] sm:text-xs font-black uppercase tracking-wider">
+                <span className="px-2 py-0.5 rounded-sm bg-black/20 text-[10px] sm:text-xs font-black uppercase tracking-wider">
                   Miễn phí
                 </span>
               </a>
 
               <a
                 href="#kham-pha"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-full whitespace-nowrap bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-xs sm:text-sm md:text-base transition-all border border-white/20 hover:border-white/40 shadow-md cursor-pointer tracking-[0.015em] hover:scale-105 active:scale-95 group"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-7 py-3 sm:py-3.5 rounded-md whitespace-nowrap bg-transparent hover:bg-white/10 text-white font-bold text-xs sm:text-sm md:text-base transition-colors border border-white/25 hover:border-white/50 cursor-pointer tracking-[0.015em] group"
               >
-                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-300" />
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-clay-300" />
                 <span>Khám Phá Điểm Đến</span>
-                <ArrowDown className="w-3.5 h-3.5 text-emerald-300 group-hover:translate-y-0.5 transition-transform" />
+                <ArrowDown className="w-3.5 h-3.5 text-clay-300 group-hover:translate-y-0.5 transition-transform" />
               </a>
             </motion.div>
           </motion.div>
 
-          {/* Editorial Image Collage (visual only) */}
+          {/* Editorial Cover Photo (visual only) */}
           <motion.div
-            initial={{ opacity: 0, x: 40 }}
+            initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="hidden lg:block lg:col-span-5 relative h-[480px] w-full"
+            className="hidden lg:block lg:col-span-4 relative w-full"
           >
-            <div className="absolute right-4 top-0 w-56 h-72 rounded-[2rem] overflow-hidden ring-1 ring-white/25 shadow-[0_30px_70px_-25px_rgba(0,0,0,0.75)] rotate-3">
+            <div className="relative h-[460px] w-full overflow-hidden rounded-md border border-white/15">
               <img
-                src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80"
+                src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=85"
                 className="w-full h-full object-cover"
                 alt=""
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
             </div>
-            <div className="absolute left-10 top-24 w-60 h-80 rounded-[2rem] overflow-hidden ring-1 ring-white/30 shadow-[0_35px_80px_-25px_rgba(0,0,0,0.8)] -rotate-6">
-              <img
-                src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=650&q=80"
-                className="w-full h-full object-cover"
-                alt=""
-              />
-            </div>
-            <div className="absolute right-24 bottom-0 w-44 h-52 rounded-[1.6rem] overflow-hidden ring-1 ring-white/25 shadow-[0_25px_60px_-20px_rgba(0,0,0,0.7)] rotate-[-4deg]">
-              <img
-                src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=520&q=80"
-                className="w-full h-full object-cover"
-                alt=""
-              />
-            </div>
-            <div className="absolute inset-x-6 bottom-6 h-40 rounded-full bg-amber-400/20 blur-3xl pointer-events-none" />
           </motion.div>
           </div>
         </div>
@@ -649,21 +629,21 @@ export const HomePage = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="p-4 sm:p-7 lg:p-9 rounded-[1.7rem] sm:rounded-[2.4rem] bg-white shadow-[0_40px_90px_-40px_rgba(6,78,59,0.35)] border border-[#E7DFCE] border-t-2 border-t-emerald-600/70 transition-all"
+          className="p-4 sm:p-7 lg:p-9 rounded-lg sm:rounded-xl bg-white shadow-sm border border-[#E1D8C7] border-t-2 border-t-clay-600/70 transition-all"
         >
           {/* Planner Modes Tabs & Estimate Pill */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 mb-3.5 sm:mb-6 pb-3 sm:pb-4 border-b border-[#EEE6D4]">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 mb-3.5 sm:mb-6 pb-3 sm:pb-4 border-b border-[#E8E0D1]">
             {/* 3 Tabs */}
-            <div className="grid grid-cols-3 sm:flex sm:items-center gap-1.5 p-1 rounded-xl sm:rounded-full bg-[#F5EFE2]/80 border border-[#E4DCC9] shadow-2xs w-full sm:w-auto">
+            <div className="grid grid-cols-3 sm:flex sm:items-center gap-1.5 p-1 rounded-md bg-[#F3EDE3]/80 border border-[#DED5C5] shadow-2xs w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => setActiveDockTab('ai')}
-                className={`w-full sm:w-auto px-3 sm:px-5 py-2 rounded-lg sm:rounded-full text-xs sm:text-sm font-bold shadow-xs flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap ${activeDockTab === 'ai'
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-white'
+                className={`w-full sm:w-auto px-3 sm:px-5 py-2 rounded-md text-xs sm:text-sm font-bold shadow-xs flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap ${activeDockTab === 'ai'
+                  ? 'bg-clay-600 text-white'
+                  : 'text-slate-700 hover:text-clay-700 hover:bg-white'
                   }`}
               >
-                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-200 shrink-0" />
+                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-clay-200 shrink-0" />
                 <span>Lên lịch trình</span>
               </button>
 
@@ -673,9 +653,9 @@ export const HomePage = () => {
                   setActiveDockTab('explore');
                   navigate('/explore');
                 }}
-                className={`w-full sm:w-auto px-3 sm:px-5 py-2 rounded-lg sm:rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap ${activeDockTab === 'explore'
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-white'
+                className={`w-full sm:w-auto px-3 sm:px-5 py-2 rounded-md text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap ${activeDockTab === 'explore'
+                  ? 'bg-clay-600 text-white'
+                  : 'text-slate-700 hover:text-clay-700 hover:bg-white'
                   }`}
               >
                 <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -688,9 +668,9 @@ export const HomePage = () => {
                   setActiveDockTab('community');
                   navigate('/community');
                 }}
-                className={`w-full sm:w-auto px-3 sm:px-5 py-2 rounded-lg sm:rounded-full text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap ${activeDockTab === 'community'
-                  ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-white'
+                className={`w-full sm:w-auto px-3 sm:px-5 py-2 rounded-md text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all cursor-pointer whitespace-nowrap ${activeDockTab === 'community'
+                  ? 'bg-clay-600 text-white'
+                  : 'text-slate-700 hover:text-clay-700 hover:bg-white'
                   }`}
               >
                 <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
@@ -699,14 +679,14 @@ export const HomePage = () => {
             </div>
 
             {/* Dynamic Estimate Pill */}
-            <div className="flex items-center justify-between sm:justify-end px-3.5 py-1.5 rounded-lg sm:rounded-full bg-emerald-50 text-emerald-900 border border-emerald-200/70 shadow-2xs text-xs sm:text-sm font-semibold">
+            <div className="flex items-center justify-between sm:justify-end px-3.5 py-1.5 rounded-md bg-clay-50 text-clay-900 border border-clay-200/70 shadow-2xs text-xs sm:text-sm font-semibold">
               <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <ShieldCheck className="w-4 h-4 text-clay-600 shrink-0" />
                 <span>Dự toán: ~{dockEstimate.budgetText}</span>
               </span>
               <span className="flex items-center gap-1.5 ml-2.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                <span className="text-emerald-700 font-bold shrink-0">{dockEstimate.savings}</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-clay-500 shrink-0" />
+                <span className="text-clay-700 font-bold shrink-0">{dockEstimate.savings}</span>
               </span>
             </div>
           </div>
@@ -718,9 +698,9 @@ export const HomePage = () => {
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6"
           >
             {/* Field 1: Destination */}
-            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-[#F7F2E6]/70 hover:bg-slate-100/70 transition-all flex flex-col justify-center border border-[#E4DCCB] hover:border-emerald-400 focus-within:border-emerald-600 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-100/50 shadow-xs">
+            <div className="p-3 sm:p-4 rounded-md bg-[#F5EFE5]/70 hover:bg-slate-100/70 transition-all flex flex-col justify-center border border-[#DED6C5] hover:border-clay-400 focus-within:border-clay-600 focus-within:bg-white focus-within:ring-2 focus-within:ring-clay-100/50 shadow-xs">
               <label className="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider mb-1">
-                <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <MapPin className="w-3.5 h-3.5 text-clay-600 shrink-0" />
                 <span>Điểm đến mong muốn</span>
               </label>
               <input
@@ -737,19 +717,19 @@ export const HomePage = () => {
               <button
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === 'budget' ? null : 'budget')}
-                className={`w-full text-left p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-all flex flex-col justify-center border shadow-xs cursor-pointer ${
+                className={`w-full text-left p-3 sm:p-4 rounded-md transition-all flex flex-col justify-center border shadow-xs cursor-pointer ${
                   activeDropdown === 'budget'
-                    ? 'bg-white border-emerald-600 ring-4 ring-emerald-100/70 shadow-md'
-                    : 'bg-[#F7F2E6]/70 hover:bg-slate-100/70 border-[#E4DCCB] hover:border-emerald-400'
+                    ? 'bg-white border-clay-600 ring-2 ring-clay-100/70 shadow-md'
+                    : 'bg-[#F5EFE5]/70 hover:bg-slate-100/70 border-[#DED6C5] hover:border-clay-400'
                 }`}
               >
                 <div className="flex items-center justify-between w-full mb-1">
                   <span className="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider">
-                    <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
+                    <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-clay-600" />
                     <span>Ngân sách dự kiến</span>
                   </span>
                   <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                    activeDropdown === 'budget' ? 'rotate-180 text-emerald-600' : ''
+                    activeDropdown === 'budget' ? 'rotate-180 text-clay-600' : ''
                   }`} />
                 </div>
                 <div className="flex items-center justify-between">
@@ -766,7 +746,7 @@ export const HomePage = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.98 }}
                     transition={{ duration: 0.15, ease: 'easeOut' }}
-                    className="absolute top-full left-0 right-0 mt-2 z-50 bg-white rounded-2xl shadow-2xl border border-[#E4DCC9] p-2 space-y-1 min-w-[260px]"
+                    className="absolute top-full left-0 right-0 mt-2 z-50 bg-white rounded-2xl shadow-2xl border border-[#DED5C5] p-2 space-y-1 min-w-[260px]"
                   >
                     {DOCK_BUDGET_OPTIONS.map((opt) => {
                       const isSelected = dockBudget === opt.val;
@@ -780,7 +760,7 @@ export const HomePage = () => {
                           }}
                           className={`w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between cursor-pointer group ${
                             isSelected
-                              ? 'bg-emerald-50 text-emerald-900 font-bold border border-emerald-200/60 shadow-xs'
+                              ? 'bg-clay-50 text-clay-900 font-bold border border-clay-200/60 shadow-xs'
                               : 'hover:bg-slate-100 text-slate-700 hover:text-slate-900'
                           }`}
                         >
@@ -800,7 +780,7 @@ export const HomePage = () => {
                               <p className="text-[11px] text-slate-500 truncate font-normal mt-0.5">{opt.sub}</p>
                             </div>
                           </div>
-                          {isSelected && <Check className="w-4 h-4 text-emerald-600 shrink-0 ml-2" />}
+                          {isSelected && <Check className="w-4 h-4 text-clay-600 shrink-0 ml-2" />}
                         </button>
                       );
                     })}
@@ -814,19 +794,19 @@ export const HomePage = () => {
               <button
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === 'style' ? null : 'style')}
-                className={`w-full text-left p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-all flex flex-col justify-center border shadow-xs cursor-pointer ${
+                className={`w-full text-left p-3 sm:p-4 rounded-md transition-all flex flex-col justify-center border shadow-xs cursor-pointer ${
                   activeDropdown === 'style'
-                    ? 'bg-white border-emerald-600 ring-4 ring-emerald-100/70 shadow-md'
-                    : 'bg-[#F7F2E6]/70 hover:bg-slate-100/70 border-[#E4DCCB] hover:border-emerald-400'
+                    ? 'bg-white border-clay-600 ring-2 ring-clay-100/70 shadow-md'
+                    : 'bg-[#F5EFE5]/70 hover:bg-slate-100/70 border-[#DED6C5] hover:border-clay-400'
                 }`}
               >
                 <div className="flex items-center justify-between w-full mb-1">
                   <span className="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider">
-                    <SlidersHorizontal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
+                    <SlidersHorizontal className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-clay-600" />
                     <span>Gu trải nghiệm</span>
                   </span>
                   <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                    activeDropdown === 'style' ? 'rotate-180 text-emerald-600' : ''
+                    activeDropdown === 'style' ? 'rotate-180 text-clay-600' : ''
                   }`} />
                 </div>
                 <div className="flex items-center justify-between">
@@ -843,7 +823,7 @@ export const HomePage = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.98 }}
                     transition={{ duration: 0.15, ease: 'easeOut' }}
-                    className="absolute top-full left-0 right-0 mt-2 z-50 bg-white rounded-2xl shadow-2xl border border-[#E4DCC9] p-2 space-y-1 min-w-[270px]"
+                    className="absolute top-full left-0 right-0 mt-2 z-50 bg-white rounded-2xl shadow-2xl border border-[#DED5C5] p-2 space-y-1 min-w-[270px]"
                   >
                     {DOCK_STYLE_OPTIONS.map((opt) => {
                       const isSelected = dockStyle === opt.val;
@@ -857,7 +837,7 @@ export const HomePage = () => {
                           }}
                           className={`w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between cursor-pointer group ${
                             isSelected
-                              ? 'bg-emerald-50 text-emerald-900 font-bold border border-emerald-200/60 shadow-xs'
+                              ? 'bg-clay-50 text-clay-900 font-bold border border-clay-200/60 shadow-xs'
                               : 'hover:bg-slate-100 text-slate-700 hover:text-slate-900'
                           }`}
                         >
@@ -869,7 +849,7 @@ export const HomePage = () => {
                               <div className="flex items-center gap-1.5">
                                 <span className="text-xs sm:text-sm font-bold truncate">{opt.title}</span>
                                 {opt.badge && (
-                                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-emerald-100 text-emerald-800">
+                                  <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-clay-100 text-clay-800">
                                     {opt.badge}
                                   </span>
                                 )}
@@ -877,7 +857,7 @@ export const HomePage = () => {
                               <p className="text-[11px] text-slate-500 truncate font-normal mt-0.5">{opt.sub}</p>
                             </div>
                           </div>
-                          {isSelected && <Check className="w-4 h-4 text-emerald-600 shrink-0 ml-2" />}
+                          {isSelected && <Check className="w-4 h-4 text-clay-600 shrink-0 ml-2" />}
                         </button>
                       );
                     })}
@@ -891,19 +871,19 @@ export const HomePage = () => {
               <button
                 type="button"
                 onClick={() => setActiveDropdown(activeDropdown === 'duration' ? null : 'duration')}
-                className={`w-full text-left p-3 sm:p-4 rounded-xl sm:rounded-2xl transition-all flex flex-col justify-center border shadow-xs cursor-pointer ${
+                className={`w-full text-left p-3 sm:p-4 rounded-md transition-all flex flex-col justify-center border shadow-xs cursor-pointer ${
                   activeDropdown === 'duration'
-                    ? 'bg-white border-emerald-600 ring-4 ring-emerald-100/70 shadow-md'
-                    : 'bg-[#F7F2E6]/70 hover:bg-slate-100/70 border-[#E4DCCB] hover:border-emerald-400'
+                    ? 'bg-white border-clay-600 ring-2 ring-clay-100/70 shadow-md'
+                    : 'bg-[#F5EFE5]/70 hover:bg-slate-100/70 border-[#DED6C5] hover:border-clay-400'
                 }`}
               >
                 <div className="flex items-center justify-between w-full mb-1">
                   <span className="flex items-center gap-1.5 text-slate-500 text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider">
-                    <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600" />
+                    <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-clay-600" />
                     <span>Thời lượng chuyến đi</span>
                   </span>
                   <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-                    activeDropdown === 'duration' ? 'rotate-180 text-emerald-600' : ''
+                    activeDropdown === 'duration' ? 'rotate-180 text-clay-600' : ''
                   }`} />
                 </div>
                 <div className="flex items-center justify-between">
@@ -920,7 +900,7 @@ export const HomePage = () => {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.98 }}
                     transition={{ duration: 0.15, ease: 'easeOut' }}
-                    className="absolute top-full left-0 right-0 mt-2 z-50 bg-white rounded-2xl shadow-2xl border border-[#E4DCC9] p-2 space-y-1 min-w-[280px]"
+                    className="absolute top-full left-0 right-0 mt-2 z-50 bg-white rounded-2xl shadow-2xl border border-[#DED5C5] p-2 space-y-1 min-w-[280px]"
                   >
                     {DOCK_DURATION_OPTIONS.map((opt) => {
                       const isSelected = dockDuration === opt.val;
@@ -934,7 +914,7 @@ export const HomePage = () => {
                           }}
                           className={`w-full text-left p-2.5 rounded-xl transition-all flex items-center justify-between cursor-pointer group ${
                             isSelected
-                              ? 'bg-emerald-50 text-emerald-900 font-bold border border-emerald-200/60 shadow-xs'
+                              ? 'bg-clay-50 text-clay-900 font-bold border border-clay-200/60 shadow-xs'
                               : 'hover:bg-slate-100 text-slate-700 hover:text-slate-900'
                           }`}
                         >
@@ -954,7 +934,7 @@ export const HomePage = () => {
                               <p className="text-[11px] text-slate-500 truncate font-normal mt-0.5">{opt.sub}</p>
                             </div>
                           </div>
-                          {isSelected && <Check className="w-4 h-4 text-emerald-600 shrink-0 ml-2" />}
+                          {isSelected && <Check className="w-4 h-4 text-clay-600 shrink-0 ml-2" />}
                         </button>
                       );
                     })}
@@ -973,10 +953,10 @@ export const HomePage = () => {
                   key={chip.val}
                   type="button"
                   onClick={() => setDockDest(chip.val)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border cursor-pointer shadow-2xs hover:scale-105 active:scale-95 ${
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all border cursor-pointer shadow-2xs ${
                     dockDest === chip.val
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                      : 'bg-[#F5EFE2] hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 border-[#E2DAC7]'
+                      ? 'bg-clay-600 text-white border-clay-600 shadow-xs'
+                      : 'bg-[#F3EDE3] hover:bg-clay-50 text-slate-700 hover:text-clay-700 border-[#DCD3C2]'
                   }`}
                 >
                   {chip.label}
@@ -988,7 +968,7 @@ export const HomePage = () => {
               type="button"
               disabled={isDockGenerating}
               onClick={handleDockGenerate}
-              className="w-full sm:w-auto px-6 sm:px-8 py-3 rounded-xl sm:rounded-2xl bg-gradient-to-r from-emerald-600 via-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 tracking-tight whitespace-nowrap shrink-0"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3 rounded-md bg-clay-600 hover:bg-clay-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-lg  transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 tracking-tight whitespace-nowrap shrink-0"
             >
               {isDockGenerating ? (
                 <>
@@ -997,7 +977,7 @@ export const HomePage = () => {
                 </>
               ) : (
                 <>
-                  <Compass className="w-4 h-4 text-emerald-200" />
+                  <Compass className="w-4 h-4 text-clay-200" />
                   <span>Tạo Lịch Trình Chuyến Đi</span>
                   <span className="px-1.5 py-0.5 rounded-md bg-white/20 text-[10px] font-extrabold uppercase">
                     3s
@@ -1011,10 +991,10 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           3. 4 VALUE PILLARS (WARM IVORY CANVAS WITH CRISP WHITE TILES)
-          - Subtle Warm Ivory Editorial Canvas (#F3EDE1)
+          - Subtle Warm Ivory Editorial Canvas (#F1EADF)
           - White Bento Cards with delicate borders
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#F3EDE1]/70 border-t border-b border-[#E4DCC9]">
+      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#F1EADF]/70 border-t border-b border-[#DED5C5]">
         <div className="w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header with Motion Scroll */}
           <motion.div
@@ -1024,8 +1004,8 @@ export const HomePage = () => {
             transition={{ duration: 0.6 }}
             className="flex flex-col items-center text-center max-w-2xl mx-auto mb-10 sm:mb-16 space-y-2.5 sm:space-y-3"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-emerald-800 text-xs font-bold shadow-xs border border-[#E2DAC7]">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <div className="inline-flex items-center gap-2 pl-3 py-0.5 rounded-none bg-transparent text-clay-700 text-xs font-bold tracking-[0.12em] border-l-2 border-clay-500">
+              <ShieldCheck className="w-3.5 h-3.5 text-clay-600" />
               <span>Giá Trị Khác Biệt</span>
             </div>
             <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -1046,24 +1026,24 @@ export const HomePage = () => {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.55, delay: 0 }}
               whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className="p-6 sm:p-7 rounded-[1.6rem] sm:rounded-[2rem] bg-white transition-all duration-300 shadow-[0_12px_34px_-16px_rgba(20,40,34,0.14)] hover:shadow-[0_30px_60px_-30px_rgba(6,78,59,0.35)] group flex flex-col justify-between border border-[#E5DDCB] hover:border-emerald-400 cursor-pointer"
+              className="p-6 sm:p-7 rounded-lg sm:rounded-xl bg-white transition-all duration-300 shadow-sm hover:shadow-sm group flex flex-col justify-between border border-[#DFD7C6] hover:border-clay-400 cursor-pointer"
             >
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-md bg-clay-50 border border-clay-200 text-clay-700 flex items-center justify-center">
                     <Zap className="w-6 h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-200/60">
+                  <span className="px-3 py-1 rounded-sm bg-transparent text-clay-700 font-bold text-xs border border-clay-200">
                     Tốc độ 3.2s
                   </span>
                 </div>
-                <h3 className="font-bold text-base sm:text-lg text-slate-900 mb-2 group-hover:text-emerald-700 transition-colors">Lập Lịch Trình Siêu Tốc</h3>
+                <h3 className="font-bold text-base sm:text-lg text-slate-900 mb-2 group-hover:text-clay-700 transition-colors">Lập Lịch Trình Siêu Tốc</h3>
                 <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal tracking-[0.015em]">
                   Xử lý dữ liệu phân luồng giao thông, giờ mở cửa và thứ tự ghé thăm hợp lý nhất
                   trong 3 giây, tránh hoàn toàn đi lòng vòng.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-[#EFE7D6] flex items-center gap-1.5 text-emerald-600 font-bold text-xs sm:text-sm">
+              <div className="mt-6 pt-4 border-t border-[#EAE2D4] flex items-center gap-1.5 text-clay-600 font-bold text-xs sm:text-sm">
                 <span>Tự động tối ưu 100%</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
@@ -1076,24 +1056,24 @@ export const HomePage = () => {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.55, delay: 0.1 }}
               whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className="p-6 sm:p-7 rounded-[1.6rem] sm:rounded-[2rem] bg-white transition-all duration-300 shadow-[0_12px_34px_-16px_rgba(20,40,34,0.14)] hover:shadow-[0_30px_60px_-30px_rgba(6,78,59,0.35)] group flex flex-col justify-between border border-[#E5DDCB] hover:border-teal-400 cursor-pointer"
+              className="p-6 sm:p-7 rounded-lg sm:rounded-xl bg-white transition-all duration-300 shadow-sm hover:shadow-sm group flex flex-col justify-between border border-[#DFD7C6] hover:border-clay-400 cursor-pointer"
             >
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-600 to-amber-600 text-white flex items-center justify-center shadow-md shadow-teal-600/20 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-md bg-clay-50 border border-clay-200 text-clay-700 flex items-center justify-center">
                     <Wallet className="w-6 h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-teal-50 text-teal-700 font-bold text-xs border border-teal-200/60">
+                  <span className="px-3 py-1 rounded-sm bg-transparent text-clay-700 font-bold text-xs border border-clay-200">
                     Tiết kiệm 22%
                   </span>
                 </div>
-                <h3 className="font-bold text-base sm:text-lg text-slate-900 mb-2 group-hover:text-teal-700 transition-colors">Tối Ưu Ngân Sách Thực Tế</h3>
+                <h3 className="font-bold text-base sm:text-lg text-slate-900 mb-2 group-hover:text-clay-700 transition-colors">Tối Ưu Ngân Sách Thực Tế</h3>
                 <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal tracking-[0.015em]">
                   Dự toán chi tiết từng khoản chi: vé máy bay, phòng ốc, ăn uống địa phương và dự
                   phòng phát sinh chính xác đến 95%.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-[#EFE7D6] flex items-center gap-1.5 text-teal-600 font-bold text-xs sm:text-sm">
+              <div className="mt-6 pt-4 border-t border-[#EAE2D4] flex items-center gap-1.5 text-clay-600 font-bold text-xs sm:text-sm">
                 <span>Cắt giảm chi phí thừa</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
@@ -1106,24 +1086,24 @@ export const HomePage = () => {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.55, delay: 0.2 }}
               whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className="p-6 sm:p-7 rounded-[1.6rem] sm:rounded-[2rem] bg-white transition-all duration-300 shadow-[0_12px_34px_-16px_rgba(20,40,34,0.14)] hover:shadow-[0_30px_60px_-30px_rgba(6,78,59,0.35)] group flex flex-col justify-between border border-[#E5DDCB] hover:border-emerald-400 cursor-pointer"
+              className="p-6 sm:p-7 rounded-lg sm:rounded-xl bg-white transition-all duration-300 shadow-sm hover:shadow-sm group flex flex-col justify-between border border-[#DFD7C6] hover:border-clay-400 cursor-pointer"
             >
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-500 to-emerald-600 text-white flex items-center justify-center shadow-md shadow-teal-500/20 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-md bg-clay-50 border border-clay-200 text-clay-700 flex items-center justify-center">
                     <NavigationIcon className="w-6 h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-teal-50 text-teal-800 font-bold text-xs border border-teal-200/60">
+                  <span className="px-3 py-1 rounded-sm bg-transparent text-clay-800 font-bold text-xs border border-clay-200">
                     Lộ trình chuẩn xác
                   </span>
                 </div>
-                <h3 className="font-bold text-base sm:text-lg text-slate-900 mb-2 group-hover:text-teal-700 transition-colors">Lộ Trình Tinh Gọn On-The-Go</h3>
+                <h3 className="font-bold text-base sm:text-lg text-slate-900 mb-2 group-hover:text-clay-700 transition-colors">Lộ Trình Tinh Gọn On-The-Go</h3>
                 <p className="text-slate-600 text-xs sm:text-sm leading-relaxed font-normal tracking-[0.015em]">
                   Trời mưa bất ngờ? Điểm tham quan đóng cửa? Wayfare chủ động gợi ý phương án dự phòng
                   ngay tức thì trong bán kính gần.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-[#EFE7D6] flex items-center gap-1.5 text-teal-700 font-bold text-xs sm:text-sm">
+              <div className="mt-6 pt-4 border-t border-[#EAE2D4] flex items-center gap-1.5 text-clay-700 font-bold text-xs sm:text-sm">
                 <span>Linh hoạt theo điểm đến</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
@@ -1136,14 +1116,14 @@ export const HomePage = () => {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.55, delay: 0.3 }}
               whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className="p-6 sm:p-7 rounded-[1.6rem] sm:rounded-[2rem] bg-white transition-all duration-300 shadow-[0_12px_34px_-16px_rgba(20,40,34,0.14)] hover:shadow-[0_30px_60px_-30px_rgba(6,78,59,0.35)] group flex flex-col justify-between border border-[#E5DDCB] hover:border-amber-400 cursor-pointer"
+              className="p-6 sm:p-7 rounded-lg sm:rounded-xl bg-white transition-all duration-300 shadow-sm hover:shadow-sm group flex flex-col justify-between border border-[#DFD7C6] hover:border-amber-400 cursor-pointer"
             >
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-rose-600 text-white flex items-center justify-center shadow-md shadow-amber-500/20 group-hover:scale-110 transition-transform">
+                  <div className="w-12 h-12 rounded-md bg-amber-50 border border-amber-200 text-amber-700 flex items-center justify-center">
                     <Users className="w-6 h-6" />
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-amber-50 text-amber-800 font-bold text-xs border border-amber-200/60">
+                  <span className="px-3 py-1 rounded-sm bg-transparent text-amber-800 font-bold text-xs border border-amber-200">
                     {homeStats.totalPosts.toLocaleString()}+ Bài Viết
                   </span>
                 </div>
@@ -1153,7 +1133,7 @@ export const HomePage = () => {
                   viên bản địa đã được kiểm chứng.
                 </p>
               </div>
-              <div className="mt-6 pt-4 border-t border-[#EFE7D6] flex items-center gap-1.5 text-amber-700 font-bold text-xs sm:text-sm">
+              <div className="mt-6 pt-4 border-t border-[#EAE2D4] flex items-center gap-1.5 text-amber-700 font-bold text-xs sm:text-sm">
                 <span>Sao chép 1-click</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
@@ -1167,14 +1147,14 @@ export const HomePage = () => {
           - Left: Natural Prompt Lab with unified Sky Blue actions
           - Right: Dynamic multi-day timeline with instant estimates
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#FBF7EE] border-b border-[#E4DCC9]">
+      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#F8F4EC] border-b border-[#DED5C5]">
         <div className="w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <motion.div
             initial={{ opacity: 0, y: 40, scale: 0.98 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="rounded-[2rem] sm:rounded-[3rem] bg-white p-6 sm:p-10 lg:p-12 shadow-[0_15px_45px_rgba(40,30,20,0.05)] border border-[#E4DCC9]"
+            className="rounded-md bg-white p-6 sm:p-10 lg:p-12 shadow-[0_15px_45px_rgba(40,30,20,0.05)] border border-[#DED5C5]"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Left Column: Interactive Prompt Lab (5 cols) */}
@@ -1185,7 +1165,7 @@ export const HomePage = () => {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="lg:col-span-5 flex flex-col"
               >
-                <div className="inline-flex items-center gap-2 text-emerald-700 font-extrabold text-xs uppercase tracking-wider mb-2.5">
+                <div className="inline-flex items-center gap-2 text-clay-700 font-extrabold text-xs uppercase tracking-wider mb-2.5">
                   <Compass className="w-4 h-4" />
                   <span>Trải nghiệm thử nghiệm trực tiếp</span>
                 </div>
@@ -1204,15 +1184,15 @@ export const HomePage = () => {
                     rows={3}
                     value={sandboxPrompt}
                     onChange={(e) => setSandboxPrompt(e.target.value)}
-                    className="w-full p-4 rounded-xl sm:rounded-2xl bg-[#F7F2E6]/80 font-medium text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-4 focus:ring-emerald-100 focus:border-emerald-600 focus:bg-white border border-[#E1D9C6] resize-none shadow-xs placeholder:text-slate-400 tracking-[0.015em] transition-all"
+                    className="w-full p-4 rounded-md bg-[#F5EFE5]/80 font-medium text-xs sm:text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-clay-100 focus:border-clay-600 focus:bg-white border border-[#DBD2C1] resize-none shadow-xs placeholder:text-slate-400 tracking-[0.015em] transition-all"
                   />
                   <div className="flex justify-end">
                     <button
                       type="button"
                       onClick={handleRunSandbox}
-                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-105 active:scale-95"
+                      className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-clay-600 hover:bg-clay-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                     >
-                      <Compass className="w-4 h-4 text-emerald-200" />
+                      <Compass className="w-4 h-4 text-clay-200" />
                       <span>Lên kế hoạch</span>
                     </button>
                   </div>
@@ -1228,7 +1208,7 @@ export const HomePage = () => {
                         'Gia đình 4 người đi Đà Nẵng 4N3Đ có người lớn tuổi, ưu tiên resort biển và ẩm thực nhẹ nhàng.'
                       );
                     }}
-                    className="px-3 py-1.5 rounded-full bg-[#F5EFE2] hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 text-xs font-semibold transition-all border border-[#E2DAC7] cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
+                    className="px-3 py-1.5 rounded-md bg-[#F3EDE3] hover:bg-clay-50 text-slate-700 hover:text-clay-700 text-xs font-semibold transition-all border border-[#DCD3C2] cursor-pointer shadow-2xs active:scale-95"
                   >
                     👨‍👩‍👧‍👦 Gia đình Đà Nẵng
                   </button>
@@ -1239,7 +1219,7 @@ export const HomePage = () => {
                         'Solo trekking Hà Giang 3N2Đ săn mây Mã Pí Lèng, ngân sách sinh viên tiết kiệm.'
                       );
                     }}
-                    className="px-3 py-1.5 rounded-full bg-[#F5EFE2] hover:bg-emerald-50 text-slate-700 hover:text-emerald-700 text-xs font-semibold transition-all border border-[#E2DAC7] cursor-pointer shadow-2xs hover:scale-105 active:scale-95"
+                    className="px-3 py-1.5 rounded-md bg-[#F3EDE3] hover:bg-clay-50 text-slate-700 hover:text-clay-700 text-xs font-semibold transition-all border border-[#DCD3C2] cursor-pointer shadow-2xs active:scale-95"
                   >
                     🏍️ Phượt Hà Giang
                   </button>
@@ -1252,12 +1232,12 @@ export const HomePage = () => {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.15 }}
-                className="lg:col-span-7 rounded-[1.6rem] sm:rounded-[2rem] bg-[#F6F0E4]/80 p-4 sm:p-6 lg:p-7 flex flex-col justify-between text-slate-900 shadow-sm border border-[#E4DCC9]"
+                className="lg:col-span-7 rounded-lg sm:rounded-xl bg-[#F4EEE4]/80 p-4 sm:p-6 lg:p-7 flex flex-col justify-between text-slate-900 shadow-sm border border-[#DED5C5]"
               >
                 {/* Header with Title and Day Switcher */}
-                <div className="flex flex-col gap-3 pb-4 border-b border-[#E4DCC9]">
+                <div className="flex flex-col gap-3 pb-4 border-b border-[#DED5C5]">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-black text-sm shadow-sm shrink-0">
+                    <div className="w-10 h-10 rounded-2xl bg-clay-600 text-white flex items-center justify-center font-black text-sm shadow-sm shrink-0">
                       <Compass className="w-5 h-5 text-white" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -1271,15 +1251,15 @@ export const HomePage = () => {
                   </div>
 
                   {/* Multi-Day Tabs */}
-                  <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-white border border-[#E2DAC7] shadow-2xs w-full">
+                  <div className="grid grid-cols-3 gap-1.5 p-1 rounded-xl bg-white border border-[#DCD3C2] shadow-2xs w-full">
                     {[1, 2, 3].map((dayNum) => (
                       <button
                         key={dayNum}
                         type="button"
                         onClick={() => setSandboxActiveDay(dayNum)}
                         className={`w-full py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer text-center ${sandboxActiveDay === dayNum
-                          ? 'bg-emerald-600 text-white shadow-xs'
-                          : 'text-slate-600 hover:text-emerald-700 hover:bg-[#F7F2E6]'
+                          ? 'bg-clay-600 text-white shadow-xs'
+                          : 'text-slate-600 hover:text-clay-700 hover:bg-[#F5EFE5]'
                           }`}
                       >
                         Ngày {dayNum}
@@ -1289,8 +1269,8 @@ export const HomePage = () => {
                 </div>
 
                 {/* Day Subtitle */}
-                <div className="py-2.5 text-xs sm:text-sm font-bold text-emerald-800 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="py-2.5 text-xs sm:text-sm font-bold text-clay-800 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-clay-600 shrink-0" />
                   <span className="truncate">{sandboxMultiDayData[sandboxActiveDay].dayTitle}</span>
                 </div>
 
@@ -1305,16 +1285,16 @@ export const HomePage = () => {
                       className="flex items-start gap-3 group"
                     >
                       <div className="flex flex-col items-center shrink-0">
-                        <div className="w-8 h-8 rounded-full bg-emerald-600 text-white font-extrabold flex items-center justify-center text-xs shadow-xs group-hover:scale-110 transition-transform">
+                        <div className="w-8 h-8 rounded-full bg-clay-600 text-white font-extrabold flex items-center justify-center text-xs shadow-xs group-hover:scale-110 transition-transform">
                           {item.time}
                         </div>
                         {idx < sandboxMultiDayData[sandboxActiveDay].items.length - 1 && (
-                          <div className="w-0.5 h-8 bg-[#D8CFBB] mt-1" />
+                          <div className="w-0.5 h-8 bg-[#D2C9B7] mt-1" />
                         )}
                       </div>
-                      <div className="bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl flex-1 shadow-2xs border border-[#E4DCC9] hover:border-emerald-300 hover:shadow-sm transition-all min-w-0">
+                      <div className="bg-white p-3 sm:p-4 rounded-md flex-1 shadow-2xs border border-[#DED5C5] hover:border-clay-300 hover:shadow-sm transition-all min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <span className="font-bold text-xs sm:text-sm md:text-base text-slate-900 group-hover:text-emerald-700 transition-colors truncate">
+                          <span className="font-bold text-xs sm:text-sm md:text-base text-slate-900 group-hover:text-clay-700 transition-colors truncate">
                             {item.title}
                           </span>
                           <span
@@ -1332,7 +1312,7 @@ export const HomePage = () => {
                 </div>
 
                 {/* Footer Action within widget */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-[#E4DCC9]">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-4 border-t border-[#DED5C5]">
                   <span className="text-xs text-slate-500 font-semibold text-center sm:text-left">
                     Đã đồng bộ Google Maps & Thời tiết thực tế
                   </span>
@@ -1347,7 +1327,7 @@ export const HomePage = () => {
                       });
                       toast.success('Đang mở chi tiết toàn bộ lộ trình 3 ngày!');
                     }}
-                    className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-105 active:scale-95"
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-md bg-clay-600 hover:bg-clay-700 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                   >
                     <span>Mở toàn bộ lộ trình 3 ngày</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1" />
@@ -1360,10 +1340,10 @@ export const HomePage = () => {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          5. CURATED TRENDING ITINERARIES SHOWCASE (WARM EDITORIAL CANVAS #F6F0E4)
+          5. CURATED TRENDING ITINERARIES SHOWCASE (WARM EDITORIAL CANVAS #F4EEE4)
           - Delicate warm porcelain background with white elevated cards
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#F6F0E4]/60 border-b border-[#E4DCC9]" id="kham-pha">
+      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#F4EEE4]/60 border-b border-[#DED5C5]" id="kham-pha">
         <div className="w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header with Filter Tabs */}
           <motion.div
@@ -1374,8 +1354,8 @@ export const HomePage = () => {
             className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 sm:mb-12"
           >
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-emerald-800 text-xs font-bold shadow-xs border border-[#E2DAC7] mb-2">
-                <Compass className="w-3.5 h-3.5 text-emerald-600" />
+              <div className="inline-flex items-center gap-2 pl-3 py-0.5 rounded-none bg-transparent text-clay-700 text-xs font-bold tracking-[0.12em] border-l-2 border-clay-500 mb-2">
+                <Compass className="w-3.5 h-3.5 text-clay-600" />
                 <span>Tuyển Tập Lộ Trình</span>
               </div>
               <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -1398,9 +1378,9 @@ export const HomePage = () => {
                   key={tab.id}
                   type="button"
                   onClick={() => setShowcaseRegion(tab.id)}
-                  className={`w-full sm:w-auto px-2 sm:px-5 py-2.5 rounded-xl sm:rounded-full text-xs sm:text-sm font-bold transition-all text-center cursor-pointer ${showcaseRegion === tab.id
-                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/25'
-                    : 'bg-white hover:bg-[#F7F2E6] text-slate-700 border border-[#E2DAC7] shadow-2xs'
+                  className={`w-full sm:w-auto px-2 sm:px-5 py-2.5 rounded-md text-xs sm:text-sm font-bold transition-all text-center cursor-pointer ${showcaseRegion === tab.id
+                    ? 'bg-clay-600 text-white'
+                    : 'bg-white hover:bg-[#F5EFE5] text-slate-700 border border-[#DCD3C2] shadow-2xs'
                     }`}
                 >
                   {tab.label}
@@ -1420,22 +1400,22 @@ export const HomePage = () => {
                 transition={{ duration: 0.55, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
                 whileHover={{ y: -8, transition: { duration: 0.25 } }}
                 onClick={() => navigate('/explore')}
-                className="rounded-[1.6rem] sm:rounded-[2rem] bg-white overflow-hidden shadow-[0_12px_34px_-16px_rgba(20,40,34,0.14)] hover:shadow-[0_30px_60px_-30px_rgba(6,78,59,0.35)] transition-all duration-300 flex flex-col group border border-[#E6DECB] hover:border-emerald-400 cursor-pointer"
+                className="rounded-lg sm:rounded-xl bg-white overflow-hidden shadow-sm hover:shadow-sm transition-all duration-300 flex flex-col group border border-[#E0D8C7] hover:border-clay-400 cursor-pointer"
               >
                 <div className="relative h-48 sm:h-56 w-full overflow-hidden">
                   <img
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+                    className="w-full h-full object-cover group-transition-transform duration-500 ease-out"
                     alt={tour.title}
                     src={tour.image}
                   />
-                  <div className="absolute top-3 right-3 px-3 py-1 rounded-full bg-slate-950/75 backdrop-blur-md text-xs font-bold text-white shadow-xs">
+                  <div className="absolute top-3 right-3 px-3 py-1 rounded-sm bg-slate-950/80 text-xs font-bold text-white shadow-xs">
                     {tour.duration}
                   </div>
-                  <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center gap-1 shadow-xs">
-                    <Compass className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
+                  <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-clay-600 text-white text-xs font-bold flex items-center gap-1 shadow-xs">
+                    <Compass className="w-3.5 h-3.5 text-clay-200 shrink-0" />
                     <span>{tour.tag}</span>
                   </div>
-                  <div className="hidden sm:block absolute bottom-3 left-3 px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-slate-900 text-xs font-bold shadow-xs">
+                  <div className="hidden sm:block absolute bottom-3 left-3 px-3 py-1 rounded-sm bg-white/95 text-slate-900 text-xs font-bold shadow-xs">
                     {tour.category}
                   </div>
                 </div>
@@ -1448,10 +1428,10 @@ export const HomePage = () => {
                         <strong className="text-slate-900">{tour.rating}</strong>
                         <span>({tour.saves} lưu)</span>
                       </span>
-                      <span className="text-emerald-700 font-bold">{tour.location}</span>
+                      <span className="text-clay-700 font-bold">{tour.location}</span>
                     </div>
 
-                    <h3 className="font-bold text-sm sm:text-base text-slate-900 mb-1.5 group-hover:text-emerald-700 transition-colors line-clamp-1 leading-snug">
+                    <h3 className="font-bold text-sm sm:text-base text-slate-900 mb-1.5 group-hover:text-clay-700 transition-colors line-clamp-1 leading-snug">
                       {tour.title}
                     </h3>
                     <p className="text-slate-600 text-xs sm:text-sm mb-4 line-clamp-2 leading-relaxed font-normal tracking-[0.015em]">
@@ -1459,12 +1439,12 @@ export const HomePage = () => {
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-[#EFE7D6] flex items-center justify-between">
+                  <div className="pt-3 border-t border-[#EAE2D4] flex items-center justify-between">
                     <div>
                       <span className="text-[11px] text-slate-400 font-medium block">
                         Dự toán/người
                       </span>
-                      <span className="font-extrabold text-sm sm:text-base lg:text-lg text-emerald-700">
+                      <span className="font-extrabold text-sm sm:text-base lg:text-lg text-clay-700">
                         {tour.price}
                       </span>
                     </div>
@@ -1479,9 +1459,9 @@ export const HomePage = () => {
                           e.stopPropagation();
                           handleCopyTour(tour);
                         }}
-                        className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border flex items-center justify-center gap-1 cursor-pointer hover:scale-105 active:scale-95 ${savedTours[tour.id]
-                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                          : 'bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-800 border-emerald-200'
+                        className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all border flex items-center justify-center gap-1 cursor-pointer ${savedTours[tour.id]
+                          ? 'bg-clay-600 text-white border-clay-600 shadow-xs'
+                          : 'bg-clay-50 hover:bg-clay-600 hover:text-white text-clay-800 border-clay-200'
                           }`}
                       >
                         {savedTours[tour.id] ? (
@@ -1508,7 +1488,7 @@ export const HomePage = () => {
             <button
               type="button"
               onClick={() => navigate('/explore')}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white hover:bg-[#F7F2E6] text-emerald-700 hover:text-emerald-800 font-bold text-xs sm:text-sm border border-[#E2DAC7] shadow-2xs hover:shadow-md transition-all active:scale-95"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-white hover:bg-[#F5EFE5] text-clay-700 hover:text-clay-800 font-bold text-xs sm:text-sm border border-[#DCD3C2] shadow-2xs hover:shadow-md transition-all active:scale-95"
             >
               <span>Khám phá thêm các lộ trình khác</span>
               <ArrowRight className="w-4 h-4" />
@@ -1519,9 +1499,9 @@ export const HomePage = () => {
 
       {/* ──────────────────────────────────────────────────────────────────────────
           5B. COMMUNITY HIGHLIGHTS & LIVE TRAVEL PULSE
-          - Warm Ivory editorial backdrop (#FBF7EE)
+          - Warm Ivory editorial backdrop (#F8F4EC)
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#FBF7EE] border-b border-[#E4DCC9]">
+      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#F8F4EC] border-b border-[#DED5C5]">
         <div className="w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Header */}
           <motion.div
@@ -1532,8 +1512,8 @@ export const HomePage = () => {
             className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 sm:mb-12"
           >
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-emerald-800 text-xs font-bold shadow-xs border border-[#E2DAC7] mb-2">
-                <Users className="w-3.5 h-3.5 text-emerald-600" />
+              <div className="inline-flex items-center gap-2 pl-3 py-0.5 rounded-none bg-transparent text-clay-700 text-xs font-bold tracking-[0.12em] border-l-2 border-clay-500 mb-2">
+                <Users className="w-3.5 h-3.5 text-clay-600" />
                 <span>Cộng Đồng Chia Sẻ</span>
               </div>
               <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
@@ -1554,15 +1534,15 @@ export const HomePage = () => {
                     navigate('/community');
                   }
                 }}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer hover:scale-105 active:scale-95"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-md bg-clay-600 hover:bg-clay-700 text-white font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
-                <Compass className="w-4 h-4 text-emerald-200" />
+                <Compass className="w-4 h-4 text-clay-200" />
                 <span>Chia sẻ chuyến đi của bạn</span>
               </button>
               <button
                 type="button"
                 onClick={() => navigate('/community')}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-white hover:bg-[#F7F2E6] text-slate-700 hover:text-emerald-700 border border-[#E2DAC7] text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer hover:scale-105"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-md bg-white hover:bg-[#F5EFE5] text-slate-700 hover:text-clay-700 border border-[#DCD3C2] text-xs sm:text-sm font-bold transition-all shadow-2xs cursor-pointer "
               >
                 <span>Xem tất cả ({homeStats.totalPosts}+ bài viết)</span>
               </button>
@@ -1580,17 +1560,17 @@ export const HomePage = () => {
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.55, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
                   whileHover={{ y: -8, transition: { duration: 0.25 } }}
-                  className="rounded-[1.6rem] sm:rounded-[2rem] bg-white overflow-hidden shadow-[0_12px_34px_-16px_rgba(20,40,34,0.14)] hover:shadow-[0_30px_60px_-30px_rgba(6,78,59,0.35)] transition-all duration-300 flex flex-col group border border-[#E6DECB] hover:border-emerald-400"
+                  className="rounded-lg sm:rounded-xl bg-white overflow-hidden shadow-sm hover:shadow-sm transition-all duration-300 flex flex-col group border border-[#E0D8C7] hover:border-clay-400"
                 >
                   {/* Photo */}
                   <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-100">
                     <img
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-transition-transform duration-500"
                       src={post.image || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=800&q=80'}
                       alt={post.title}
                     />
                     {post.locationTag && (
-                      <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/75 backdrop-blur-md text-white text-xs font-bold flex items-center gap-1 border border-white/20">
+                      <div className="absolute top-3 left-3 px-3 py-1 rounded-sm bg-slate-950/80 text-white text-xs font-bold flex items-center gap-1 border border-white/20">
                         <MapPin className="w-3.5 h-3.5 text-rose-400" />
                         <span className="truncate max-w-[120px]">{post.locationTag}</span>
                       </div>
@@ -1605,7 +1585,7 @@ export const HomePage = () => {
                         <img
                           src={post.author?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
                           alt={post.author?.name}
-                          className="w-8 h-8 rounded-full object-cover ring-2 ring-emerald-400 shrink-0"
+                          className="w-8 h-8 rounded-full object-cover ring-2 ring-clay-400 shrink-0"
                         />
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-slate-900 truncate">
@@ -1617,7 +1597,7 @@ export const HomePage = () => {
 
                       <h3
                         onClick={() => navigate('/community')}
-                        className="font-bold text-sm sm:text-base text-slate-900 mb-1.5 line-clamp-1 group-hover:text-emerald-600 transition-colors cursor-pointer"
+                        className="font-bold text-sm sm:text-base text-slate-900 mb-1.5 line-clamp-1 group-hover:text-clay-600 transition-colors cursor-pointer"
                       >
                         {post.title}
                       </h3>
@@ -1627,7 +1607,7 @@ export const HomePage = () => {
                     </div>
 
                     {/* Footer Interactions */}
-                    <div className="pt-3 border-t border-[#EFE7D6] flex items-center justify-between text-xs text-slate-500 font-semibold">
+                    <div className="pt-3 border-t border-[#EAE2D4] flex items-center justify-between text-xs text-slate-500 font-semibold">
                       <button
                         type="button"
                         onClick={() => handleLikePost(post.id)}
@@ -1641,7 +1621,7 @@ export const HomePage = () => {
                       <button
                         type="button"
                         onClick={() => navigate('/community')}
-                        className="flex items-center gap-1.5 hover:text-emerald-600 transition-colors cursor-pointer"
+                        className="flex items-center gap-1.5 hover:text-clay-600 transition-colors cursor-pointer"
                       >
                         <MessageSquare className="w-4 h-4" />
                         <span>{post.commentsCount || 0} phản hồi</span>
@@ -1714,15 +1694,15 @@ export const HomePage = () => {
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.55, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
                   whileHover={{ y: -8, transition: { duration: 0.25 } }}
-                  className="rounded-[1.6rem] sm:rounded-[2rem] bg-white overflow-hidden shadow-[0_12px_34px_-16px_rgba(20,40,34,0.14)] hover:shadow-[0_30px_60px_-30px_rgba(6,78,59,0.35)] transition-all duration-300 flex flex-col group border border-[#E6DECB] hover:border-emerald-400"
+                  className="rounded-lg sm:rounded-xl bg-white overflow-hidden shadow-sm hover:shadow-sm transition-all duration-300 flex flex-col group border border-[#E0D8C7] hover:border-clay-400"
                 >
                   <div className="relative h-48 sm:h-56 w-full overflow-hidden bg-slate-100">
                     <img
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      className="w-full h-full object-cover group-transition-transform duration-500"
                       src={post.image}
                       alt={post.title}
                     />
-                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-slate-950/75 backdrop-blur-md text-white text-xs font-bold flex items-center gap-1 border border-white/20">
+                    <div className="absolute top-3 left-3 px-3 py-1 rounded-sm bg-slate-950/80 text-white text-xs font-bold flex items-center gap-1 border border-white/20">
                       <MapPin className="w-3.5 h-3.5 text-rose-400" />
                       <span>{post.location}</span>
                     </div>
@@ -1734,7 +1714,7 @@ export const HomePage = () => {
                         <img
                           src={post.avatar}
                           alt={post.author}
-                          className="w-8 h-8 rounded-full object-cover ring-2 ring-emerald-400 shrink-0"
+                          className="w-8 h-8 rounded-full object-cover ring-2 ring-clay-400 shrink-0"
                         />
                         <div className="min-w-0">
                           <p className="text-xs font-bold text-slate-900 truncate">{post.author}</p>
@@ -1744,7 +1724,7 @@ export const HomePage = () => {
 
                       <h3
                         onClick={() => navigate('/community')}
-                        className="font-bold text-sm sm:text-base text-slate-900 mb-1.5 line-clamp-1 group-hover:text-emerald-600 transition-colors cursor-pointer"
+                        className="font-bold text-sm sm:text-base text-slate-900 mb-1.5 line-clamp-1 group-hover:text-clay-600 transition-colors cursor-pointer"
                       >
                         {post.title}
                       </h3>
@@ -1753,7 +1733,7 @@ export const HomePage = () => {
                       </p>
                     </div>
 
-                    <div className="pt-3 border-t border-[#EFE7D6] flex items-center justify-between text-xs text-slate-500 font-semibold">
+                    <div className="pt-3 border-t border-[#EAE2D4] flex items-center justify-between text-xs text-slate-500 font-semibold">
                       <button
                         type="button"
                         onClick={() => handleLikePost(post.id)}
@@ -1767,7 +1747,7 @@ export const HomePage = () => {
                       <button
                         type="button"
                         onClick={() => navigate('/community')}
-                        className="flex items-center gap-1.5 hover:text-emerald-600 transition-colors cursor-pointer"
+                        className="flex items-center gap-1.5 hover:text-clay-600 transition-colors cursor-pointer"
                       >
                         <MessageSquare className="w-4 h-4" />
                         <span>{post.comments}</span>
@@ -1794,20 +1774,20 @@ export const HomePage = () => {
           6. INTERACTIVE MAP & HIDDEN GEMS (EMBEDDED MIDNIGHT CARD ON WARM CANVAS)
           - Deep Sapphire Card floating gracefully on Warm Ivory backdrop
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#F3EDE1]/70 border-b border-[#E4DCC9]">
+      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#F1EADF]/70 border-b border-[#DED5C5]">
         <div className="w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="rounded-[1.6rem] sm:rounded-[2rem] bg-[#08201C] text-white p-6 sm:p-10 lg:p-12 shadow-2xl border border-[#1B3B32]"
+            className="rounded-lg sm:rounded-xl bg-[#1E1A15] text-white p-6 sm:p-10 lg:p-12 shadow-2xl border border-[#2B271F]"
           >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Text & List Details (5 cols) */}
               <div className="lg:col-span-5 flex flex-col">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-300 text-xs font-bold border border-white/15 w-fit mb-3">
-                  <Compass className="w-3.5 h-3.5 text-emerald-400" />
+                <div className="inline-flex items-center gap-2 pl-3 py-0.5 rounded-none bg-transparent text-clay-200 text-xs font-bold tracking-[0.12em] border-l-2 border-clay-500 w-fit mb-3">
+                  <Compass className="w-3.5 h-3.5 text-clay-400" />
                   <span>Dữ Liệu Bản Địa Độc Quyền</span>
                 </div>
 
@@ -1830,17 +1810,15 @@ export const HomePage = () => {
                     <motion.button
                       key={gem.id}
                       type="button"
-                      whileHover={{ scale: 1.015 }}
-                      whileTap={{ scale: 0.985 }}
                       onClick={() => setSelectedGemId(gem.id)}
-                      className={`w-full p-3 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 transition-all text-left cursor-pointer border ${selectedGemId === gem.id
-                        ? 'bg-emerald-600/35 border-emerald-400 shadow-md ring-1 ring-emerald-400/30'
+                      className={`w-full p-3 sm:p-4 rounded-md flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 transition-colors text-left cursor-pointer border ${selectedGemId === gem.id
+                        ? 'bg-clay-600/25 border-clay-400'
                         : 'bg-white/5 hover:bg-white/10 border-white/10'
                         }`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
                         <span
-                          className={`w-2.5 h-2.5 rounded-full shrink-0 ${selectedGemId === gem.id ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'
+                          className={`w-2.5 h-2.5 rounded-full shrink-0 ${selectedGemId === gem.id ? 'bg-clay-400 animate-none' : 'bg-slate-400'
                             }`}
                         />
                         <div className="min-w-0 flex-1">
@@ -1849,8 +1827,8 @@ export const HomePage = () => {
                               {gem.name} <span className="text-slate-400 font-normal">({gem.location})</span>
                             </h4>
                             <span
-                              className={`sm:hidden px-2 py-0.5 rounded-full text-[9px] font-bold uppercase transition-colors shrink-0 ${selectedGemId === gem.id
-                                ? 'bg-emerald-500 text-white'
+                              className={`sm:hidden px-2 py-0.5 rounded-sm text-[9px] font-bold uppercase transition-colors shrink-0 ${selectedGemId === gem.id
+                                ? 'bg-clay-500 text-white'
                                 : 'bg-white/20 text-slate-300'
                                 }`}
                             >
@@ -1863,8 +1841,8 @@ export const HomePage = () => {
                         </div>
                       </div>
                       <span
-                        className={`hidden sm:inline-block px-3 py-1 rounded-full text-xs font-bold uppercase transition-colors shrink-0 ${selectedGemId === gem.id
-                          ? 'bg-emerald-500 text-white'
+                        className={`hidden sm:inline-block px-3 py-1 rounded-sm text-xs font-bold uppercase transition-colors shrink-0 ${selectedGemId === gem.id
+                          ? 'bg-clay-500 text-white'
                           : 'bg-white/15 text-slate-300'
                           }`}
                       >
@@ -1877,37 +1855,37 @@ export const HomePage = () => {
                 <button
                   type="button"
                   onClick={() => navigate('/explore')}
-                  className="inline-flex items-center gap-2 text-emerald-400 font-bold text-xs sm:text-sm md:text-base hover:text-emerald-300 hover:underline cursor-pointer group"
+                  className="inline-flex items-center gap-2 text-clay-400 font-bold text-xs sm:text-sm md:text-base hover:text-clay-300 hover:underline cursor-pointer group"
                 >
                   <span>Khám phá các tọa độ ẩn xung quanh bạn</span>
-                  <NavigationIcon className="w-4 h-4 text-emerald-300 group-hover:translate-x-1 transition-transform" />
+                  <NavigationIcon className="w-4 h-4 text-clay-300 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
 
               {/* Dynamic Map & Scenic View Container (7 cols) */}
               <div className="lg:col-span-7">
-                <div className="relative w-full h-[280px] sm:h-[420px] lg:h-[460px] rounded-[1.6rem] sm:rounded-[2rem] overflow-hidden shadow-2xl bg-slate-900 border border-[#1B3B32]">
+                <div className="relative w-full h-[280px] sm:h-[420px] lg:h-[460px] rounded-lg sm:rounded-xl overflow-hidden bg-slate-900 border border-[#2B271F]">
                   <div
                     className="w-full h-full bg-cover bg-center transition-all duration-700"
                     style={{
                       backgroundImage: `url('${hiddenGems[selectedGemId].image}')`
                     }}
                   />
-                  <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-[1px]" />
+                  <div className="absolute inset-0 bg-slate-950/40" />
 
                   {/* Top Badge: Weather & Crowd */}
                   <div className="absolute top-4 left-4 flex items-center gap-2">
-                    <span className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-emerald-300 text-xs font-bold border border-emerald-400/40">
+                    <span className="px-3 py-1 rounded-sm bg-slate-950/85 text-clay-300 text-xs font-bold border border-clay-400/40">
                       🌤️ {hiddenGems[selectedGemId].temp}
                     </span>
-                    <span className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-emerald-300 text-xs font-bold border border-emerald-400/40">
+                    <span className="px-3 py-1 rounded-sm bg-slate-950/85 text-clay-300 text-xs font-bold border border-clay-400/40">
                       👥 {hiddenGems[selectedGemId].crowd}
                     </span>
                   </div>
 
                   {/* Floating GPS Card with Dynamic Selected Gem Details */}
-                  <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:max-w-md p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-slate-900/95 backdrop-blur-xl shadow-2xl flex items-center gap-3.5 text-white border border-slate-700">
-                    <div className="w-11 h-11 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-emerald-600/50">
+                  <div className="absolute bottom-4 left-4 right-4 sm:right-auto sm:max-w-md p-4 sm:p-5 rounded-lg bg-slate-900/95 flex items-center gap-3.5 text-white border border-slate-700">
+                    <div className="w-11 h-11 rounded-md bg-clay-600 text-white flex items-center justify-center shrink-0">
                       <MapPin className="w-5 h-5 text-white" />
                     </div>
                     <div className="min-w-0">
@@ -1927,10 +1905,10 @@ export const HomePage = () => {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          7. SOCIAL PROOF & TESTIMONIALS (WARM EDITORIAL CANVAS #FBF7EE)
+          7. SOCIAL PROOF & TESTIMONIALS (WARM EDITORIAL CANVAS #F8F4EC)
           - Pure White Editorial Cards with soft shadows
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#FBF7EE] border-b border-[#E4DCC9]">
+      <section className="w-full py-14 sm:py-20 lg:py-28 bg-[#F8F4EC] border-b border-[#DED5C5]">
         <div className="w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Header with Motion Scroll */}
           <motion.div
@@ -1940,7 +1918,7 @@ export const HomePage = () => {
             transition={{ duration: 0.6 }}
             className="text-center max-w-2xl mx-auto mb-10 sm:mb-16 space-y-2.5"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white text-emerald-800 text-xs font-bold shadow-xs border border-[#E2DAC7]">
+            <div className="inline-flex items-center gap-2 pl-3 py-0.5 rounded-none bg-transparent text-clay-700 text-xs font-bold tracking-[0.12em] border-l-2 border-clay-500">
               <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
               <span>Phản Hồi Chân Thực</span>
             </div>
@@ -1960,7 +1938,7 @@ export const HomePage = () => {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.55, delay: 0 }}
               whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className="p-7 rounded-3xl bg-white shadow-[0_12px_34px_-16px_rgba(20,40,34,0.14)] hover:shadow-[0_30px_60px_-30px_rgba(6,78,59,0.35)] transition-all flex flex-col justify-between border-t-4 border-t-emerald-600 border border-[#E6DECB] cursor-pointer"
+              className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-sm transition-all flex flex-col justify-between border-t-4 border-t-clay-600 border border-[#E0D8C7] cursor-pointer"
             >
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
@@ -1974,9 +1952,9 @@ export const HomePage = () => {
                   chuẩn vị.”
                 </p>
               </div>
-              <div className="flex items-center gap-3.5 pt-4 border-t border-[#EFE7D6]">
+              <div className="flex items-center gap-3.5 pt-4 border-t border-[#EAE2D4]">
                 <img
-                  className="w-11 h-11 rounded-full object-cover ring-2 ring-emerald-500"
+                  className="w-11 h-11 rounded-full object-cover ring-2 ring-clay-500"
                   alt="Minh Trang"
                   src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80"
                 />
@@ -1994,7 +1972,7 @@ export const HomePage = () => {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.55, delay: 0.15 }}
               whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className="p-7 rounded-3xl bg-white shadow-[0_12px_34px_-16px_rgba(20,40,34,0.14)] hover:shadow-[0_30px_60px_-30px_rgba(6,78,59,0.35)] transition-all flex flex-col justify-between border-t-4 border-t-teal-600 border border-[#E6DECB] cursor-pointer"
+              className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-sm transition-all flex flex-col justify-between border-t-4 border-t-clay-600 border border-[#E0D8C7] cursor-pointer"
             >
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
@@ -2007,9 +1985,9 @@ export const HomePage = () => {
                   Pa đã cứu cánh cả chuyến đi! Chi phí dự tính sát nút chỉ lệch có 150k.”
                 </p>
               </div>
-              <div className="flex items-center gap-3.5 pt-4 border-t border-[#EFE7D6]">
+              <div className="flex items-center gap-3.5 pt-4 border-t border-[#EAE2D4]">
                 <img
-                  className="w-11 h-11 rounded-full object-cover ring-2 ring-teal-500"
+                  className="w-11 h-11 rounded-full object-cover ring-2 ring-clay-500"
                   alt="Hoàng Nam"
                   src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&q=80"
                 />
@@ -2029,7 +2007,7 @@ export const HomePage = () => {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.55, delay: 0.3 }}
               whileHover={{ y: -6, transition: { duration: 0.2 } }}
-              className="p-7 rounded-3xl bg-white shadow-[0_12px_34px_-16px_rgba(20,40,34,0.14)] hover:shadow-[0_30px_60px_-30px_rgba(6,78,59,0.35)] transition-all flex flex-col justify-between border-t-4 border-t-amber-600 border border-[#E6DECB] cursor-pointer"
+              className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-sm transition-all flex flex-col justify-between border-t-4 border-t-amber-600 border border-[#E0D8C7] cursor-pointer"
             >
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
@@ -2042,7 +2020,7 @@ export const HomePage = () => {
                   gợi ý không hề xô bồ như các tour đại trà, cực kỳ lãng mạn và tinh tế!”
                 </p>
               </div>
-              <div className="flex items-center gap-3.5 pt-4 border-t border-[#EFE7D6]">
+              <div className="flex items-center gap-3.5 pt-4 border-t border-[#EAE2D4]">
                 <img
                   className="w-11 h-11 rounded-full object-cover ring-2 ring-amber-500"
                   alt="Quang & Thảo"
@@ -2059,22 +2037,18 @@ export const HomePage = () => {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          8. GRAND FINALE CTA BANNER (#F3EDE1 PEDESTAL)
+          8. GRAND FINALE CTA BANNER (#F1EADF PEDESTAL)
           - Deep Sapphire canvas floating on Warm Ivory foundation
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="w-full py-12 sm:py-20 bg-[#F3EDE1]/70">
+      <section className="w-full py-12 sm:py-20 bg-[#F1EADF]/70">
         <div className="w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <motion.div
             initial={{ opacity: 0, y: 40, scale: 0.98 }}
             whileInView={{ opacity: 1, y: 0, scale: 1 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="relative rounded-[1.6rem] sm:rounded-[2rem] overflow-hidden p-6 sm:p-10 lg:p-16 bg-gradient-to-r from-[#08201C] via-[#0C302A] to-[#0F3A31] text-white shadow-2xl border border-[#1B3B32]"
+            className="relative rounded-lg sm:rounded-xl overflow-hidden p-6 sm:p-10 lg:p-16 bg-[#1E1A15] text-white border border-[#2B271F]"
           >
-            {/* Ambient Light Orbs */}
-            <div className="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-teal-500/15 blur-3xl pointer-events-none animate-pulse-slow" />
-            <div className="absolute top-0 right-1/3 w-64 h-64 rounded-full bg-emerald-400/15 blur-2xl pointer-events-none animate-pulse-slow [animation-delay:3s]" />
-
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
               {/* Left Column: Heading, Subtitle & Actions (7 cols) */}
               <motion.div
@@ -2084,8 +2058,8 @@ export const HomePage = () => {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 className="lg:col-span-7 flex flex-col items-start space-y-4 sm:space-y-6"
               >
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-200 text-xs font-bold border border-white/15">
-                  <Compass className="w-3.5 h-3.5 text-emerald-300" />
+                <div className="inline-flex items-center gap-2 pl-3 py-0.5 rounded-none bg-transparent text-clay-200 text-xs font-bold tracking-[0.12em] border-l-2 border-clay-500">
+                  <Compass className="w-3.5 h-3.5 text-clay-300" />
                   <span>Khởi Đầu Chuyến Đi</span>
                 </div>
 
@@ -2093,7 +2067,7 @@ export const HomePage = () => {
                   Sẵn Sàng Cho Chuyến Phiêu Lưu Kế Tiếp?
                 </h2>
 
-                <p className="text-emerald-100/90 text-xs sm:text-base leading-relaxed font-normal tracking-[0.015em] max-w-xl">
+                <p className="text-clay-100/90 text-xs sm:text-base leading-relaxed font-normal tracking-[0.015em] max-w-xl">
                   Hãy để Wayfare đồng hành chuẩn bị, lên lịch trình và tối ưu chi phí. Bạn chỉ cần tận hưởng
                   từng khoảnh khắc trọn vẹn bên người thân yêu.
                 </p>
@@ -2101,29 +2075,29 @@ export const HomePage = () => {
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 w-full sm:w-auto pt-2">
                   <a
                     href="#plan-dock"
-                    className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-full bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-700 hover:from-emerald-600 hover:to-teal-800 text-white font-extrabold text-xs sm:text-sm md:text-base shadow-[0_12px_28px_rgba(5,150,105,0.35)] hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer ring-1 ring-white/30"
+                    className="w-full sm:w-auto px-7 sm:px-8 py-3.5 sm:py-4 rounded-md bg-clay-600 hover:bg-clay-700 text-white font-bold text-xs sm:text-sm md:text-base transition-colors flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-200" />
+                    <Compass className="w-4 h-4 sm:w-5 sm:h-5 text-clay-200" />
                     <span>Lên Lịch Trình Miễn Phí Ngay</span>
                   </a>
 
                   <button
                     type="button"
                     onClick={() => navigate('/community')}
-                    className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white font-bold text-xs sm:text-sm md:text-base transition-all border border-white/20 hover:border-white/40 shadow-sm cursor-pointer hover:scale-105 active:scale-95 flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-6 sm:px-7 py-3.5 sm:py-4 rounded-md bg-transparent hover:bg-white/10 text-white font-bold text-xs sm:text-sm md:text-base transition-colors border border-white/25 hover:border-white/50 cursor-pointer flex items-center justify-center gap-2"
                   >
-                    <Users className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-300" />
+                    <Users className="w-4 h-4 sm:w-5 sm:h-5 text-clay-300" />
                     <span>Khám Phá Cộng Đồng</span>
                   </button>
                 </div>
 
-                <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 text-xs text-emerald-100">
+                <div className="pt-2 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 text-xs text-clay-100">
                   <div className="flex items-center gap-2 font-medium">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-clay-400 shrink-0" />
                     <span>Không cần thẻ tín dụng • Trải nghiệm ngay 100% miễn phí</span>
                   </div>
-                  <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-emerald-400/50" />
-                  <div className="flex items-center gap-1.5 text-emerald-200">
+                  <div className="hidden sm:block w-1.5 h-1.5 rounded-full bg-clay-400/50" />
+                  <div className="flex items-center gap-1.5 text-clay-200">
                     <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                     <span className="font-bold text-white">4.9/5</span>
                     <span>từ 50.000+ du khách</span>
@@ -2139,19 +2113,19 @@ export const HomePage = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="lg:col-span-5 flex justify-center lg:justify-end w-full"
               >
-                <div className="w-full max-w-md rounded-[1.6rem] sm:rounded-[2rem] bg-[#07231E]/90 backdrop-blur-2xl p-5 sm:p-6 border border-[#1B3B32] shadow-2xl space-y-3.5 sm:space-y-4 hover:border-emerald-400/40 transition-all">
+                <div className="w-full max-w-md rounded-lg sm:rounded-xl bg-[#17130F] p-5 sm:p-6 border border-[#2B271F] space-y-3.5 sm:space-y-4 hover:border-clay-400/40 transition-colors">
                   {/* Card Header Preview */}
-                  <div className="flex items-center justify-between pb-3.5 border-b border-white/10">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shrink-0">
+                  <div className="flex items-center justify-between gap-3 pb-3.5 border-b border-white/10">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-md bg-clay-600 flex items-center justify-center text-white shrink-0">
                         <Compass className="w-5 h-5 text-white" />
                       </div>
                       <div className="min-w-0">
                         <h4 className="font-bold text-sm sm:text-base text-white truncate">Lộ Trình Tinh Gọn</h4>
-                        <p className="text-xs text-emerald-200 truncate">Đà Lạt • Sương Mù & Thung Lũng</p>
+                        <p className="text-xs text-clay-200 truncate">Đà Lạt • Sương Mù & Thung Lũng</p>
                       </div>
                     </div>
-                    <span className="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold shrink-0">
+                    <span className="px-2 py-0.5 rounded-sm bg-transparent text-clay-300 border border-clay-500/50 text-[11px] font-bold shrink-0">
                       Sẵn sàng
                     </span>
                   </div>
@@ -2160,18 +2134,18 @@ export const HomePage = () => {
                   <div className="space-y-2.5">
                     <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs text-slate-200">
                       <span className="flex items-center gap-2 truncate pr-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping shrink-0" />
+                        <span className="w-2 h-2 rounded-full bg-clay-400 animate-none shrink-0" />
                         <span className="truncate">Tự động phân luồng thứ tự ghé thăm</span>
                       </span>
-                      <span className="font-bold text-emerald-300 shrink-0">Tốc độ 3.2s</span>
+                      <span className="font-bold text-clay-300 shrink-0">Tốc độ 3.2s</span>
                     </div>
 
                     <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs text-slate-200">
                       <span className="flex items-center gap-2 truncate pr-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                        <span className="w-2 h-2 rounded-full bg-clay-400 shrink-0" />
                         <span className="truncate">Dự toán chi phí & cảnh báo phát sinh</span>
                       </span>
-                      <span className="font-bold text-emerald-300 shrink-0">Chuẩn 98%</span>
+                      <span className="font-bold text-clay-300 shrink-0">Chuẩn 98%</span>
                     </div>
 
                     <div className="p-3 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between text-xs text-slate-200">
@@ -2186,7 +2160,7 @@ export const HomePage = () => {
                   {/* Footer Stat Summary within Preview */}
                   <div className="pt-2 flex items-center justify-between text-xs">
                     <span className="text-slate-300">Tiết kiệm trung bình</span>
-                    <span className="font-black text-xs sm:text-sm text-emerald-300 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/20">
+                    <span className="font-black text-xs sm:text-sm text-clay-300 bg-clay-500/10 px-3 py-1 rounded-lg border border-clay-500/20">
                       ~850.000đ / chuyến
                     </span>
                   </div>
