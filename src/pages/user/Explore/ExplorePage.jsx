@@ -516,7 +516,11 @@ export const ExplorePage = () => {
       };
 
       const created = await addNewPlace(payload);
-      toast.success(`Đã gửi địa điểm "${created.name}" thành công! Vui lòng chờ Ban Quản Trị kiểm duyệt trước khi hiển thị trên hệ thống 🎉`);
+      if (created.status === 'ACTIVE') {
+        toast.success(`🎉 Tuyệt vời! Địa điểm "${created.name}" đã được AI thẩm định thành công và hiển thị ngay trên hệ thống!`);
+      } else {
+        toast.info(`📍 Địa điểm "${created.name}" đã được chuyển tới Ban Quản Trị để thẩm định thêm: ${created.aiModerationNote || 'Chờ duyệt'}`);
+      }
       setIsAddPlaceModalOpen(false);
       setNewPlaceForm(defaultPlaceForm);
     } catch (err) {

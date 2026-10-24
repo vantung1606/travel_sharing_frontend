@@ -602,6 +602,21 @@ export const AdminPlacesPage = () => {
                                     Đã xác thực
                                   </span>
                                 )}
+                                {p.aiModerationStatus === 'DUPLICATE_FLAGGED' && (
+                                  <span className="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 text-[9px] font-bold border border-rose-200 flex items-center gap-1">
+                                    <AlertTriangle className="w-2.5 h-2.5" /> AI: Trùng lặp
+                                  </span>
+                                )}
+                                {p.aiModerationStatus === 'UNVERIFIED_SUSPECTED' && (
+                                  <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 text-[9px] font-bold border border-amber-200 flex items-center gap-1">
+                                    <AlertCircle className="w-2.5 h-2.5" /> AI: Nghi vấn
+                                  </span>
+                                )}
+                                {p.aiModerationStatus === 'APPROVED_BY_AI' && (
+                                  <span className="px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 text-[9px] font-bold border border-sky-200 flex items-center gap-1">
+                                    <Sparkles className="w-2.5 h-2.5" /> AI: Hợp lệ
+                                  </span>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -787,6 +802,38 @@ export const AdminPlacesPage = () => {
                 ) : (
                   <p className="text-[11px] text-slate-400 mt-1">Chưa cập nhật tọa độ GPS</p>
                 )}
+
+                {/* WanderAI Shield Verification Details */}
+                <div className={`mt-3 p-3 rounded-xl border text-xs space-y-1.5 ${
+                  selectedPlace.aiModerationStatus === 'DUPLICATE_FLAGGED'
+                    ? 'bg-rose-50/90 border-rose-200 text-rose-900'
+                    : selectedPlace.aiModerationStatus === 'UNVERIFIED_SUSPECTED'
+                    ? 'bg-amber-50/90 border-amber-200 text-amber-900'
+                    : 'bg-emerald-50/90 border-emerald-200 text-emerald-900'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold flex items-center gap-1.5 text-[11px] uppercase tracking-wide">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      WanderAI Thẩm định & Xác thực
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                      selectedPlace.aiModerationStatus === 'DUPLICATE_FLAGGED'
+                        ? 'bg-rose-200 text-rose-800'
+                        : selectedPlace.aiModerationStatus === 'UNVERIFIED_SUSPECTED'
+                        ? 'bg-amber-200 text-amber-800'
+                        : 'bg-emerald-200 text-emerald-800'
+                    }`}>
+                      {selectedPlace.aiModerationStatus === 'DUPLICATE_FLAGGED'
+                        ? 'Trùng lặp'
+                        : selectedPlace.aiModerationStatus === 'UNVERIFIED_SUSPECTED'
+                        ? 'Cần xác minh'
+                        : 'Hợp lệ'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] leading-relaxed">
+                    {selectedPlace.aiModerationNote || 'Địa điểm đã qua hệ thống đối soát dữ liệu và kiểm tra tính xác thực.'}
+                  </p>
+                </div>
               </div>
 
               {/* Business Stats Grid */}
