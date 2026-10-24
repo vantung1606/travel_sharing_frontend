@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
-  Star, MapPin, Copy, ExternalLink, Calendar, ArrowLeft, CheckCircle2, Phone,
+  Star, MapPin, Copy, ExternalLink, Calendar, ArrowLeft, CheckCircle2, Phone, Camera, Heart, MessageCircle
 } from 'lucide-react';
-import { placeApi, reviewApi } from '../../../services/api';
+import { placeApi, reviewApi, postApi } from '../../../services/api';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { RealMapView } from '../../../components/map/RealMapView';
@@ -20,6 +20,8 @@ export const PlaceDetailPage = () => {
   const [place, setPlace] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reviews, setReviews] = useState([]);
+  const [placePosts, setPlacePosts] = useState([]);
+  const [loadingPosts, setLoadingPosts] = useState(false);
   const [liveWeather, setLiveWeather] = useState(null);
   const [isWeatherLoading, setIsWeatherLoading] = useState(false);
   const [weatherUnavailable, setWeatherUnavailable] = useState(false);
@@ -37,6 +39,17 @@ export const PlaceDetailPage = () => {
     reviewApi.getReviews(placeId).then(list => {
       if (alive) setReviews(list || []);
     }).catch(() => {});
+
+    setLoadingPosts(true);
+    postApi.getPosts({ placeId }).then(list => {
+      if (alive) {
+        setPlacePosts(Array.isArray(list) ? list : []);
+        setLoadingPosts(false);
+      }
+    }).catch(() => {
+      if (alive) setLoadingPosts(false);
+    });
+
     return () => { alive = false; };
   }, [placeId]);
 
@@ -271,6 +284,12 @@ export const PlaceDetailPage = () => {
 
           {/* Action buttons */}
           <div className="space-y-2">
+            <button
+              onClick={() => navigate(`/community?checkinPlaceId=${place.rawId || place.id}`)}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl h-11 font-bold text-xs shadow-md shadow-emerald-600/20 transition cursor-pointer"
+            >
+              <Camera className="w-4 h-4" /> Viết bài check-in tại đây
+            </button>
             <a href={mapUrl} target="_blank" rel="noreferrer" className="w-full flex items-center justify-center gap-2 bg-sky-50 border border-sky-200 rounded-xl h-11 font-bold text-sky-700 text-xs hover:bg-sky-100 transition">
               <MapPin className="w-4 h-4" /> Xem Google Maps
             </a>
@@ -281,12 +300,115 @@ export const PlaceDetailPage = () => {
             )}
             <button
               onClick={() => navigate('/explore')}
-              className="w-full flex items-center justify-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl h-11 font-bold text-emerald-700 text-xs hover:bg-emerald-100 transition cursor-pointer"
+              className="w-full flex items-center justify-center gap-2 bg-slate-50 border border-slate-200 rounded-xl h-11 font-bold text-slate-600 text-xs hover:bg-slate-100 transition cursor-pointer"
             >
-              <Calendar className="w-4 h-4" /> Khám phá thêm tại đây
+              <Calendar className="w-4 h-4" /> Khám phá thêm địa điểm
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Community Check-in Posts Section */}
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-2xs space-y-4">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold shadow-xs">
+                <Camera className="w-4 h-4" />
+              </span>
+              <h3 className="font-extrabold text-base sm:text-lg text-slate-900">
+                Bài viết check-in từ cộng đồng ({placePosts.length})
+              </h3>
+            </div>
+            <p className="text-xs text-slate-500">
+              Khoảnh khắc, đánh giá và cẩm nang thực tế từ các du khách đã check-in tại {place.name}
+            </p>
+          </div>
+
+          <button
+            onClick={() => navigate(`/community?checkinPlaceId=${place.rawId || place.id}`)}
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold shadow-sm transition cursor-pointer"
+          >
+            <Camera className="w-3.5 h-3.5" />
+            <span>+ Viết bài check-in</span>
+          </button>
+        </div>
+
+        {loadingPosts ? (
+          <div className="py-8 text-center text-xs text-slate-400 font-semibold animate-pulse">
+            Đang tải bài viết check-in từ cộng đồng...
+          </div>
+        ) : placePosts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            {placePosts.map((p) => (
+              <div
+                key={p.id}
+                onClick={() => navigate('/community')}
+                className="group p-3.5 rounded-2xl border border-slate-200/80 hover:border-emerald-300 bg-slate-50/50 hover:bg-white transition-all cursor-pointer flex gap-3 shadow-2xs hover:shadow-xs"
+              >
+                {/* Image */}
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden shrink-0 bg-slate-100">
+                  <img
+                    src={p.imageUrl || (p.images && p.images[0]) || pickFallbackImage(p.id)}
+                    alt={p.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-5 h-5 rounded-full overflow-hidden bg-slate-200 shrink-0">
+                        <img
+                          src={p.authorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
+                          alt={p.authorName}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <span className="text-[11px] font-bold text-slate-700 truncate">
+                        {p.authorName || 'Du khách Wayfare'}
+                      </span>
+                    </div>
+
+                    <h4 className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-emerald-700 transition-colors line-clamp-1">
+                      {p.title}
+                    </h4>
+
+                    <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
+                      {p.content}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3 text-[10px] text-slate-400 pt-1">
+                    <span className="inline-flex items-center gap-1">
+                      <Heart className="w-3 h-3 text-rose-500 fill-rose-500/20" /> {p.likeCount || 0}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <MessageCircle className="w-3 h-3 text-sky-500" /> {p.commentCount || 0}
+                    </span>
+                    <span className="ml-auto font-medium text-slate-400">
+                      {p.formattedDate || 'Vừa xong'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="py-8 text-center space-y-2.5 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50 p-6">
+            <p className="text-xs text-slate-500 font-medium">
+              Chưa có bài viết check-in nào tại địa điểm này.
+            </p>
+            <button
+              onClick={() => navigate(`/community?checkinPlaceId=${place.rawId || place.id}`)}
+              className="text-xs font-bold text-emerald-600 hover:text-emerald-700 hover:underline inline-flex items-center gap-1.5 cursor-pointer"
+            >
+              <Camera className="w-4 h-4" />
+              <span>Hãy là người đầu tiên chia sẻ khoảnh khắc check-in!</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

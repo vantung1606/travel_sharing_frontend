@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
-import { postApi, uploadApi, userApi, itineraryApi } from '../../../services/api';
+import { postApi, uploadApi, userApi, itineraryApi, placeApi } from '../../../services/api';
 import { useCommunityRealtime } from '../../../hooks/useCommunityRealtime';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { UserProfileModal } from '../../../components/community/UserProfileModal';
@@ -12,10 +12,11 @@ import { ShareModal } from '../../../components/community/ShareModal';
 import { ReportPostModal } from '../../../components/community/ReportPostModal';
 import { ImageLightboxModal } from '../../../components/community/ImageLightboxModal';
 import { BlogArticleReaderModal } from '../../../components/community/BlogArticleReaderModal';
+import { PlaceAttachCard } from '../../../components/community/PlaceAttachCard';
 import { CustomSelect } from '../../../components/common/CustomSelect';
 import { UserAvatar } from '../../../components/common/UserAvatar';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../components/community/MentionSuggestions';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AtSign, Heart, MessageCircle, MessageSquare, Share2, Bookmark, MapPin, Award, TrendingUp, Compass, Route, Copy, DollarSign, Camera, Image as ImageIcon, CheckCircle2, Send, Search, SlidersHorizontal, Filter, Plus, X, Loader2, Eye, MoreHorizontal, ChevronLeft, ChevronRight, ArrowRight, Flame, Check, UserCheck, ShieldCheck, AlertCircle, AlertTriangle, ShieldAlert, Lock, Globe, Upload, Video, Trash2, Edit, UserPlus, Users, CornerDownRight, Flag, EyeOff, BookOpen, Hash } from 'lucide-react';
 
 const FEED_SCOPES = [
@@ -40,9 +41,10 @@ const TRAVEL_HASHTAGS = [
 
 const TOPIC_FILTERS = [
   { id: 'Tất cả', label: 'Tất cả chủ đề', icon: Compass },
-  { id: 'video', label: 'Thước phim video', icon: Video, badge: 'Video' },
+  { id: 'checkin', label: 'Check-in Địa điểm', icon: MapPin, badge: 'Điểm đến' },
   { id: 'itinerary', label: 'Có Lịch trình', icon: Route, badge: 'Tour' },
-  { id: 'food', label: 'Ẩm thực & Check-in', icon: MapPin },
+  { id: 'video', label: 'Thước phim video', icon: Video, badge: 'Video' },
+  { id: 'food', label: 'Ẩm thực & Món ngon', icon: MapPin },
   { id: 'adventure', label: 'Phượt & Khám phá', icon: Flame },
   { id: 'beach', label: 'Biển đảo & Nghỉ dưỡng', icon: Globe }
 ];
@@ -85,6 +87,7 @@ export const CommunityPage = () => {
   };
 
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Handle navigating to direct chat with post author
   const handleDirectMessage = (author) => {
@@ -135,6 +138,8 @@ export const CommunityPage = () => {
   const [postVideoUrl, setPostVideoUrl] = useState('');
   const [uploadingMedia, setUploadingMedia] = useState(false);
   const [attachedItineraryId, setAttachedItineraryId] = useState('');
+  const [places, setPlaces] = useState([]);
+  const [attachedPlaceId, setAttachedPlaceId] = useState('');
   const [submittingPost, setSubmittingPost] = useState(false);
   const createFileInputRef = useRef(null);
   const postTextareaRef = useRef(null);
@@ -645,7 +650,9 @@ export const CommunityPage = () => {
     }
 
     // 2. Filter by Topic / Media format (Chủ đề & Định dạng)
-    if (topicFilter === 'video') {
+    if (topicFilter === 'checkin') {
+      result = result.filter(p => Boolean(p.placeId || p.placeName || (p.sharedPost && (p.sharedPost.placeId || p.sharedPost.placeName))));
+    } else if (topicFilter === 'video') {
       result = result.filter(p => Boolean(p.videoUrl));
     } else if (topicFilter === 'itinerary') {
       result = result.filter(p => p.itineraryId || p.itineraryTitle || (p.sharedPost && (p.sharedPost.itineraryId || p.sharedPost.itineraryTitle)));
@@ -1236,7 +1243,8 @@ export const CommunityPage = () => {
         visibility: postVisibility,
         images: postImagesList.length > 0 ? postImagesList : [],
         videoUrl: postVideoUrl || null,
-        itineraryId: attachedItineraryId ? Number(attachedItineraryId) : null
+        itineraryId: attachedItineraryId ? Number(attachedItineraryId) : null,
+        placeId: attachedPlaceId ? Number(attachedPlaceId) : null
       };
 
       const result = await postApi.createPost(payload, currentUser?.email);
@@ -1251,6 +1259,7 @@ export const CommunityPage = () => {
       setPostImagesList([]);
       setPostVideoUrl('');
       setAttachedItineraryId('');
+      setAttachedPlaceId('');
       setTaggedUsersInPost([]);
       setPostMentionState({ isOpen: false, query: '', cursorIndex: -1 });
 
@@ -1306,6 +1315,30 @@ export const CommunityPage = () => {
     if (!attachedItineraryId) return null;
     return itineraries.find(i => String(i.id) === String(attachedItineraryId));
   }, [attachedItineraryId, itineraries]);
+
+  // Selected place check-in preview for the creator modal
+  const selectedPlacePreview = useMemo(() => {
+    if (!attachedPlaceId) return null;
+    return places.find(p => String(p.id) === String(attachedPlaceId));
+  }, [attachedPlaceId, places]);
+
+  // Fetch available places for check-in picker
+  useEffect(() => {
+    placeApi.getPlaces({ status: 'APPROVED' })
+      .then(data => setPlaces(Array.isArray(data) ? data : []))
+      .catch(err => console.warn('Could not load places for check-in picker:', err));
+  }, []);
+
+  // Handle auto-open create modal if navigated with ?checkinPlaceId=...
+  useEffect(() => {
+    const checkinId = searchParams.get('checkinPlaceId');
+    if (checkinId) {
+      setAttachedPlaceId(checkinId);
+      setIsCreateModalOpen(true);
+      searchParams.delete('checkinPlaceId');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Real Location Stories extracted dynamically from loaded posts
   const realLocationStories = useMemo(() => {
@@ -2462,6 +2495,13 @@ export const CommunityPage = () => {
                             <span className="text-xs font-bold text-blue-600 shrink-0">Xem tour &rarr;</span>
                           </div>
                         )}
+
+                        {/* Original Attached Place Check-in */}
+                        {(post.sharedPost.placeId || post.sharedPost.placeName) && (
+                          <div className="mt-2.5">
+                            <PlaceAttachCard post={post.sharedPost} />
+                          </div>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -2678,6 +2718,11 @@ export const CommunityPage = () => {
                         )}
                       </div>
                     </div>
+                  )}
+
+                  {/* ATTACHED CHECK-IN PLACE CARD */}
+                  {!post.sharedPost && (post.placeId || post.placeName) && (
+                    <PlaceAttachCard post={post} />
                   )}
 
                   {/* Post Interaction Bar (Facebook Style) */}
@@ -3216,6 +3261,69 @@ export const CommunityPage = () => {
                       </p>
                     </div>
                     <CheckCircle2 className="w-4 h-4 text-sky-500 flex-shrink-0" />
+                  </div>
+                )}
+              </div>
+
+              {/* ATTACH CHECK-IN PLACE SELECTOR */}
+              <div className="p-3.5 bg-emerald-50/70 border border-emerald-100 rounded-2xl space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                    <MapPin className="w-4 h-4 text-emerald-600" />
+                    <span>Gắn vị trí check-in địa điểm</span>
+                  </label>
+                  {attachedPlaceId && (
+                    <button
+                      type="button"
+                      onClick={() => setAttachedPlaceId('')}
+                      className="text-[10px] text-rose-600 font-bold hover:underline"
+                    >
+                      Bỏ check-in
+                    </button>
+                  )}
+                </div>
+
+                <CustomSelect
+                  value={attachedPlaceId}
+                  onChange={setAttachedPlaceId}
+                  placeholder="-- Chọn địa điểm du lịch muốn check-in --"
+                  searchable={true}
+                  searchPlaceholder="Tìm kiếm địa điểm theo tên hoặc tỉnh thành..."
+                  clearable={true}
+                  onClear={() => setAttachedPlaceId('')}
+                  buttonClassName="bg-white border-emerald-200 py-2.5 rounded-xl text-xs font-semibold"
+                  options={[
+                    {
+                      value: '',
+                      label: '-- Không check-in địa điểm cụ thể --',
+                      description: 'Đăng bài viết thông thường không gắn vị trí'
+                    },
+                    ...places.map(p => ({
+                      value: String(p.id),
+                      label: p.name,
+                      description: `${p.city || ''} • ${p.categoryName || 'Địa điểm'} • ⭐ ${p.averageRating ? Number(p.averageRating).toFixed(1) : '5.0'}`,
+                      image: p.coverImageUrl,
+                      badge: p.city || 'Việt Nam'
+                    }))
+                  ]}
+                />
+
+                {selectedPlacePreview && (
+                  <div className="bg-white p-3 rounded-xl border border-emerald-100 flex items-center gap-3 mt-2 shadow-2xs">
+                    <img
+                      src={selectedPlacePreview.coverImageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'}
+                      alt={selectedPlacePreview.name}
+                      className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <h5 className="font-bold text-xs text-slate-900 truncate">
+                        {selectedPlacePreview.name}
+                      </h5>
+                      <p className="text-[11px] text-emerald-600 font-semibold truncate">
+                        📍 {selectedPlacePreview.address || selectedPlacePreview.city}
+                      </p>
+                    </div>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
                   </div>
                 )}
               </div>

@@ -8,6 +8,7 @@ import { useApp } from '../../context/AppContext';
 import { ShareModal } from './ShareModal';
 import { ReportPostModal } from './ReportPostModal';
 import { ImageLightboxModal } from './ImageLightboxModal';
+import { PlaceAttachCard } from './PlaceAttachCard';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from './MentionSuggestions';
 
 export const PostDetailModal = ({
@@ -782,6 +783,19 @@ export const PostDetailModal = ({
                       <span className="text-xs font-bold text-sky-600 shrink-0">Xem tour &rarr;</span>
                     </div>
                   )}
+
+                  {/* Original Attached Place Check-in */}
+                  {(post.sharedPost.placeId || post.sharedPost.placeName) && (
+                    <div className="mt-2.5">
+                      <PlaceAttachCard
+                        post={post.sharedPost}
+                        onNavigatePlace={(pid) => {
+                          onClose();
+                          navigate(`/places/${pid}`);
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
@@ -927,6 +941,19 @@ export const PostDetailModal = ({
                       <Eye className="w-4 h-4" />
                       <span>Xem lịch trình</span>
                     </button>
+                  </div>
+                )}
+
+                {/* Attached Check-in Place Card */}
+                {(post.placeId || post.placeName) && (
+                  <div className="mt-3">
+                    <PlaceAttachCard
+                      post={post}
+                      onNavigatePlace={(pid) => {
+                        onClose();
+                        navigate(`/places/${pid}`);
+                      }}
+                    />
                   </div>
                 )}
               </>

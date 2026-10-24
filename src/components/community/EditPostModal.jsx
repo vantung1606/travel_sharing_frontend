@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { X, MapPin, ImageIcon, Video, Upload, Loader2, Send, ShieldCheck, Sparkles, Lock, Globe, Flame, Compass } from 'lucide-react';
-import { postApi, uploadApi } from '../../services/api';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { X, MapPin, ImageIcon, Video, Upload, Loader2, Send, ShieldCheck, Sparkles, Lock, Globe, Flame, Compass, CheckCircle2 } from 'lucide-react';
+import { postApi, uploadApi, placeApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { CustomSelect } from '../common/CustomSelect';
 
@@ -12,6 +12,19 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
   const [visibility, setVisibility] = useState(post.visibility || 'PUBLIC');
   const [images, setImages] = useState(post.images || []);
   const [videoUrl, setVideoUrl] = useState(post.videoUrl || '');
+  const [placeId, setPlaceId] = useState(post.placeId ? String(post.placeId) : '');
+  const [places, setPlaces] = useState([]);
+
+  useEffect(() => {
+    placeApi.getPlaces({ status: 'APPROVED' })
+      .then(data => setPlaces(Array.isArray(data) ? data : []))
+      .catch(err => console.warn('Could not load places:', err));
+  }, []);
+
+  const selectedPlace = useMemo(() => {
+    if (!placeId) return null;
+    return places.find(p => String(p.id) === String(placeId));
+  }, [placeId, places]);
 
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -79,7 +92,8 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
         locationTag: locationTag.trim() || 'Việt Nam',
         visibility,
         images,
-        videoUrl: videoUrl || null
+        videoUrl: videoUrl || null,
+        placeId: placeId ? Number(placeId) : (post.placeId ? 0 : null)
       };
 
       const updated = await postApi.update(post.id, payload);
@@ -240,6 +254,69 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
               className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 resize-none"
               required
             />
+          </div>
+
+          {/* ATTACH CHECK-IN PLACE SELECTOR */}
+          <div className="p-3.5 bg-emerald-50/70 border border-emerald-100 rounded-2xl space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-emerald-600" />
+                <span>Gắn vị trí check-in địa điểm</span>
+              </label>
+              {placeId && (
+                <button
+                  type="button"
+                  onClick={() => setPlaceId('')}
+                  className="text-[10px] text-rose-600 font-bold hover:underline"
+                >
+                  Bỏ check-in
+                </button>
+              )}
+            </div>
+
+            <CustomSelect
+              value={placeId}
+              onChange={setPlaceId}
+              placeholder="-- Chọn địa điểm du lịch muốn check-in --"
+              searchable={true}
+              searchPlaceholder="Tìm kiếm địa điểm theo tên hoặc tỉnh thành..."
+              clearable={true}
+              onClear={() => setPlaceId('')}
+              buttonClassName="bg-white border-emerald-200 py-2.5 rounded-xl text-xs font-semibold"
+              options={[
+                {
+                  value: '',
+                  label: '-- Không check-in địa điểm cụ thể --',
+                  description: 'Bài viết không gắn vị trí địa điểm'
+                },
+                ...places.map(p => ({
+                  value: String(p.id),
+                  label: p.name,
+                  description: `${p.city || ''} • ${p.categoryName || 'Địa điểm'} • ⭐ ${p.averageRating ? Number(p.averageRating).toFixed(1) : '5.0'}`,
+                  image: p.coverImageUrl,
+                  badge: p.city || 'Việt Nam'
+                }))
+              ]}
+            />
+
+            {selectedPlace && (
+              <div className="bg-white p-3 rounded-xl border border-emerald-100 flex items-center gap-3 mt-2 shadow-2xs">
+                <img
+                  src={selectedPlace.coverImageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'}
+                  alt={selectedPlace.name}
+                  className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                />
+                <div className="min-w-0 flex-1">
+                  <h5 className="font-bold text-xs text-slate-900 truncate">
+                    {selectedPlace.name}
+                  </h5>
+                  <p className="text-[11px] text-emerald-600 font-semibold truncate">
+                    📍 {selectedPlace.address || selectedPlace.city}
+                  </p>
+                </div>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+              </div>
+            )}
           </div>
 
           {/* Media Section: Cloudinary Upload */}

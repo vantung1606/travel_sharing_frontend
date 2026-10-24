@@ -37,6 +37,7 @@ export function normalizePost(post) {
   if (normalized.author?.avatarUrl) {
     normalized.author = { ...normalized.author, avatarUrl: normalizeMediaUrl(normalized.author.avatarUrl) };
   }
+  if (normalized.placeCoverImageUrl) normalized.placeCoverImageUrl = normalizeMediaUrl(normalized.placeCoverImageUrl);
   if (normalized.sharedPost) {
     normalized.sharedPost = normalizePost(normalized.sharedPost);
   }
@@ -1078,13 +1079,14 @@ export const auditLogApi = {
 
 // ─── Community Posts & Social Interaction API ────────────────────────────────
 export const postApi = {
-  async getPosts({ category = '', keyword = '', email = '' } = {}) {
+  async getPosts({ category = '', keyword = '', placeId = null, email = '' } = {}) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
       const userEmail = email || user.email || '';
       const params = new URLSearchParams();
       if (category && category !== 'Tất cả') params.append('category', category);
       if (keyword) params.append('keyword', keyword);
+      if (placeId) params.append('placeId', String(placeId));
       if (userEmail) params.append('email', userEmail);
 
       const res = await fetch(`${BASE_URL}/posts?${params.toString()}`, {
