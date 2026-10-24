@@ -596,38 +596,35 @@ export const HomePage = () => {
             </motion.div>
           </motion.div>
 
-          {/* Editorial photo stack (visual only) */}
+          {/* Editorial photo cascade (visual only) */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="hidden lg:block lg:col-span-4 relative w-full h-[500px]"
+            className="hidden lg:block lg:col-span-4 relative w-full h-[460px]"
           >
-            {/* Back plate */}
-            <div aria-hidden="true" className="absolute inset-x-8 top-8 bottom-4 border border-white/10 bg-[#0F0C09]/30" />
-
-            {/* Photo 1 — back, large */}
-            <div className="absolute left-0 top-0 w-[74%] h-[330px] bg-[#F8F4EC] p-2 border border-black/10 shadow-[0_18px_40px_-26px_rgba(0,0,0,0.75)] z-10">
+            {/* Photo 1 — back */}
+            <div className="absolute left-0 top-0 w-[80%] h-[290px] bg-[#F8F4EC] p-2 border border-black/10 shadow-[0_18px_40px_-26px_rgba(0,0,0,0.7)] z-10">
               <img
-                src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1100&q=85"
+                src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=82"
                 className="w-full h-full object-cover"
                 alt=""
               />
             </div>
 
-            {/* Photo 2 — right, mid layer */}
-            <div className="absolute right-0 top-[112px] w-[56%] h-[238px] bg-[#F8F4EC] p-2 border border-black/10 shadow-[0_18px_40px_-26px_rgba(0,0,0,0.75)] z-20">
+            {/* Photo 2 — middle */}
+            <div className="absolute left-[10%] top-[80px] w-[80%] h-[290px] bg-[#F8F4EC] p-2 border border-black/10 shadow-[0_18px_40px_-26px_rgba(0,0,0,0.7)] z-20">
               <img
-                src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=800&q=80"
+                src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=900&q=82"
                 className="w-full h-full object-cover"
                 alt=""
               />
             </div>
 
-            {/* Photo 3 — bottom, front layer */}
-            <div className="absolute left-[10%] bottom-0 w-[54%] h-[176px] bg-[#F8F4EC] p-2 border border-black/10 shadow-[0_20px_44px_-26px_rgba(0,0,0,0.8)] z-30">
+            {/* Photo 3 — front */}
+            <div className="absolute left-[20%] top-[160px] w-[80%] h-[290px] bg-[#F8F4EC] p-2 border border-black/10 shadow-[0_20px_44px_-26px_rgba(0,0,0,0.75)] z-30">
               <img
-                src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=700&q=80"
+                src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=82"
                 className="w-full h-full object-cover"
                 alt=""
               />
@@ -635,7 +632,7 @@ export const HomePage = () => {
 
             {/* Editorial marks */}
             <span aria-hidden="true" className="pointer-events-none absolute -left-2 -top-2 h-10 w-10 border-l-2 border-t-2 border-clay-500 z-40" />
-            <span aria-hidden="true" className="pointer-events-none absolute right-[6%] top-[96px] h-2 w-2 bg-clay-500 z-40" />
+            <span aria-hidden="true" className="pointer-events-none absolute -bottom-2 -right-2 h-7 w-7 border-b border-r border-white/35 z-40" />
           </motion.div>
           </div>
         </div>
