@@ -4,7 +4,7 @@ import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { ItineraryExportModal } from '../../../components/itinerary/ItineraryExportModal';
-import { Sparkles, MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation, Download, Upload, Camera } from 'lucide-react';
+import { MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation, Download, Upload, Camera } from 'lucide-react';
 
 export const ItineraryManagerPage = () => {
   const {
@@ -329,35 +329,8 @@ export const ItineraryManagerPage = () => {
 
   return (
     <div className="w-full min-h-screen bg-[#F8F4EC] text-[#1E1A15] pb-24">
-      {/* ─── 1. HERO EDITORIAL: NỀN MỰC + ẢNH THIÊN NHIÊN, CHỮ SERIF ─── */}
-      <section className="relative w-full overflow-hidden -mt-16 pt-24 pb-24 sm:pt-28 sm:pb-30 lg:pt-32 lg:pb-34 bg-[#17130F] text-white">
-        {/* Ảnh nền + lớp mực tối dần sang trái để chữ đọc được */}
-        <div className="absolute inset-0 z-0 pointer-events-none select-none">
-          <div
-            className="w-full h-full bg-cover bg-center"
-            style={{
-              backgroundImage: `url('/images/hero/nui-may.jpg')`
-            }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(100deg, rgba(23,19,15,0.97) 0%, rgba(23,19,15,0.92) 32%, rgba(23,19,15,0.62) 66%, rgba(23,19,15,0.34) 100%)',
-            }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(180deg, rgba(23,19,15,0.55) 0%, rgba(23,19,15,0) 26%, rgba(23,19,15,0) 58%, rgba(23,19,15,0.86) 100%)',
-            }}
-          />
-
-          {/* Hoà chân hero vào nền giấy */}
-          <div className="absolute bottom-0 left-0 right-0 h-16 sm:h-24 bg-gradient-to-t from-[#F8F4EC] to-transparent pointer-events-none" />
-        </div>
-
+      {/* ─── 1. HERO EDITORIAL: NỀN MỰC PHẲNG, KHÔNG ẢNH ─── */}
+      <section className="relative w-full overflow-hidden -mt-16 pt-24 pb-16 sm:pt-28 sm:pb-20 lg:pt-32 lg:pb-24 bg-[#17130F] text-white">
         {/* Hero Content Container Aligned Exactly with Navbar Spacing */}
         <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
@@ -399,8 +372,7 @@ export const ItineraryManagerPage = () => {
                 }}
                 className="group inline-flex items-center gap-2.5 px-7 py-4 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-sm sm:text-base font-extrabold transition-colors duration-200 cursor-pointer"
               >
-                <Sparkles className="w-5 h-5 text-clay-200" />
-                <span>Lập Tour Bằng AI (30s) ✨</span>
+                <span>Lập Tour Bằng AI (30s)</span>
                 <span className="px-2.5 py-0.5 rounded-sm bg-black/25 text-xs font-black uppercase tracking-wider">
                   Miễn phí
                 </span>
@@ -415,7 +387,6 @@ export const ItineraryManagerPage = () => {
                 }}
                 className="inline-flex items-center gap-2 px-6 py-4 rounded-sm bg-transparent hover:bg-[#FFFDF8]/10 text-white font-bold text-sm sm:text-base transition-colors border border-white/30 hover:border-white/60 cursor-pointer"
               >
-                <Plus className="w-5 h-5 text-clay-300" />
                 <span>+ Tạo Thủ Công</span>
               </button>
             </div>
@@ -424,7 +395,7 @@ export const ItineraryManagerPage = () => {
       </section>
 
       {/* ─── 2. ELEVATED DASHBOARD LAYER (OVERLAPPING SEAMLESS HERO GRADIENT) ─── */}
-      <div className="relative -mt-8 sm:-mt-12 z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 space-y-5">
+      <div className="relative mt-8 sm:mt-10 z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 space-y-5">
         {/* Guest Restriction Banner (Nếu chưa đăng nhập) */}
         {!isLoggedIn && (
           <div className="bg-[#FFFDF8] border border-clay-600/30 rounded-sm p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -549,7 +520,6 @@ export const ItineraryManagerPage = () => {
                         : 'border-transparent text-[#8A7E6E] hover:text-[#1E1A15]'
                     }`}
                   >
-                    {tab.isAi && <Sparkles className="w-3.5 h-3.5 text-clay-600" />}
                     <span>{tab.label}</span>
                     <span
                       className={`px-2 py-0.5 rounded-sm text-[10px] font-extrabold ${
@@ -637,7 +607,6 @@ export const ItineraryManagerPage = () => {
                       : 'bg-transparent text-[#6B6154] border-[#1E1A15]/15 hover:border-clay-600/60 hover:text-[#1E1A15]'
                   }`}
                 >
-                  {tag.isAi && <Sparkles className={`w-3 h-3 ${isSelected ? 'text-clay-300' : 'text-clay-600'}`} />}
                   <span>{tag.label}</span>
                 </button>
               );
@@ -671,8 +640,7 @@ export const ItineraryManagerPage = () => {
                 }}
                 className="px-6 py-3 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer flex items-center gap-2"
               >
-                <Sparkles className="w-4 h-4 text-clay-200" />
-                <span>Khởi Tạo Bằng AI ✨</span>
+                <span>Khởi Tạo Bằng AI</span>
               </button>
 
               <button
@@ -717,8 +685,7 @@ export const ItineraryManagerPage = () => {
 
                       {itin.isAiGenerated && (
                         <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-clay-600 text-white text-[11px] font-bold border border-clay-400/40">
-                          <Sparkles className="w-3.5 h-3.5 text-clay-100" />
-                          <span>WanderAI ✨</span>
+                          <span>WanderAI</span>
                         </span>
                       )}
                     </div>
@@ -847,10 +814,6 @@ export const ItineraryManagerPage = () => {
             <div className="bg-[#1E1A15] text-white rounded-sm p-6 sm:p-8 border border-[#1E1A15] md:col-span-2 lg:col-span-3 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
               <div className="lg:col-span-7 space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-sm bg-clay-600/15 border border-clay-500/40 flex items-center justify-center text-clay-300 shrink-0">
-                    <Sparkles className="w-5 h-5" />
-                  </div>
-
                   <div className="inline-block px-3 py-1 rounded-sm bg-clay-600/15 text-clay-200 border border-clay-500/40 text-[11px] font-bold">
                     Khám phá AI 1 chạm
                   </div>
@@ -899,7 +862,6 @@ export const ItineraryManagerPage = () => {
                   }}
                   className="mt-2 w-full py-3 px-4 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-xs font-extrabold transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <Sparkles className="w-4 h-4 text-clay-200" />
                   <span>Khởi Tạo Lịch Trình Ngay</span>
                 </button>
               </div>
