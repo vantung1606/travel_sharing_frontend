@@ -332,7 +332,7 @@ export const ItineraryManagerPage = () => {
       {/* ─── 1. HERO EDITORIAL: NỀN GIẤY, CHỮ MỰC, GẠCH ĐẤT NUNG ─── */}
       <section className="relative w-full overflow-hidden bg-[#F8F4EC] text-[#1E1A15] border-b border-[#1E1A15]/10">
         <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-10 pb-8 sm:pt-12 sm:pb-10 lg:pt-16 lg:pb-12">
-          <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8">
+          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10">
             
             {/* Left Content Column */}
             <div className="max-w-3xl">
@@ -361,36 +361,63 @@ export const ItineraryManagerPage = () => {
               <p className="mt-4 text-[#6B6154] text-sm sm:text-base max-w-2xl leading-relaxed font-medium tracking-[0.015em]">
                 Quản lý các chuyến đi sắp tới, đồng bộ danh lam thắng cảnh từ Khám phá, kiểm soát ngân sách chi tiết và kiến tạo hành trình từng giờ chỉ với một chạm cùng AI.
               </p>
+
+              {/* Action CTA Cluster */}
+              <div className="flex flex-wrap items-center gap-3.5 mt-6">
+                {/* AI CTA Button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!requireAuth('lập lịch trình bằng AI')) return;
+                    setIsAIGeneratorOpen(true);
+                  }}
+                  className="inline-flex items-center gap-2.5 px-7 py-4 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-sm sm:text-base font-extrabold transition-colors duration-200 cursor-pointer"
+                >
+                  <span>Lập Tour Bằng AI (30s)</span>
+                  <span className="px-2.5 py-0.5 rounded-sm bg-[#17130F]/25 text-xs font-black uppercase tracking-wider">
+                    Miễn phí
+                  </span>
+                </button>
+
+                {/* Manual Trip CTA */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!requireAuth('tạo chuyến đi mới')) return;
+                    setIsManualCreateOpen(true);
+                  }}
+                  className="inline-flex items-center gap-2 px-6 py-4 rounded-sm bg-transparent hover:bg-[#1E1A15]/5 text-[#1E1A15] font-bold text-sm sm:text-base transition-colors border border-[#1E1A15]/25 hover:border-clay-600/70 cursor-pointer"
+                >
+                  <span>+ Tạo Thủ Công</span>
+                </button>
+              </div>
             </div>
 
-            {/* Action CTA Cluster */}
-            <div className="flex flex-wrap items-center gap-3.5 shrink-0">
-              {/* AI CTA Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (!requireAuth('lập lịch trình bằng AI')) return;
-                  setIsAIGeneratorOpen(true);
-                }}
-                className="inline-flex items-center gap-2.5 px-7 py-4 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-sm sm:text-base font-extrabold transition-colors duration-200 cursor-pointer"
-              >
-                <span>Lập Tour Bằng AI (30s)</span>
-                <span className="px-2.5 py-0.5 rounded-sm bg-[#17130F]/25 text-xs font-black uppercase tracking-wider">
-                  Miễn phí
-                </span>
-              </button>
+            {/* Right Column: Cụm ảnh bưu thiếp lệch nhau */}
+            <div className="hidden xl:block relative shrink-0 w-[600px] h-[360px]">
+              <figure className="absolute left-0 top-0 w-[350px] h-[220px] overflow-hidden border-2 border-[#1E1A15] bg-[#F8F4EC]">
+                <img
+                  src="/images/hero/ninh-binh.jpg"
+                  alt="Ninh Bình"
+                  className="w-full h-full object-cover"
+                />
+              </figure>
 
-              {/* Manual Trip CTA */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (!requireAuth('tạo chuyến đi mới')) return;
-                  setIsManualCreateOpen(true);
-                }}
-                className="inline-flex items-center gap-2 px-6 py-4 rounded-sm bg-transparent hover:bg-[#1E1A15]/5 text-[#1E1A15] font-bold text-sm sm:text-base transition-colors border border-[#1E1A15]/25 hover:border-clay-600/70 cursor-pointer"
-              >
-                <span>+ Tạo Thủ Công</span>
-              </button>
+              <figure className="absolute right-0 top-[36px] w-[260px] h-[300px] overflow-hidden border-2 border-[#1E1A15] bg-[#F8F4EC]">
+                <img
+                  src="/images/hero/saigon-sunset.jpg"
+                  alt="Sài Gòn"
+                  className="w-full h-full object-cover"
+                />
+              </figure>
+
+              <figure className="absolute left-[80px] bottom-0 w-[300px] h-[185px] overflow-hidden border-2 border-[#1E1A15] bg-[#F8F4EC]">
+                <img
+                  src="/images/login/travel_banner_3.jpg"
+                  alt="Tràng An"
+                  className="w-full h-full object-cover"
+                />
+              </figure>
             </div>
           </div>
         </div>
