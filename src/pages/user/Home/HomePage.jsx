@@ -596,21 +596,35 @@ export const HomePage = () => {
             </motion.div>
           </motion.div>
 
-          {/* Editorial Cover Photo (visual only) */}
+          {/* Editorial Diptych (visual only) */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="hidden lg:block lg:col-span-4 relative w-full"
           >
-            <div className="relative h-[460px] w-full overflow-hidden rounded-md border border-white/15">
-              <img
-                src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=85"
-                className="w-full h-full object-cover"
-                alt=""
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+            <div className="relative border border-black/10 bg-[#F8F4EC] p-2.5">
+              <div className="flex flex-col gap-2.5">
+                <div className="h-[300px] w-full overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=85"
+                    className="w-full h-full object-cover"
+                    alt=""
+                  />
+                </div>
+                <div className="h-[124px] w-full overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=900&q=80"
+                    className="w-full h-full object-cover object-center"
+                    alt=""
+                  />
+                </div>
+              </div>
             </div>
+
+            {/* Editorial corner rules */}
+            <span aria-hidden="true" className="pointer-events-none absolute -left-2 -top-2 h-10 w-10 border-l-2 border-t-2 border-clay-500" />
+            <span aria-hidden="true" className="pointer-events-none absolute -bottom-2 -right-2 h-10 w-10 border-b-2 border-r-2 border-clay-500" />
           </motion.div>
           </div>
         </div>
