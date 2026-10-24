@@ -100,6 +100,19 @@ const AppContent = () => {
           return;
         }
 
+        // 3. Không hiển thị Toast nếu thông báo do chính người dùng hiện tại thực hiện (Self-action)
+        const isSelfActor = (notification.actorId && notification.actorId === currentUser.id) ||
+                            (notification.actorEmail && currentUser.email && notification.actorEmail.toLowerCase() === currentUser.email.toLowerCase());
+        if (isSelfActor) {
+          return;
+        }
+
+        // 4. Nếu đang ở trang Khám phá (/explore) và nhận thông báo về địa điểm vừa gửi -> tránh đè Toast đôi
+        const isOnExplore = window.location.pathname.startsWith('/explore');
+        if (isOnExplore && (notification.type === 'PLACE_MODERATION' || notification.type === 'PLACE_PENDING')) {
+          return;
+        }
+
         // Hiển thị Toast nổi thông báo tức thời
         const title = notification.title || 'Thông báo';
         const msg = notification.message || 'Bạn có thông báo mới';
