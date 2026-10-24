@@ -74,12 +74,28 @@ export const CustomSelect = ({
     opt => String(opt.value) === String(value)
   );
 
+  const normalizeText = (str) =>
+    (str || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[đĐ]/g, 'd');
+
   const filteredOptions = searchable && searchQuery.trim()
     ? options.filter(opt => {
-        const query = searchQuery.toLowerCase();
+        const query = searchQuery.toLowerCase().trim();
+        const qNorm = normalizeText(query);
         const label = (opt.label || '').toLowerCase();
         const desc = (opt.description || '').toLowerCase();
-        return label.includes(query) || desc.includes(query);
+        const badge = (opt.badge || '').toLowerCase();
+        return (
+          label.includes(query) ||
+          desc.includes(query) ||
+          badge.includes(query) ||
+          normalizeText(label).includes(qNorm) ||
+          normalizeText(desc).includes(qNorm) ||
+          normalizeText(badge).includes(qNorm)
+        );
       })
     : options;
 

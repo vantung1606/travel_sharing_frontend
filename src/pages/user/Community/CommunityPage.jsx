@@ -579,6 +579,19 @@ export const CommunityPage = () => {
     return () => { isMounted = false; };
   }, []);
 
+  // Load Approved Places for Check-in Selection
+  useEffect(() => {
+    let isMounted = true;
+    placeApi.getPlaces({ status: 'APPROVED' })
+      .then(data => {
+        if (isMounted && Array.isArray(data)) {
+          setPlaces(data);
+        }
+      })
+      .catch(err => console.warn('Could not load places for check-in:', err));
+    return () => { isMounted = false; };
+  }, []);
+
   // Real Top Authors computed from live community posts & active creators
   const topAuthors = useMemo(() => {
     const authorMap = new Map();
