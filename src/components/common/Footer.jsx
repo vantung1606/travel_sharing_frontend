@@ -3,8 +3,8 @@ import { Compass, Heart } from 'lucide-react';
 
 export const Footer = () => {
   return (
-    <footer className="bg-[#0b1320] text-slate-200 py-10 sm:py-14 border-t border-slate-800">
-      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+    <footer className="bg-[#07231E] text-slate-200 py-10 sm:py-14 border-t border-slate-800">
+      <div className="w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-10">
           {/* Brand & Intro */}
           <div>
@@ -48,8 +48,8 @@ export const Footer = () => {
             <p className="text-slate-300 text-xs sm:text-sm mb-1.5 sm:mb-2">Email: <span className="text-white font-medium">contact@wayfare.vn</span></p>
             <p className="text-slate-300 text-xs sm:text-sm mb-3 sm:mb-4">Hotline: <span className="text-white font-medium">1900 6868</span></p>
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1.5 rounded-full bg-sky-500/20 text-sky-200 border border-sky-400/30 text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 shadow-sm">
-                <Compass className="w-3.5 h-3.5 text-sky-300" /> Wayfare Authentic Travel
+              <span className="px-3 py-1.5 rounded-full bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 text-[11px] sm:text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                <Compass className="w-3.5 h-3.5 text-emerald-300" /> Wayfare Authentic Travel
               </span>
             </div>
           </div>
