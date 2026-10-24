@@ -523,14 +523,16 @@ export const HomePage = () => {
           - Cột phải: 4 ảnh xếp đè, phủ kín cột, viền mực mảnh
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="relative w-full overflow-hidden pt-28 pb-28 lg:pt-36 lg:pb-40 bg-[#17130F] text-white">
-        {/* Mobile backdrop — ảnh mờ làm nền, chữ vẫn rõ */}
-        <div className="absolute inset-0 z-0 lg:hidden">
+        {/* Nền tổng: ảnh mờ nhẹ sau lớp kính tối, phủ toàn hero */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
           <img
             src="/images/hero/saigon-sunset.jpg"
             alt=""
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover scale-110 opacity-[0.32]"
+            style={{ filter: 'blur(20px) saturate(0.95)' }}
           />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(23,19,15,0.93) 0%, rgba(23,19,15,0.88) 55%, #17130F 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'radial-gradient(125% 95% at 74% 34%, rgba(23,19,15,0.40) 0%, rgba(23,19,15,0.80) 52%, #17130F 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(118deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 24%, rgba(255,255,255,0) 42%, rgba(255,255,255,0.035) 60%, rgba(255,255,255,0) 78%)' }} />
         </div>
 
         {/* Content Container Aligned with Navbar Width */}
