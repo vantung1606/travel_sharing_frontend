@@ -106,7 +106,7 @@ export const Navbar = () => {
                 <img
                   src={isDarkHero ? '/wayfare-logo-white.png' : '/wayfare-logo.png'}
                   alt="Wayfare"
-                  className="h-9 sm:h-10 w-auto object-contain transition-all duration-300 group-hover:scale-105 drop-shadow-sm"
+                  className="h-9 sm:h-10 w-auto object-contain transition-all duration-300 group-drop-shadow-sm"
                 />
               </div>
             </div>
@@ -126,7 +126,7 @@ export const Navbar = () => {
                         active
                           ? isDarkHero
                             ? 'text-white font-bold drop-shadow-sm'
-                            : 'text-emerald-700 font-bold'
+                            : 'text-clay-700 font-bold'
                           : isDarkHero
                             ? 'text-white/80 hover:text-white hover:bg-white/10'
                             : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
@@ -141,7 +141,7 @@ export const Navbar = () => {
                             isDarkHero
                               ? 'bg-white/20 backdrop-blur-md shadow-sm ring-1 ring-white/25'
                               : isScrolled
-                                ? 'bg-emerald-50 ring-1 ring-emerald-100'
+                                ? 'bg-clay-50 ring-1 ring-clay-100'
                                 : 'bg-white shadow-sm ring-1 ring-slate-900/10'
                           }`}
                         />
@@ -150,7 +150,7 @@ export const Navbar = () => {
                       {tab.isAi ? (
                         <Sparkles className={`w-3.5 h-3.5 shrink-0 ${active ? (isDarkHero ? 'text-amber-200' : 'text-amber-500') : isDarkHero ? 'text-amber-300' : 'text-amber-500'}`} />
                       ) : (
-                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? (isDarkHero ? 'text-white' : 'text-emerald-600') : isDarkHero ? 'text-white/70' : 'text-slate-500'}`} />
+                        <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? (isDarkHero ? 'text-white' : 'text-clay-600') : isDarkHero ? 'text-white/70' : 'text-slate-500'}`} />
                       )}
                       
                       {/* Responsive adaptive label */}
@@ -163,7 +163,7 @@ export const Navbar = () => {
                           active
                             ? 'bg-amber-400/20 text-amber-300'
                             : isDarkHero
-                              ? 'bg-white/20 text-emerald-200'
+                              ? 'bg-white/20 text-clay-200'
                               : 'bg-amber-100 text-amber-800'
                         }`}>
                           Smart
@@ -222,7 +222,7 @@ export const Navbar = () => {
               {!isLoggedIn ? (
                 <button
                   onClick={() => { setAuthMode('login'); setIsAuthModalOpen(true); }}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs hover:shadow-emerald-600/30 transition-all cursor-pointer shrink-0"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-clay-600 hover:bg-clay-700 text-white text-xs font-bold shadow-xs hover:shadow-clay-600/30 transition-all cursor-pointer shrink-0"
                 >
                   <User className="w-3.5 h-3.5 text-white" />
                   <span>Đăng nhập</span>
@@ -231,7 +231,7 @@ export const Navbar = () => {
                 <div ref={profileDropdownRef} className="relative group ml-1">
                   <button
                     onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                    className="relative flex items-center justify-center p-0.5 rounded-full transition-all cursor-pointer shrink-0 focus:outline-hidden hover:scale-105 active:scale-95"
+                    className="relative flex items-center justify-center p-0.5 rounded-full transition-all cursor-pointer shrink-0 focus:outline-hidden active:scale-95"
                     aria-label={`Tài khoản: ${currentUser.name}`}
                   >
                     <UserAvatar user={currentUser} size="sm" showBadge={true} />
@@ -257,7 +257,7 @@ export const Navbar = () => {
                         <div className="min-w-0 flex-1">
                           <p className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</p>
                           <p className="text-[11px] text-slate-400 truncate">{currentUser.handle || currentUser.email}</p>
-                          <span className="inline-block mt-0.5 px-2 py-0.5 text-[9px] font-bold rounded-full bg-emerald-100 text-emerald-800">
+                          <span className="inline-block mt-0.5 px-2 py-0.5 text-[9px] font-bold rounded-full bg-clay-100 text-clay-800">
                             {portalMode === 'admin' ? 'Quản trị viên' : 'Thành viên Wayfare'}
                           </span>
                         </div>
@@ -268,7 +268,7 @@ export const Navbar = () => {
                         className="w-full flex items-center justify-between px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
                         <div className="flex items-center gap-2">
-                          <Bell className="w-4 h-4 text-emerald-600" />
+                          <Bell className="w-4 h-4 text-clay-600" />
                           <span>Thông báo</span>
                         </div>
                         {unreadNotificationsCount > 0 && (
@@ -282,7 +282,7 @@ export const Navbar = () => {
                         onClick={() => { setPortalMode('user'); setUserTab('profile'); setIsProfileDropdownOpen(false); }}
                         className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
-                        <User className="w-4 h-4 text-emerald-600" />
+                        <User className="w-4 h-4 text-clay-600" />
                         <span>Trang cá nhân</span>
                       </button>
 
@@ -290,7 +290,7 @@ export const Navbar = () => {
                         onClick={() => { setPortalMode('user'); setUserTab('itineraries'); setIsProfileDropdownOpen(false); }}
                         className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
-                        <Calendar className="w-4 h-4 text-emerald-600" />
+                        <Calendar className="w-4 h-4 text-clay-600" />
                         <span>Lịch trình của tôi</span>
                       </button>
 
@@ -319,7 +319,7 @@ export const Navbar = () => {
                         onClick={() => { setIsAIGeneratorOpen(true); setIsProfileDropdownOpen(false); }}
                         className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                       >
-                        <Compass className="w-4 h-4 text-emerald-600" />
+                        <Compass className="w-4 h-4 text-clay-600" />
                         <span>Lập lịch trình chuyến đi</span>
                       </button>
 
@@ -329,7 +329,7 @@ export const Navbar = () => {
                           onClick={() => { setPortalMode(portalMode === 'admin' ? 'user' : 'admin'); setIsProfileDropdownOpen(false); }}
                           className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                         >
-                          <Shield className="w-4 h-4 text-emerald-600" />
+                          <Shield className="w-4 h-4 text-clay-600" />
                           <span>{portalMode === 'admin' ? 'Về giao diện Người dùng' : 'Giao diện Quản Trị'}</span>
                         </button>
                       )}
@@ -407,7 +407,7 @@ export const Navbar = () => {
                 {!isLoggedIn ? (
                   <button
                     onClick={() => { setAuthMode('login'); setIsAuthModalOpen(true); }}
-                    className="w-full py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                    className="w-full py-3 rounded-2xl bg-clay-600 hover:bg-clay-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                   >
                     <User className="w-4 h-4 text-white" />
                     <span>Đăng nhập / Đăng ký</span>
@@ -415,9 +415,9 @@ export const Navbar = () => {
                 ) : (
                   <button
                     onClick={() => { setIsAIGeneratorOpen(true); setIsMobileMenuOpen(false); }}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                    className="w-full bg-clay-600 hover:bg-clay-700 text-white py-3 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-md cursor-pointer"
                   >
-                    <Compass className="w-4 h-4 text-emerald-200" />
+                    <Compass className="w-4 h-4 text-clay-200" />
                     <span>Lập Lịch Trình Mới</span>
                   </button>
                 )}
@@ -437,13 +437,13 @@ export const Navbar = () => {
                       onClick={() => handleNavClick(tab.id)}
                       className={`w-full flex items-center justify-between p-3 rounded-2xl text-xs font-bold transition-all ${
                         active
-                          ? 'bg-emerald-50 text-emerald-800 shadow-xs border border-emerald-100 font-extrabold'
+                          ? 'bg-clay-50 text-clay-800 shadow-xs border border-clay-100 font-extrabold'
                           : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                          active ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-500'
+                          active ? 'bg-clay-600 text-white' : 'bg-slate-100 text-slate-500'
                         }`}>
                           <Icon className="w-4 h-4" />
                         </div>
