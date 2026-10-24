@@ -518,51 +518,30 @@ export const HomePage = () => {
   return (
     <div className="min-h-screen bg-[#F8F4EC] text-slate-900 selection:bg-clay-600 selection:text-white pb-20 w-full max-w-full overflow-x-clip -mt-16">
       {/* ──────────────────────────────────────────────────────────────────────────
-          1. HERO SECTION (SPLIT EDITORIAL)
-          - Nửa trái: nền mực, chữ serif
-          - Nửa phải: ảnh lớn tràn viền, không khung
+          1. HERO SECTION (EDITORIAL PHOTO MOSAIC)
+          - Nền mực, chữ serif bên trái
+          - Cột phải: 4 ảnh xếp đè, phủ kín cột, viền mực mảnh
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="relative w-full overflow-hidden pt-28 pb-28 lg:pt-36 lg:pb-40 bg-[#17130F] text-white">
         {/* Mobile backdrop — ảnh mờ làm nền, chữ vẫn rõ */}
         <div className="absolute inset-0 z-0 lg:hidden">
           <img
-            src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1400&q=85"
+            src="/images/hero/saigon-sunset.jpg"
             alt=""
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(23,19,15,0.93) 0%, rgba(23,19,15,0.88) 55%, #17130F 100%)' }} />
         </div>
 
-        {/* Desktop: nửa phải là ảnh lớn tràn viền, không khung */}
-        <div className="hidden lg:block absolute inset-y-0 right-0 w-[46%] z-0">
-          <img
-            src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1600&q=88"
-            alt=""
-            className="w-full h-full object-cover object-center"
-            style={{ filter: 'sepia(0.16) saturate(1.08) contrast(1.03)' }}
-          />
-          {/* Lớp nối mềm từ nền mực sang ảnh */}
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, #17130F 0%, rgba(23,19,15,0.72) 10%, rgba(23,19,15,0.16) 34%, rgba(23,19,15,0.05) 60%, rgba(23,19,15,0.38) 100%)' }} />
-          {/* Scrim trên đỉnh để navbar luôn đọc được */}
-          <div className="absolute inset-x-0 top-0 h-40" style={{ background: 'linear-gradient(180deg, rgba(23,19,15,0.82) 0%, rgba(23,19,15,0.35) 55%, rgba(23,19,15,0) 100%)' }} />
-          {/* Grade ấm đồng bộ đất nung */}
-          <div className="absolute inset-0 bg-[#8C3F22]/16 mix-blend-multiply" />
-          {/* Gutter giấy giữa chữ và ảnh */}
-          <div className="absolute inset-y-0 left-0 w-[2px] bg-[#F8F4EC]/25" />
-        </div>
-
-        {/* Đường cắt ngang kết thúc hero, không dùng gradient mờ */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-[#F8F4EC]/15 z-0 pointer-events-none" />
-
         {/* Content Container Aligned with Navbar Width */}
         <div className="relative z-10 w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
           {/* Main Hero Header Stack with Motion Scroll */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-6 relative z-10 min-w-0 flex flex-col items-center text-center lg:items-start lg:text-left max-w-[600px] mx-auto lg:mx-0 space-y-4 sm:space-y-6"
+            className="lg:col-span-7 relative z-10 min-w-0 flex flex-col items-center text-center lg:items-start lg:text-left max-w-[600px] mx-auto lg:mx-0 space-y-4 sm:space-y-6"
           >
             {/* Top Pill Accent */}
             <div className="inline-flex items-center gap-2.5 pl-3 py-0.5 border-l-2 border-clay-500 rounded-none bg-transparent text-clay-200 text-xs font-semibold tracking-[0.16em]">
@@ -610,6 +589,54 @@ export const HomePage = () => {
                 <ArrowDown className="w-3.5 h-3.5 text-clay-300 group-hover:translate-y-0.5 transition-transform" />
               </a>
             </motion.div>
+          </motion.div>
+
+          {/* Editorial photo mosaic (visual only) */}
+          <motion.div
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="hidden lg:block lg:col-span-5 relative w-full h-[500px]"
+          >
+            {/* Ảnh 1 — lớn, trên trái */}
+            <div className="absolute left-0 top-0 w-[64%] h-[58%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-10">
+              <img
+                src="/images/hero/saigon-sunset.jpg"
+                alt=""
+                className="w-full h-full object-cover"
+                style={{ filter: 'sepia(0.2) saturate(0.97) contrast(1.02)' }}
+              />
+            </div>
+
+            {/* Ảnh 2 — phải, đè lên ảnh 1 */}
+            <div className="absolute left-[52%] top-[6%] w-[48%] h-[48%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-20">
+              <img
+                src="/images/hero/ninh-binh.jpg"
+                alt=""
+                className="w-full h-full object-cover"
+                style={{ filter: 'sepia(0.2) saturate(0.97) contrast(1.02)' }}
+              />
+            </div>
+
+            {/* Ảnh 3 — dọc, dưới phải */}
+            <div className="absolute left-[54%] top-[52%] w-[46%] h-[48%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-30">
+              <img
+                src="/images/login/travel_banner_3.jpg"
+                alt=""
+                className="w-full h-full object-cover"
+                style={{ filter: 'sepia(0.3) saturate(0.86) contrast(1.02)' }}
+              />
+            </div>
+
+            {/* Ảnh 4 — ngang, dưới trái, trên cùng */}
+            <div className="absolute left-0 top-[56%] w-[56%] h-[44%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-40">
+              <img
+                src="/images/hero/nui-may.jpg"
+                alt=""
+                className="w-full h-full object-cover"
+                style={{ filter: 'sepia(0.2) saturate(0.97) contrast(1.02)' }}
+              />
+            </div>
           </motion.div>
           </div>
         </div>
