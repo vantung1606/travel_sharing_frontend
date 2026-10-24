@@ -1378,7 +1378,7 @@ export const CommunityPage = () => {
   }, [posts]);
 
   return (
-    <div className="w-full min-h-screen bg-[#F8F4EC] text-[#1E1A15] pb-16 sm:pb-20">
+    <div className="community-page w-full min-h-screen bg-[#F8F4EC] text-[#1E1A15] pb-16 sm:pb-20">
       {/* ─── 3-COLUMN COMMUNITY WORKSPACE ─── */}
       <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-5 sm:py-6">
         {/* 3-COLUMN DESKTOP GRID */}

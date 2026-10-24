@@ -350,3 +350,13 @@ select option {
   background: #94a3b8;
 }
 
+
+/* Community controls: soft 5px corners; large editorial blocks stay near-square. */
+.community-page button.rounded-sm,
+.community-page input.rounded-sm,
+.community-page textarea.rounded-sm,
+.community-page select.rounded-sm,
+.community-page a.rounded-sm {
+  border-radius: 5px;
+}
+
