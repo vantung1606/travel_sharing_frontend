@@ -277,28 +277,29 @@ export const AdminDashboardPage = () => {
           <button 
             onClick={() => loadDashboardData(true)}
             disabled={refreshing}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors shadow-2xs cursor-pointer active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs border border-slate-200/80 shadow-xs transition-all cursor-pointer active:scale-95 disabled:opacity-50"
             title="Đồng bộ dữ liệu thời gian thực từ CSDL"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-slate-600 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${refreshing ? 'animate-spin text-sky-600' : ''}`} />
             <span>{refreshing ? 'Đang đồng bộ...' : 'Làm mới CSDL'}</span>
           </button>
 
           <button 
             onClick={handleExportCsv}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors shadow-2xs cursor-pointer active:scale-95"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs border border-slate-200/80 shadow-xs transition-all cursor-pointer active:scale-95"
             title="Xuất bảng dữ liệu hiện tại ra file CSV"
           >
-            <Download className="w-3.5 h-3.5 text-slate-600" />
+            <Download className="w-3.5 h-3.5 text-slate-500" />
             <span>Xuất CSV</span>
           </button>
 
           <button
             onClick={() => setAdminTab('places')}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs shadow-xs transition-all cursor-pointer active:scale-95"
+            title="Đi đến trang Quản lý Điểm đến"
           >
-            <Plus className="w-4 h-4" />
-            <span>+ Quản lý điểm đến</span>
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <span>Quản lý điểm đến</span>
           </button>
         </div>
       </div>
@@ -436,22 +437,30 @@ export const AdminDashboardPage = () => {
               </div>
 
               {/* Metric Toggle Tabs */}
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-full text-xs font-bold">
+              <div className="inline-flex items-center p-1 bg-slate-100/90 rounded-xl border border-slate-200/60 shrink-0 text-xs">
                 <button
+                  type="button"
                   onClick={() => setChartMetric('users')}
-                  className={`px-3 py-1.5 rounded-full transition-all cursor-pointer ${
-                    chartMetric === 'users' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                    chartMetric === 'users'
+                      ? 'bg-white text-sky-700 shadow-xs border border-slate-200/80'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent'
                   }`}
                 >
-                  Người dùng mới
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Người dùng mới</span>
                 </button>
                 <button
+                  type="button"
                   onClick={() => setChartMetric('posts')}
-                  className={`px-3 py-1.5 rounded-full transition-all cursor-pointer ${
-                    chartMetric === 'posts' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                    chartMetric === 'posts'
+                      ? 'bg-white text-sky-700 shadow-xs border border-slate-200/80'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent'
                   }`}
                 >
-                  Bài viết mới
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Bài viết mới</span>
                 </button>
               </div>
             </div>
@@ -535,22 +544,30 @@ export const AdminDashboardPage = () => {
               </div>
 
               {/* Subtabs for Trends */}
-              <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-full text-xs font-bold">
+              <div className="inline-flex items-center p-1 bg-slate-100/90 rounded-xl border border-slate-200/60 shrink-0 text-xs">
                 <button
+                  type="button"
                   onClick={() => setTopTab('destinations')}
-                  className={`px-3 py-1.5 rounded-full transition-all cursor-pointer ${
-                    topTab === 'destinations' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                    topTab === 'destinations'
+                      ? 'bg-white text-sky-700 shadow-xs border border-slate-200/80'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent'
                   }`}
                 >
-                  Top Điểm đến ({stats.topDestinations?.length || 0})
+                  <MapPin className="w-3.5 h-3.5" />
+                  <span>Top Điểm đến ({stats.topDestinations?.length || 0})</span>
                 </button>
                 <button
+                  type="button"
                   onClick={() => setTopTab('places')}
-                  className={`px-3 py-1.5 rounded-full transition-all cursor-pointer ${
-                    topTab === 'places' ? 'bg-sky-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-semibold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                    topTab === 'places'
+                      ? 'bg-white text-sky-700 shadow-xs border border-slate-200/80'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent'
                   }`}
                 >
-                  Địa danh đánh giá cao ({stats.topPlaces?.length || 0})
+                  <Star className="w-3.5 h-3.5" />
+                  <span>Đánh giá cao ({stats.topPlaces?.length || 0})</span>
                 </button>
               </div>
             </div>
@@ -796,7 +813,7 @@ export const AdminDashboardPage = () => {
             <select
               value={tableStatusFilter}
               onChange={(e) => setTableStatusFilter(e.target.value)}
-              className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full text-xs font-semibold text-slate-700 outline-none cursor-pointer"
+              className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none cursor-pointer hover:bg-slate-100/80 transition-colors"
             >
               {activeTableTab === 'itineraries' ? (
                 <>
@@ -816,10 +833,10 @@ export const AdminDashboardPage = () => {
             <button 
               onClick={() => loadDashboardData(true)}
               disabled={refreshing}
-              className="p-2 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer" 
+              className="p-2 rounded-xl bg-white border border-slate-200/80 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors shadow-xs cursor-pointer disabled:opacity-50" 
               title="Làm mới bảng"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-sky-600' : ''}`} />
             </button>
           </div>
         </div>
