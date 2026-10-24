@@ -603,28 +603,38 @@ export const HomePage = () => {
             transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="hidden lg:block lg:col-span-4 relative w-full"
           >
-            <div className="relative border border-black/10 bg-[#F8F4EC] p-2.5">
-              <div className="flex flex-col gap-2.5">
-                <div className="h-[300px] w-full overflow-hidden">
+            <div aria-hidden="true" className="pointer-events-none absolute -inset-2 border border-white/12" />
+
+            <div className="relative border border-black/10 bg-[#F8F4EC] p-3">
+              <div className="flex flex-col gap-3">
+                <div className="group relative h-[316px] w-full overflow-hidden">
                   <img
                     src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=85"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
                     alt=""
                   />
+                  <div className="pointer-events-none absolute inset-0 bg-[#8C3F22]/10 mix-blend-multiply" />
                 </div>
-                <div className="h-[124px] w-full overflow-hidden">
+                <div className="group relative h-[104px] w-full overflow-hidden">
                   <img
                     src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=900&q=80"
-                    className="w-full h-full object-cover object-center"
+                    className="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
                     alt=""
                   />
+                  <div className="pointer-events-none absolute inset-0 bg-[#8C3F22]/10 mix-blend-multiply" />
+                </div>
+
+                {/* Editorial rule strip (visual only) */}
+                <div className="flex items-center gap-2">
+                  <span className="h-[2px] w-10 bg-clay-600" />
+                  <span className="h-[2px] flex-1 bg-[#DED5C5]" />
                 </div>
               </div>
             </div>
 
-            {/* Editorial corner rules */}
+            {/* Editorial crop marks */}
             <span aria-hidden="true" className="pointer-events-none absolute -left-2 -top-2 h-10 w-10 border-l-2 border-t-2 border-clay-500" />
-            <span aria-hidden="true" className="pointer-events-none absolute -bottom-2 -right-2 h-10 w-10 border-b-2 border-r-2 border-clay-500" />
+            <span aria-hidden="true" className="pointer-events-none absolute -bottom-2 -right-2 h-7 w-7 border-b border-r border-white/35" />
           </motion.div>
           </div>
         </div>
