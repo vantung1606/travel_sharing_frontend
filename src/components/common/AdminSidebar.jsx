@@ -140,7 +140,7 @@ export const AdminSidebar = ({ onNavigate }) => {
               ? 'bg-sky-500/10 text-sky-400 border-sky-500/30' 
               : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
           }`}>
-            {isAdminUser ? 'Super Admin' : 'Moderator'}
+            {isAdminUser ? 'Admin' : 'Moderator'}
           </span>
         </div>
 
@@ -243,7 +243,7 @@ export const AdminSidebar = ({ onNavigate }) => {
               <div className="flex items-center gap-1 mt-0.5">
                 <ShieldCheck className="w-3 h-3 text-sky-400 shrink-0" />
                 <span className="text-[10px] text-sky-300/90 font-medium truncate">
-                  {isAdminUser ? 'Super Admin' : 'Kiểm duyệt viên'}
+                  {isAdminUser ? 'Quản trị viên' : 'Kiểm duyệt viên'}
                 </span>
               </div>
             </div>

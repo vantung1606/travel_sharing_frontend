@@ -351,7 +351,7 @@ export const AdminUsersPage = () => {
     if (roles.includes('ROLE_ADMIN')) {
       return (
         <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-800 font-bold inline-flex items-center gap-1">
-          <Shield className="w-3.5 h-3.5 text-purple-600" /> Super Admin
+          <Shield className="w-3.5 h-3.5 text-purple-600" /> Quản trị viên
         </span>
       );
     }
@@ -476,7 +476,7 @@ export const AdminUsersPage = () => {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-bold">
-            <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">ROLE_ADMIN (Super Admin)</span>
+            <span className="px-2 py-0.5 rounded-full bg-purple-100 text-purple-700">ROLE_ADMIN (Quản trị viên)</span>
             <span className="px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700">ROLE_MODERATOR (Kiểm duyệt)</span>
           </div>
         </div>
@@ -581,7 +581,7 @@ export const AdminUsersPage = () => {
             className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-full text-xs font-semibold text-slate-700 outline-none cursor-pointer"
           >
             <option value="all">Tất cả vai trò</option>
-            <option value="ROLE_ADMIN">Super Admin (Quản trị viên)</option>
+            <option value="ROLE_ADMIN">Quản trị viên (Admin)</option>
             <option value="ROLE_MODERATOR">Kiểm duyệt viên (Mod)</option>
             <option value="ROLE_GUIDE">Đối tác / HDV (Guide)</option>
             <option value="ROLE_USER">Thành viên (Wanderer)</option>
@@ -1023,7 +1023,7 @@ export const AdminUsersPage = () => {
               
               <div className="space-y-2">
                 {[
-                  { role: 'ROLE_ADMIN', title: 'Quản trị viên (Super Admin)', desc: 'Toàn quyền cấu hình hệ thống, quản trị người dùng, duyệt địa điểm và kiểm duyệt báo cáo vi phạm.' },
+                  { role: 'ROLE_ADMIN', title: 'Quản trị viên (Admin)', desc: 'Toàn quyền cấu hình hệ thống, quản trị người dùng, duyệt địa điểm và kiểm duyệt báo cáo vi phạm.' },
                   { role: 'ROLE_MODERATOR', title: 'Kiểm duyệt viên (Moderator)', desc: 'Kiểm duyệt bài viết, đánh giá và địa điểm chờ duyệt. KHÔNG có quyền quản trị người dùng & hệ thống.' },
                   { role: 'ROLE_USER', title: 'Người dùng tiêu chuẩn (Wanderer User)', desc: 'Tạo lịch trình du lịch cá nhân, chia sẻ bài viết, đánh giá địa điểm và tham gia cộng đồng.' }
                 ].map((item) => (
@@ -1172,7 +1172,7 @@ export const AdminUsersPage = () => {
                   <option value="ROLE_USER">Thành viên thông thường (Wanderer)</option>
                   <option value="ROLE_MODERATOR">Kiểm duyệt viên (Moderator)</option>
                   <option value="ROLE_GUIDE">Đối tác / Hướng dẫn viên (Guide)</option>
-                  <option value="ROLE_ADMIN">Quản trị viên cấp cao (Super Admin)</option>
+                  <option value="ROLE_ADMIN">Quản trị viên (Admin)</option>
                 </select>
               </div>
 
