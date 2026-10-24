@@ -227,8 +227,15 @@ export const AdminPlacesPage = () => {
       toast.error('Vui lòng nhập tên địa điểm!');
       return;
     }
-    if (!newPlaceForm.address.trim()) {
+    const trimmedAddr = newPlaceForm.address.trim();
+    if (!trimmedAddr) {
       toast.error('Vui lòng nhập địa chỉ địa điểm!');
+      return;
+    }
+    const hasDelimiter = trimmedAddr.includes('-') || trimmedAddr.includes(',') || trimmedAddr.includes('/');
+    const hasAdminLevel = /quận|huyện|phường|xã|thị xã|tp|thành phố/i.test(trimmedAddr);
+    if (!hasDelimiter && !hasAdminLevel && trimmedAddr.length < 16) {
+      toast.warning('⚠️ Địa chỉ chưa đủ cụ thể! Không được chỉ ghi tên đường cộc lốc như "202 Chương Dương". Vui lòng ghi đầy đủ: Số nhà/Đường - Phường/Quận/Huyện - Tỉnh/Thành phố (Ví dụ: 202 Chương Dương - Sơn Trà - Đà Nẵng).');
       return;
     }
 
@@ -1015,16 +1022,25 @@ export const AdminPlacesPage = () => {
                 </div>
 
                 {/* Address */}
+                {/* Address */}
                 <div className="sm:col-span-2">
-                  <label className="font-bold text-slate-700 block mb-1">Địa chỉ chi tiết *</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="font-bold text-slate-700 block">Địa chỉ cụ thể *</label>
+                    <span className="text-[10px] text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                      Bắt buộc kèm Quận/Huyện & Tỉnh/Thành
+                    </span>
+                  </div>
                   <input
                     type="text"
                     required
-                    placeholder="Số nhà, tên đường, phường/xã, quận/huyện..."
+                    placeholder="Ví dụ: 202 Chương Dương - Sơn Trà - Đà Nẵng"
                     value={newPlaceForm.address}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, address: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
+                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs font-medium"
                   />
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    💡 Quy chuẩn: Phải ghi rõ Số nhà/Đường - Phường/Quận/Huyện - Tỉnh/Thành phố (Ví dụ: <strong className="text-slate-700">202 Chương Dương - Sơn Trà - Đà Nẵng</strong>). Không được ghi cộc lốc mỗi tên đường.
+                  </p>
                 </div>
 
                 {/* Open Hours */}

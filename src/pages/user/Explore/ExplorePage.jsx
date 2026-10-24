@@ -493,8 +493,15 @@ export const ExplorePage = () => {
       toast.error('Vui lòng nhập tên địa điểm!');
       return;
     }
-    if (!newPlaceForm.address.trim()) {
+    const trimmedAddress = newPlaceForm.address.trim();
+    if (!trimmedAddress) {
       toast.error('Vui lòng nhập địa chỉ cụ thể của địa điểm!');
+      return;
+    }
+    const hasDelimiter = trimmedAddress.includes('-') || trimmedAddress.includes(',') || trimmedAddress.includes('/');
+    const hasAdminLevel = /quận|huyện|phường|xã|thị xã|tp|thành phố/i.test(trimmedAddress);
+    if (!hasDelimiter && !hasAdminLevel && trimmedAddress.length < 16) {
+      toast.warning('⚠️ Địa chỉ chưa đủ cụ thể! Không được chỉ ghi tên đường cộc lốc như "202 Chương Dương". Vui lòng ghi đầy đủ: Số nhà/Đường - Phường/Quận/Huyện - Tỉnh/Thành phố (Ví dụ: 202 Chương Dương - Sơn Trà - Đà Nẵng).');
       return;
     }
     setIsSubmittingPlace(true);

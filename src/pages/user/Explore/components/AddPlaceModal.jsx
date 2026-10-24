@@ -346,17 +346,26 @@ export const AddPlaceModal = ({
 
             {/* Địa chỉ chi tiết */}
             <div className="space-y-1.5">
-              <label className="font-bold text-slate-800 text-xs">
-                Địa chỉ chi tiết / Khu vực <span className="text-rose-500">*</span>
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="font-bold text-slate-800 text-xs flex items-center gap-1">
+                  <span>Địa chỉ cụ thể</span>
+                  <span className="text-rose-500 font-bold">*</span>
+                </label>
+                <span className="text-[10px] text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                  Kèm Quận/Huyện & Tỉnh/Thành
+                </span>
+              </div>
               <input
                 type="text"
                 required
-                placeholder="VD: Đèo Mã Pí Lèng, Xã Pải Lủng, Huyện Mèo Vạc..."
+                placeholder="VD: 202 Chương Dương - Sơn Trà - Đà Nẵng"
                 value={newPlaceForm.address}
                 onChange={(e) => setNewPlaceForm(prev => ({ ...prev, address: e.target.value }))}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:border-sky-500 text-slate-800 outline-none"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:border-sky-500 text-slate-800 outline-none text-xs font-medium"
               />
+              <p className="text-[11px] text-slate-500 leading-snug">
+                <span className="text-sky-600 font-bold">💡 Quy chuẩn:</span> Phải ghi rõ Số nhà/Đường - Phường/Quận/Huyện - Tỉnh/Thành phố (Ví dụ: <strong className="text-slate-700">202 Chương Dương - Sơn Trà - Đà Nẵng</strong>). Tuyệt đối không chỉ ghi tên đường cộc lốc.
+              </p>
             </div>
 
             {/* Smart 1-Tap GPS Button */}
