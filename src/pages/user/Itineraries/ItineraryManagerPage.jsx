@@ -328,7 +328,7 @@ export const ItineraryManagerPage = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#F8F4EC] text-[#1E1A15] pb-24">
+    <div className="itinerary-page w-full min-h-screen bg-[#F8F4EC] text-[#1E1A15] pb-24">
       {/* ─── 1. PAGE HEADER GỌN: TIÊU ĐỀ + HÀNH ĐỘNG ─── */}
       <section className="relative w-full overflow-hidden bg-[#F8F4EC] text-[#1E1A15] border-b border-[#1E1A15]/10">
         <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6 pb-6 sm:pt-7 sm:pb-7 lg:pt-8 lg:pb-8">
