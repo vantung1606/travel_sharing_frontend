@@ -147,26 +147,26 @@ export const AddToTripModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden my-auto">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-ink-900/55  animate-fade-in overflow-y-auto">
+      <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full shadow-none border border-ink-200 overflow-hidden my-auto">
         {/* Header */}
-        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
+        <div className="px-5 py-4 border-b border-ink-200/70 flex items-center justify-between bg-[#F8F4EC]">
           <div className="flex items-center gap-3">
             {selectedTrip && (
               <button
                 type="button"
                 onClick={() => setSelectedTrip(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 cursor-pointer transition-colors"
+                className="w-8 h-8 rounded-full bg-[#F5F0E6] hover:bg-[#EFE8DC] flex items-center justify-center text-ink-500 cursor-pointer transition-colors"
                 title="Quay lại danh sách chuyến đi"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
             )}
             <div>
-              <h3 className="font-bold text-base text-slate-900">
+              <h3 className="font-bold text-base text-ink-800">
                 {selectedTrip ? 'Lên lịch trình chi tiết' : 'Thêm vào Lịch trình'}
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
+              <p className="text-xs text-ink-400 mt-0.5">
                 {selectedTrip
                   ? `Chọn ngày & thời gian cho "${item.name}"`
                   : `Chọn chuyến đi để thêm "${item.name}"`}
@@ -176,7 +176,7 @@ export const AddToTripModal = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 cursor-pointer transition-colors"
+            className="w-8 h-8 rounded-full bg-[#F5F0E6] hover:bg-[#EFE8DC] flex items-center justify-center text-ink-400 cursor-pointer transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -185,7 +185,7 @@ export const AddToTripModal = ({
         {/* BƯỚC 1: CHỌN CHUYẾN ĐI */}
         {!selectedTrip ? (
           <div className="p-5 space-y-4">
-            <div className="flex items-center gap-2 p-2.5 rounded-xl bg-sky-50/80 border border-sky-100 text-sky-800 text-xs">
+            <div className="flex items-center gap-2 p-2.5 rounded-[5px] bg-sky-50/80 border border-sky-100 text-sky-800 text-xs">
               <Compass className="w-4 h-4 text-sky-600 shrink-0" />
               <span>
                 Bạn muốn ghé thăm <strong>{item.name}</strong> trong chuyến đi nào?
@@ -194,13 +194,13 @@ export const AddToTripModal = ({
 
             <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
               {itineraries.length === 0 ? (
-                <div className="p-6 rounded-2xl bg-slate-50 text-center space-y-3 border border-slate-100">
-                  <Calendar className="w-10 h-10 text-slate-300 mx-auto" />
-                  <p className="text-xs text-slate-500">Bạn chưa có lịch trình nào trên tài khoản này.</p>
+                <div className="p-6 rounded-[6px] bg-[#F8F4EC] text-center space-y-3 border border-ink-200/70">
+                  <Calendar className="w-10 h-10 text-ink-300 mx-auto" />
+                  <p className="text-xs text-ink-400">Bạn chưa có lịch trình nào trên tài khoản này.</p>
                   <button
                     type="button"
                     onClick={onCreateNewTripWithItem}
-                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 text-white text-xs font-bold hover:shadow-md transition-all cursor-pointer flex items-center gap-1.5 mx-auto"
+                    className="px-4 py-2.5 rounded-[5px] bg-clay-600 text-white text-xs font-bold hover:shadow-none transition-all cursor-pointer flex items-center gap-1.5 mx-auto"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-amber-300" />
                     <span>Tạo lịch trình mới với điểm này</span>
@@ -217,25 +217,25 @@ export const AddToTripModal = ({
                     <div
                       key={itin.id}
                       onClick={() => handleSelectTrip(itin)}
-                      className="p-3.5 rounded-2xl border border-slate-200/90 hover:border-sky-500 hover:bg-sky-50/40 transition-all cursor-pointer flex items-center justify-between gap-3 group shadow-2xs hover:shadow-xs"
+                      className="p-3.5 rounded-[6px] border border-ink-200/90 hover:border-sky-500 hover:bg-sky-50/40 transition-all cursor-pointer flex items-center justify-between gap-3 group shadow-none hover:shadow-none"
                     >
                       <div className="min-w-0 space-y-1">
-                        <h4 className="font-bold text-xs sm:text-sm text-slate-900 truncate group-hover:text-sky-600 transition-colors">
+                        <h4 className="font-bold text-xs sm:text-sm text-ink-800 truncate group-hover:text-sky-600 transition-colors">
                           {itin.title}
                         </h4>
-                        <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                          <span className="flex items-center gap-1 font-medium text-slate-600">
+                        <div className="flex items-center gap-2 text-[11px] text-ink-400">
+                          <span className="flex items-center gap-1 font-medium text-ink-500">
                             <MapPin className="w-3 h-3 text-red-500" /> {itin.destination || 'Việt Nam'}
                           </span>
                           <span>•</span>
-                          <span className="font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
+                          <span className="font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-[3px] border border-sky-100">
                             {daysTotal} ngày
                           </span>
                           <span>•</span>
                           <span>{stopsCount} điểm dừng</span>
                         </div>
                       </div>
-                      <span className="p-2 rounded-xl bg-slate-100 group-hover:bg-sky-600 group-hover:text-white text-slate-600 transition-colors shrink-0">
+                      <span className="p-2 rounded-[5px] bg-[#F5F0E6] group-hover:bg-sky-600 group-hover:text-white text-ink-500 transition-colors shrink-0">
                         <ChevronRight className="w-4 h-4" />
                       </span>
                     </div>
@@ -244,7 +244,7 @@ export const AddToTripModal = ({
               )}
             </div>
 
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
+            <div className="pt-2 border-t border-ink-200/70 flex items-center justify-between">
               <button
                 type="button"
                 onClick={onCreateNewTripWithItem}
@@ -256,7 +256,7 @@ export const AddToTripModal = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-[5px] bg-[#F5F0E6] text-ink-600 text-xs font-bold hover:bg-[#EFE8DC] transition-colors cursor-pointer"
               >
                 Đóng
               </button>
@@ -266,13 +266,13 @@ export const AddToTripModal = ({
           /* BƯỚC 2: CHỌN NGÀY & KHUNG GIỜ CHI TIẾT */
           <div className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
             {/* Selected Trip Info Banner */}
-            <div className="p-3 rounded-2xl bg-gradient-to-br from-sky-50 to-indigo-50/50 border border-sky-200/70 flex items-center justify-between gap-3">
+            <div className="p-3 rounded-[6px] bg-clay-50 border border-sky-200/70 flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <span className="text-[10px] uppercase font-black tracking-wider text-sky-600">Chuyến đi đã chọn</span>
-                <h4 className="font-extrabold text-xs sm:text-sm text-slate-900 truncate">
+                <h4 className="font-extrabold text-xs sm:text-sm text-ink-800 truncate">
                   {selectedTrip.title}
                 </h4>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className="text-[11px] text-ink-400 mt-0.5">
                   📍 {selectedTrip.destination || 'Điểm đến'} • Thời lượng: {currentTotalDays} ngày
                   {selectedTrip.startDate ? ` (${selectedTrip.startDate} → ${selectedTrip.endDate || ''})` : ''}
                 </p>
@@ -280,7 +280,7 @@ export const AddToTripModal = ({
               <button
                 type="button"
                 onClick={() => setSelectedTrip(null)}
-                className="text-[11px] font-bold text-sky-700 hover:text-sky-900 bg-white px-2.5 py-1.5 rounded-lg border border-sky-200 shadow-2xs shrink-0 cursor-pointer"
+                className="text-[11px] font-bold text-sky-700 hover:text-sky-900 bg-[#FFFDF8] px-2.5 py-1.5 rounded-[5px] border border-sky-200 shadow-none shrink-0 cursor-pointer"
               >
                 Đổi chuyến
               </button>
@@ -289,11 +289,11 @@ export const AddToTripModal = ({
             {/* Mục 1: Chọn Ngày Thứ Mấy */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <label className="text-xs font-bold text-ink-800 flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-sky-600" />
                   <span>1. Ghé thăm vào ngày thứ mấy?</span>
                 </label>
-                <span className="text-[11px] text-slate-500 font-medium">
+                <span className="text-[11px] text-ink-400 font-medium">
                   Đang chọn: <strong className="text-sky-600">Ngày {selectedDayNumber}</strong>
                   {getExistingStopsCountForDay(selectedTrip, selectedDayNumber) > 0 &&
                     ` (${getExistingStopsCountForDay(selectedTrip, selectedDayNumber)} điểm đã có)`}
@@ -312,20 +312,20 @@ export const AddToTripModal = ({
                       key={dayNum}
                       type="button"
                       onClick={() => setSelectedDayNumber(dayNum)}
-                      className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer flex flex-col items-center min-w-[72px] ${
+                      className={`px-3 py-2 rounded-[5px] text-xs font-bold border transition-all cursor-pointer flex flex-col items-center min-w-[72px] ${
                         isSelected
-                          ? 'bg-sky-600 text-white border-sky-600 shadow-sm scale-102'
-                          : 'bg-white text-slate-700 border-slate-200 hover:border-sky-400 hover:bg-slate-50'
+                          ? 'bg-sky-600 text-white border-sky-600 shadow-none '
+                          : 'bg-[#FFFDF8] text-ink-600 border-ink-200 hover:border-sky-400 hover:bg-[#F8F4EC]'
                       }`}
                     >
                       <span>Ngày {dayNum}</span>
                       {dateStr && (
-                        <span className={`text-[10px] font-normal ${isSelected ? 'text-sky-100' : 'text-slate-400'}`}>
+                        <span className={`text-[10px] font-normal ${isSelected ? 'text-sky-100' : 'text-ink-300'}`}>
                           {dateStr}
                         </span>
                       )}
                       {stops > 0 && (
-                        <span className={`text-[9px] font-semibold mt-0.5 ${isSelected ? 'text-amber-200' : 'text-slate-500'}`}>
+                        <span className={`text-[9px] font-semibold mt-0.5 ${isSelected ? 'text-amber-200' : 'text-ink-400'}`}>
                           • {stops} điểm
                         </span>
                       )}
@@ -336,7 +336,7 @@ export const AddToTripModal = ({
                 <button
                   type="button"
                   onClick={handleAddExtraDay}
-                  className="px-3 py-2 rounded-xl text-xs font-bold border border-dashed border-sky-300 text-sky-600 hover:bg-sky-50 hover:border-sky-500 transition-colors flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-2 rounded-[5px] text-xs font-bold border border-dashed border-sky-300 text-sky-600 hover:bg-sky-50 hover:border-sky-500 transition-colors flex items-center gap-1 cursor-pointer"
                   title="Thêm ngày mới cho lịch trình này"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -347,7 +347,7 @@ export const AddToTripModal = ({
 
             {/* Mục 2: Chọn Buổi / Khung giờ */}
             <div className="space-y-2 pt-1">
-              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <label className="text-xs font-bold text-ink-800 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-sky-600" />
                 <span>2. Khung giờ dự kiến trong ngày</span>
               </label>
@@ -360,16 +360,16 @@ export const AddToTripModal = ({
                       key={preset.id}
                       type="button"
                       onClick={() => setSelectedTimeSlot(preset.id)}
-                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
+                      className={`p-2.5 rounded-[5px] border text-left transition-all cursor-pointer flex items-center gap-2.5 ${
                         isSelected
                           ? 'border-sky-600 bg-sky-50/70 text-sky-900 ring-1 ring-sky-500'
-                          : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
+                          : 'border-ink-200 hover:border-ink-200 hover:bg-[#F8F4EC] text-ink-600'
                       }`}
                     >
                       <span className="text-base">{preset.icon}</span>
                       <div className="min-w-0">
                         <p className="font-bold text-xs">{preset.label}</p>
-                        <p className="text-[10px] text-slate-500">{preset.displayTime}</p>
+                        <p className="text-[10px] text-ink-400">{preset.displayTime}</p>
                       </div>
                     </button>
                   );
@@ -377,17 +377,17 @@ export const AddToTripModal = ({
               </div>
 
               {selectedTimeSlot === 'custom' && (
-                <div className="pt-2 flex items-center gap-2 p-3 bg-slate-50 rounded-xl border border-slate-200">
-                  <Clock className="w-4 h-4 text-slate-500" />
-                  <label htmlFor="customTimeInput" className="text-xs font-semibold text-slate-700">Giờ bắt đầu:</label>
+                <div className="pt-2 flex items-center gap-2 p-3 bg-[#F8F4EC] rounded-[5px] border border-ink-200">
+                  <Clock className="w-4 h-4 text-ink-400" />
+                  <label htmlFor="customTimeInput" className="text-xs font-semibold text-ink-600">Giờ bắt đầu:</label>
                   <input
                     id="customTimeInput"
                     type="time"
                     value={customTime}
                     onChange={(e) => setCustomTime(e.target.value)}
-                    className="px-2.5 py-1 rounded-lg border border-slate-300 bg-white text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="px-2.5 py-1 rounded-[5px] border border-ink-200 bg-[#FFFDF8] text-xs font-bold text-ink-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
                   />
-                  <span className="text-[11px] text-slate-400 italic">(Định dạng 24h)</span>
+                  <span className="text-[11px] text-ink-300 italic">(Định dạng 24h)</span>
                 </div>
               )}
             </div>
@@ -395,14 +395,14 @@ export const AddToTripModal = ({
             {/* Mục 3: Phân loại & Chi phí dự kiến */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                  <Tag className="w-3.5 h-3.5 text-slate-500" />
+                <label className="text-xs font-bold text-ink-800 flex items-center gap-1">
+                  <Tag className="w-3.5 h-3.5 text-ink-400" />
                   <span>Loại hoạt động</span>
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-3 py-2 rounded-[5px] border border-ink-200 bg-[#FFFDF8] text-xs font-semibold text-ink-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
                 >
                   {CATEGORY_PRESETS.map((cat) => (
                     <option key={cat} value={cat}>
@@ -413,7 +413,7 @@ export const AddToTripModal = ({
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
+                <label className="text-xs font-bold text-ink-800 flex items-center gap-1">
                   <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Chi phí dự kiến (VNĐ)</span>
                 </label>
@@ -424,16 +424,16 @@ export const AddToTripModal = ({
                   value={estimatedCost}
                   onChange={(e) => setEstimatedCost(Math.max(0, Number(e.target.value)))}
                   placeholder="0 (Miễn phí)"
-                  className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-3 py-2 rounded-[5px] border border-ink-200 bg-[#FFFDF8] text-xs font-semibold text-ink-800 focus:outline-none focus:ring-2 focus:ring-sky-500"
                 />
               </div>
             </div>
 
             {/* Mục 4: Ghi chú kế hoạch */}
             <div className="space-y-1.5 pt-1">
-              <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
+              <label className="text-xs font-bold text-ink-800 flex items-center justify-between">
                 <span>Ghi chú cho hoạt động này</span>
-                <span className="text-[10px] text-slate-400 font-normal">Tối đa 300 ký tự</span>
+                <span className="text-[10px] text-ink-300 font-normal">Tối đa 300 ký tự</span>
               </label>
               <textarea
                 value={note}
@@ -441,16 +441,16 @@ export const AddToTripModal = ({
                 onChange={(e) => setNote(e.target.value)}
                 rows={2}
                 placeholder="VD: Chụp ảnh hoàng hôn, ăn đặc sản, chuẩn bị vé..."
-                className="w-full px-3 py-2 rounded-xl border border-slate-300 bg-white text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 leading-relaxed resize-none"
+                className="w-full px-3 py-2 rounded-[5px] border border-ink-200 bg-[#FFFDF8] text-xs text-ink-800 focus:outline-none focus:ring-2 focus:ring-sky-500 leading-relaxed resize-none"
               />
             </div>
 
             {/* Buttons Action */}
-            <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3">
+            <div className="pt-3 border-t border-ink-200/70 flex items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={() => setSelectedTrip(null)}
-                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                className="px-4 py-2.5 rounded-[5px] bg-[#F5F0E6] hover:bg-[#EFE8DC] text-ink-600 text-xs font-bold transition-colors cursor-pointer"
               >
                 Quay lại
               </button>
@@ -459,7 +459,7 @@ export const AddToTripModal = ({
                 type="button"
                 disabled={isSubmitting}
                 onClick={handleConfirmAdd}
-                className="flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white text-xs font-bold transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="flex-1 px-4 py-2.5 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white text-xs font-bold transition-all shadow-none hover:shadow-none flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <span>Đang lưu vào lịch trình...</span>

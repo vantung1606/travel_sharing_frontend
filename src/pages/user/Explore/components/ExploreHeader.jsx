@@ -42,109 +42,96 @@ export const ExploreHeader = ({
 
   return (
     <div className="space-y-4">
-      {/* 1. Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-        <a href="/" className="hover:text-sky-600 transition-colors flex items-center gap-1 text-slate-500">
+      {/* 1. Breadcrumb */}
+      <div className="flex items-center gap-2 text-[11px] font-semibold text-ink-400">
+        <a href="/" className="hover:text-clay-700 transition-colors flex items-center gap-1">
           <Compass className="w-3.5 h-3.5" />
           <span>Trang chủ</span>
         </a>
-        <span>/</span>
-        <span className="text-slate-800 font-bold">Khám phá</span>
+        <span className="text-ink-300">/</span>
+        <span className="text-ink-800">Khám phá</span>
       </div>
 
-      {/* 2. Minimalist Header Row (Phong cách Airbnb/Google Travel: Không banner cồng kềnh, đẩy nội dung lên ngay) */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-1">
-        {/* Left: Clean Heading & Subtitle                       — thống kê THẬT từ server, không dùng số cứng */}
-        <div>
-          <h1 className="font-display text-2xl sm:text-3xl font-black tracking-tight text-slate-900">
+      {/* 2. Editorial heading + quick actions */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div className="min-w-0">
+          <h1 className="font-display text-3xl sm:text-4xl font-black tracking-tight text-ink-800">
             Khám Phá Điểm Đến
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
-            Theo dõi thời tiết thực tế & tọa độ du lịch của cộng đồng Wayfare
+          <p className="mt-1.5 text-xs sm:text-sm text-ink-400 font-medium">
+            Thời tiết thực tế và tọa độ du lịch từ cộng đồng Wayfare.
           </p>
-          <div className="flex flex-wrap items-center gap-1.5 mt-2">
-            <span className="px-2 py-0.5 rounded-lg bg-sky-50 border border-sky-200/70 text-[10px] sm:text-[11px] font-bold text-sky-700">
-              {placesCount} địa điểm
-            </span>
-            <span className="px-2 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200/70 text-[10px] sm:text-[11px] font-bold text-emerald-700">
-              {provincesCount} tỉnh thành
-            </span>
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] font-semibold text-ink-400">
+            <span><strong className="text-ink-800 font-bold">{placesCount}</strong> địa điểm</span>
+            <span className="h-3 w-px bg-ink-200" />
+            <span><strong className="text-ink-800 font-bold">{provincesCount}</strong> tỉnh thành</span>
             {destinationsCount > 0 && (
-              <span className="px-2 py-0.5 rounded-lg bg-violet-50 border border-violet-200/70 text-[10px] sm:text-[11px] font-bold text-violet-700">
-                {destinationsCount} danh mục tỉnh
-              </span>
-            )}
-            {placesCount > 0 && (provincesCount === 0 || destinationsCount === 0) && (
-              <span className="animate-pulse text-[10px] text-slate-400">đang tải thống kê...</span>
+              <>
+                <span className="h-3 w-px bg-ink-200" />
+                <span><strong className="text-ink-800 font-bold">{destinationsCount}</strong> danh mục tỉnh</span>
+              </>
             )}
           </div>
         </div>
 
-        {/* Right: Quick Action Buttons - 3 columns grid on mobile so they fit in 1 neat row */}
-        <div className="grid grid-cols-3 gap-1.5 sm:flex sm:items-center sm:gap-2 w-full sm:w-auto shrink-0">
-          {/* GPS Radar Button */}
+        <div className="grid grid-cols-3 gap-2 w-full lg:w-auto shrink-0">
           <button
             onClick={onGetLiveLocation}
             disabled={isLocating}
-            className={`w-full sm:w-auto px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1 transition-all cursor-pointer border shadow-2xs ${
+            className={`h-9 w-full lg:w-auto px-2.5 sm:px-3.5 rounded-[5px] text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1.5 border transition-colors cursor-pointer disabled:opacity-60 ${
               userCoords
-                ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                ? 'bg-clay-50 text-clay-700 border-clay-400'
+                : 'bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 border-ink-200 hover:border-clay-400'
             }`}
           >
-            <Navigation className={`w-3.5 h-3.5 shrink-0 ${isLocating ? 'animate-spin text-sky-500' : 'text-emerald-600'}`} />
-            <span className="truncate">{userCoords ? '📍 Đang dùng' : 'Gần tôi'}</span>
+            <Navigation className={`w-3.5 h-3.5 shrink-0 ${isLocating ? 'animate-spin text-clay-600' : 'text-clay-600'}`} />
+            <span className="truncate">{userCoords ? 'Đang dùng' : 'Gần tôi'}</span>
           </button>
 
-          {/* Quick Itinerary Planner Button */}
           <button
             onClick={onOpenAIGenerator}
-            className="w-full sm:w-auto px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 border border-slate-200 text-slate-800 font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow-2xs transition-all cursor-pointer"
+            className="h-9 w-full lg:w-auto px-2.5 sm:px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 border border-ink-200 hover:border-clay-400 text-ink-700 font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
           >
-            <Calendar className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+            <Calendar className="w-3.5 h-3.5 text-clay-600 shrink-0" />
             <span className="truncate">Lịch trình</span>
           </button>
 
-          {/* Add Place Button */}
           <button
             onClick={onOpenAddPlaceModal}
-            className="w-full sm:w-auto px-2 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1 shadow-xs hover:shadow-sm transition-all cursor-pointer"
+            className="h-9 w-full lg:w-auto px-2.5 sm:px-3.5 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-[11px] sm:text-xs flex items-center justify-center gap-1.5 border border-clay-600 transition-colors cursor-pointer"
           >
             <PlusCircle className="w-3.5 h-3.5 shrink-0" />
-            <span className="truncate">+ Đăng địa điểm</span>
+            <span className="truncate">Đăng địa điểm</span>
           </button>
         </div>
       </div>
 
-      {/* 3. Live Weather Stations Tickers Ribbon (Cuộn ngang mượt mà bằng chuột) */}
+      {/* 3. Live weather ticker */}
       <div
         onWheel={(e) => {
           if (e.deltaY !== 0) {
             e.currentTarget.scrollLeft += e.deltaY;
           }
         }}
-        className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 no-scrollbar pt-0.5 scroll-smooth"
+        className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar scroll-smooth"
       >
-        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1 pl-0.5">
-          <CloudSun className="w-3.5 h-3.5 text-sky-500 shrink-0" />
-          <span className="hidden sm:inline">Thời tiết:</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-ink-400 shrink-0 flex items-center gap-1.5">
+          <CloudSun className="w-3.5 h-3.5 text-clay-600 shrink-0" />
+          <span>Thời tiết</span>
         </span>
         {stations.map((station) => (
           <button
             key={station.city}
             onClick={() => onQuickFilterCity(station.city)}
             disabled={!station.temp}
-            className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg sm:rounded-xl bg-white hover:bg-sky-50 border border-slate-200/80 hover:border-sky-300 shadow-2xs text-[11px] sm:text-xs font-semibold flex items-center gap-1 shrink-0 transition-all cursor-pointer group"
+            className="px-2.5 py-1 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 border border-ink-200 hover:border-clay-300 text-[11px] font-semibold flex items-center gap-1.5 shrink-0 transition-colors cursor-pointer disabled:cursor-default disabled:opacity-60"
           >
-            <span className="text-xs sm:text-sm select-none">{station.icon || '☁️'}</span>
-            <span className="font-bold text-slate-700 group-hover:text-sky-600 transition-colors">{station.city}</span>
+            <span className="text-xs select-none">{station.icon || '☁️'}</span>
+            <span className="font-bold text-ink-600">{station.city}</span>
             {station.temp ? (
-              <span className="font-extrabold text-sky-700 text-[11px] sm:text-xs">{station.temp}</span>
+              <span className="font-extrabold text-clay-700">{station.temp}</span>
             ) : (
-              <span className="text-[10px] text-slate-400 animate-pulse">...</span>
-            )}
-            {station.label && (
-              <span className="text-[10px] text-slate-400 hidden lg:inline">• {station.label}</span>
+              <span className="text-[10px] text-ink-300">...</span>
             )}
           </button>
         ))}

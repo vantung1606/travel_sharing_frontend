@@ -713,9 +713,9 @@ export const ExplorePage = () => {
   const renderPagination = () => {
     if (totalPages <= 1) return null;
     return (
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-4 pt-4 sm:pt-6 pb-2 border-t border-slate-200/80 mt-4 sm:mt-6">
-        <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
-          Hiển thị <strong className="text-slate-900 font-bold">{(currentPage - 1) * itemsPerPage + 1}</strong> - <strong className="text-slate-900 font-bold">{Math.min(currentPage * itemsPerPage, filteredItems.length)}</strong> trong số <strong className="text-slate-900 font-bold">{filteredItems.length}</strong> {exploreLayer === 'spots' ? 'tọa độ' : 'điểm đến'}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-5 pb-1 border-t border-ink-200/70 mt-5">
+        <p className="text-[11px] text-ink-400 font-medium">
+          Hiển thị <strong className="text-ink-800 font-bold">{(currentPage - 1) * itemsPerPage + 1}</strong> - <strong className="text-ink-800 font-bold">{Math.min(currentPage * itemsPerPage, filteredItems.length)}</strong> trong số <strong className="text-ink-800 font-bold">{filteredItems.length}</strong> {exploreLayer === 'spots' ? 'tọa độ' : 'điểm đến'}
         </p>
 
         <div className="flex items-center gap-1 flex-wrap justify-center">
@@ -726,7 +726,7 @@ export const ExplorePage = () => {
               setCurrentPage((p) => Math.max(p - 1, 1));
               window.scrollTo({ top: 120, behavior: 'smooth' });
             }}
-            className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 transition-all shadow-2xs"
+            className="h-8 px-2 sm:px-3 rounded-[5px] border border-ink-200 bg-[#FFFDF8] hover:bg-clay-50 hover:border-clay-300 text-[11px] font-bold text-ink-600 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 transition-colors"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Trước</span>
@@ -741,16 +741,16 @@ export const ExplorePage = () => {
                   setCurrentPage(p);
                   window.scrollTo({ top: 120, behavior: 'smooth' });
                 }}
-                className={`min-w-[28px] sm:min-w-[32px] h-7 sm:h-8 px-1.5 sm:px-2 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
+                className={`min-w-[30px] h-8 px-1.5 rounded-[5px] text-[11px] font-bold transition-colors cursor-pointer flex items-center justify-center border ${
                   currentPage === p
-                    ? 'bg-sky-600 text-white shadow-xs'
-                    : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs'
+                    ? 'bg-clay-600 text-[#FFFDF8] border-clay-600'
+                    : 'bg-[#FFFDF8] hover:bg-clay-50 text-ink-600 border-ink-200 hover:border-clay-300'
                 }`}
               >
                 {p}
               </button>
             ) : (
-              <span key={idx} className="px-1 text-slate-400 text-xs select-none">...</span>
+              <span key={idx} className="px-1 text-ink-300 text-xs select-none">...</span>
             )
           ))}
 
@@ -761,7 +761,7 @@ export const ExplorePage = () => {
               setCurrentPage((p) => Math.min(p + 1, totalPages));
               window.scrollTo({ top: 120, behavior: 'smooth' });
             }}
-            className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 transition-all shadow-2xs"
+            className="h-8 px-2 sm:px-3 rounded-[5px] border border-ink-200 bg-[#FFFDF8] hover:bg-clay-50 hover:border-clay-300 text-[11px] font-bold text-ink-600 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 transition-colors"
           >
             <span className="hidden sm:inline">Sau</span>
             <ChevronRight className="w-3.5 h-3.5" />
@@ -814,7 +814,8 @@ export const ExplorePage = () => {
   };
 
   return (
-    <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 space-y-6">
+    <div className="explore-page w-full min-h-screen bg-[#F8F4EC] text-ink-800 pb-14">
+      <div className="w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6 sm:pt-8 space-y-5">
       
       {/* 1. COMPACT DISCOVERY HEADER */}
       <ExploreHeader
@@ -849,9 +850,9 @@ export const ExplorePage = () => {
       />
 
       {/* 3. FILTER RESULTS META BAR */}
-      <div className="flex items-center justify-between text-xs text-slate-500 font-medium px-1">
+      <div className="flex items-center justify-between gap-3 text-[11px] text-ink-400 font-medium px-0.5">
         <span>
-          Tìm thấy <strong className="text-slate-900 font-bold">{filteredItems.length}</strong>{' '}
+          <strong className="text-ink-800 font-bold">{filteredItems.length}</strong>{' '}
           {exploreLayer === 'spots' ? 'địa điểm du lịch' : 'tỉnh thành & điểm đến'}
           {searchQuery && ` cho từ khóa "${searchQuery}"`}
           {selectedRegion !== 'Tất cả' && ` tại ${selectedRegion}`}
@@ -860,41 +861,41 @@ export const ExplorePage = () => {
         {(searchQuery || selectedCategory !== 'Tất cả' || activeFilterCount > 0) && (
           <button
             onClick={handleResetFilters}
-            className="text-sky-600 hover:text-sky-700 font-bold hover:underline cursor-pointer"
+            className="text-clay-700 hover:text-clay-800 font-bold hover:underline transition-colors cursor-pointer shrink-0"
           >
             Xóa bộ lọc
           </button>
         )}
       </div>
 
-      {/* 3.1 PHÂN TRANG ĐỊA ĐIỂM (tải dần từ server để giảm payload ban đầu) */}
+      {/* 3.1 SERVER SEARCH / LOAD-MORE STATUS */}
       {exploreLayer === 'spots' && remotePool !== null && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-emerald-100 bg-emerald-50/70 px-4 py-3">
-          <span className="text-xs text-slate-600 text-center sm:text-left">
-            {isRemoteSearching && !remotePool.length ? 'Đang hỏi server...' : (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-[5px] border border-ink-200 bg-[#FFFDF8] px-4 py-3">
+          <span className="text-[11px] sm:text-xs text-ink-400 text-center sm:text-left">
+            {isRemoteSearching && !remotePool.length ? 'Đang tìm trên server...' : (
               <>
-                Tìm thấy <strong className="text-slate-900 font-bold">{remotePool.length}</strong> địa điểm trên toàn bộ hệ thống (từ server).
+                Tìm thấy <strong className="text-ink-800 font-bold">{remotePool.length}</strong> địa điểm trên toàn bộ hệ thống.
                 {!remotePool.length && ' Không có kết quả phù hợp — thử từ khoá khác.'}
               </>
             )}
           </span>
           <button
             onClick={() => { setSearchQuery(''); setSelectedCity('Tất cả'); }}
-            className="shrink-0 rounded-lg border border-emerald-200 bg-white px-4 py-2 text-xs font-bold text-emerald-700 shadow-sm transition hover:bg-emerald-50 cursor-pointer"
+            className="shrink-0 h-8 rounded-[5px] border border-ink-200 bg-[#F8F4EC] px-3.5 text-[11px] font-bold text-ink-700 transition-colors hover:border-clay-400 hover:text-clay-700 cursor-pointer"
           >
             Nhìn lại toàn bộ địa điểm
           </button>
         </div>
       )}
       {exploreLayer === 'spots' && remotePool === null && hasMorePlaces && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-sky-100 bg-sky-50/70 px-4 py-3">
-          <span className="text-xs text-slate-600 text-center sm:text-left">
-            Đang hiển thị <strong className="text-slate-900 font-bold">{places.length}</strong> / {placesTotal} địa điểm.
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-[5px] border border-ink-200 bg-[#FFFDF8] px-4 py-3">
+          <span className="text-[11px] sm:text-xs text-ink-400 text-center sm:text-left">
+            Đang hiển thị <strong className="text-ink-800 font-bold">{places.length}</strong> / {placesTotal} địa điểm.
           </span>
           <button
             onClick={loadMorePlaces}
             disabled={loadingMorePlaces}
-            className="shrink-0 inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+            className="shrink-0 inline-flex items-center justify-center gap-2 h-8 rounded-[5px] bg-clay-600 px-4 text-[11px] font-bold text-[#FFFDF8] border border-clay-600 transition-colors hover:bg-clay-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
           >
             {loadingMorePlaces ? (
               <>
@@ -911,27 +912,27 @@ export const ExplorePage = () => {
       {/* 4. MAIN CONTENT VIEW DISPLAY */}
       {/* ─── A. SPLIT VIEW (Cards Left + Interactive Map Right) ─── */}
       {viewMode === 'split' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-[650px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 min-h-[650px]">
           
           {/* Left Column: Scrollable Cards */}
-          <div className="lg:col-span-6 space-y-4 max-h-[820px] overflow-y-auto pr-1.5 sidebar-scrollbar">
+          <div className="lg:col-span-6 space-y-4 max-h-[760px] overflow-y-auto pr-1.5 sidebar-scrollbar">
             {filteredItems.length === 0 ? (
-              <div className="bg-white p-12 rounded-3xl text-center space-y-3 border border-slate-200 shadow-xs">
-                <Compass className="w-12 h-12 text-slate-300 mx-auto" />
-                <h3 className="font-bold text-base text-slate-900">Không tìm thấy địa điểm phù hợp</h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Hãy thử đổi từ khóa tìm kiếm hoặc bấm "Đăng địa điểm" để chia sẻ tọa độ mới của bạn nhé!
+              <div className="bg-[#FFFDF8] p-10 rounded-[6px] text-center space-y-3 border border-ink-200">
+                <Compass className="w-10 h-10 text-ink-300 mx-auto" />
+                <h3 className="font-bold text-base text-ink-800">Không tìm thấy địa điểm phù hợp</h3>
+                <p className="text-xs text-ink-400 max-w-sm mx-auto leading-relaxed">
+                  Hãy thử đổi từ khóa tìm kiếm hoặc đăng một tọa độ mới để cộng đồng cùng khám phá.
                 </p>
                 <button
                   onClick={() => setIsAddPlaceModalOpen(true)}
-                  className="px-5 py-2.5 bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer"
+                  className="px-5 h-9 bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] rounded-[5px] text-xs font-bold transition-colors cursor-pointer"
                 >
-                  + Đăng Địa Điểm Mới
+                  Đăng địa điểm mới
                 </button>
               </div>
             ) : (
               <>
-                <div className="space-y-3 sm:space-y-4">
+                <div className="space-y-3">
                     {paginatedItems.map(item => {
                       if (exploreLayer === 'destinations') {
                         return (
@@ -967,7 +968,7 @@ export const ExplorePage = () => {
             </div>
 
             {/* Right Column: Interactive Real Map */}
-            <div className="lg:col-span-6 sticky top-24 h-[550px] sm:h-[650px] lg:h-[820px] rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/80 shadow-md">
+            <div className="lg:col-span-6 sticky top-24 h-[550px] sm:h-[650px] lg:h-[760px] rounded-[6px] overflow-hidden border border-ink-200 bg-[#FFFDF8]">
               <RealMapView
                 items={filteredItems}
                 activeItem={activeItem}
@@ -986,19 +987,22 @@ export const ExplorePage = () => {
         {viewMode === 'grid' && (
           <div>
             {filteredItems.length === 0 ? (
-              <div className="bg-white p-12 rounded-3xl text-center space-y-3 border border-slate-200 shadow-xs">
-                <Compass className="w-12 h-12 text-slate-300 mx-auto" />
-                <h3 className="font-bold text-base text-slate-900">Không tìm thấy địa điểm phù hợp</h3>
+              <div className="bg-[#FFFDF8] p-10 sm:p-12 rounded-[6px] text-center space-y-3 border border-ink-200">
+                <Compass className="w-10 h-10 text-ink-300 mx-auto" />
+                <h3 className="font-bold text-base text-ink-800">Không tìm thấy địa điểm phù hợp</h3>
+                <p className="text-xs text-ink-400 max-w-sm mx-auto leading-relaxed">
+                  Thử đổi từ khóa, chọn tỉnh thành khác hoặc đặt lại bộ lọc.
+                </p>
                 <button
                   onClick={handleResetFilters}
-                  className="px-5 py-2.5 bg-sky-600 text-white rounded-xl text-xs font-bold shadow-md cursor-pointer"
+                  className="px-5 h-9 bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] rounded-[5px] text-xs font-bold transition-colors cursor-pointer"
                 >
                   Đặt lại bộ lọc
                 </button>
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
                   {paginatedItems.map(item => {
                     if (exploreLayer === 'destinations') {
                       return (
@@ -1036,7 +1040,7 @@ export const ExplorePage = () => {
 
       {/* ─── C. FULL MAP VIEW ─── */}
       {viewMode === 'map' && (
-        <div className="w-full h-[750px] rounded-3xl overflow-hidden border border-slate-200/80 shadow-md">
+        <div className="w-full h-[750px] rounded-[6px] overflow-hidden border border-ink-200 bg-[#FFFDF8]">
           <RealMapView
             items={filteredItems}
             activeItem={activeItem}
@@ -1157,7 +1161,7 @@ export const ExplorePage = () => {
           }
         }}
       />
-
+      </div>
     </div>
   );
 };

@@ -100,17 +100,17 @@ export const AddPlaceModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/70 backdrop-blur-md animate-fade-in overflow-y-auto">
-      <div className="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-100 overflow-hidden my-auto max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-ink-900/55  animate-fade-in overflow-y-auto">
+      <div className="bg-[#FFFDF8] rounded-[6px] max-w-xl w-full shadow-none border border-ink-200/70 overflow-hidden my-auto max-h-[92vh] flex flex-col">
         
         {/* Header with Visual Banner */}
-        <div className="relative p-5 sm:p-6 bg-gradient-to-br from-sky-600 via-sky-700 to-indigo-800 text-white shrink-0 overflow-hidden">
-          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-56 h-56 rounded-full bg-white/10 blur-2xl pointer-events-none"></div>
+        <div className="relative p-5 sm:p-6 bg-[#3A2A21] text-white shrink-0 overflow-hidden">
+          
           
           <div className="relative flex items-start justify-between">
             <div className="space-y-1.5 pr-6">
               <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full bg-white/20 backdrop-blur-md text-white text-[11px] font-bold tracking-wide uppercase flex items-center gap-1 border border-white/20">
+                <span className="px-2.5 py-0.5 rounded-full bg-[#FFFDF8]/20  text-white text-[11px] font-bold tracking-wide uppercase flex items-center gap-1 border border-white/20">
                   <Compass className="w-3 h-3 text-amber-300" />
                   Đóng góp tọa độ
                 </span>
@@ -122,14 +122,14 @@ export const AddPlaceModal = ({
               <h2 className="font-display font-extrabold text-xl sm:text-2xl tracking-tight text-white">
                 Chia Sẻ Địa Điểm Mới
               </h2>
-              <p className="text-xs text-sky-100/90 leading-relaxed max-w-md">
+              <p className="text-xs text-[#E3D6C6] leading-relaxed max-w-md">
                 Gợi ý điểm đến yêu thích của bạn. Sau khi Ban Quản Trị xác minh, địa điểm sẽ xuất hiện trên bản đồ cộng đồng.
               </p>
             </div>
 
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-white/15 hover:bg-white/25 text-white flex items-center justify-center transition-all cursor-pointer shrink-0"
+              className="w-8 h-8 rounded-full bg-[#FFFDF8]/15 hover:bg-[#FFFDF8]/25 text-white flex items-center justify-center transition-all cursor-pointer shrink-0"
               title="Đóng modal"
             >
               <X className="w-4 h-4" />
@@ -143,10 +143,10 @@ export const AddPlaceModal = ({
           {/* 1. Tải Ảnh Từ Máy / Thiết Bị (Direct Device Upload) */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+              <label className="font-bold text-ink-800 text-xs flex items-center gap-1.5">
                 <ImageIcon className="w-4 h-4 text-sky-600" />
                 <span>Ảnh địa điểm thực tế</span>
-                <span className="text-slate-400 font-normal text-[11px]">(tải trực tiếp từ máy của bạn)</span>
+                <span className="text-ink-300 font-normal text-[11px]">(tải trực tiếp từ máy của bạn)</span>
               </label>
 
               <button
@@ -169,16 +169,16 @@ export const AddPlaceModal = ({
 
             {/* Case A: Image is Selected/Uploaded -> Show Preview with Actions */}
             {newPlaceForm.coverImageUrl ? (
-              <div className="relative h-44 sm:h-48 rounded-2xl overflow-hidden border border-slate-200 group shadow-sm bg-slate-900">
+              <div className="relative h-44 sm:h-48 rounded-[6px] overflow-hidden border border-ink-200 group shadow-none bg-ink-800">
                 <img
                   src={newPlaceForm.coverImageUrl}
                   alt="Preview"
-                  className={`w-full h-full object-cover transition-all duration-300 ${isUploading ? 'opacity-50 blur-xs scale-102' : 'group-hover:scale-105'}`}
+                  className={`w-full h-full object-cover transition-all duration-300 ${isUploading ? 'opacity-50 blur-xs ' : ''}`}
                 />
 
                 {/* Loading state overlay */}
                 {isUploading && (
-                  <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-white">
+                  <div className="absolute inset-0 bg-ink-800/70  flex flex-col items-center justify-center gap-2 text-white">
                     <Loader2 className="w-6 h-6 animate-spin text-sky-400" />
                     <span className="text-xs font-bold tracking-wide">Đang tải ảnh lên hệ thống...</span>
                   </div>
@@ -186,8 +186,8 @@ export const AddPlaceModal = ({
 
                 {/* Bottom Bar with Actions */}
                 {!isUploading && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end justify-between p-3.5">
-                    <span className="text-white text-xs font-bold drop-shadow-sm flex items-center gap-1.5">
+                  <div className="absolute inset-0 bg-ink-900/50 flex items-end justify-between p-3.5">
+                    <span className="text-white text-xs font-bold drop-shadow-none flex items-center gap-1.5">
                       <Check className="w-3.5 h-3.5 text-emerald-400" />
                       Ảnh đã sẵn sàng
                     </span>
@@ -196,7 +196,7 @@ export const AddPlaceModal = ({
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-white/20 shadow-xs"
+                        className="px-3 py-1.5 rounded-[5px] bg-[#FFFDF8]/20 hover:bg-[#FFFDF8]/30  text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer border border-white/20 shadow-none"
                       >
                         <RefreshCw className="w-3 h-3" />
                         <span>Đổi ảnh khác</span>
@@ -205,7 +205,7 @@ export const AddPlaceModal = ({
                       <button
                         type="button"
                         onClick={handleClearImage}
-                        className="p-1.5 rounded-xl bg-rose-600/80 hover:bg-rose-600 backdrop-blur-md text-white transition-all cursor-pointer shadow-xs"
+                        className="p-1.5 rounded-[5px] bg-rose-600/80 hover:bg-rose-600  text-white transition-all cursor-pointer shadow-none"
                         title="Xóa ảnh"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -221,20 +221,20 @@ export const AddPlaceModal = ({
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-2xl p-6 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-2 group ${
+                className={`border-2 border-dashed rounded-[6px] p-6 text-center transition-all cursor-pointer flex flex-col items-center justify-center gap-2 group ${
                   isDragging
-                    ? 'border-sky-500 bg-sky-50/80 scale-[1.01]'
-                    : 'border-slate-300 hover:border-sky-400 hover:bg-sky-50/40 bg-slate-50/50'
+                    ? 'border-sky-500 bg-sky-50/80 '
+                    : 'border-ink-200 hover:border-sky-400 hover:bg-sky-50/40 bg-[#F8F4EC]/50'
                 }`}
               >
-                <div className="w-12 h-12 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-sky-600 group-hover:text-white transition-all shadow-xs">
+                <div className="w-12 h-12 rounded-[6px] bg-sky-100 text-sky-600 flex items-center justify-center group-hover:bg-clay-600 group-hover:text-white transition-all shadow-none">
                   <UploadCloud className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="font-bold text-slate-800 text-xs group-hover:text-sky-600 transition-colors">
+                  <p className="font-bold text-ink-800 text-xs group-hover:text-sky-600 transition-colors">
                     Nhấp để tải ảnh từ máy tính / điện thoại
                   </p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
+                  <p className="text-[11px] text-ink-300 mt-0.5">
                     Hoặc kéo thả file ảnh vào đây (Hỗ trợ JPG, PNG, WebP)
                   </p>
                 </div>
@@ -243,7 +243,7 @@ export const AddPlaceModal = ({
 
             {/* Error Message if upload fails */}
             {uploadError && (
-              <div className="p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+              <div className="p-2.5 rounded-[5px] bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{uploadError}</span>
               </div>
@@ -256,14 +256,14 @@ export const AddPlaceModal = ({
                 placeholder="Dán link ảnh từ Internet: https://..."
                 value={newPlaceForm.coverImageUrl}
                 onChange={(e) => setNewPlaceForm(prev => ({ ...prev, coverImageUrl: e.target.value }))}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-sky-500 text-slate-800 text-xs outline-none"
+                className="w-full px-3.5 py-2.5 rounded-[5px] bg-[#F8F4EC] border border-ink-200 focus:bg-[#FFFDF8] focus:border-sky-500 text-ink-800 text-xs outline-none"
               />
             )}
           </div>
 
           {/* 2. Tên Địa Điểm */}
           <div className="space-y-1.5">
-            <label className="font-bold text-slate-800 text-xs flex items-center gap-1">
+            <label className="font-bold text-ink-800 text-xs flex items-center gap-1">
               <span>Tên địa điểm</span>
               <span className="text-rose-500 font-bold">*</span>
             </label>
@@ -273,13 +273,13 @@ export const AddPlaceModal = ({
               placeholder="VD: Cột cờ Lũng Cú, Tiệm Cà Phê Hoàng Hôn, Đèo Ô Quy Hồ..."
               value={newPlaceForm.name}
               onChange={(e) => setNewPlaceForm(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 text-slate-900 font-semibold text-sm outline-none transition-all placeholder:text-slate-400 placeholder:font-normal"
+              className="w-full px-4 py-3 rounded-[6px] bg-[#F8F4EC] border border-ink-200 focus:bg-[#FFFDF8] focus:border-sky-500 focus:ring-4 focus:ring-sky-500/10 text-ink-800 font-semibold text-sm outline-none transition-all placeholder:text-ink-300 placeholder:font-normal"
             />
           </div>
 
           {/* 3. Danh Mục Trải Nghiệm (Visual Chip Badges) */}
           <div className="space-y-2">
-            <label className="font-bold text-slate-800 text-xs">
+            <label className="font-bold text-ink-800 text-xs">
               Danh mục trải nghiệm
             </label>
             <div className="flex flex-wrap gap-1.5">
@@ -290,10 +290,10 @@ export const AddPlaceModal = ({
                     key={cat.id}
                     type="button"
                     onClick={() => setNewPlaceForm(prev => ({ ...prev, categoryName: cat.id }))}
-                    className={`px-3.5 py-1.5 rounded-xl font-semibold text-xs transition-all cursor-pointer border ${
+                    className={`px-3.5 py-1.5 rounded-[5px] font-semibold text-xs transition-all cursor-pointer border ${
                       isSelected
-                        ? 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-600/25'
-                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
+                        ? 'bg-sky-600 text-white border-sky-600 shadow-none'
+                        : 'bg-[#F8F4EC] text-ink-600 border-ink-200 hover:bg-[#F5F0E6] hover:text-ink-800'
                     }`}
                   >
                     <span>{cat.label}</span>
@@ -304,16 +304,16 @@ export const AddPlaceModal = ({
           </div>
 
           {/* 4. Tỉnh Thành & Địa Chỉ Cụ Thể */}
-          <div className="space-y-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+          <div className="space-y-3 p-4 rounded-[6px] bg-[#F8F4EC] border border-ink-200/80">
             {/* Tỉnh thành chọn nhanh */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="font-bold text-slate-800 text-xs flex items-center gap-1">
+                <label className="font-bold text-ink-800 text-xs flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-sky-600" />
                   <span>Tỉnh / Thành phố</span>
                   <span className="text-rose-500 font-bold">*</span>
                 </label>
-                <span className="text-[11px] text-slate-400">Chọn nhanh hoặc tự gõ:</span>
+                <span className="text-[11px] text-ink-300">Chọn nhanh hoặc tự gõ:</span>
               </div>
 
               {/* Quick City Chips */}
@@ -323,10 +323,10 @@ export const AddPlaceModal = ({
                     key={c}
                     type="button"
                     onClick={() => setNewPlaceForm(prev => ({ ...prev, city: c }))}
-                    className={`px-2 py-0.5 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer ${
+                    className={`px-2 py-0.5 rounded-[5px] text-[11px] font-semibold transition-colors cursor-pointer ${
                       newPlaceForm.city === c
                         ? 'bg-sky-600 text-white'
-                        : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                        : 'bg-[#FFFDF8] text-ink-500 border border-ink-200 hover:bg-[#F5F0E6]'
                     }`}
                   >
                     {c}
@@ -340,14 +340,14 @@ export const AddPlaceModal = ({
                 placeholder="VD: Đà Lạt, Hà Giang, Đà Nẵng, Quảng Ninh..."
                 value={newPlaceForm.city}
                 onChange={(e) => setNewPlaceForm(prev => ({ ...prev, city: e.target.value }))}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:border-sky-500 text-slate-800 font-semibold outline-none"
+                className="w-full px-3.5 py-2.5 rounded-[5px] bg-[#FFFDF8] border border-ink-200 focus:border-sky-500 text-ink-800 font-semibold outline-none"
               />
             </div>
 
             {/* Địa chỉ chi tiết */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="font-bold text-slate-800 text-xs flex items-center gap-1">
+                <label className="font-bold text-ink-800 text-xs flex items-center gap-1">
                   <span>Địa chỉ cụ thể</span>
                   <span className="text-rose-500 font-bold">*</span>
                 </label>
@@ -361,16 +361,16 @@ export const AddPlaceModal = ({
                 placeholder="VD: 202 Chương Dương - Sơn Trà - Đà Nẵng"
                 value={newPlaceForm.address}
                 onChange={(e) => setNewPlaceForm(prev => ({ ...prev, address: e.target.value }))}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 focus:border-sky-500 text-slate-800 outline-none text-xs font-medium"
+                className="w-full px-3.5 py-2.5 rounded-[5px] bg-[#FFFDF8] border border-ink-200 focus:border-sky-500 text-ink-800 outline-none text-xs font-medium"
               />
-              <p className="text-[11px] text-slate-500 leading-snug">
-                <span className="text-sky-600 font-bold">💡 Quy chuẩn:</span> Phải ghi rõ Số nhà/Đường - Phường/Quận/Huyện - Tỉnh/Thành phố (Ví dụ: <strong className="text-slate-700">202 Chương Dương - Sơn Trà - Đà Nẵng</strong>). Tuyệt đối không chỉ ghi tên đường cộc lốc.
+              <p className="text-[11px] text-ink-400 leading-snug">
+                <span className="text-sky-600 font-bold">💡 Quy chuẩn:</span> Phải ghi rõ Số nhà/Đường - Phường/Quận/Huyện - Tỉnh/Thành phố (Ví dụ: <strong className="text-ink-600">202 Chương Dương - Sơn Trà - Đà Nẵng</strong>). Tuyệt đối không chỉ ghi tên đường cộc lốc.
               </p>
             </div>
 
             {/* Smart 1-Tap GPS Button */}
             <div className="pt-1 flex items-center justify-between">
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-ink-400">
                 {newPlaceForm.latitude ? (
                   <span className="text-emerald-600 font-semibold flex items-center gap-1">
                     <Check className="w-3.5 h-3.5" />
@@ -384,7 +384,7 @@ export const AddPlaceModal = ({
               <button
                 type="button"
                 onClick={onGetLocationForForm}
-                className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="px-3 py-1.5 rounded-[5px] bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
               >
                 <Navigation className="w-3.5 h-3.5 text-sky-600" />
                 <span>📍 Ghim vị trí hiện tại</span>
@@ -394,7 +394,7 @@ export const AddPlaceModal = ({
 
           {/* 5. Cảm Nhận & Mô Tả Ngắn */}
           <div className="space-y-1.5">
-            <label className="font-bold text-slate-800 text-xs">
+            <label className="font-bold text-ink-800 text-xs">
               Mô tả & Kinh nghiệm khám phá
             </label>
             <textarea
@@ -402,16 +402,16 @@ export const AddPlaceModal = ({
               placeholder="Chia sẻ vẻ đẹp, view ngắm cảnh, mùa nào đi đẹp nhất, lưu ý đường đi..."
               value={newPlaceForm.description}
               onChange={(e) => setNewPlaceForm(prev => ({ ...prev, description: e.target.value }))}
-              className="w-full p-3 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-sky-500 text-slate-800 outline-none resize-none transition-all"
+              className="w-full p-3 rounded-[6px] bg-[#F8F4EC] border border-ink-200 focus:bg-[#FFFDF8] focus:border-sky-500 text-ink-800 outline-none resize-none transition-all"
             />
           </div>
 
           {/* 6. Mục Mở Rộng: Giờ Mở Cửa, Giá Vé, Hotline (Thu gọn mặc định) */}
-          <div className="border-t border-slate-100 pt-2">
+          <div className="border-t border-ink-200/70 pt-2">
             <button
               type="button"
               onClick={() => setShowAdvanced(!showAdvanced)}
-              className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1.5 py-1 cursor-pointer transition-colors"
+              className="text-xs font-bold text-ink-400 hover:text-ink-800 flex items-center gap-1.5 py-1 cursor-pointer transition-colors"
             >
               {showAdvanced ? (
                 <>
@@ -427,35 +427,35 @@ export const AddPlaceModal = ({
             </button>
 
             {showAdvanced && (
-              <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 animate-fade-in">
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-[6px] bg-[#F8F4EC] border border-ink-200/80 animate-fade-in">
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-700 text-[11px]">Giờ mở cửa</label>
+                  <label className="font-bold text-ink-600 text-[11px]">Giờ mở cửa</label>
                   <input
                     type="text"
                     placeholder="VD: 07:00 - 22:00"
                     value={newPlaceForm.openHours}
                     onChange={(e) => setNewPlaceForm(prev => ({ ...prev, openHours: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 outline-none"
+                    className="w-full px-3 py-2 rounded-[5px] bg-[#FFFDF8] border border-ink-200 text-ink-800 outline-none"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-700 text-[11px]">Khoảng giá / Vé</label>
+                  <label className="font-bold text-ink-600 text-[11px]">Khoảng giá / Vé</label>
                   <input
                     type="text"
                     placeholder="VD: Miễn phí, 50.000đ"
                     value={newPlaceForm.priceRange}
                     onChange={(e) => setNewPlaceForm(prev => ({ ...prev, priceRange: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 outline-none"
+                    className="w-full px-3 py-2 rounded-[5px] bg-[#FFFDF8] border border-ink-200 text-ink-800 outline-none"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="font-bold text-slate-700 text-[11px]">Hotline liên hệ</label>
+                  <label className="font-bold text-ink-600 text-[11px]">Hotline liên hệ</label>
                   <input
                     type="text"
                     placeholder="VD: 0988 123 456"
                     value={newPlaceForm.phoneNumber}
                     onChange={(e) => setNewPlaceForm(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-slate-800 outline-none"
+                    className="w-full px-3 py-2 rounded-[5px] bg-[#FFFDF8] border border-ink-200 text-ink-800 outline-none"
                   />
                 </div>
               </div>
@@ -463,18 +463,18 @@ export const AddPlaceModal = ({
           </div>
 
           {/* Modal Actions */}
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3 shrink-0">
+          <div className="pt-3 border-t border-ink-200/70 flex items-center justify-end gap-3 shrink-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl text-slate-600 font-bold hover:bg-slate-100 transition-colors cursor-pointer text-xs"
+              className="px-4 py-2.5 rounded-[5px] text-ink-500 font-bold hover:bg-[#F5F0E6] transition-colors cursor-pointer text-xs"
             >
               Hủy bỏ
             </button>
             <button
               type="submit"
               disabled={isSubmitting || isUploading}
-              className="px-6 py-2.5 rounded-2xl bg-gradient-to-r from-sky-600 via-sky-700 to-indigo-700 hover:from-sky-700 hover:to-indigo-800 text-white font-bold text-xs shadow-lg shadow-sky-600/25 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+              className="px-6 py-2.5 rounded-[6px] bg-clay-600 hover:bg-clay-700 text-white font-bold text-xs shadow-none transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
             >
               {isSubmitting || isUploading ? (
                 <span>{isUploading ? 'Đang tải ảnh...' : 'Đang gửi thông tin...'}</span>

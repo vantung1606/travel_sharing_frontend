@@ -44,141 +44,125 @@ export const ExploreSpotCard = ({
     <div
       id={`explore-card-${item.id}`}
       onClick={() => onOpenDetail(item)}
-      className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/80 hover:border-sky-400 shadow-2xs hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col group relative"
+      className={`bg-[#FFFDF8] rounded-[6px] overflow-hidden border transition-colors duration-200 cursor-pointer flex flex-col group relative ${
+        isActive ? 'border-clay-500' : 'border-ink-200/80 hover:border-clay-400'
+      }`}
     >
-      {/* 1. Panoramic Image Cover - Compact height on mobile */}
-      <div className="relative h-32 sm:h-52 w-full overflow-hidden bg-slate-900 shrink-0">
+      {/* 1. Image cover */}
+      <div className="relative h-40 sm:h-44 w-full overflow-hidden bg-ink-100 shrink-0">
         <img
           src={item.image}
           alt={item.name}
           onError={(e) => handleImageError(e, item)}
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-95"
+          className="w-full h-full object-cover"
           loading="lazy"
+          decoding="async"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-        {/* Top Badges Row */}
-        <div className="absolute top-2 left-2 right-2 flex items-center justify-between pointer-events-none">
-          {/* Category Pill Tag + Badge xác thực (dữ liệu thật: isVerifiedHost từ server) */}
-          <div className="flex items-center gap-1 min-w-0">
-            <span className="px-2 sm:px-2.5 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[9px] sm:text-[10px] font-bold text-white shadow-xs border border-white/15 tracking-wide">
+        {/* Top badges */}
+        <div className="absolute top-2 left-2 right-2 flex items-start justify-between gap-2 pointer-events-none">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="max-w-[190px] px-2 py-1 rounded-[3px] bg-[#F8F4EC]/95 text-[9px] sm:text-[10px] font-bold text-ink-700 border border-ink-200/80 truncate">
               {item.category}
             </span>
             {item.isVerifiedHost && (
               <span
                 title="Cơ sở / người đăng đã được xác thực"
-                className="w-5 sm:w-6 h-5 sm:h-6 rounded-full bg-sky-500 flex items-center justify-center shadow-xs border border-white/25 shrink-0"
+                className="w-5 h-5 rounded-[3px] bg-clay-600 flex items-center justify-center shrink-0"
               >
-                <BadgeCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-white" />
+                <BadgeCheck className="w-3.5 h-3.5 text-[#FFFDF8]" />
               </span>
             )}
           </div>
 
-          {/* Wishlist Heart Button (pointer-events-auto) */}
           <button
             onClick={(e) => onToggleSave(item, e)}
-            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all cursor-pointer pointer-events-auto ${
+            className={`w-7 h-7 rounded-[5px] flex items-center justify-center transition-colors cursor-pointer pointer-events-auto border ${
               isSaved
-                ? 'bg-rose-500 text-white shadow-md scale-105'
-                : 'bg-black/40 text-white hover:bg-black/60'
+                ? 'bg-clay-600 text-[#FFFDF8] border-clay-600'
+                : 'bg-[#F8F4EC]/95 text-ink-500 border-ink-200 hover:text-clay-700'
             }`}
             title={isSaved ? 'Gỡ khỏi yêu thích' : 'Lưu vào yêu thích'}
           >
-            <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isSaved ? 'fill-current' : ''}`} />
+            <Heart className={`w-3.5 h-3.5 ${isSaved ? 'fill-current' : ''}`} />
           </button>
         </div>
 
-        {/* Bottom Badges on Image: Real Weather + GPS (chỉ hiện khi có dữ liệu thật) */}
-        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white pointer-events-none">
-          {/* Weather Tag — từ Open-Meteo theo toạ độ GPS của địa điểm */}
+        {/* Bottom badges: real weather + GPS distance */}
+        <div className="absolute bottom-2 left-2 right-2 flex items-end justify-between gap-2 pointer-events-none">
           {weather && (
-            <span className="px-2 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[9px] sm:text-[10px] font-semibold text-sky-200 flex items-center gap-1 border border-sky-400/25 shadow-xs">
+            <span className="px-2 py-1 rounded-[3px] bg-ink-800/85 text-[9px] font-semibold text-[#F8F4EC] flex items-center gap-1">
               <span>{weather.icon}</span>
               <span>{weather.temp}°C • {weather.label}</span>
             </span>
           )}
-
-          {/* GPS Distance (if radar active) */}
           {item.distanceKm && (
-            <span className="px-2 py-0.5 rounded-full bg-emerald-600/90 backdrop-blur-md text-[9px] sm:text-[10px] font-bold text-white flex items-center gap-1 shadow-xs">
-              <Navigation className="w-2.5 h-2.5 text-white" />
+            <span className="px-2 py-1 rounded-[3px] bg-clay-600/90 text-[9px] font-bold text-[#FFFDF8] flex items-center gap-1 ml-auto">
+              <Navigation className="w-2.5 h-2.5" />
               <span>{item.distanceKm} km</span>
             </span>
           )}
         </div>
       </div>
 
-      {/* 2. Content Info Details */}
-      <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between space-y-1.5 sm:space-y-2.5">
-        <div>
-          {/* City & Rating Row */}
-          <div className="flex items-center justify-between gap-1.5 text-[11px] sm:text-xs">
-            <span className="font-bold text-slate-500 flex items-center gap-1 truncate">
-              <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-sky-600 shrink-0" />
-              <span className="truncate">{item.city}</span>
-              {item.region && <span className="text-slate-400 font-normal shrink-0">• {item.region}</span>}
+      {/* 2. Content */}
+      <div className="p-3.5 flex-1 flex flex-col gap-1.5">
+        <div className="flex items-center justify-between gap-2 text-[11px]">
+          <span className="font-semibold text-ink-400 flex items-center gap-1 min-w-0">
+            <MapPin className="w-3.5 h-3.5 text-clay-600 shrink-0" />
+            <span className="truncate">{item.city}</span>
+            {item.region && <span className="text-ink-300 font-normal shrink-0">• {item.region}</span>}
+          </span>
+
+          {item.rating && item.reviewsCount > 0 ? (
+            <span className="flex items-center gap-1 font-bold text-ink-700 shrink-0">
+              <Star className="w-3.5 h-3.5 fill-clay-500 text-clay-500" />
+              <span>{item.rating}</span>
+              <span className="text-[10px] text-ink-300 font-normal">({item.reviewsCount})</span>
             </span>
-
-            {item.rating && item.reviewsCount > 0 ? (
-              <div className="flex items-center gap-1 font-black text-amber-600 bg-amber-50 px-1.5 sm:px-2 py-0.5 rounded-lg border border-amber-200/60 shrink-0">
-                <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-amber-400 text-amber-400" />
-                <span>{item.rating}</span>
-                <span className="text-[10px] text-slate-400 font-normal">({item.reviewsCount})</span>
-              </div>
-            ) : null}
-          </div>
-
-          {/* Place Title */}
-          <h3 className="font-display font-extrabold text-sm sm:text-base text-slate-900 mt-1 line-clamp-1 group-hover:text-sky-600 transition-colors">
-            {item.name}
-          </h3>
-
-          {/* Short Description */}
-          <p className="text-[11px] sm:text-xs text-slate-500 line-clamp-2 mt-0.5 sm:mt-1 leading-relaxed">
-            {item.description || item.tagline}
-          </p>
+          ) : null}
         </div>
 
-        {/* 3. Footer: Refined, Spacious & Zero Overflow */}
-        <div className="pt-2 sm:pt-2.5 border-t border-slate-100 flex items-center justify-between gap-1.5 sm:gap-2">
-          {/* Price Tag */}
-          <div className="min-w-0 flex items-center">
+        <h3 className="font-display font-bold text-[15px] text-ink-800 mt-0.5 line-clamp-1 group-hover:text-clay-700 transition-colors">
+          {item.name}
+        </h3>
+
+        <p className="text-[11px] text-ink-400 line-clamp-2 leading-relaxed">
+          {item.description || item.tagline}
+        </p>
+
+        <div className="mt-auto pt-2.5 border-t border-ink-200/70 flex items-center justify-between gap-2">
+          <div className="min-w-0">
             {priceInfo.isFree ? (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/70 shrink-0 whitespace-nowrap">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Miễn phí vé
-              </span>
+              <span className="text-xs font-bold text-clay-700 whitespace-nowrap">Miễn phí vé</span>
             ) : (
-              <div className="min-w-0">
-                <span className="block text-[9px] text-slate-400 font-semibold uppercase tracking-wider">Chi phí</span>
-                <span className="font-extrabold text-sky-800 text-xs truncate block max-w-[110px]" title={item.priceEstimate || item.priceRange}>
+              <>
+                <span className="block text-[9px] text-ink-300 font-semibold uppercase tracking-wider">Chi phí</span>
+                <span className="font-bold text-clay-700 text-xs truncate block max-w-[120px]" title={item.priceEstimate || item.priceRange}>
                   {priceInfo.text}
                 </span>
-              </div>
+              </>
             )}
           </div>
 
-          {/* Actions Cluster: Add To Trip (+) + View Map */}
           <div className="flex items-center gap-1.5 shrink-0">
-            {/* Quick Add To Trip (+) */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onAddToTrip(item);
               }}
               title="Thêm vào lịch trình chuyến đi"
-              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-700 hover:border-emerald-300 border border-slate-200 flex items-center justify-center transition-all cursor-pointer shrink-0 shadow-2xs"
+              className="w-8 h-8 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-ink-500 hover:text-clay-700 border border-ink-200 hover:border-clay-300 flex items-center justify-center transition-colors cursor-pointer shrink-0"
             >
               <Plus className="w-4 h-4" />
             </button>
 
-            {/* View Map / Detail */}
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 onOpenDetail(item);
               }}
-              className="px-3 py-1.5 rounded-xl bg-sky-50 group-hover:bg-sky-600 text-sky-700 group-hover:text-white font-bold text-xs border border-sky-200 group-hover:border-sky-600 transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap shadow-2xs"
+              className="h-8 px-2.5 rounded-[5px] bg-clay-50 text-clay-700 border border-clay-600/30 hover:bg-clay-600 hover:text-[#FFFDF8] hover:border-clay-600 font-bold text-[11px] transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
             >
               <Compass className="w-3.5 h-3.5 shrink-0" />
               <span>Bản đồ</span>
