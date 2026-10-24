@@ -299,7 +299,7 @@ export const AdminPlacesPage = () => {
     <div className="space-y-6 pb-12 animate-fade-in">
       
       {/* ─── 1. BREADCRUMB & HEADER ACTION TOOLBAR ─────────────────────────────── */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div className="space-y-1.5">
           <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400">
             <span>Quản trị hệ thống</span>
@@ -310,7 +310,7 @@ export const AdminPlacesPage = () => {
             <h1 className="font-display text-2xl font-bold text-slate-900 tracking-tight">
               Quản lý Địa điểm & Phê duyệt Điểm Đến
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full bg-sky-50 text-sky-700 font-bold text-xs border border-sky-100 flex items-center gap-1.5">
+            <span className="px-2.5 py-1 rounded-lg bg-sky-50 text-sky-700 font-semibold text-xs border border-sky-100 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
               Đồng bộ dữ liệu thời gian thực
             </span>
@@ -326,20 +326,21 @@ export const AdminPlacesPage = () => {
             type="button"
             onClick={() => loadData(true)}
             disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors shadow-2xs cursor-pointer active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs border border-slate-200/80 shadow-xs transition-all cursor-pointer active:scale-95 disabled:opacity-50"
             title="Làm mới dữ liệu từ CSDL"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-slate-600 ${isLoading ? 'animate-spin' : ''}`} />
-            <span>{isLoading ? 'Đang tải...' : 'Làm mới'}</span>
+            <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isLoading ? 'animate-spin text-sky-600' : ''}`} />
+            <span>{isLoading ? 'Đang tải...' : 'Làm mới CSDL'}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-md transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs shadow-xs transition-all cursor-pointer active:scale-95"
+            title="Thêm địa điểm mới"
           >
-            <Plus className="w-4 h-4" />
-            <span>+ Thêm địa điểm mới</span>
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <span>Thêm địa điểm mới</span>
           </button>
         </div>
       </div>
@@ -348,17 +349,17 @@ export const AdminPlacesPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* Metric 1: Pending Moderation */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md transition-all space-y-3">
+        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all space-y-3">
           <div className="flex items-start justify-between">
-            <div className="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shadow-2xs">
+            <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shadow-2xs">
               <Clock className="w-5 h-5" />
             </div>
             {pendingPlaces.length > 0 ? (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200 animate-pulse">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200 animate-pulse">
                 Cần xử lý gấp
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-100">
                 Đã xử lý hết
               </span>
             )}
@@ -374,12 +375,12 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Metric 2: Active Places */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md transition-all space-y-3">
+        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all space-y-3">
           <div className="flex items-start justify-between">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-2xs">
+            <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-2xs">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-100">
               Đang công khai
             </span>
           </div>
@@ -394,12 +395,12 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Metric 3: City Coverage */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md transition-all space-y-3">
+        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all space-y-3">
           <div className="flex items-start justify-between">
-            <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center shadow-2xs">
+            <div className="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shadow-2xs">
               <Compass className="w-5 h-5" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 text-xs font-bold border border-sky-100">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-700 text-xs font-semibold border border-sky-100">
               Toàn quốc
             </span>
           </div>
@@ -414,12 +415,12 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Metric 4: Average Rating */}
-        <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-sm hover:shadow-md transition-all space-y-3">
+        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all space-y-3">
           <div className="flex items-start justify-between">
-            <div className="w-11 h-11 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center shadow-2xs">
+            <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shadow-2xs">
               <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold border border-amber-200">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200">
               Chất lượng cao
             </span>
           </div>
@@ -440,25 +441,25 @@ export const AdminPlacesPage = () => {
       {/* ─── 3. STATUS TABS & SMART SEARCH / FILTER BAR ───────────────────────── */}
       <div className="space-y-3">
         {/* Status Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs font-bold">
+        <div className="inline-flex items-center p-1 bg-slate-100/90 rounded-xl border border-slate-200/60 shrink-0 text-xs font-semibold overflow-x-auto max-w-full">
           {[
-            { label: 'Đang hoạt động', count: totalActive, badgeBg: 'bg-emerald-100 text-emerald-800' },
-            { label: 'Chờ duyệt', count: pendingPlaces.length, badgeBg: 'bg-amber-100 text-amber-800' },
-            { label: 'Tất cả', count: allPlaces.length, badgeBg: 'bg-slate-100 text-slate-700' }
+            { label: 'Đang hoạt động', count: totalActive, badgeBg: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
+            { label: 'Chờ duyệt', count: pendingPlaces.length, badgeBg: 'bg-amber-50 text-amber-700 border border-amber-200' },
+            { label: 'Tất cả', count: allPlaces.length, badgeBg: 'bg-slate-100 text-slate-700 border border-slate-200' }
           ].map(tab => (
             <button
               key={tab.label}
               type="button"
               onClick={() => setActiveTab(tab.label)}
-              className={`px-4 py-2.5 rounded-full whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer ${
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-semibold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
                 activeTab === tab.label
-                  ? 'bg-sky-600 text-white shadow-sm'
-                  : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50'
+                  ? 'bg-white text-sky-700 shadow-xs border border-slate-200/80'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent'
               }`}
             >
               <span>{tab.label}</span>
-              <span className={`px-2 py-0.5 rounded-full text-[11px] font-extrabold ${
-                activeTab === tab.label ? 'bg-white/20 text-white' : tab.badgeBg
+              <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold ${
+                activeTab === tab.label ? 'bg-sky-50 text-sky-700 border border-sky-100' : tab.badgeBg
               }`}>
                 {tab.count}
               </span>
@@ -467,7 +468,7 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Search & Filter Toolbar */}
-        <div className="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-center gap-3">
+        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col md:flex-row items-center gap-3">
           {/* Keyword Search */}
           <div className="relative flex-1 w-full">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -476,7 +477,7 @@ export const AdminPlacesPage = () => {
               placeholder="Tìm theo tên địa điểm, địa chỉ, số điện thoại, người gửi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 text-slate-800 rounded-full text-xs placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-sky-500/20 border border-slate-200 transition-all"
+              className="w-full pl-10 pr-4 py-2 bg-slate-50 text-slate-800 rounded-xl text-xs placeholder:text-slate-400 outline-none focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 border border-slate-200/80 transition-all"
             />
           </div>
 
@@ -485,7 +486,7 @@ export const AdminPlacesPage = () => {
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 text-slate-800 rounded-full text-xs font-semibold outline-none border border-slate-200 cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 text-slate-800 rounded-xl text-xs font-semibold outline-none border border-slate-200/80 hover:bg-slate-100/70 cursor-pointer transition-colors"
             >
               <option value="">Tất cả tỉnh thành</option>
               {dynamicCities.map(city => (
@@ -499,7 +500,7 @@ export const AdminPlacesPage = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 text-slate-800 rounded-full text-xs font-semibold outline-none border border-slate-200 cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 text-slate-800 rounded-xl text-xs font-semibold outline-none border border-slate-200/80 hover:bg-slate-100/70 cursor-pointer transition-colors"
             >
               <option value="">Tất cả danh mục</option>
               {CATEGORIES.map(cat => (
@@ -514,7 +515,7 @@ export const AdminPlacesPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Table Column (7 Cols) */}
-        <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col space-y-4 p-5">
+        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col space-y-4 p-5">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <span className="font-bold text-sm text-slate-900">
               Danh sách địa điểm ({filteredPlaces.length})
@@ -724,19 +725,19 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Right Preview Drawer (5 Cols - Sticky) */}
-        <div className="lg:col-span-5 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-sm space-y-4 sticky top-20">
+        <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4 sticky top-20">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <span className="font-bold text-sm text-slate-900 flex items-center gap-2">
               <Eye className="w-4 h-4 text-sky-600" />
               Chi Tiết Địa Điểm
             </span>
             {selectedPlace && (
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+              <span className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold ${
                 selectedPlace.status === 'PENDING_APPROVAL'
-                  ? 'bg-amber-100 text-amber-800'
+                  ? 'bg-amber-50 text-amber-700 border border-amber-200'
                   : selectedPlace.status === 'ACTIVE'
-                  ? 'bg-emerald-100 text-emerald-800'
-                  : 'bg-rose-100 text-rose-800'
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  : 'bg-rose-50 text-rose-700 border border-rose-200'
               }`}>
                 {selectedPlace.status === 'PENDING_APPROVAL' ? 'Chờ phê duyệt' : selectedPlace.status === 'ACTIVE' ? 'Đã công khai' : 'Tạm ẩn'}
               </span>
@@ -746,16 +747,16 @@ export const AdminPlacesPage = () => {
           {selectedPlace ? (
             <div className="space-y-3.5 text-xs">
               {/* Photo Cover */}
-              <div className="h-44 rounded-2xl overflow-hidden relative shadow-sm bg-slate-100">
+              <div className="h-44 rounded-xl overflow-hidden relative shadow-xs bg-slate-100">
                 <img
                   src={selectedPlace.coverImageUrl || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80'}
                   alt={selectedPlace.name}
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute bottom-2 left-2 px-2.5 py-1 rounded-full bg-slate-900/80 backdrop-blur text-white text-[10px] font-bold">
+                <span className="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur text-white text-[10px] font-semibold">
                   {selectedPlace.categoryName || 'Tọa độ du lịch'}
                 </span>
-                <span className="absolute top-2 right-2 px-2.5 py-1 rounded-full bg-black/60 text-amber-300 text-[10px] font-bold flex items-center gap-1">
+                <span className="absolute top-2 right-2 px-2.5 py-1 rounded-lg bg-black/60 text-amber-300 text-[10px] font-semibold flex items-center gap-1 backdrop-blur-xs">
                   <Star className="w-3 h-3 fill-amber-400" />
                   {selectedPlace.averageRating ? Number(selectedPlace.averageRating).toFixed(1) : '5.0'} ({selectedPlace.reviewCount || 0})
                 </span>
@@ -776,7 +777,7 @@ export const AdminPlacesPage = () => {
                       href={`https://www.google.com/maps?q=${selectedPlace.latitude},${selectedPlace.longitude}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-700 text-[11px] font-bold transition-colors border border-sky-100"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-[11px] font-semibold transition-colors border border-sky-100"
                     >
                       <Navigation className="w-3 h-3" />
                       <span>Xem trên Google Maps ({selectedPlace.latitude}, {selectedPlace.longitude})</span>
