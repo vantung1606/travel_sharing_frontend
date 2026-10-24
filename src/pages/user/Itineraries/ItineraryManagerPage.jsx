@@ -329,40 +329,42 @@ export const ItineraryManagerPage = () => {
 
   return (
     <div className="w-full min-h-screen bg-[#F8F4EC] text-[#1E1A15] pb-24">
-      {/* ─── 1. HERO EDITORIAL: NỀN MỰC PHẲNG, KHÔNG ẢNH ─── */}
-      <section className="relative w-full overflow-hidden -mt-16 pt-24 pb-16 sm:pt-28 sm:pb-20 lg:pt-32 lg:pb-24 bg-[#17130F] text-white">
-        {/* Hero Content Container Aligned Exactly with Navbar Spacing */}
-        <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+      {/* ─── 1. HERO EDITORIAL: NỀN GIẤY, CHỮ MỰC, GẠCH ĐẤT NUNG ─── */}
+      <section className="relative w-full overflow-hidden bg-[#F8F4EC] text-[#1E1A15] border-b border-[#1E1A15]/10">
+        <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-10 pb-8 sm:pt-12 sm:pb-10 lg:pt-16 lg:pb-12">
+          <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8">
             
-            {/* Left Content Column with High-Contrast Changed Text Color */}
-            <div className="max-w-3xl space-y-3">
+            {/* Left Content Column */}
+            <div className="max-w-3xl">
               {/* Breadcrumb */}
               <div className="flex flex-wrap items-center gap-2.5 text-xs">
-                <span className="flex items-center gap-1.5 text-clay-200 font-semibold">
-                  <Compass className="w-3.5 h-3.5 text-clay-300" />
+                <span className="flex items-center gap-1.5 text-clay-700 font-semibold">
+                  <Compass className="w-3.5 h-3.5 text-clay-600" />
                   <span>Wayfare</span>
                 </span>
-                <ChevronRight className="w-3 h-3 text-white/40" />
-                <span className="text-white font-bold">Kế Hoạch & Lịch Trình</span>
+                <ChevronRight className="w-3 h-3 text-[#1E1A15]/30" />
+                <span className="text-[#1E1A15] font-bold">Kế Hoạch & Lịch Trình</span>
               </div>
 
+              {/* Gạch ngang đất nung */}
+              <div className="mt-4 h-0.5 w-12 bg-clay-600" />
+
               {/* Main Headline */}
-              <h1 className="font-display text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.08]">
+              <h1 className="mt-4 font-display text-4xl sm:text-5xl lg:text-[3.25rem] font-extrabold tracking-tight text-[#1E1A15] leading-[1.06]">
                 Lịch Trình Du Lịch{' '}
-                <span className="text-clay-300">
+                <span className="text-clay-700">
                   Của Bạn
                 </span>
               </h1>
               
               {/* Subtitle */}
-              <p className="text-[#D9CFC0] text-sm sm:text-base max-w-2xl leading-relaxed font-medium tracking-[0.015em]">
+              <p className="mt-4 text-[#6B6154] text-sm sm:text-base max-w-2xl leading-relaxed font-medium tracking-[0.015em]">
                 Quản lý các chuyến đi sắp tới, đồng bộ danh lam thắng cảnh từ Khám phá, kiểm soát ngân sách chi tiết và kiến tạo hành trình từng giờ chỉ với một chạm cùng AI.
               </p>
             </div>
 
             {/* Action CTA Cluster */}
-            <div className="flex flex-wrap items-center gap-3.5 shrink-0 pt-2 lg:pt-0">
+            <div className="flex flex-wrap items-center gap-3.5 shrink-0">
               {/* AI CTA Button */}
               <button
                 type="button"
@@ -370,10 +372,10 @@ export const ItineraryManagerPage = () => {
                   if (!requireAuth('lập lịch trình bằng AI')) return;
                   setIsAIGeneratorOpen(true);
                 }}
-                className="group inline-flex items-center gap-2.5 px-7 py-4 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-sm sm:text-base font-extrabold transition-colors duration-200 cursor-pointer"
+                className="inline-flex items-center gap-2.5 px-7 py-4 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-sm sm:text-base font-extrabold transition-colors duration-200 cursor-pointer"
               >
                 <span>Lập Tour Bằng AI (30s)</span>
-                <span className="px-2.5 py-0.5 rounded-sm bg-black/25 text-xs font-black uppercase tracking-wider">
+                <span className="px-2.5 py-0.5 rounded-sm bg-[#17130F]/25 text-xs font-black uppercase tracking-wider">
                   Miễn phí
                 </span>
               </button>
@@ -385,7 +387,7 @@ export const ItineraryManagerPage = () => {
                   if (!requireAuth('tạo chuyến đi mới')) return;
                   setIsManualCreateOpen(true);
                 }}
-                className="inline-flex items-center gap-2 px-6 py-4 rounded-sm bg-transparent hover:bg-[#FFFDF8]/10 text-white font-bold text-sm sm:text-base transition-colors border border-white/30 hover:border-white/60 cursor-pointer"
+                className="inline-flex items-center gap-2 px-6 py-4 rounded-sm bg-transparent hover:bg-[#1E1A15]/5 text-[#1E1A15] font-bold text-sm sm:text-base transition-colors border border-[#1E1A15]/25 hover:border-clay-600/70 cursor-pointer"
               >
                 <span>+ Tạo Thủ Công</span>
               </button>
@@ -394,8 +396,8 @@ export const ItineraryManagerPage = () => {
         </div>
       </section>
 
-      {/* ─── 2. ELEVATED DASHBOARD LAYER (OVERLAPPING SEAMLESS HERO GRADIENT) ─── */}
-      <div className="relative mt-8 sm:mt-10 z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 space-y-5">
+      {/* ─── 2. DASHBOARD LAYER ─── */}
+      <div className="relative mt-6 sm:mt-8 z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 space-y-5">
         {/* Guest Restriction Banner (Nếu chưa đăng nhập) */}
         {!isLoggedIn && (
           <div className="bg-[#FFFDF8] border border-clay-600/30 rounded-sm p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -433,7 +435,7 @@ export const ItineraryManagerPage = () => {
               <Compass className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[11px] font-bold text-[#8A7E6E] uppercase tracking-[0.12em]">Tổng Chuyến Đi</p>
+              <p className="text-[10px] font-bold text-[#8A7E6E] uppercase tracking-[0.1em] whitespace-nowrap">Tổng Chuyến Đi</p>
               <div className="flex items-baseline gap-2 mt-1">
                 <span className="font-display text-2xl sm:text-3xl font-extrabold text-[#1E1A15]">
                   {(itineraries || []).length}
@@ -449,7 +451,7 @@ export const ItineraryManagerPage = () => {
               <MapPin className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[11px] font-bold text-[#8A7E6E] uppercase tracking-[0.12em]">Điểm Dừng Chân</p>
+              <p className="text-[10px] font-bold text-[#8A7E6E] uppercase tracking-[0.1em] whitespace-nowrap">Điểm Dừng Chân</p>
               <div className="flex items-baseline gap-2 mt-1">
                 <span className="font-display text-2xl sm:text-3xl font-extrabold text-[#1E1A15]">
                   {(itineraries || []).reduce((acc, curr) => acc + (curr.placesCount || (curr.placesList ? curr.placesList.length : 3)), 0)}
@@ -465,7 +467,7 @@ export const ItineraryManagerPage = () => {
               <DollarSign className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[11px] font-bold text-[#8A7E6E] uppercase tracking-[0.12em]">Tổng Dự Toán Chi Phí</p>
+              <p className="text-[10px] font-bold text-[#8A7E6E] uppercase tracking-[0.1em] whitespace-nowrap">Tổng Dự Toán Chi Phí</p>
               <div className="flex items-baseline gap-2 mt-1">
                 <span className="font-display text-xl sm:text-2xl font-extrabold text-clay-700">
                   {((itineraries || []).reduce((acc, curr) => acc + (curr.totalBudget || (curr.budgetPerPerson ? curr.budgetPerPerson * 2 : 4000000)), 0) / 1000000).toFixed(1)}M
@@ -483,7 +485,7 @@ export const ItineraryManagerPage = () => {
               <Clock className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <p className="text-[11px] font-bold text-clay-200 uppercase tracking-[0.12em]">Kế Hoạch Sắp Tới</p>
+              <p className="text-[10px] font-bold text-clay-200 uppercase tracking-[0.1em] whitespace-nowrap">Kế Hoạch Sắp Tới</p>
               <p className="font-display text-base sm:text-lg font-extrabold text-white truncate mt-0.5">
                 {(itineraries && itineraries[0]) ? itineraries[0].destination : 'Sắp khởi hành'}
               </p>
