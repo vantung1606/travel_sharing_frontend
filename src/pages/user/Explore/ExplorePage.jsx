@@ -434,38 +434,51 @@ export const ExplorePage = () => {
   };
 
   // Add Place to Existing Itinerary — GHI VÀO DB THẬT (POST /itineraries/{id}/details)
-  const handleAddToTrip = async (itin) => {
+  const handleAddToTrip = async (payload) => {
     const targetItem = detailModalItem || activeItem;
-    if (!itin || !targetItem) return;
+    if (!payload || !targetItem) return;
 
-    // Cần đăng nhập — lịch trình chỉnh sửa thuốc bài chạy qua server
+    const itin = payload.itinerary || payload;
+    const dayNumber = Number(payload.dayNumber) || Number(itin.daysCount) || 1;
+    const startTime = payload.startTime || '09:00:00';
+    const timeSlotLabel = payload.timeSlotLabel || '09:00';
+    const activityCategory = payload.category || targetItem.category || 'Khám phá';
+    const cost = payload.estimatedCost !== undefined ? Number(payload.estimatedCost) : (Number(targetItem.ticketPrice) || null);
+    const noteText = payload.note || (targetItem.tagline || targetItem.description || '').slice(0, 500);
+
+    // Cần đăng nhập — lịch trình chỉnh sửa chạy qua server
     if (!currentUser?.email || /^itin-|^-/.test(String(itin.id))) {
       toast.info('Vui lòng đăng nhập bằng tài khoản có lịch trình trên hệ thống để thêm điểm dừng nhé!');
       setIsAddToTripModalOpen(false);
       return;
     }
 
-    const dayNumber = Number(itin.daysCount) || 1;
-    // visitOrder = số điểm dừng đã có của ngày đó + 1
-    const currentDayActivities = (itin.days || []).find(d => d.dayNumber === dayNumber)?.activities || [];
+    const currentDayActivities = (itin.days || []).find(d => Number(d.dayNumber) === dayNumber)?.activities ||
+      (Array.isArray(itin.details) ? itin.details.filter(d => Number(d.dayNumber) === dayNumber) : []);
     const visitOrder = currentDayActivities.length + 1;
-    const cost = Number(targetItem.ticketPrice) || null;
 
     const detail = {
-      placeId: Number(targetItem.rawId) || null,
+      placeId: Number(targetItem.rawId || targetItem.id) || null,
       locationName: targetItem.name,
       locationAddress: targetItem.address || `${targetItem.city}, Việt Nam`,
-      category: targetItem.category || 'Khám phá',
+      category: activityCategory,
       dayNumber,
       visitOrder,
-      startTime: '09:00:00',
+      startTime,
       estimatedCost: cost,
-      note: (targetItem.tagline || targetItem.description || '').slice(0, 500)
+      note: noteText
     };
 
     try {
       await addPlaceToItinerary(itin.id, detail, currentUser.email);
-      toast.success(`Đã thêm "${targetItem.name}" vào lịch trình "${itin.title}"! 🚀`);
+      toast.success(
+        <div>
+          <p className="font-bold">Đã thêm vào lịch trình thành công! 🚀</p>
+          <p className="text-xs text-slate-100 mt-0.5">
+            "{targetItem.name}" • Ngày {dayNumber} ({timeSlotLabel}) của chuyến đi "{itin.title}"
+          </p>
+        </div>
+      );
     } catch (err) {
       toast.error('Lỗi khi thêm vào lịch trình: ' + err.message);
     } finally {

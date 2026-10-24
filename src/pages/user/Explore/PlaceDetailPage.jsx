@@ -10,11 +10,12 @@ import { RealMapView } from '../../../components/map/RealMapView';
 import { fetchLiveWeather } from '../../../utils/weatherUtils';
 import { mapApiSpot } from '../../../utils/placeMap';
 import { pickFallbackImage, SHARED_PLACEHOLDER_IMAGE } from '../../../utils/placeImages';
+import { AddToTripModal } from './components/AddToTripModal';
 
 export const PlaceDetailPage = () => {
   const { placeId } = useParams();
   const navigate = useNavigate();
-  const { currentUser } = useApp();
+  const { currentUser, itineraries = [], addPlaceToItinerary } = useApp();
   const toast = useToast();
 
   const [place, setPlace] = useState(null);
@@ -25,6 +26,56 @@ export const PlaceDetailPage = () => {
   const [liveWeather, setLiveWeather] = useState(null);
   const [isWeatherLoading, setIsWeatherLoading] = useState(false);
   const [weatherUnavailable, setWeatherUnavailable] = useState(false);
+  const [isAddToTripModalOpen, setIsAddToTripModalOpen] = useState(false);
+
+  const handleAddToTrip = async (payload) => {
+    if (!payload || !place) return;
+    const itin = payload.itinerary || payload;
+    const dayNumber = Number(payload.dayNumber) || Number(itin.daysCount) || 1;
+    const startTime = payload.startTime || '09:00:00';
+    const timeSlotLabel = payload.timeSlotLabel || '09:00';
+    const activityCategory = payload.category || place.category || 'Khám phá';
+    const cost = payload.estimatedCost !== undefined ? Number(payload.estimatedCost) : (Number(place.ticketPrice) || null);
+    const noteText = payload.note || (place.tagline || place.description || '').slice(0, 500);
+
+    if (!currentUser?.email || /^itin-|^-/.test(String(itin.id))) {
+      toast.info('Vui lòng đăng nhập bằng tài khoản có lịch trình trên hệ thống để thêm điểm dừng nhé!');
+      setIsAddToTripModalOpen(false);
+      return;
+    }
+
+    const currentDayActivities = (itin.days || []).find(d => Number(d.dayNumber) === dayNumber)?.activities ||
+      (Array.isArray(itin.details) ? itin.details.filter(d => Number(d.dayNumber) === dayNumber) : []);
+    const visitOrder = currentDayActivities.length + 1;
+
+    const detail = {
+      placeId: Number(place.rawId || place.id) || null,
+      locationName: place.name,
+      locationAddress: place.address || `${place.city}, Việt Nam`,
+      category: activityCategory,
+      dayNumber,
+      visitOrder,
+      startTime,
+      estimatedCost: cost,
+      note: noteText
+    };
+
+    try {
+      await addPlaceToItinerary(itin.id, detail, currentUser.email);
+      toast.success(
+        <div>
+          <p className="font-bold">Đã thêm vào lịch trình thành công! 🚀</p>
+          <p className="text-xs text-slate-100 mt-0.5">
+            "{place.name}" • Ngày {dayNumber} ({timeSlotLabel}) của chuyến đi "{itin.title}"
+          </p>
+        </div>
+      );
+    } catch (err) {
+      toast.error('Lỗi khi thêm vào lịch trình: ' + err.message);
+    } finally {
+      setIsAddToTripModalOpen(false);
+    }
+  };
 
   useEffect(() => {
     let alive = true;
@@ -285,6 +336,12 @@ export const PlaceDetailPage = () => {
           {/* Action buttons */}
           <div className="space-y-2">
             <button
+              onClick={() => setIsAddToTripModalOpen(true)}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-700 hover:to-blue-700 text-white rounded-xl h-11 font-bold text-xs shadow-md shadow-sky-600/20 transition cursor-pointer"
+            >
+              <Calendar className="w-4 h-4" /> Thêm vào Lịch trình chuyến đi
+            </button>
+            <button
               onClick={() => navigate(`/community?checkinPlaceId=${place.rawId || place.id}`)}
               className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl h-11 font-bold text-xs shadow-md shadow-emerald-600/20 transition cursor-pointer"
             >
@@ -410,6 +467,19 @@ export const PlaceDetailPage = () => {
           </div>
         )}
       </div>
+
+      {/* Add To Trip Modal */}
+      <AddToTripModal
+        isOpen={isAddToTripModalOpen}
+        onClose={() => setIsAddToTripModalOpen(false)}
+        item={place}
+        itineraries={itineraries}
+        onAddToTrip={handleAddToTrip}
+        onCreateNewTripWithItem={() => {
+          setIsAddToTripModalOpen(false);
+          navigate('/itinerary');
+        }}
+      />
     </div>
   );
 };
