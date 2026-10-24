@@ -545,10 +545,15 @@ export const HomePage = () => {
           <div className="absolute bottom-0 left-0 right-0 h-28 sm:h-40 bg-gradient-to-t from-[#f8fafc] via-[#f8fafc]/50 to-transparent pointer-events-none" />
         </div>
 
-          {/* Content Container Aligned with Navbar Width */}
+        {/* Content Container Aligned with Navbar Width */}
         <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          {/* Main Hero Header Stack */}
-          <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-4 sm:space-y-6">
+          {/* Main Hero Header Stack with Motion Scroll */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-4 sm:space-y-6"
+          >
             {/* Expansive Grand Headline with Gradient Flow - Scaled for Mobile */}
             <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight leading-[1.2] text-white drop-shadow-md">
               Kiến Tạo Chuyến Đi Mơ Ước <br className="hidden sm:inline" />
@@ -564,7 +569,12 @@ export const HomePage = () => {
             </p>
 
             {/* Action Buttons: Responsive full-width on mobile, compact and clean travel icons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2 sm:pt-4 w-full sm:w-auto">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-2 sm:pt-4 w-full sm:w-auto"
+            >
               <a
                 href="#plan-dock"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-500 hover:from-blue-700 hover:to-sky-600 text-white font-extrabold text-xs sm:text-sm md:text-base shadow-[0_10px_25px_rgba(2,132,199,0.4)] hover:scale-105 active:scale-95 transition-all cursor-pointer ring-2 ring-blue-300/40 tracking-[0.015em]"
@@ -584,22 +594,26 @@ export const HomePage = () => {
                 <span>Khám Phá Điểm Đến</span>
                 <ArrowDown className="w-3.5 h-3.5 text-sky-300 group-hover:translate-y-0.5 transition-transform" />
               </a>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
           2. SMART TRAVEL PLANNER DOCK (CRISP WHITE ELEVATED CARD - NO WASHOUT)
-          - Compact responsive paddings
-          - High-legibility mobile layout without clipped pills or oversized boxes
-          - Clear, high-contrast travel inputs
+          - Motion Scroll reveal with smooth float up
       ────────────────────────────────────────────────────────────────────────── */}
       <section
         className="relative z-20 w-full max-w-[1700px] mx-auto px-3 sm:px-6 lg:px-8 xl:px-12 -mt-10 sm:-mt-12 lg:-mt-16 mb-12 sm:mb-16 lg:mb-20"
         id="plan-dock"
       >
-        <div className="p-3.5 sm:p-7 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/98 backdrop-blur-2xl shadow-[0_15px_45px_-15px_rgba(2,132,199,0.18)] border border-slate-200/90 transition-all">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          className="p-3.5 sm:p-7 lg:p-8 rounded-2xl sm:rounded-3xl bg-white/98 backdrop-blur-2xl shadow-[0_15px_45px_-15px_rgba(2,132,199,0.18)] border border-slate-200/90 transition-all"
+        >
           {/* Planner Modes Tabs & Estimate Pill */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 sm:gap-4 mb-3.5 sm:mb-6 pb-3 sm:pb-4 border-b border-slate-100">
             {/* 3 Tabs: 3-column grid on mobile so no scrolling or truncation occurs */}
@@ -954,19 +968,24 @@ export const HomePage = () => {
               )}
             </button>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          3. 4 VALUE PILLARS (CLEAN MODERN BENTO CARDS)
+          3. 4 VALUE PILLARS (CLEAN MODERN BENTO CARDS - MOTION SCROLL REVEAL)
           - Subtle sage leaf gradient canvas
-          - Crisp white cards with distinctive accent borders
-          - Gradient icon bubbles & responsive typography
+          - Staggered scroll animations for each card
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#f2f7f4] via-[#f8faf9] to-[#edf5f0] border-t border-b border-sky-900/10">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          {/* Section Header */}
-          <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-2 sm:space-y-3">
+          {/* Section Header with Motion Scroll */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col items-center text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-2 sm:space-y-3"
+          >
             <h2 className="font-display text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
               Tại Sao Hơn {homeStats.totalUsers.toLocaleString()}+ Du Khách Chọn Wayfare?
             </h2>
@@ -974,12 +993,19 @@ export const HomePage = () => {
               Không còn nỗi lo lập bảng tính excel phức tạp, lúng túng khi thời tiết xấu hay chi tiêu
               thâm hụt ngoài dự kiến.
             </p>
-          </div>
+          </motion.div>
 
-          {/* 4 Cards Bento Grid */}
+          {/* 4 Cards Bento Grid with Scroll Reveal Animations */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Pillar 1 */}
-            <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400 cursor-pointer">
+            <motion.div
+              initial={{ opacity: 0, y: 35 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.55, delay: 0 }}
+              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400 cursor-pointer"
+            >
               <div>
                 <div className="flex items-center justify-between mb-4 sm:mb-5">
                   <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-br from-blue-500 to-sky-600 text-white flex items-center justify-center shadow-md shadow-blue-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
@@ -999,10 +1025,17 @@ export const HomePage = () => {
                 <span>Tự động tối ưu 100%</span>
                 <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
-            </div>
+            </motion.div>
 
             {/* Pillar 2 */}
-            <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-sky-400 cursor-pointer">
+            <motion.div
+              initial={{ opacity: 0, y: 35 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.55, delay: 0.1 }}
+              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-sky-400 cursor-pointer"
+            >
               <div>
                 <div className="flex items-center justify-between mb-4 sm:mb-5">
                   <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-sky-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
@@ -1022,10 +1055,17 @@ export const HomePage = () => {
                 <span>Cắt giảm chi phí thừa</span>
                 <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
-            </div>
+            </motion.div>
 
             {/* Pillar 3 */}
-            <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400 cursor-pointer">
+            <motion.div
+              initial={{ opacity: 0, y: 35 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.55, delay: 0.2 }}
+              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-blue-400 cursor-pointer"
+            >
               <div>
                 <div className="flex items-center justify-between mb-4 sm:mb-5">
                   <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-md shadow-blue-600/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
@@ -1045,10 +1085,17 @@ export const HomePage = () => {
                 <span>Linh hoạt theo điểm đến</span>
                 <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
-            </div>
+            </motion.div>
 
             {/* Pillar 4 */}
-            <div className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-amber-400 cursor-pointer">
+            <motion.div
+              initial={{ opacity: 0, y: 35 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.55, delay: 0.3 }}
+              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              className="p-5 sm:p-7 rounded-2xl sm:rounded-3xl bg-white hover:bg-sky-50/30 transition-all duration-300 shadow-sm hover:shadow-xl hover-elevate group flex flex-col justify-between border border-slate-200/90 hover:border-amber-400 cursor-pointer"
+            >
               <div>
                 <div className="flex items-center justify-between mb-4 sm:mb-5">
                   <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-md shadow-amber-500/25 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
@@ -1068,24 +1115,34 @@ export const HomePage = () => {
                 <span>Sao chép 1-click</span>
                 <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1.5 transition-transform" />
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          4. LIVE INTERACTIVE TRAVEL STUDIO
-          - Dedicated soft blue-slate lab environment
-          - Elevated grand white workspace card
+          4. LIVE INTERACTIVE TRAVEL STUDIO (SCROLL ENTRANCE)
           - Left: Natural Prompt Lab with chips & Royal Blue action
           - Right: Dynamic multi-day timeline with instant estimates
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#eaf2f8] via-[#f1f6fa] to-[#e4eef6] border-b border-blue-900/10">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="rounded-2xl sm:rounded-[2.5rem] bg-white p-5 sm:p-8 lg:p-12 shadow-xl border border-blue-200/80">
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="rounded-2xl sm:rounded-[2.5rem] bg-white p-5 sm:p-8 lg:p-12 shadow-xl border border-blue-200/80"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
               {/* Left Column: Interactive Prompt Lab (5 cols) */}
-              <div className="lg:col-span-5 flex flex-col">
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="lg:col-span-5 flex flex-col"
+              >
                 <div className="inline-flex items-center gap-2 text-blue-700 font-extrabold text-[11px] sm:text-xs uppercase tracking-wider mb-2 sm:mb-3">
                   <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   <span>Trải nghiệm thử nghiệm trực tiếp</span>
@@ -1145,10 +1202,16 @@ export const HomePage = () => {
                     🏍️ Phượt Hà Giang
                   </button>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Right Column: Real-time Multi-Day Interactive Canvas (7 cols) */}
-              <div className="lg:col-span-7 rounded-2xl sm:rounded-3xl bg-slate-50/90 p-3.5 sm:p-6 lg:p-7 flex flex-col justify-between text-slate-900 shadow-sm border border-slate-200/90 hover:shadow-md transition-shadow">
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.15 }}
+                className="lg:col-span-7 rounded-2xl sm:rounded-3xl bg-slate-50/90 p-3.5 sm:p-6 lg:p-7 flex flex-col justify-between text-slate-900 shadow-sm border border-slate-200/90 hover:shadow-md transition-shadow"
+              >
                 {/* Header with Title and Day Switcher - Stacked to guarantee zero horizontal overflow */}
                 <div className="flex flex-col gap-2.5 pb-3 sm:pb-4 border-b border-slate-200/80">
                   <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -1192,7 +1255,13 @@ export const HomePage = () => {
                 {/* Dynamic Compact Timeline Grid (Grid 1 col on mobile, compact cards) */}
                 <div className="space-y-2.5 sm:space-y-3.5 my-2 sm:my-3">
                   {sandboxMultiDayData[sandboxActiveDay].items.map((item, idx) => (
-                    <div key={idx} className="flex items-start gap-2.5 sm:gap-3.5 group">
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.35, delay: idx * 0.08 }}
+                      className="flex items-start gap-2.5 sm:gap-3.5 group"
+                    >
                       <div className="flex flex-col items-center shrink-0">
                         <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-sky-600 text-white font-extrabold flex items-center justify-center text-[11px] sm:text-xs shadow-xs group-hover:scale-110 transition-transform">
                           {item.time}
@@ -1216,7 +1285,7 @@ export const HomePage = () => {
                           {item.desc}
                         </p>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
 
@@ -1242,28 +1311,26 @@ export const HomePage = () => {
                     <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1" />
                   </button>
                 </div>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          5. CURATED TRENDING ITINERARIES SHOWCASE
-          - Soft leaf-green natural canvas
-          - Category filter pills with Royal Blue active state
-          - White photo cards with verified metrics & prices
-      ────────────────────────────────────────────────────────────────────────── */}
-      {/* ──────────────────────────────────────────────────────────────────────────
-          5. CURATED TRENDING ITINERARIES SHOWCASE
-          - Soft natural canvas
-          - Category filter pills with Royal Blue active state
-          - White photo cards with verified metrics & prices
+          5. CURATED TRENDING ITINERARIES SHOWCASE (STAGGERED SCROLL ANIMATIONS)
+          - Cards slide up smoothly when scrolling into view
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#f0f9ff] via-[#f8fafc] to-[#e0f2fe] border-b border-sky-900/10" id="kham-pha">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           {/* Section Header with Filter Tabs */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 sm:mb-10">
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 sm:mb-10"
+          >
             <div>
               <h2 className="font-display text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
                 Bộ Sưu Tập Lộ Trình Nổi Bật
@@ -1294,13 +1361,18 @@ export const HomePage = () => {
                 </button>
               ))}
             </div>
-          </div>
+          </motion.div>
 
-          {/* Compact Responsive Grid Showcase (2 cols on mobile, 4 on desktop, max 4 items displayed) */}
+          {/* Compact Responsive Grid Showcase with Staggered Scroll Motion */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-6">
-            {featuredTours.slice(0, 4).map((tour) => (
-              <div
+            {featuredTours.slice(0, 4).map((tour, idx) => (
+              <motion.div
                 key={tour.id}
+                initial={{ opacity: 0, y: 35 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.55, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                whileHover={{ y: -8, transition: { duration: 0.25 } }}
                 onClick={() => navigate('/explore')}
                 className="rounded-xl sm:rounded-3xl bg-white overflow-hidden shadow-xs hover:shadow-xl hover-elevate transition-all duration-300 flex flex-col group border border-sky-100 hover:border-sky-400 cursor-pointer"
               >
@@ -1326,7 +1398,7 @@ export const HomePage = () => {
                   <div>
                     <div className="flex items-center justify-between text-slate-500 text-[10px] sm:text-xs mb-1 sm:mb-2 font-semibold">
                       <span className="flex items-center gap-1">
-                        <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400 fill-amber-400" />
+                        <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                         <strong className="text-slate-900">{tour.rating}</strong>
                         <span className="hidden sm:inline">({tour.saves} lưu)</span>
                       </span>
@@ -1381,7 +1453,7 @@ export const HomePage = () => {
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -1400,15 +1472,19 @@ export const HomePage = () => {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          5B. COMMUNITY HIGHLIGHTS & LIVE TRAVEL PULSE
-          - Connected to real backend MySQL post repository
-          - Shows top community travel stories with likes, comments, author badges
-          - Guest vs Member actions (Like/Bookmark/Create prompt login if guest)
+          5B. COMMUNITY HIGHLIGHTS & LIVE TRAVEL PULSE (SCROLL ENTRANCE)
+          - Real backend MySQL post cards slide up when scrolling
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#edf2f7] border-b border-slate-200">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          {/* Header */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 sm:mb-12">
+          {/* Header with Motion Scroll */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.6 }}
+            className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 sm:mb-12"
+          >
             <div>
               <h2 className="font-display text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight mt-1">
                 Nhịp Sống Du Lịch & Khoảnh Khắc Thực Tế
@@ -1441,14 +1517,19 @@ export const HomePage = () => {
                 <span>Xem tất cả ({homeStats.totalPosts}+ bài viết)</span>
               </button>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Cards Grid */}
+          {/* Cards Grid with Staggered Scroll Motion */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {communityPosts.length > 0 ? (
-              communityPosts.slice(0, 4).map((post) => (
-                <div
+              communityPosts.slice(0, 4).map((post, idx) => (
+                <motion.div
                   key={post.id}
+                  initial={{ opacity: 0, y: 35 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.55, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ y: -8, transition: { duration: 0.25 } }}
                   className="rounded-2xl sm:rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-xl hover-elevate transition-all duration-300 flex flex-col group border border-slate-200/90 hover:border-blue-400"
                 >
                   {/* Photo */}
@@ -1527,10 +1608,9 @@ export const HomePage = () => {
                       </button>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))
             ) : (
-              // Fallback curated community posts if database empty
               [
                 {
                   id: 101,
@@ -1576,9 +1656,14 @@ export const HomePage = () => {
                   comments: 72,
                   image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'
                 }
-              ].map((post) => (
-                <div
+              ].map((post, idx) => (
+                <motion.div
                   key={post.id}
+                  initial={{ opacity: 0, y: 35 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.55, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ y: -8, transition: { duration: 0.25 } }}
                   className="rounded-2xl sm:rounded-3xl bg-white overflow-hidden shadow-sm hover:shadow-xl hover-elevate transition-all duration-300 flex flex-col group border border-slate-200/90 hover:border-blue-400"
                 >
                   <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-slate-100">
@@ -1648,7 +1733,7 @@ export const HomePage = () => {
                       </button>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))
             )}
           </div>
@@ -1656,13 +1741,18 @@ export const HomePage = () => {
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          6. INTERACTIVE MAP & HIDDEN GEMS
-          - Immersive midnight obsidian section canvas
+          6. INTERACTIVE MAP & HIDDEN GEMS (SCROLL REVEAL)
           - Natural travel discovery & destination preview
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#0a111a] via-[#0f1926] to-[#070d14] text-white border-b border-slate-800">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="rounded-2xl sm:rounded-3xl bg-slate-900/90 backdrop-blur-xl text-white p-5 sm:p-8 lg:p-12 shadow-2xl border border-slate-700/80">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="rounded-2xl sm:rounded-3xl bg-slate-900/90 backdrop-blur-xl text-white p-5 sm:p-8 lg:p-12 shadow-2xl border border-slate-700/80"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
               {/* Text & List Details (5 cols) */}
               <div className="lg:col-span-5 flex flex-col">
@@ -1675,18 +1765,20 @@ export const HomePage = () => {
                   con thác nguyên sơ, quán cà phê ẩn mình và góc ngắm bình minh tuyệt đối riêng tư.
                 </p>
 
-                {/* Clickable Hidden Gem Cards */}
+                {/* Clickable Hidden Gem Cards with Motion Hover */}
                 <div className="space-y-2 sm:space-y-3 mb-5 sm:mb-7">
                   {[
                     { id: 'dalat', name: 'Suối Tía - Hồ Tuyền Lâm', location: 'Đà Lạt', tag: 'Tọa độ bí mật' },
                     { id: 'sapa', name: 'Bản Sâu Chua', location: 'Sa Pa', tag: 'Bản địa' },
                     { id: 'phuquoc', name: 'Hòn Dăm & Rạch Tràm', location: 'Phú Quốc', tag: 'Hoang sơ' }
                   ].map((gem) => (
-                    <button
+                    <motion.button
                       key={gem.id}
                       type="button"
+                      whileHover={{ scale: 1.015 }}
+                      whileTap={{ scale: 0.985 }}
                       onClick={() => setSelectedGemId(gem.id)}
-                      className={`w-full p-2.5 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 transition-all text-left cursor-pointer border hover:scale-[1.01] active:scale-[0.99] ${selectedGemId === gem.id
+                      className={`w-full p-2.5 sm:p-4 rounded-xl sm:rounded-2xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2 transition-all text-left cursor-pointer border ${selectedGemId === gem.id
                         ? 'bg-sky-600/35 border-sky-400 shadow-md ring-1 ring-sky-400/30'
                         : 'bg-white/10 hover:bg-white/15 border-white/15'
                         }`}
@@ -1723,7 +1815,7 @@ export const HomePage = () => {
                       >
                         {gem.tag}
                       </span>
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
 
@@ -1775,28 +1867,42 @@ export const HomePage = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          7. SOCIAL PROOF & TESTIMONIALS
-          - Crisp warm slate canvas with color-accented review cards
+          7. SOCIAL PROOF & TESTIMONIALS (STAGGERED SCROLL MOTION)
+          - Cards slide up when scrolling into view
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-10 sm:py-16 lg:py-20 bg-gradient-to-b from-[#f8fafc] via-[#f1f5f9] to-[#eef2f6] border-b border-slate-200/90">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-2">
+          {/* Header with Motion Scroll */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.6 }}
+            className="text-center max-w-2xl mx-auto mb-8 sm:mb-12 space-y-2"
+          >
             <h2 className="font-display text-xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">
               Câu Chuyện Từ Những Người Đã Đi
             </h2>
             <p className="text-slate-600 text-xs sm:text-sm md:text-base font-normal tracking-[0.015em]">
               Hàng ngàn chuyến đi đáng nhớ đã được hoàn thành trọn vẹn nhờ sự đồng hành của Wayfare.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
             {/* Review 1 */}
-            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl hover-elevate transition-all flex flex-col justify-between border-t-4 border-t-blue-600 border border-slate-200/90 cursor-pointer">
+            <motion.div
+              initial={{ opacity: 0, y: 35 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.55, delay: 0 }}
+              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl hover-elevate transition-all flex flex-col justify-between border-t-4 border-t-blue-600 border border-slate-200/90 cursor-pointer"
+            >
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1820,10 +1926,17 @@ export const HomePage = () => {
                   <p className="text-xs text-slate-500 font-medium">Chuyến đi Đà Nẵng gia đình</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Review 2 */}
-            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl hover-elevate transition-all flex flex-col justify-between border-t-4 border-t-sky-600 border border-slate-200/90 cursor-pointer">
+            <motion.div
+              initial={{ opacity: 0, y: 35 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.55, delay: 0.15 }}
+              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl hover-elevate transition-all flex flex-col justify-between border-t-4 border-t-sky-600 border border-slate-200/90 cursor-pointer"
+            >
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1848,10 +1961,17 @@ export const HomePage = () => {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Review 3 */}
-            <div className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl hover-elevate transition-all flex flex-col justify-between border-t-4 border-t-amber-500 border border-slate-200/90 cursor-pointer">
+            <motion.div
+              initial={{ opacity: 0, y: 35 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.55, delay: 0.3 }}
+              whileHover={{ y: -6, transition: { duration: 0.2 } }}
+              className="p-7 rounded-3xl bg-white shadow-sm hover:shadow-xl hover-elevate transition-all flex flex-col justify-between border-t-4 border-t-amber-500 border border-slate-200/90 cursor-pointer"
+            >
               <div>
                 <div className="flex items-center gap-1 text-amber-400 mb-4">
                   {[...Array(5)].map((_, i) => (
@@ -1874,29 +1994,37 @@ export const HomePage = () => {
                   <p className="text-xs text-slate-500 font-medium">Honeymoon Phú Quốc 4N3Đ</p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* ──────────────────────────────────────────────────────────────────────────
-          8. GRAND FINALE CTA BANNER
-          - Framed on a soft sapphire ambient pedestal
-      ────────────────────────────────────────────────────────────────────────── */}
-      {/* ──────────────────────────────────────────────────────────────────────────
-          8. GRAND FINALE CTA BANNER
+          8. GRAND FINALE CTA BANNER (SCROLL REVEAL)
           - Framed on a soft sapphire ambient pedestal
       ────────────────────────────────────────────────────────────────────────── */}
       <section className="w-full py-10 sm:py-16 bg-gradient-to-b from-[#f0f9ff] to-[#f8fafc]">
         <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
-          <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden p-6 sm:p-10 lg:p-16 bg-gradient-to-r from-[#031726] via-[#082845] to-[#0c385f] text-white shadow-2xl border border-sky-900/40">
+          <motion.div
+            initial={{ opacity: 0, y: 40, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="relative rounded-2xl sm:rounded-3xl overflow-hidden p-6 sm:p-10 lg:p-16 bg-gradient-to-r from-[#031726] via-[#082845] to-[#0c385f] text-white shadow-2xl border border-sky-900/40"
+          >
             {/* Subtle Ambient Light Orbs with Pulse Animations */}
             <div className="absolute -right-20 -bottom-20 w-96 h-96 rounded-full bg-blue-500/20 blur-3xl pointer-events-none animate-pulse-slow" />
             <div className="absolute top-0 right-1/3 w-64 h-64 rounded-full bg-sky-400/20 blur-2xl pointer-events-none animate-pulse-slow [animation-delay:3s]" />
 
             <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
               {/* Left Column: Heading, Subtitle & Actions (7 cols) */}
-              <div className="lg:col-span-7 flex flex-col items-start space-y-4 sm:space-y-6">
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="lg:col-span-7 flex flex-col items-start space-y-4 sm:space-y-6"
+              >
                 <h2 className="font-display text-xl sm:text-3xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
                   Sẵn Sàng Cho Chuyến Phiêu Lưu Kế Tiếp?
                 </h2>
@@ -1937,10 +2065,16 @@ export const HomePage = () => {
                     <span>từ 50.000+ du khách</span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Right Column: High-tech Glassmorphism Trip Preview Card (5 cols - fills empty space) */}
-              <div className="lg:col-span-5 flex justify-center lg:justify-end w-full">
+              <motion.div
+                initial={{ opacity: 0, x: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, x: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="lg:col-span-5 flex justify-center lg:justify-end w-full"
+              >
                 <div className="w-full max-w-md rounded-2xl sm:rounded-3xl bg-slate-900/80 backdrop-blur-2xl p-4 sm:p-6 border border-sky-400/30 shadow-2xl space-y-3 sm:space-y-4 hover:border-sky-400/60 transition-all">
                   {/* Card Header Preview */}
                   <div className="flex items-center justify-between pb-3 border-b border-white/10">
@@ -1993,12 +2127,11 @@ export const HomePage = () => {
                     </span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </div>
   );
 };
-
