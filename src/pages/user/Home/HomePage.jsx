@@ -518,25 +518,41 @@ export const HomePage = () => {
   return (
     <div className="min-h-screen bg-[#F8F4EC] text-slate-900 selection:bg-clay-600 selection:text-white pb-20 w-full max-w-full overflow-x-clip -mt-16">
       {/* ──────────────────────────────────────────────────────────────────────────
-          1. HERO SECTION (WARM SAPPHIRE LUXURY - EDITORIAL VIBE)
-          - Deep Sapphire canvas blending gently into Warm Ivory page canvas
-          - Natural specular lighting
+          1. HERO SECTION (SPLIT EDITORIAL)
+          - Nửa trái: nền mực, chữ serif
+          - Nửa phải: ảnh lớn tràn viền, không khung
       ────────────────────────────────────────────────────────────────────────── */}
-      <section className="relative w-full overflow-hidden pt-28 pb-28 lg:pt-36 lg:pb-40 bg-[#1E1A15] text-white">
-        {/* Cinematic Backdrop with Balanced Contrast */}
-        <div className="absolute inset-0 z-0">
-          <div
-            className="w-full h-full bg-cover bg-center transition-all duration-1000 scale-105"
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=2400&q=90')`
-            }}
+      <section className="relative w-full overflow-hidden pt-28 pb-28 lg:pt-36 lg:pb-40 bg-[#17130F] text-white">
+        {/* Mobile backdrop — ảnh mờ làm nền, chữ vẫn rõ */}
+        <div className="absolute inset-0 z-0 lg:hidden">
+          <img
+            src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1400&q=85"
+            alt=""
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(23,19,15,0.96) 0%, rgba(30,26,21,0.84) 55%, rgba(23,19,15,0.94) 100%)' }} />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(15,12,9,0.78) 0%, rgba(15,12,9,0.25) 55%, #17130F 100%)' }} />
-
-          {/* Seamless Feathered Transition to Warm Ivory Page Background */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none" style={{ background: 'linear-gradient(0deg, #F8F4EC 0%, rgba(248,244,236,0.4) 55%, rgba(248,244,236,0) 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(23,19,15,0.93) 0%, rgba(23,19,15,0.88) 55%, #17130F 100%)' }} />
         </div>
+
+        {/* Desktop: nửa phải là ảnh lớn tràn viền, không khung */}
+        <div className="hidden lg:block absolute inset-y-0 right-0 w-[46%] z-0">
+          <img
+            src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?auto=format&fit=crop&w=1600&q=88"
+            alt=""
+            className="w-full h-full object-cover object-center"
+            style={{ filter: 'sepia(0.16) saturate(1.08) contrast(1.03)' }}
+          />
+          {/* Lớp nối mềm từ nền mực sang ảnh */}
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, #17130F 0%, rgba(23,19,15,0.72) 10%, rgba(23,19,15,0.16) 34%, rgba(23,19,15,0.05) 60%, rgba(23,19,15,0.38) 100%)' }} />
+          {/* Scrim trên đỉnh để navbar luôn đọc được */}
+          <div className="absolute inset-x-0 top-0 h-40" style={{ background: 'linear-gradient(180deg, rgba(23,19,15,0.82) 0%, rgba(23,19,15,0.35) 55%, rgba(23,19,15,0) 100%)' }} />
+          {/* Grade ấm đồng bộ đất nung */}
+          <div className="absolute inset-0 bg-[#8C3F22]/16 mix-blend-multiply" />
+          {/* Gutter giấy giữa chữ và ảnh */}
+          <div className="absolute inset-y-0 left-0 w-[2px] bg-[#F8F4EC]/25" />
+        </div>
+
+        {/* Đường cắt ngang kết thúc hero, không dùng gradient mờ */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-[#F8F4EC]/15 z-0 pointer-events-none" />
 
         {/* Content Container Aligned with Navbar Width */}
         <div className="relative z-10 w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
@@ -546,7 +562,7 @@ export const HomePage = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:col-span-8 relative z-10 min-w-0 flex flex-col items-center text-center lg:items-start lg:text-left max-w-4xl mx-auto lg:mx-0 space-y-4 sm:space-y-6"
+            className="lg:col-span-6 relative z-10 min-w-0 flex flex-col items-center text-center lg:items-start lg:text-left max-w-[600px] mx-auto lg:mx-0 space-y-4 sm:space-y-6"
           >
             {/* Top Pill Accent */}
             <div className="inline-flex items-center gap-2.5 pl-3 py-0.5 border-l-2 border-clay-500 rounded-none bg-transparent text-clay-200 text-xs font-semibold tracking-[0.16em]">
@@ -572,7 +588,7 @@ export const HomePage = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2 sm:pt-4 w-full sm:w-auto"
+              className="flex flex-col items-stretch sm:items-start justify-center lg:justify-start gap-3 pt-2 sm:pt-4 w-full sm:w-auto"
             >
               <a
                 href="#plan-dock"
@@ -594,45 +610,6 @@ export const HomePage = () => {
                 <ArrowDown className="w-3.5 h-3.5 text-clay-300 group-hover:translate-y-0.5 transition-transform" />
               </a>
             </motion.div>
-          </motion.div>
-
-          {/* Editorial photo cascade (visual only) */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="hidden lg:block lg:col-span-4 relative w-full h-[460px]"
-          >
-            {/* Photo 1 — back */}
-            <div className="absolute left-0 top-0 w-[80%] h-[290px] bg-[#F8F4EC] p-2 border border-black/10 shadow-[0_18px_40px_-26px_rgba(0,0,0,0.7)] z-10">
-              <img
-                src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=900&q=82"
-                className="w-full h-full object-cover"
-                alt=""
-              />
-            </div>
-
-            {/* Photo 2 — middle */}
-            <div className="absolute left-[10%] top-[80px] w-[80%] h-[290px] bg-[#F8F4EC] p-2 border border-black/10 shadow-[0_18px_40px_-26px_rgba(0,0,0,0.7)] z-20">
-              <img
-                src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=900&q=82"
-                className="w-full h-full object-cover"
-                alt=""
-              />
-            </div>
-
-            {/* Photo 3 — front */}
-            <div className="absolute left-[20%] top-[160px] w-[80%] h-[290px] bg-[#F8F4EC] p-2 border border-black/10 shadow-[0_20px_44px_-26px_rgba(0,0,0,0.75)] z-30">
-              <img
-                src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=82"
-                className="w-full h-full object-cover"
-                alt=""
-              />
-            </div>
-
-            {/* Editorial marks */}
-            <span aria-hidden="true" className="pointer-events-none absolute -left-2 -top-2 h-10 w-10 border-l-2 border-t-2 border-clay-500 z-40" />
-            <span aria-hidden="true" className="pointer-events-none absolute -bottom-2 -right-2 h-7 w-7 border-b border-r border-white/35 z-40" />
           </motion.div>
           </div>
         </div>
