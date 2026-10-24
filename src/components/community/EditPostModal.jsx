@@ -16,7 +16,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
   const [places, setPlaces] = useState([]);
 
   useEffect(() => {
-    placeApi.getPlaces({ status: 'APPROVED' })
+    placeApi.getPlaces({ status: 'ACTIVE' })
       .then(data => setPlaces(Array.isArray(data) ? data : []))
       .catch(err => console.warn('Could not load places:', err));
   }, []);

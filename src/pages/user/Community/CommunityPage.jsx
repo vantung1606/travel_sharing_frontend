@@ -579,10 +579,10 @@ export const CommunityPage = () => {
     return () => { isMounted = false; };
   }, []);
 
-  // Load Approved Places for Check-in Selection
+  // Load Active Places for Check-in Selection
   useEffect(() => {
     let isMounted = true;
-    placeApi.getPlaces({ status: 'APPROVED' })
+    placeApi.getPlaces({ status: 'ACTIVE' })
       .then(data => {
         if (isMounted && Array.isArray(data)) {
           setPlaces(data);
@@ -1337,7 +1337,7 @@ export const CommunityPage = () => {
 
   // Fetch available places for check-in picker
   useEffect(() => {
-    placeApi.getPlaces({ status: 'APPROVED' })
+    placeApi.getPlaces({ status: 'ACTIVE' })
       .then(data => setPlaces(Array.isArray(data) ? data : []))
       .catch(err => console.warn('Could not load places for check-in picker:', err));
   }, []);
