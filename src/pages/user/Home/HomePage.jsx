@@ -599,7 +599,7 @@ export const HomePage = () => {
             className="hidden lg:block lg:col-span-5 relative w-full h-[500px]"
           >
             {/* Ảnh 1 — lớn, trên trái */}
-            <div className="absolute left-0 top-0 w-[64%] h-[58%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-10">
+            <div className="absolute left-0 top-[4%] w-[64%] h-[60%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-10">
               <img
                 src="/images/hero/saigon-sunset.jpg"
                 alt=""
@@ -609,7 +609,7 @@ export const HomePage = () => {
             </div>
 
             {/* Ảnh 2 — phải, đè lên ảnh 1 */}
-            <div className="absolute left-[52%] top-[6%] w-[48%] h-[48%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-20">
+            <div className="absolute left-[40%] top-0 w-[48%] h-[40%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-20">
               <img
                 src="/images/hero/ninh-binh.jpg"
                 alt=""
@@ -619,7 +619,7 @@ export const HomePage = () => {
             </div>
 
             {/* Ảnh 3 — dọc, dưới phải */}
-            <div className="absolute left-[54%] top-[52%] w-[46%] h-[48%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-30">
+            <div className="absolute left-[50%] top-[34%] w-[46%] h-[56%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-30">
               <img
                 src="/images/login/travel_banner_3.jpg"
                 alt=""
@@ -629,7 +629,7 @@ export const HomePage = () => {
             </div>
 
             {/* Ảnh 4 — ngang, dưới trái, trên cùng */}
-            <div className="absolute left-0 top-[56%] w-[56%] h-[44%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-40">
+            <div className="absolute left-[4%] top-[54%] w-[60%] h-[46%] overflow-hidden border-2 border-[#17130F] bg-[#241D16] z-40">
               <img
                 src="/images/hero/nui-may.jpg"
                 alt=""
