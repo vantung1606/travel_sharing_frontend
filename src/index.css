@@ -360,3 +360,14 @@ select option {
   border-radius: 5px;
 }
 
+
+/* Itinerary controls: soft 5px corners; cards stay editorial/square. */
+.itinerary-page button.rounded-sm,
+.itinerary-page input.rounded-sm,
+.itinerary-page textarea.rounded-sm,
+.itinerary-page select.rounded-sm,
+.itinerary-page a.rounded-sm,
+.itinerary-page label.rounded-sm {
+  border-radius: 5px;
+}
+
