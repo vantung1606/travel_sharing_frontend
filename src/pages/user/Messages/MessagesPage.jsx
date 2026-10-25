@@ -112,15 +112,15 @@ const AudioMessagePlayer = ({ src, isMe }) => {
   };
 
   return (
-    <div className={`flex items-center gap-2.5 p-2.5 rounded-2xl min-w-[210px] sm:min-w-[240px] select-none ${
-      isMe ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white shadow-sm' : 'bg-slate-100 text-slate-800 border border-slate-200/80'
+    <div className={`flex items-center gap-2.5 p-2.5 rounded-[6px] min-w-[210px] sm:min-w-[240px] select-none ${
+      isMe ? 'bg-clay-600 text-white shadow-none' : 'bg-[#F5F0E6] text-ink-800 border border-ink-200/80'
     }`}>
       <audio ref={audioRef} src={src} preload="metadata" />
       <button
         type="button"
         onClick={togglePlay}
         className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-90 cursor-pointer ${
-          isMe ? 'bg-white text-sky-600 hover:bg-sky-50 shadow-xs' : 'bg-sky-600 text-white hover:bg-sky-700 shadow-xs'
+          isMe ? 'bg-[#FFFDF8] text-clay-600 hover:bg-clay-50 shadow-none' : 'bg-clay-600 text-white hover:bg-clay-700 shadow-none'
         }`}
         title={isPlaying ? 'Tạm dừng' : 'Phát tin thoại'}
       >
@@ -134,7 +134,7 @@ const AudioMessagePlayer = ({ src, isMe }) => {
           max={duration || 100}
           value={currentTime}
           onChange={handleSeek}
-          className="w-full h-1.5 bg-slate-200/40 rounded-lg appearance-none cursor-pointer accent-sky-500"
+          className="w-full h-1.5 bg-[#EFE8DC]/40 rounded-[5px] appearance-none cursor-pointer accent-clay-500"
         />
         <div className="flex items-center justify-between text-[10px] font-semibold opacity-85 leading-none">
           <span>{formatSec(currentTime)}</span>
@@ -158,11 +158,11 @@ const FileAttachmentBubble = ({ src, isMe }) => {
   }, [src]);
 
   return (
-    <div className={`flex items-center gap-3 p-3 rounded-2xl max-w-xs ${
-      isMe ? 'bg-sky-700 text-white shadow-sm' : 'bg-slate-100 text-slate-800 border border-slate-200/80'
+    <div className={`flex items-center gap-3 p-3 rounded-[6px] max-w-xs ${
+      isMe ? 'bg-clay-700 text-white shadow-none' : 'bg-[#F5F0E6] text-ink-800 border border-ink-200/80'
     }`}>
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-        isMe ? 'bg-white/20 text-white' : 'bg-sky-50 text-sky-600 border border-sky-100'
+      <div className={`w-10 h-10 rounded-[5px] flex items-center justify-center shrink-0 ${
+        isMe ? 'bg-[#FFFDF8]/20 text-white' : 'bg-clay-50 text-clay-600 border border-clay-100'
       }`}>
         <FileText className="w-5 h-5" />
       </div>
@@ -175,8 +175,8 @@ const FileAttachmentBubble = ({ src, isMe }) => {
         download
         target="_blank"
         rel="noopener noreferrer"
-        className={`p-2 rounded-xl transition-all shrink-0 cursor-pointer ${
-          isMe ? 'hover:bg-white/20 text-white' : 'hover:bg-slate-200 text-slate-600'
+        className={`p-2 rounded-[5px] transition-all shrink-0 cursor-pointer ${
+          isMe ? 'hover:bg-[#FFFDF8]/20 text-white' : 'hover:bg-[#EFE8DC] text-ink-500'
         }`}
         title="Tải tệp tin về máy"
       >
@@ -1006,24 +1006,24 @@ export const MessagesPage = () => {
   }, [isMembersModalOpen, membersModalTab, addMemberSearchKeyword, loadAvailableUsers]);
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8 space-y-6">
+    <div className="messages-page w-full h-[calc(100vh-64px)] sm:h-[calc(100dvh-64px)] bg-[#FFFDF8] text-ink-800 flex flex-col overflow-hidden">
       
       {/* Lightbox Xem Ảnh Chi Tiết */}
       {previewMediaUrl && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 bg-ink-950/95  flex items-center justify-center p-4 animate-in fade-in duration-200"
           onClick={() => setPreviewMediaUrl(null)}
         >
           <button
             onClick={() => setPreviewMediaUrl(null)}
-            className="absolute top-6 right-6 p-2 rounded-full bg-white/20 hover:bg-white/30 text-white transition-all cursor-pointer"
+            className="absolute top-6 right-6 p-2 rounded-full bg-[#FFFDF8]/20 hover:bg-[#FFFDF8]/30 text-white transition-all cursor-pointer"
           >
             <X className="w-6 h-6" />
           </button>
           <img
             src={previewMediaUrl}
             alt="Ảnh xem chi tiết"
-            className="max-w-full max-h-[90vh] rounded-2xl object-contain shadow-2xl ring-1 ring-white/10"
+            className="max-w-full max-h-[90vh] rounded-[6px] object-contain shadow-none ring-1 ring-white/10"
             onClick={e => e.stopPropagation()}
           />
         </div>
@@ -1031,24 +1031,24 @@ export const MessagesPage = () => {
 
       {/* Modal Tạo Nhóm Trò Chuyện Mới */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200 space-y-4 max-h-[92vh] flex flex-col">
+        <div className="fixed inset-0 z-50 bg-ink-900/55  flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 shadow-none border border-ink-200 animate-in zoom-in-95 duration-200 space-y-4 max-h-[92vh] flex flex-col">
             
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
+            <div className="flex items-center justify-between pb-3 border-b border-ink-200/70 shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-[6px] bg-clay-100 text-clay-700 flex items-center justify-center shrink-0">
                   <UserPlus className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-sm sm:text-base text-slate-900">Tạo nhóm trò chuyện mới</h3>
-                  <p className="text-xs text-slate-500">Cùng bạn bè lập đội phượt, trao đổi lịch trình & ảnh/video</p>
+                  <h3 className="font-extrabold text-sm sm:text-base text-ink-800">Tạo nhóm trò chuyện mới</h3>
+                  <p className="text-xs text-ink-400">Cùng bạn bè lập đội phượt, trao đổi lịch trình & ảnh/video</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="p-1.5 rounded-[5px] hover:bg-[#F5F0E6] text-ink-300 hover:text-ink-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1057,26 +1057,26 @@ export const MessagesPage = () => {
             <form onSubmit={handleCreateGroup} className="space-y-4 overflow-y-auto pr-1 flex-1 custom-dropdown-scroll">
               {/* Tên nhóm */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Tên nhóm phượt *</label>
+                <label className="block text-xs font-bold text-ink-600 mb-1.5">Tên nhóm phượt *</label>
                 <input
                   type="text"
                   placeholder="Ví dụ: Đội Phượt Hà Giang 2026, Nhóm Đi Phú Quốc..."
                   value={newRoomName}
                   onChange={e => setNewRoomName(e.target.value)}
                   required
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-hidden transition-all font-medium"
+                  className="w-full px-4 py-2.5 rounded-[5px] border border-ink-200 text-xs focus:ring-2 focus:ring-clay-500/20 focus:border-clay-500 outline-hidden transition-all font-medium"
                 />
               </div>
 
               {/* Thêm thành viên vào nhóm (Bắt buộc tối thiểu 1 người) */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <label className="text-xs font-bold text-ink-600 flex items-center gap-1.5">
                     <span>Thêm thành viên vào nhóm *</span>
-                    <span className="text-[11px] font-normal text-slate-500">(Tối thiểu 1 người khác)</span>
+                    <span className="text-[11px] font-normal text-ink-400">(Tối thiểu 1 người khác)</span>
                   </label>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    selectedUserIds.length > 0 ? 'bg-sky-100 text-sky-700' : 'bg-slate-100 text-slate-500'
+                    selectedUserIds.length > 0 ? 'bg-clay-100 text-clay-700' : 'bg-[#F5F0E6] text-ink-400'
                   }`}>
                     Đã chọn: {selectedUserIds.length} người
                   </span>
@@ -1084,13 +1084,13 @@ export const MessagesPage = () => {
 
                 {/* Huy hiệu các thành viên ĐÃ CHỌN */}
                 {selectedUserIds.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 p-2 bg-slate-50 rounded-2xl border border-slate-100 max-h-24 overflow-y-auto">
+                  <div className="flex flex-wrap gap-1.5 p-2 bg-[#F8F4EC] rounded-[6px] border border-ink-200/70 max-h-24 overflow-y-auto">
                     {selectedUserIds.map(uid => {
                       const userObj = availableUsers.find(u => u.userId === uid);
                       return (
                         <span
                           key={uid}
-                          className="inline-flex items-center gap-1.5 pl-1.5 pr-2 py-1 rounded-xl bg-white border border-sky-200 text-slate-800 text-xs font-semibold shadow-2xs animate-in zoom-in-95 duration-150"
+                          className="inline-flex items-center gap-1.5 pl-1.5 pr-2 py-1 rounded-[5px] bg-[#FFFDF8] border border-clay-200 text-ink-800 text-xs font-semibold shadow-none animate-in zoom-in-95 duration-150"
                         >
                           <img
                             src={userObj?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
@@ -1101,7 +1101,7 @@ export const MessagesPage = () => {
                           <button
                             type="button"
                             onClick={() => handleToggleUserSelection(uid)}
-                            className="text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
+                            className="text-ink-300 hover:text-rose-500 transition-colors cursor-pointer"
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -1113,25 +1113,25 @@ export const MessagesPage = () => {
 
                 {/* Ô tìm kiếm thành viên */}
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-3.5 h-3.5 text-ink-300 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     placeholder="Tìm theo tên hoặc email người dùng..."
                     value={userSearchKeyword}
                     onChange={e => setUserSearchKeyword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50/70 border border-slate-200 text-xs focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-hidden transition-all placeholder:text-slate-400"
+                    className="w-full pl-9 pr-3 py-2 rounded-[5px] bg-[#F8F4EC] border border-ink-200 text-xs focus:ring-2 focus:ring-clay-500/20 focus:border-clay-500 outline-hidden transition-all placeholder:text-ink-300"
                   />
                 </div>
 
                 {/* Danh sách người dùng khả dụng */}
-                <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-white max-h-44 overflow-y-auto custom-dropdown-scroll divide-y divide-slate-100">
+                <div className="border border-ink-200/80 rounded-[6px] overflow-hidden bg-[#FFFDF8] max-h-44 overflow-y-auto custom-dropdown-scroll divide-y divide-ink-200/70">
                   {isLoadingAvailableUsers && availableUsers.length === 0 ? (
-                    <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
+                    <div className="py-6 text-center text-xs text-ink-300 flex items-center justify-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin text-clay-600" />
                       <span>Đang tải danh sách thành viên...</span>
                     </div>
                   ) : filteredAvailableUsers.length === 0 ? (
-                    <div className="py-6 text-center text-xs text-slate-400">
+                    <div className="py-6 text-center text-xs text-ink-300">
                       Không tìm thấy người dùng phù hợp
                     </div>
                   ) : (
@@ -1142,7 +1142,7 @@ export const MessagesPage = () => {
                           key={user.userId}
                           onClick={() => handleToggleUserSelection(user.userId)}
                           className={`p-2.5 flex items-center justify-between gap-2.5 cursor-pointer transition-colors ${
-                            isSelected ? 'bg-sky-50/60' : 'hover:bg-slate-50'
+                            isSelected ? 'bg-clay-50/60' : 'hover:bg-[#F8F4EC]'
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
@@ -1150,7 +1150,7 @@ export const MessagesPage = () => {
                               <img
                                 src={user.avatarUrl}
                                 alt=""
-                                className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-slate-200"
+                                className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-ink-200"
                               />
                               <span
                                 className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
@@ -1161,14 +1161,14 @@ export const MessagesPage = () => {
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <p className="text-xs font-bold text-slate-900 truncate">{user.fullName}</p>
+                                <p className="text-xs font-bold text-ink-800 truncate">{user.fullName}</p>
                                 {user.isOnline && (
                                   <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">
                                     Online
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[10px] text-slate-400 truncate">
+                              <p className="text-[10px] text-ink-300 truncate">
                                 {user.handle || user.email} {user.statusText ? `• ${user.statusText}` : ''}
                               </p>
                             </div>
@@ -1176,8 +1176,8 @@ export const MessagesPage = () => {
 
                           <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all shrink-0 ${
                             isSelected
-                              ? 'bg-sky-600 border-sky-600 text-white'
-                              : 'border-slate-300 hover:border-sky-400'
+                              ? 'bg-clay-600 border-clay-600 text-white'
+                              : 'border-ink-200 hover:border-clay-400'
                           }`}>
                             {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
                           </div>
@@ -1196,29 +1196,29 @@ export const MessagesPage = () => {
 
               {/* Tin nhắn mở đầu */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">Tin nhắn mở đầu (tùy chọn)</label>
+                <label className="block text-xs font-bold text-ink-600 mb-1.5">Tin nhắn mở đầu (tùy chọn)</label>
                 <textarea
                   placeholder="Nhập lời chào khởi đầu cho các thành viên trong nhóm..."
                   value={newRoomIntro}
                   onChange={e => setNewRoomIntro(e.target.value)}
                   rows={2}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-hidden transition-all resize-none font-medium"
+                  className="w-full px-4 py-2.5 rounded-[5px] border border-ink-200 text-xs focus:ring-2 focus:ring-clay-500/20 focus:border-clay-500 outline-hidden transition-all resize-none font-medium"
                 />
               </div>
 
               {/* Footer nút hành động */}
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-ink-200/70">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
+                  className="px-4 py-2 rounded-[5px] text-xs font-semibold text-ink-500 hover:bg-[#F5F0E6] transition-all cursor-pointer"
                 >
                   Hủy bỏ
                 </button>
                 <button
                   type="submit"
                   disabled={!newRoomName.trim() || selectedUserIds.length === 0 || isCreatingRoom}
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-sky-600/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
+                  className="px-5 py-2.5 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white text-xs font-bold shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
                 >
                   {isCreatingRoom && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>Tạo nhóm ngay ({selectedUserIds.length + 1} người)</span>
@@ -1231,20 +1231,20 @@ export const MessagesPage = () => {
 
       {/* Modal Quản Lý Thành Viên Nhóm (Xem danh sách, Kick, Thêm người, Rời nhóm) */}
       {isMembersModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 animate-in zoom-in-95 duration-200 space-y-4 max-h-[92vh] flex flex-col">
+        <div className="fixed inset-0 z-50 bg-ink-900/55  flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 shadow-none border border-ink-200 animate-in zoom-in-95 duration-200 space-y-4 max-h-[92vh] flex flex-col">
             
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 shrink-0">
+            <div className="flex items-center justify-between pb-3 border-b border-ink-200/70 shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-[6px] bg-clay-100 text-clay-700 flex items-center justify-center shrink-0">
                   <Users className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-sm sm:text-base text-slate-900 truncate max-w-[280px] sm:max-w-xs">
+                  <h3 className="font-extrabold text-sm sm:text-base text-ink-800 truncate max-w-[280px] sm:max-w-xs">
                     {currentThreadObj?.name}
                   </h3>
-                  <p className="text-xs text-slate-500 flex items-center gap-1.5">
+                  <p className="text-xs text-ink-400 flex items-center gap-1.5">
                     <span>{roomMembers.length || currentThreadObj?.membersCount || 1} thành viên tham gia</span>
                     {isCurrentOwner && (
                       <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 text-[10px] font-bold border border-amber-200">
@@ -1262,21 +1262,21 @@ export const MessagesPage = () => {
                   setConfirmKickMember(null);
                   setConfirmLeaveGroup(false);
                 }}
-                className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 cursor-pointer"
+                className="p-1.5 rounded-[5px] hover:bg-[#F5F0E6] text-ink-300 hover:text-ink-500 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Tab điều hướng: Danh sách thành viên | Thêm thành viên */}
-            <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl text-xs font-bold shrink-0">
+            <div className="flex items-center gap-1.5 p-1 bg-[#F5F0E6] rounded-[5px] text-xs font-bold shrink-0">
               <button
                 type="button"
                 onClick={() => setMembersModalTab('list')}
-                className={`flex-1 py-1.5 rounded-lg text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-1.5 rounded-[5px] text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   membersModalTab === 'list'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#FFFDF8] text-ink-800 shadow-none'
+                    : 'text-ink-500 hover:text-ink-800'
                 }`}
               >
                 <Users className="w-3.5 h-3.5" />
@@ -1285,10 +1285,10 @@ export const MessagesPage = () => {
               <button
                 type="button"
                 onClick={() => setMembersModalTab('add')}
-                className={`flex-1 py-1.5 rounded-lg text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                className={`flex-1 py-1.5 rounded-[5px] text-center transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   membersModalTab === 'add'
-                    ? 'bg-white text-sky-700 shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#FFFDF8] text-clay-700 shadow-none'
+                    : 'text-ink-500 hover:text-ink-800'
                 }`}
               >
                 <UserPlus className="w-3.5 h-3.5" />
@@ -1302,7 +1302,7 @@ export const MessagesPage = () => {
                 
                 {/* Hộp xác nhận Kick thành viên */}
                 {confirmKickMember && (
-                  <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs space-y-2.5 animate-in fade-in duration-150">
+                  <div className="p-3.5 rounded-[6px] bg-rose-50 border border-rose-200 text-xs space-y-2.5 animate-in fade-in duration-150">
                     <div className="flex items-start gap-2 text-rose-800">
                       <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                       <div>
@@ -1316,7 +1316,7 @@ export const MessagesPage = () => {
                       <button
                         type="button"
                         onClick={() => setConfirmKickMember(null)}
-                        className="px-3 py-1.5 rounded-xl bg-white text-slate-700 hover:bg-slate-100 text-xs font-semibold border border-slate-200 cursor-pointer"
+                        className="px-3 py-1.5 rounded-[5px] bg-[#FFFDF8] text-ink-600 hover:bg-[#F5F0E6] text-xs font-semibold border border-ink-200 cursor-pointer"
                       >
                         Hủy
                       </button>
@@ -1324,7 +1324,7 @@ export const MessagesPage = () => {
                         type="button"
                         onClick={() => handleKickMember(confirmKickMember)}
                         disabled={memberActionLoadingId === confirmKickMember.userId}
-                        className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1 disabled:opacity-50"
+                        className="px-3.5 py-1.5 rounded-[5px] bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1 disabled:opacity-50"
                       >
                         {memberActionLoadingId === confirmKickMember.userId && (
                           <Loader2 className="w-3 h-3 animate-spin" />
@@ -1337,7 +1337,7 @@ export const MessagesPage = () => {
 
                 {/* Hộp xác nhận Tự rời nhóm */}
                 {confirmLeaveGroup && (
-                  <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs space-y-2.5 animate-in fade-in duration-150">
+                  <div className="p-3.5 rounded-[6px] bg-amber-50 border border-amber-200 text-xs space-y-2.5 animate-in fade-in duration-150">
                     <div className="flex items-start gap-2 text-amber-800">
                       <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
                       <div>
@@ -1351,7 +1351,7 @@ export const MessagesPage = () => {
                       <button
                         type="button"
                         onClick={() => setConfirmLeaveGroup(false)}
-                        className="px-3 py-1.5 rounded-xl bg-white text-slate-700 hover:bg-slate-100 text-xs font-semibold border border-slate-200 cursor-pointer"
+                        className="px-3 py-1.5 rounded-[5px] bg-[#FFFDF8] text-ink-600 hover:bg-[#F5F0E6] text-xs font-semibold border border-ink-200 cursor-pointer"
                       >
                         Hủy
                       </button>
@@ -1359,7 +1359,7 @@ export const MessagesPage = () => {
                         type="button"
                         onClick={handleLeaveGroup}
                         disabled={memberActionLoadingId === currentUser?.id}
-                        className="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1 disabled:opacity-50"
+                        className="px-3.5 py-1.5 rounded-[5px] bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1 disabled:opacity-50"
                       >
                         {memberActionLoadingId === currentUser?.id && (
                           <Loader2 className="w-3 h-3 animate-spin" />
@@ -1372,16 +1372,16 @@ export const MessagesPage = () => {
 
                 {/* Danh sách thành viên */}
                 {isLoadingMembers ? (
-                  <div className="py-12 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-                    <Loader2 className="w-5 h-5 animate-spin text-sky-600" />
+                  <div className="py-12 text-center text-xs text-ink-300 flex items-center justify-center gap-2">
+                    <Loader2 className="w-5 h-5 animate-spin text-clay-600" />
                     <span>Đang tải danh sách thành viên...</span>
                   </div>
                 ) : roomMembers.length === 0 ? (
-                  <div className="py-12 text-center text-xs text-slate-400">
+                  <div className="py-12 text-center text-xs text-ink-300">
                     Chưa có thành viên nào
                   </div>
                 ) : (
-                  <div className="divide-y divide-slate-100">
+                  <div className="divide-y divide-ink-200/70">
                     {roomMembers.map(member => {
                       const isMe = member.userId === currentUser?.id || member.email === effectiveEmail;
                       const isOwnerRole = member.role === 'OWNER';
@@ -1389,7 +1389,7 @@ export const MessagesPage = () => {
                       return (
                         <div
                           key={member.userId}
-                          className="py-3 px-2 flex items-center justify-between gap-3 hover:bg-slate-50/70 rounded-2xl transition-colors"
+                          className="py-3 px-2 flex items-center justify-between gap-3 hover:bg-[#F8F4EC] rounded-[6px] transition-colors"
                         >
                           <div className="flex items-center gap-3 min-w-0">
                             <div className="relative shrink-0">
@@ -1405,7 +1405,7 @@ export const MessagesPage = () => {
                                 title={member.isOnline ? 'Đang hoạt động' : (member.statusText || 'Ngoại tuyến')}
                               />
                               {isOwnerRole && (
-                                <span className="absolute -top-1 -right-1 p-0.5 rounded-full bg-amber-500 text-white shadow-2xs" title="Trưởng nhóm">
+                                <span className="absolute -top-1 -right-1 p-0.5 rounded-full bg-amber-500 text-white shadow-none" title="Trưởng nhóm">
                                   <Crown className="w-2.5 h-2.5" />
                                 </span>
                               )}
@@ -1413,11 +1413,11 @@ export const MessagesPage = () => {
 
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <p className="text-xs sm:text-sm font-bold text-slate-900 truncate">
+                                <p className="text-xs sm:text-sm font-bold text-ink-800 truncate">
                                   {member.fullName}
                                 </p>
                                 {isMe && (
-                                  <span className="text-[10px] font-bold text-sky-600 bg-sky-50 px-1.5 py-0.5 rounded-md border border-sky-100 shrink-0">
+                                  <span className="text-[10px] font-bold text-clay-600 bg-clay-50 px-1.5 py-0.5 rounded-md border border-clay-100 shrink-0">
                                     Bạn
                                   </span>
                                 )}
@@ -1427,7 +1427,7 @@ export const MessagesPage = () => {
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[11px] text-slate-400 truncate">
+                              <p className="text-[11px] text-ink-300 truncate">
                                 {member.handle || member.email} {member.statusText ? `• ${member.statusText}` : ''}
                               </p>
                             </div>
@@ -1436,12 +1436,12 @@ export const MessagesPage = () => {
                           <div className="flex items-center gap-2 shrink-0">
                             {/* Vai trò */}
                             {isOwnerRole ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-50 text-amber-700 text-[11px] font-bold border border-amber-200 shadow-2xs">
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[5px] bg-amber-50 text-amber-700 text-[11px] font-bold border border-amber-200 shadow-none">
                                 <Crown className="w-3 h-3 text-amber-600" />
                                 <span>Trưởng nhóm</span>
                               </span>
                             ) : (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-xl bg-slate-100 text-slate-600 text-[11px] font-medium">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-[5px] bg-[#F5F0E6] text-ink-500 text-[11px] font-medium">
                                 Thành viên
                               </span>
                             )}
@@ -1452,7 +1452,7 @@ export const MessagesPage = () => {
                                 type="button"
                                 onClick={() => setConfirmKickMember(member)}
                                 title="Kick khỏi nhóm"
-                                className="p-1.5 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
+                                className="p-1.5 rounded-[5px] text-ink-300 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
                               >
                                 <UserMinus className="w-4 h-4" />
                               </button>
@@ -1464,7 +1464,7 @@ export const MessagesPage = () => {
                                 type="button"
                                 onClick={() => setConfirmLeaveGroup(true)}
                                 title="Rời khỏi nhóm này"
-                                className="p-1.5 rounded-xl text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-all cursor-pointer"
+                                className="p-1.5 rounded-[5px] text-ink-300 hover:text-amber-600 hover:bg-amber-50 transition-all cursor-pointer"
                               >
                                 <LogOut className="w-4 h-4" />
                               </button>
@@ -1480,25 +1480,25 @@ export const MessagesPage = () => {
               /* TAB THÊM THÀNH VIÊN VÀO NHÓM HIỆN TẠI */
               <div className="space-y-3.5 overflow-y-auto pr-1 flex-1 custom-dropdown-scroll">
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-3.5 h-3.5 text-ink-300 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     placeholder="Tìm theo tên hoặc email người dùng..."
                     value={addMemberSearchKeyword}
                     onChange={e => setAddMemberSearchKeyword(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-hidden transition-all placeholder:text-slate-400"
+                    className="w-full pl-9 pr-3 py-2 rounded-[5px] bg-[#F8F4EC] border border-ink-200 text-xs focus:ring-2 focus:ring-clay-500/20 focus:border-clay-500 outline-hidden transition-all placeholder:text-ink-300"
                   />
                 </div>
 
                 {/* Huy hiệu những người đã chọn thêm */}
                 {addMemberSelectedIds.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 p-2 bg-sky-50/50 rounded-2xl border border-sky-100 max-h-24 overflow-y-auto">
+                  <div className="flex flex-wrap gap-1.5 p-2 bg-clay-50/50 rounded-[6px] border border-clay-100 max-h-24 overflow-y-auto">
                     {addMemberSelectedIds.map(uid => {
                       const userObj = availableUsers.find(u => u.userId === uid);
                       return (
                         <span
                           key={uid}
-                          className="inline-flex items-center gap-1.5 pl-1.5 pr-2 py-1 rounded-xl bg-white border border-sky-200 text-slate-800 text-xs font-semibold shadow-2xs"
+                          className="inline-flex items-center gap-1.5 pl-1.5 pr-2 py-1 rounded-[5px] bg-[#FFFDF8] border border-clay-200 text-ink-800 text-xs font-semibold shadow-none"
                         >
                           <img
                             src={userObj?.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
@@ -1509,7 +1509,7 @@ export const MessagesPage = () => {
                           <button
                             type="button"
                             onClick={() => handleToggleAddMemberSelection(uid)}
-                            className="text-slate-400 hover:text-rose-500 transition-colors cursor-pointer"
+                            className="text-ink-300 hover:text-rose-500 transition-colors cursor-pointer"
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -1520,14 +1520,14 @@ export const MessagesPage = () => {
                 )}
 
                 {/* Danh sách người dùng khả dụng */}
-                <div className="border border-slate-200/80 rounded-2xl overflow-hidden bg-white max-h-52 overflow-y-auto custom-dropdown-scroll divide-y divide-slate-100">
+                <div className="border border-ink-200/80 rounded-[6px] overflow-hidden bg-[#FFFDF8] max-h-52 overflow-y-auto custom-dropdown-scroll divide-y divide-ink-200/70">
                   {isLoadingAvailableUsers && availableUsers.length === 0 ? (
-                    <div className="py-8 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-                      <Loader2 className="w-4 h-4 animate-spin text-sky-600" />
+                    <div className="py-8 text-center text-xs text-ink-300 flex items-center justify-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin text-clay-600" />
                       <span>Đang tải danh sách người dùng...</span>
                     </div>
                   ) : candidateUsersToAdd.length === 0 ? (
-                    <div className="py-8 text-center text-xs text-slate-400">
+                    <div className="py-8 text-center text-xs text-ink-300">
                       Tất cả bạn bè/người dùng phù hợp đã ở trong nhóm
                     </div>
                   ) : (
@@ -1538,7 +1538,7 @@ export const MessagesPage = () => {
                           key={user.userId}
                           onClick={() => handleToggleAddMemberSelection(user.userId)}
                           className={`p-2.5 flex items-center justify-between gap-2.5 cursor-pointer transition-colors ${
-                            isSelected ? 'bg-sky-50/60' : 'hover:bg-slate-50'
+                            isSelected ? 'bg-clay-50/60' : 'hover:bg-[#F8F4EC]'
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
@@ -1546,7 +1546,7 @@ export const MessagesPage = () => {
                               <img
                                 src={user.avatarUrl}
                                 alt=""
-                                className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-slate-200"
+                                className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-ink-200"
                               />
                               <span
                                 className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${
@@ -1557,14 +1557,14 @@ export const MessagesPage = () => {
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <p className="text-xs font-bold text-slate-900 truncate">{user.fullName}</p>
+                                <p className="text-xs font-bold text-ink-800 truncate">{user.fullName}</p>
                                 {user.isOnline && (
                                   <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-100">
                                     Online
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[10px] text-slate-400 truncate">
+                              <p className="text-[10px] text-ink-300 truncate">
                                 {user.handle || user.email} {user.statusText ? `• ${user.statusText}` : ''}
                               </p>
                             </div>
@@ -1572,8 +1572,8 @@ export const MessagesPage = () => {
 
                           <div className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all shrink-0 ${
                             isSelected
-                              ? 'bg-sky-600 border-sky-600 text-white'
-                              : 'border-slate-300 hover:border-sky-400'
+                              ? 'bg-clay-600 border-clay-600 text-white'
+                              : 'border-ink-200 hover:border-clay-400'
                           }`}>
                             {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
                           </div>
@@ -1583,11 +1583,11 @@ export const MessagesPage = () => {
                   )}
                 </div>
 
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-ink-200/70">
                   <button
                     type="button"
                     onClick={() => setMembersModalTab('list')}
-                    className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-all cursor-pointer"
+                    className="px-4 py-2 rounded-[5px] text-xs font-semibold text-ink-500 hover:bg-[#F5F0E6] transition-all cursor-pointer"
                   >
                     Quay lại
                   </button>
@@ -1595,7 +1595,7 @@ export const MessagesPage = () => {
                     type="button"
                     onClick={handleAddMembersToExistingGroup}
                     disabled={addMemberSelectedIds.length === 0 || isSubmittingAddMembers}
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-sky-600/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
+                    className="px-5 py-2.5 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white text-xs font-bold shadow-none transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1.5"
                   >
                     {isSubmittingAddMembers && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                     <span>Thêm vào nhóm ({addMemberSelectedIds.length})</span>
@@ -1607,118 +1607,102 @@ export const MessagesPage = () => {
         </div>
       )}
 
-      {/* Header Trang Tin Nhắn */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="p-2 rounded-2xl bg-sky-100 text-sky-700">
-              <MessageSquare className="w-5 h-5" />
-            </span>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
-              Tin Nhắn & Đội Phượt
-            </h1>
-          </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
-            Trò chuyện trực tiếp, chia sẻ hình ảnh và video chất lượng cao lưu trữ Cloudinary CDN.
-          </p>
-        </div>
+      {/* Khung chat chính - Tràn viền bao quanh toàn màn hình */}
+      <div className="flex-1 w-full min-h-0 overflow-hidden grid grid-cols-1 md:grid-cols-12 bg-[#FFFDF8]">
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setIsCreateModalOpen(true)}
-            className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-sky-600/20 flex items-center gap-1.5 transition-all cursor-pointer active:scale-95"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Tạo nhóm chat mới</span>
-          </button>
-        </div>
-      </div>
+        {/* CỘT TRÁI: Hộp thư */}
+        <div className={`md:col-span-5 lg:col-span-4 xl:col-span-3 border-r border-ink-200/70 flex flex-col min-h-0 h-full bg-[#FFFDF8] ${showMobileChat ? 'hidden md:flex' : 'flex'}`}>
+          <div className="p-3.5 sm:p-4 border-b border-ink-200/70 shrink-0 bg-[#FFFDF8]">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <h2 className="font-display text-base sm:text-lg font-bold text-ink-800 truncate">Hộp thư</h2>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F5F0E6] text-ink-500 font-semibold border border-ink-200/60 shrink-0">
+                  {filteredThreads.length}
+                </span>
+              </div>
 
-      {/* Khung chat chính */}
-      <div className="bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[600px] sm:min-h-[680px]">
-        
-        {/* CỘT TRÁI: Danh sách phòng chat (4 Cột) */}
-        <div className={`md:col-span-4 lg:col-span-4 border-r border-slate-100 flex flex-col p-4 sm:p-5 bg-slate-50/50 ${showMobileChat ? 'hidden md:flex' : 'flex'}`}>
-          <div className="flex items-center justify-between gap-2 pb-4 border-b border-slate-200/70">
-            <div>
-              <h2 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-sky-600" />
-                <span>Hộp thư</span>
-              </h2>
-              <p className="text-[11px] text-slate-500 font-medium">Kết nối trực tiếp & Nhóm chuyến đi</p>
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(true)}
+                className="h-8 px-2.5 sm:px-3 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] text-[11px] font-bold border border-clay-600 flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+                title="Tạo nhóm trò chuyện mới"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Tạo nhóm</span>
+              </button>
             </div>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              title="Tạo nhóm mới"
-              className="p-1.5 rounded-xl bg-sky-100/80 hover:bg-sky-200 text-sky-800 transition-all cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-            </button>
+
+            <div className="relative mt-3">
+              <Search className="w-3.5 h-3.5 text-ink-300 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                placeholder="Tìm cuộc trò chuyện..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full h-9 pl-9 pr-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200 focus:border-clay-500 focus:bg-[#FFFDF8] text-xs font-medium text-ink-800 outline-none transition-colors placeholder:text-ink-300"
+              />
+            </div>
+
+            <div className="flex items-center gap-4 mt-3 border-b border-ink-200/70">
+              <button
+                type="button"
+                onClick={() => setFilterTab('all')}
+                className={`pb-2 -mb-px border-b-2 text-[11px] font-bold transition-colors cursor-pointer ${
+                  filterTab === 'all'
+                    ? 'border-clay-600 text-clay-700'
+                    : 'border-transparent text-ink-400 hover:text-ink-800'
+                }`}
+              >
+                Tất cả
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterTab('group')}
+                className={`pb-2 -mb-px border-b-2 text-[11px] font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                  filterTab === 'group'
+                    ? 'border-clay-600 text-clay-700'
+                    : 'border-transparent text-ink-400 hover:text-ink-800'
+                }`}
+              >
+                <Users className="w-3 h-3" />
+                <span>Nhóm</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFilterTab('direct')}
+                className={`pb-2 -mb-px border-b-2 text-[11px] font-bold transition-colors cursor-pointer ${
+                  filterTab === 'direct'
+                    ? 'border-clay-600 text-clay-700'
+                    : 'border-transparent text-ink-400 hover:text-ink-800'
+                }`}
+              >
+                Cá nhân
+              </button>
+            </div>
           </div>
 
-          {/* Ô tìm kiếm phòng chat */}
-          <div className="relative my-3.5">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm phòng chat, người bạn..."
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl bg-white border border-slate-200 text-xs focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 outline-hidden transition-all placeholder:text-slate-400"
-            />
-          </div>
-
-          {/* Bộ lọc: Tất cả | Nhóm tour | 1-1 */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-200/60 rounded-xl mb-3 text-xs font-semibold">
-            <button
-              onClick={() => setFilterTab('all')}
-              className={`flex-1 py-1.5 rounded-lg text-center transition-all cursor-pointer ${
-                filterTab === 'all' ? 'bg-white text-slate-900 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Tất cả
-            </button>
-            <button
-              onClick={() => setFilterTab('group')}
-              className={`flex-1 py-1.5 rounded-lg text-center transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                filterTab === 'group' ? 'bg-white text-sky-700 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Users className="w-3 h-3" />
-              <span>Nhóm</span>
-            </button>
-            <button
-              onClick={() => setFilterTab('direct')}
-              className={`flex-1 py-1.5 rounded-lg text-center transition-all cursor-pointer ${
-                filterTab === 'direct' ? 'bg-white text-slate-900 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Cá nhân
-            </button>
-          </div>
-
-          {/* Danh sách phòng */}
-          <div className="flex-1 overflow-y-auto space-y-1.5 custom-dropdown-scroll pr-1">
+          <div className="flex-1 overflow-y-auto p-2 custom-dropdown-scroll">
             {isLoadingRooms ? (
-              <div className="py-12 text-center text-slate-400 text-xs space-y-2">
-                <Loader2 className="w-6 h-6 animate-spin mx-auto text-sky-600" />
-                <p>Đang tải danh sách cuộc trò chuyện...</p>
+              <div className="py-14 text-center text-ink-300 text-xs space-y-2">
+                <Loader2 className="w-5 h-5 animate-spin mx-auto text-clay-600" />
+                <p>Đang tải cuộc trò chuyện...</p>
               </div>
             ) : filteredThreads.length === 0 ? (
-              <div className="py-12 text-center text-slate-400 text-xs space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto">
-                  <MessageSquare className="w-6 h-6" />
+              <div className="py-14 px-4 text-center text-ink-300 text-xs space-y-3">
+                <div className="w-11 h-11 rounded-[6px] bg-clay-50 border border-clay-200 text-clay-700 flex items-center justify-center mx-auto">
+                  <MessageSquare className="w-5 h-5" />
                 </div>
-                <p className="font-semibold text-slate-600">Chưa có cuộc trò chuyện nào</p>
-                <p className="text-[11px] text-slate-400 px-4">Hãy tạo nhóm mới hoặc nhắn tin từ trang Lịch trình / Bạn bè để kết nối!</p>
+                <p className="font-bold text-ink-600">Chưa có cuộc trò chuyện</p>
+                <p className="text-[10px] leading-relaxed">
+                  Tạo nhóm mới hoặc bắt đầu nhắn tin từ một lịch trình.
+                </p>
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(true)}
-                  className="px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-[11px] font-bold shadow-xs transition-all cursor-pointer inline-flex items-center gap-1"
+                  className="h-8 px-3 rounded-[5px] bg-clay-50 border border-clay-300 text-clay-700 text-[10px] font-bold inline-flex items-center gap-1 hover:bg-clay-100 transition-colors cursor-pointer"
                 >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Tạo nhóm ngay</span>
+                  <Plus className="w-3 h-3" />
+                  <span>Tạo nhóm</span>
                 </button>
               </div>
             ) : (
@@ -1729,138 +1713,127 @@ export const MessagesPage = () => {
                     setActiveThreadId(thread.id);
                     setShowMobileChat(true);
                   }}
-                  className={`p-3 rounded-2xl cursor-pointer transition-all flex items-center gap-3 ${
+                  className={`relative p-2.5 rounded-[5px] cursor-pointer transition-colors flex items-center gap-2.5 border ${
                     activeThreadId === thread.id
-                      ? 'bg-white shadow-md border border-sky-200 ring-2 ring-sky-500/15'
-                      : 'hover:bg-slate-100/80 border border-transparent'
+                      ? 'bg-clay-50 border-clay-200'
+                      : 'border-transparent hover:bg-[#F8F4EC]'
                   }`}
                 >
+                  {activeThreadId === thread.id && (
+                    <span className="absolute left-0 top-2.5 bottom-2.5 w-[2px] rounded-full bg-clay-600" />
+                  )}
+
                   <div className="relative shrink-0">
                     <img
                       src={thread.avatar}
                       alt={thread.name}
-                      className="w-11 h-11 rounded-2xl object-cover ring-1 ring-slate-200"
+                      className="w-10 h-10 rounded-full object-cover border border-ink-200/70"
                     />
                     {thread.type === 'DIRECT' ? (
                       <span
-                        className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white ${
-                          thread.isOnline ? 'bg-emerald-500' : 'bg-slate-300'
+                        className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#FFFDF8] ${
+                          thread.isOnline ? 'bg-emerald-500' : 'bg-ink-300'
                         }`}
                         title={thread.isOnline ? 'Đang hoạt động' : (thread.statusText || 'Ngoại tuyến')}
                       />
                     ) : (
-                      <span className="absolute -bottom-0.5 -right-0.5 p-0.5 rounded-full bg-sky-600 text-white border border-white text-[8px]" title="Nhóm tour">
-                        <Users className="w-2.5 h-2.5" />
+                      <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-clay-600 text-[#FFFDF8] border-2 border-[#FFFDF8] flex items-center justify-center" title="Nhóm chuyến đi">
+                        <Users className="w-2 h-2" />
                       </span>
                     )}
                   </div>
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1">
-                      <h4 className="font-bold text-xs text-slate-900 truncate">{thread.name}</h4>
-                      <span className="text-[10px] text-slate-400 shrink-0">{thread.time}</span>
+                      <h4 className="font-bold text-[12px] text-ink-800 truncate">{thread.name}</h4>
+                      <span className="text-[9px] text-ink-300 shrink-0">{thread.time}</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 truncate mt-0.5">{thread.lastMsg}</p>
+                    <div className="flex items-center justify-between gap-2 mt-0.5">
+                      <p className="text-[10.5px] text-ink-400 truncate">{thread.lastMsg}</p>
+                      {thread.unread > 0 && (
+                        <span className="min-w-4 h-4 px-1 rounded-[3px] bg-clay-600 text-[#FFFDF8] text-[9px] font-bold flex items-center justify-center shrink-0">
+                          {thread.unread}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  {thread.unread > 0 && (
-                    <span className="w-4 h-4 rounded-full bg-sky-600 text-white text-[9px] font-bold flex items-center justify-center shrink-0">
-                      {thread.unread}
-                    </span>
-                  )}
                 </div>
               ))
             )}
           </div>
         </div>
 
-        {/* CỘT PHẢI: Khung nhắn tin chi tiết (8 Cột) */}
-        <div className={`md:col-span-8 lg:col-span-8 p-4 sm:p-6 flex flex-col justify-between space-y-4 ${!showMobileChat ? 'hidden md:flex' : 'flex'}`}>
-          
-          {/* Header phòng chat hoặc Empty State */}
+        {/* CỘT PHẢI: Nội dung hội thoại */}
+        <div className={`md:col-span-7 lg:col-span-8 xl:col-span-9 flex flex-col min-h-0 h-full bg-[#FFFDF8] ${!showMobileChat ? 'hidden md:flex' : 'flex'}`}>
           {currentThreadObj ? (
             <>
-              <div className="flex items-center justify-between pb-3.5 border-b border-slate-100">
-                <div className="flex items-center gap-3 min-w-0">
+              {/* Header phòng chat */}
+              <div className="px-4 sm:px-5 py-3 border-b border-ink-200/70 flex items-center justify-between gap-2 shrink-0 bg-[#FFFDF8]">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <button
+                    type="button"
                     onClick={() => setShowMobileChat(false)}
-                    className="md:hidden p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-bold cursor-pointer"
+                    className="md:hidden w-8 h-8 rounded-[5px] border border-ink-200 bg-[#F8F4EC] text-ink-500 hover:text-clay-700 flex items-center justify-center cursor-pointer shrink-0"
                   >
                     <ArrowLeft className="w-4 h-4" />
                   </button>
 
-                  <div className="relative shrink-0">
-                    <img
-                      src={currentThreadObj?.avatar || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=150&q=80'}
-                      alt=""
-                      className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl object-cover ring-2 ring-sky-100"
-                    />
-                    <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
-                      currentThreadObj?.isOnline ? 'bg-emerald-500' : 'bg-slate-300'
-                    }`} />
-                  </div>
+                  <img
+                    src={currentThreadObj?.avatar || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=150&q=80'}
+                    alt=""
+                    className="w-9 h-9 rounded-full object-cover border border-ink-200 shrink-0"
+                  />
 
                   <div className="min-w-0">
-                    <h3 className="font-extrabold text-xs sm:text-sm text-slate-900 truncate">
+                    <h3 className="font-bold text-xs sm:text-sm text-ink-800 truncate">
                       {currentThreadObj?.name}
                     </h3>
-                    <p className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                    <div className="text-[10px] text-ink-400 flex items-center gap-1.5 mt-0.5 min-w-0">
                       {currentThreadObj?.type === 'DIRECT' ? (
-                        <>
-                          {currentThreadObj?.isOnline ? (
-                            <span className="text-emerald-600 font-bold flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                              <span>Đang hoạt động</span>
-                            </span>
-                          ) : (
-                            <span className="text-slate-500 font-medium flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                              <span>{currentThreadObj?.statusText || 'Ngoại tuyến'}</span>
-                            </span>
-                          )}
-                          <span>•</span>
-                          <span>Hội thoại 1-1 trực tiếp</span>
-                        </>
+                        currentThreadObj?.isOnline ? (
+                          <span className="text-emerald-700 font-bold flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            <span>Đang hoạt động</span>
+                          </span>
+                        ) : (
+                          <span className="font-medium flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-ink-300" />
+                            <span>{currentThreadObj?.statusText || 'Ngoại tuyến'}</span>
+                          </span>
+                        )
                       ) : (
-                        <>
-                          <button
-                            type="button"
-                            onClick={handleOpenMembersModal}
-                            className="text-sky-600 hover:text-sky-700 font-bold hover:underline flex items-center gap-1 cursor-pointer transition-colors"
-                            title="Bấm để xem & quản lý thành viên nhóm"
-                          >
-                            <Users className="w-3.5 h-3.5" />
-                            <span>{currentThreadObj?.membersCount || 1} thành viên</span>
-                          </button>
-                          <span>•</span>
-                          <span>Bấm để quản lý thành viên & kick</span>
-                        </>
+                        <button
+                          type="button"
+                          onClick={handleOpenMembersModal}
+                          className="text-clay-700 hover:text-clay-800 font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                          title="Xem danh sách thành viên nhóm"
+                        >
+                          <Users className="w-3 h-3" />
+                          <span>Nhóm chuyến đi</span>
+                        </button>
                       )}
-                    </p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1 shrink-0">
                   {currentThreadObj?.type === 'GROUP' && (
                     <button
                       type="button"
                       onClick={handleOpenMembersModal}
                       title="Xem danh sách & quản lý thành viên nhóm"
-                      className="px-2.5 sm:px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 border border-sky-100 shadow-2xs"
+                      className="h-8 px-2.5 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-ink-600 hover:text-clay-700 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1.5 border border-ink-200"
                     >
-                      <Users className="w-3.5 h-3.5 text-sky-600" />
-                      <span>Thành viên ({currentThreadObj?.membersCount || 1})</span>
+                      <Users className="w-3.5 h-3.5 text-clay-600" />
+                      <span>{currentThreadObj?.membersCount || 1}</span>
                     </button>
                   )}
-
-                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100 flex items-center gap-1 hidden lg:flex">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Cloud CDN</span>
-                  </span>
 
                   <button
                     type="button"
                     onClick={() => handleDeleteRoom(currentThreadObj.id)}
                     title="Xóa cuộc trò chuyện này"
-                    className="p-2 rounded-xl text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
+                    className="w-8 h-8 rounded-[5px] text-ink-300 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer flex items-center justify-center"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -1868,28 +1841,28 @@ export const MessagesPage = () => {
               </div>
 
               {/* Lịch sử tin nhắn */}
-              <div ref={chatScrollContainerRef} className="flex-1 space-y-3.5 max-h-[440px] overflow-y-auto pr-1.5 custom-dropdown-scroll">
+              <div ref={chatScrollContainerRef} className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4 space-y-3 bg-[#F8F4EC] custom-dropdown-scroll">
                 {isLoadingMessages ? (
-                  <div className="py-24 text-center text-slate-400 text-xs space-y-2">
-                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-sky-600" />
-                    <p>Đang đồng bộ tin nhắn đám mây...</p>
+                  <div className="py-20 text-center text-ink-300 text-xs space-y-2">
+                    <Loader2 className="w-5 h-5 animate-spin mx-auto text-clay-600" />
+                    <p>Đang tải tin nhắn...</p>
                   </div>
                 ) : messages.length === 0 ? (
-                  <div className="py-24 text-center text-slate-400 text-xs space-y-1">
-                    <p className="font-semibold text-slate-600">Chưa có tin nhắn nào trong phòng</p>
-                    <p>Gửi tin nhắn hoặc đính kèm ảnh/video đầu tiên để bắt đầu cuộc trò chuyện!</p>
+                  <div className="py-20 text-center text-ink-300 text-xs space-y-1">
+                    <p className="font-bold text-ink-600">Chưa có tin nhắn nào</p>
+                    <p>Gửi lời chào hoặc một tấm ảnh để bắt đầu.</p>
                   </div>
                 ) : (
                   messages.map(msg => {
                     const isMe = isMessageFromMe(msg);
                     if (msg.messageType === 'SYSTEM') {
                       return (
-                        <div key={msg.id} className="flex justify-center my-2">
-                          <div className="px-3.5 py-1.5 rounded-full bg-slate-100 text-slate-600 text-[11px] font-medium border border-slate-200/80 flex items-center gap-1.5 shadow-2xs">
-                            <Shield className="w-3.5 h-3.5 text-sky-600 shrink-0" />
+                        <div key={msg.id} className="flex justify-center my-1">
+                          <span className="px-2.5 py-1 rounded-[5px] bg-[#FFFDF8] border border-ink-200/70 text-ink-400 text-[10px] font-medium flex items-center gap-1.5">
+                            <Shield className="w-3 h-3 text-clay-600 shrink-0" />
                             <span>{msg.content}</span>
-                            <span className="text-[10px] text-slate-400">• {msg.time}</span>
-                          </div>
+                            <span className="text-ink-300">· {msg.time}</span>
+                          </span>
                         </div>
                       );
                     }
@@ -1897,131 +1870,97 @@ export const MessagesPage = () => {
                     return (
                       <div
                         key={msg.id}
-                        className={`flex gap-2.5 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}
+                        className={`flex gap-2 ${isMe ? 'flex-row-reverse' : 'flex-row'}`}
                       >
                         {!isMe && (
                           <img
                             src={msg.senderAvatar || currentThreadObj?.avatar}
                             alt=""
-                            className="w-8 h-8 rounded-full object-cover shrink-0 mt-0.5"
+                            className="w-7 h-7 rounded-full object-cover shrink-0 mt-1 border border-ink-200/70"
                           />
                         )}
-                      <div className={`max-w-md space-y-1 flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                        {!isMe && (
-                          <span className="text-[10px] font-bold text-slate-500 px-1">
-                            {msg.senderName}
-                          </span>
-                        )}
 
-                        {/* RENDER NỘI DUNG THEO LOẠI */}
-                        {msg.messageType === 'IMAGE' ? (
-                          <div className="relative group overflow-hidden rounded-2xl border border-slate-200/80 shadow-sm bg-slate-100">
-                            <img
-                              src={msg.content}
-                              alt="Ảnh chia sẻ"
-                              className="max-w-[260px] sm:max-w-xs max-h-64 rounded-2xl object-cover cursor-pointer hover:opacity-95 transition-all"
-                              onClick={() => setPreviewMediaUrl(msg.content)}
-                            />
-                            {msg.isPending && (
-                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center text-white text-xs font-bold gap-1.5">
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span>Đang tải lên Cloud...</span>
-                              </div>
-                            )}
-                            {!msg.isPending && (
-                              <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1 cursor-pointer pointer-events-none">
-                                <Maximize2 className="w-4 h-4" />
-                                <span>Xem ảnh</span>
-                              </div>
-                            )}
-                          </div>
-                        ) : msg.messageType === 'VIDEO' ? (
-                          <div className="rounded-2xl overflow-hidden border border-slate-800 shadow-md max-w-[280px] sm:max-w-xs bg-black relative">
-                            <video
-                              controls
-                              src={msg.content}
-                              className="w-full max-h-64 object-contain rounded-2xl"
-                              preload="metadata"
-                            />
-                            {msg.isPending && (
-                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white text-xs font-bold gap-1.5">
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                                <span>Đang tải video lên Cloud...</span>
-                              </div>
-                            )}
-                          </div>
-                        ) : msg.messageType === 'AUDIO' ? (
-                          <AudioMessagePlayer src={msg.content} isMe={isMe} />
-                        ) : msg.messageType === 'FILE' ? (
-                          <FileAttachmentBubble src={msg.content} isMe={isMe} />
-                        ) : msg.messageType === 'ITINERARY' ? (
-                          <ItineraryMessageBubble
-                            content={msg.content}
-                            isMe={isMe}
-                            onViewItinerary={(itinData) => {
-                              navigate(`/itinerary?id=${itinData.id || ''}`);
-                            }}
-                          />
-                        ) : (
-                          <div
-                            className={`p-3 rounded-2xl text-xs leading-relaxed break-words ${
-                              isMe
-                                ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white rounded-tr-none shadow-sm shadow-sky-600/20'
-                                : 'bg-slate-100 text-slate-800 rounded-tl-none border border-slate-200/60'
-                            }`}
-                          >
-                            {msg.content}
-                          </div>
-                        )}
+                        <div className={`max-w-[82%] sm:max-w-[70%] flex flex-col gap-1 ${isMe ? 'items-end' : 'items-start'}`}>
+                          {!isMe && (
+                            <span className="text-[9px] font-bold text-ink-400 px-0.5">
+                              {msg.senderName}
+                            </span>
+                          )}
 
-                        <div className="flex items-center gap-1 text-[10px] text-slate-400 px-1">
-                          <span>{msg.time}</span>
-                          {isMe && <CheckCheck className="w-3 h-3 text-sky-500" />}
+                          {msg.messageType === 'IMAGE' ? (
+                            <div className="relative overflow-hidden rounded-[6px] border border-ink-200/80 bg-[#FFFDF8]">
+                              <img
+                                src={msg.content}
+                                alt="Ảnh chia sẻ"
+                                className="max-w-[260px] sm:max-w-xs max-h-64 rounded-[6px] object-cover cursor-pointer"
+                                onClick={() => setPreviewMediaUrl(msg.content)}
+                              />
+                              {msg.isPending && (
+                                <div className="absolute inset-0 bg-ink-900/60 flex items-center justify-center text-[#FFFDF8] text-[10px] font-bold gap-1.5">
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  <span>Đang tải...</span>
+                                </div>
+                              )}
+                            </div>
+                          ) : msg.messageType === 'VIDEO' ? (
+                            <div className="rounded-[6px] overflow-hidden border border-ink-800 max-w-[280px] sm:max-w-xs bg-ink-950 relative">
+                              <video
+                                controls
+                                src={msg.content}
+                                className="w-full max-h-64 object-contain rounded-[6px]"
+                                preload="metadata"
+                              />
+                              {msg.isPending && (
+                                <div className="absolute inset-0 bg-ink-900/60 flex items-center justify-center text-[#FFFDF8] text-[10px] font-bold gap-1.5">
+                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                  <span>Đang tải video...</span>
+                                </div>
+                              )}
+                            </div>
+                          ) : msg.messageType === 'AUDIO' ? (
+                            <AudioMessagePlayer src={msg.content} isMe={isMe} />
+                          ) : msg.messageType === 'FILE' ? (
+                            <FileAttachmentBubble src={msg.content} isMe={isMe} />
+                          ) : msg.messageType === 'ITINERARY' ? (
+                            <ItineraryMessageBubble
+                              content={msg.content}
+                              isMe={isMe}
+                              onViewItinerary={(itinData) => {
+                                navigate(`/itinerary?id=${itinData.id || ''}`);
+                              }}
+                            />
+                          ) : (
+                            <div
+                              className={`px-3.5 py-2.5 rounded-[6px] text-[12px] leading-relaxed break-words border ${
+                                isMe
+                                  ? 'bg-clay-600 text-[#FFFDF8] border-clay-600'
+                                  : 'bg-[#FFFDF8] text-ink-800 border-ink-200/70'
+                              }`}
+                            >
+                              {msg.content}
+                            </div>
+                          )}
+
+                          <div className="flex items-center gap-1 text-[9px] text-ink-300 px-0.5">
+                            <span>{msg.time}</span>
+                            {isMe && <CheckCheck className="w-3 h-3 text-clay-600" />}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                }))}
+                    );
+                  })
+                )}
                 <div ref={messagesEndRef} />
               </div>
-            </>
-          ) : (
-            /* Khi chưa có phòng chat nào được chọn */
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-4">
-              <div className="w-16 h-16 rounded-3xl bg-sky-100/70 text-sky-600 flex items-center justify-center shadow-inner">
-                <Compass className="w-8 h-8" />
-              </div>
-              <div className="max-w-md space-y-2">
-                <h3 className="text-base sm:text-lg font-black text-slate-900">
-                  Chào mừng bạn đến với Tin Nhắn Wayfare!
-                </h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Hiện bạn chưa có cuộc trò chuyện nào. Hãy tạo một nhóm mới hoặc nhắn tin kết nối với bạn bè qua các lịch trình du lịch để bắt đầu chia sẻ hình ảnh và video.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsCreateModalOpen(true)}
-                className="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white text-xs font-bold shadow-md shadow-sky-600/20 flex items-center gap-2 transition-all cursor-pointer active:scale-95"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tạo nhóm trò chuyện ngay</span>
-              </button>
-            </div>
-          )}
 
-          {/* Thanh Tiến Trình Tải Lên Media */}
-          {isUploading && (
-            <div className="p-3 bg-sky-50 border border-sky-100 rounded-2xl flex items-center gap-2.5 text-xs text-sky-800 font-bold animate-pulse">
-              <Loader2 className="w-4 h-4 animate-spin text-sky-600 shrink-0" />
-              <span className="flex-1 truncate">{uploadProgressText}</span>
-            </div>
-          )}
+              {/* Thanh tiến trình tải media */}
+              {isUploading && (
+                <div className="mx-3 mt-2 p-2.5 rounded-[5px] bg-clay-50 border border-clay-200 flex items-center gap-2 text-[11px] text-clay-800 font-semibold">
+                  <Loader2 className="w-4 h-4 animate-spin text-clay-600 shrink-0" />
+                  <span className="truncate">{uploadProgressText}</span>
+                </div>
+              )}
 
-          {/* Form Nhập tin nhắn & Nút Chọn Ảnh/Video/Tệp/Ghi âm */}
-          {currentThreadObj && (
-            <>
-              {/* Input file ẩn hỗ trợ Ảnh, Video, Audio và Tài liệu PDF/Doc/Zip */}
               <input
                 type="file"
                 ref={fileInputRef}
@@ -2031,28 +1970,19 @@ export const MessagesPage = () => {
               />
 
               {isRecording ? (
-                /* Thanh Trạng Thái Đang Ghi Âm Tin Nhắn Thoại */
-                <div className="flex items-center gap-2 pt-3 border-t border-slate-100 animate-fade-in">
-                  <div className="flex-1 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700">
-                    <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping shrink-0" />
-                    <span className="text-xs font-bold text-rose-600">Đang ghi âm...</span>
-                    <span className="font-mono text-xs font-black text-rose-700 bg-rose-100/70 px-2 py-0.5 rounded-md">
+                <div className="border-t border-ink-200/70 p-3 flex items-center gap-2 bg-[#FFFDF8] shrink-0">
+                  <div className="flex-1 h-10 min-w-0 flex items-center gap-2 px-3 rounded-[5px] bg-rose-50 border border-rose-200 text-rose-700">
+                    <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                    <span className="text-[11px] font-bold shrink-0">Đang ghi âm</span>
+                    <span className="font-mono text-xs font-black">
                       {Math.floor(recordingDuration / 60)}:{String(recordingDuration % 60).padStart(2, '0')}
                     </span>
-                    {/* Hiệu ứng sóng âm thanh động */}
-                    <div className="flex items-center gap-1 ml-auto">
-                      <span className="w-1 h-3 bg-rose-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                      <span className="w-1 h-5 bg-rose-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                      <span className="w-1 h-3.5 bg-rose-400 rounded-full animate-bounce [animation-delay:-0.45s]"></span>
-                      <span className="w-1 h-6 bg-rose-600 rounded-full animate-bounce"></span>
-                      <span className="w-1 h-3 bg-rose-400 rounded-full animate-bounce [animation-delay:-0.2s]"></span>
-                    </div>
                   </div>
 
                   <button
                     type="button"
                     onClick={handleCancelRecording}
-                    className="p-2.5 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 transition-all cursor-pointer shrink-0"
+                    className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] hover:bg-rose-50 text-ink-400 hover:text-rose-600 border border-ink-200 hover:border-rose-200 transition-colors cursor-pointer shrink-0 flex items-center justify-center"
                     title="Hủy ghi âm"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -2062,46 +1992,45 @@ export const MessagesPage = () => {
                     type="button"
                     onClick={handleStopAndSendRecording}
                     disabled={isUploading}
-                    className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-md shadow-rose-600/20 transition-all flex items-center gap-1.5 cursor-pointer shrink-0 active:scale-95"
+                    className="h-9 px-3.5 rounded-[5px] bg-clay-600 hover:bg-clay-700 disabled:opacity-40 text-[#FFFDF8] text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer shrink-0"
                   >
                     <Send className="w-3.5 h-3.5" />
-                    <span>Gửi Thoại</span>
+                    <span className="hidden sm:inline">Gửi</span>
                   </button>
                 </div>
               ) : (
-                /* Thanh Nhập Tin Nhắn Bình Thường */
-                <form onSubmit={handleSendMessage} className="flex items-center gap-2 pt-3 border-t border-slate-100">
-                  {/* Nút đính kèm ảnh/video/tệp lên Cloudinary */}
+                <form
+                  onSubmit={handleSendMessage}
+                  className="border-t border-ink-200/70 p-3 flex items-center gap-1.5 bg-[#FFFDF8] shrink-0"
+                >
                   <button
                     type="button"
                     disabled={isUploading}
                     onClick={() => fileInputRef.current?.click()}
                     title="Đính kèm ảnh, video hoặc tệp tài liệu"
-                    className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-sky-600 hover:border-sky-300 hover:bg-sky-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-ink-400 hover:text-clay-700 hover:bg-[#F8F4EC] transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
                   >
                     <Paperclip className="w-4 h-4" />
                   </button>
 
-                  {/* Nút Ghi âm Tin nhắn Thoại */}
                   <button
                     type="button"
                     disabled={isUploading}
                     onClick={handleStartRecording}
-                    title="Bấm để ghi âm tin nhắn thoại"
-                    className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-300 hover:bg-rose-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                    title="Ghi âm tin nhắn thoại"
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-ink-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
                   >
                     <Mic className="w-4 h-4" />
                   </button>
 
-                  {/* Nút Gửi Lịch Trình AI */}
                   <button
                     type="button"
                     disabled={isUploading}
                     onClick={() => setIsItineraryPickerOpen(true)}
-                    title="Gửi lịch trình du lịch vào cuộc trò chuyện"
-                    className="p-2.5 rounded-xl border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 hover:bg-blue-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
+                    title="Gửi lịch trình vào cuộc trò chuyện"
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-clay-600 hover:bg-clay-50 transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
                   >
-                    <Route className="w-4 h-4 text-blue-600" />
+                    <Route className="w-4 h-4" />
                   </button>
 
                   <input
@@ -2109,27 +2038,48 @@ export const MessagesPage = () => {
                     placeholder={
                       currentThreadObj?.type === 'DIRECT'
                         ? `Nhắn tin cho ${currentThreadObj.name}...`
-                        : 'Nhập tin nhắn nhóm (hoặc bấm biểu tượng ghim/micro/lịch trình để gửi)...'
+                        : 'Nhập tin nhắn...'
                     }
                     value={inputText}
                     onChange={e => setInputText(e.target.value)}
                     disabled={isUploading}
-                    className="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 bg-slate-50/50 focus:bg-white transition-all font-medium disabled:opacity-60"
+                    className="flex-1 min-w-0 h-10 px-3 rounded-[5px] border border-ink-200 text-xs text-ink-800 outline-none focus:border-clay-500 focus:bg-[#FFFDF8] bg-[#F8F4EC] transition-colors font-medium placeholder:text-ink-300 disabled:opacity-60"
                   />
 
                   <button
                     type="submit"
                     disabled={!inputText.trim() || isUploading}
-                    className="bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed px-5 py-2.5 rounded-xl text-white text-xs font-bold shrink-0 shadow-md shadow-sky-600/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                    className="h-10 px-3 sm:px-4 rounded-[5px] bg-clay-600 hover:bg-clay-700 disabled:opacity-40 disabled:cursor-not-allowed text-[#FFFDF8] text-xs font-bold shrink-0 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <Send className="w-3.5 h-3.5" />
-                    <span>Gửi</span>
+                    <span className="hidden sm:inline">Gửi</span>
                   </button>
                 </form>
               )}
             </>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 space-y-4 bg-[#F8F4EC]">
+              <div className="w-12 h-12 rounded-[6px] bg-clay-50 border border-clay-200 text-clay-700 flex items-center justify-center">
+                <MessageSquare className="w-6 h-6" />
+              </div>
+              <div className="max-w-sm space-y-1.5">
+                <h3 className="font-display text-lg font-bold text-ink-800">
+                  Bắt đầu trò chuyện
+                </h3>
+                <p className="text-xs text-ink-400 leading-relaxed">
+                  Chọn một cuộc trò chuyện ở bên trái, hoặc tạo nhóm mới cho chuyến đi tiếp theo.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsCreateModalOpen(true)}
+                className="h-9 px-4 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] text-xs font-bold border border-clay-600 flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tạo nhóm mới</span>
+              </button>
+            </div>
           )}
-
         </div>
 
       </div>

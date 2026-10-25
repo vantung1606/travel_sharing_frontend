@@ -69,6 +69,7 @@ const RouteLoadingFallback = () => (
 const AppContent = () => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
+  const isMessagesPath = location.pathname.startsWith('/messages');
   const { isLoggedIn, currentUser, addNewNotification } = useApp();
   const toast = useToast();
   const recentNotifKeysRef = useRef(new Set());
@@ -132,10 +133,10 @@ const AppContent = () => {
 
       {!isAdminPath ? (
         /* USER PORTAL LAYOUT */
-        <div className="min-h-screen flex flex-col pb-20 md:pb-0">
+        <div className={`min-h-screen flex flex-col ${isMessagesPath ? '' : 'pb-20 md:pb-0'}`}>
           <Navbar />
 
-          <main className="flex-1">
+          <main className={`flex-1 ${isMessagesPath ? 'flex flex-col min-h-0' : ''}`}>
             <Suspense fallback={<RouteLoadingFallback />}>
               <Routes>
               <Route path="/" element={<HomePage />} />
@@ -185,8 +186,8 @@ const AppContent = () => {
             </Suspense>
           </main>
 
-          <BottomNav />
-          <Footer />
+          {!isMessagesPath && <BottomNav />}
+          {!isMessagesPath && <Footer />}
         </div>
       ) : (
         /* ADMIN PORTAL SECURED LAYOUT */
