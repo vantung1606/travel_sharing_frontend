@@ -14,59 +14,86 @@ import {
   BarChart3,
   Activity,
   ArrowUpRight,
-  Loader2
+  Loader2,
+  Sparkles,
+  Compass
 } from 'lucide-react';
 import { adminApi } from '../../../services/api';
 
-// ─── Mini Bar Chart Component ─────────────────────────────────────────────────
-const BarChart = ({ data, color = '#6366f1', label }) => {
+// ─── Mini Bar Chart Component (Paper - Ink - Clay) ───────────────────────────
+const BarChart = ({ data, color = '#B0522F', label, metricType = 'items' }) => {
   if (!data || data.length === 0) return null;
-  const max = Math.max(...data.map(d => d.count), 1);
+  const max = Math.max(...data.map(d => Number(d.count) || 0), 1);
   return (
-    <div className="space-y-1">
-      {label && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{label}</p>}
-      <div className="flex items-end gap-1.5 h-20">
-        {data.map((item, i) => (
-          <div key={i} className="flex-1 flex flex-col items-center gap-1 group">
-            <div
-              className="w-full rounded-t-md transition-all duration-500 hover:opacity-80 cursor-default"
-              style={{
-                height: `${Math.max((item.count / max) * 70, 4)}px`,
-                backgroundColor: color,
-                opacity: 0.7 + 0.3 * (i / data.length)
-              }}
-              title={`${item.label}: ${item.count}`}
-            />
-            <span className="text-[8px] text-slate-400 whitespace-nowrap">{item.label?.replace('Th', 'T')}</span>
-          </div>
-        ))}
+    <div className="space-y-2">
+      {label && (
+        <p className="text-[10px] font-bold text-ink-400 uppercase tracking-wider">{label}</p>
+      )}
+      <div className="flex items-end gap-2 h-28 pt-4 pb-1 border-b border-ink-200/60">
+        {data.map((item, i) => {
+          const count = Number(item.count) || 0;
+          const percent = Math.min(100, Math.max(10, Math.round((count / max) * 100)));
+          const isLatest = i === data.length - 1;
+
+          return (
+            <div key={i} className="flex-1 flex flex-col items-center h-full justify-end group relative">
+              {/* Tooltip */}
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-7 bg-ink-900 text-[#FFFDF8] px-2 py-0.5 rounded-[4px] text-[10px] font-bold whitespace-nowrap pointer-events-none z-10 border border-ink-800">
+                {count.toLocaleString('vi-VN')} {metricType}
+              </div>
+
+              {/* Bar Value Header */}
+              <span className={`text-[10px] font-bold mb-1 transition-colors ${
+                isLatest ? 'text-clay-700 font-black' : 'text-ink-400 group-hover:text-ink-800'
+              }`}>
+                {count}
+              </span>
+
+              {/* Bar column */}
+              <div className="w-full max-w-[40px] bg-[#F8F4EC] rounded-t-[3px] border-t border-x border-ink-200/60 overflow-hidden flex flex-col justify-end h-full">
+                <div
+                  className={`w-full rounded-t-[3px] transition-all duration-500 ease-out ${
+                    isLatest
+                      ? 'bg-gradient-to-t from-clay-700 to-clay-500'
+                      : 'bg-gradient-to-t from-ink-300 to-ink-200 group-hover:from-clay-400 group-hover:to-clay-300'
+                  }`}
+                  style={{ height: `${percent}%` }}
+                />
+              </div>
+
+              {/* Month label */}
+              <span className="text-[10px] text-ink-500 font-semibold mt-2 block text-center truncate w-full">
+                {item.label?.replace('Th', 'T')}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 };
 
-// ─── KPI Card ─────────────────────────────────────────────────────────────────
-const KpiCard = ({ icon: Icon, label, value, sub, color, bgColor, trend, loading }) => (
-  <div className={`bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex flex-col justify-between gap-3 hover:shadow-md transition-shadow relative overflow-hidden`}>
-    <div className={`absolute top-0 right-0 w-24 h-24 ${bgColor} rounded-full -translate-y-8 translate-x-8 opacity-30 blur-xl pointer-events-none`} />
+// ─── KPI Card (Paper - Ink - Clay) ───────────────────────────────────────────
+const KpiCard = ({ icon: Icon, label, value, sub, trend, loading }) => (
+  <div className="bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex flex-col justify-between gap-3 relative transition-colors hover:border-ink-300">
     <div className="flex items-center justify-between">
-      <span className="text-xs font-bold text-slate-500">{label}</span>
-      <div className={`w-10 h-10 rounded-xl ${bgColor} ${color} flex items-center justify-center`}>
-        <Icon className="w-5 h-5" />
+      <span className="text-xs font-bold text-ink-400">{label}</span>
+      <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
+        <Icon className="w-4 h-4" />
       </div>
     </div>
     <div>
       {loading ? (
-        <div className="h-9 w-16 bg-slate-100 animate-pulse rounded-lg mb-1.5" />
+        <div className="h-8 w-24 bg-[#F8F4EC] animate-pulse rounded-[4px] mb-1.5" />
       ) : (
-        <div className={`font-display font-extrabold text-3xl ${color.replace('text-', 'text-').replace('-600', '-700').replace('-500', '-700')} leading-none mb-1.5`}>
+        <div className="font-display font-black text-3xl text-ink-800 leading-none mb-1.5">
           {value}
         </div>
       )}
       {sub && (
-        <div className="flex items-center gap-1 text-xs font-bold text-slate-500">
-          {trend === 'up' && <TrendingUp className="w-3.5 h-3.5 text-sky-500" />}
-          {trend === 'down' && <TrendingDown className="w-3.5 h-3.5 text-rose-500" />}
+        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-ink-500">
+          {trend === 'up' && <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />}
+          {trend === 'down' && <TrendingDown className="w-3.5 h-3.5 text-rose-600" />}
           <span>{sub}</span>
         </div>
       )}
@@ -74,27 +101,31 @@ const KpiCard = ({ icon: Icon, label, value, sub, color, bgColor, trend, loading
   </div>
 );
 
-// ─── Top List Item ────────────────────────────────────────────────────────────
+// ─── Top List Item (Paper - Ink - Clay) ──────────────────────────────────────
 const TopListItem = ({ rank, name, value, suffix = '', bar, maxBar }) => (
-  <div className="flex items-center gap-3 py-2">
-    <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-extrabold shrink-0 ${
-      rank === 1 ? 'bg-amber-400 text-white' :
-      rank === 2 ? 'bg-slate-300 text-slate-700' :
-      rank === 3 ? 'bg-amber-600/80 text-white' :
-      'bg-slate-100 text-slate-500'
-    }`}>{rank}</span>
+  <div className="flex items-center gap-3 py-2 px-2.5 rounded-[5px] hover:bg-[#F8F4EC]/60 transition-colors">
+    <span className={`w-5 h-5 rounded-[4px] flex items-center justify-center text-[10px] font-extrabold shrink-0 border ${
+      rank === 1 ? 'bg-amber-100 text-amber-800 border-amber-300' :
+      rank === 2 ? 'bg-ink-100 text-ink-700 border-ink-300' :
+      rank === 3 ? 'bg-clay-100 text-clay-800 border-clay-300' :
+      'bg-[#FFFDF8] text-ink-500 border-ink-200/80'
+    }`}>
+      #{rank}
+    </span>
     <div className="flex-1 min-w-0">
-      <p className="text-xs font-bold text-slate-800 truncate">{name}</p>
+      <p className="font-display font-bold text-xs text-ink-800 truncate">{name}</p>
       {maxBar > 0 && (
-        <div className="w-full bg-slate-100 rounded-full h-1.5 mt-1">
+        <div className="w-full bg-ink-200/50 rounded-full h-1.5 mt-1.5">
           <div
-            className="bg-indigo-500 h-1.5 rounded-full transition-all duration-700"
-            style={{ width: `${(bar / maxBar) * 100}%` }}
+            className="bg-clay-600 h-1.5 rounded-full transition-all duration-700"
+            style={{ width: `${Math.min(100, Math.round((bar / maxBar) * 100))}%` }}
           />
         </div>
       )}
     </div>
-    <span className="text-xs font-extrabold text-slate-700 shrink-0">{value}{suffix && <span className="font-normal text-slate-400 ml-0.5">{suffix}</span>}</span>
+    <span className="font-display font-bold text-xs text-clay-700 shrink-0">
+      {value}{suffix && <span className="font-sans font-normal text-ink-400 text-[11px] ml-0.5">{suffix}</span>}
+    </span>
   </div>
 );
 
@@ -128,37 +159,38 @@ export const AdminStatisticsPage = () => {
     if (n === undefined || n === null) return '—';
     if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M';
     if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K';
-    return n.toString();
+    return n.toLocaleString('vi-VN');
   };
 
-  const fmtRating = (r) => r ? r.toFixed(1) : '—';
+  const fmtRating = (r) => r ? Number(r).toFixed(1) : '—';
 
   const maxDest = stats?.topDestinations?.[0]?.count || 1;
   const maxPlace = stats?.topPlaces?.[0]?.reviewCount || 1;
 
   return (
-    <div className="space-y-6 animate-fadeIn pb-12">
+    <div className="space-y-6 pb-12 animate-in fade-in duration-200">
 
-      {/* ── Header ── */}
-      <div className="bg-white rounded-2xl p-6 shadow-xs border border-slate-200/80 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      {/* ── Page Header ── */}
+      <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="px-3 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-extrabold text-[11px] uppercase tracking-wide border border-indigo-100">
+            <span className="px-2.5 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 font-bold text-[10px] uppercase tracking-wider border border-clay-200/60">
               Ban Quản Trị
             </span>
-            <span className="text-slate-300">/</span>
-            <span className="font-extrabold text-xs text-indigo-600">Thống kê hệ thống</span>
+            <span className="text-ink-200">/</span>
+            <span className="font-bold text-xs text-clay-700">Báo cáo & Thống kê hệ thống</span>
           </div>
-          <h1 className="font-display font-extrabold text-2xl text-slate-900 tracking-tight">
+          <h1 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">
             Tổng quan Thống kê Hệ thống
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
-            Dữ liệu thống kê thực tế từ CSDL · Người dùng, Bài viết, Địa điểm, Hành trình
+          <p className="text-xs text-ink-400 mt-1">
+            Dữ liệu thống kê thực tế từ CSDL MySQL · Người dùng, Bài viết, Địa điểm, Hành trình
           </p>
         </div>
+
         <div className="flex items-center gap-3">
           {lastUpdated && (
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-ink-400">
               Cập nhật: {lastUpdated.toLocaleTimeString('vi-VN')}
             </span>
           )}
@@ -166,26 +198,24 @@ export const AdminStatisticsPage = () => {
             id="btn-refresh-stats"
             onClick={fetchStats}
             disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-bold shadow-xs transition-all disabled:opacity-60 cursor-pointer"
+            className="inline-flex items-center gap-2 px-3.5 py-2 bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] rounded-[5px] text-xs font-bold border border-clay-600 transition-colors disabled:opacity-60 cursor-pointer"
           >
             {loading
               ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
               : <RefreshCw className="w-3.5 h-3.5" />
             }
-            <span>{loading ? 'Đang tải...' : 'Làm mới'}</span>
+            <span>{loading ? 'Đang tải...' : 'Làm mới số liệu'}</span>
           </button>
         </div>
       </div>
 
       {/* ── KPI Overview Row ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
         <KpiCard
           icon={Users}
           label="Tổng người dùng"
           value={fmt(stats?.totalUsers)}
-          sub={`+${fmt(stats?.newUsersThisMonth)} tháng này`}
-          color="text-indigo-600"
-          bgColor="bg-indigo-50"
+          sub={`+${fmt(stats?.newUsersThisMonth)} thành viên tháng này`}
           trend="up"
           loading={loading}
         />
@@ -193,9 +223,7 @@ export const AdminStatisticsPage = () => {
           icon={FileText}
           label="Tổng bài viết"
           value={fmt(stats?.totalPosts)}
-          sub={`+${fmt(stats?.newPostsThisMonth)} tháng này`}
-          color="text-sky-600"
-          bgColor="bg-sky-50"
+          sub={`+${fmt(stats?.newPostsThisMonth)} bài chia sẻ mới`}
           trend="up"
           loading={loading}
         />
@@ -203,59 +231,62 @@ export const AdminStatisticsPage = () => {
           icon={MapPin}
           label="Địa điểm du lịch"
           value={fmt(stats?.totalPlaces)}
-          sub={`Rating TB: ${fmtRating(stats?.averagePlaceRating)} ★`}
-          color="text-sky-600"
-          bgColor="bg-sky-50"
+          sub={`Điểm đánh giá TB: ${fmtRating(stats?.averagePlaceRating)} ★`}
           loading={loading}
         />
         <KpiCard
           icon={Map}
-          label="Hành trình"
+          label="Lịch trình du lịch"
           value={fmt(stats?.totalItineraries)}
-          sub={`${fmt(stats?.activeItineraries)} đang hoạt động`}
-          color="text-amber-600"
-          bgColor="bg-amber-50"
+          sub={`${fmt(stats?.activeItineraries)} hành trình đang hoạt động`}
           trend="up"
           loading={loading}
         />
       </div>
 
       {/* ── Engagement Row ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-500 flex items-center justify-center shrink-0">
-            <Heart className="w-6 h-6" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+        <div className="bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
+          <div className="w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-rose-600 flex items-center justify-center shrink-0">
+            <Heart className="w-5 h-5 fill-rose-100" />
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-500">Tổng lượt thích</p>
-            {loading
-              ? <div className="h-7 w-12 bg-slate-100 animate-pulse rounded mt-1" />
-              : <p className="font-display font-extrabold text-2xl text-slate-900">{fmt(stats?.totalLikes)}</p>
-            }
+            <p className="text-xs font-bold text-ink-400">Tổng lượt thích (Likes)</p>
+            {loading ? (
+              <div className="h-7 w-16 bg-[#F8F4EC] animate-pulse rounded-[4px] mt-1" />
+            ) : (
+              <p className="font-display font-black text-2xl text-ink-800 mt-0.5">{fmt(stats?.totalLikes)}</p>
+            )}
           </div>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-violet-50 text-violet-500 flex items-center justify-center shrink-0">
-            <MessageCircle className="w-6 h-6" />
+
+        <div className="bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
+          <div className="w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center shrink-0">
+            <MessageCircle className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-500">Tổng bình luận</p>
-            {loading
-              ? <div className="h-7 w-12 bg-slate-100 animate-pulse rounded mt-1" />
-              : <p className="font-display font-extrabold text-2xl text-slate-900">{fmt(stats?.totalComments)}</p>
-            }
+            <p className="text-xs font-bold text-ink-400">Tổng bình luận (Comments)</p>
+            {loading ? (
+              <div className="h-7 w-16 bg-[#F8F4EC] animate-pulse rounded-[4px] mt-1" />
+            ) : (
+              <p className="font-display font-black text-2xl text-ink-800 mt-0.5">{fmt(stats?.totalComments)}</p>
+            )}
           </div>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shrink-0">
-            <Star className="w-6 h-6" />
+
+        <div className="bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
+          <div className="w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-amber-600 flex items-center justify-center shrink-0">
+            <Star className="w-5 h-5 fill-amber-300 text-amber-500" />
           </div>
           <div>
-            <p className="text-xs font-bold text-slate-500">Rating trung bình địa điểm</p>
-            {loading
-              ? <div className="h-7 w-12 bg-slate-100 animate-pulse rounded mt-1" />
-              : <p className="font-display font-extrabold text-2xl text-slate-900">{fmtRating(stats?.averagePlaceRating)} <span className="text-base text-amber-400">★</span></p>
-            }
+            <p className="text-xs font-bold text-ink-400">Rating trung bình địa điểm</p>
+            {loading ? (
+              <div className="h-7 w-16 bg-[#F8F4EC] animate-pulse rounded-[4px] mt-1" />
+            ) : (
+              <p className="font-display font-black text-2xl text-ink-800 mt-0.5">
+                {fmtRating(stats?.averagePlaceRating)} <span className="text-base text-amber-500">★</span>
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -263,50 +294,50 @@ export const AdminStatisticsPage = () => {
       {/* ── Charts Row ── */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* User Growth Chart */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+        <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-ink-200/60">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
                 <Activity className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-display font-extrabold text-sm text-slate-900">Tăng trưởng Người dùng</h3>
-                <p className="text-[10px] text-slate-400">6 tháng gần nhất</p>
+                <h3 className="font-display font-black text-base text-ink-800">Tăng trưởng Thành viên</h3>
+                <p className="text-[11px] text-ink-400">Số lượng tài khoản đăng ký theo 6 tháng gần nhất</p>
               </div>
             </div>
-            <span className="flex items-center gap-1 text-xs font-bold text-sky-600">
+            <span className="flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-[4px] border border-emerald-200">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>+{fmt(stats?.newUsersThisMonth)} tháng này</span>
             </span>
           </div>
           {loading ? (
-            <div className="h-20 bg-slate-50 animate-pulse rounded-xl" />
+            <div className="h-28 bg-[#F8F4EC] animate-pulse rounded-[5px]" />
           ) : (
-            <BarChart data={stats?.userGrowth} color="#6366f1" label="Số người dùng đăng ký mới" />
+            <BarChart data={stats?.userGrowth} color="#B0522F" label="Thành viên đăng ký mới" metricType="thành viên" />
           )}
         </div>
 
         {/* Post Growth Chart */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+        <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-ink-200/60">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
                 <BarChart3 className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-display font-extrabold text-sm text-slate-900">Hoạt động Bài viết</h3>
-                <p className="text-[10px] text-slate-400">6 tháng gần nhất</p>
+                <h3 className="font-display font-black text-base text-ink-800">Hoạt động Đăng bài Viết</h3>
+                <p className="text-[11px] text-ink-400">Số lượng bài chia sẻ kinh nghiệm theo chu kỳ 6 tháng</p>
               </div>
             </div>
-            <span className="flex items-center gap-1 text-xs font-bold text-sky-600">
+            <span className="flex items-center gap-1 text-xs font-bold text-clay-700 bg-clay-50 px-2 py-0.5 rounded-[4px] border border-clay-200">
               <ArrowUpRight className="w-3.5 h-3.5" />
               <span>+{fmt(stats?.newPostsThisMonth)} tháng này</span>
             </span>
           </div>
           {loading ? (
-            <div className="h-20 bg-slate-50 animate-pulse rounded-xl" />
+            <div className="h-28 bg-[#F8F4EC] animate-pulse rounded-[5px]" />
           ) : (
-            <BarChart data={stats?.postGrowth} color="#0ea5e9" label="Số bài viết mới" />
+            <BarChart data={stats?.postGrowth} color="#B0522F" label="Bài viết mới xuất bản" metricType="bài viết" />
           )}
         </div>
       </div>
@@ -314,69 +345,69 @@ export const AdminStatisticsPage = () => {
       {/* ── Top Lists Row ── */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Top Destinations */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
-              <Map className="w-4 h-4" />
+        <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-ink-200/60">
+            <div className="w-8 h-8 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
+              <Compass className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-display font-extrabold text-sm text-slate-900">Top Điểm đến Phổ biến</h3>
-              <p className="text-[10px] text-slate-400">Dựa trên số lượng hành trình được tạo</p>
+              <h3 className="font-display font-black text-base text-ink-800">Top Điểm đến Phổ biến</h3>
+              <p className="text-[11px] text-ink-400">Dựa trên số lượng hành trình du lịch được khởi tạo</p>
             </div>
           </div>
           {loading ? (
-            <div className="space-y-3">
-              {[1,2,3,4,5].map(i => (
-                <div key={i} className="h-8 bg-slate-50 animate-pulse rounded-lg" />
+            <div className="space-y-2.5">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="h-9 bg-[#F8F4EC] animate-pulse rounded-[5px]" />
               ))}
             </div>
           ) : stats?.topDestinations?.length > 0 ? (
-            <div className="divide-y divide-slate-50">
+            <div className="space-y-1">
               {stats.topDestinations.map((dest, i) => (
                 <TopListItem
                   key={i}
                   rank={i + 1}
                   name={dest.destination}
                   value={dest.count}
-                  suffix=" hành trình"
+                  suffix=" chuyến đi"
                   bar={dest.count}
                   maxBar={maxDest}
                 />
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-slate-400 text-xs">
-              <Map className="w-8 h-8 mx-auto mb-2 opacity-30" />
-              <p>Chưa có dữ liệu hành trình</p>
+            <div className="text-center py-8 text-ink-400 text-xs">
+              <Map className="w-8 h-8 mx-auto mb-2 opacity-30 text-ink-400" />
+              <p>Chưa ghi nhận đủ dữ liệu hành trình.</p>
             </div>
           )}
         </div>
 
         {/* Top Places by Rating */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">
-          <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-              <Star className="w-4 h-4" />
+        <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
+          <div className="flex items-center gap-2.5 pb-2 border-b border-ink-200/60">
+            <div className="w-8 h-8 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-amber-600 flex items-center justify-center">
+              <Star className="w-4 h-4 fill-amber-300" />
             </div>
             <div>
-              <h3 className="font-display font-extrabold text-sm text-slate-900">Top Địa điểm được đánh giá cao</h3>
-              <p className="text-[10px] text-slate-400">Theo điểm trung bình từ người dùng</p>
+              <h3 className="font-display font-black text-base text-ink-800">Top Địa điểm Đánh giá Cao</h3>
+              <p className="text-[11px] text-ink-400">Theo điểm số trung bình và số lượt nhận xét từ du khách</p>
             </div>
           </div>
           {loading ? (
-            <div className="space-y-3">
-              {[1,2,3,4,5].map(i => (
-                <div key={i} className="h-8 bg-slate-50 animate-pulse rounded-lg" />
+            <div className="space-y-2.5">
+              {[1, 2, 3, 4, 5].map(i => (
+                <div key={i} className="h-9 bg-[#F8F4EC] animate-pulse rounded-[5px]" />
               ))}
             </div>
           ) : stats?.topPlaces?.length > 0 ? (
-            <div className="divide-y divide-slate-50">
+            <div className="space-y-1">
               {stats.topPlaces.map((place, i) => (
                 <TopListItem
                   key={i}
                   rank={i + 1}
                   name={`${place.name}${place.city ? ` · ${place.city}` : ''}`}
-                  value={place.rating.toFixed(1)}
+                  value={Number(place.rating || 0).toFixed(1)}
                   suffix="★"
                   bar={place.reviewCount}
                   maxBar={maxPlace}
@@ -384,43 +415,44 @@ export const AdminStatisticsPage = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-8 text-slate-400 text-xs">
-              <Star className="w-8 h-8 mx-auto mb-2 opacity-30" />
-              <p>Chưa có dữ liệu địa điểm</p>
+            <div className="text-center py-8 text-ink-400 text-xs">
+              <Star className="w-8 h-8 mx-auto mb-2 opacity-30 text-ink-400" />
+              <p>Chưa ghi nhận dữ liệu đánh giá địa danh.</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* ── Itinerary Status Row ── */}
-      <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs">
-        <div className="flex items-center gap-2 mb-5">
-          <div className="w-8 h-8 rounded-lg bg-violet-50 text-violet-600 flex items-center justify-center">
+      {/* ── Itinerary Distribution Row ── */}
+      <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
+        <div className="flex items-center gap-2.5 pb-2 border-b border-ink-200/60">
+          <div className="w-8 h-8 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
             <TrendingUp className="w-4 h-4" />
           </div>
           <div>
-            <h3 className="font-display font-extrabold text-sm text-slate-900">Phân bổ Hành trình</h3>
-            <p className="text-[10px] text-slate-400">Trạng thái toàn bộ hành trình trong hệ thống</p>
+            <h3 className="font-display font-black text-base text-ink-800">Phân bổ Hành trình & Tăng trưởng</h3>
+            <p className="text-[11px] text-ink-400">Trạng thái toàn bộ hành trình và chu kỳ phát triển hệ thống</p>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: 'Tổng hành trình', value: stats?.totalItineraries, color: 'text-slate-700', bg: 'bg-slate-50' },
-            { label: 'Đang hoạt động', value: stats?.activeItineraries, color: 'text-sky-700', bg: 'bg-sky-50' },
-            { label: 'Mới tháng này', value: stats?.newItinerariesThisMonth, color: 'text-indigo-700', bg: 'bg-indigo-50' },
-            { label: 'Người dùng mới TM', value: stats?.newUsersThisMonth, color: 'text-sky-700', bg: 'bg-sky-50' },
+            { label: 'Tổng hành trình', value: stats?.totalItineraries, color: 'text-ink-800' },
+            { label: 'Đang hoạt động', value: stats?.activeItineraries, color: 'text-emerald-700' },
+            { label: 'Mới tháng này', value: stats?.newItinerariesThisMonth, color: 'text-clay-700' },
+            { label: 'Người dùng mới', value: stats?.newUsersThisMonth, color: 'text-ink-800' },
           ].map((item, i) => (
-            <div key={i} className={`${item.bg} rounded-xl p-4 text-center`}>
-              <p className="text-[10px] font-bold text-slate-500 mb-1">{item.label}</p>
-              {loading
-                ? <div className="h-8 w-12 bg-white/60 animate-pulse rounded mx-auto" />
-                : <p className={`font-display font-extrabold text-2xl ${item.color}`}>{fmt(item.value)}</p>
-              }
+            <div key={i} className="bg-[#F8F4EC] rounded-[6px] p-4 text-center border border-ink-200/60">
+              <p className="text-[11px] font-bold text-ink-400 mb-1">{item.label}</p>
+              {loading ? (
+                <div className="h-7 w-14 bg-ink-200/60 animate-pulse rounded-[4px] mx-auto" />
+              ) : (
+                <p className={`font-display font-black text-2xl ${item.color}`}>{fmt(item.value)}</p>
+              )}
             </div>
           ))}
         </div>
       </div>
+
     </div>
   );
 };
-
