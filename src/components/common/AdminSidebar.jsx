@@ -9,13 +9,9 @@ import {
   MessageSquare, 
   History, 
   Star, 
-  Shield, 
-  Sparkles, 
-  Layers, 
-  Compass, 
   ShieldCheck, 
-  ExternalLink,
-  ChevronRight
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
 
 export const AdminSidebar = ({ onNavigate }) => {
@@ -56,7 +52,7 @@ export const AdminSidebar = ({ onNavigate }) => {
           label: 'Quản lý Địa điểm', 
           icon: MapPin, 
           badge: pendingPlacesCount,
-          badgeColor: 'amber',
+          badgeColor: 'clay',
           badgeLabel: 'Chờ duyệt'
         },
         { 
@@ -64,7 +60,7 @@ export const AdminSidebar = ({ onNavigate }) => {
           label: 'Kiểm duyệt Đánh giá', 
           icon: Star, 
           badge: hiddenReviewsCount,
-          badgeColor: 'purple',
+          badgeColor: 'amber',
           badgeLabel: 'Đã ẩn'
         },
         { 
@@ -107,39 +103,35 @@ export const AdminSidebar = ({ onNavigate }) => {
   })).filter(sec => sec.items.length > 0);
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-[260px] bg-gradient-to-b from-slate-900 via-[#0c1322] to-[#070b14] text-slate-200 z-50 flex flex-col justify-between border-r border-slate-800/80 shadow-[4px_0_24px_-4px_rgba(0,0,0,0.35)] select-none">
+    <aside className="fixed left-0 top-0 h-full w-[260px] bg-[#FFFDF8] text-ink-800 z-50 flex flex-col justify-between border-r border-ink-200/80 shadow-xs select-none">
       {/* Top Section */}
       <div className="flex flex-col min-h-0">
         
         {/* Brand Header */}
         <div 
           onClick={() => { setAdminTab('dashboard'); onNavigate?.(); }}
-          className="h-16 px-4 flex items-center justify-between border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md cursor-pointer hover:bg-slate-800/40 transition-colors group"
+          className="h-16 px-4 flex items-center justify-between border-b border-ink-200/80 bg-[#FFFDF8] cursor-pointer hover:bg-[#F8F4EC] transition-colors group"
         >
           <div className="flex items-center gap-2.5">
             <div className="relative">
               <img
-                src="/wayfare-logo-white.png"
+                src="/wayfare-logo.png"
                 alt="Wayfare"
                 className="h-7 w-auto object-contain transition-transform group-hover:scale-105"
               />
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] font-black tracking-widest text-slate-400 uppercase leading-none">
+              <span className="font-mono text-[9px] font-bold tracking-widest text-ink-500 uppercase leading-none">
                 ADMIN CONSOLE
               </span>
-              <span className="text-[9px] font-bold text-sky-400 font-mono leading-tight">
+              <span className="font-serif text-[11px] font-bold text-clay-700 leading-tight">
                 Wayfare Portal
               </span>
             </div>
           </div>
 
-          <span className={`text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full border shadow-xs ${
-            isAdminUser 
-              ? 'bg-sky-500/10 text-sky-400 border-sky-500/30' 
-              : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-          }`}>
+          <span className="font-mono text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-800 border border-clay-300/70 shadow-2xs">
             {isAdminUser ? 'Admin' : 'Moderator'}
           </span>
         </div>
@@ -149,15 +141,15 @@ export const AdminSidebar = ({ onNavigate }) => {
           {filteredSections.map((section, idx) => (
             <div key={idx} className="space-y-1">
               {/* Section Header */}
-              <div className="px-3 pt-1 pb-1 flex items-center justify-between">
-                <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
+              <div className="px-2 pt-1 pb-1 flex items-center justify-between">
+                <span className="font-mono text-[10px] font-bold tracking-wider text-ink-400 uppercase">
                   {section.title}
                 </span>
-                <span className="w-8 h-[1px] bg-slate-700/60"></span>
+                <span className="w-8 h-[1px] bg-ink-200/70"></span>
               </div>
 
               {/* Section Items */}
-              <div className="space-y-0.5">
+              <div className="space-y-1">
                 {section.items.map(item => {
                   const Icon = item.icon;
                   const active = adminTab === item.id;
@@ -168,44 +160,41 @@ export const AdminSidebar = ({ onNavigate }) => {
                       key={item.id}
                       onClick={() => { setAdminTab(item.id); onNavigate?.(); }}
                       aria-current={active ? 'page' : undefined}
-                      className={`group relative w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all duration-150 cursor-pointer text-left ${
+                      className={`group relative w-full flex items-center justify-between px-3 py-2 rounded-[5px] text-xs transition-colors cursor-pointer text-left ${
                         active
-                          ? 'bg-gradient-to-r from-sky-500/15 via-sky-500/10 to-transparent text-white border border-sky-500/30 shadow-xs'
-                          : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent'
+                          ? 'bg-clay-600 text-white font-serif font-bold shadow-xs'
+                          : 'text-ink-600 hover:text-ink-900 hover:bg-[#F8F4EC] font-serif font-medium'
                       }`}
                     >
-                      {/* Active indicator bar */}
-                      {active && (
-                        <span className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-gradient-to-b from-sky-400 to-sky-600 shadow-[0_0_8px_rgba(14,165,233,0.8)]"></span>
-                      )}
-
                       {/* Icon + Label */}
                       <div className="flex items-center gap-2.5 min-w-0 pr-1">
-                        <div className={`p-1.5 rounded-lg transition-colors shrink-0 ${
+                        <div className={`w-6 h-6 rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${
                           active
-                            ? 'bg-sky-500/20 text-sky-400 border border-sky-500/30 shadow-xs'
-                            : 'bg-slate-800/40 text-slate-400 group-hover:text-slate-200 group-hover:bg-slate-800/80 border border-slate-700/40'
+                            ? 'bg-clay-700 text-white'
+                            : 'bg-[#F8F4EC] text-ink-500 border border-ink-200/60 group-hover:text-clay-700 group-hover:border-clay-300'
                         }`}>
                           <Icon className="w-3.5 h-3.5" />
                         </div>
-                        <span className={`truncate ${active ? 'font-extrabold text-white' : 'font-semibold'}`}>
+                        <span className="truncate">
                           {item.label}
                         </span>
                       </div>
 
                       {/* Badge / Pill */}
                       {hasBadge ? (
-                        <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-black rounded-full font-mono shrink-0 shadow-xs border ${
-                          item.badgeColor === 'rose'
-                            ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse'
-                            : item.badgeColor === 'purple'
-                            ? 'bg-purple-500/20 text-purple-300 border-purple-500/40'
-                            : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                        <span className={`inline-flex items-center justify-center min-w-[18px] h-4.5 px-1.5 text-[9px] font-mono font-bold rounded-[3px] shrink-0 border ${
+                          active
+                            ? 'bg-white text-clay-700 border-white'
+                            : item.badgeColor === 'rose'
+                            ? 'bg-rose-50 text-rose-700 border-rose-200 font-extrabold'
+                            : item.badgeColor === 'amber'
+                            ? 'bg-amber-50 text-amber-800 border-amber-200'
+                            : 'bg-clay-50 text-clay-800 border-clay-200'
                         }`}>
                           {item.badge}
                         </span>
                       ) : active ? (
-                        <ChevronRight className="w-3.5 h-3.5 text-sky-400/80 shrink-0" />
+                        <ChevronRight className="w-3.5 h-3.5 text-white/80 shrink-0" />
                       ) : null}
                     </button>
                   );
@@ -217,32 +206,32 @@ export const AdminSidebar = ({ onNavigate }) => {
       </div>
 
       {/* Bottom Profile Footer */}
-      <div className="p-3 border-t border-slate-800/80 bg-slate-950/60 backdrop-blur-sm space-y-2.5 shrink-0">
+      <div className="p-3 border-t border-ink-200/80 bg-[#FFFDF8] space-y-2 shrink-0">
         {/* User Card */}
-        <div className="p-2.5 rounded-2xl bg-gradient-to-br from-slate-800/70 via-slate-850/80 to-slate-900/90 border border-slate-700/50 shadow-sm flex items-center justify-between gap-2.5">
+        <div className="p-2.5 rounded-[6px] bg-[#F8F4EC] border border-ink-200/80 shadow-2xs flex items-center justify-between gap-2.5">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="relative shrink-0">
               {currentUser?.avatar ? (
                 <img 
                   src={currentUser.avatar} 
                   alt={currentUser.name || 'Admin'} 
-                  className="w-9 h-9 rounded-full object-cover ring-2 ring-sky-500/40 shadow-xs"
+                  className="w-8 h-8 rounded-[4px] object-cover border border-ink-200/80 shadow-xs"
                 />
               ) : (
-                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-600 to-sky-400 text-white flex items-center justify-center font-extrabold text-xs shadow-xs ring-1 ring-white/20">
+                <div className="w-8 h-8 rounded-[4px] bg-clay-600 text-white flex items-center justify-center font-display font-black text-xs shadow-xs">
                   {currentUser?.name?.charAt(0) || 'A'}
                 </div>
               )}
-              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-slate-900"></span>
+              <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-600 ring-2 ring-[#F8F4EC]"></span>
             </div>
 
             <div className="truncate min-w-0">
-              <p className="font-extrabold text-xs text-white truncate leading-tight">
+              <p className="font-serif font-bold text-xs text-ink-800 truncate leading-tight">
                 {currentUser?.name || 'Quản Trị Viên'}
               </p>
               <div className="flex items-center gap-1 mt-0.5">
-                <ShieldCheck className="w-3 h-3 text-sky-400 shrink-0" />
-                <span className="text-[10px] text-sky-300/90 font-medium truncate">
+                <ShieldCheck className="w-3 h-3 text-clay-600 shrink-0" />
+                <span className="font-mono text-[9px] text-ink-500 font-semibold truncate">
                   {isAdminUser ? 'Quản trị viên' : 'Kiểm duyệt viên'}
                 </span>
               </div>
@@ -253,22 +242,21 @@ export const AdminSidebar = ({ onNavigate }) => {
           <button
             onClick={() => setPortalMode('user')}
             title="Chuyển về giao diện Khách du lịch (User Mode)"
-            className="p-2 rounded-xl bg-slate-800/80 hover:bg-rose-500/15 hover:text-rose-400 text-slate-400 border border-slate-700/60 hover:border-rose-500/30 transition-all shrink-0 cursor-pointer group shadow-2xs"
+            className="w-7 h-7 rounded-[4px] bg-[#FFFDF8] hover:bg-clay-50 hover:text-clay-700 text-ink-500 border border-ink-200/80 transition-colors flex items-center justify-center shrink-0 cursor-pointer"
           >
-            <LogOut className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+            <LogOut className="w-3.5 h-3.5" />
           </button>
         </div>
 
         {/* System Sub-Footer Info */}
-        <div className="px-2 flex items-center justify-between text-[10px] text-slate-400/80 font-mono">
+        <div className="px-1 flex items-center justify-between font-mono text-[9px] text-ink-400">
           <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
             <span>Wayfare Engine v2.5</span>
           </span>
-          <span className="font-semibold text-slate-400">Secure</span>
+          <span className="font-semibold text-ink-500 uppercase">Secure</span>
         </div>
       </div>
     </aside>
   );
 };
-

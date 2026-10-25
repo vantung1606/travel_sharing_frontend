@@ -6,7 +6,7 @@ import { NotificationDropdown } from './NotificationDropdown';
 import { BASE_URL } from '../../services/api';
 
 export const AdminHeader = () => {
-  const { setPortalMode, setAdminTab, adminTab, unreadNotificationsCount } = useApp();
+  const { setPortalMode, setAdminTab, adminTab, unreadNotificationsCount, currentUser } = useApp();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [serverHealth, setServerHealth] = useState('checking'); // checking | online | offline
@@ -21,9 +21,11 @@ export const AdminHeader = () => {
     analytics: 'Thống kê Hệ thống',
     'audit-logs': 'Nhật ký Hệ thống & Hoạt động'
   };
+
   useEffect(() => {
     if (!isMobileMenuOpen) return undefined;
     const dialog = mobileDialog.current;
+    if (!dialog) return undefined;
     const overflow = document.body.style.overflow;
     dialog.showModal();
     document.body.style.overflow = 'hidden';
@@ -32,7 +34,7 @@ export const AdminHeader = () => {
     return () => { dialog.close(); document.body.style.overflow = overflow; window.removeEventListener('resize', closeOnDesktop); };
   }, [isMobileMenuOpen]);
 
-  // Kiểm tra trạng thái backend thật: GET /health (public) — khỏi indicator hardcode "Server 1: OK"
+  // Kiểm tra trạng thái backend thật: GET /health
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -51,60 +53,65 @@ export const AdminHeader = () => {
     <>
       <header className="fixed top-0 left-0 md:left-[260px] right-0 h-16 bg-[#FFFDF8] border-b border-ink-200/80 z-40 flex items-center justify-between px-4 sm:px-6 shadow-none">
         
-        {/* Mobile Hamburger & Search Bar */}
-        <div className="flex min-w-0 items-center gap-3 flex-1 max-w-xl">
+        {/* Left Section: Mobile Hamburger & Search Bar with fixed max width to prevent colliding */}
+        <div className="flex items-center gap-3 min-w-0 mr-4">
           {/* Mobile Hamburger Drawer Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-[5px] text-ink-700 hover:bg-[#F8F4EC] transition-colors cursor-pointer"
+            className="md:hidden p-2 rounded-[5px] text-ink-700 bg-[#F8F4EC] border border-ink-200/80 hover:bg-[#EBE5D8] transition-colors cursor-pointer shrink-0"
             title="Mở menu Admin"
             aria-label="Mở menu Admin"
             aria-expanded={isMobileMenuOpen}
           >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
 
-          <div className="relative min-w-0 w-full">
-            <Search className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-300" />
+          {/* Search Box - Distinct width, generous margins */}
+          <div className="relative w-56 sm:w-72 md:w-80 lg:w-96">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" />
             <input
               type="text"
-              placeholder="Tìm kiếm người dùng, địa điểm, bài viết, mã vé..."
-              className="w-full pl-9 pr-4 py-2 bg-[#F8F4EC] border border-ink-200 text-ink-800 rounded-[5px] text-xs placeholder:text-ink-300 focus:outline-none focus:border-clay-500 focus:bg-[#FFFDF8] transition-colors"
+              placeholder="Tìm kiếm người dùng, địa điểm, bài viết..."
+              className="w-full pl-8 pr-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 text-ink-800 rounded-[5px] text-xs placeholder:text-ink-400 focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] transition-colors font-sans"
             />
           </div>
         </div>
 
-        {/* Active Page Breadcrumb Indicator */}
-        <div className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-xs font-bold text-ink-700">
+        {/* Center / Breadcrumb: Active Tab Title */}
+        <div className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-xs font-serif font-bold text-ink-700 shrink-0">
           <Shield className="w-3.5 h-3.5 text-clay-600" />
           <span>{ADMIN_TAB_NAMES[adminTab] || 'Quản trị hệ thống'}</span>
         </div>
 
-        {/* Right Controls */}
-        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+        {/* Right Section: Action button, Server status, Notifications, User Mode switcher */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          
+          {/* Add Place Quick Action */}
           <button
             onClick={() => setAdminTab('places')}
-            className="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] text-xs font-bold transition-colors border border-clay-600 cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white text-xs font-serif font-bold transition-colors shadow-xs cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
-            <span>Thêm địa điểm</span>
+            <Plus className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Thêm địa điểm</span>
           </button>
 
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-[5px] bg-[#F8F4EC] border border-ink-200/70 text-ink-600 text-xs font-semibold">
-            <span className={`w-2 h-2 rounded-full ${serverHealth === 'online' ? 'bg-emerald-500' : serverHealth === 'checking' ? 'bg-amber-400' : 'bg-rose-500'} ${serverHealth === 'online' ? 'animate-pulse' : ''}`}></span>
-            <span>{serverHealth === 'online' ? 'Server: Online' : serverHealth === 'checking' ? 'Đang kiểm tra...' : 'Server: Offline'}</span>
+          {/* Real Backend Server Health */}
+          <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-ink-700 text-xs font-mono font-medium">
+            <span className={`w-1.5 h-1.5 rounded-full ${serverHealth === 'online' ? 'bg-emerald-600 animate-pulse' : serverHealth === 'checking' ? 'bg-amber-500' : 'bg-rose-500'}`}></span>
+            <span>{serverHealth === 'online' ? 'Server: Online' : serverHealth === 'checking' ? 'Kiểm tra...' : 'Offline'}</span>
           </div>
 
+          {/* System Notifications Bell Button */}
           <div className="relative shrink-0">
             <button
               type="button"
               onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-              className="relative p-2 rounded-full text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="relative w-8 h-8 rounded-[5px] bg-[#F8F4EC] hover:bg-[#EBE5D8] border border-ink-200/80 text-ink-700 flex items-center justify-center transition-colors cursor-pointer"
               title="Thông báo hệ thống"
             >
-              <Bell className="w-5 h-5" />
+              <Bell className="w-4 h-4 text-ink-700" />
               {unreadNotificationsCount > 0 && (
-                <span className="absolute top-1 right-1 min-w-[18px] h-[18px] px-1 bg-rose-500 text-white text-[10px] rounded-full flex items-center justify-center font-extrabold shadow-sm ring-2 ring-white">
+                <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-rose-600 text-white font-mono text-[9px] font-bold rounded-[3px] flex items-center justify-center shadow-xs">
                   {unreadNotificationsCount > 9 ? '9+' : unreadNotificationsCount}
                 </span>
               )}
@@ -115,30 +122,35 @@ export const AdminHeader = () => {
             />
           </div>
 
-          {/* Switch Portal Button */}
-          <div
+          {/* Switch Portal Button (Paper-Ink-Clay style) */}
+          <button
+            type="button"
             onClick={() => setPortalMode('user')}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer"
-            title="Bấm để chuyển về Giao diện Người dùng"
+            className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-[5px] bg-[#F8F4EC] hover:bg-[#EBE5D8] border border-ink-200/80 text-ink-800 transition-colors cursor-pointer shadow-2xs"
+            title="Chuyển về giao diện Người dùng (User Mode)"
           >
-            <div className="w-7 h-7 rounded-full bg-sky-600 text-white font-bold text-xs flex items-center justify-center">
-              MQ
+            <div className="w-5 h-5 rounded-[3px] bg-clay-600 text-white font-mono font-bold text-[10px] flex items-center justify-center shrink-0">
+              {currentUser?.name ? currentUser.name.slice(0, 2).toUpperCase() : 'MQ'}
             </div>
-            <span className="text-xs font-bold text-slate-700 hidden sm:inline">User Mode</span>
-          </div>
+            <span className="font-serif font-bold text-xs text-ink-800 hidden md:inline">
+              User Mode
+            </span>
+          </button>
+
         </div>
 
       </header>
 
       {/* Mobile Slide-Over Drawer for Admin Menu */}
       {isMobileMenuOpen && (
-        <dialog ref={mobileDialog} aria-label="Điều hướng quản trị" onCancel={() => setIsMobileMenuOpen(false)} className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none border-0 bg-transparent p-0 backdrop:bg-slate-900/60 backdrop:backdrop-blur-sm">
+        <dialog ref={mobileDialog} aria-label="Điều hướng quản trị" onCancel={() => setIsMobileMenuOpen(false)} className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none border-0 bg-transparent p-0 backdrop:bg-ink-900/60 backdrop:backdrop-blur-xs">
           <button type="button" tabIndex={-1} aria-label="Đóng menu" className="absolute inset-0 h-full w-full" onClick={() => setIsMobileMenuOpen(false)} />
           <AdminSidebar onNavigate={() => setIsMobileMenuOpen(false)} />
-          <button autoFocus type="button" aria-label="Đóng menu Admin" className="fixed right-2 top-3 z-[60] flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-700 shadow-lg" onClick={() => setIsMobileMenuOpen(false)}><X className="h-5 w-5" /></button>
+          <button autoFocus type="button" aria-label="Đóng menu Admin" className="fixed right-3 top-3 z-[60] flex h-9 w-9 items-center justify-center rounded-[5px] bg-[#FFFDF8] border border-ink-200/80 text-ink-800 shadow-lg cursor-pointer" onClick={() => setIsMobileMenuOpen(false)}>
+            <X className="h-4 w-4" />
+          </button>
         </dialog>
       )}
     </>
   );
 };
-
