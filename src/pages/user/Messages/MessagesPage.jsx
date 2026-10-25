@@ -1006,7 +1006,8 @@ export const MessagesPage = () => {
   }, [isMembersModalOpen, membersModalTab, addMemberSearchKeyword, loadAvailableUsers]);
 
   return (
-    <div className="messages-page w-full h-[calc(100vh-64px)] sm:h-[calc(100dvh-64px)] bg-[#FFFDF8] text-ink-800 flex flex-col overflow-hidden">
+    <div className="messages-page w-full h-[calc(100vh-64px)] sm:h-[calc(100dvh-64px)] bg-[#F8F4EC] text-ink-800 flex flex-col py-3 sm:py-4 px-4 sm:px-6 lg:px-8 xl:px-12 overflow-hidden">
+      <div className="w-full max-w-[1700px] mx-auto flex-1 min-h-0 flex flex-col">
       
       {/* Lightbox Xem Ảnh Chi Tiết */}
       {previewMediaUrl && (
@@ -1607,8 +1608,8 @@ export const MessagesPage = () => {
         </div>
       )}
 
-      {/* Khung chat chính - Tràn viền bao quanh toàn màn hình */}
-      <div className="flex-1 w-full min-h-0 overflow-hidden grid grid-cols-1 md:grid-cols-12 bg-[#FFFDF8]">
+      {/* Khung chat chính - Đồng bộ lề 2 bên mép px-4 sm:px-6 lg:px-8 xl:px-12 và bo viền chuẩn */}
+      <div className="flex-1 w-full min-h-0 overflow-hidden grid grid-cols-1 md:grid-cols-12 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-xs">
 
         {/* CỘT TRÁI: Hộp thư */}
         <div className={`md:col-span-5 lg:col-span-4 xl:col-span-3 border-r border-ink-200/70 flex flex-col min-h-0 h-full bg-[#FFFDF8] ${showMobileChat ? 'hidden md:flex' : 'flex'}`}>
@@ -2090,6 +2091,7 @@ export const MessagesPage = () => {
         onClose={() => setIsItineraryPickerOpen(false)}
         onSelectItinerary={handleSendItinerary}
       />
+      </div>
     </div>
   );
 };
