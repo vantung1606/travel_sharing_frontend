@@ -67,13 +67,13 @@ export const AdminRouteGuard = ({ children }) => {
   if (!isLoggedIn) {
     return (
       <div className="min-h-[80vh] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-slate-200/80 shadow-xl text-center space-y-5 animate-in fade-in zoom-in-95">
-          <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto shadow-inner">
-            <Lock className="w-8 h-8" />
+        <div className="max-w-md w-full bg-[#FFFDF8] rounded-[6px] p-8 border border-ink-200 shadow-xs text-center space-y-5 animate-in fade-in zoom-in-95">
+          <div className="w-14 h-14 rounded-[5px] bg-clay-100 text-clay-700 flex items-center justify-center mx-auto border border-clay-200">
+            <Lock className="w-7 h-7" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-900 font-display">Khu vực Quản Trị Viên (Admin Portal)</h2>
-            <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+            <h2 className="text-xl font-bold text-ink-800 font-display">Khu vực Quản Trị Viên (Admin Portal)</h2>
+            <p className="text-xs text-ink-400 mt-2 leading-relaxed">
               Bạn đang truy cập phân hệ Quản trị hệ thống. Vui lòng đăng nhập bằng tài khoản Quản Trị Viên được cấp quyền.
             </p>
           </div>
@@ -83,13 +83,13 @@ export const AdminRouteGuard = ({ children }) => {
                 setAuthMode('login');
                 setIsAuthModalOpen(true);
               }}
-              className="w-full py-3 rounded-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-extrabold text-xs shadow-md shadow-sky-500/20 transition-all cursor-pointer flex items-center justify-center gap-2"
+              className="w-full h-10 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs border border-clay-600 transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
               <LogIn className="w-4 h-4" /> Đăng nhập tài khoản Quản trị
             </button>
             <button
               onClick={() => navigate('/')}
-              className="w-full py-2 rounded-full text-slate-400 hover:text-slate-600 font-medium text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+              className="w-full h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200 text-ink-600 hover:text-ink-800 hover:bg-[#F5F0E6] font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Quay về Trang chủ Người dùng
             </button>

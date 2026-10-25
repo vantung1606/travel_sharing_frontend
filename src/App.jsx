@@ -192,7 +192,7 @@ const AppContent = () => {
       ) : (
         /* ADMIN PORTAL SECURED LAYOUT */
         <AdminRouteGuard>
-          <div className="min-h-screen bg-[#faf8ff]">
+          <div className="min-h-screen bg-[#F8F4EC]">
             {/* Fixed Sidebar */}
             <div className="hidden md:block">
               <AdminSidebar />
@@ -203,7 +203,7 @@ const AppContent = () => {
 
             {/* Admin Workspace Content */}
             <div className="min-w-0 md:pl-[260px] pt-16 min-h-screen">
-              <main className="min-w-0 p-4 sm:p-6 lg:p-8 bg-[#faf8ff] min-h-[calc(100vh-64px)]">
+              <main className="min-w-0 p-4 sm:p-6 lg:p-8 bg-[#F8F4EC] min-h-[calc(100vh-64px)]">
                 <Suspense fallback={<RouteLoadingFallback />}>
                   <Routes>
                     <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
