@@ -307,21 +307,21 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
       {/* ========================================================= */}
       {/* HEADER BENTO: PROGRESS HERO & BADGE                       */}
       {/* ========================================================= */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-sky-950 to-blue-900 text-white p-6 sm:p-8 shadow-xl border border-sky-800/40">
-        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-80 h-80 rounded-full bg-sky-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-80 h-80 rounded-full bg-indigo-500/15 blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-[6px] bg-gradient-to-br from-ink-950 via-ink-900 to-clay-950 text-white p-6 sm:p-8 shadow-sm border border-ink-700/60">
+        <div className="absolute top-0 right-0 -mt-12 -mr-12 w-80 h-80 rounded-full bg-clay-500/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 -mb-12 -ml-12 w-80 h-80 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
 
         <div className="relative z-10 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/20 text-sky-300 text-xs font-bold border border-sky-400/30 mb-2">
-                <Compass className="w-3.5 h-3.5 animate-spin-slow" />
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-clay-500/20 text-clay-300 text-xs font-bold border border-clay-400/30 mb-2.5">
+                <Compass className="w-3.5 h-3.5" />
                 <span>Bản Đồ Dấu Chân Du Lịch Việt Nam</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-white">
                 Hành Trình Khám Phá {totalCount} Tỉnh Thành
               </h2>
-              <p className="text-slate-300 text-xs sm:text-sm mt-1 max-w-xl font-normal leading-relaxed">
+              <p className="text-ink-300 text-xs sm:text-sm mt-1 max-w-xl font-serif leading-relaxed">
                 Ghi dấu mọi tọa độ bạn từng đi qua. Kết nối các bài blog, lịch trình AI và chia sẻ cột mốc chinh phục dải đất hình chữ S cùng cộng đồng Wayfare.
               </p>
             </div>
@@ -329,7 +329,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
             <div className="flex items-center gap-2">
               <button
                 onClick={handleShareFootprint}
-                className="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all border border-white/20 flex items-center gap-1.5 cursor-pointer backdrop-blur-xs"
+                className="px-3.5 py-2 rounded-[5px] bg-[#FFFDF8]/10 hover:bg-[#FFFDF8]/20 text-white text-xs font-bold transition-all border border-white/20 flex items-center gap-1.5 cursor-pointer backdrop-blur-xs shadow-2xs"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 <span>Chia sẻ dấu chân</span>
@@ -338,54 +338,54 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
           </div>
 
           {/* Progress Bar & Big Counters */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center bg-ink-900/60 border border-ink-700/70 rounded-[6px] p-4 sm:p-5 backdrop-blur-sm">
             <div className="md:col-span-5 flex items-center gap-4">
-              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 flex flex-col items-center justify-center text-white shrink-0 shadow-lg shadow-sky-500/30">
-                <span className="text-2xl sm:text-3xl font-black leading-none">{visitedCount}</span>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-200 mt-1">/ {totalCount} Tỉnh</span>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[6px] bg-gradient-to-br from-clay-600 to-clay-800 flex flex-col items-center justify-center text-white shrink-0 shadow-md border border-clay-500/30">
+                <span className="text-2xl sm:text-3xl font-black font-display leading-none">{visitedCount}</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-clay-200 mt-1">/ {totalCount} Tỉnh</span>
               </div>
               <div>
-                <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-black bg-gradient-to-r ${explorerRank.color} text-white shadow-xs`}>
+                <span className="inline-block px-2.5 py-0.5 rounded-[4px] text-xs font-black bg-clay-500 text-white shadow-2xs border border-clay-400/40">
                   {explorerRank.badge}
                 </span>
-                <h4 className="text-base sm:text-lg font-extrabold text-white mt-1">
+                <h4 className="text-base sm:text-lg font-black font-display text-white mt-1">
                   {explorerRank.title}
                 </h4>
-                <p className="text-xs text-sky-200 font-medium">
+                <p className="text-xs text-clay-200/90 font-serif">
                   Đã đặt chân qua {progressPercent}% lãnh thổ Việt Nam
                 </p>
               </div>
             </div>
 
             <div className="md:col-span-7 space-y-2">
-              <div className="flex justify-between items-center text-xs font-bold text-slate-300">
+              <div className="flex justify-between items-center text-xs font-bold text-ink-300">
                 <span>Tiến độ khám phá toàn quốc</span>
-                <span className="text-sky-300 font-extrabold">{visitedCount}/{totalCount} ({progressPercent}%)</span>
+                <span className="text-clay-300 font-black">{visitedCount}/{totalCount} ({progressPercent}%)</span>
               </div>
-              <div className="w-full h-3.5 bg-slate-800/80 rounded-full overflow-hidden p-0.5 border border-white/10">
+              <div className="w-full h-3 bg-ink-950 rounded-[4px] overflow-hidden p-0.5 border border-ink-800">
                 <div
-                  className="h-full bg-gradient-to-r from-sky-400 via-teal-400 to-emerald-400 rounded-full transition-all duration-700 ease-out shadow-sm"
+                  className="h-full bg-gradient-to-r from-clay-500 via-amber-500 to-emerald-500 rounded-[3px] transition-all duration-700 ease-out shadow-xs"
                   style={{ width: `${Math.max(5, progressPercent)}%` }}
                 />
               </div>
 
               {/* 4 Regions Small Counters */}
               <div className="grid grid-cols-4 gap-2 pt-2 text-[11px]">
-                <div className="bg-white/5 rounded-xl p-2 text-center border border-white/5">
-                  <span className="text-slate-400 block text-[10px]">Miền Bắc</span>
-                  <span className="font-extrabold text-white text-xs">{regionStats.north.visited}/{regionStats.north.total}</span>
+                <div className="bg-ink-900/90 rounded-[5px] p-2 text-center border border-ink-800">
+                  <span className="text-ink-400 block text-[10px] font-serif">Miền Bắc</span>
+                  <span className="font-black text-white text-xs">{regionStats.north.visited}/{regionStats.north.total}</span>
                 </div>
-                <div className="bg-white/5 rounded-xl p-2 text-center border border-white/5">
-                  <span className="text-slate-400 block text-[10px]">Miền Trung</span>
-                  <span className="font-extrabold text-white text-xs">{regionStats.central.visited}/{regionStats.central.total}</span>
+                <div className="bg-ink-900/90 rounded-[5px] p-2 text-center border border-ink-800">
+                  <span className="text-ink-400 block text-[10px] font-serif">Miền Trung</span>
+                  <span className="font-black text-white text-xs">{regionStats.central.visited}/{regionStats.central.total}</span>
                 </div>
-                <div className="bg-white/5 rounded-xl p-2 text-center border border-white/5">
-                  <span className="text-slate-400 block text-[10px]">Tây Nguyên</span>
-                  <span className="font-extrabold text-white text-xs">{regionStats.highlands.visited}/{regionStats.highlands.total}</span>
+                <div className="bg-ink-900/90 rounded-[5px] p-2 text-center border border-ink-800">
+                  <span className="text-ink-400 block text-[10px] font-serif">Tây Nguyên</span>
+                  <span className="font-black text-white text-xs">{regionStats.highlands.visited}/{regionStats.highlands.total}</span>
                 </div>
-                <div className="bg-white/5 rounded-xl p-2 text-center border border-white/5">
-                  <span className="text-slate-400 block text-[10px]">Miền Nam</span>
-                  <span className="font-extrabold text-white text-xs">{regionStats.south.visited}/{regionStats.south.total}</span>
+                <div className="bg-ink-900/90 rounded-[5px] p-2 text-center border border-ink-800">
+                  <span className="text-ink-400 block text-[10px] font-serif">Miền Nam</span>
+                  <span className="font-black text-white text-xs">{regionStats.south.visited}/{regionStats.south.total}</span>
                 </div>
               </div>
             </div>
@@ -396,7 +396,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
       {/* ========================================================= */}
       {/* FILTER & SEARCH CONTROLS                                  */}
       {/* ========================================================= */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200/90 shadow-2xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#FFFDF8] p-3.5 sm:p-4 rounded-[6px] border border-ink-200/80 shadow-2xs">
         {/* Region Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
           {REGION_META.map(reg => {
@@ -405,15 +405,15 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
               <button
                 key={reg.id}
                 onClick={() => setSelectedRegion(reg.id)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-[5px] text-xs font-bold transition-all shrink-0 cursor-pointer ${
                   isActive
-                    ? 'bg-sky-600 text-white shadow-md shadow-sky-600/20 font-extrabold'
-                    : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/70'
+                    ? 'bg-clay-600 text-white shadow-xs font-bold'
+                    : 'bg-[#F8F4EC] hover:bg-[#EFE9DC] text-ink-700 border border-ink-200/80'
                 }`}
               >
                 <span>{reg.label}</span>
-                <span className={`ml-1.5 text-[10px] px-1.5 py-0.2 rounded-md ${
-                  isActive ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'
+                <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-[3px] ${
+                  isActive ? 'bg-white/20 text-white' : 'bg-ink-200 text-ink-700'
                 }`}>
                   {reg.id === 'all'
                     ? `${visitedCount}/${totalCount}`
@@ -426,13 +426,13 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
 
         {/* Search province input */}
         <div className="relative w-full sm:w-64">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Tìm tỉnh, điểm đến..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+            className="w-full pl-8 pr-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs font-medium text-ink-800 placeholder-ink-400 focus:outline-hidden focus:ring-1 focus:ring-clay-500/20 focus:border-clay-500 transition-all"
           />
         </div>
       </div>
@@ -457,18 +457,18 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
                   handleToggleCheckin(prov.id);
                 }
               }}
-              className={`group relative p-3.5 rounded-2xl border transition-all cursor-pointer select-none flex flex-col justify-between min-h-[110px] ${
+              className={`group relative p-3.5 rounded-[6px] border transition-all cursor-pointer select-none flex flex-col justify-between min-h-[115px] ${
                 isVisited
-                  ? 'bg-gradient-to-br from-emerald-50/70 via-sky-50/50 to-white border-emerald-300/80 shadow-xs hover:shadow-md hover:border-emerald-400'
-                  : 'bg-white hover:bg-slate-50/80 border-slate-200/80 hover:border-slate-300 opacity-80 hover:opacity-100'
+                  ? 'bg-[#FFFDF8] border-clay-300 shadow-2xs hover:shadow-xs hover:border-clay-500'
+                  : 'bg-[#FDFBF7] hover:bg-[#F8F4EC] border-ink-200/60 hover:border-ink-300 opacity-90 hover:opacity-100'
               }`}
             >
               <div>
                 <div className="flex items-start justify-between gap-1 mb-1.5">
-                  <span className={`text-[10px] font-extrabold uppercase tracking-wider px-1.5 py-0.5 rounded-md ${
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-[3px] border ${
                     isVisited
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : 'bg-slate-100 text-slate-500'
+                      ? 'bg-clay-50 text-clay-700 border-clay-200/60'
+                      : 'bg-ink-100 text-ink-600 border-ink-200/60'
                   }`}>
                     {prov.region === 'north' ? 'Bắc' : prov.region === 'central' ? 'Trung' : prov.region === 'highlands' ? 'T.Nguyên' : 'Nam'}
                   </span>
@@ -477,10 +477,10 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
                   <button
                     type="button"
                     onClick={(e) => handleToggleCheckin(prov.id, e)}
-                    className={`w-6 h-6 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                    className={`w-6 h-6 rounded-[4px] flex items-center justify-center transition-all cursor-pointer ${
                       isVisited
-                        ? 'bg-emerald-600 text-white shadow-xs hover:bg-emerald-700'
-                        : 'bg-slate-100 text-slate-400 hover:bg-sky-100 hover:text-sky-600'
+                        ? 'bg-clay-600 text-white shadow-2xs hover:bg-clay-700'
+                        : 'bg-ink-100 text-ink-500 hover:bg-clay-50 hover:text-clay-600 border border-ink-200/60'
                     }`}
                     title={isVisited ? 'Bấm để gỡ dấu chân' : 'Bấm để đánh dấu đã từng đến'}
                   >
@@ -488,19 +488,19 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
                   </button>
                 </div>
 
-                <h4 className={`font-extrabold text-sm leading-snug ${isVisited ? 'text-slate-900' : 'text-slate-700'}`}>
+                <h4 className={`font-black font-display text-sm leading-snug ${isVisited ? 'text-ink-800' : 'text-ink-700'}`}>
                   {prov.name}
                 </h4>
-                <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-1 font-medium">
+                <p className="text-[11px] text-ink-500 mt-0.5 line-clamp-1 font-serif">
                   {prov.highlight}
                 </p>
               </div>
 
               {/* Footer Story badge or Check-in status */}
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px]">
+              <div className="pt-2 border-t border-ink-200/60 flex items-center justify-between text-[10px]">
                 {storyCount > 0 ? (
-                  <span className="font-bold text-sky-700 flex items-center gap-1">
-                    <FileText className="w-3 h-3 text-sky-600" />
+                  <span className="font-bold text-clay-700 flex items-center gap-1">
+                    <FileText className="w-3 h-3 text-clay-600" />
                     {storyCount} kỷ niệm
                   </span>
                 ) : isVisited ? (
@@ -509,12 +509,12 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
                     Đã đến
                   </span>
                 ) : (
-                  <span className="text-slate-400 font-medium">Chưa ghé</span>
+                  <span className="text-ink-400 font-serif">Chưa ghé</span>
                 )}
 
                 {isAutoDetected && (
-                  <span className="text-amber-600 font-bold" title="Tự động nhận diện từ bài viết/tour">
-                    AI ✨
+                  <span className="text-clay-600 font-bold" title="Tự động nhận diện từ bài viết/tour">
+                    Tự động
                   </span>
                 )}
               </div>
@@ -527,46 +527,46 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
       {/* MODAL: PROVINCE STORIES & ITINERARIES DRAWER              */}
       {/* ========================================================= */}
       {selectedProvinceForStories && selectedStories && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-ink-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl border border-ink-200/80 animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-4 sm:p-5 border-b border-ink-200/80 bg-[#F8F4EC] rounded-t-[6px] flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center font-black">
-                  <MapPin className="w-5 h-5 text-sky-600" />
+                <div className="w-9 h-9 rounded-[5px] bg-clay-50 text-clay-700 border border-clay-200 flex items-center justify-center font-black">
+                  <MapPin className="w-4 h-4 text-clay-600" />
                 </div>
                 <div>
-                  <h3 className="font-extrabold text-base text-slate-900">
+                  <h3 className="font-black font-display text-base text-ink-800">
                     Dấu chân tại {selectedProvinceForStories.name}
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">
+                  <p className="text-xs text-ink-500 font-serif">
                     {selectedProvinceForStories.highlight}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedProvinceForStories(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 cursor-pointer"
+                className="w-7 h-7 rounded-[4px] bg-[#FFFDF8] hover:bg-ink-100 flex items-center justify-center text-ink-600 border border-ink-200/80 cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            <div className="p-5 overflow-y-auto space-y-4 flex-1">
+            <div className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
               {/* Lịch trình liên quan */}
               {selectedStories.itineraries.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                    <Route className="w-3.5 h-3.5 text-sky-600" />
-                    Lịch trình AI ({selectedStories.itineraries.length})
+                  <span className="text-xs font-bold text-ink-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <Route className="w-3.5 h-3.5 text-clay-600" />
+                    Lịch trình du lịch ({selectedStories.itineraries.length})
                   </span>
                   <div className="space-y-2">
                     {selectedStories.itineraries.map(itin => (
-                      <div key={itin.id} className="p-3 rounded-2xl border border-blue-100 bg-blue-50/50 flex items-center justify-between gap-3">
+                      <div key={itin.id} className="p-3 rounded-[5px] border border-ink-200/80 bg-[#F8F4EC]/60 flex items-center justify-between gap-3">
                         <div className="min-w-0">
-                          <h5 className="font-bold text-xs text-slate-900 truncate">{itin.title}</h5>
-                          <span className="text-[10px] text-slate-500">{itin.destination || selectedProvinceForStories.name}</span>
+                          <h5 className="font-bold text-xs text-ink-800 truncate">{itin.title}</h5>
+                          <span className="text-[10px] text-ink-500 font-serif">{itin.destination || selectedProvinceForStories.name}</span>
                         </div>
-                        <span className="text-xs font-extrabold text-sky-600 shrink-0">Xem tour &rarr;</span>
+                        <span className="text-xs font-bold text-clay-700 shrink-0">Xem tour &rarr;</span>
                       </div>
                     ))}
                   </div>
@@ -576,15 +576,15 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
               {/* Bài viết liên quan */}
               {selectedStories.posts.length > 0 && (
                 <div className="space-y-2">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-sky-600" />
-                    Bài viết Blog ({selectedStories.posts.length})
+                  <span className="text-xs font-bold text-ink-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-clay-600" />
+                    Bài viết chia sẻ ({selectedStories.posts.length})
                   </span>
                   <div className="space-y-2">
                     {selectedStories.posts.map(p => (
-                      <div key={p.id} className="p-3 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-1">
-                        <h5 className="font-bold text-xs text-slate-900">{p.title || 'Chia sẻ chuyến đi'}</h5>
-                        <p className="text-[11px] text-slate-600 line-clamp-2">{p.content}</p>
+                      <div key={p.id} className="p-3 rounded-[5px] border border-ink-200/80 bg-[#F8F4EC]/60 space-y-1">
+                        <h5 className="font-bold text-xs text-ink-800">{p.title || 'Chia sẻ chuyến đi'}</h5>
+                        <p className="text-[11px] text-ink-600 line-clamp-2 font-serif">{p.content}</p>
                       </div>
                     ))}
                   </div>
@@ -592,19 +592,19 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
               )}
             </div>
 
-            <div className="p-4 border-t border-slate-100 flex items-center justify-between bg-slate-50/50 rounded-b-3xl">
+            <div className="p-3.5 sm:p-4 border-t border-ink-200/80 flex items-center justify-between bg-[#F8F4EC] rounded-b-[6px]">
               <button
                 onClick={(e) => {
                   handleToggleCheckin(selectedProvinceForStories.id, e);
                   setSelectedProvinceForStories(null);
                 }}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-200 transition-colors cursor-pointer"
+                className="px-3.5 py-1.5 rounded-[5px] text-xs font-bold bg-[#FFFDF8] hover:bg-ink-100 text-ink-700 border border-ink-200/80 transition-colors cursor-pointer"
               >
                 {allVisitedIds.includes(selectedProvinceForStories.id) ? 'Gỡ dấu chân tỉnh này' : 'Đánh dấu đã ghé'}
               </button>
               <button
                 onClick={() => setSelectedProvinceForStories(null)}
-                className="px-5 py-2 rounded-xl bg-sky-600 text-white text-xs font-extrabold hover:bg-sky-700 transition-colors cursor-pointer"
+                className="px-4 py-1.5 rounded-[5px] bg-clay-600 text-white text-xs font-bold hover:bg-clay-700 transition-colors cursor-pointer shadow-xs"
               >
                 Đóng
               </button>

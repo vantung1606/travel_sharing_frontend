@@ -82,18 +82,18 @@ export const UserAvatar = ({
       <div
         className={`w-full h-full rounded-full flex items-center justify-center transition-transform duration-200 ${
           currentTier.avatarEffect || ''
-        } ${currentTier.avatarRing || 'ring-2 ring-slate-200'}`}
+        } ${currentTier.avatarRing || 'ring-2 ring-ink-200/80'}`}
       >
         {rawAvatarUrl && !imageError ? (
           <img
             src={rawAvatarUrl}
             alt={displayName}
             onError={() => setImageError(true)}
-            className={`rounded-full object-cover bg-slate-100 ${currentSize.img} ${avatarClassName}`}
+            className={`rounded-full object-cover bg-ink-100 ${currentSize.img} ${avatarClassName}`}
           />
         ) : (
           <div
-            className={`rounded-full bg-gradient-to-tr from-sky-600 to-blue-700 text-white font-extrabold flex items-center justify-center select-none shadow-inner ${currentSize.img} ${avatarClassName}`}
+            className={`rounded-full bg-gradient-to-tr from-clay-600 to-clay-800 text-white font-black font-display flex items-center justify-center select-none shadow-inner ${currentSize.img} ${avatarClassName}`}
           >
             {firstLetter}
           </div>
@@ -103,7 +103,7 @@ export const UserAvatar = ({
       {/* Huy hiệu Cấp độ ở góc (Corner Badge 💎/👑/🥈/🥉) */}
       {showBadge && currentTier?.cornerIcon && (
         <span
-          className={`absolute rounded-full flex items-center justify-center font-bold shadow-md border-2 border-white select-none transition-transform hover:scale-110 ${currentSize.badge} ${currentTier.cornerBg}`}
+          className={`absolute rounded-full flex items-center justify-center font-bold shadow-md border-2 border-[#FFFDF8] select-none transition-transform hover:scale-110 ${currentSize.badge} ${currentTier.cornerBg}`}
           title={`${currentTier.name} (${currentTier.tagText})`}
         >
           {currentTier.cornerIcon}
@@ -113,7 +113,7 @@ export const UserAvatar = ({
       {/* Tích xanh xác minh (nếu không hiển thị badge góc hoặc là account verified) */}
       {showVerified && !showBadge && user?.isVerified && (
         <span
-          className={`absolute rounded-full bg-sky-600 text-white flex items-center justify-center font-bold border-2 border-white shadow-xs ${currentSize.verified}`}
+          className={`absolute rounded-full bg-clay-600 text-white flex items-center justify-center font-bold border-2 border-[#FFFDF8] shadow-xs ${currentSize.verified}`}
           title="Tài khoản đã xác minh"
         >
           ✓
