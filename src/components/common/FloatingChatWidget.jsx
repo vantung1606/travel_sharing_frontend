@@ -89,30 +89,36 @@ const AudioMessagePlayer = ({ src, isMe }) => {
   };
 
   return (
-    <div className={`flex items-center gap-2 p-2 rounded-[5px] min-w-[180px] max-w-[210px] select-none ${
-      isMe ? 'bg-clay-600 text-white shadow-2xs' : 'bg-[#F8F4EC] text-ink-800 border border-ink-200/80'
+    <div className={`flex items-center gap-2.5 p-2.5 rounded-2xl min-w-[190px] max-w-[230px] select-none ${
+      isMe
+        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
+        : 'bg-white text-slate-800 border border-slate-200/80 shadow-xs'
     }`}>
       <audio ref={audioRef} src={src} preload="metadata" />
       <button
         type="button"
         onClick={togglePlay}
-        className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-90 cursor-pointer ${
-          isMe ? 'bg-[#FFFDF8] text-clay-700 hover:bg-clay-50 shadow-2xs' : 'bg-clay-600 text-white hover:bg-clay-700 shadow-2xs'
+        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-90 cursor-pointer ${
+          isMe
+            ? 'bg-white/20 hover:bg-white/30 text-white shadow-xs backdrop-blur-xs'
+            : 'bg-blue-600 hover:bg-blue-500 text-white shadow-xs'
         }`}
         title={isPlaying ? 'Tạm dừng' : 'Phát tin thoại'}
       >
         {isPlaying ? <Pause className="w-3.5 h-3.5 fill-current" /> : <Play className="w-3.5 h-3.5 fill-current ml-0.5" />}
       </button>
-      <div className="flex-1 space-y-0.5">
+      <div className="flex-1 space-y-1">
         <input
           type="range"
           min="0"
           max={duration || 100}
           value={currentTime}
           onChange={handleSeek}
-          className="w-full h-1 bg-ink-200/60 rounded-lg appearance-none cursor-pointer accent-clay-500"
+          className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer ${
+            isMe ? 'bg-white/30 accent-white' : 'bg-slate-200 accent-blue-600'
+          }`}
         />
-        <div className="flex items-center justify-between text-[9px] font-semibold opacity-85 leading-none font-mono">
+        <div className="flex items-center justify-between text-[10px] font-semibold opacity-90 leading-none font-mono">
           <span>{formatSec(currentTime)}</span>
           <span>{duration > 0 ? formatSec(duration) : 'Thoại'}</span>
         </div>
@@ -134,25 +140,27 @@ const FileAttachmentBubble = ({ src, isMe }) => {
   }, [src]);
 
   return (
-    <div className={`flex items-center gap-2 p-2 rounded-[5px] max-w-[210px] ${
-      isMe ? 'bg-clay-700 text-white shadow-2xs' : 'bg-[#F8F4EC] text-ink-800 border border-ink-200/80'
+    <div className={`flex items-center gap-2.5 p-2.5 rounded-2xl max-w-[220px] ${
+      isMe
+        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
+        : 'bg-white text-slate-800 border border-slate-200/80 shadow-xs'
     }`}>
-      <div className={`w-7 h-7 rounded-[4px] flex items-center justify-center shrink-0 ${
-        isMe ? 'bg-white/20 text-white' : 'bg-clay-50 text-clay-700 border border-clay-200/60'
+      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+        isMe ? 'bg-white/20 text-white backdrop-blur-xs' : 'bg-blue-50 text-blue-600 border border-blue-100'
       }`}>
         <FileText className="w-4 h-4" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-bold truncate leading-tight">{fileName}</p>
-        <span className="text-[8px] opacity-75 font-serif">Tệp đính kèm</span>
+        <p className="text-xs font-semibold truncate leading-tight">{fileName}</p>
+        <span className="text-[10px] opacity-75">Tệp đính kèm</span>
       </div>
       <a
         href={src}
         download
         target="_blank"
         rel="noopener noreferrer"
-        className={`p-1.5 rounded-[4px] transition-all shrink-0 cursor-pointer ${
-          isMe ? 'hover:bg-white/20 text-white' : 'hover:bg-ink-200/60 text-ink-600'
+        className={`p-1.5 rounded-lg transition-all shrink-0 cursor-pointer ${
+          isMe ? 'hover:bg-white/20 text-white' : 'hover:bg-slate-100 text-slate-600'
         }`}
         title="Tải tệp tin"
       >
@@ -704,17 +712,21 @@ export const FloatingChatWidget = () => {
     <div className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 select-none font-sans group/widget">
       {/* Mini Chat Window Box */}
       {isOpen && (
-        <div className="absolute bottom-16 sm:bottom-20 right-0 w-[360px] sm:w-[390px] max-w-[calc(100vw-32px)] h-[520px] max-h-[calc(100vh-110px)] bg-[#FFFDF8] rounded-[6px] shadow-2xl border border-ink-200/80 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200 ring-1 ring-ink-950/10">
+        <div className="absolute bottom-16 sm:bottom-20 right-0 w-[370px] sm:w-[410px] max-w-[calc(100vw-32px)] h-[560px] max-h-[calc(100vh-110px)] bg-white/95 backdrop-blur-2xl rounded-3xl shadow-[0_25px_60px_-15px_rgba(15,23,42,0.28)] border border-slate-100 flex flex-col overflow-hidden ring-1 ring-slate-900/5 transition-all duration-300 animate-in fade-in zoom-in-95">
           
           {/* Header Bar */}
-          <div className="p-3.5 bg-gradient-to-r from-ink-950 via-ink-900 to-clay-950 text-white flex items-center justify-between shadow-xs shrink-0 border-b border-ink-700/60">
-            <div className="flex items-center gap-2 min-w-0">
+          <div className="px-4 py-3.5 bg-gradient-to-r from-slate-950 via-blue-950 to-indigo-950 text-white flex items-center justify-between shrink-0 shadow-sm relative overflow-hidden border-b border-white/10">
+            {/* Ambient Lighting Accents */}
+            <div className="absolute -top-12 -right-12 w-32 h-32 bg-blue-500/25 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute -bottom-8 -left-8 w-28 h-28 bg-indigo-500/20 rounded-full blur-xl pointer-events-none" />
+
+            <div className="flex items-center gap-2.5 min-w-0 relative z-10">
               {activeThreadId ? (
                 <>
                   <button
                     type="button"
                     onClick={handleBackToList}
-                    className="p-1 rounded-[4px] hover:bg-white/10 text-ink-300 hover:text-white transition-colors cursor-pointer"
+                    className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-all cursor-pointer shrink-0"
                     title="Quay lại danh sách"
                   >
                     <ArrowLeft className="w-4 h-4" />
@@ -722,19 +734,19 @@ export const FloatingChatWidget = () => {
                   <img
                     src={activeThreadObj?.avatar || 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=150&q=80'}
                     alt=""
-                    className="w-7 h-7 rounded-[4px] object-cover ring-1 ring-white/30 shrink-0"
+                    className="w-9 h-9 rounded-2xl object-cover ring-2 ring-white/25 shadow-xs shrink-0"
                   />
                   <div className="min-w-0">
-                    <h4 className="font-display font-black text-xs text-white truncate max-w-[170px] sm:max-w-[200px]">
+                    <h4 className="font-bold text-xs text-white truncate max-w-[170px] sm:max-w-[210px] leading-tight">
                       {activeThreadObj?.name}
                     </h4>
-                    <span className="text-[10px] text-ink-300 font-serif flex items-center gap-1">
+                    <span className="text-[11px] text-slate-300 flex items-center gap-1.5 mt-0.5">
                       {activeThreadObj?.type === 'DIRECT' ? (
                         <>
                           <span className={`w-1.5 h-1.5 rounded-full ${
-                            activeThreadObj?.isOnline ? 'bg-emerald-400 animate-pulse' : 'bg-ink-400'
+                            activeThreadObj?.isOnline ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'
                           }`} />
-                          <span>{activeThreadObj?.isOnline ? 'Đang hoạt động' : (activeThreadObj?.statusText || 'Ngoại tuyến')}</span>
+                          <span className="truncate">{activeThreadObj?.isOnline ? 'Đang hoạt động' : (activeThreadObj?.statusText || 'Ngoại tuyến')}</span>
                         </>
                       ) : (
                         <button
@@ -743,9 +755,10 @@ export const FloatingChatWidget = () => {
                             navigate('/messages');
                             setIsOpen(false);
                           }}
-                          className="hover:underline cursor-pointer font-bold flex items-center gap-0.5 text-clay-300"
+                          className="hover:underline cursor-pointer font-medium flex items-center gap-1 text-sky-300"
                           title="Xem & quản lý thành viên trên trang tin nhắn"
                         >
+                          <Users className="w-3 h-3" />
                           <span>{activeThreadObj?.membersCount || 2} thành viên</span>
                         </button>
                       )}
@@ -753,32 +766,35 @@ export const FloatingChatWidget = () => {
                   </div>
                 </>
               ) : (
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-[4px] bg-clay-500/20 border border-clay-400/30 flex items-center justify-center font-bold text-clay-300">
-                    <MessageCircle className="w-4 h-4 text-clay-300" />
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/30 shrink-0">
+                    <MessageCircle className="w-4.5 h-4.5" />
                   </div>
                   <div>
-                    <h4 className="font-display font-black text-xs text-white">Tin nhắn Wayfare</h4>
-                    <span className="text-[10px] text-ink-300 font-serif">Nhóm & Cá nhân</span>
+                    <h4 className="font-bold text-xs text-white leading-tight">Wayfare Messenger</h4>
+                    <span className="text-[11px] text-slate-300 mt-0.5 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-amber-300" />
+                      <span>Hộp thư & Bạn đồng hành</span>
+                    </span>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Header Action Buttons */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 relative z-10">
               <button
                 type="button"
                 onClick={handleExpandToFullPage}
-                className="p-1.5 rounded-[4px] hover:bg-white/10 text-ink-300 hover:text-white transition-colors cursor-pointer"
-                title="Mở toàn trang"
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-all cursor-pointer"
+                title="Mở toàn màn hình"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
               </button>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-[4px] hover:bg-white/10 text-ink-300 hover:text-white transition-colors cursor-pointer"
+                className="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white transition-all cursor-pointer"
                 title="Thu nhỏ"
               >
                 <Minus className="w-3.5 h-3.5" />
@@ -788,93 +804,96 @@ export const FloatingChatWidget = () => {
 
           {/* Body: Danh sách phòng hoặc Khung chat */}
           {!activeThreadId ? (
-            <div className="flex-1 flex flex-col min-h-0 bg-[#FFFDF8]">
+            <div className="flex-1 flex flex-col min-h-0 bg-white">
               {/* Search Bar */}
-              <div className="p-2.5 pb-2 bg-[#F8F4EC] border-b border-ink-200/80">
+              <div className="p-3 bg-slate-50/80 border-b border-slate-100">
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     placeholder="Tìm cuộc trò chuyện..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    className="w-full pl-8 pr-3 py-1.5 rounded-[5px] bg-[#FFFDF8] border border-ink-200/80 text-xs text-ink-800 placeholder-ink-400 focus:ring-1 focus:ring-clay-500/20 focus:border-clay-500 outline-hidden transition-all"
+                    className="w-full pl-8 pr-3 py-2 rounded-2xl bg-white border border-slate-200/90 text-xs text-slate-800 placeholder-slate-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all shadow-2xs"
                   />
                 </div>
               </div>
 
               {/* Tabs Filter */}
-              <div className="flex items-center gap-1 px-2.5 py-2 bg-[#F8F4EC]/60 border-b border-ink-200/60 text-[11px] font-bold">
-                <button
-                  type="button"
-                  onClick={() => setFilterTab('all')}
-                  className={`flex-1 py-1 rounded-[4px] text-center transition-all cursor-pointer ${
-                    filterTab === 'all' ? 'bg-[#FFFDF8] text-ink-800 border border-ink-200/80 shadow-2xs font-bold' : 'text-ink-500 hover:text-ink-800'
-                  }`}
-                >
-                  Tất cả
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFilterTab('group')}
-                  className={`flex-1 py-1 rounded-[4px] text-center transition-all cursor-pointer ${
-                    filterTab === 'group' ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-2xs font-bold' : 'text-ink-500 hover:text-ink-800'
-                  }`}
-                >
-                  Nhóm
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFilterTab('direct')}
-                  className={`flex-1 py-1 rounded-[4px] text-center transition-all cursor-pointer ${
-                    filterTab === 'direct' ? 'bg-[#FFFDF8] text-ink-800 border border-ink-200/80 shadow-2xs font-bold' : 'text-ink-500 hover:text-ink-800'
-                  }`}
-                >
-                  1-1
-                </button>
+              <div className="px-3 py-2 bg-slate-50/50 border-b border-slate-100">
+                <div className="p-1 bg-slate-200/60 rounded-2xl flex gap-1 text-xs font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => setFilterTab('all')}
+                    className={`flex-1 py-1 rounded-xl text-center transition-all cursor-pointer ${
+                      filterTab === 'all' ? 'bg-white text-blue-600 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Tất cả
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFilterTab('group')}
+                    className={`flex-1 py-1 rounded-xl text-center transition-all cursor-pointer ${
+                      filterTab === 'group' ? 'bg-white text-blue-600 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Nhóm
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFilterTab('direct')}
+                    className={`flex-1 py-1 rounded-xl text-center transition-all cursor-pointer ${
+                      filterTab === 'direct' ? 'bg-white text-blue-600 shadow-xs font-bold' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    1-1
+                  </button>
+                </div>
               </div>
 
               {/* Threads List */}
-              <div className="flex-1 overflow-y-auto px-2 py-1.5 space-y-1 custom-dropdown-scroll">
+              <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1 custom-dropdown-scroll">
                 {filteredThreads.length === 0 ? (
-                  <div className="py-12 text-center text-ink-400 text-xs font-serif">
-                    Chưa có cuộc trò chuyện nào
+                  <div className="py-14 text-center text-slate-400 text-xs space-y-2">
+                    <MessageCircle className="w-8 h-8 mx-auto text-slate-300 stroke-[1.5]" />
+                    <p>Chưa có cuộc trò chuyện nào</p>
                   </div>
                 ) : (
                   filteredThreads.map(thread => (
                     <div
                       key={thread.id}
                       onClick={() => handleOpenThread(thread.id)}
-                      className="p-2.5 rounded-[5px] hover:bg-[#F8F4EC] border border-transparent hover:border-ink-200/80 transition-all cursor-pointer flex items-center gap-2.5"
+                      className="p-2.5 rounded-2xl hover:bg-slate-50 border border-transparent hover:border-slate-100 transition-all duration-150 cursor-pointer flex items-center gap-3"
                     >
                       <div className="relative shrink-0">
                         <img
                           src={thread.avatar}
                           alt=""
-                          className="w-10 h-10 rounded-[5px] object-cover ring-1 ring-ink-200/80"
+                          className="w-11 h-11 rounded-2xl object-cover ring-1 ring-slate-200/80 shadow-2xs"
                         />
                         {thread.type === 'DIRECT' ? (
                           <span
-                            className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-[#FFFDF8] ${
-                              thread.isOnline ? 'bg-emerald-500' : 'bg-ink-300'
+                            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full ring-2 ring-white ${
+                              thread.isOnline ? 'bg-emerald-500' : 'bg-slate-300'
                             }`}
                             title={thread.isOnline ? 'Đang hoạt động' : (thread.statusText || 'Ngoại tuyến')}
                           />
                         ) : (
-                          <span className="absolute -bottom-0.5 -right-0.5 p-0.5 rounded-[3px] bg-clay-600 text-white border border-[#FFFDF8] text-[7px]">
-                            <Users className="w-2 h-2" />
+                          <span className="absolute -bottom-0.5 -right-0.5 p-1 rounded-lg bg-blue-600 text-white ring-2 ring-white text-[8px]">
+                            <Users className="w-2.5 h-2.5" />
                           </span>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
-                          <h5 className="font-display font-bold text-xs text-ink-800 truncate">{thread.name}</h5>
-                          <span className="text-[10px] text-ink-400 font-mono shrink-0">{thread.time}</span>
+                          <h5 className="font-bold text-xs text-slate-800 truncate">{thread.name}</h5>
+                          <span className="text-[10px] text-slate-400 font-mono shrink-0">{thread.time}</span>
                         </div>
-                        <p className="text-[11px] text-ink-500 truncate mt-0.5 font-serif">{thread.lastMsg}</p>
+                        <p className="text-xs text-slate-500 truncate mt-0.5 leading-relaxed">{thread.lastMsg}</p>
                       </div>
                       {thread.unread > 0 && (
-                        <span className="w-4 h-4 rounded-[3px] bg-clay-600 text-white text-[9px] font-mono font-bold flex items-center justify-center shrink-0">
+                        <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-gradient-to-r from-rose-500 to-red-600 text-white text-[10px] font-mono font-bold flex items-center justify-center shrink-0 shadow-xs">
                           {thread.unread}
                         </span>
                       )}
@@ -885,23 +904,24 @@ export const FloatingChatWidget = () => {
             </div>
           ) : (
             /* Khung chat tin nhắn */
-            <div className="flex-1 flex flex-col min-h-0 bg-[#FFFDF8]">
-              <div ref={widgetScrollContainerRef} className="flex-1 p-3 overflow-y-auto space-y-3 custom-dropdown-scroll">
+            <div className="flex-1 flex flex-col min-h-0 bg-slate-50/50">
+              <div ref={widgetScrollContainerRef} className="flex-1 p-3.5 overflow-y-auto space-y-3 custom-dropdown-scroll">
                 {isLoadingMessages ? (
-                  <div className="py-12 text-center text-ink-400 text-xs space-y-1">
-                    <Loader2 className="w-5 h-5 animate-spin mx-auto text-clay-600" />
-                    <p className="font-serif">Đang tải tin nhắn...</p>
+                  <div className="py-14 text-center text-slate-400 text-xs space-y-2">
+                    <Loader2 className="w-6 h-6 animate-spin mx-auto text-blue-600" />
+                    <p>Đang tải tin nhắn...</p>
                   </div>
                 ) : messages.length === 0 ? (
-                  <div className="py-12 text-center text-ink-400 text-xs font-serif">
-                    Chưa có tin nhắn nào. Hãy gửi lời chào đầu tiên!
+                  <div className="py-14 text-center text-slate-400 text-xs space-y-2">
+                    <Sparkles className="w-6 h-6 mx-auto text-blue-400" />
+                    <p>Chưa có tin nhắn nào. Hãy gửi lời chào đầu tiên!</p>
                   </div>
                 ) : (
                   messages.map(msg => {
                     if (msg.messageType === 'SYSTEM') {
                       return (
-                        <div key={msg.id} className="flex justify-center my-1.5 px-2">
-                          <span className="px-2.5 py-1 rounded-[4px] bg-[#F8F4EC] text-ink-500 text-[10px] font-serif border border-ink-200/60 text-center">
+                        <div key={msg.id} className="flex justify-center my-2 px-2">
+                          <span className="px-3 py-1 rounded-full bg-slate-200/70 text-slate-600 text-[10px] font-medium text-center shadow-2xs">
                             {msg.content}
                           </span>
                         </div>
@@ -918,56 +938,56 @@ export const FloatingChatWidget = () => {
                           <img
                             src={msg.senderAvatar || activeThreadObj?.avatar}
                             alt=""
-                            className="w-6 h-6 rounded-full object-cover shrink-0 mt-0.5 ring-1 ring-ink-200"
+                            className="w-7 h-7 rounded-xl object-cover shrink-0 mt-0.5 ring-1 ring-slate-200 shadow-2xs"
                           />
                         )}
-                      <div className={`max-w-[75%] space-y-0.5 flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                        {!isMe && (
-                          <span className="text-[9px] font-bold text-ink-400 px-1 font-display">{msg.senderName}</span>
-                        )}
+                        <div className={`max-w-[78%] space-y-1 flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                          {!isMe && (
+                            <span className="text-[10px] font-semibold text-slate-500 px-1">{msg.senderName}</span>
+                          )}
 
-                        {/* RENDER MEDIA HOẶC TEXT */}
-                        {msg.messageType === 'IMAGE' ? (
-                          <img
-                            src={msg.content}
-                            alt="Media"
-                            className="max-w-[200px] max-h-48 object-cover rounded-[5px] shadow-2xs border border-ink-200/80"
-                          />
-                        ) : msg.messageType === 'VIDEO' ? (
-                          <video
-                            controls
-                            src={msg.content}
-                            className="max-w-[220px] max-h-48 rounded-[5px] bg-black"
-                          />
-                        ) : msg.messageType === 'AUDIO' ? (
-                          <AudioMessagePlayer src={msg.content} isMe={isMe} />
-                        ) : msg.messageType === 'FILE' ? (
-                          <FileAttachmentBubble src={msg.content} isMe={isMe} />
-                        ) : msg.messageType === 'ITINERARY' ? (
-                          <ItineraryMessageBubble
-                            content={msg.content}
-                            isMe={isMe}
-                            onViewItinerary={(itinData) => {
-                              setIsOpen(false);
-                              navigate(`/itinerary?id=${itinData.id || ''}`);
-                            }}
-                          />
-                        ) : (
-                          <div
-                            className={`p-2.5 rounded-[6px] text-xs leading-relaxed break-words ${
-                              isMe
-                                ? 'bg-clay-600 text-white rounded-tr-[1px] shadow-2xs'
-                                : 'bg-[#F8F4EC] text-ink-800 rounded-tl-[1px] border border-ink-200/80 font-serif'
-                            }`}
-                          >
-                            {msg.content}
+                          {/* RENDER MEDIA HOẶC TEXT */}
+                          {msg.messageType === 'IMAGE' ? (
+                            <img
+                              src={msg.content}
+                              alt="Media"
+                              className="max-w-[210px] max-h-52 object-cover rounded-2xl shadow-sm border border-slate-100"
+                            />
+                          ) : msg.messageType === 'VIDEO' ? (
+                            <video
+                              controls
+                              src={msg.content}
+                              className="max-w-[230px] max-h-52 rounded-2xl bg-black shadow-sm"
+                            />
+                          ) : msg.messageType === 'AUDIO' ? (
+                            <AudioMessagePlayer src={msg.content} isMe={isMe} />
+                          ) : msg.messageType === 'FILE' ? (
+                            <FileAttachmentBubble src={msg.content} isMe={isMe} />
+                          ) : msg.messageType === 'ITINERARY' ? (
+                            <ItineraryMessageBubble
+                              content={msg.content}
+                              isMe={isMe}
+                              onViewItinerary={(itinData) => {
+                                setIsOpen(false);
+                                navigate(`/itinerary?id=${itinData.id || ''}`);
+                              }}
+                            />
+                          ) : (
+                            <div
+                              className={`p-3 rounded-2xl text-xs leading-relaxed break-words ${
+                                isMe
+                                  ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-tr-xs shadow-sm shadow-blue-500/20'
+                                  : 'bg-white text-slate-800 rounded-tl-xs border border-slate-200/80 shadow-xs'
+                              }`}
+                            >
+                              {msg.content}
+                            </div>
+                          )}
+
+                          <div className={`flex items-center gap-1 text-[9px] text-slate-400 px-1 font-mono ${isMe ? 'justify-end' : 'justify-start'}`}>
+                            <span>{msg.time}</span>
+                            {isMe && <CheckCheck className="w-3 h-3 text-blue-500" />}
                           </div>
-                        )}
-
-                        <div className={`flex items-center gap-1 text-[8px] text-ink-400 px-1 font-mono ${isMe ? 'justify-end' : 'justify-start'}`}>
-                          <span>{msg.time}</span>
-                          {isMe && <CheckCheck className="w-2.5 h-2.5 text-clay-600" />}
-                        </div>
                         </div>
                       </div>
                     );
@@ -978,8 +998,8 @@ export const FloatingChatWidget = () => {
 
               {/* Upload Status Bar */}
               {isUploading && (
-                <div className="px-3 py-1.5 bg-clay-50 text-clay-800 text-[11px] font-medium flex items-center gap-1.5 border-t border-clay-200/60 font-serif">
-                  <Loader2 className="w-3.5 h-3.5 animate-spin text-clay-600 shrink-0" />
+                <div className="px-4 py-2 bg-blue-50 text-blue-700 text-xs font-medium flex items-center gap-2 border-t border-blue-100">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600 shrink-0" />
                   <span className="truncate">Đang tải tệp lên Cloudinary CDN...</span>
                 </div>
               )}
@@ -987,11 +1007,11 @@ export const FloatingChatWidget = () => {
               {/* Form Gửi tin nhắn / Ghi âm tin thoại */}
               {isRecording ? (
                 /* Thanh Trạng Thái Đang Ghi Âm Tin Nhắn Thoại */
-                <div className="p-2.5 border-t border-ink-200/80 flex items-center gap-1.5 bg-rose-50/70 animate-in fade-in duration-200">
-                  <div className="flex-1 flex items-center gap-2 px-2.5 py-1.5 rounded-[5px] bg-[#FFFDF8] border border-rose-200 text-rose-700 min-w-0">
+                <div className="p-3 border-t border-slate-100 flex items-center gap-2 bg-rose-50/80 animate-in fade-in duration-200">
+                  <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-2xl bg-white border border-rose-200 text-rose-700 min-w-0 shadow-2xs">
                     <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping shrink-0" />
-                    <span className="text-[11px] font-bold text-rose-600 truncate">Đang ghi âm...</span>
-                    <span className="font-mono text-[11px] font-black text-rose-700 bg-rose-100/70 px-1.5 py-0.2 rounded-[3px] shrink-0">
+                    <span className="text-xs font-bold text-rose-600 truncate">Đang ghi âm...</span>
+                    <span className="font-mono text-xs font-black text-rose-700 bg-rose-100/80 px-2 py-0.5 rounded-lg shrink-0">
                       {Math.floor(recordingDuration / 60)}:{String(recordingDuration % 60).padStart(2, '0')}
                     </span>
                     {/* Sóng âm thanh */}
@@ -1007,17 +1027,17 @@ export const FloatingChatWidget = () => {
                   <button
                     type="button"
                     onClick={handleCancelRecording}
-                    className="p-2 rounded-[5px] bg-[#FFFDF8] hover:bg-rose-100 text-ink-500 hover:text-rose-600 transition-all cursor-pointer shrink-0 border border-ink-200/80"
+                    className="p-2.5 rounded-2xl bg-white hover:bg-rose-100 text-slate-500 hover:text-rose-600 transition-all cursor-pointer shrink-0 border border-slate-200/80 shadow-2xs"
                     title="Hủy ghi âm"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-4 h-4" />
                   </button>
 
                   <button
                     type="button"
                     onClick={handleStopAndSendRecording}
                     disabled={isUploading}
-                    className="p-2 px-3 rounded-[5px] bg-rose-600 hover:bg-rose-500 text-white transition-all shadow-2xs cursor-pointer shrink-0 active:scale-95 flex items-center gap-1 font-bold text-xs"
+                    className="p-2.5 px-3.5 rounded-2xl bg-rose-600 hover:bg-rose-500 text-white transition-all shadow-sm shadow-rose-600/30 cursor-pointer shrink-0 active:scale-95 flex items-center gap-1.5 font-bold text-xs"
                     title="Gửi tin nhắn thoại"
                   >
                     <Send className="w-3.5 h-3.5" />
@@ -1026,7 +1046,7 @@ export const FloatingChatWidget = () => {
                 </div>
               ) : (
                 /* Thanh Nhập Tin Nhắn Bình Thường Kèm Nút Mic */
-                <form onSubmit={handleSendMessage} className="p-2.5 border-t border-ink-200/80 flex items-center gap-1.5 bg-[#F8F4EC]">
+                <form onSubmit={handleSendMessage} className="p-3 border-t border-slate-100 flex items-center gap-1.5 bg-white/95 backdrop-blur-md">
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -1039,10 +1059,10 @@ export const FloatingChatWidget = () => {
                     type="button"
                     disabled={isUploading}
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-2 rounded-[5px] text-ink-600 hover:text-clay-700 hover:bg-[#FFFDF8] transition-all cursor-pointer disabled:opacity-50 shrink-0 border border-ink-200/80 bg-[#FFFDF8]"
+                    className="p-2.5 rounded-2xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
                     title="Đính kèm ảnh, video hoặc tài liệu"
                   >
-                    <Paperclip className="w-3.5 h-3.5" />
+                    <Paperclip className="w-4 h-4" />
                   </button>
 
                   {/* Nút Mic Ghi Âm Tin Nhắn Thoại */}
@@ -1050,10 +1070,10 @@ export const FloatingChatWidget = () => {
                     type="button"
                     disabled={isUploading}
                     onClick={handleStartRecording}
-                    className="p-2 rounded-[5px] text-ink-600 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-200 transition-all cursor-pointer disabled:opacity-50 shrink-0 border border-ink-200/80 bg-[#FFFDF8]"
+                    className="p-2.5 rounded-2xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
                     title="Ghi âm tin nhắn thoại"
                   >
-                    <Mic className="w-3.5 h-3.5 text-rose-500" />
+                    <Mic className="w-4 h-4 text-rose-500" />
                   </button>
 
                   {/* Nút Gửi Lịch Trình AI */}
@@ -1061,10 +1081,10 @@ export const FloatingChatWidget = () => {
                     type="button"
                     disabled={isUploading}
                     onClick={() => setIsItineraryPickerOpen(true)}
-                    className="p-2 rounded-[5px] text-ink-600 hover:text-clay-700 hover:bg-clay-50 hover:border-clay-300 transition-all cursor-pointer disabled:opacity-50 shrink-0 border border-ink-200/80 bg-[#FFFDF8]"
+                    className="p-2.5 rounded-2xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-all cursor-pointer disabled:opacity-50 shrink-0"
                     title="Gửi lịch trình du lịch vào cuộc trò chuyện"
                   >
-                    <Route className="w-3.5 h-3.5 text-clay-600" />
+                    <Route className="w-4 h-4 text-blue-600" />
                   </button>
 
                   <input
@@ -1073,15 +1093,15 @@ export const FloatingChatWidget = () => {
                     value={inputText}
                     onChange={e => setInputText(e.target.value)}
                     disabled={isUploading}
-                    className="flex-1 px-3 py-1.5 rounded-[5px] border border-ink-200/80 text-xs outline-hidden focus:ring-1 focus:ring-clay-500/20 focus:border-clay-500 bg-[#FFFDF8] transition-all placeholder:text-ink-400 min-w-0"
+                    className="flex-1 px-3.5 py-2.5 rounded-2xl border border-slate-200/90 text-xs outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-slate-50/80 focus:bg-white transition-all placeholder:text-slate-400 min-w-0"
                   />
                   <button
                     type="submit"
                     disabled={!inputText.trim() || isUploading}
-                    className="p-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer shrink-0"
+                    className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-md shadow-blue-600/30 cursor-pointer shrink-0 flex items-center justify-center active:scale-95"
                     title="Gửi tin nhắn"
                   >
-                    <Send className="w-3.5 h-3.5" />
+                    <Send className="w-4 h-4" />
                   </button>
                 </form>
               )}
@@ -1098,33 +1118,43 @@ export const FloatingChatWidget = () => {
         onSelectItinerary={handleSendItinerary}
       />
 
-      {/* Floating Trigger Circle Button with Paper-Ink-Clay Aesthetics */}
+      {/* Floating Trigger Circle Button with Vibrant Modern Aesthetic */}
       <div className="relative flex items-center justify-end">
         {/* Tooltip Tag on Hover (Desktop) */}
         {!isOpen && (
-          <div className="absolute right-full mr-3 hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-ink-950/95 text-ink-100 text-[11px] font-serif tracking-wide shadow-md border border-ink-700/70 whitespace-nowrap opacity-0 group-hover/widget:opacity-100 transition-all duration-200 pointer-events-none translate-x-2 group-hover/widget:translate-x-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-clay-400 animate-pulse"></span>
-            <span>Hộp thư & Chat chuyến đi</span>
+          <div className="absolute right-full mr-3.5 hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-slate-900/90 text-white text-xs font-semibold tracking-wide shadow-xl shadow-slate-950/25 border border-white/10 whitespace-nowrap opacity-0 group-hover/widget:opacity-100 transition-all duration-300 pointer-events-none translate-x-2 group-hover/widget:translate-x-0 backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Hộp thư & Trò chuyện chuyến đi</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-300 ml-0.5" />
           </div>
         )}
+
+        {/* Ambient Glow Aura */}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-sky-400 via-blue-600 to-indigo-600 blur-xl opacity-45 group-hover/widget:opacity-85 transition-opacity duration-300 pointer-events-none animate-pulse" />
 
         <button
           type="button"
           onClick={handleToggleOpen}
-          className="w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-clay-800 via-clay-600 to-amber-600 text-white flex items-center justify-center shadow-xl shadow-clay-950/25 hover:shadow-2xl hover:shadow-clay-950/35 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer relative ring-4 ring-[#FFFDF8] border border-clay-400/40"
+          className="w-14 h-14 sm:w-[60px] sm:h-[60px] rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white flex items-center justify-center shadow-xl shadow-blue-600/35 hover:shadow-2xl hover:shadow-indigo-600/50 hover:scale-108 active:scale-95 transition-all duration-300 cursor-pointer relative ring-4 ring-white backdrop-blur-md"
           title="Trò chuyện chuyến đi Wayfare"
           aria-label="Trò chuyện chuyến đi"
         >
+          {/* Subtle Top Reflection Glass */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/35 via-white/5 to-transparent pointer-events-none" />
+
           {isOpen ? (
-            <X className="w-6 h-6 stroke-[2.5] transition-transform duration-200 rotate-0 hover:rotate-90" />
+            <X className="w-6 h-6 stroke-[2.5] transition-transform duration-300 rotate-0 hover:rotate-90 drop-shadow-sm" />
           ) : (
             <>
-              <div className="relative">
-                <MessageCircle className="w-6 h-6 stroke-[2.2]" />
-                <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 ring-2 ring-clay-700 animate-pulse" />
+              <div className="relative flex items-center justify-center">
+                <MessageCircle className="w-6.5 h-6.5 stroke-[2.2] drop-shadow-sm" />
+                <span className="absolute -bottom-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 ring-2 ring-white" />
+                </span>
               </div>
               {totalUnread > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-rose-600 text-white text-[10px] font-black font-mono flex items-center justify-center border-2 border-[#FFFDF8] shadow-xs animate-bounce">
+                <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-gradient-to-r from-rose-500 via-red-500 to-rose-600 text-white text-[11px] font-black font-mono flex items-center justify-center ring-2 ring-white shadow-lg shadow-rose-500/40 animate-bounce">
                   {totalUnread > 99 ? '99+' : totalUnread}
                 </span>
               )}
