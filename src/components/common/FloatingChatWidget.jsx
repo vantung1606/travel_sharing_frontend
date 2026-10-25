@@ -23,7 +23,8 @@ import {
   Mic,
   Trash2,
   Route,
-  Sparkles
+  Sparkles,
+  Compass
 } from 'lucide-react';
 import { ItineraryMessageBubble } from '../chat/ItineraryMessageBubble';
 import { ItineraryPickerModal } from '../chat/ItineraryPickerModal';
@@ -199,6 +200,25 @@ export const FloatingChatWidget = () => {
   const recordingStreamRef = useRef(null);
 
   const effectiveEmail = currentUser?.email || '';
+
+  // Dynamic Capsule Scroll Auto-collapse State
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
+  const lastScrollY = useRef(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      if (currentY > 150 && currentY > lastScrollY.current + 8) {
+        setIsScrolledDown(true);
+      } else if (currentY < lastScrollY.current - 8 || currentY <= 80) {
+        setIsScrolledDown(false);
+      }
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // 1. Tải danh sách phòng khi widget được mở
   const loadRooms = useCallback(async () => {
@@ -767,14 +787,14 @@ export const FloatingChatWidget = () => {
                 </>
               ) : (
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/30 shrink-0">
-                    <MessageCircle className="w-4.5 h-4.5" />
+                  <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-sky-400 via-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/30 shrink-0">
+                    <Compass className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-xs text-white leading-tight">Wayfare Messenger</h4>
+                    <h4 className="font-bold text-xs text-white leading-tight">Hỏi đáp chuyến đi</h4>
                     <span className="text-[11px] text-slate-300 mt-0.5 flex items-center gap-1">
                       <Sparkles className="w-3 h-3 text-amber-300" />
-                      <span>Hộp thư & Bạn đồng hành</span>
+                      <span>Trợ lý & Đồng hành 24/7</span>
                     </span>
                   </div>
                 </div>
@@ -1118,49 +1138,76 @@ export const FloatingChatWidget = () => {
         onSelectItinerary={handleSendItinerary}
       />
 
-      {/* Floating Trigger Circle Button with Vibrant Modern Aesthetic */}
+      {/* Dynamic Capsule Launcher Pill */}
       <div className="relative flex items-center justify-end">
-        {/* Tooltip Tag on Hover (Desktop) */}
-        {!isOpen && (
-          <div className="absolute right-full mr-3.5 hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-slate-900/90 text-white text-xs font-semibold tracking-wide shadow-xl shadow-slate-950/25 border border-white/10 whitespace-nowrap opacity-0 group-hover/widget:opacity-100 transition-all duration-300 pointer-events-none translate-x-2 group-hover/widget:translate-x-0 backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Hộp thư & Trò chuyện chuyến đi</span>
-            <Sparkles className="w-3.5 h-3.5 text-amber-300 ml-0.5" />
-          </div>
-        )}
-
         {/* Ambient Glow Aura */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-sky-400 via-blue-600 to-indigo-600 blur-xl opacity-45 group-hover/widget:opacity-85 transition-opacity duration-300 pointer-events-none animate-pulse" />
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-sky-400 via-blue-600 to-indigo-600 blur-xl opacity-35 group-hover/widget:opacity-75 transition-opacity duration-300 pointer-events-none" />
 
-        <button
-          type="button"
-          onClick={handleToggleOpen}
-          className="w-14 h-14 sm:w-[60px] sm:h-[60px] rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-500 text-white flex items-center justify-center shadow-xl shadow-blue-600/35 hover:shadow-2xl hover:shadow-indigo-600/50 hover:scale-108 active:scale-95 transition-all duration-300 cursor-pointer relative ring-4 ring-white backdrop-blur-md"
-          title="Trò chuyện chuyến đi Wayfare"
-          aria-label="Trò chuyện chuyến đi"
-        >
-          {/* Subtle Top Reflection Glass */}
-          <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/35 via-white/5 to-transparent pointer-events-none" />
+        {isOpen ? (
+          /* Khi đang mở: Nút Đóng dạng Capsule tối giản & tinh tế */
+          <button
+            type="button"
+            onClick={handleToggleOpen}
+            className="group/close relative flex items-center gap-2 h-12 px-4.5 rounded-full bg-slate-950/92 hover:bg-slate-900 text-white shadow-xl shadow-slate-950/40 border border-white/20 backdrop-blur-xl transition-all duration-300 cursor-pointer active:scale-95"
+            title="Đóng hộp thư"
+            aria-label="Đóng hộp thư"
+          >
+            <div className="w-6.5 h-6.5 rounded-full bg-white/10 flex items-center justify-center text-slate-200 group-hover/close:bg-white/20 transition-all">
+              <X className="w-4 h-4 stroke-[2.5] group-hover/close:rotate-90 transition-transform duration-300" />
+            </div>
+            <span className="text-xs font-bold text-slate-200">Đóng</span>
+          </button>
+        ) : (
+          /* Khi đóng: Viên thuốc Dynamic Capsule với La bàn du lịch + Text tự thu gọn khi lướt */
+          <button
+            type="button"
+            onClick={handleToggleOpen}
+            className={`group/capsule relative flex items-center gap-2.5 h-13 rounded-full bg-slate-950/92 hover:bg-slate-900 text-white shadow-[0_12px_36px_-6px_rgba(15,23,42,0.45)] hover:shadow-[0_18px_45px_-6px_rgba(37,99,235,0.4)] border border-white/20 hover:border-blue-400/50 backdrop-blur-xl transition-all duration-300 ease-out cursor-pointer active:scale-95 ${
+              isScrolledDown
+                ? 'p-1.5 sm:hover:px-4'
+                : 'px-4'
+            }`}
+            title="Hỏi đáp & Đồng hành chuyến đi Wayfare"
+            aria-label="Hỏi đáp chuyến đi"
+          >
+            {/* Lớp phản quang ánh sáng kính mờ */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 via-indigo-500/15 to-transparent pointer-events-none" />
 
-          {isOpen ? (
-            <X className="w-6 h-6 stroke-[2.5] transition-transform duration-300 rotate-0 hover:rotate-90 drop-shadow-sm" />
-          ) : (
-            <>
-              <div className="relative flex items-center justify-center">
-                <MessageCircle className="w-6.5 h-6.5 stroke-[2.2] drop-shadow-sm" />
-                <span className="absolute -bottom-1 -right-1 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 ring-2 ring-white" />
-                </span>
+            {/* Biểu tượng La bàn dẫn đường du lịch (Compass Emblem) */}
+            <div className="relative w-10 h-10 rounded-full bg-gradient-to-tr from-sky-400 via-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/40 shrink-0 group-hover/capsule:rotate-12 transition-transform duration-300 ring-2 ring-white/30">
+              <Compass className="w-5.5 h-5.5 group-hover/capsule:rotate-45 transition-transform duration-500 drop-shadow-sm" />
+              {/* Radar trạng thái trực tuyến xanh ngọc lục bảo */}
+              <span className="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 ring-2 ring-slate-950" />
+              </span>
+            </div>
+
+            {/* Khối chữ: Tự động thu gọn khi cuộn xuống, mở rộng khi rê chuột */}
+            <div
+              className={`flex flex-col text-left select-none overflow-hidden transition-all duration-300 ${
+                isScrolledDown
+                  ? 'max-w-0 opacity-0 sm:group-hover/capsule:max-w-[170px] sm:group-hover/capsule:opacity-100 sm:group-hover/capsule:pr-1'
+                  : 'max-w-[170px] opacity-100 pr-1'
+              }`}
+            >
+              <div className="flex items-center gap-1.5 whitespace-nowrap">
+                <span className="text-xs font-bold text-white tracking-wide">Hỏi đáp chuyến đi</span>
+                <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse shrink-0" />
               </div>
-              {totalUnread > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-gradient-to-r from-rose-500 via-red-500 to-rose-600 text-white text-[11px] font-black font-mono flex items-center justify-center ring-2 ring-white shadow-lg shadow-rose-500/40 animate-bounce">
-                  {totalUnread > 99 ? '99+' : totalUnread}
-                </span>
-              )}
-            </>
-          )}
-        </button>
+              <span className="text-[10px] text-blue-300 font-medium whitespace-nowrap flex items-center gap-1">
+                <span>Bạn đồng hành 24/7</span>
+              </span>
+            </div>
+
+            {/* Huy hiệu tin nhắn chưa đọc */}
+            {totalUnread > 0 && (
+              <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-gradient-to-r from-rose-500 to-red-600 text-white text-[10px] font-black font-mono flex items-center justify-center ring-2 ring-slate-950 shadow-md shadow-rose-500/40 animate-bounce shrink-0">
+                {totalUnread > 99 ? '99+' : totalUnread}
+              </span>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );
