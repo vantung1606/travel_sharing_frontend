@@ -1,7 +1,33 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
-import { Bell, Sparkles, Heart, MessageCircle, Users, MapPin, ShieldCheck, CheckCheck, Trash2, Filter, Search, ChevronRight, ExternalLink, Clock, Send, PlusCircle, RotateCcw, CheckCircle2, Megaphone, X, Share2, EyeOff, ShieldAlert, Flag } from 'lucide-react';
+import {
+  Bell,
+  Sparkles,
+  Heart,
+  MessageCircle,
+  Users,
+  MapPin,
+  ShieldCheck,
+  CheckCheck,
+  Trash2,
+  Filter,
+  Search,
+  ChevronRight,
+  ExternalLink,
+  Clock,
+  Send,
+  PlusCircle,
+  RotateCcw,
+  CheckCircle2,
+  Megaphone,
+  X,
+  Share2,
+  EyeOff,
+  ShieldAlert,
+  Flag,
+  Inbox
+} from 'lucide-react';
 
 export const NotificationsPage = () => {
   const toast = useToast();
@@ -35,48 +61,48 @@ export const NotificationsPage = () => {
   const [testTargetUrl, setTestTargetUrl] = useState('/itineraries');
   const [isSubmittingTest, setIsSubmittingTest] = useState(false);
 
-  // Icon Resolver
+  // Icon Resolver (Paper-Ink-Clay palette)
   const getTypeMeta = (type) => {
     switch (type) {
       case 'AI_READY':
         return {
           icon: Sparkles,
-          color: 'text-amber-500 bg-amber-50 border-amber-200',
+          color: 'text-amber-800 bg-amber-50 border-amber-300/80',
           badgeText: 'AI Planner',
           actionText: 'Xem Lịch Trình'
         };
       case 'LIKE':
         return {
           icon: Heart,
-          color: 'text-rose-500 bg-rose-50 border-rose-200',
+          color: 'text-rose-700 bg-rose-50 border-rose-300/80',
           badgeText: 'Yêu Thích',
           actionText: 'Xem Bài Viết'
         };
       case 'COMMENT':
         return {
           icon: MessageCircle,
-          color: 'text-sky-500 bg-sky-50 border-sky-200',
+          color: 'text-clay-800 bg-clay-50 border-clay-300/80',
           badgeText: 'Bình Luận',
-          actionText: 'Trả Lời Ngay'
+          actionText: 'Trả Lời'
         };
       case 'COMMENT_REPLY':
         return {
           icon: MessageCircle,
-          color: 'text-sky-500 bg-sky-50 border-sky-200',
+          color: 'text-clay-800 bg-clay-50 border-clay-300/80',
           badgeText: 'Phản Hồi',
           actionText: 'Trả Lời'
         };
       case 'CHAT_MESSAGE':
         return {
           icon: MessageCircle,
-          color: 'text-blue-600 bg-blue-50 border-blue-200',
+          color: 'text-ink-700 bg-[#F8F4EC] border-ink-200/80',
           badgeText: 'Tin Nhắn Mới',
           actionText: 'Vào Trò Chuyện'
         };
       case 'FOLLOW':
         return {
           icon: Users,
-          color: 'text-indigo-600 bg-indigo-50 border-indigo-200',
+          color: 'text-emerald-800 bg-emerald-50 border-emerald-300/80',
           badgeText: 'Người Theo Dõi',
           actionText: 'Xem Cộng Đồng'
         };
@@ -84,70 +110,70 @@ export const NotificationsPage = () => {
       case 'COMMUNITY_SHARE':
         return {
           icon: Share2,
-          color: 'text-sky-600 bg-sky-50 border-sky-200',
+          color: 'text-clay-800 bg-clay-50 border-clay-300/80',
           badgeText: 'Chia Sẻ',
           actionText: 'Xem Bài Viết'
         };
       case 'ITINERARY_SHARED':
         return {
           icon: ExternalLink,
-          color: 'text-indigo-600 bg-indigo-50 border-indigo-200',
+          color: 'text-amber-800 bg-amber-50 border-amber-300/80',
           badgeText: 'Sao Chép Tour',
           actionText: 'Xem Lịch Trình'
         };
       case 'CHAT_INVITE':
         return {
           icon: Users,
-          color: 'text-indigo-500 bg-indigo-50 border-indigo-200',
+          color: 'text-clay-800 bg-clay-50 border-clay-300/80',
           badgeText: 'Nhóm Chuyến Đi',
           actionText: 'Vào Phòng Chat'
         };
       case 'PLACE_APPROVED':
         return {
           icon: MapPin,
-          color: 'text-sky-500 bg-sky-50 border-sky-200',
+          color: 'text-emerald-800 bg-emerald-50 border-emerald-300/80',
           badgeText: 'Địa Điểm',
           actionText: 'Xem Địa Điểm'
         };
       case 'POST_APPROVED':
         return {
           icon: CheckCircle2,
-          color: 'text-sky-600 bg-sky-50 border-sky-200',
+          color: 'text-emerald-800 bg-emerald-50 border-emerald-300/80',
           badgeText: 'Duyệt Bài Viết',
           actionText: 'Xem Bài Viết'
         };
       case 'POST_HIDDEN':
         return {
           icon: EyeOff,
-          color: 'text-amber-600 bg-amber-50 border-amber-200',
+          color: 'text-amber-800 bg-amber-50 border-amber-300/80',
           badgeText: 'Tạm Ẩn Bài',
           actionText: 'Xem Chi Tiết'
         };
       case 'POST_LOCKED':
         return {
           icon: ShieldAlert,
-          color: 'text-rose-600 bg-rose-50 border-rose-200',
+          color: 'text-rose-800 bg-rose-50 border-rose-300/80',
           badgeText: 'Khóa & Cảnh Cáo',
           actionText: 'Xem Chi Tiết'
         };
       case 'REPORT_DISMISSED':
         return {
           icon: ShieldCheck,
-          color: 'text-sky-600 bg-sky-50 border-sky-200',
+          color: 'text-ink-700 bg-[#F8F4EC] border-ink-200/80',
           badgeText: 'Bác Bỏ Báo Cáo',
           actionText: 'Xem Bài Viết'
         };
       case 'POST_DELETED':
         return {
           icon: Trash2,
-          color: 'text-rose-600 bg-rose-50 border-rose-200',
+          color: 'text-rose-800 bg-rose-50 border-rose-300/80',
           badgeText: 'Xóa Bài Viết',
           actionText: 'Chi Tiết'
         };
       case 'REPORT_ALERT':
         return {
           icon: Flag,
-          color: 'text-rose-600 bg-rose-50 border-rose-200',
+          color: 'text-rose-800 bg-rose-50 border-rose-300/80',
           badgeText: 'Báo Cáo Vi Phạm',
           actionText: 'Xử Lý Báo Cáo'
         };
@@ -155,7 +181,7 @@ export const NotificationsPage = () => {
       default:
         return {
           icon: ShieldCheck,
-          color: 'text-sky-600 bg-sky-50 border-sky-200',
+          color: 'text-clay-800 bg-clay-50 border-clay-300/80',
           badgeText: 'Hệ Thống',
           actionText: 'Chi Tiết'
         };
@@ -181,11 +207,11 @@ export const NotificationsPage = () => {
       } else if (activeTab === 'ai') {
         tabMatch = item.type === 'AI_READY';
       } else if (activeTab === 'social') {
-        tabMatch = ['LIKE', 'COMMENT', 'COMMENT_REPLY', 'SHARE', 'COMMUNITY_SHARE'].includes(item.type);
+        tabMatch = ['LIKE', 'COMMENT', 'COMMENT_REPLY', 'SHARE', 'COMMUNITY_SHARE', 'FOLLOW'].includes(item.type);
       } else if (activeTab === 'trips') {
         tabMatch = item.type === 'CHAT_INVITE' || item.type === 'ITINERARY_SHARED';
       } else if (activeTab === 'system') {
-        tabMatch = item.type === 'SYSTEM' || item.type === 'PLACE_APPROVED';
+        tabMatch = item.type === 'SYSTEM' || item.type === 'PLACE_APPROVED' || item.type === 'POST_APPROVED' || item.type === 'POST_HIDDEN' || item.type === 'POST_LOCKED';
       }
 
       // Search matching
@@ -229,7 +255,7 @@ export const NotificationsPage = () => {
 
   const handleMarkAllRead = () => {
     markAllNotificationsAsRead();
-    toast.success('Đã đánh dấu tất cả thông báo là đã đọc! ✓');
+    toast.success('Đã đánh dấu tất cả thông báo là đã đọc!');
   };
 
   const handleDeleteRead = () => {
@@ -273,7 +299,7 @@ export const NotificationsPage = () => {
     setIsRefreshing(true);
     try {
       await fetchNotifications();
-      toast.info('Đã đồng bộ thông báo mới nhất! 🔄');
+      toast.info('Đã đồng bộ thông báo mới nhất từ CSDL! 🔄');
     } catch {
       toast.error('Không thể đồng bộ thông báo.');
     } finally {
@@ -284,73 +310,73 @@ export const NotificationsPage = () => {
   return (
     <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 sm:py-8 space-y-6 animate-fade-in">
       
-      {/* ─── 1. BREADCRUMB & PAGE HEADER ────────────────────────────────────────── */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* ─── 1. BREADCRUMB & PAGE HEADER (Paper-Ink-Clay) ───────────────────────── */}
+      <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="space-y-1.5">
-          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-ink-500 font-bold">
             <span
               onClick={() => setUserTab('home')}
-              className="hover:text-sky-600 transition-colors cursor-pointer"
+              className="hover:text-clay-600 transition-colors cursor-pointer"
             >
               Trang chủ
             </span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-            <span className="text-sky-600 font-bold">Trung tâm Thông Báo</span>
+            <ChevronRight className="w-3 h-3 text-ink-300" />
+            <span className="text-clay-600">Trung tâm Thông Báo</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h1 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">
               Trung Tâm Thông Báo & Cảnh Báo Hành Trình
             </h1>
             {unreadNotificationsCount > 0 ? (
-              <span className="px-3 py-0.5 rounded-full bg-rose-500 text-white font-extrabold text-xs shadow-xs">
+              <span className="px-2.5 py-0.5 rounded-[4px] bg-rose-50 text-rose-800 border border-rose-200 font-mono text-xs font-bold">
                 {unreadNotificationsCount} chưa đọc
               </span>
             ) : (
-              <span className="px-3 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 font-extrabold text-xs">
+              <span className="px-2.5 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 border border-emerald-300 font-mono text-xs font-bold">
                 Đã cập nhật hết
               </span>
             )}
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-500 flex items-center gap-2">
+          <p className="text-xs text-ink-500 flex flex-wrap items-center gap-2">
             <span>Theo dõi các gợi ý thông minh từ AI, tương tác bạn bè và cập nhật trạng thái địa điểm.</span>
             {isNotificationLiveBackend && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">
-                <CheckCircle2 className="w-3 h-3" /> Kết nối MySQL
+              <span className="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.2 rounded-[3px] border border-emerald-300">
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Kết nối MySQL
               </span>
             )}
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5 self-start md:self-center">
+        <div className="flex flex-wrap items-center gap-2 self-start md:self-center">
           <button
             type="button"
             onClick={handleManualRefresh}
             disabled={isRefreshing}
-            className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-sky-600 transition-colors shadow-xs"
+            className="p-2 rounded-[5px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-[#F3EFE6] text-ink-700 transition-colors shadow-xs cursor-pointer disabled:opacity-50"
             title="Đồng bộ lại thông báo từ CSDL"
           >
-            <RotateCcw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-sky-600' : ''}`} />
+            <RotateCcw className={`w-3.5 h-3.5 text-clay-600 ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
 
           <button
             type="button"
             onClick={() => setIsTestDispatcherOpen(!isTestDispatcherOpen)}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition-all shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[5px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-[#F3EFE6] text-ink-700 font-serif font-bold text-xs transition-colors shadow-xs cursor-pointer"
           >
-            <PlusCircle className="w-4 h-4 text-sky-600" />
-            <span>Gửi thông báo / Phát tin</span>
+            <PlusCircle className="w-3.5 h-3.5 text-clay-600" />
+            <span>Phát tin / Thử nghiệm</span>
           </button>
 
           {unreadNotificationsCount > 0 && (
             <button
               type="button"
               onClick={handleMarkAllRead}
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold transition-all shadow-sm shadow-sky-600/20"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white font-serif font-bold text-xs transition-colors shadow-xs cursor-pointer"
             >
-              <CheckCheck className="w-4 h-4" />
+              <CheckCheck className="w-3.5 h-3.5" />
               <span>Đọc tất cả</span>
             </button>
           )}
@@ -358,70 +384,70 @@ export const NotificationsPage = () => {
           <button
             type="button"
             onClick={handleDeleteRead}
-            className="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-500 hover:text-rose-600 transition-colors shadow-xs"
+            className="p-2 rounded-[5px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-rose-50 text-ink-500 hover:text-rose-700 transition-colors shadow-xs cursor-pointer"
             title="Dọn dẹp thông báo đã đọc"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
-      {/* ─── 2. LIVE PUSH / TEST NOTIFICATION DISPATCHER CARD ─────────────────── */}
+      {/* ─── 2. LIVE PUSH / DISPATCHER CARD ────────────────────────────────────── */}
       {isTestDispatcherOpen && (
-        <div className="bg-gradient-to-br from-sky-50 via-white to-amber-50/30 rounded-3xl p-6 border-2 border-sky-300/80 shadow-md animate-in fade-in slide-in-from-top-3 duration-200 space-y-4">
-          <div className="flex items-center justify-between border-b border-sky-100 pb-3">
+        <div className="bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 shadow-xs animate-in fade-in slide-in-from-top-2 duration-150 space-y-4">
+          <div className="flex items-center justify-between border-b border-ink-200/80 pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 rounded-[4px] bg-clay-100 text-clay-700 flex items-center justify-center font-bold">
                 <Send className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-display font-extrabold text-sm sm:text-base text-slate-900">
-                  Khu vực kiểm thử & Bắn thông báo thật (Live Dispatcher)
+                <h3 className="font-serif font-bold text-sm text-ink-800">
+                  Khu vực thử nghiệm & Phát thông báo hệ thống (Live Dispatcher)
                 </h3>
-                <p className="text-xs text-slate-500">
-                  Gửi trực tiếp thông báo mới vào CSDL Backend và hiển thị ngay trên màn hình.
+                <p className="font-mono text-[10px] text-ink-500">
+                  Gửi trực tiếp thông báo mới vào CSDL Backend và kích hoạt hiển thị thời gian thực.
                 </p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => setIsTestDispatcherOpen(false)}
-              className="w-8 h-8 rounded-full bg-white hover:bg-slate-100 text-slate-500 flex items-center justify-center border border-slate-200"
+              className="w-7 h-7 rounded-[4px] bg-[#F8F4EC] hover:bg-[#EBE5D8] text-ink-500 flex items-center justify-center border border-ink-200/80 cursor-pointer"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 border-b border-sky-100 pb-3">
+          <div className="flex flex-wrap items-center gap-2 border-b border-ink-200/80 pb-3">
             <button
               type="button"
               onClick={() => setDispatchMode('test')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-[4px] text-xs font-serif transition-colors flex items-center gap-1.5 cursor-pointer ${
                 dispatchMode === 'test'
-                  ? 'bg-sky-600 text-white shadow-xs'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                  ? 'bg-clay-600 text-white font-bold shadow-xs'
+                  : 'bg-[#F8F4EC] text-ink-700 border border-ink-200/80 hover:bg-[#EBE5D8] font-medium'
               }`}
             >
-              <Send className="w-3.5 h-3.5" />
+              <Send className="w-3 h-3" />
               <span>Thông báo thử nghiệm (Cá nhân)</span>
             </button>
             <button
               type="button"
               onClick={() => setDispatchMode('broadcast')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-[4px] text-xs font-serif transition-colors flex items-center gap-1.5 cursor-pointer ${
                 dispatchMode === 'broadcast'
-                  ? 'bg-amber-600 text-white shadow-xs'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                  ? 'bg-clay-600 text-white font-bold shadow-xs'
+                  : 'bg-[#F8F4EC] text-ink-700 border border-ink-200/80 hover:bg-[#EBE5D8] font-medium'
               }`}
             >
-              <Megaphone className="w-3.5 h-3.5" />
+              <Megaphone className="w-3 h-3" />
               <span>Phát thông báo toàn hệ thống (Broadcast All)</span>
             </button>
           </div>
 
-          <form onSubmit={handleCreateTestPush} className="grid grid-cols-1 md:grid-cols-12 gap-4">
-            <div className="md:col-span-4 space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Loại thông báo (Type)</label>
+          <form onSubmit={handleCreateTestPush} className="grid grid-cols-1 md:grid-cols-12 gap-3.5 text-xs">
+            <div className="md:col-span-4 space-y-1">
+              <label className="font-serif font-bold text-ink-700 block">Loại thông báo (Type)</label>
               <select
                 value={testType}
                 onChange={(e) => {
@@ -443,7 +469,7 @@ export const NotificationsPage = () => {
                     setTestTargetUrl('/messages');
                   }
                 }}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-800 outline-none focus:border-sky-500"
+                className="w-full rounded-[5px] border border-ink-200/80 bg-[#F8F4EC] px-3 py-2 text-ink-800 font-serif font-semibold outline-none focus:border-clay-600 cursor-pointer"
               >
                 <option value="AI_READY">✨ AI_READY (Trợ lý AI tạo lịch trình)</option>
                 <option value="SHARE">🔗 SHARE (Chia sẻ bài viết)</option>
@@ -456,57 +482,53 @@ export const NotificationsPage = () => {
             </div>
 
             {dispatchMode === 'test' && (
-              <div className="md:col-span-4 space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Tên người gửi (Actor Name)</label>
+              <div className="md:col-span-4 space-y-1">
+                <label className="font-serif font-bold text-ink-700 block">Tên người gửi (Actor Name)</label>
                 <input
                   type="text"
                   value={testActorName}
                   onChange={(e) => setTestActorName(e.target.value)}
                   required
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none focus:border-sky-500"
+                  className="w-full rounded-[5px] border border-ink-200/80 bg-[#F8F4EC] px-3 py-2 text-ink-800 outline-none focus:border-clay-600 font-sans"
                 />
               </div>
             )}
 
-            <div className={`${dispatchMode === 'test' ? 'md:col-span-4' : 'md:col-span-8'} space-y-1.5`}>
-              <label className="text-xs font-bold text-slate-700">Đường dẫn điều hướng (Target URL)</label>
+            <div className={`${dispatchMode === 'test' ? 'md:col-span-4' : 'md:col-span-8'} space-y-1`}>
+              <label className="font-serif font-bold text-ink-700 block">Đường dẫn điều hướng (Target URL)</label>
               <input
                 type="text"
                 value={testTargetUrl}
                 onChange={(e) => setTestTargetUrl(e.target.value)}
                 required
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none focus:border-sky-500"
+                className="w-full rounded-[5px] border border-ink-200/80 bg-[#F8F4EC] px-3 py-2 text-ink-800 outline-none focus:border-clay-600 font-sans"
               />
             </div>
 
-            <div className="md:col-span-12 space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">Nội dung thông báo (Message)</label>
+            <div className="md:col-span-12 space-y-1">
+              <label className="font-serif font-bold text-ink-700 block">Nội dung thông báo (Message)</label>
               <input
                 type="text"
                 value={testMessage}
                 onChange={(e) => setTestMessage(e.target.value)}
                 required
                 placeholder={dispatchMode === 'broadcast' ? 'Nhập thông báo gửi đến toàn thể cộng đồng du khách Wayfare...' : 'Nhập nội dung thông báo...'}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-sky-500"
+                className="w-full rounded-[5px] border border-ink-200/80 bg-[#F8F4EC] px-3.5 py-2 text-ink-800 outline-none focus:border-clay-600 font-sans"
               />
             </div>
 
-            <div className="md:col-span-12 flex justify-end gap-2 pt-1">
+            <div className="md:col-span-12 flex justify-end gap-2 pt-1 border-t border-ink-200/80">
               <button
                 type="button"
                 onClick={() => setIsTestDispatcherOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-xs hover:bg-slate-50"
+                className="px-3.5 py-2 rounded-[5px] border border-ink-200/80 bg-[#F8F4EC] text-ink-700 font-serif font-bold hover:bg-[#EBE5D8] cursor-pointer"
               >
-                Đóng
+                Hủy bỏ
               </button>
               <button
                 type="submit"
                 disabled={isSubmittingTest}
-                className={`inline-flex items-center gap-2 px-5 py-2 rounded-xl text-white font-bold text-xs shadow-sm transition-all disabled:opacity-50 ${
-                  dispatchMode === 'broadcast'
-                    ? 'bg-amber-600 hover:bg-amber-700'
-                    : 'bg-sky-600 hover:bg-sky-700 shadow-sky-600/20'
-                }`}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white font-serif font-bold shadow-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 {dispatchMode === 'broadcast' ? <Megaphone className="w-3.5 h-3.5" /> : <Send className="w-3.5 h-3.5" />}
                 <span>
@@ -523,9 +545,9 @@ export const NotificationsPage = () => {
       )}
 
       {/* ─── 3. FILTER TABS & SEARCH BAR ────────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-[#FFFDF8] rounded-[6px] p-3 border border-ink-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 md:pb-0">
+        <div className="flex items-center gap-1.5 bg-[#EBE5D8] p-1 rounded-[5px] overflow-x-auto">
           {[
             { id: 'all', label: 'Tất cả' },
             { id: 'unread', label: 'Chưa đọc' },
@@ -538,10 +560,10 @@ export const NotificationsPage = () => {
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id)}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+              className={`px-3 py-1.5 rounded-[4px] font-serif text-xs transition-colors whitespace-nowrap cursor-pointer ${
                 activeTab === tab.id
-                  ? 'bg-sky-600 text-white shadow-xs'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                  ? 'bg-[#FFFDF8] text-ink-800 font-bold shadow-xs border border-ink-200/80'
+                  : 'text-ink-600 hover:text-ink-900 hover:bg-[#E2DACB] font-medium'
               }`}
             >
               {tab.label}
@@ -550,14 +572,14 @@ export const NotificationsPage = () => {
         </div>
 
         {/* Search Filter */}
-        <div className="relative min-w-0 md:w-64 shrink-0">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+        <div className="relative min-w-0 md:w-72 shrink-0">
+          <Search className="w-3.5 h-3.5 text-ink-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm theo từ khóa, người gửi..."
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 pl-9 pr-3 py-1.5 text-xs text-slate-800 outline-none focus:border-sky-500 focus:bg-white"
+            className="w-full rounded-[5px] border border-ink-200/80 bg-[#F8F4EC] pl-8 pr-3 py-1.5 text-xs text-ink-800 placeholder:text-ink-400 outline-none focus:border-clay-600 focus:bg-[#FFFDF8] font-sans"
           />
         </div>
       </div>
@@ -572,10 +594,10 @@ export const NotificationsPage = () => {
             return (
               <div
                 key={item.id}
-                className={`bg-white rounded-2xl p-4 sm:p-5 border transition-all hover:shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 group relative ${
+                className={`bg-[#FFFDF8] rounded-[6px] p-4 sm:p-5 border transition-colors flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative shadow-2xs ${
                   !item.isRead
-                    ? 'border-sky-200/90 bg-sky-50/20 shadow-xs'
-                    : 'border-slate-200/80'
+                    ? 'border-clay-300/80 bg-clay-50/15 border-l-4 border-l-clay-600'
+                    : 'border-ink-200/80 hover:bg-[#FDFBF7]'
                 }`}
               >
                 {/* Left Side: Avatar & Message Details */}
@@ -583,18 +605,18 @@ export const NotificationsPage = () => {
                   {/* Avatar + Badge */}
                   <div className="relative shrink-0 mt-0.5">
                     {item.type === 'SYSTEM' || !item.actorId ? (
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-500 to-sky-600 text-white flex items-center justify-center ring-2 ring-sky-100 shadow-xs">
-                        <ShieldCheck className="w-6 h-6 text-white" />
+                      <div className="w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center shadow-xs">
+                        <ShieldCheck className="w-5 h-5 text-clay-600" />
                       </div>
                     ) : (
                       <>
                         <img
                           src={item.actorAvatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'}
                           alt={item.actorName || 'User'}
-                          className="w-12 h-12 rounded-2xl object-cover ring-2 ring-slate-100"
+                          className="w-11 h-11 rounded-[5px] object-cover border border-ink-200/80"
                         />
-                        <span className={`absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full border-2 border-white shadow-xs flex items-center justify-center ${meta.color}`}>
-                          <Icon className="w-3 h-3" />
+                        <span className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-[3px] border border-ink-200/80 shadow-xs flex items-center justify-center ${meta.color}`}>
+                          <Icon className="w-2.5 h-2.5" />
                         </span>
                       </>
                     )}
@@ -603,33 +625,33 @@ export const NotificationsPage = () => {
                   {/* Main Info */}
                   <div className="space-y-1 min-w-0 pr-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-extrabold text-xs sm:text-sm text-slate-900">
+                      <span className="font-serif font-bold text-xs sm:text-sm text-ink-800">
                         {item.type === 'SYSTEM' || !item.actorId ? 'Hệ Thống Wayfare (WanderAI Shield)' : item.actorName}
                       </span>
                       {item.type !== 'SYSTEM' && item.actorId && item.actorHandle && (
-                        <span className="text-[11px] font-semibold text-slate-400">
+                        <span className="font-mono text-[10px] text-ink-400">
                           {item.actorHandle}
                         </span>
                       )}
-                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold border ${meta.color}`}>
+                      <span className={`px-1.5 py-0.2 rounded-[3px] font-mono text-[9px] font-bold border ${meta.color}`}>
                         {meta.badgeText}
                       </span>
                       {!item.isRead && (
-                        <span className="w-2 h-2 rounded-full bg-sky-600 inline-block"></span>
+                        <span className="w-1.5 h-1.5 rounded-full bg-clay-600 inline-block animate-pulse" title="Chưa đọc"></span>
                       )}
                     </div>
 
-                    <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+                    <p className="text-xs sm:text-sm text-ink-700 leading-relaxed font-sans">
                       {item.message}
                     </p>
 
-                    <div className="flex items-center gap-3 text-[11px] text-slate-400 pt-0.5">
+                    <div className="flex items-center gap-2 font-mono text-[10px] text-ink-400 pt-0.5">
                       <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
+                        <Clock className="w-2.5 h-2.5" />
                         {formatRelativeTime(item.createdAt)}
                       </span>
                       <span>•</span>
-                      <span className="font-mono text-[10px]">
+                      <span>
                         {new Date(item.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {new Date(item.createdAt).toLocaleDateString('vi-VN')}
                       </span>
                     </div>
@@ -641,10 +663,10 @@ export const NotificationsPage = () => {
                   <button
                     type="button"
                     onClick={() => handleActionClick(item)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 font-bold text-xs transition-colors shadow-xs"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-100 text-clay-700 hover:text-clay-800 font-serif font-bold text-xs border border-ink-200/80 transition-colors shadow-2xs cursor-pointer"
                   >
                     <span>{meta.actionText}</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink className="w-3 h-3" />
                   </button>
 
                   <button
@@ -656,14 +678,14 @@ export const NotificationsPage = () => {
                       }
                     }}
                     disabled={item.isRead}
-                    className={`p-2 rounded-xl border text-xs transition-colors ${
+                    className={`w-7 h-7 rounded-[4px] border flex items-center justify-center transition-colors cursor-pointer ${
                       item.isRead
-                        ? 'border-transparent text-slate-300 cursor-default'
-                        : 'border-slate-200 bg-white text-slate-600 hover:text-sky-600 shadow-xs'
+                        ? 'border-transparent text-ink-300 cursor-default'
+                        : 'border-ink-200/80 bg-[#FFFDF8] hover:bg-[#F8F4EC] text-ink-600 hover:text-emerald-700 shadow-2xs'
                     }`}
                     title={item.isRead ? 'Đã đọc' : 'Đánh dấu đã đọc'}
                   >
-                    <CheckCheck className="w-4 h-4" />
+                    <CheckCheck className="w-3.5 h-3.5" />
                   </button>
 
                   <button
@@ -672,10 +694,10 @@ export const NotificationsPage = () => {
                       deleteNotification(item.id);
                       toast.info('Đã xóa thông báo.');
                     }}
-                    className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors shadow-xs"
+                    className="w-7 h-7 rounded-[4px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-rose-50 text-ink-400 hover:text-rose-700 flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
                     title="Xóa thông báo này"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
@@ -683,16 +705,16 @@ export const NotificationsPage = () => {
           })
         ) : (
           /* Empty state */
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200/80 shadow-xs space-y-4">
-            <div className="w-16 h-16 rounded-3xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto shadow-inner">
-              <Bell className="w-8 h-8" />
+          <div className="bg-[#FFFDF8] rounded-[6px] p-12 text-center border border-ink-200/80 shadow-xs space-y-3">
+            <div className="w-12 h-12 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-600 flex items-center justify-center mx-auto shadow-2xs">
+              <Inbox className="w-6 h-6" />
             </div>
             <div className="space-y-1">
-              <h3 className="font-display font-extrabold text-base text-slate-800">
+              <h3 className="font-display font-black text-base text-ink-800">
                 Không tìm thấy thông báo nào
               </h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                Không có thông báo phù hợp với bộ lọc hiện tại. Thử chọn danh mục khác hoặc bấm nút "Gửi thông báo thật / Test" ở trên.
+              <p className="text-xs text-ink-400 max-w-sm mx-auto">
+                Không có thông báo phù hợp với bộ lọc hiện tại. Thử chọn danh mục khác hoặc bấm nút "Phát tin / Thử nghiệm" ở trên.
               </p>
             </div>
             <button
@@ -701,9 +723,9 @@ export const NotificationsPage = () => {
                 setActiveTab('all');
                 setSearchQuery('');
               }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[5px] bg-[#F8F4EC] hover:bg-[#EBE5D8] text-ink-700 font-serif font-bold text-xs border border-ink-200/80 transition-colors cursor-pointer"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
+              <RotateCcw className="w-3.5 h-3.5 text-clay-600" />
               <span>Xem tất cả thông báo</span>
             </button>
           </div>
@@ -714,3 +736,4 @@ export const NotificationsPage = () => {
   );
 };
 
+export default NotificationsPage;
