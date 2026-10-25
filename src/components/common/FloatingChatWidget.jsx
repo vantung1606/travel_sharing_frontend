@@ -201,25 +201,6 @@ export const FloatingChatWidget = () => {
 
   const effectiveEmail = currentUser?.email || '';
 
-  // Dynamic Capsule Scroll Auto-collapse State
-  const [isScrolledDown, setIsScrolledDown] = useState(false);
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      if (currentY > 150 && currentY > lastScrollY.current + 8) {
-        setIsScrolledDown(true);
-      } else if (currentY < lastScrollY.current - 8 || currentY <= 80) {
-        setIsScrolledDown(false);
-      }
-      lastScrollY.current = currentY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   // 1. Tải danh sách phòng khi widget được mở
   const loadRooms = useCallback(async () => {
     if (!isLoggedIn) return;
@@ -1138,76 +1119,38 @@ export const FloatingChatWidget = () => {
         onSelectItinerary={handleSendItinerary}
       />
 
-      {/* Dynamic Capsule Launcher Pill */}
+      {/* Compact Minimalist Trigger Button */}
       <div className="relative flex items-center justify-end">
-        {/* Ambient Glow Aura */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-sky-400 via-blue-600 to-indigo-600 blur-xl opacity-35 group-hover/widget:opacity-75 transition-opacity duration-300 pointer-events-none" />
-
-        {isOpen ? (
-          /* Khi đang mở: Nút Đóng dạng Capsule tối giản & tinh tế */
-          <button
-            type="button"
-            onClick={handleToggleOpen}
-            className="group/close relative flex items-center gap-2 h-12 px-4.5 rounded-full bg-slate-950/92 hover:bg-slate-900 text-white shadow-xl shadow-slate-950/40 border border-white/20 backdrop-blur-xl transition-all duration-300 cursor-pointer active:scale-95"
-            title="Đóng hộp thư"
-            aria-label="Đóng hộp thư"
-          >
-            <div className="w-6.5 h-6.5 rounded-full bg-white/10 flex items-center justify-center text-slate-200 group-hover/close:bg-white/20 transition-all">
-              <X className="w-4 h-4 stroke-[2.5] group-hover/close:rotate-90 transition-transform duration-300" />
-            </div>
-            <span className="text-xs font-bold text-slate-200">Đóng</span>
-          </button>
-        ) : (
-          /* Khi đóng: Viên thuốc Dynamic Capsule với La bàn du lịch + Text tự thu gọn khi lướt */
-          <button
-            type="button"
-            onClick={handleToggleOpen}
-            className={`group/capsule relative flex items-center gap-2.5 h-13 rounded-full bg-slate-950/92 hover:bg-slate-900 text-white shadow-[0_12px_36px_-6px_rgba(15,23,42,0.45)] hover:shadow-[0_18px_45px_-6px_rgba(37,99,235,0.4)] border border-white/20 hover:border-blue-400/50 backdrop-blur-xl transition-all duration-300 ease-out cursor-pointer active:scale-95 ${
-              isScrolledDown
-                ? 'p-1.5 sm:hover:px-4'
-                : 'px-4'
-            }`}
-            title="Hỏi đáp & Đồng hành chuyến đi Wayfare"
-            aria-label="Hỏi đáp chuyến đi"
-          >
-            {/* Lớp phản quang ánh sáng kính mờ */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 via-indigo-500/15 to-transparent pointer-events-none" />
-
-            {/* Biểu tượng La bàn dẫn đường du lịch (Compass Emblem) */}
-            <div className="relative w-10 h-10 rounded-full bg-gradient-to-tr from-sky-400 via-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/40 shrink-0 group-hover/capsule:rotate-12 transition-transform duration-300 ring-2 ring-white/30">
-              <Compass className="w-5.5 h-5.5 group-hover/capsule:rotate-45 transition-transform duration-500 drop-shadow-sm" />
-              {/* Radar trạng thái trực tuyến xanh ngọc lục bảo */}
-              <span className="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-400 ring-2 ring-slate-950" />
-              </span>
-            </div>
-
-            {/* Khối chữ: Tự động thu gọn khi cuộn xuống, mở rộng khi rê chuột */}
-            <div
-              className={`flex flex-col text-left select-none overflow-hidden transition-all duration-300 ${
-                isScrolledDown
-                  ? 'max-w-0 opacity-0 sm:group-hover/capsule:max-w-[170px] sm:group-hover/capsule:opacity-100 sm:group-hover/capsule:pr-1'
-                  : 'max-w-[170px] opacity-100 pr-1'
-              }`}
-            >
-              <div className="flex items-center gap-1.5 whitespace-nowrap">
-                <span className="text-xs font-bold text-white tracking-wide">Hỏi đáp chuyến đi</span>
-                <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse shrink-0" />
-              </div>
-              <span className="text-[10px] text-blue-300 font-medium whitespace-nowrap flex items-center gap-1">
-                <span>Bạn đồng hành 24/7</span>
-              </span>
-            </div>
-
-            {/* Huy hiệu tin nhắn chưa đọc */}
-            {totalUnread > 0 && (
-              <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-gradient-to-r from-rose-500 to-red-600 text-white text-[10px] font-black font-mono flex items-center justify-center ring-2 ring-slate-950 shadow-md shadow-rose-500/40 animate-bounce shrink-0">
-                {totalUnread > 99 ? '99+' : totalUnread}
-              </span>
-            )}
-          </button>
+        {/* Subtle Tooltip on Desktop Hover */}
+        {!isOpen && (
+          <div className="absolute right-full mr-2.5 hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/90 text-white text-[11px] font-medium shadow-md border border-white/10 whitespace-nowrap opacity-0 group-hover/widget:opacity-100 transition-opacity duration-200 pointer-events-none backdrop-blur-xs">
+            <span>Hỏi đáp & Trò chuyện</span>
+          </div>
         )}
+
+        <button
+          type="button"
+          onClick={handleToggleOpen}
+          className="w-11 h-11 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white flex items-center justify-center shadow-md shadow-blue-600/25 hover:shadow-lg hover:shadow-blue-600/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer relative ring-2 ring-white shrink-0"
+          title="Hỏi đáp & Trò chuyện Wayfare"
+          aria-label="Trò chuyện chuyến đi"
+        >
+          {isOpen ? (
+            <X className="w-4.5 h-4.5 stroke-[2.2] transition-transform duration-200 rotate-0 hover:rotate-90" />
+          ) : (
+            <>
+              <div className="relative flex items-center justify-center">
+                <Compass className="w-5 h-5 stroke-[2] drop-shadow-xs" />
+                <span className="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-blue-600" />
+              </div>
+              {totalUnread > 0 && (
+                <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold font-mono flex items-center justify-center ring-1.5 ring-white shadow-xs">
+                  {totalUnread > 99 ? '99+' : totalUnread}
+                </span>
+              )}
+            </>
+          )}
+        </button>
       </div>
     </div>
   );
