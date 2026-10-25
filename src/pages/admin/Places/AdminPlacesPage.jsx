@@ -156,7 +156,7 @@ export const AdminPlacesPage = () => {
     }
   };
 
-  // Quy trình Badge "Xác thực": cấp/gỡ cờ is_verified_host ngay từ bảng (PHẦN P1)
+  // Badge "Xác thực": cấp/gỡ cờ is_verified_host ngay từ bảng
   const handleToggleVerified = async (place) => {
     setIsSubmitting(true);
     try {
@@ -235,7 +235,7 @@ export const AdminPlacesPage = () => {
     const hasDelimiter = trimmedAddr.includes('-') || trimmedAddr.includes(',') || trimmedAddr.includes('/');
     const hasAdminLevel = /quận|huyện|phường|xã|thị xã|tp|thành phố/i.test(trimmedAddr);
     if (!hasDelimiter && !hasAdminLevel && trimmedAddr.length < 16) {
-      toast.warning('⚠️ Địa chỉ chưa đủ cụ thể! Không được chỉ ghi tên đường cộc lốc như "202 Chương Dương". Vui lòng ghi đầy đủ: Số nhà/Đường - Phường/Quận/Huyện - Tỉnh/Thành phố (Ví dụ: 202 Chương Dương - Sơn Trà - Đà Nẵng).');
+      toast.warning('⚠️ Địa chỉ chưa đủ cụ thể! Vui lòng ghi đầy đủ: Số nhà/Đường - Phường/Quận/Huyện - Tỉnh/Thành phố.');
       return;
     }
 
@@ -303,27 +303,27 @@ export const AdminPlacesPage = () => {
     : '4.8';
 
   return (
-    <div className="space-y-6 pb-12 animate-fade-in">
+    <div className="space-y-6 pb-12 animate-in fade-in duration-200">
       
       {/* ─── 1. BREADCRUMB & HEADER ACTION TOOLBAR ─────────────────────────────── */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-        <div className="space-y-1.5">
-          <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+      <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <nav className="flex items-center gap-2 text-xs font-semibold text-ink-400">
             <span>Quản trị hệ thống</span>
-            <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-            <span className="text-sky-600 font-bold">Địa điểm & Điểm tham quan</span>
+            <ChevronRight className="w-3.5 h-3.5 text-ink-300" />
+            <span className="text-clay-700 font-bold">Địa điểm & Điểm tham quan</span>
           </nav>
           <div className="flex items-center gap-3 flex-wrap">
-            <h1 className="font-display text-2xl font-bold text-slate-900 tracking-tight">
+            <h1 className="font-display text-2xl sm:text-3xl font-black text-ink-800 tracking-tight">
               Quản lý Địa điểm & Phê duyệt Điểm Đến
             </h1>
-            <span className="px-2.5 py-1 rounded-lg bg-sky-50 text-sky-700 font-semibold text-xs border border-sky-100 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></span>
-              Đồng bộ dữ liệu thời gian thực
+            <span className="px-2.5 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-700 font-bold text-xs border border-ink-200/80 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+              Đồng bộ CSDL thực tế
             </span>
           </div>
-          <p className="text-xs text-slate-600">
-            Hệ thống đang quản lý <strong className="text-slate-900 font-bold">{allPlaces.length}</strong> địa điểm du lịch, trong đó có <strong className="text-amber-600 font-bold">{pendingPlaces.length}</strong> yêu cầu gửi lên đang chờ kiểm duyệt.
+          <p className="text-xs text-ink-400">
+            Hệ thống đang quản lý <strong className="text-ink-800 font-bold">{allPlaces.length}</strong> địa điểm du lịch, trong đó có <strong className="text-clay-700 font-bold">{pendingPlaces.length}</strong> yêu cầu gửi lên đang chờ kiểm duyệt.
           </p>
         </div>
 
@@ -333,17 +333,17 @@ export const AdminPlacesPage = () => {
             type="button"
             onClick={() => loadData(true)}
             disabled={isLoading}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs border border-slate-200/80 shadow-xs transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-[5px] bg-[#FFFDF8] hover:bg-[#F8F4EC] text-ink-700 font-bold text-xs border border-ink-200/80 transition-colors cursor-pointer disabled:opacity-50"
             title="Làm mới dữ liệu từ CSDL"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-slate-500 ${isLoading ? 'animate-spin text-sky-600' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-ink-400 ${isLoading ? 'animate-spin text-clay-600' : ''}`} />
             <span>{isLoading ? 'Đang tải...' : 'Làm mới CSDL'}</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs shadow-xs transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-2 px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs border border-clay-600 transition-colors cursor-pointer"
             title="Thêm địa điểm mới"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
@@ -353,93 +353,93 @@ export const AdminPlacesPage = () => {
       </div>
 
       {/* ─── 2. 4 METRIC CARDS GRID ───────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         
         {/* Metric 1: Pending Moderation */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all space-y-3">
+        <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
-            <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shadow-2xs">
-              <Clock className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
+              <Clock className="w-4 h-4" />
             </div>
             {pendingPlaces.length > 0 ? (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200 animate-pulse">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-rose-50 text-rose-800 text-[10px] font-bold border border-rose-200 animate-pulse">
                 Cần xử lý gấp
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-100">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
                 Đã xử lý hết
               </span>
             )}
           </div>
           <div>
-            <span className="text-xs text-slate-500 font-semibold block">Địa điểm chờ phê duyệt</span>
+            <span className="text-xs text-ink-400 font-medium block">Địa điểm chờ phê duyệt</span>
             <div className="flex items-baseline gap-2 mt-1">
-              <span className="font-display text-2xl font-extrabold text-amber-600">{pendingPlaces.length}</span>
-              <span className="text-xs text-slate-400 font-medium">yêu cầu mới</span>
+              <span className="font-display text-3xl font-black text-clay-700">{pendingPlaces.length}</span>
+              <span className="text-xs text-ink-400 font-medium">yêu cầu mới</span>
             </div>
-            <p className="text-xs text-slate-400 mt-2">Được gửi từ chủ quán & cộng đồng</p>
+            <p className="text-[11px] text-ink-400 mt-2">Được gửi từ chủ quán & cộng đồng</p>
           </div>
         </div>
 
         {/* Metric 2: Active Places */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all space-y-3">
+        <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
-            <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-2xs">
-              <ShieldCheck className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-emerald-700 flex items-center justify-center">
+              <ShieldCheck className="w-4 h-4" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-100">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
               Đang công khai
             </span>
           </div>
           <div>
-            <span className="text-xs text-slate-500 font-semibold block">Địa điểm chính thức (Active)</span>
+            <span className="text-xs text-ink-400 font-medium block">Địa điểm chính thức (Active)</span>
             <div className="flex items-baseline gap-2 mt-1">
-              <span className="font-display text-2xl font-extrabold text-slate-900">{totalActive}</span>
-              <span className="text-xs text-slate-400 font-medium">điểm đến</span>
+              <span className="font-display text-3xl font-black text-ink-800">{totalActive}</span>
+              <span className="text-xs text-ink-400 font-medium">điểm đến</span>
             </div>
-            <p className="text-xs text-slate-400 mt-2">Hiển thị cho du khách trên bản đồ</p>
+            <p className="text-[11px] text-ink-400 mt-2">Hiển thị cho du khách trên bản đồ</p>
           </div>
         </div>
 
         {/* Metric 3: City Coverage */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all space-y-3">
+        <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
-            <div className="w-11 h-11 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shadow-2xs">
-              <Compass className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
+              <Compass className="w-4 h-4" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-sky-50 text-sky-700 text-xs font-semibold border border-sky-100">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-700 text-[10px] font-bold border border-ink-200/80">
               Toàn quốc
             </span>
           </div>
           <div>
-            <span className="text-xs text-slate-500 font-semibold block">Độ phủ sóng địa lý</span>
+            <span className="text-xs text-ink-400 font-medium block">Độ phủ sóng địa lý</span>
             <div className="flex items-baseline gap-2 mt-1">
-              <span className="font-display text-2xl font-extrabold text-slate-900">{dynamicCities.length}</span>
-              <span className="text-xs text-slate-400 font-medium">tỉnh thành</span>
+              <span className="font-display text-3xl font-black text-ink-800">{dynamicCities.length}</span>
+              <span className="text-xs text-ink-400 font-medium">tỉnh thành</span>
             </div>
-            <p className="text-xs text-slate-400 mt-2">Trải dài khắp 3 miền Bắc - Trung - Nam</p>
+            <p className="text-[11px] text-ink-400 mt-2">Trải dài khắp 3 miền Bắc - Trung - Nam</p>
           </div>
         </div>
 
         {/* Metric 4: Average Rating */}
-        <div className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs hover:shadow-md transition-all space-y-3">
+        <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
-            <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center shadow-2xs">
-              <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+            <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-amber-600 flex items-center justify-center">
+              <Star className="w-4 h-4 fill-amber-300" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-700 text-xs font-semibold border border-amber-200">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-amber-50 text-amber-800 text-[10px] font-bold border border-amber-200">
               Chất lượng cao
             </span>
           </div>
           <div>
-            <span className="text-xs text-slate-500 font-semibold block">Đánh giá trung bình</span>
+            <span className="text-xs text-ink-400 font-medium block">Đánh giá trung bình</span>
             <div className="flex items-baseline gap-2 mt-1">
-              <span className="font-display text-2xl font-extrabold text-slate-900 flex items-center gap-1">
-                {avgRating} <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span className="font-display text-3xl font-black text-ink-800 flex items-center gap-1">
+                {avgRating} <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
               </span>
-              <span className="text-xs text-slate-400 font-medium">/ 5.0</span>
+              <span className="text-xs text-ink-400 font-medium">/ 5.0</span>
             </div>
-            <p className="text-xs text-slate-400 mt-2">Dựa trên đánh giá từ cộng đồng du khách</p>
+            <p className="text-[11px] text-ink-400 mt-2">Dựa trên nhận xét từ cộng đồng du khách</p>
           </div>
         </div>
 
@@ -448,25 +448,25 @@ export const AdminPlacesPage = () => {
       {/* ─── 3. STATUS TABS & SMART SEARCH / FILTER BAR ───────────────────────── */}
       <div className="space-y-3">
         {/* Status Tabs */}
-        <div className="inline-flex items-center p-1 bg-slate-100/90 rounded-xl border border-slate-200/60 shrink-0 text-xs font-semibold overflow-x-auto max-w-full">
+        <div className="inline-flex items-center p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80 shrink-0 text-xs font-semibold overflow-x-auto max-w-full">
           {[
-            { label: 'Đang hoạt động', count: totalActive, badgeBg: 'bg-emerald-50 text-emerald-700 border border-emerald-200' },
-            { label: 'Chờ duyệt', count: pendingPlaces.length, badgeBg: 'bg-amber-50 text-amber-700 border border-amber-200' },
-            { label: 'Tất cả', count: allPlaces.length, badgeBg: 'bg-slate-100 text-slate-700 border border-slate-200' }
+            { label: 'Đang hoạt động', count: totalActive, badgeBg: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
+            { label: 'Chờ duyệt', count: pendingPlaces.length, badgeBg: 'bg-clay-50 text-clay-800 border-clay-200' },
+            { label: 'Tất cả', count: allPlaces.length, badgeBg: 'bg-ink-100 text-ink-700 border-ink-200' }
           ].map(tab => (
             <button
               key={tab.label}
               type="button"
               onClick={() => setActiveTab(tab.label)}
-              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg font-semibold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+              className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
                 activeTab === tab.label
-                  ? 'bg-white text-sky-700 shadow-xs border border-slate-200/80'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent'
+                  ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
+                  : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
               }`}
             >
               <span>{tab.label}</span>
-              <span className={`px-2 py-0.5 rounded-md text-[11px] font-bold ${
-                activeTab === tab.label ? 'bg-sky-50 text-sky-700 border border-sky-100' : tab.badgeBg
+              <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
+                activeTab === tab.label ? 'bg-clay-50 text-clay-800 border-clay-200' : tab.badgeBg
               }`}>
                 {tab.count}
               </span>
@@ -475,16 +475,16 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Search & Filter Toolbar */}
-        <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-col md:flex-row items-center gap-3">
+        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 flex flex-col md:flex-row items-center gap-3">
           {/* Keyword Search */}
           <div className="relative flex-1 w-full">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
             <input
               type="text"
               placeholder="Tìm theo tên địa điểm, địa chỉ, số điện thoại, người gửi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 text-slate-800 rounded-xl text-xs placeholder:text-slate-400 outline-none focus:bg-white focus:border-sky-500 focus:ring-2 focus:ring-sky-500/10 border border-slate-200/80 transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-[#F8F4EC] text-ink-800 rounded-[5px] text-xs placeholder:text-ink-300 outline-none focus:border-clay-600 border border-ink-200/80 transition-all"
             />
           </div>
 
@@ -493,7 +493,7 @@ export const AdminPlacesPage = () => {
             <select
               value={selectedCity}
               onChange={(e) => setSelectedCity(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 text-slate-800 rounded-xl text-xs font-semibold outline-none border border-slate-200/80 hover:bg-slate-100/70 cursor-pointer transition-colors"
+              className="w-full px-3 py-2 bg-[#F8F4EC] text-ink-700 rounded-[5px] text-xs font-bold outline-none border border-ink-200/80 hover:bg-[#F8F4EC]/80 cursor-pointer transition-colors"
             >
               <option value="">Tất cả tỉnh thành</option>
               {dynamicCities.map(city => (
@@ -507,7 +507,7 @@ export const AdminPlacesPage = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 text-slate-800 rounded-xl text-xs font-semibold outline-none border border-slate-200/80 hover:bg-slate-100/70 cursor-pointer transition-colors"
+              className="w-full px-3 py-2 bg-[#F8F4EC] text-ink-700 rounded-[5px] text-xs font-bold outline-none border border-ink-200/80 hover:bg-[#F8F4EC]/80 cursor-pointer transition-colors"
             >
               <option value="">Tất cả danh mục</option>
               {CATEGORIES.map(cat => (
@@ -522,54 +522,54 @@ export const AdminPlacesPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Table Column (7 Cols) */}
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden flex flex-col space-y-4 p-5">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100">
-            <span className="font-bold text-sm text-slate-900">
+        <div className="lg:col-span-7 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 overflow-hidden flex flex-col space-y-4 p-5">
+          <div className="flex items-center justify-between pb-2 border-b border-ink-200/60">
+            <span className="font-display font-black text-base text-ink-800">
               Danh sách địa điểm ({filteredPlaces.length})
             </span>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-ink-400">
               Nhấp vào một dòng để xem chi tiết bên phải
             </span>
           </div>
 
-          <div className="overflow-x-auto rounded-2xl border border-slate-100">
+          <div className="overflow-x-auto rounded-[5px] border border-ink-200/80">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-100 uppercase tracking-wider">
+              <thead className="bg-[#F8F4EC] text-ink-600 font-bold border-b border-ink-200/80 uppercase text-[11px] tracking-wider">
                 <tr>
-                  <th className="py-3.5 px-4">Tên Địa Điểm</th>
-                  <th className="py-3.5 px-4">Tỉnh / Thành</th>
-                  <th className="py-3.5 px-4">Đánh Giá</th>
-                  <th className="py-3.5 px-4">Trạng Thái</th>
-                  <th className="py-3.5 px-4 text-right">Thao Tác</th>
+                  <th className="py-3 px-4">Tên Địa Điểm</th>
+                  <th className="py-3 px-4">Tỉnh / Thành</th>
+                  <th className="py-3 px-4">Đánh Giá</th>
+                  <th className="py-3 px-4">Trạng Thái</th>
+                  <th className="py-3 px-4 text-right">Thao Tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-ink-200/60 bg-[#FFFDF8]">
                 {isLoading ? (
                   <tr>
-                    <td colSpan="5" className="py-12 text-center text-slate-400">
-                      <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-sky-500" />
+                    <td colSpan="5" className="py-12 text-center text-ink-400">
+                      <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-clay-600" />
                       Đang tải danh sách địa điểm từ cơ sở dữ liệu...
                     </td>
                   </tr>
                 ) : paginatedPlaces.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="py-12 text-center text-slate-400">
+                    <td colSpan="5" className="py-12 text-center text-ink-400">
                       {activeTab === 'Chờ duyệt' ? (
                         <div className="space-y-2">
-                          <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
-                          <p className="font-bold text-slate-800 text-sm">Không có địa điểm nào đang chờ phê duyệt!</p>
-                          <p className="text-xs text-slate-500">Tất cả yêu cầu gửi lên đã được xử lý xong.</p>
+                          <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+                          <p className="font-display font-bold text-ink-800 text-sm">Không có địa điểm nào đang chờ phê duyệt!</p>
+                          <p className="text-xs text-ink-400">Tất cả yêu cầu gửi lên đã được xử lý xong.</p>
                           <button
                             type="button"
                             onClick={() => setActiveTab('Đang hoạt động')}
-                            className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs shadow-sm cursor-pointer"
+                            className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer"
                           >
                             Xem {totalActive} địa điểm đang hoạt động →
                           </button>
                         </div>
                       ) : (
                         <div>
-                          <AlertCircle className="w-6 h-6 mx-auto mb-2 text-slate-300" />
+                          <AlertCircle className="w-6 h-6 mx-auto mb-2 text-ink-300" />
                           Không tìm thấy địa điểm nào khớp với tiêu chí lọc.
                         </div>
                       )}
@@ -585,13 +585,13 @@ export const AdminPlacesPage = () => {
                         key={p.id}
                         onClick={() => setSelectedPlace(p)}
                         className={`transition-colors cursor-pointer ${
-                          isSelected ? 'bg-sky-50/80 border-l-4 border-l-sky-600' : 'hover:bg-slate-50/80'
+                          isSelected ? 'bg-clay-50/70 border-l-4 border-l-clay-600' : 'hover:bg-[#F8F4EC]/50'
                         }`}
                       >
                         {/* Place Name & Thumbnail */}
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 shrink-0 shadow-2xs">
+                            <div className="w-11 h-11 rounded-[4px] overflow-hidden bg-[#F8F4EC] shrink-0 border border-ink-200/80">
                               <img
                                 src={p.coverImageUrl || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=150&q=80'}
                                 alt={p.name}
@@ -599,28 +599,28 @@ export const AdminPlacesPage = () => {
                               />
                             </div>
                             <div className="space-y-0.5 min-w-0">
-                              <h4 className="font-bold text-slate-900 truncate max-w-[170px] sm:max-w-[200px]">{p.name}</h4>
+                              <h4 className="font-display font-bold text-ink-800 truncate max-w-[170px] sm:max-w-[200px]">{p.name}</h4>
                               <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 text-[10px] font-bold">
+                                <span className="px-1.5 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-600 text-[10px] font-bold border border-ink-200/60">
                                   {p.categoryName || 'Tọa độ du lịch'}
                                 </span>
                                 {p.isVerifiedHost && (
-                                  <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[9px] font-bold">
+                                  <span className="px-1.5 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[9px] font-bold border border-emerald-200">
                                     Đã xác thực
                                   </span>
                                 )}
                                 {p.aiModerationStatus === 'DUPLICATE_FLAGGED' && (
-                                  <span className="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 text-[9px] font-bold border border-rose-200 flex items-center gap-1">
+                                  <span className="px-1.5 py-0.5 rounded-[4px] bg-rose-50 text-rose-800 text-[9px] font-bold border border-rose-200 flex items-center gap-1">
                                     <AlertTriangle className="w-2.5 h-2.5" /> AI: Trùng lặp
                                   </span>
                                 )}
                                 {p.aiModerationStatus === 'UNVERIFIED_SUSPECTED' && (
-                                  <span className="px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 text-[9px] font-bold border border-amber-200 flex items-center gap-1">
+                                  <span className="px-1.5 py-0.5 rounded-[4px] bg-amber-50 text-amber-800 text-[9px] font-bold border border-amber-200 flex items-center gap-1">
                                     <AlertCircle className="w-2.5 h-2.5" /> AI: Nghi vấn
                                   </span>
                                 )}
                                 {p.aiModerationStatus === 'APPROVED_BY_AI' && (
-                                  <span className="px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 text-[9px] font-bold border border-sky-200 flex items-center gap-1">
+                                  <span className="px-1.5 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[9px] font-bold border border-emerald-200 flex items-center gap-1">
                                     <Sparkles className="w-2.5 h-2.5" /> AI: Hợp lệ
                                   </span>
                                 )}
@@ -631,27 +631,27 @@ export const AdminPlacesPage = () => {
 
                         {/* City & Address */}
                         <td className="py-3 px-4">
-                          <span className="font-bold text-slate-800 block truncate max-w-[120px]">{p.city || 'Việt Nam'}</span>
-                          <span className="text-[10px] text-slate-400 truncate block max-w-[140px]">{p.address}</span>
+                          <span className="font-bold text-ink-800 block truncate max-w-[120px]">{p.city || 'Việt Nam'}</span>
+                          <span className="text-[10px] text-ink-400 truncate block max-w-[140px]">{p.address}</span>
                         </td>
 
                         {/* Rating */}
                         <td className="py-3 px-4">
-                          <div className="flex items-center gap-1 font-bold text-amber-500">
-                            <Star className="w-3.5 h-3.5 fill-amber-400" />
+                          <div className="flex items-center gap-1 font-bold text-amber-600">
+                            <Star className="w-3.5 h-3.5 fill-amber-300" />
                             <span>{p.averageRating ? Number(p.averageRating).toFixed(1) : '5.0'}</span>
                           </div>
-                          <span className="text-[10px] text-slate-400">{p.reviewCount || 0} đánh giá</span>
+                          <span className="text-[10px] text-ink-400">{p.reviewCount || 0} đánh giá</span>
                         </td>
 
                         {/* Status */}
                         <td className="py-3 px-4">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap inline-flex items-center gap-1 ${
+                          <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-bold whitespace-nowrap inline-flex items-center gap-1 border ${
                             isPending
-                              ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                              ? 'bg-clay-50 text-clay-800 border-clay-200'
                               : p.status === 'ACTIVE'
-                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
-                              : 'bg-rose-100 text-rose-800 border border-rose-200'
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                              : 'bg-rose-50 text-rose-800 border-rose-200'
                           }`}>
                             <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                             {isPending ? 'Chờ duyệt' : p.status === 'ACTIVE' ? 'Đã công khai' : 'Tạm ẩn'}
@@ -667,7 +667,7 @@ export const AdminPlacesPage = () => {
                                   type="button"
                                   onClick={() => handleApprove(p.id, p.name)}
                                   disabled={isSubmitting}
-                                  className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors cursor-pointer"
+                                  className="p-1.5 rounded-[4px] bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border border-emerald-200 transition-colors cursor-pointer"
                                   title="Phê duyệt nhanh"
                                 >
                                   <Check className="w-3.5 h-3.5" />
@@ -676,7 +676,7 @@ export const AdminPlacesPage = () => {
                                   type="button"
                                   onClick={() => setRejectModalData({ id: p.id, name: p.name })}
                                   disabled={isSubmitting}
-                                  className="p-1.5 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white transition-colors cursor-pointer"
+                                  className="p-1.5 rounded-[4px] bg-amber-50 text-amber-700 hover:bg-amber-600 hover:text-white border border-amber-200 transition-colors cursor-pointer"
                                   title="Từ chối duyệt"
                                 >
                                   <X className="w-3.5 h-3.5" />
@@ -687,10 +687,10 @@ export const AdminPlacesPage = () => {
                               type="button"
                               onClick={() => handleToggleVerified(p)}
                               disabled={isSubmitting}
-                              className={`p-1.5 rounded-lg transition-colors cursor-pointer disabled:opacity-40 ${
+                              className={`p-1.5 rounded-[4px] border transition-colors cursor-pointer disabled:opacity-40 ${
                                 p.isVerifiedHost
-                                  ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                                  : 'bg-slate-100 text-slate-500 hover:bg-emerald-600 hover:text-white'
+                                  ? 'bg-emerald-700 text-white border-emerald-700 hover:bg-emerald-800'
+                                  : 'bg-[#F8F4EC] text-ink-600 border-ink-200 hover:bg-emerald-600 hover:text-white'
                               }`}
                               title={p.isVerifiedHost ? 'Gỡ badge Xác thực' : 'Cấp badge Xác thực'}
                             >
@@ -700,7 +700,7 @@ export const AdminPlacesPage = () => {
                               type="button"
                               onClick={() => setDeleteModalData({ id: p.id, name: p.name })}
                               disabled={isSubmitting}
-                              className="p-1.5 rounded-lg bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white transition-colors cursor-pointer"
+                              className="p-1.5 rounded-[4px] bg-rose-50 text-rose-700 hover:bg-rose-700 hover:text-white border border-rose-200 transition-colors cursor-pointer"
                               title="Xóa địa điểm"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -717,7 +717,7 @@ export const AdminPlacesPage = () => {
 
           {/* Pagination Footer */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-2 text-xs text-slate-500">
+            <div className="flex items-center justify-between pt-2 text-xs text-ink-500">
               <span>
                 Hiển thị {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, filteredPlaces.length)} trong số {filteredPlaces.length} địa điểm
               </span>
@@ -726,18 +726,18 @@ export const AdminPlacesPage = () => {
                   type="button"
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="p-1.5 rounded-[5px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-[#F8F4EC] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-ink-700"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="px-3 py-1 font-bold text-slate-800">
+                <span className="px-3 py-1 font-bold text-ink-800">
                   Trang {currentPage} / {totalPages}
                 </span>
                 <button
                   type="button"
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  className="p-1.5 rounded-[5px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-[#F8F4EC] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-ink-700"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -747,19 +747,19 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Right Preview Drawer (5 Cols - Sticky) */}
-        <div className="lg:col-span-5 bg-white p-6 rounded-2xl border border-slate-200/80 shadow-xs space-y-4 sticky top-20">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <span className="font-bold text-sm text-slate-900 flex items-center gap-2">
-              <Eye className="w-4 h-4 text-sky-600" />
+        <div className="lg:col-span-5 bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4 sticky top-20">
+          <div className="flex items-center justify-between border-b border-ink-200/60 pb-3">
+            <span className="font-display font-black text-base text-ink-800 flex items-center gap-2">
+              <Eye className="w-4 h-4 text-clay-600" />
               Chi Tiết Địa Điểm
             </span>
             {selectedPlace && (
-              <span className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold ${
+              <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
                 selectedPlace.status === 'PENDING_APPROVAL'
-                  ? 'bg-amber-50 text-amber-700 border border-amber-200'
+                  ? 'bg-clay-50 text-clay-800 border-clay-200'
                   : selectedPlace.status === 'ACTIVE'
-                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                  : 'bg-rose-50 text-rose-700 border border-rose-200'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                  : 'bg-rose-50 text-rose-800 border-rose-200'
               }`}>
                 {selectedPlace.status === 'PENDING_APPROVAL' ? 'Chờ phê duyệt' : selectedPlace.status === 'ACTIVE' ? 'Đã công khai' : 'Tạm ẩn'}
               </span>
@@ -769,16 +769,16 @@ export const AdminPlacesPage = () => {
           {selectedPlace ? (
             <div className="space-y-3.5 text-xs">
               {/* Photo Cover */}
-              <div className="h-44 rounded-xl overflow-hidden relative shadow-xs bg-slate-100">
+              <div className="h-44 rounded-[5px] overflow-hidden relative border border-ink-200/80 bg-[#F8F4EC]">
                 <img
                   src={selectedPlace.coverImageUrl || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80'}
                   alt={selectedPlace.name}
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-slate-900/80 backdrop-blur text-white text-[10px] font-semibold">
+                <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-[4px] bg-ink-900/80 text-[#FFFDF8] text-[10px] font-bold border border-ink-800">
                   {selectedPlace.categoryName || 'Tọa độ du lịch'}
                 </span>
-                <span className="absolute top-2 right-2 px-2.5 py-1 rounded-lg bg-black/60 text-amber-300 text-[10px] font-semibold flex items-center gap-1 backdrop-blur-xs">
+                <span className="absolute top-2 right-2 px-2 py-0.5 rounded-[4px] bg-ink-900/80 text-amber-300 text-[10px] font-bold flex items-center gap-1 border border-ink-800">
                   <Star className="w-3 h-3 fill-amber-400" />
                   {selectedPlace.averageRating ? Number(selectedPlace.averageRating).toFixed(1) : '5.0'} ({selectedPlace.reviewCount || 0})
                 </span>
@@ -786,9 +786,9 @@ export const AdminPlacesPage = () => {
 
               {/* Title, Address & GPS */}
               <div>
-                <h3 className="font-display font-bold text-lg text-slate-900 leading-snug">{selectedPlace.name}</h3>
-                <p className="text-slate-600 mt-1 flex items-start gap-1.5 text-xs">
-                  <MapPin className="w-3.5 h-3.5 text-sky-600 shrink-0 mt-0.5" />
+                <h3 className="font-display font-black text-lg text-ink-800 leading-snug">{selectedPlace.name}</h3>
+                <p className="text-ink-600 mt-1 flex items-start gap-1.5 text-xs">
+                  <MapPin className="w-3.5 h-3.5 text-clay-600 shrink-0 mt-0.5" />
                   <span>{selectedPlace.address || selectedPlace.city || 'Chưa cập nhật địa chỉ'}</span>
                 </p>
 
@@ -799,7 +799,7 @@ export const AdminPlacesPage = () => {
                       href={`https://www.google.com/maps?q=${selectedPlace.latitude},${selectedPlace.longitude}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 text-[11px] font-semibold transition-colors border border-sky-100"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-[#F8F4EC] hover:bg-clay-50 text-clay-700 text-[11px] font-bold transition-colors border border-ink-200/80"
                     >
                       <Navigation className="w-3 h-3" />
                       <span>Xem trên Google Maps ({selectedPlace.latitude}, {selectedPlace.longitude})</span>
@@ -807,28 +807,28 @@ export const AdminPlacesPage = () => {
                     </a>
                   </div>
                 ) : (
-                  <p className="text-[11px] text-slate-400 mt-1">Chưa cập nhật tọa độ GPS</p>
+                  <p className="text-[11px] text-ink-400 mt-1">Chưa cập nhật tọa độ GPS</p>
                 )}
 
                 {/* WanderAI Shield Verification Details */}
-                <div className={`mt-3 p-3 rounded-xl border text-xs space-y-1.5 ${
+                <div className={`mt-3 p-3 rounded-[5px] border text-xs space-y-1.5 ${
                   selectedPlace.aiModerationStatus === 'DUPLICATE_FLAGGED'
-                    ? 'bg-rose-50/90 border-rose-200 text-rose-900'
+                    ? 'bg-rose-50 border-rose-200 text-rose-900'
                     : selectedPlace.aiModerationStatus === 'UNVERIFIED_SUSPECTED'
-                    ? 'bg-amber-50/90 border-amber-200 text-amber-900'
-                    : 'bg-emerald-50/90 border-emerald-200 text-emerald-900'
+                    ? 'bg-amber-50 border-amber-200 text-amber-900'
+                    : 'bg-emerald-50 border-emerald-200 text-emerald-900'
                 }`}>
                   <div className="flex items-center justify-between">
                     <span className="font-bold flex items-center gap-1.5 text-[11px] uppercase tracking-wide">
                       <Sparkles className="w-3.5 h-3.5" />
                       WanderAI Thẩm định & Xác thực
                     </span>
-                    <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] ${
+                    <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${
                       selectedPlace.aiModerationStatus === 'DUPLICATE_FLAGGED'
-                        ? 'bg-rose-200 text-rose-800'
+                        ? 'bg-rose-100 text-rose-800 border-rose-200'
                         : selectedPlace.aiModerationStatus === 'UNVERIFIED_SUSPECTED'
-                        ? 'bg-amber-200 text-amber-800'
-                        : 'bg-emerald-200 text-emerald-800'
+                        ? 'bg-amber-100 text-amber-800 border-amber-200'
+                        : 'bg-emerald-100 text-emerald-800 border-emerald-200'
                     }`}>
                       {selectedPlace.aiModerationStatus === 'DUPLICATE_FLAGGED'
                         ? 'Trùng lặp'
@@ -844,24 +844,24 @@ export const AdminPlacesPage = () => {
               </div>
 
               {/* Business Stats Grid */}
-              <div className="grid grid-cols-2 gap-2 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+              <div className="grid grid-cols-2 gap-2 p-3 bg-[#F8F4EC] rounded-[5px] border border-ink-200/60">
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Giờ mở cửa</span>
-                  <span className="font-bold text-slate-800">{selectedPlace.openHours || '07:00 - 22:00'}</span>
+                  <span className="text-[10px] text-ink-400 font-bold uppercase block">Giờ mở cửa</span>
+                  <span className="font-bold text-ink-800">{selectedPlace.openHours || '07:00 - 22:00'}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Điện thoại liên hệ</span>
-                  <span className="font-bold text-slate-800">{selectedPlace.phoneNumber || 'Chưa cập nhật'}</span>
+                  <span className="text-[10px] text-ink-400 font-bold uppercase block">Điện thoại liên hệ</span>
+                  <span className="font-bold text-ink-800">{selectedPlace.phoneNumber || 'Chưa cập nhật'}</span>
                 </div>
                 <div className="pt-1">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Giá vé / Chi phí</span>
-                  <span className="font-bold text-emerald-600">
+                  <span className="text-[10px] text-ink-400 font-bold uppercase block">Giá vé / Chi phí</span>
+                  <span className="font-display font-black text-clay-700">
                     {selectedPlace.ticketPrice ? `${Number(selectedPlace.ticketPrice).toLocaleString('vi-VN')} đ` : (selectedPlace.priceRange || 'Miễn phí')}
                   </span>
                 </div>
                 <div className="pt-1">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Người gửi / Host</span>
-                  <span className="font-bold text-slate-800 truncate block">
+                  <span className="text-[10px] text-ink-400 font-bold uppercase block">Người gửi / Host</span>
+                  <span className="font-bold text-ink-800 truncate block">
                     {selectedPlace.ownerName || 'Ban Quản trị'}
                   </span>
                 </div>
@@ -870,10 +870,10 @@ export const AdminPlacesPage = () => {
               {/* Amenities */}
               {selectedPlace.amenities && (
                 <div>
-                  <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Tiện ích & Dịch vụ</span>
+                  <span className="text-[10px] text-ink-400 font-bold uppercase block mb-1">Tiện ích & Dịch vụ</span>
                   <div className="flex flex-wrap gap-1">
                     {selectedPlace.amenities.split(',').map((am, idx) => (
-                      <span key={idx} className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 text-[10px] font-medium">
+                      <span key={idx} className="px-2 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-700 text-[10px] font-bold border border-ink-200/60">
                         {am.trim()}
                       </span>
                     ))}
@@ -883,21 +883,21 @@ export const AdminPlacesPage = () => {
 
               {/* Description */}
               <div>
-                <span className="text-[10px] text-slate-400 font-bold uppercase block mb-1">Mô tả chi tiết</span>
-                <p className="text-slate-600 bg-slate-50 p-3 rounded-2xl border border-slate-100 leading-relaxed text-[11px] max-h-32 overflow-y-auto">
+                <span className="text-[10px] text-ink-400 font-bold uppercase block mb-1">Mô tả chi tiết</span>
+                <p className="text-ink-600 bg-[#F8F4EC] p-3 rounded-[5px] border border-ink-200/60 leading-relaxed text-[11px] max-h-32 overflow-y-auto">
                   {selectedPlace.description || 'Chưa có thông tin mô tả chi tiết từ người đăng.'}
                 </p>
               </div>
 
               {/* Action Buttons in Drawer */}
-              <div className="pt-2 border-t border-slate-100 space-y-2">
+              <div className="pt-2 border-t border-ink-200/60 space-y-2">
                 {selectedPlace.status === 'PENDING_APPROVAL' ? (
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => handleApprove(selectedPlace.id, selectedPlace.name)}
                       disabled={isSubmitting}
-                      className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+                      className="flex-1 py-2.5 rounded-[5px] bg-emerald-700 hover:bg-emerald-800 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                     >
                       <Check className="w-4 h-4" /> Phê duyệt lên bản đồ
                     </button>
@@ -905,7 +905,7 @@ export const AdminPlacesPage = () => {
                       type="button"
                       onClick={() => setRejectModalData({ id: selectedPlace.id, name: selectedPlace.name })}
                       disabled={isSubmitting}
-                      className="px-4 py-2.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-xs transition-colors cursor-pointer active:scale-95"
+                      className="px-4 py-2.5 rounded-[5px] bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-bold text-xs transition-colors cursor-pointer"
                     >
                       Từ chối
                     </button>
@@ -916,15 +916,15 @@ export const AdminPlacesPage = () => {
                       type="button"
                       onClick={() => handleToggleStatus(selectedPlace)}
                       disabled={isSubmitting}
-                      className={`flex-1 py-2.5 rounded-xl font-bold text-xs transition-colors shadow-sm cursor-pointer flex items-center justify-center gap-1.5 ${
+                      className={`flex-1 py-2.5 rounded-[5px] font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5 border ${
                         selectedPlace.status === 'ACTIVE'
-                          ? 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                          : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                          ? 'bg-[#F8F4EC] hover:bg-ink-100 text-ink-700 border-ink-200/80'
+                          : 'bg-emerald-700 hover:bg-emerald-800 text-[#FFFDF8] border-emerald-700'
                       }`}
                     >
                       {selectedPlace.status === 'ACTIVE' ? (
                         <>
-                          <EyeOff className="w-4 h-4 text-slate-500" /> Tạm ẩn địa điểm
+                          <EyeOff className="w-4 h-4 text-ink-500" /> Tạm ẩn địa điểm
                         </>
                       ) : (
                         <>
@@ -937,7 +937,7 @@ export const AdminPlacesPage = () => {
                       type="button"
                       onClick={() => setDeleteModalData({ id: selectedPlace.id, name: selectedPlace.name })}
                       disabled={isSubmitting}
-                      className="px-3.5 py-2.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold text-xs transition-colors cursor-pointer"
+                      className="px-3.5 py-2.5 rounded-[5px] bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 font-bold text-xs transition-colors cursor-pointer"
                       title="Xóa địa điểm"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -948,8 +948,8 @@ export const AdminPlacesPage = () => {
 
             </div>
           ) : (
-            <div className="py-16 text-center text-slate-400 text-xs">
-              <Compass className="w-8 h-8 mx-auto mb-2 text-slate-300" />
+            <div className="py-16 text-center text-ink-400 text-xs">
+              <Compass className="w-8 h-8 mx-auto mb-2 text-ink-300" />
               Chọn một địa điểm ở bảng bên trái để xem đầy đủ thông tin chi tiết.
             </div>
           )}
@@ -959,21 +959,21 @@ export const AdminPlacesPage = () => {
 
       {/* ─── 5. MODAL: CREATE NEW PLACE ───────────────────────────────────────── */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-start justify-between border-b border-slate-100 pb-3">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#FFFDF8] rounded-[6px] max-w-2xl w-full p-6 border border-ink-200 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between border-b border-ink-200/60 pb-3">
               <div>
-                <span className="text-[11px] font-bold text-sky-600 uppercase tracking-wider block">
+                <span className="text-[11px] font-bold text-clay-700 uppercase tracking-wider block">
                   Quản lý Địa điểm Du lịch
                 </span>
-                <h3 className="font-display font-bold text-lg text-slate-900 mt-0.5">
+                <h3 className="font-display font-black text-xl text-ink-800 mt-0.5">
                   Thêm mới Địa điểm
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                className="p-1.5 rounded-[5px] hover:bg-[#F8F4EC] text-ink-400 hover:text-ink-700 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -983,37 +983,37 @@ export const AdminPlacesPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {/* Name */}
                 <div className="sm:col-span-2">
-                  <label className="font-bold text-slate-700 block mb-1">Tên địa điểm *</label>
+                  <label className="font-bold text-ink-700 block mb-1">Tên địa điểm *</label>
                   <input
                     type="text"
                     required
                     placeholder="Ví dụ: Bà Nà Hills, Phố cổ Hội An, Bánh Mì Phượng..."
                     value={newPlaceForm.name}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, name: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
                   />
                 </div>
 
                 {/* City */}
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Tỉnh / Thành phố *</label>
+                  <label className="font-bold text-ink-700 block mb-1">Tỉnh / Thành phố *</label>
                   <input
                     type="text"
                     required
                     placeholder="Ví dụ: Đà Nẵng, Quảng Nam, Lâm Đồng..."
                     value={newPlaceForm.city}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, city: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
                   />
                 </div>
 
                 {/* Category */}
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Danh mục phân loại *</label>
+                  <label className="font-bold text-ink-700 block mb-1">Danh mục phân loại *</label>
                   <select
                     value={newPlaceForm.categoryName}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, categoryName: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs cursor-pointer font-semibold"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs cursor-pointer font-bold text-ink-700"
                   >
                     {CATEGORIES.map(c => (
                       <option key={c} value={c}>{c}</option>
@@ -1022,11 +1022,10 @@ export const AdminPlacesPage = () => {
                 </div>
 
                 {/* Address */}
-                {/* Address */}
                 <div className="sm:col-span-2">
                   <div className="flex items-center justify-between mb-1">
-                    <label className="font-bold text-slate-700 block">Địa chỉ cụ thể *</label>
-                    <span className="text-[10px] text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                    <label className="font-bold text-ink-700 block">Địa chỉ cụ thể *</label>
+                    <span className="text-[10px] text-clay-700 font-bold bg-clay-50 px-2 py-0.5 rounded-[4px] border border-clay-200">
                       Bắt buộc kèm Quận/Huyện & Tỉnh/Thành
                     </span>
                   </div>
@@ -1036,122 +1035,122 @@ export const AdminPlacesPage = () => {
                     placeholder="Ví dụ: 202 Chương Dương - Sơn Trà - Đà Nẵng"
                     value={newPlaceForm.address}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, address: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs font-medium"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800 font-medium"
                   />
-                  <p className="text-[11px] text-slate-500 mt-1">
-                    💡 Quy chuẩn: Phải ghi rõ Số nhà/Đường - Phường/Quận/Huyện - Tỉnh/Thành phố (Ví dụ: <strong className="text-slate-700">202 Chương Dương - Sơn Trà - Đà Nẵng</strong>). Không được ghi cộc lốc mỗi tên đường.
+                  <p className="text-[11px] text-ink-400 mt-1">
+                    💡 Quy chuẩn: Phải ghi rõ Số nhà/Đường - Phường/Quận/Huyện - Tỉnh/Thành phố.
                   </p>
                 </div>
 
                 {/* Open Hours */}
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Giờ mở cửa</label>
+                  <label className="font-bold text-ink-700 block mb-1">Giờ mở cửa</label>
                   <input
                     type="text"
                     placeholder="07:00 - 22:00 hoặc Mở cả ngày"
                     value={newPlaceForm.openHours}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, openHours: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
                   />
                 </div>
 
                 {/* Phone */}
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Số điện thoại liên hệ</label>
+                  <label className="font-bold text-ink-700 block mb-1">Số điện thoại liên hệ</label>
                   <input
                     type="text"
                     placeholder="0987 654 321 hoặc Hotline"
                     value={newPlaceForm.phoneNumber}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, phoneNumber: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
                   />
                 </div>
 
                 {/* Ticket Price */}
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Giá vé tham quan (VNĐ)</label>
+                  <label className="font-bold text-ink-700 block mb-1">Giá vé tham quan (VNĐ)</label>
                   <input
                     type="number"
                     placeholder="0 (nếu miễn phí)"
                     value={newPlaceForm.ticketPrice}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, ticketPrice: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
                   />
                 </div>
 
                 {/* Price Range */}
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Khoảng giá dự kiến</label>
+                  <label className="font-bold text-ink-700 block mb-1">Khoảng giá dự kiến</label>
                   <input
                     type="text"
                     placeholder="Miễn phí, hoặc 50.000đ - 150.000đ"
                     value={newPlaceForm.priceRange}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, priceRange: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
                   />
                 </div>
 
                 {/* Latitude & Longitude */}
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Vĩ độ (Latitude)</label>
+                  <label className="font-bold text-ink-700 block mb-1">Vĩ độ (Latitude)</label>
                   <input
                     type="number"
                     step="any"
                     placeholder="Ví dụ: 16.0544"
                     value={newPlaceForm.latitude}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, latitude: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs font-mono"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs font-mono text-ink-800"
                   />
                 </div>
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Kinh độ (Longitude)</label>
+                  <label className="font-bold text-ink-700 block mb-1">Kinh độ (Longitude)</label>
                   <input
                     type="number"
                     step="any"
                     placeholder="Ví dụ: 108.2022"
                     value={newPlaceForm.longitude}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, longitude: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs font-mono"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs font-mono text-ink-800"
                   />
                 </div>
 
                 {/* Image URL */}
                 <div className="sm:col-span-2">
-                  <label className="font-bold text-slate-700 block mb-1">Đường dẫn ảnh bìa (Cover Image URL)</label>
+                  <label className="font-bold text-ink-700 block mb-1">Đường dẫn ảnh bìa (Cover Image URL)</label>
                   <input
                     type="url"
                     placeholder="https://images.unsplash.com/..."
                     value={newPlaceForm.coverImageUrl}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, coverImageUrl: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
                   />
                 </div>
 
                 {/* Description */}
                 <div className="sm:col-span-2">
-                  <label className="font-bold text-slate-700 block mb-1">Mô tả giới thiệu</label>
+                  <label className="font-bold text-ink-700 block mb-1">Mô tả giới thiệu</label>
                   <textarea
                     rows={3}
                     placeholder="Chia sẻ điểm đặc biệt, kinh nghiệm tham quan, gợi ý góc chụp ảnh đẹp..."
                     value={newPlaceForm.description}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, description: e.target.value })}
-                    className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-sky-500/20 text-xs resize-none"
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800 resize-none"
                   ></textarea>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-ink-200/60">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition-colors cursor-pointer"
+                  className="px-4 py-2.5 rounded-[5px] bg-[#F8F4EC] hover:bg-ink-100 text-ink-700 font-bold border border-ink-200/80 transition-colors cursor-pointer"
                 >
                   Hủy bỏ
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                  className="px-5 py-2.5 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold border border-clay-600 transition-colors cursor-pointer disabled:opacity-50"
                 >
                   {isSubmitting ? 'Đang lưu...' : 'Lưu & Đưa lên bản đồ'}
                 </button>
@@ -1163,26 +1162,26 @@ export const AdminPlacesPage = () => {
 
       {/* ─── 6. MODAL: REJECT CONFIRMATION ───────────────────────────────────── */}
       {rejectModalData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-[5px] bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-base text-slate-900">Từ chối phê duyệt địa điểm</h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Địa điểm: <strong className="text-slate-800">{rejectModalData.name}</strong>
+                <h3 className="font-display font-black text-base text-ink-800">Từ chối phê duyệt địa điểm</h3>
+                <p className="text-xs text-ink-400 mt-0.5">
+                  Địa điểm: <strong className="text-ink-800">{rejectModalData.name}</strong>
                 </p>
               </div>
             </div>
 
             <div className="space-y-2 text-xs">
-              <label className="font-bold text-slate-700 block">Lý do từ chối gửi đến người đăng:</label>
+              <label className="font-bold text-ink-700 block">Lý do từ chối gửi đến người đăng:</label>
               <select
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none font-medium cursor-pointer"
+                className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none font-bold text-ink-700 cursor-pointer"
               >
                 <option value="Thông tin địa chỉ hoặc định vị chưa chính xác">Thông tin địa chỉ hoặc định vị chưa chính xác</option>
                 <option value="Hình ảnh không rõ ràng hoặc vi phạm tiêu chuẩn cộng đồng">Hình ảnh không rõ ràng hoặc vi phạm tiêu chuẩn</option>
@@ -1196,15 +1195,15 @@ export const AdminPlacesPage = () => {
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Hoặc tự nhập lý do chi tiết..."
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none text-xs resize-none mt-2"
+                className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none text-xs text-ink-800 resize-none mt-2"
               ></textarea>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-ink-200/60">
               <button
                 type="button"
                 onClick={() => setRejectModalData(null)}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-[5px] bg-[#F8F4EC] hover:bg-ink-100 text-ink-700 font-bold text-xs border border-ink-200/80 transition-colors cursor-pointer"
               >
                 Đóng
               </button>
@@ -1212,7 +1211,7 @@ export const AdminPlacesPage = () => {
                 type="button"
                 onClick={confirmReject}
                 disabled={isSubmitting}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 rounded-[5px] bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 {isSubmitting ? 'Đang xử lý...' : 'Xác nhận từ chối'}
               </button>
@@ -1223,25 +1222,25 @@ export const AdminPlacesPage = () => {
 
       {/* ─── 7. MODAL: DELETE CONFIRMATION ───────────────────────────────────── */}
       {deleteModalData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
+              <div className="w-10 h-10 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center shrink-0">
                 <Trash2 className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-bold text-base text-slate-900">Xóa vĩnh viễn địa điểm?</h3>
-                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                  Bạn có chắc chắn muốn xóa địa điểm <strong className="text-slate-900">"{deleteModalData.name}"</strong>? Dữ liệu đánh giá và hình ảnh liên quan sẽ bị xóa khỏi cơ sở dữ liệu và không thể hoàn tác.
+                <h3 className="font-display font-black text-base text-ink-800">Xóa vĩnh viễn địa điểm?</h3>
+                <p className="text-xs text-ink-400 mt-1 leading-relaxed">
+                  Bạn có chắc chắn muốn xóa địa điểm <strong className="text-ink-800 font-bold">"{deleteModalData.name}"</strong>? Dữ liệu đánh giá và hình ảnh liên quan sẽ bị xóa khỏi cơ sở dữ liệu và không thể hoàn tác.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-ink-200/60">
               <button
                 type="button"
                 onClick={() => setDeleteModalData(null)}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-[5px] bg-[#F8F4EC] hover:bg-ink-100 text-ink-700 font-bold text-xs border border-ink-200/80 transition-colors cursor-pointer"
               >
                 Hủy bỏ
               </button>
@@ -1249,7 +1248,7 @@ export const AdminPlacesPage = () => {
                 type="button"
                 onClick={confirmDelete}
                 disabled={isSubmitting}
-                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                className="px-4 py-2 rounded-[5px] bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 {isSubmitting ? 'Đang xóa...' : 'Xác nhận xóa vĩnh viễn'}
               </button>
