@@ -1,7 +1,32 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { auditLogApi, adminUserApi } from '../../../services/api';
-import { History, Search, Filter, RefreshCw, User, Shield, KeyRound, UserPlus, Compass, FileText, AlertTriangle, Eye, X, Calendar, Globe, Monitor, ChevronLeft, ChevronRight, ShieldCheck, Cpu, Layers, Sparkles, Download, Info } from 'lucide-react';
+import {
+  History,
+  Search,
+  Filter,
+  RefreshCw,
+  User,
+  Shield,
+  KeyRound,
+  UserPlus,
+  Compass,
+  FileText,
+  AlertTriangle,
+  Eye,
+  X,
+  Calendar,
+  Globe,
+  Monitor,
+  ChevronLeft,
+  ChevronRight,
+  ShieldCheck,
+  Cpu,
+  Layers,
+  Sparkles,
+  Download,
+  Info
+} from 'lucide-react';
 
 export const AdminAuditLogsPage = () => {
   const toast = useToast();
@@ -31,11 +56,15 @@ export const AdminAuditLogsPage = () => {
       const [statsData, actionsData, usersData] = await Promise.all([
         auditLogApi.getStats(),
         auditLogApi.getActions(),
-        adminUserApi.getUsers('', 'ALL', 'ALL')
+        adminUserApi.getUsers({ size: 100 })
       ]);
       setStats(statsData || { totalLogs: 0, logsToday: 0, distinctActionsCount: 0 });
-      setActionsList(actionsData || []);
-      setUsersList(usersData || []);
+      setActionsList(Array.isArray(actionsData) ? actionsData : []);
+      // usersData is Page<UserDto> object: { content: [...] } or array
+      const safeUsers = Array.isArray(usersData)
+        ? usersData
+        : (usersData && Array.isArray(usersData.content) ? usersData.content : []);
+      setUsersList(safeUsers);
     } catch (err) {
       console.error('Lỗi khi tải metadata nhật ký:', err);
     }
@@ -100,109 +129,95 @@ export const AdminAuditLogsPage = () => {
     setPage(0);
   };
 
-  // Helper for action badges
+  // Helper for action badges in Paper-Ink-Clay style
   const getActionBadge = (action) => {
     const act = (action || '').toUpperCase();
     if (act.includes('LOGIN')) {
       return {
-        bg: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800',
+        bg: 'bg-[#F8F4EC] text-ink-700 border-ink-200/80',
         icon: KeyRound,
         label: 'Đăng nhập'
       };
     }
     if (act.includes('REGISTER')) {
       return {
-        bg: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800',
+        bg: 'bg-emerald-50 text-emerald-800 border-emerald-300/80',
         icon: UserPlus,
         label: 'Đăng ký'
       };
     }
     if (act.includes('ITINERARY')) {
       return {
-        bg: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-400 dark:border-violet-800',
+        bg: 'bg-clay-50 text-clay-800 border-clay-300/80',
         icon: Compass,
         label: 'Lịch trình'
       };
     }
     if (act.includes('POST')) {
       return {
-        bg: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-800',
+        bg: 'bg-[#F8F4EC] text-ink-700 border-ink-200/80',
         icon: FileText,
         label: 'Bài viết'
       };
     }
     if (act.includes('LOCK') || act.includes('BAN')) {
       return {
-        bg: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800',
+        bg: 'bg-rose-50 text-rose-800 border-rose-300/80',
         icon: AlertTriangle,
         label: 'Khóa / Chặn'
       };
     }
     if (act.includes('MODERATION_APPROVE')) {
       return {
-        bg: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800',
+        bg: 'bg-emerald-50 text-emerald-800 border-emerald-300/80',
         icon: ShieldCheck,
         label: 'Duyệt xuất bản'
       };
     }
     if (act.includes('MODERATION_DISMISS')) {
       return {
-        bg: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800',
+        bg: 'bg-[#F8F4EC] text-ink-600 border-ink-200/80',
         icon: ShieldCheck,
         label: 'Bác bỏ báo cáo'
       };
     }
     if (act.includes('MODERATION_HIDE')) {
       return {
-        bg: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800',
+        bg: 'bg-amber-50 text-amber-900 border-amber-300/80',
         icon: AlertTriangle,
         label: 'Tạm ẩn bài'
       };
     }
     if (act.includes('MODERATION_UNHIDE')) {
       return {
-        bg: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-400 dark:border-indigo-800',
+        bg: 'bg-clay-50 text-clay-800 border-clay-300/80',
         icon: RefreshCw,
         label: 'Bỏ ẩn bài'
       };
     }
-    if (act.includes('MODERATION_REMOVE_BAN')) {
+    if (act.includes('MODERATION_REMOVE_BAN') || act.includes('MODERATION_DELETE')) {
       return {
-        bg: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800',
+        bg: 'bg-rose-50 text-rose-800 border-rose-300/80',
         icon: AlertTriangle,
-        label: 'Gỡ bài & Khóa TK'
-      };
-    }
-    if (act.includes('MODERATION_DELETE')) {
-      return {
-        bg: 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800',
-        icon: AlertTriangle,
-        label: 'Xóa bài viết'
-      };
-    }
-    if (act.includes('REPORT') || act.includes('RESOLVE')) {
-      return {
-        bg: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-800',
-        icon: ShieldCheck,
-        label: 'Báo cáo vi phạm'
+        label: 'Gỡ bài / Vi phạm'
       };
     }
     if (act.includes('ROLE') || act.includes('MANAGEMENT')) {
       return {
-        bg: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-800',
+        bg: 'bg-amber-50 text-amber-900 border-amber-300/80',
         icon: Shield,
         label: 'Phân quyền'
       };
     }
     if (act.includes('AI')) {
       return {
-        bg: 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-400 dark:border-cyan-800',
+        bg: 'bg-clay-50 text-clay-800 border-clay-300/80',
         icon: Cpu,
         label: 'Trợ lý AI'
       };
     }
     return {
-      bg: 'bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700',
+      bg: 'bg-[#F8F4EC] text-ink-700 border-ink-200/80',
       icon: Layers,
       label: action
     };
@@ -213,27 +228,27 @@ export const AdminAuditLogsPage = () => {
     switch (cat) {
       case 'AUTH':
         return {
-          bg: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800',
-          label: '🔐 AUTH',
+          bg: 'bg-[#F8F4EC] text-ink-700 border-ink-200/80',
+          label: 'AUTH',
           title: 'Nhật ký Xác thực & Tài khoản'
         };
       case 'SECURITY':
         return {
-          bg: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800',
-          label: '🛡️ SECURITY',
+          bg: 'bg-rose-50 text-rose-800 border-rose-200',
+          label: 'SECURITY',
           title: 'Nhật ký An toàn & Kiểm duyệt'
         };
       case 'SYSTEM':
         return {
-          bg: 'bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-950/40 dark:text-violet-400 dark:border-violet-800',
-          label: '⚙️ SYSTEM',
+          bg: 'bg-amber-50 text-amber-900 border-amber-200',
+          label: 'SYSTEM',
           title: 'Nhật ký Cấu hình & Hệ thống'
         };
       case 'ACTIVITY':
       default:
         return {
-          bg: 'bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-950/40 dark:text-sky-400 dark:border-sky-800',
-          label: '🧭 ACTIVITY',
+          bg: 'bg-clay-50 text-clay-800 border-clay-200',
+          label: 'ACTIVITY',
           title: 'Nhật ký Hoạt động Nghiệp vụ'
         };
     }
@@ -289,7 +304,10 @@ export const AdminAuditLogsPage = () => {
     return `${os} • ${browser}`;
   };
 
-  const selectedUserObj = usersList.find(u => String(u.id) === String(selectedUserId));
+  // Safe selected user lookup (avoids TypeError: usersList.find is not a function)
+  const selectedUserObj = Array.isArray(usersList)
+    ? usersList.find(u => String(u.id) === String(selectedUserId))
+    : null;
 
   // Export to CSV
   const handleExportCSV = () => {
@@ -321,46 +339,50 @@ export const AdminAuditLogsPage = () => {
 
   return (
     <div className="space-y-6 pb-12">
-      {/* 1. Header & Title */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* 1. Header & Title (Paper-Ink-Clay) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-ink-200/80">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-2xl bg-sky-600/10 text-sky-600 flex items-center justify-center font-bold">
-              <History className="w-5 h-5" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold font-display text-slate-900 dark:text-white">
-                Nhật Ký Hệ Thống & Hoạt Động
-              </h1>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Theo dõi toàn bộ lịch sử đăng nhập, phân quyền, can thiệp quản trị và thao tác người dùng (Audit Logs)
-              </p>
-            </div>
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-ink-500 mb-1">
+            <History className="w-3.5 h-3.5 text-clay-600" />
+            <span>Audit & Compliance Center</span>
+            <span>•</span>
+            <span className="text-clay-600 font-bold">Nhật ký hệ thống</span>
           </div>
+          <h1 className="font-display font-black text-2xl lg:text-3xl text-ink-800 tracking-tight flex items-center gap-3">
+            Nhật Ký Hệ Thống & Hoạt Động
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[4px] text-[10px] font-mono uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-300/80">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span>
+              Live Audit Stream
+            </span>
+          </h1>
+          <p className="text-xs text-ink-500 mt-1 max-w-2xl">
+            Theo dõi chi tiết toàn bộ lịch sử đăng nhập, phân quyền RBAC, kiểm duyệt an toàn nội dung và thao tác của người dùng.
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
           <button
             onClick={fetchLogs}
-            className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/60 text-slate-700 dark:text-slate-200 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[5px] bg-[#FFFDF8] hover:bg-[#F3EFE6] text-ink-700 font-serif font-bold text-xs border border-ink-200/80 shadow-xs transition-colors cursor-pointer disabled:opacity-50"
             title="Tải lại nhật ký"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-sky-600' : ''}`} />
-            <span>Làm mới</span>
+            <RefreshCw className={`w-3.5 h-3.5 text-clay-600 ${loading ? 'animate-spin' : ''}`} />
+            <span>Đồng bộ</span>
           </button>
 
           <button
             onClick={() => handleDownloadFile(selectedCategory)}
-            className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs hover:shadow-md cursor-pointer"
-            title="Tải xuống tệp nhật ký nguyên bản (.log) được phân loại và lưu trữ trên máy chủ"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[5px] bg-[#FFFDF8] hover:bg-[#F3EFE6] text-ink-700 font-serif font-bold text-xs border border-ink-200/80 shadow-xs transition-colors cursor-pointer"
+            title="Tải xuống tệp nhật ký nguyên bản (.log)"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-3.5 h-3.5 text-ink-500" />
             <span>Tải File Log (.log)</span>
           </button>
 
           <button
             onClick={handleExportCSV}
-            className="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold flex items-center gap-1.5 transition-all shadow-2xs hover:shadow-md cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white font-serif font-bold text-xs shadow-xs transition-colors cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Xuất CSV</span>
@@ -368,72 +390,76 @@ export const AdminAuditLogsPage = () => {
         </div>
       </div>
 
-      {/* 2. Top Metric Cards */}
+      {/* 2. Top Metric Cards (Paper-Ink-Clay) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-            <Layers className="w-5 h-5" />
+        {/* Metric 1 */}
+        <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+          <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center shrink-0">
+            <Layers className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Lưu trữ File Log</p>
-            <p className="text-xl font-extrabold text-slate-900 dark:text-white mt-0.5">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-ink-500">Tổng bản ghi nhật ký</p>
+            <p className="font-display font-black text-2xl lg:text-3xl text-ink-800 mt-0.5">
               {stats.totalLogs?.toLocaleString() || 0}
             </p>
-            <span className="text-[10px] font-bold text-sky-600 dark:text-sky-400">✓ Không tốn CSDL</span>
+            <span className="font-mono text-[10px] text-emerald-700 font-bold">Lưu trữ Rolling File</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0">
-            <Calendar className="w-5 h-5" />
+        {/* Metric 2 */}
+        <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+          <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center shrink-0">
+            <Calendar className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Hoạt động hôm nay</p>
-            <p className="text-xl font-extrabold text-sky-600 dark:text-sky-400 mt-0.5">
+            <p className="font-mono text-[10px] uppercase tracking-wider text-ink-500">Hoạt động hôm nay</p>
+            <p className="font-display font-black text-2xl lg:text-3xl text-clay-700 mt-0.5">
               {stats.logsToday?.toLocaleString() || 0}
             </p>
-            <span className="text-[10px] font-bold text-slate-400">Theo thời gian thực</span>
+            <span className="font-mono text-[10px] text-ink-500">Theo thời gian thực</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
-            <Shield className="w-5 h-5" />
+        {/* Metric 3 */}
+        <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+          <div className="w-9 h-9 rounded-[5px] bg-amber-50 border border-amber-200/80 text-amber-700 flex items-center justify-center shrink-0">
+            <Shield className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Phân loại hành động</p>
-            <p className="text-xl font-extrabold text-violet-600 dark:text-violet-400 mt-0.5">
-              {stats.distinctActionsCount || actionsList.length || 0} loại
+            <p className="font-mono text-[10px] uppercase tracking-wider text-ink-500">Phân loại hành động</p>
+            <p className="font-display font-black text-2xl lg:text-3xl text-ink-800 mt-0.5">
+              {stats.distinctActionsCount || actionsList.length || 0} <span className="text-xs font-serif font-normal text-ink-400">loại</span>
             </p>
-            <span className="text-[10px] font-bold text-violet-600 dark:text-violet-400">4 file phân loại độc lập</span>
+            <span className="font-mono text-[10px] text-amber-800 font-bold">4 file phân loại độc lập</span>
           </div>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5" />
+        {/* Metric 4 */}
+        <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+          <div className="w-9 h-9 rounded-[5px] bg-clay-50 border border-clay-200/80 text-clay-700 flex items-center justify-center shrink-0">
+            <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Cơ chế File Rolling</p>
-            <p className="text-sm font-bold text-amber-600 dark:text-amber-400 mt-0.5 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-sky-500 animate-ping"></span>
+            <p className="font-mono text-[10px] uppercase tracking-wider text-ink-500">Cơ chế File Rolling</p>
+            <p className="font-serif font-bold text-sm text-ink-800 mt-0.5 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
               Xoay vòng 30 ngày
             </p>
-            <span className="text-[10px] text-slate-400">Tự động nén .gz</span>
+            <span className="font-mono text-[10px] text-ink-400">Tự động nén .gz</span>
           </div>
         </div>
       </div>
 
       {/* 3. Search & Filter Bar */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 shadow-xs space-y-4">
+      <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs space-y-3.5">
         {/* Category Filter Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar border-b border-slate-100 dark:border-slate-700/60">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-ink-200/80">
           {[
             { id: 'ALL', label: 'Tất cả phân loại', count: stats.totalLogs, icon: Layers },
-            { id: 'AUTH', label: '🔐 Xác thực (AUTH)', count: stats.authCount, icon: KeyRound },
-            { id: 'SECURITY', label: '🛡️ An ninh (SECURITY)', count: stats.securityCount, icon: ShieldCheck },
-            { id: 'ACTIVITY', label: '🧭 Nghiệp vụ (ACTIVITY)', count: stats.activityCount, icon: Compass },
-            { id: 'SYSTEM', label: '⚙️ Hệ thống (SYSTEM)', count: stats.systemCount, icon: Cpu }
+            { id: 'AUTH', label: 'Xác thực (AUTH)', count: stats.authCount, icon: KeyRound },
+            { id: 'SECURITY', label: 'An ninh & Kiểm duyệt', count: stats.securityCount, icon: ShieldCheck },
+            { id: 'ACTIVITY', label: 'Nghiệp vụ (ACTIVITY)', count: stats.activityCount, icon: Compass },
+            { id: 'SYSTEM', label: 'Hệ thống (SYSTEM)', count: stats.systemCount, icon: Cpu }
           ].map((tab) => {
             const Icon = tab.icon;
             const active = selectedCategory === tab.id;
@@ -442,16 +468,16 @@ export const AdminAuditLogsPage = () => {
                 key={tab.id}
                 type="button"
                 onClick={() => { setSelectedCategory(tab.id); setPage(0); }}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-[4px] font-serif text-xs transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                   active
-                    ? 'bg-slate-900 text-white shadow-xs dark:bg-sky-600'
-                    : 'bg-slate-100 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    ? 'bg-clay-600 text-white font-bold shadow-xs'
+                    : 'bg-[#F8F4EC] text-ink-700 hover:bg-[#EBE5D8] border border-ink-200/80 font-medium'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
                 <span>{tab.label}</span>
                 {typeof tab.count === 'number' && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${active ? 'bg-white/20 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-2xs'}`}>
+                  <span className={`px-1.5 py-0.2 rounded-[3px] font-mono text-[10px] ${active ? 'bg-white/20 text-white font-bold' : 'bg-ink-100 text-ink-700'}`}>
                     {tab.count}
                   </span>
                 )}
@@ -459,37 +485,39 @@ export const AdminAuditLogsPage = () => {
             );
           })}
         </div>
+
+        {/* Search & Select Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
           
           {/* Keyword Search Input */}
           <div className="sm:col-span-5 relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={keyword}
               onChange={(e) => { setKeyword(e.target.value); setPage(0); }}
               placeholder="Tìm hành động, nội dung, IP, tên hoặc email..."
-              className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+              className="w-full pl-8 pr-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs text-ink-800 placeholder:text-ink-400 outline-none focus:border-clay-600 font-sans"
             />
           </div>
 
-          {/* User Selector Dropdown (Tìm kiếm & Hiển thị theo người dùng) */}
+          {/* User Selector Dropdown */}
           <div className="sm:col-span-4 relative">
             <div className="relative">
-              <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <User className="w-3.5 h-3.5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <select
                 value={selectedUserId}
                 onChange={(e) => { setSelectedUserId(e.target.value); setPage(0); }}
-                className="w-full pl-9 pr-8 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all appearance-none cursor-pointer"
+                className="w-full pl-8 pr-8 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs font-serif font-semibold text-ink-700 outline-none focus:border-clay-600 cursor-pointer appearance-none"
               >
                 <option value="">— Lọc theo tất cả người dùng —</option>
-                {usersList.map((u) => (
+                {(Array.isArray(usersList) ? usersList : []).map((u) => (
                   <option key={u.id} value={u.id}>
-                    {u.fullName} ({u.email})
+                    {u.fullName || u.email} ({u.email})
                   </option>
                 ))}
               </select>
-              <Filter className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Filter className="w-3 h-3 text-ink-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
 
@@ -498,7 +526,7 @@ export const AdminAuditLogsPage = () => {
             <select
               value={selectedAction}
               onChange={(e) => { setSelectedAction(e.target.value); setPage(0); }}
-              className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all cursor-pointer"
+              className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs font-serif font-semibold text-ink-700 outline-none focus:border-clay-600 cursor-pointer"
             >
               <option value="ALL">Tất cả loại hành động</option>
               {actionsList.map((act) => (
@@ -513,15 +541,15 @@ export const AdminAuditLogsPage = () => {
 
         {/* Active Filters Pill Bar */}
         {(keyword || selectedUserId || selectedAction !== 'ALL' || selectedCategory !== 'ALL') && (
-          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/50">
-            <span className="text-[11px] font-semibold text-slate-400">Bộ lọc đang bật:</span>
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-ink-200/80">
+            <span className="font-mono text-[10px] uppercase tracking-wider text-ink-500 font-bold">Bộ lọc đang bật:</span>
 
             {selectedCategory !== 'ALL' && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-semibold">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-800 border border-ink-200/80 font-mono text-xs">
                 <span>Phân loại: {selectedCategory}</span>
                 <button
                   onClick={() => setSelectedCategory('ALL')}
-                  className="hover:text-rose-600 transition-colors ml-1 cursor-pointer"
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -529,12 +557,12 @@ export const AdminAuditLogsPage = () => {
             )}
 
             {selectedUserObj && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-semibold">
-                <User className="w-3 h-3" />
-                <span>Người dùng: {selectedUserObj.fullName}</span>
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-800 border border-ink-200/80 font-serif font-bold text-xs">
+                <User className="w-3 h-3 text-clay-600" />
+                <span>Người dùng: {selectedUserObj.fullName || selectedUserObj.email}</span>
                 <button
                   onClick={() => setSelectedUserId('')}
-                  className="hover:text-rose-600 transition-colors ml-1 cursor-pointer"
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -542,11 +570,11 @@ export const AdminAuditLogsPage = () => {
             )}
 
             {selectedAction !== 'ALL' && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 border border-violet-200 dark:border-violet-800 text-xs font-semibold">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-800 border border-ink-200/80 font-mono text-xs">
                 <span>Hành động: {selectedAction}</span>
                 <button
                   onClick={() => setSelectedAction('ALL')}
-                  className="hover:text-rose-600 transition-colors ml-1 cursor-pointer"
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -554,11 +582,11 @@ export const AdminAuditLogsPage = () => {
             )}
 
             {keyword && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-800 border border-ink-200/80 font-sans text-xs">
                 <span>Từ khóa: "{keyword}"</span>
                 <button
                   onClick={() => setKeyword('')}
-                  className="hover:text-rose-600 transition-colors ml-1 cursor-pointer"
+                  className="hover:text-rose-600 transition-colors cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -567,7 +595,7 @@ export const AdminAuditLogsPage = () => {
 
             <button
               onClick={handleResetFilters}
-              className="text-xs font-bold text-rose-600 hover:text-rose-700 dark:text-rose-400 hover:underline cursor-pointer ml-auto"
+              className="font-serif text-xs font-bold text-rose-700 hover:text-rose-800 hover:underline cursor-pointer ml-auto"
             >
               Xóa tất cả bộ lọc
             </button>
@@ -575,39 +603,39 @@ export const AdminAuditLogsPage = () => {
         )}
       </div>
 
-      {/* 4. Logs Data Table */}
-      <div className="bg-white dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/60 rounded-2xl shadow-xs overflow-hidden">
+      {/* 4. Logs Data Table (Paper-Ink-Clay) */}
+      <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] shadow-xs overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse text-xs">
             <thead>
-              <tr className="bg-slate-50/80 dark:bg-slate-900/50 border-b border-slate-200/80 dark:border-slate-700/60 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                <th className="py-3 px-4 w-12 text-center">#</th>
-                <th className="py-3 px-4 min-w-[160px]">Thời gian</th>
-                <th className="py-3 px-4 min-w-[200px]">Người dùng phát sinh</th>
-                <th className="py-3 px-4 min-w-[120px]">Phân loại</th>
-                <th className="py-3 px-4 min-w-[150px]">Hành động</th>
-                <th className="py-3 px-4 min-w-[280px]">Nội dung & Chi tiết nghiệp vụ</th>
-                <th className="py-3 px-4 min-w-[150px]">IP & Thiết bị</th>
-                <th className="py-3 px-4 w-20 text-center">Chi tiết</th>
+              <tr className="bg-[#F8F4EC] border-b border-ink-200/80 font-mono text-[10px] font-bold text-ink-500 uppercase tracking-wider">
+                <th className="py-2.5 px-3 w-10 text-center">#</th>
+                <th className="py-2.5 px-3 min-w-[150px]">Thời gian</th>
+                <th className="py-2.5 px-3 min-w-[190px]">Người dùng phát sinh</th>
+                <th className="py-2.5 px-3 min-w-[110px]">Phân loại</th>
+                <th className="py-2.5 px-3 min-w-[140px]">Hành động</th>
+                <th className="py-2.5 px-3 min-w-[260px]">Nội dung & Chi tiết nghiệp vụ</th>
+                <th className="py-2.5 px-3 min-w-[140px]">IP & Thiết bị</th>
+                <th className="py-2.5 px-3 w-16 text-center">Chi tiết</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60 text-xs text-slate-700 dark:text-slate-200">
+            <tbody className="divide-y divide-ink-100 text-ink-700">
               {loading ? (
                 <tr>
                   <td colSpan="8" className="py-12 text-center">
-                    <div className="inline-flex flex-col items-center gap-2 text-slate-400">
-                      <RefreshCw className="w-6 h-6 animate-spin text-sky-600" />
-                      <span>Đang tải nhật ký hệ thống...</span>
+                    <div className="inline-flex flex-col items-center gap-2 text-ink-400">
+                      <RefreshCw className="w-5 h-5 animate-spin text-clay-600" />
+                      <span className="font-serif">Đang đồng bộ nhật ký hệ thống...</span>
                     </div>
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="py-12 text-center text-slate-400">
-                    <div className="inline-flex flex-col items-center gap-2">
-                      <Info className="w-8 h-8 text-slate-300" />
-                      <p className="font-semibold text-slate-600 dark:text-slate-300">Không tìm thấy bản ghi nhật ký phù hợp</p>
-                      <p className="text-[11px] text-slate-400">Thử thay đổi từ khóa hoặc đặt lại bộ lọc tìm kiếm</p>
+                  <td colSpan="8" className="py-12 text-center text-ink-400">
+                    <div className="inline-flex flex-col items-center gap-1.5">
+                      <Info className="w-7 h-7 text-ink-300" />
+                      <p className="font-serif font-bold text-ink-700">Không tìm thấy bản ghi nhật ký phù hợp</p>
+                      <p className="font-sans text-[11px] text-ink-400">Thử thay đổi từ khóa hoặc xóa bớt bộ lọc tìm kiếm</p>
                     </div>
                   </td>
                 </tr>
@@ -620,29 +648,29 @@ export const AdminAuditLogsPage = () => {
                   return (
                     <tr
                       key={logItem.id}
-                      className="hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors"
+                      className="hover:bg-[#F8F4EC]/70 transition-colors"
                     >
                       {/* Index */}
-                      <td className="py-3 px-4 text-center text-[11px] font-mono text-slate-400">
+                      <td className="py-2.5 px-3 text-center font-mono text-[10px] text-ink-400">
                         {page * pageSize + idx + 1}
                       </td>
 
                       {/* Created At */}
-                      <td className="py-3 px-4 whitespace-nowrap">
+                      <td className="py-2.5 px-3 whitespace-nowrap">
                         <div className="space-y-0.5">
-                          <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white text-xs">
-                            <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
+                          <div className="flex items-center gap-1 font-serif font-bold text-ink-800 text-xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-clay-600"></span>
                             <span>{formatRelativeTime(logItem.createdAt) || 'Vừa xong'}</span>
                           </div>
-                          <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono">
-                            <Calendar className="w-3 h-3 text-slate-300" />
+                          <div className="flex items-center gap-1 text-[10px] text-ink-400 font-mono">
+                            <Calendar className="w-2.5 h-2.5" />
                             <span>{formatDate(logItem.createdAt)}</span>
                           </div>
                         </div>
                       </td>
 
-                      {/* User Cell with Fast Filter Button */}
-                      <td className="py-3 px-4">
+                      {/* User Cell */}
+                      <td className="py-2.5 px-3">
                         <div className="flex items-center gap-2.5">
                           <img
                             src={
@@ -650,42 +678,42 @@ export const AdminAuditLogsPage = () => {
                               'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
                             }
                             alt={logItem.userName}
-                            className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200 dark:ring-slate-700 shrink-0"
+                            className="w-7 h-7 rounded-[4px] object-cover border border-ink-200/80 shrink-0"
                           />
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-slate-900 dark:text-white truncate">
+                              <span className="font-serif font-bold text-ink-800 truncate">
                                 {logItem.userName || 'Hệ thống'}
                               </span>
                               {logItem.userId && (
                                 <button
                                   type="button"
                                   onClick={() => handleSelectUserFilter(logItem.userId)}
-                                  className={`text-[9px] px-1.5 py-0.5 rounded font-semibold transition-colors cursor-pointer ${
+                                  className={`text-[9px] px-1 py-0.2 rounded-[3px] font-mono font-bold transition-colors cursor-pointer ${
                                     isCurrentFilterUser
-                                      ? 'bg-sky-600 text-white'
-                                      : 'bg-slate-100 dark:bg-slate-700 text-slate-500 hover:bg-sky-100 hover:text-sky-700'
+                                      ? 'bg-clay-600 text-white'
+                                      : 'bg-[#F8F4EC] text-ink-600 hover:bg-clay-100 hover:text-clay-800'
                                   }`}
-                                  title="Lọc chỉ hiển thị nhật ký người dùng này"
+                                  title="Lọc hiển thị nhật ký người dùng này"
                                 >
-                                  {isCurrentFilterUser ? 'Đang lọc' : 'Lọc theo user'}
+                                  {isCurrentFilterUser ? 'Đang lọc' : 'Lọc user'}
                                 </button>
                               )}
                             </div>
-                            <p className="text-[11px] text-slate-400 truncate">
-                              {logItem.userEmail} • {logItem.userHandle || '@system'}
+                            <p className="text-[10px] font-mono text-ink-400 truncate">
+                              {logItem.userEmail}
                             </p>
                           </div>
                         </div>
                       </td>
 
                       {/* Category Badge */}
-                      <td className="py-3 px-4 whitespace-nowrap">
+                      <td className="py-2.5 px-3 whitespace-nowrap">
                         {(() => {
                           const catBadge = getCategoryBadge(logItem.category || logItem.action);
                           return (
                             <span
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${catBadge.bg}`}
+                              className={`inline-flex items-center px-2 py-0.5 rounded-[4px] font-mono text-[9px] font-bold border ${catBadge.bg}`}
                               title={catBadge.title}
                             >
                               {catBadge.label}
@@ -695,9 +723,9 @@ export const AdminAuditLogsPage = () => {
                       </td>
 
                       {/* Action Badge */}
-                      <td className="py-3 px-4 whitespace-nowrap">
+                      <td className="py-2.5 px-3 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${badge.bg}`}
+                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] font-serif text-[10px] font-bold border ${badge.bg}`}
                         >
                           <Icon className="w-3 h-3" />
                           <span>{logItem.action}</span>
@@ -705,34 +733,34 @@ export const AdminAuditLogsPage = () => {
                       </td>
 
                       {/* Details */}
-                      <td className="py-3 px-4">
-                        <p className="line-clamp-2 text-slate-700 dark:text-slate-200 font-normal leading-relaxed">
+                      <td className="py-2.5 px-3">
+                        <p className="line-clamp-2 text-ink-700 font-sans text-xs leading-relaxed">
                           {logItem.details || '—'}
                         </p>
                       </td>
 
                       {/* IP & User Agent */}
-                      <td className="py-3 px-4 whitespace-nowrap">
-                        <div className="space-y-1">
-                          <span className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-semibold">
-                            <Globe className="w-3 h-3 text-sky-500" />
-                            {logItem.ipAddress || '118.69.190.10'}
+                      <td className="py-2.5 px-3 whitespace-nowrap">
+                        <div className="space-y-0.5">
+                          <span className="inline-flex items-center gap-1 font-mono text-[10px] px-1.5 py-0.2 rounded-[3px] bg-[#F8F4EC] text-ink-700 border border-ink-200/60 font-bold">
+                            <Globe className="w-2.5 h-2.5 text-clay-600" />
+                            {logItem.ipAddress || '127.0.0.1'}
                           </span>
-                          <p className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1 font-medium" title={logItem.userAgent}>
-                            <Monitor className="w-3 h-3 text-slate-400 shrink-0" />
-                            <span className="truncate max-w-[170px]">{parseDevice(logItem.userAgent)}</span>
+                          <p className="text-[10px] text-ink-400 flex items-center gap-1 font-mono truncate max-w-[150px]" title={logItem.userAgent}>
+                            <Monitor className="w-2.5 h-2.5 shrink-0" />
+                            <span>{parseDevice(logItem.userAgent)}</span>
                           </p>
                         </div>
                       </td>
 
                       {/* Action Button */}
-                      <td className="py-3 px-4 text-center">
+                      <td className="py-2.5 px-3 text-center">
                         <button
                           onClick={() => setSelectedLog(logItem)}
-                          className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 hover:text-sky-600 transition-colors cursor-pointer"
-                          title="Xem chi tiết nhật ký"
+                          className="w-7 h-7 rounded-[4px] hover:bg-[#EBE5D8] text-ink-500 hover:text-clay-600 inline-flex items-center justify-center transition-colors cursor-pointer"
+                          title="Xem chi tiết bản ghi nhật ký"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-3.5 h-3.5" />
                         </button>
                       </td>
                     </tr>
@@ -744,13 +772,11 @@ export const AdminAuditLogsPage = () => {
         </div>
 
         {/* 5. Pagination */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 bg-slate-50/60 dark:bg-slate-900/40 border-t border-slate-200/80 dark:border-slate-700/60 text-xs text-slate-500">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-2.5 bg-[#F8F4EC] border-t border-ink-200/80 text-xs text-ink-500 font-mono">
           <div>
-            <span>
-              Hiển thị {logs.length} / {totalElements} bản ghi nhật ký
-            </span>
+            Hiển thị <strong className="text-ink-800">{logs.length}</strong> / <strong className="text-ink-800">{totalElements}</strong> bản ghi nhật ký
             {totalPages > 1 && (
-              <span className="ml-2 font-semibold">
+              <span className="ml-1.5 font-bold">
                 (Trang {page + 1} / {totalPages})
               </span>
             )}
@@ -760,74 +786,74 @@ export const AdminAuditLogsPage = () => {
             <button
               onClick={() => setPage(p => Math.max(p - 1, 0))}
               disabled={page === 0 || loading}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              className="w-7 h-7 rounded-[4px] bg-[#FFFDF8] border border-ink-200/80 flex items-center justify-center text-ink-700 hover:bg-[#F3EFE6] disabled:opacity-40 cursor-pointer"
               title="Trang trước"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-3.5 h-3.5" />
             </button>
 
-            <span className="px-3 py-1 font-bold text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
+            <span className="px-2.5 py-1 rounded-[4px] bg-clay-600 text-white font-mono font-bold text-xs">
               {page + 1}
             </span>
 
             <button
               onClick={() => setPage(p => (p + 1 < totalPages ? p + 1 : p))}
               disabled={page + 1 >= totalPages || loading}
-              className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              className="w-7 h-7 rounded-[4px] bg-[#FFFDF8] border border-ink-200/80 flex items-center justify-center text-ink-700 hover:bg-[#F3EFE6] disabled:opacity-40 cursor-pointer"
               title="Trang sau"
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
       </div>
 
-      {/* 6. Log Detail Modal */}
+      {/* 6. Log Detail Modal (Paper-Ink-Clay) */}
       {selectedLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-5 animate-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-700">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] max-w-lg w-full p-6 shadow-xl space-y-4 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-ink-200/80">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 flex items-center justify-center font-bold">
-                  <ShieldCheck className="w-5 h-5" />
+                <div className="w-8 h-8 rounded-[4px] bg-clay-100 text-clay-700 flex items-center justify-center font-bold">
+                  <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                  <h3 className="font-serif font-bold text-sm text-ink-800">
                     Chi Tiết Nhật Ký Hệ Thống #{selectedLog.id}
                   </h3>
-                  <p className="text-[11px] text-slate-400">
-                    Ghi nhận lúc: {formatDate(selectedLog.createdAt)}
+                  <p className="font-mono text-[10px] text-ink-400">
+                    Ghi nhận: {formatDate(selectedLog.createdAt)}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setSelectedLog(null)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-[4px] hover:bg-[#F8F4EC] text-ink-400 hover:text-ink-700 flex items-center justify-center cursor-pointer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Modal Body */}
-            <div className="space-y-4 text-xs">
+            <div className="space-y-3.5 text-xs">
               {/* User info */}
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/80 border border-slate-100 dark:border-slate-800 flex items-center gap-3">
+              <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 flex items-center gap-3">
                 <img
                   src={
                     selectedLog.userAvatar ||
                     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
                   }
                   alt={selectedLog.userName}
-                  className="w-10 h-10 rounded-full object-cover ring-2 ring-sky-500/20"
+                  className="w-10 h-10 rounded-[4px] object-cover border border-ink-200/80 shrink-0"
                 />
-                <div>
-                  <p className="font-bold text-slate-900 dark:text-white text-sm">
+                <div className="min-w-0">
+                  <p className="font-serif font-bold text-ink-800 text-sm">
                     {selectedLog.userName || 'Hệ thống (System)'}
                   </p>
-                  <p className="text-slate-400 text-[11px]">
-                    {selectedLog.userEmail} • {selectedLog.userHandle}
+                  <p className="font-mono text-[10px] text-ink-500 truncate">
+                    {selectedLog.userEmail} {selectedLog.userHandle ? `• @${selectedLog.userHandle}` : ''}
                   </p>
-                  <span className="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-bold bg-sky-100 dark:bg-sky-900/60 text-sky-800 dark:text-sky-300">
+                  <span className="inline-block mt-1 px-2 py-0.2 rounded-[3px] font-mono text-[9px] font-bold bg-[#EBE5D8] text-ink-700 border border-ink-200/60">
                     Vai trò: {selectedLog.userRole || 'MEMBER'}
                   </span>
                 </div>
@@ -836,14 +862,14 @@ export const AdminAuditLogsPage = () => {
               {/* Category & Action type */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    Phân loại (Category)
+                  <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-ink-500 block mb-1">
+                    Phân loại
                   </label>
-                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 flex items-center">
+                  <div className="p-2 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 flex items-center">
                     {(() => {
                       const cb = getCategoryBadge(selectedLog.category || selectedLog.action);
                       return (
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold border ${cb.bg}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-[3px] font-mono text-[10px] font-bold border ${cb.bg}`}>
                           {cb.label}
                         </span>
                       );
@@ -851,10 +877,10 @@ export const AdminAuditLogsPage = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
-                    Hành động (Action)
+                  <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-ink-500 block mb-1">
+                    Hành động
                   </label>
-                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 font-mono font-bold text-sky-600 dark:text-sky-400 flex items-center">
+                  <div className="p-2 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 font-mono font-bold text-clay-700 text-xs truncate">
                     {selectedLog.action}
                   </div>
                 </div>
@@ -862,10 +888,10 @@ export const AdminAuditLogsPage = () => {
 
               {/* Details */}
               <div>
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-ink-500 block mb-1">
                   Nội dung chi tiết (Audit Details)
                 </label>
-                <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 leading-relaxed font-sans">
+                <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-ink-800 leading-relaxed font-sans text-xs">
                   {selectedLog.details || 'Không có chi tiết bổ sung'}
                 </div>
               </div>
@@ -873,18 +899,18 @@ export const AdminAuditLogsPage = () => {
               {/* Network & Device Info */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-ink-500 block mb-1">
                     Địa chỉ IP
                   </label>
-                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 font-mono text-slate-700 dark:text-slate-300">
+                  <div className="p-2 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 font-mono text-ink-800 text-xs">
                     {selectedLog.ipAddress || '127.0.0.1'}
                   </div>
                 </div>
                 <div>
-                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-ink-500 block mb-1">
                     Mã bản ghi ID
                   </label>
-                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-900 font-mono text-slate-700 dark:text-slate-300">
+                  <div className="p-2 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 font-mono text-ink-800 text-xs">
                     #{selectedLog.id}
                   </div>
                 </div>
@@ -892,17 +918,17 @@ export const AdminAuditLogsPage = () => {
 
               {/* User Agent */}
               <div>
-                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                <label className="font-mono text-[10px] font-bold uppercase tracking-wider text-ink-500 block mb-1">
                   User Agent
                 </label>
-                <div className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-[11px] text-slate-500 font-mono break-all">
+                <div className="p-2 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 font-mono text-[10px] text-ink-600 break-all">
                   {selectedLog.userAgent || 'Internal System'}
                 </div>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="pt-2 flex items-center justify-between">
+            <div className="pt-2 border-t border-ink-200/80 flex items-center justify-between">
               {selectedLog.userId && (
                 <button
                   type="button"
@@ -910,15 +936,15 @@ export const AdminAuditLogsPage = () => {
                     handleSelectUserFilter(selectedLog.userId);
                     setSelectedLog(null);
                   }}
-                  className="px-3 py-1.5 rounded-xl bg-sky-50 text-sky-700 font-semibold text-xs hover:bg-sky-100 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-[5px] bg-[#F8F4EC] text-clay-700 font-serif font-bold text-xs hover:bg-clay-100 border border-ink-200/80 transition-colors cursor-pointer"
                 >
-                  Lọc tất cả hoạt động của user này
+                  Lọc tất cả nhật ký của user này
                 </button>
               )}
               <button
                 type="button"
                 onClick={() => setSelectedLog(null)}
-                className="ml-auto px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs hover:bg-slate-800 transition-colors cursor-pointer"
+                className="ml-auto px-4 py-2 rounded-[5px] bg-clay-600 text-white font-serif font-bold text-xs hover:bg-clay-700 transition-colors cursor-pointer shadow-xs"
               >
                 Đóng
               </button>
@@ -931,4 +957,3 @@ export const AdminAuditLogsPage = () => {
 };
 
 export default AdminAuditLogsPage;
-
