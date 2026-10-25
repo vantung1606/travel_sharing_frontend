@@ -29,6 +29,13 @@ import {
 import { ItineraryMessageBubble } from '../chat/ItineraryMessageBubble';
 import { ItineraryPickerModal } from '../chat/ItineraryPickerModal';
 
+// Official Facebook Messenger SVG Icon
+const MessengerIcon = ({ className = "w-6 h-6" }) => (
+  <svg viewBox="0 0 28 28" fill="currentColor" className={className}>
+    <path d="M14 2C7.373 2 2 6.955 2 13.067c0 3.481 1.745 6.581 4.473 8.528V26l4.24-2.333c1.036.287 2.137.442 3.287.442 6.627 0 12-4.955 12-11.067C26 6.955 20.627 2 14 2zm1.187 14.862l-3.067-3.273-5.986 3.273 6.586-7 3.134 3.273 5.92-3.273-6.587 7z"/>
+  </svg>
+);
+
 const normalizeVietnamese = (str) => {
   if (!str) return '';
   return str
@@ -381,6 +388,7 @@ export const FloatingChatWidget = () => {
   }, []);
 
   const totalUnread = threads.reduce((acc, t) => acc + (t.unread || 0), 0);
+  const [isClickAnimating, setIsClickAnimating] = useState(false);
 
   const handleToggleOpen = () => {
     if (!isLoggedIn) {
@@ -389,6 +397,12 @@ export const FloatingChatWidget = () => {
       return;
     }
     setIsOpen(prev => !prev);
+  };
+
+  const handleToggleOpenWithAnimation = () => {
+    setIsClickAnimating(true);
+    setTimeout(() => setIsClickAnimating(false), 450);
+    handleToggleOpen();
   };
 
   const handleOpenThread = (threadId) => {
@@ -768,14 +782,14 @@ export const FloatingChatWidget = () => {
                 </>
               ) : (
                 <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-sky-400 via-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/30 shrink-0">
-                    <Compass className="w-5 h-5" />
+                  <div className="w-8.5 h-8.5 rounded-2xl bg-gradient-to-tr from-[#0084FF] via-[#7B42F6] to-[#FD3A84] flex items-center justify-center text-white shadow-md shadow-blue-500/30 shrink-0">
+                    <MessengerIcon className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-xs text-white leading-tight">Hỏi đáp chuyến đi</h4>
+                    <h4 className="font-bold text-xs text-white leading-tight">Tin nhắn Wayfare</h4>
                     <span className="text-[11px] text-slate-300 mt-0.5 flex items-center gap-1">
                       <Sparkles className="w-3 h-3 text-amber-300" />
-                      <span>Trợ lý & Đồng hành 24/7</span>
+                      <span>Hỏi đáp & Trò chuyện</span>
                     </span>
                   </div>
                 </div>
@@ -1119,36 +1133,60 @@ export const FloatingChatWidget = () => {
         onSelectItinerary={handleSendItinerary}
       />
 
-      {/* Compact Minimalist Trigger Button */}
+      {/* Compact Messenger Trigger Button with Click Animation */}
       <div className="relative flex items-center justify-end">
         {/* Subtle Tooltip on Desktop Hover */}
         {!isOpen && (
           <div className="absolute right-full mr-2.5 hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/90 text-white text-[11px] font-medium shadow-md border border-white/10 whitespace-nowrap opacity-0 group-hover/widget:opacity-100 transition-opacity duration-200 pointer-events-none backdrop-blur-xs">
-            <span>Hỏi đáp & Trò chuyện</span>
+            <span>Nhắn tin & Trò chuyện</span>
           </div>
+        )}
+
+        {/* Click Shockwave Ripple Burst */}
+        {isClickAnimating && (
+          <span className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#0084FF] to-[#FD3A84] animate-ping opacity-60 pointer-events-none" />
         )}
 
         <button
           type="button"
-          onClick={handleToggleOpen}
-          className="w-11 h-11 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white flex items-center justify-center shadow-md shadow-blue-600/25 hover:shadow-lg hover:shadow-blue-600/40 hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer relative ring-2 ring-white shrink-0"
-          title="Hỏi đáp & Trò chuyện Wayfare"
-          aria-label="Trò chuyện chuyến đi"
+          onClick={handleToggleOpenWithAnimation}
+          className={`w-12 h-12 rounded-full bg-gradient-to-tr from-[#0084FF] via-[#7B42F6] to-[#FD3A84] hover:brightness-110 text-white flex items-center justify-center shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-purple-500/40 cursor-pointer relative ring-2 ring-white active:scale-75 transition-all duration-300 ease-out shrink-0 select-none ${
+            isClickAnimating ? 'scale-90' : 'hover:scale-108'
+          }`}
+          title="Nhắn tin & Trò chuyện Wayfare"
+          aria-label="Nhắn tin Messenger"
         >
-          {isOpen ? (
-            <X className="w-4.5 h-4.5 stroke-[2.2] transition-transform duration-200 rotate-0 hover:rotate-90" />
-          ) : (
-            <>
-              <div className="relative flex items-center justify-center">
-                <Compass className="w-5 h-5 stroke-[2] drop-shadow-xs" />
-                <span className="absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-blue-600" />
-              </div>
-              {totalUnread > 0 && (
-                <span className="absolute -top-1 -right-1 min-w-[17px] h-[17px] px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold font-mono flex items-center justify-center ring-1.5 ring-white shadow-xs">
-                  {totalUnread > 99 ? '99+' : totalUnread}
-                </span>
-              )}
-            </>
+          {/* Smooth Icon Morphing Animation between Messenger and Close X */}
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Messenger Icon */}
+            <div
+              className={`transition-all duration-300 ease-out transform flex items-center justify-center ${
+                isOpen
+                  ? 'rotate-90 scale-0 opacity-0 pointer-events-none'
+                  : 'rotate-0 scale-100 opacity-100'
+              }`}
+            >
+              <MessengerIcon className="w-6 h-6 drop-shadow-xs" />
+              <span className="absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white" />
+            </div>
+
+            {/* Close X Icon */}
+            <div
+              className={`absolute transition-all duration-300 ease-out transform flex items-center justify-center ${
+                isOpen
+                  ? 'rotate-0 scale-100 opacity-100'
+                  : '-rotate-90 scale-0 opacity-0 pointer-events-none'
+              }`}
+            >
+              <X className="w-5 h-5 stroke-[2.5] drop-shadow-xs" />
+            </div>
+          </div>
+
+          {/* Unread badge */}
+          {totalUnread > 0 && !isOpen && (
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[9px] font-bold font-mono flex items-center justify-center ring-2 ring-white shadow-xs animate-bounce">
+              {totalUnread > 99 ? '99+' : totalUnread}
+            </span>
           )}
         </button>
       </div>
