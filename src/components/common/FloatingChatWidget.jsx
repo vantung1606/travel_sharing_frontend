@@ -1144,19 +1144,16 @@ export const FloatingChatWidget = () => {
           </div>
         )}
 
-        {/* Ambient Glow Aura */}
-        <div className="absolute inset-0 rounded-full bg-sky-400/35 blur-xl opacity-60 group-hover/widget:opacity-90 transition-opacity duration-300 pointer-events-none" />
-
         {/* Click Shockwave Ripple Burst */}
         {isClickAnimating && (
-          <span className="absolute inset-0 rounded-full bg-sky-400 animate-ping opacity-60 pointer-events-none" />
+          <span className="absolute inset-0 rounded-full bg-sky-400/25 animate-ping pointer-events-none" />
         )}
 
         <button
           type="button"
           onClick={handleToggleOpenWithAnimation}
-          className={`w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center cursor-pointer relative active:scale-75 transition-all duration-300 ease-out shrink-0 select-none drop-shadow-[0_8px_20px_rgba(56,189,248,0.4)] ${
-            isClickAnimating ? 'scale-90' : 'hover:scale-108'
+          className={`w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center cursor-pointer relative active:scale-75 transition-all duration-300 ease-out shrink-0 select-none ${
+            isClickAnimating ? 'scale-90' : 'hover:scale-105'
           }`}
           title="Hỏi đáp & Trò chuyện Wayfare"
           aria-label="Trò chuyện Wayfare"
@@ -1174,7 +1171,7 @@ export const FloatingChatWidget = () => {
               <img
                 src="/chaticon.png"
                 alt="Wayfare Chat"
-                className="w-full h-full object-contain filter drop-shadow-[0_4px_10px_rgba(0,120,255,0.3)]"
+                className="w-full h-full object-contain"
               />
               <span className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white shadow-xs" />
             </div>
