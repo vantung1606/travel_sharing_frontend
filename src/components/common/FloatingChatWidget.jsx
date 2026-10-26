@@ -782,14 +782,16 @@ export const FloatingChatWidget = () => {
                 </>
               ) : (
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8.5 h-8.5 rounded-2xl bg-gradient-to-tr from-[#0084FF] via-[#7B42F6] to-[#FD3A84] flex items-center justify-center text-white shadow-md shadow-blue-500/30 shrink-0">
-                    <MessengerIcon className="w-5 h-5" />
-                  </div>
+                  <img
+                    src="/chaticon.png"
+                    alt=""
+                    className="w-9 h-9 object-contain drop-shadow-sm shrink-0"
+                  />
                   <div>
-                    <h4 className="font-bold text-xs text-white leading-tight">Tin nhắn Wayfare</h4>
+                    <h4 className="font-bold text-xs text-white leading-tight">Hỏi đáp chuyến đi</h4>
                     <span className="text-[11px] text-slate-300 mt-0.5 flex items-center gap-1">
                       <Sparkles className="w-3 h-3 text-amber-300" />
-                      <span>Hỏi đáp & Trò chuyện</span>
+                      <span>Trợ lý & Đồng hành 24/7</span>
                     </span>
                   </div>
                 </div>
@@ -1133,46 +1135,53 @@ export const FloatingChatWidget = () => {
         onSelectItinerary={handleSendItinerary}
       />
 
-      {/* Compact Messenger Trigger Button with Click Animation */}
+      {/* Compact Crystal Glass Chat Trigger Button with Click Animation */}
       <div className="relative flex items-center justify-end">
         {/* Subtle Tooltip on Desktop Hover */}
         {!isOpen && (
-          <div className="absolute right-full mr-2.5 hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900/90 text-white text-[11px] font-medium shadow-md border border-white/10 whitespace-nowrap opacity-0 group-hover/widget:opacity-100 transition-opacity duration-200 pointer-events-none backdrop-blur-xs">
-            <span>Nhắn tin & Trò chuyện</span>
+          <div className="absolute right-full mr-2.5 hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/90 text-white text-xs font-medium shadow-md border border-white/10 whitespace-nowrap opacity-0 group-hover/widget:opacity-100 transition-opacity duration-200 pointer-events-none backdrop-blur-xs">
+            <span>Hỏi đáp & Trò chuyện</span>
           </div>
         )}
 
+        {/* Ambient Glow Aura */}
+        <div className="absolute inset-0 rounded-full bg-sky-400/35 blur-xl opacity-60 group-hover/widget:opacity-90 transition-opacity duration-300 pointer-events-none" />
+
         {/* Click Shockwave Ripple Burst */}
         {isClickAnimating && (
-          <span className="absolute inset-0 rounded-full bg-gradient-to-tr from-[#0084FF] to-[#FD3A84] animate-ping opacity-60 pointer-events-none" />
+          <span className="absolute inset-0 rounded-full bg-sky-400 animate-ping opacity-60 pointer-events-none" />
         )}
 
         <button
           type="button"
           onClick={handleToggleOpenWithAnimation}
-          className={`w-12 h-12 rounded-full bg-gradient-to-tr from-[#0084FF] via-[#7B42F6] to-[#FD3A84] hover:brightness-110 text-white flex items-center justify-center shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-purple-500/40 cursor-pointer relative ring-2 ring-white active:scale-75 transition-all duration-300 ease-out shrink-0 select-none ${
+          className={`w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center cursor-pointer relative active:scale-75 transition-all duration-300 ease-out shrink-0 select-none drop-shadow-[0_8px_20px_rgba(56,189,248,0.4)] ${
             isClickAnimating ? 'scale-90' : 'hover:scale-108'
           }`}
-          title="Nhắn tin & Trò chuyện Wayfare"
-          aria-label="Nhắn tin Messenger"
+          title="Hỏi đáp & Trò chuyện Wayfare"
+          aria-label="Trò chuyện Wayfare"
         >
-          {/* Smooth Icon Morphing Animation between Messenger and Close X */}
+          {/* Smooth Icon Morphing Animation between Crystal Orb and Close X */}
           <div className="relative w-full h-full flex items-center justify-center">
-            {/* Messenger Icon */}
+            {/* Crystal Glass Chat Orb */}
             <div
-              className={`transition-all duration-300 ease-out transform flex items-center justify-center ${
+              className={`transition-all duration-300 ease-out transform flex items-center justify-center w-full h-full ${
                 isOpen
                   ? 'rotate-90 scale-0 opacity-0 pointer-events-none'
                   : 'rotate-0 scale-100 opacity-100'
               }`}
             >
-              <MessengerIcon className="w-6 h-6 drop-shadow-xs" />
-              <span className="absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white" />
+              <img
+                src="/chaticon.png"
+                alt="Wayfare Chat"
+                className="w-full h-full object-contain filter drop-shadow-[0_4px_10px_rgba(0,120,255,0.3)]"
+              />
+              <span className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white shadow-xs" />
             </div>
 
             {/* Close X Icon */}
             <div
-              className={`absolute transition-all duration-300 ease-out transform flex items-center justify-center ${
+              className={`absolute transition-all duration-300 ease-out transform flex items-center justify-center w-11 h-11 rounded-full bg-slate-900/90 text-white border border-white/20 shadow-lg ${
                 isOpen
                   ? 'rotate-0 scale-100 opacity-100'
                   : '-rotate-90 scale-0 opacity-0 pointer-events-none'
@@ -1184,7 +1193,7 @@ export const FloatingChatWidget = () => {
 
           {/* Unread badge */}
           {totalUnread > 0 && !isOpen && (
-            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[9px] font-bold font-mono flex items-center justify-center ring-2 ring-white shadow-xs animate-bounce">
+            <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 rounded-full bg-gradient-to-r from-rose-500 to-red-600 text-white text-[10px] font-black font-mono flex items-center justify-center ring-2 ring-white shadow-sm animate-bounce">
               {totalUnread > 99 ? '99+' : totalUnread}
             </span>
           )}
