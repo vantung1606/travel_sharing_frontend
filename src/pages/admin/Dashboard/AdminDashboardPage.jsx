@@ -166,8 +166,9 @@ export const AdminDashboardPage = () => {
   const filteredUsers = useMemo(() => {
     return usersList.filter(user => {
       if (tableStatusFilter !== 'all') {
-        if (tableStatusFilter === 'admin' && user.role !== 'ROLE_ADMIN' && user.role !== 'ADMIN') return false;
-        if (tableStatusFilter === 'user' && (user.role === 'ROLE_ADMIN' || user.role === 'ADMIN')) return false;
+        const isAdminOrMod = (user.roles && user.roles.some(r => r === 'ROLE_ADMIN' || r === 'ROLE_MODERATOR')) || user.role === 'ROLE_ADMIN' || user.role === 'ADMIN' || user.role === 'ROLE_MODERATOR';
+        if (tableStatusFilter === 'admin' && !isAdminOrMod) return false;
+        if (tableStatusFilter === 'user' && isAdminOrMod) return false;
       }
       if (tableSearch.trim()) {
         const q = tableSearch.toLowerCase();
@@ -994,13 +995,29 @@ export const AdminDashboardPage = () => {
                       <td className="py-3 px-4 text-ink-600 font-mono text-[11px]">{user.email}</td>
 
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
-                          user.role === 'ROLE_ADMIN' || user.role === 'ADMIN'
-                            ? 'bg-rose-50 text-rose-800 border-rose-200'
-                            : 'bg-clay-50 text-clay-800 border-clay-200'
-                        }`}>
-                          {user.role === 'ROLE_ADMIN' || user.role === 'ADMIN' ? 'ADMIN' : 'USER'}
-                        </span>
+                        {(() => {
+                          const isAdmin = (user.roles && user.roles.includes('ROLE_ADMIN')) || user.role === 'ROLE_ADMIN' || user.role === 'ADMIN';
+                          const isMod = (user.roles && user.roles.includes('ROLE_MODERATOR')) || user.role === 'ROLE_MODERATOR';
+                          if (isAdmin) {
+                            return (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-bold border bg-amber-50 text-amber-900 border-amber-300">
+                                ADMIN
+                              </span>
+                            );
+                          }
+                          if (isMod) {
+                            return (
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-bold border bg-clay-50 text-clay-800 border-clay-300">
+                                MODERATOR
+                              </span>
+                            );
+                          }
+                          return (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-bold border bg-[#F8F4EC] text-ink-700 border-ink-200">
+                              USER
+                            </span>
+                          );
+                        })()}
                       </td>
 
                       <td className="py-3 px-4">

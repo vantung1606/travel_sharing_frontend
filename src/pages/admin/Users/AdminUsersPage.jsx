@@ -9,7 +9,6 @@ import {
   Search,
   UserPlus,
   ChevronRight,
-  UserCheck,
   Award,
   Download,
   Eye,
@@ -176,7 +175,7 @@ export const AdminUsersPage = () => {
     return usersList.filter(user => {
       // 1. Tab filter
       if (activeTab === 'staff') {
-        const isStaff = user.roles && user.roles.some(r => r === 'ROLE_ADMIN' || r === 'ROLE_MODERATOR' || r === 'ROLE_GUIDE');
+        const isStaff = user.roles && user.roles.some(r => r === 'ROLE_ADMIN' || r === 'ROLE_MODERATOR');
         if (!isStaff) return false;
       } else if (activeTab === 'locked') {
         if (user.status !== 'LOCKED') return false;
@@ -243,7 +242,6 @@ export const AdminUsersPage = () => {
     setUserToChangeRole(user);
     const currentPrimary = (user.roles && user.roles.find(r => r === 'ROLE_ADMIN')) 
       || (user.roles && user.roles.find(r => r === 'ROLE_MODERATOR')) 
-      || (user.roles && user.roles.find(r => r === 'ROLE_GUIDE')) 
       || 'ROLE_USER';
     setNewSelectedRole(currentPrimary);
     setShowRoleModal(true);
@@ -386,13 +384,6 @@ export const AdminUsersPage = () => {
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] bg-clay-50 text-clay-800 border border-clay-300/80 font-serif font-bold text-[10px]">
           <ShieldCheck className="w-3 h-3 text-clay-700" /> Kiểm duyệt
-        </span>
-      );
-    }
-    if (roles.includes('ROLE_GUIDE')) {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-900 border border-emerald-300/80 font-mono text-[10px] font-bold">
-          <UserCheck className="w-3 h-3 text-emerald-700" /> Đối tác / HDV
         </span>
       );
     }
@@ -616,7 +607,6 @@ export const AdminUsersPage = () => {
               <option value="all">Tất cả vai trò</option>
               <option value="ROLE_ADMIN">Quản trị viên (Admin)</option>
               <option value="ROLE_MODERATOR">Kiểm duyệt viên (Mod)</option>
-              <option value="ROLE_GUIDE">Đối tác / HDV (Guide)</option>
               <option value="ROLE_USER">Thành viên (Wanderer)</option>
             </select>
           </div>
@@ -1065,7 +1055,6 @@ export const AdminUsersPage = () => {
                 {[
                   { role: 'ROLE_ADMIN', title: 'Quản trị viên (Admin)', desc: 'Toàn quyền cấu hình hệ thống, quản trị người dùng, duyệt địa điểm và kiểm duyệt báo cáo vi phạm.' },
                   { role: 'ROLE_MODERATOR', title: 'Kiểm duyệt viên (Moderator)', desc: 'Kiểm duyệt bài viết, đánh giá và địa điểm chờ duyệt. KHÔNG có quyền can thiệp quản trị người dùng.' },
-                  { role: 'ROLE_GUIDE', title: 'Đối tác / Hướng dẫn viên (Guide)', desc: 'Tạo và quản lý các lịch trình chuyên nghiệp, hướng dẫn du khách và đăng bài trải nghiệm.' },
                   { role: 'ROLE_USER', title: 'Người dùng tiêu chuẩn (Wanderer)', desc: 'Tạo lịch trình du lịch cá nhân, chia sẻ bài viết, đánh giá địa điểm và tham gia cộng đồng.' }
                 ].map((item) => (
                   <label
@@ -1206,7 +1195,6 @@ export const AdminUsersPage = () => {
                 >
                   <option value="ROLE_USER">Thành viên thông thường (Wanderer)</option>
                   <option value="ROLE_MODERATOR">Kiểm duyệt viên (Moderator)</option>
-                  <option value="ROLE_GUIDE">Đối tác / Hướng dẫn viên (Guide)</option>
                   <option value="ROLE_ADMIN">Quản trị viên (Admin)</option>
                 </select>
               </div>
