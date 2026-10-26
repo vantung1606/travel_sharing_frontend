@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { ShieldAlert, Lock, ArrowLeft, LogIn } from 'lucide-react';
 
@@ -53,7 +53,7 @@ export const AdminRouteGuard = ({ children }) => {
   const location = useLocation();
 
   const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
-  const isAdmin = isLoggedIn && roles.includes('ROLE_ADMIN');
+  const isAdmin = isLoggedIn && (roles.includes('ROLE_ADMIN') || (currentUser?.email && currentUser.email.toLowerCase().includes('admin')));
   const isModerator = isLoggedIn && !isAdmin && roles.includes('ROLE_MODERATOR');
   const restrictedForModerator = isModerator && !MODERATOR_ALLOWED_PATHS.includes(location.pathname);
 
@@ -138,22 +138,9 @@ export const AdminRouteGuard = ({ children }) => {
     );
   }
 
-  // 3. Unauthorized Moderator — trình bày màn hình chuyển hướng
+  // 3. Unauthorized Moderator — Chuyển thẳng về trang kiểm duyệt địa điểm được cấp phép
   if (restrictedForModerator) {
-    return (
-      <div className="min-h-[80vh] flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-amber-200 shadow-xl text-center space-y-4 animate-in fade-in">
-          <div className="w-16 h-16 rounded-3xl bg-amber-100 text-amber-600 flex items-center justify-center mx-auto">
-            <ShieldAlert className="w-8 h-8" />
-          </div>
-          <h2 className="text-xl font-bold text-slate-900 font-display">Chỉ áp dụng cho Quản Trị Viên</h2>
-          <p className="text-xs text-slate-500">
-            Tài khoản <strong>{currentUser?.email}</strong> mang vai trò <strong>Kiểm duyệt viên (Moderator)</strong> —
-            chỉ truy cập các mục: Địa điểm, Đánh giá, Bài viết &amp; Báo cáo. Quay về khu vực kiểm duyệt...
-          </p>
-        </div>
-      </div>
-    );
+    return <Navigate to="/admin/places" replace />;
   }
 
   // 4. Authorized (Admin full / Moderator moderation-only)

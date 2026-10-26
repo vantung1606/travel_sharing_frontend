@@ -82,7 +82,9 @@ export const AppProvider = ({ children }) => {
 
   const setPortalMode = (mode) => {
     if (mode === 'admin') {
-      navigate('/admin/dashboard');
+      const userRoles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
+      const isModOnly = userRoles.includes('ROLE_MODERATOR') && !userRoles.includes('ROLE_ADMIN');
+      navigate(isModOnly ? '/admin/places' : '/admin/dashboard');
     } else {
       navigate('/');
     }
@@ -139,7 +141,10 @@ export const AppProvider = ({ children }) => {
       analytics: '/admin/analytics',
       'audit-logs': '/admin/audit-logs'
     };
-    navigate(pathMap[tabId] || '/admin/dashboard');
+    const userRoles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
+    const isModOnly = userRoles.includes('ROLE_MODERATOR') && !userRoles.includes('ROLE_ADMIN');
+    const target = pathMap[tabId] || (isModOnly ? '/admin/places' : '/admin/dashboard');
+    navigate(target);
   };
 
   // AI & Auth Modal State

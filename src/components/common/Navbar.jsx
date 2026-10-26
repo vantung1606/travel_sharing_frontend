@@ -51,6 +51,12 @@ export const Navbar = () => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const profileDropdownRef = useRef(null);
 
+  // RBAC checks for Navbar
+  const userRoles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
+  const isAdmin = isLoggedIn && (userRoles.includes('ROLE_ADMIN') || (currentUser?.email && currentUser.email.toLowerCase().includes('admin')));
+  const isModerator = isLoggedIn && !isAdmin && userRoles.includes('ROLE_MODERATOR');
+  const isStaff = isAdmin || isModerator;
+
   // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -217,6 +223,25 @@ export const Navbar = () => {
                 </div>
               )}
 
+              {/* Direct Portal Toggle for Admin & Moderator */}
+              {isLoggedIn && isStaff && (
+                <button
+                  type="button"
+                  onClick={() => setPortalMode(portalMode === 'admin' ? 'user' : 'admin')}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-serif font-bold transition-all cursor-pointer shadow-2xs border shrink-0 ${
+                    portalMode === 'admin'
+                      ? 'bg-clay-600 text-white border-clay-700 hover:bg-clay-700'
+                      : (isDarkHero
+                          ? 'bg-amber-400/20 text-amber-300 border-amber-400/40 hover:bg-amber-400/30'
+                          : 'bg-amber-50 text-amber-900 border-amber-300/80 hover:bg-amber-100')
+                  }`}
+                  title={isAdmin ? "Vào trang Quản trị hệ thống" : "Vào trang Kiểm duyệt viên"}
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>{portalMode === 'admin' ? 'Về Web' : (isAdmin ? 'Trang Quản Trị' : 'Trang Kiểm Soát')}</span>
+                </button>
+              )}
+
               {/* User Profile / Auth Toggle */}
               {!isLoggedIn ? (
                 <button
@@ -257,7 +282,7 @@ export const Navbar = () => {
                           <p className="text-xs font-bold text-slate-900 truncate">{currentUser.name}</p>
                           <p className="text-[11px] text-slate-400 truncate">{currentUser.handle || currentUser.email}</p>
                           <span className="inline-block mt-0.5 px-2 py-0.5 text-[9px] font-bold rounded-full bg-clay-100 text-clay-800">
-                            {portalMode === 'admin' ? 'Quản trị viên' : 'Thành viên Wayfare'}
+                            {isAdmin ? 'Quản trị viên' : (isModerator ? 'Kiểm duyệt viên' : 'Thành viên Wayfare')}
                           </span>
                         </div>
                       </div>
@@ -322,14 +347,18 @@ export const Navbar = () => {
                         <span>Lập lịch trình chuyến đi</span>
                       </button>
 
-                      {/* Admin Portal Toggle - Protected: Only visible for ROLE_ADMIN */}
-                      {isLoggedIn && ((currentUser?.roles && currentUser.roles.includes('ROLE_ADMIN')) || (currentUser?.email && currentUser.email.toLowerCase().includes('admin'))) && (
+                      {/* Admin / Moderator Portal Toggle */}
+                      {isLoggedIn && isStaff && (
                         <button
                           onClick={() => { setPortalMode(portalMode === 'admin' ? 'user' : 'admin'); setIsProfileDropdownOpen(false); }}
                           className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer"
                         >
                           <Shield className="w-4 h-4 text-clay-600" />
-                          <span>{portalMode === 'admin' ? 'Về giao diện Người dùng' : 'Giao diện Quản Trị'}</span>
+                          <span>
+                            {portalMode === 'admin' 
+                              ? 'Về giao diện Người dùng' 
+                              : (isAdmin ? 'Trang Quản Trị Hệ Thống' : 'Trang Kiểm Soát / Kiểm Duyệt')}
+                          </span>
                         </button>
                       )}
 
@@ -483,6 +512,23 @@ export const Navbar = () => {
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-400" />
                 </div>
+
+                {isStaff && (
+                  <button
+                    onClick={() => {
+                      setPortalMode(portalMode === 'admin' ? 'user' : 'admin');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition-colors cursor-pointer border border-amber-200"
+                  >
+                    <Shield className="w-4 h-4 text-amber-700" />
+                    <span>
+                      {portalMode === 'admin'
+                        ? 'Về giao diện Người dùng'
+                        : (isAdmin ? 'Trang Quản Trị Hệ Thống' : 'Trang Kiểm Soát / Kiểm Duyệt')}
+                    </span>
+                  </button>
+                )}
 
                 <button
                   onClick={() => { logout(); setIsMobileMenuOpen(false); }}

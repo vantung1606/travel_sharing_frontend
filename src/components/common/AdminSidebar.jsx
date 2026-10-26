@@ -109,7 +109,7 @@ export const AdminSidebar = ({ onNavigate }) => {
         
         {/* Brand Header */}
         <div 
-          onClick={() => { setAdminTab('dashboard'); onNavigate?.(); }}
+          onClick={() => { setAdminTab(isModeratorUsersOnly ? 'places' : 'dashboard'); onNavigate?.(); }}
           className="h-16 px-4 flex items-center justify-between border-b border-ink-200/80 bg-[#FFFDF8] cursor-pointer hover:bg-[#F8F4EC] transition-colors group"
         >
           <div className="flex items-center gap-2.5">
