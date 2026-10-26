@@ -223,25 +223,6 @@ export const Navbar = () => {
                 </div>
               )}
 
-              {/* Direct Portal Toggle for Admin & Moderator */}
-              {isLoggedIn && isStaff && (
-                <button
-                  type="button"
-                  onClick={() => setPortalMode(portalMode === 'admin' ? 'user' : 'admin')}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-serif font-bold transition-all cursor-pointer shadow-2xs border shrink-0 ${
-                    portalMode === 'admin'
-                      ? 'bg-clay-600 text-white border-clay-700 hover:bg-clay-700'
-                      : (isDarkHero
-                          ? 'bg-amber-400/20 text-amber-300 border-amber-400/40 hover:bg-amber-400/30'
-                          : 'bg-amber-50 text-amber-900 border-amber-300/80 hover:bg-amber-100')
-                  }`}
-                  title={isAdmin ? "Vào trang Quản trị hệ thống" : "Vào trang Kiểm duyệt viên"}
-                >
-                  <Shield className="w-3.5 h-3.5" />
-                  <span>{portalMode === 'admin' ? 'Về Web' : (isAdmin ? 'Trang Quản Trị' : 'Trang Kiểm Soát')}</span>
-                </button>
-              )}
-
               {/* User Profile / Auth Toggle */}
               {!isLoggedIn ? (
                 <button
@@ -357,7 +338,7 @@ export const Navbar = () => {
                           <span>
                             {portalMode === 'admin' 
                               ? 'Về giao diện Người dùng' 
-                              : (isAdmin ? 'Trang Quản Trị Hệ Thống' : 'Trang Kiểm Soát / Kiểm Duyệt')}
+                              : (isAdmin ? 'Giao diện Quản trị' : 'Giao diện Kiểm duyệt')}
                           </span>
                         </button>
                       )}
@@ -519,13 +500,13 @@ export const Navbar = () => {
                       setPortalMode(portalMode === 'admin' ? 'user' : 'admin');
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold transition-colors cursor-pointer border border-amber-200"
+                    className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors cursor-pointer"
                   >
-                    <Shield className="w-4 h-4 text-amber-700" />
+                    <Shield className="w-4 h-4 text-clay-600" />
                     <span>
                       {portalMode === 'admin'
                         ? 'Về giao diện Người dùng'
-                        : (isAdmin ? 'Trang Quản Trị Hệ Thống' : 'Trang Kiểm Soát / Kiểm Duyệt')}
+                        : (isAdmin ? 'Giao diện Quản trị' : 'Giao diện Kiểm duyệt')}
                     </span>
                   </button>
                 )}
