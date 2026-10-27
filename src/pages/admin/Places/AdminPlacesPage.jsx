@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { useApp } from '../../../context/AppContext';
-import { placeApi } from '../../../services/api';
+import { placeApi, reportApi } from '../../../services/api';
 import { 
   MapPin, Check, X, Search, Star, Clock, ChevronRight, Eye, Trash2, 
   RefreshCw, ShieldCheck, Phone, AlertCircle, Plus, ExternalLink, 
   Filter, ChevronLeft, Building2, Tag, Compass, DollarSign, Image, 
-  Navigation, CheckCircle2, AlertTriangle, EyeOff, Sparkles
+  Navigation, CheckCircle2, AlertTriangle, EyeOff, Sparkles, Flag
 } from 'lucide-react';
 
 export const AdminPlacesPage = () => {
@@ -36,6 +36,22 @@ export const AdminPlacesPage = () => {
       return [];
     }
   });
+
+  // Real-time Community Reports against Places (Batch 1 #74)
+  const [placeReports, setPlaceReports] = useState([]);
+  const [selectedEvidenceModal, setSelectedEvidenceModal] = useState(null);
+
+  const handleResolvePlaceReport = async (reportId, action, notes = '') => {
+    try {
+      await reportApi.resolveSystemReport(reportId, action, notes);
+      toast.success(`Đã cập nhật trạng thái báo cáo #${reportId} (${action})!`);
+      const repRes = await reportApi.getAdminSystemReports('ALL', 'PLACE').catch(() => []);
+      setPlaceReports(Array.isArray(repRes) ? repRes : []);
+    } catch (err) {
+      toast.error('Lỗi khi cập nhật báo cáo: ' + err.message);
+    }
+  };
+
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [isLoading, setIsLoading] = useState(() => {
     return !sessionStorage.getItem('wayfare_admin_all_places');
@@ -88,16 +104,19 @@ export const AdminPlacesPage = () => {
       setIsLoading(true);
     }
     try {
-      const [pendingRes, allRes] = await Promise.all([
+      const [pendingRes, allRes, repRes] = await Promise.all([
         placeApi.getPendingPlaces().catch(() => []),
-        placeApi.getPlaces({ status: 'ALL' }).catch(() => [])
+        placeApi.getPlaces({ status: 'ALL' }).catch(() => []),
+        reportApi.getAdminSystemReports('ALL', 'PLACE').catch(() => [])
       ]);
       
       const pendingList = Array.isArray(pendingRes) ? pendingRes : [];
       const fullList = Array.isArray(allRes) ? allRes : [];
+      const reportList = Array.isArray(repRes) ? repRes : [];
 
       setPendingPlaces(pendingList);
       setAllPlaces(fullList);
+      setPlaceReports(reportList);
       try {
         sessionStorage.setItem('wayfare_admin_pending_places', JSON.stringify(pendingList));
         sessionStorage.setItem('wayfare_admin_all_places', JSON.stringify(fullList));
@@ -285,6 +304,30 @@ export const AdminPlacesPage = () => {
       sourceList = pendingPlaces;
     } else if (activeTab === 'Đang hoạt động') {
       sourceList = allPlaces.filter(p => p.status === 'ACTIVE');
+    } else if (activeTab === 'Bị báo cáo vi phạm') {
+      const reportedTargetIds = new Set(
+        placeReports.map(r => String(r.targetId))
+      );
+      const combined = [...allPlaces];
+      pendingPlaces.forEach(p => {
+        if (!combined.some(cp => String(cp.id) === String(p.id))) combined.push(p);
+      });
+      // Fallback: If a place in reports is not found in allPlaces or pendingPlaces, synthesize a placeholder
+      placeReports.forEach(r => {
+        if (!combined.some(cp => String(cp.id) === String(r.targetId))) {
+          combined.push({
+            id: r.targetId,
+            name: r.targetTitle || `Địa điểm #${r.targetId}`,
+            city: 'Chưa cập nhật',
+            address: 'Địa điểm từ báo cáo vi phạm',
+            categoryName: 'Bị báo cáo',
+            status: 'ACTIVE',
+            coverImageUrl: r.evidenceImageUrl || 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+            description: r.description
+          });
+        }
+      });
+      sourceList = combined.filter(p => reportedTargetIds.has(String(p.id)));
     } else {
       sourceList = allPlaces;
     }
@@ -303,7 +346,7 @@ export const AdminPlacesPage = () => {
 
       return matchQuery && matchCity && matchCategory;
     });
-  }, [activeTab, pendingPlaces, allPlaces, searchQuery, selectedCity, selectedCategory]);
+  }, [activeTab, pendingPlaces, allPlaces, placeReports, searchQuery, selectedCity, selectedCategory]);
 
   // Paginated dataset
   const totalPages = Math.max(1, Math.ceil(filteredPlaces.length / pageSize));
@@ -479,6 +522,11 @@ export const AdminPlacesPage = () => {
           {[
             { label: 'Đang hoạt động', count: totalActive, badgeBg: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
             { label: 'Chờ duyệt', count: pendingPlaces.length, badgeBg: 'bg-clay-50 text-clay-800 border-clay-200' },
+            { 
+              label: 'Bị báo cáo vi phạm', 
+              count: placeReports.filter(r => r.status === 'PENDING').length, 
+              badgeBg: placeReports.some(r => r.status === 'PENDING') ? 'bg-rose-100 text-rose-800 border-rose-300 font-bold' : 'bg-ink-100 text-ink-600 border-ink-200' 
+            },
             { label: 'Tất cả', count: allPlaces.length, badgeBg: 'bg-ink-100 text-ink-700 border-ink-200' }
           ].map(tab => (
             <button
@@ -594,6 +642,19 @@ export const AdminPlacesPage = () => {
                             Xem {totalActive} địa điểm đang hoạt động →
                           </button>
                         </div>
+                      ) : activeTab === 'Bị báo cáo vi phạm' ? (
+                        <div className="space-y-2">
+                          <ShieldCheck className="w-8 h-8 text-emerald-600 mx-auto" />
+                          <p className="font-display font-bold text-ink-800 text-sm">Không có địa điểm nào bị báo cáo vi phạm!</p>
+                          <p className="text-xs text-ink-400">Tất cả địa điểm đều trong trạng thái hoạt động an toàn và tích cực.</p>
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab('Đang hoạt động')}
+                            className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer"
+                          >
+                            Xem {totalActive} địa điểm đang hoạt động →
+                          </button>
+                        </div>
                       ) : (
                         <div>
                           <AlertCircle className="w-6 h-6 mx-auto mb-2 text-ink-300" />
@@ -651,6 +712,17 @@ export const AdminPlacesPage = () => {
                                     <Sparkles className="w-2.5 h-2.5" /> AI: Hợp lệ
                                   </span>
                                 )}
+                                {(() => {
+                                  const pendingReps = placeReports.filter(r => String(r.targetId) === String(p.id) && r.status === 'PENDING');
+                                  if (pendingReps.length > 0) {
+                                    return (
+                                      <span className="px-1.5 py-0.5 rounded-[4px] bg-rose-100 text-rose-800 text-[9px] font-bold border border-rose-300 flex items-center gap-1 animate-pulse">
+                                        <Flag className="w-2.5 h-2.5 fill-rose-600 text-rose-600" /> Bị báo cáo ({pendingReps.length})
+                                      </span>
+                                    );
+                                  }
+                                  return null;
+                                })()}
                               </div>
                             </div>
                           </div>
@@ -868,6 +940,83 @@ export const AdminPlacesPage = () => {
                     {selectedPlace.aiModerationNote || 'Địa điểm đã qua hệ thống đối soát dữ liệu và kiểm tra tính xác thực.'}
                   </p>
                 </div>
+
+                {/* Community Reports on Selected Place */}
+                {(() => {
+                  const currentPlaceReports = placeReports.filter(r => String(r.targetId) === String(selectedPlace.id));
+                  if (currentPlaceReports.length === 0) return null;
+
+                  return (
+                    <div className="mt-3 p-3.5 rounded-[5px] border border-rose-300 bg-rose-50/70 space-y-2.5">
+                      <div className="flex items-center justify-between border-b border-rose-200 pb-2">
+                        <span className="font-bold flex items-center gap-1.5 text-xs text-rose-900 uppercase tracking-wide">
+                          <Flag className="w-3.5 h-3.5 fill-rose-600 text-rose-600" />
+                          Báo cáo vi phạm từ cộng đồng ({currentPlaceReports.length})
+                        </span>
+                        <span className="px-2 py-0.5 rounded-[4px] bg-rose-200 text-rose-900 text-[10px] font-black">
+                          CẦN DUYỆT
+                        </span>
+                      </div>
+
+                      <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                        {currentPlaceReports.map((rep) => (
+                          <div key={rep.id} className="p-2.5 rounded-[4px] bg-[#FFFDF8] border border-rose-200 space-y-1.5 text-[11px]">
+                            <div className="flex items-center justify-between gap-1">
+                              <span className="font-bold text-rose-800 truncate">
+                                Lý do: {rep.reason || rep.category || 'Nội dung vi phạm'}
+                              </span>
+                              <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                                rep.status === 'PENDING' ? 'bg-amber-100 text-amber-900' : 'bg-emerald-100 text-emerald-900'
+                              }`}>
+                                {rep.status === 'PENDING' ? 'Chưa xử lý' : 'Đã xử lý'}
+                              </span>
+                            </div>
+
+                            <p className="text-ink-600 leading-snug">
+                              {rep.description || 'Không có mô tả chi tiết từ người báo cáo.'}
+                            </p>
+
+                            <div className="text-[10px] text-ink-400 flex items-center justify-between">
+                              <span>Người báo: <strong className="text-ink-700">{rep.reporterName || rep.reporterEmail || 'Du khách'}</strong></span>
+                              <span>{rep.createdAt ? new Date(rep.createdAt).toLocaleDateString('vi-VN') : ''}</span>
+                            </div>
+
+                            {rep.evidenceImageUrl && (
+                              <div className="pt-1">
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedEvidenceModal(rep.evidenceImageUrl)}
+                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-clay-700 hover:text-clay-900 underline cursor-pointer"
+                                >
+                                  <Eye className="w-3 h-3" /> Xem ảnh bằng chứng vi phạm
+                                </button>
+                              </div>
+                            )}
+
+                            {rep.status === 'PENDING' && (
+                              <div className="flex items-center gap-1.5 pt-1.5 border-t border-ink-100">
+                                <button
+                                  type="button"
+                                  onClick={() => handleResolvePlaceReport(rep.id, 'RESOLVE', 'Đã xử lý và nhắc nhở địa điểm')}
+                                  className="flex-1 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] transition-colors cursor-pointer"
+                                >
+                                  Đánh dấu Đã xử lý
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleResolvePlaceReport(rep.id, 'DISMISS', 'Báo cáo sai sự thật hoặc không hợp lệ')}
+                                  className="px-2.5 py-1 rounded bg-[#F8F4EC] hover:bg-ink-200 text-ink-700 font-bold text-[10px] border border-ink-200 transition-colors cursor-pointer"
+                                >
+                                  Bác bỏ
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Business Stats Grid */}
@@ -1278,6 +1427,43 @@ export const AdminPlacesPage = () => {
                 className="px-4 py-2 rounded-[5px] bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs transition-colors cursor-pointer disabled:opacity-50"
               >
                 {isSubmitting ? 'Đang xóa...' : 'Xác nhận xóa vĩnh viễn'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── 8. MODAL: EVIDENCE IMAGE PREVIEW ─────────────────────────────────── */}
+      {selectedEvidenceModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/70 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-4 border border-ink-200 shadow-2xl space-y-3">
+            <div className="flex items-center justify-between border-b border-ink-200/60 pb-2">
+              <span className="font-display font-black text-sm text-ink-800 flex items-center gap-1.5">
+                <Flag className="w-4 h-4 text-rose-600" />
+                Ảnh bằng chứng vi phạm của địa điểm
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedEvidenceModal(null)}
+                className="p-1 rounded text-ink-400 hover:text-ink-800 hover:bg-[#F8F4EC] transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="rounded-[4px] overflow-hidden bg-black/5 flex items-center justify-center max-h-[70vh]">
+              <img
+                src={selectedEvidenceModal}
+                alt="Evidence preview"
+                className="max-w-full max-h-[65vh] object-contain rounded"
+              />
+            </div>
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => setSelectedEvidenceModal(null)}
+                className="px-4 py-1.5 rounded-[5px] bg-ink-800 text-[#FFFDF8] text-xs font-bold hover:bg-ink-900 transition-colors cursor-pointer"
+              >
+                Đóng
               </button>
             </div>
           </div>
