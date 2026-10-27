@@ -114,16 +114,29 @@ export const PlaceDetailModal = ({
     }
   };
 
-  const handleDeleteReview = async (reviewId) => {
-    if (!window.confirm('Bạn có chắc chắn muốn xóa đánh giá này không?')) return;
+  // Delete Confirmation State
+  const [deleteConfirmReviewId, setDeleteConfirmReviewId] = useState(null);
+  const [isDeletingReview, setIsDeletingReview] = useState(false);
+
+  const handleDeleteReview = (reviewId) => {
+    setDeleteConfirmReviewId(reviewId);
+  };
+
+  const executeDeleteReview = async () => {
+    if (!deleteConfirmReviewId) return;
+    const reviewId = deleteConfirmReviewId;
+    setIsDeletingReview(true);
     try {
       await reviewApi.deleteReview(reviewId, currentUser?.email);
       toast.success('Đã xóa đánh giá thành công!');
       if (typeof setReviews === 'function') {
         setReviews(prev => prev.filter(r => r.id !== reviewId));
       }
+      setDeleteConfirmReviewId(null);
     } catch (err) {
       toast.error('Lỗi khi xóa đánh giá: ' + (err.message || 'Thao tác thất bại'));
+    } finally {
+      setIsDeletingReview(false);
     }
   };
 
@@ -604,6 +617,53 @@ export const PlaceDetailModal = ({
         targetId={reportTargetId}
         targetTitle={reportTargetTitle}
       />
+
+      {/* Styled Delete Review Confirmation Modal */}
+      {deleteConfirmReviewId && (
+        <div className="fixed inset-0 z-60 bg-ink-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-[#FFFDF8] rounded-[6px] max-w-sm w-full p-5 border border-ink-200/80 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150">
+            <div className="flex items-start gap-3.5">
+              <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-display font-bold text-ink-900 text-sm">
+                  Xóa nhận xét này?
+                </h3>
+                <p className="text-xs text-ink-600 leading-relaxed">
+                  Đánh giá và số sao của bạn sẽ bị gỡ vĩnh viễn khỏi địa điểm này. Điểm trung bình sẽ được tự động tính toán lại.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-ink-200/60">
+              <button
+                type="button"
+                disabled={isDeletingReview}
+                onClick={() => setDeleteConfirmReviewId(null)}
+                className="px-3.5 py-1.5 rounded-[5px] bg-[#F8F4EC] hover:bg-ink-100 text-ink-700 text-xs font-bold border border-ink-200/80 transition-colors cursor-pointer"
+              >
+                Hủy bỏ
+              </button>
+              <button
+                type="button"
+                disabled={isDeletingReview}
+                onClick={executeDeleteReview}
+                className="px-4 py-1.5 rounded-[5px] bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+              >
+                {isDeletingReview ? (
+                  <span>Đang xóa...</span>
+                ) : (
+                  <>
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Xác nhận xóa</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
