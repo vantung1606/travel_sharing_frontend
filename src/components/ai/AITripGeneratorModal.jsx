@@ -538,7 +538,7 @@ ${customPrompt ? `- Yêu cầu thêm: ${customPrompt}` : ''}
 QUY TẮC BẮT BUỘC:
 1. Nghiên cứu chính xác các địa điểm, quán ăn có thật 100% tại "${destination}". Tuyệt đối không dùng văn mẫu chung chung.
 2. Mỗi ngày có 3-4 hoạt động sắp xếp từ sáng đến tối.
-3. BẮT BUỘC VỀ ĐỊA CHỈ: Cung cấp "location" (tên ngắn gọn của địa danh/quán ăn), "address" (ĐỊA CHỈ CỤ THỂ CHI TIẾT CÓ THẬT gồm số nhà/tên đường, xã/phường, quận/huyện tại ${destination}. Tuyệt đối KHÔNG chỉ ghi tên tỉnh thành chung chung), và "lat", "lng" (tọa độ GPS thực tế có thật của địa điểm đó tại Việt Nam) để đồng bộ chính xác trên bản đồ và Google Maps.
+3. BẮT BUỘC VỀ ĐỊA CHỈ & TỌA ĐỘ: Cung cấp "location" (tên ngắn gọn của địa danh/quán ăn), "address" (ĐỊA CHỈ CỤ THỂ CHI TIẾT CÓ THẬT gồm số nhà/tên đường, xã/phường, quận/huyện tại ${destination}. Tuyệt đối KHÔNG chỉ ghi tên tỉnh thành chung chung), và "lat", "lng" (TỌA ĐỘ GPS THỰC TẾ CHÍNH XÁC CỦA ĐỊA ĐIỂM ĐÓ TẠI ${destination}, VIỆT NAM dạng số thập phân float, ví dụ Đà Nẵng: lat ~16.0xx, lng ~108.2xx; Hà Nội: lat ~21.0xx, lng ~105.8xx) để đồng bộ trực quan trên bản đồ số.
 4. Trả về DUY NHẤT một chuỗi JSON hợp lệ theo định dạng:
 {
   "summaryTip": "Mẹo du lịch bản địa ngắn gọn...",
@@ -553,9 +553,9 @@ QUY TẮC BẮT BUỘC:
           "category": "Ẩm thực buổi sáng",
           "location": "Tên địa danh hoặc quán ăn cụ thể",
           "title": "Tên món và tên quán ăn cụ thể",
-          "address": "Địa chỉ cụ thể tại ${destination}",
-          "lat": 18.3414,
-          "lng": 105.9082,
+          "address": "Địa chỉ cụ thể chi tiết tại ${destination}",
+          "lat": 16.0544,
+          "lng": 108.2022,
           "note": "Kinh nghiệm ngắn gọn",
           "cost": "45.000đ/người",
           "transit": "15 phút"

@@ -8,18 +8,32 @@ import { itineraryApi } from '../../services/api';
 
 // Tọa độ trung tâm các tỉnh/thành phố du lịch chính tại Việt Nam
 const VIETNAM_COORDINATES = {
-  'hà tĩnh': { lat: 18.3436, lng: 105.9057, zoom: 11 },
-  'hà nội': { lat: 21.0285, lng: 105.8542, zoom: 12 },
   'đà nẵng': { lat: 16.0544, lng: 108.2022, zoom: 12 },
+  'sơn trà': { lat: 16.1006, lng: 108.2778, zoom: 12 },
+  'bán đảo sơn trà': { lat: 16.1006, lng: 108.2778, zoom: 12 },
+  'ngũ hành sơn': { lat: 16.0042, lng: 108.2611, zoom: 13 },
+  'hải châu': { lat: 16.0689, lng: 108.2142, zoom: 13 },
+  'thanh khê': { lat: 16.0610, lng: 108.1880, zoom: 13 },
+  'liên chiểu': { lat: 16.0833, lng: 108.1333, zoom: 12 },
+  'cẩm lệ': { lat: 16.0167, lng: 108.2000, zoom: 13 },
+  'hòa vang': { lat: 16.0167, lng: 108.0667, zoom: 11 },
+  'hà nội': { lat: 21.0285, lng: 105.8542, zoom: 12 },
+  'hà tĩnh': { lat: 18.3436, lng: 105.9057, zoom: 11 },
   'đà lạt': { lat: 11.9404, lng: 108.4583, zoom: 12 },
+  'lâm đồng': { lat: 11.9404, lng: 108.4583, zoom: 11 },
   'nha trang': { lat: 12.2388, lng: 109.1967, zoom: 12 },
+  'khánh hòa': { lat: 12.2388, lng: 109.1967, zoom: 11 },
   'phú quốc': { lat: 10.2899, lng: 103.9840, zoom: 11 },
+  'kiên giang': { lat: 10.0125, lng: 105.0809, zoom: 11 },
   'sa pa': { lat: 22.3364, lng: 103.8438, zoom: 12 },
+  'lào cai': { lat: 22.4856, lng: 103.9707, zoom: 11 },
   'ninh bình': { lat: 20.2506, lng: 105.9744, zoom: 12 },
   'hạ long': { lat: 20.9505, lng: 107.0734, zoom: 12 },
   'quảng ninh': { lat: 21.0069, lng: 107.2925, zoom: 10 },
   'hội an': { lat: 15.8801, lng: 108.3380, zoom: 13 },
+  'quảng nam': { lat: 15.5894, lng: 108.1500, zoom: 11 },
   'huế': { lat: 16.4637, lng: 107.5909, zoom: 12 },
+  'thừa thiên huế': { lat: 16.4637, lng: 107.5909, zoom: 11 },
   'tp hồ chí minh': { lat: 10.8231, lng: 106.6297, zoom: 12 },
   'sài gòn': { lat: 10.8231, lng: 106.6297, zoom: 12 },
   'hồ chí minh': { lat: 10.8231, lng: 106.6297, zoom: 12 },
@@ -29,20 +43,27 @@ const VIETNAM_COORDINATES = {
   'bình định': { lat: 14.1667, lng: 108.9000, zoom: 10 },
   'phú yên': { lat: 13.0882, lng: 109.0929, zoom: 11 },
   'buôn ma thuột': { lat: 12.6667, lng: 108.0500, zoom: 12 },
+  'đắk lắk': { lat: 12.6667, lng: 108.0500, zoom: 11 },
   'vũng tàu': { lat: 10.3460, lng: 107.0843, zoom: 12 },
+  'bà rịa vũng tàu': { lat: 10.3460, lng: 107.0843, zoom: 11 },
   'côn đảo': { lat: 8.6835, lng: 106.6074, zoom: 12 },
   'cần thơ': { lat: 10.0452, lng: 105.7469, zoom: 12 },
   'mũi né': { lat: 10.9333, lng: 108.2833, zoom: 12 },
   'phan thiết': { lat: 10.9804, lng: 108.2615, zoom: 12 },
+  'bình thuận': { lat: 10.9804, lng: 108.2615, zoom: 11 },
   'bảo lộc': { lat: 11.5478, lng: 107.8067, zoom: 12 },
   'nghệ an': { lat: 18.6734, lng: 105.6813, zoom: 11 },
   'vinh': { lat: 18.6734, lng: 105.6813, zoom: 12 },
   'thanh hóa': { lat: 19.8067, lng: 105.7852, zoom: 11 },
   'quảng bình': { lat: 17.4690, lng: 106.6200, zoom: 11 },
   'mù cang chải': { lat: 21.8488, lng: 104.0863, zoom: 12 },
+  'yên bái': { lat: 21.7167, lng: 104.9000, zoom: 11 },
   'mộc châu': { lat: 20.8439, lng: 104.6534, zoom: 12 },
+  'sơn la': { lat: 21.3256, lng: 103.9189, zoom: 11 },
   'mai châu': { lat: 20.6622, lng: 105.0847, zoom: 12 },
-  'tam đảo': { lat: 21.4589, lng: 105.6483, zoom: 13 }
+  'hòa bình': { lat: 20.8167, lng: 105.3333, zoom: 11 },
+  'tam đảo': { lat: 21.4589, lng: 105.6483, zoom: 13 },
+  'vĩnh phúc': { lat: 21.3089, lng: 105.6044, zoom: 11 }
 };
 
 // Từ điển tọa độ GPS thực tế có thật 100% của danh lam, di tích và điểm ẩm thực nổi tiếng tại Việt Nam
@@ -167,14 +188,14 @@ const getCleanPlaceName = (raw) => {
 };
 
 const getDestinationCoordinates = (destName) => {
-  if (!destName) return { lat: 18.3436, lng: 105.9057, zoom: 11 };
+  if (!destName) return { lat: 16.0544, lng: 108.2022, zoom: 12 };
   const clean = destName.toLowerCase().trim();
   for (const [key, coords] of Object.entries(VIETNAM_COORDINATES)) {
     if (clean.includes(key) || key.includes(clean)) {
       return coords;
     }
   }
-  return { lat: 18.3436, lng: 105.9057, zoom: 11 };
+  return { lat: 16.0544, lng: 108.2022, zoom: 12 };
 };
 
 // Xác định tọa độ thực tế có thật 100% của từng hoạt động
@@ -187,31 +208,37 @@ const resolvePlaceCoordinates = (act, destinationName, baseCoords) => {
   }
 
   // 2. Tra cứu từ điển danh lam thắng cảnh / quán ăn có thật
-  const cleanName = getCleanPlaceName(act.location || act.title).toLowerCase();
-  const rawTitle = (act.title || '').toLowerCase();
-  const rawAddress = (act.address || '').toLowerCase();
-  const rawLoc = (act.location || '').toLowerCase();
+  const cleanName = getCleanPlaceName(act.location || act.title).toLowerCase().trim();
+  const rawTitle = (act.title || '').toLowerCase().trim();
+  const rawAddress = (act.address || '').toLowerCase().trim();
+  const rawLoc = (act.location || '').toLowerCase().trim();
 
+  // Bắt buộc chuỗi tìm kiếm phải có độ dài tối thiểu >= 3 ký tự
+  // Tuyệt đối không cho phép chuỗi rỗng "" lọt vào key.includes("") gây khớp sai với "biển thạch hải"
   for (const [key, coords] of Object.entries(VIETNAM_LANDMARKS)) {
-    if (
-      cleanName.includes(key) ||
-      key.includes(cleanName) ||
-      rawLoc.includes(key) ||
-      rawTitle.includes(key) ||
-      rawAddress.includes(key)
-    ) {
+    const k = key.toLowerCase().trim();
+    if (k.length < 3) continue;
+
+    const isMatch =
+      (cleanName.length >= 3 && (cleanName.includes(k) || (cleanName.length >= 4 && k.includes(cleanName)))) ||
+      (rawLoc.length >= 3 && (rawLoc.includes(k) || (rawLoc.length >= 4 && k.includes(rawLoc)))) ||
+      (rawTitle.length >= 3 && rawTitle.includes(k)) ||
+      (rawAddress.length >= 3 && rawAddress.includes(k));
+
+    if (isMatch) {
       return { lat: coords.lat, lng: coords.lng, isExact: true, matchedAddress: coords.address };
     }
   }
 
   // 3. Tra cứu theo quận / huyện / thị xã
   for (const [distKey, distCoords] of Object.entries(VIETNAM_DISTRICTS)) {
-    if (rawAddress.includes(distKey) || rawTitle.includes(distKey) || rawLoc.includes(distKey)) {
+    const dk = distKey.toLowerCase().trim();
+    if (dk.length >= 3 && (rawAddress.includes(dk) || rawTitle.includes(dk) || rawLoc.includes(dk))) {
       return { lat: distCoords.lat, lng: distCoords.lng, isExact: false };
     }
   }
 
-  // 4. Nếu chưa xác định được chính xác, dùng tọa độ trung tâm địa phương (không tạo offset ngẫu nhiên gây lệch ra biển/ruộng)
+  // 4. Nếu chưa xác định được chính xác, dùng tọa độ trung tâm điểm đến (baseCoords)
   return { lat: baseCoords.lat, lng: baseCoords.lng, isExact: false };
 };
 
@@ -473,7 +500,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
           title: act.title,
           cleanName: cleanName || act.title,
           location: act.location || cleanName || act.title,
-          address: act.address || resolved.matchedAddress || `${destinationName}, Việt Nam`,
+          address: act.address || (resolved.isExact && resolved.matchedAddress ? resolved.matchedAddress : `${destinationName}, Việt Nam`),
           time: act.time,
           lat: resolved.lat,
           lng: resolved.lng,
