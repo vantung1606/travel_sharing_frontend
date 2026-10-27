@@ -65,11 +65,11 @@ export const AdminReportsPage = () => {
   const fetchSystemReports = async (status = systemReportStatusFilter, type = systemReportTypeFilter) => {
     setSystemReportLoading(true);
     try {
-      const data = await reportApi.getAdminSystemReports(status, type);
+      const data = await reportApi.getAdminReports(status, type);
       setSystemReports(Array.isArray(data) ? data : []);
     } catch (err) {
-      console.error('Failed to load system reports:', err);
-      toast.error('Không thể tải danh sách báo cáo hệ thống');
+      console.error('Failed to load reports:', err);
+      toast.error('Không thể tải danh sách báo cáo vi phạm');
     } finally {
       setSystemReportLoading(false);
     }
@@ -77,7 +77,7 @@ export const AdminReportsPage = () => {
 
   const handleResolveSystemReport = async (id, action, notes = '') => {
     try {
-      await reportApi.resolveSystemReport(id, action, notes);
+      await reportApi.resolveReport(id, action, notes);
       toast.success(`Đã cập nhật trạng thái báo cáo #${id} (${action})!`);
       await fetchSystemReports();
     } catch (err) {
@@ -629,7 +629,7 @@ export const AdminReportsPage = () => {
           {metrics.pendingReportsCount > 0 && (
             <span className="w-1.5 h-1.5 rounded-full bg-rose-600 animate-pulse"></span>
           )}
-          <span>Chờ duyệt & Báo cáo</span>
+          <span>Kiểm duyệt Bài viết</span>
           <span className="px-2 py-0.5 rounded-[4px] bg-rose-50 text-rose-800 border border-rose-200 text-[10px] font-bold">
             {metrics.pendingReportsCount}
           </span>
@@ -684,7 +684,7 @@ export const AdminReportsPage = () => {
           }`}
         >
           <Flag className="w-3.5 h-3.5 text-amber-600" />
-          <span>Báo cáo Vi phạm (Địa điểm / Du khách / Bình luận)</span>
+          <span>Báo cáo Đa đối tượng (Địa điểm / Du khách / Review)</span>
         </button>
       </div>
 

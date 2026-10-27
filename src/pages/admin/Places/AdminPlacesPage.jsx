@@ -43,9 +43,9 @@ export const AdminPlacesPage = () => {
 
   const handleResolvePlaceReport = async (reportId, action, notes = '') => {
     try {
-      await reportApi.resolveSystemReport(reportId, action, notes);
+      await reportApi.resolveReport(reportId, action, notes);
       toast.success(`Đã cập nhật trạng thái báo cáo #${reportId} (${action})!`);
-      const repRes = await reportApi.getAdminSystemReports('ALL', 'PLACE').catch(() => []);
+      const repRes = await reportApi.getAdminReports('ALL', 'PLACE').catch(() => []);
       setPlaceReports(Array.isArray(repRes) ? repRes : []);
     } catch (err) {
       toast.error('Lỗi khi cập nhật báo cáo: ' + err.message);
@@ -107,7 +107,7 @@ export const AdminPlacesPage = () => {
       const [pendingRes, allRes, repRes] = await Promise.all([
         placeApi.getPendingPlaces().catch(() => []),
         placeApi.getPlaces({ status: 'ALL' }).catch(() => []),
-        reportApi.getAdminSystemReports('ALL', 'PLACE').catch(() => [])
+        reportApi.getAdminReports('ALL', 'PLACE').catch(() => [])
       ]);
       
       const pendingList = Array.isArray(pendingRes) ? pendingRes : [];

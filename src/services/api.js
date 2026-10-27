@@ -2027,8 +2027,8 @@ export const reportApi = {
     return json.data;
   },
 
-  async getAdminSystemReports(status = 'ALL', targetType = 'ALL') {
-    const res = await fetch(`${BASE_URL}/reports/admin/system?status=${status}&targetType=${targetType}`, {
+  async getAdminReports(status = 'ALL', targetType = 'ALL') {
+    const res = await fetch(`${BASE_URL}/reports/admin?status=${status}&targetType=${targetType}`, {
       headers: {
         'Content-Type': 'application/json',
         ...getAuthHeader()
@@ -2041,8 +2041,8 @@ export const reportApi = {
     return json.data || [];
   },
 
-  async resolveSystemReport(id, action, notes) {
-    const res = await fetch(`${BASE_URL}/reports/admin/system/${id}/resolve`, {
+  async resolveReport(id, action, notes) {
+    const res = await fetch(`${BASE_URL}/reports/admin/${id}/resolve`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -2055,6 +2055,15 @@ export const reportApi = {
       throw new Error(json.message || 'Xử lý báo cáo thất bại');
     }
     return json.data;
+  },
+
+  // Backwards-compatible aliases
+  getAdminSystemReports(status = 'ALL', targetType = 'ALL') {
+    return this.getAdminReports(status, targetType);
+  },
+
+  resolveSystemReport(id, action, notes) {
+    return this.resolveReport(id, action, notes);
   }
 };
 
