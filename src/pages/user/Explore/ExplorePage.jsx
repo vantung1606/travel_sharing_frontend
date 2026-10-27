@@ -1081,6 +1081,7 @@ export const ExplorePage = () => {
           item={detailModalItem}
           onClose={() => setDetailModalItem(null)}
           reviews={placeReviews}
+          setReviews={setPlaceReviews}
           isReviewsLoading={isReviewsLoading}
           reviewRating={reviewRating}
           setReviewRating={setReviewRating}
