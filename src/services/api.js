@@ -1733,6 +1733,23 @@ export const placeApi = {
     }
   },
 
+  async geocodeMissingPlaces() {
+    try {
+      const res = await fetch(`${BASE_URL}/places/admin/geocode-missing`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      throw err;
+    }
+  },
+
   async setPlaceVerified(id, verified) {
     try {
       const res = await fetch(`${BASE_URL}/places/admin/${id}/verified?verified=${verified}`, {

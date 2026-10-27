@@ -30,12 +30,51 @@ export const AddPlaceModal = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showUrlFallback, setShowUrlFallback] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isGeocoding, setIsGeocoding] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [isDragging, setIsDragging] = useState(false);
 
   const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
+
+  // Tự động tìm tọa độ GPS từ địa chỉ người dùng đã nhập
+  const handleAutoGeocodeFromAddress = async () => {
+    const address = newPlaceForm.address?.trim() || '';
+    const city = newPlaceForm.city?.trim() || '';
+    if (!address && !city) return;
+
+    setIsGeocoding(true);
+    try {
+      const cleanAddress = address.replace(/-/g, ', ').replace(/\//g, ', ').trim();
+      const query = `${cleanAddress}, ${city}, Việt Nam`;
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&countrycodes=vn`;
+      const res = await fetch(url, { headers: { 'Accept-Language': 'vi,en;q=0.9' } });
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0 && data[0].lat && data[0].lon) {
+        setNewPlaceForm(prev => ({
+          ...prev,
+          latitude: Number(data[0].lat).toFixed(6),
+          longitude: Number(data[0].lon).toFixed(6)
+        }));
+      } else {
+        const cityUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city + ', Việt Nam')}&format=json&limit=1&countrycodes=vn`;
+        const cityRes = await fetch(cityUrl);
+        const cityData = await cityRes.json();
+        if (Array.isArray(cityData) && cityData.length > 0 && cityData[0].lat && cityData[0].lon) {
+          setNewPlaceForm(prev => ({
+            ...prev,
+            latitude: Number(cityData[0].lat).toFixed(6),
+            longitude: Number(cityData[0].lon).toFixed(6)
+          }));
+        }
+      }
+    } catch (e) {
+      console.debug('Geocoding preview notice:', e);
+    } finally {
+      setIsGeocoding(false);
+    }
+  };
 
   // Handle Local File Upload from device
   const handleFileSelected = async (file) => {
@@ -368,8 +407,8 @@ export const AddPlaceModal = ({
               </p>
             </div>
 
-            {/* Smart 1-Tap GPS Button */}
-            <div className="pt-1 flex items-center justify-between">
+            {/* Smart GPS Actions */}
+            <div className="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-ink-200/50">
               <span className="text-[11px] text-ink-400">
                 {newPlaceForm.latitude ? (
                   <span className="text-emerald-600 font-semibold flex items-center gap-1">
@@ -377,18 +416,35 @@ export const AddPlaceModal = ({
                     Đã ghim GPS: {newPlaceForm.latitude}, {newPlaceForm.longitude}
                   </span>
                 ) : (
-                  'Chưa ghim tọa độ GPS bản đồ'
+                  <span className="text-amber-600 font-medium flex items-center gap-1">
+                    <span>⚡</span>
+                    <span>Tự động định vị GPS khi gửi bài</span>
+                  </span>
                 )}
               </span>
 
-              <button
-                type="button"
-                onClick={onGetLocationForForm}
-                className="px-3 py-1.5 rounded-[5px] bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer"
-              >
-                <Navigation className="w-3.5 h-3.5 text-sky-600" />
-                <span>📍 Ghim vị trí hiện tại</span>
-              </button>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={handleAutoGeocodeFromAddress}
+                  disabled={isGeocoding || (!newPlaceForm.address && !newPlaceForm.city)}
+                  className="px-2.5 py-1.5 rounded-[5px] bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-700 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50"
+                  title="Tìm vị trí bản đồ dựa trên tên địa chỉ"
+                >
+                  {isGeocoding ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Compass className="w-3.5 h-3.5 text-emerald-600" />}
+                  <span>{isGeocoding ? 'Đang tìm...' : 'Lấy GPS từ địa chỉ'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onGetLocationForForm}
+                  className="px-2.5 py-1.5 rounded-[5px] bg-sky-50 hover:bg-sky-100 border border-sky-200 text-sky-700 font-bold text-xs flex items-center gap-1 transition-colors cursor-pointer"
+                  title="Ghim vị trí thiết bị hiện tại"
+                >
+                  <Navigation className="w-3.5 h-3.5 text-sky-600" />
+                  <span>Vị trí hiện tại</span>
+                </button>
+              </div>
             </div>
           </div>
 

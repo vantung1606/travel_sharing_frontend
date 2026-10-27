@@ -156,6 +156,22 @@ export const AdminPlacesPage = () => {
     }
   };
 
+  // Đồng bộ GPS cho toàn bộ địa điểm còn thiếu tọa độ trong CSDL
+  const handleGeocodeMissing = async () => {
+    setIsSubmitting(true);
+    try {
+      const res = await placeApi.geocodeMissingPlaces();
+      toast.success(res?.fixedCount > 0 
+        ? `Đã tự động gắn tọa độ GPS cho ${res.fixedCount} địa điểm thành công! 📍` 
+        : 'Tất cả các địa điểm đều đã có đầy đủ tọa độ bản đồ.');
+      await loadData(true);
+    } catch (err) {
+      toast.error('Lỗi đồng bộ GPS: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Badge "Xác thực": cấp/gỡ cờ is_verified_host ngay từ bảng
   const handleToggleVerified = async (place) => {
     setIsSubmitting(true);
@@ -338,6 +354,17 @@ export const AdminPlacesPage = () => {
           >
             <RefreshCw className={`w-3.5 h-3.5 text-ink-400 ${isLoading ? 'animate-spin text-clay-600' : ''}`} />
             <span>{isLoading ? 'Đang tải...' : 'Làm mới CSDL'}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGeocodeMissing}
+            disabled={isSubmitting || isLoading}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-[5px] bg-[#FFFDF8] hover:bg-[#F8F4EC] text-sky-700 font-bold text-xs border border-sky-300 transition-colors cursor-pointer disabled:opacity-50"
+            title="Tự động đồng bộ tọa độ GPS cho các địa điểm còn thiếu"
+          >
+            <Compass className="w-3.5 h-3.5 text-sky-600" />
+            <span>Đồng bộ GPS thiếu</span>
           </button>
 
           <button
