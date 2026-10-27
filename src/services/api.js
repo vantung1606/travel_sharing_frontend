@@ -198,21 +198,8 @@ export const adminApi = {
     return await response.json();
   },
 
-  async getAllItineraries() {
-    try {
-      const response = await fetch(`${BASE_URL}/itineraries/all`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader()
-        }
-      });
-      if (!response.ok) return [];
-      const res = await response.json();
-      return res.data || [];
-    } catch {
-      return [];
-    }
+  getAllItineraries() {
+    return itineraryApi.getAllItineraries();
   }
 };
 
