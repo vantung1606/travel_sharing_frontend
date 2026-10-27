@@ -4,7 +4,7 @@ import L from 'leaflet';
 import { Navigation, Phone, Eye, Star, Sparkles, MapPin, Clock, ChevronUp, X, CheckCircle2 } from 'lucide-react';
 
 // Custom Map Controller to smoothly fly to active item or user location
-function MapFlyController({ activeItem, userCoords }) {
+function MapFlyController({ activeItem, userCoords, miniMode = false }) {
   const map = useMap();
 
   useEffect(() => {
@@ -12,21 +12,21 @@ function MapFlyController({ activeItem, userCoords }) {
       const lat = parseFloat(activeItem.latitude);
       const lng = parseFloat(activeItem.longitude);
       if (!isNaN(lat) && !isNaN(lng)) {
-        map.flyTo([lat, lng], 13, {
-          duration: 1.2,
+        map.flyTo([lat, lng], miniMode ? 14 : 13, {
+          duration: 1.0,
           easeLinearity: 0.25
         });
       }
     }
-  }, [activeItem, map]);
+  }, [activeItem, map, miniMode]);
 
   useEffect(() => {
-    if (userCoords?.lat && userCoords?.lng) {
+    if (!miniMode && userCoords?.lat && userCoords?.lng) {
       map.flyTo([userCoords.lat, userCoords.lng], 12, {
         duration: 1.2
       });
     }
-  }, [userCoords, map]);
+  }, [userCoords, map, miniMode]);
 
   return null;
 }
@@ -124,7 +124,8 @@ export const RealMapView = ({
   userCoords = null,
   mapStyle = 'osm', // 'osm' | 'hot' | 'osmfr'
   setMapStyle = () => {},
-  className = ''
+  className = '',
+  miniMode = false
 }) => {
   // Trạng thái ô thông tin nổi (Floating Info Box) - Tối ưu cho Mobile
   const [selectedPlace, setSelectedPlace] = useState(null);
@@ -211,8 +212,9 @@ export const RealMapView = ({
     { label: 'Phú Quốc', lat: 10.2899, lng: 103.9840 }
   ];
 
-  // Xử lý click Marker: mở thông tin nhẹ và kích hoạt flyTo
+  // Xử lý click Marker: mở thông tin nhẹ và kích hoạt flyTo (chỉ ở chế độ full map)
   const handleMarkerClick = (item) => {
+    if (miniMode) return;
     setSelectedPlace(item);
     setActiveItem(item);
     setIsDismissed(false);
@@ -220,70 +222,72 @@ export const RealMapView = ({
   };
 
   return (
-    <div className={`relative w-full h-full rounded-3xl overflow-hidden border border-slate-700/80 shadow-2xl bg-slate-900 ${className}`}>
+    <div className={`relative w-full h-full ${miniMode ? 'rounded-none border-0 shadow-none' : 'rounded-3xl border border-slate-700/80 shadow-2xl'} overflow-hidden bg-slate-900 ${className}`}>
       
-      {/* Top Map Toolbar Overlay */}
-      <div className="absolute top-3 left-3 right-3 z-[1000] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
-        
-        {/* Live Status Pill & Vietnam Flag */}
-        <div className="pointer-events-auto bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-slate-700/80 shadow-lg flex items-center gap-2 text-xs font-bold text-white">
-          <span className="text-base">🇻🇳</span>
-          <span className="text-sky-300">Bản Đồ Du Lịch Việt Nam ({items.length} Điểm Ghim)</span>
-        </div>
+      {/* Top Map Toolbar Overlay - Chỉ hiển thị trên chế độ Bản đồ lớn */}
+      {!miniMode && (
+        <div className="absolute top-3 left-3 right-3 z-[1000] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
+          
+          {/* Live Status Pill & Vietnam Flag */}
+          <div className="pointer-events-auto bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-2xl border border-slate-700/80 shadow-lg flex items-center gap-2 text-xs font-bold text-white">
+            <span className="text-base">🇻🇳</span>
+            <span className="text-sky-300">Bản Đồ Du Lịch Việt Nam ({items.length} Điểm Ghim)</span>
+          </div>
 
-        {/* Quick VN Cities Jump Toolbar */}
-        <div className="pointer-events-auto hidden xl:flex items-center gap-1 bg-slate-900/90 backdrop-blur-md px-2 py-1 rounded-2xl border border-slate-700/80 text-[11px] font-bold text-slate-300">
-          <span className="text-slate-400 mr-1 text-[10px]">Tới nhanh:</span>
-          {quickVnCities.map(city => (
+          {/* Quick VN Cities Jump Toolbar */}
+          <div className="pointer-events-auto hidden xl:flex items-center gap-1 bg-slate-900/90 backdrop-blur-md px-2 py-1 rounded-2xl border border-slate-700/80 text-[11px] font-bold text-slate-300">
+            <span className="text-slate-400 mr-1 text-[10px]">Tới nhanh:</span>
+            {quickVnCities.map(city => (
+              <button
+                key={city.label}
+                type="button"
+                onClick={() => setActiveItem({ latitude: city.lat, longitude: city.lng, name: city.label, isJumpPoint: true })}
+                className="px-2 py-0.5 rounded-lg hover:bg-sky-600 hover:text-white transition-colors cursor-pointer"
+              >
+                {city.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Map Style Selector */}
+          <div className="pointer-events-auto flex items-center gap-1 bg-slate-900/90 backdrop-blur-md p-1 rounded-2xl border border-slate-700/80 shadow-lg text-[11px] font-bold">
             <button
-              key={city.label}
               type="button"
-              onClick={() => setActiveItem({ latitude: city.lat, longitude: city.lng, name: city.label, isJumpPoint: true })}
-              className="px-2 py-0.5 rounded-lg hover:bg-sky-600 hover:text-white transition-colors cursor-pointer"
+              onClick={() => setMapStyle('osm')}
+              className={`px-3 py-1 rounded-xl transition-all cursor-pointer ${
+                mapStyle === 'osm'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-white'
+              }`}
             >
-              {city.label}
+              Đường Phố
             </button>
-          ))}
-        </div>
+            <button
+              type="button"
+              onClick={() => setMapStyle('hot')}
+              className={`px-3 py-1 rounded-xl transition-all cursor-pointer ${
+                mapStyle === 'hot'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Màu Du Lịch
+            </button>
+          </div>
 
-        {/* Map Style Selector */}
-        <div className="pointer-events-auto flex items-center gap-1 bg-slate-900/90 backdrop-blur-md p-1 rounded-2xl border border-slate-700/80 shadow-lg text-[11px] font-bold">
-          <button
-            type="button"
-            onClick={() => setMapStyle('osm')}
-            className={`px-3 py-1 rounded-xl transition-all cursor-pointer ${
-              mapStyle === 'osm'
-                ? 'bg-sky-600 text-white shadow-xs'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Đường Phố
-          </button>
-          <button
-            type="button"
-            onClick={() => setMapStyle('hot')}
-            className={`px-3 py-1 rounded-xl transition-all cursor-pointer ${
-              mapStyle === 'hot'
-                ? 'bg-sky-600 text-white shadow-xs'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Màu Du Lịch
-          </button>
         </div>
-
-      </div>
+      )}
 
       {/* Real Interactive Leaflet Map - Locked Strictly Within Vietnam Territory */}
       <MapContainer
         center={defaultCenter}
-        zoom={6}
-        minZoom={5.8}
+        zoom={miniMode ? 14 : 6}
+        minZoom={miniMode ? 4 : 5.8}
         maxZoom={18}
         maxBounds={vietnamBounds}
         maxBoundsViscosity={1.0}
         scrollWheelZoom={true}
-        className="w-full h-full min-h-[520px] z-0"
+        className={`w-full h-full ${miniMode ? 'min-h-0' : 'min-h-[520px]'} z-0`}
       >
         <TileLayer
           url={tileLayers[mapStyle]?.url || tileLayers.osm.url}
@@ -292,7 +296,7 @@ export const RealMapView = ({
         />
 
         {/* Map Controller for dynamic flyTo */}
-        <MapFlyController activeItem={activeItem} userCoords={userCoords} />
+        <MapFlyController activeItem={activeItem} userCoords={userCoords} miniMode={miniMode} />
 
         {/* Ghim Khẳng Định Chủ Quyền Quần Đảo Hoàng Sa & Trường Sa Của Việt Nam */}
         <Marker position={hoangSaPosition} icon={hoangSaIcon}>
@@ -356,18 +360,36 @@ export const RealMapView = ({
               eventHandlers={{
                 click: () => handleMarkerClick(item)
               }}
-            />
+            >
+              {miniMode && (
+                <Popup>
+                  <div className="p-1 min-w-[130px] text-xs font-sans">
+                    <strong className="text-slate-900 block font-bold text-xs truncate mb-0.5">
+                      {item.name}
+                    </strong>
+                    <p className="text-[11px] text-slate-500 flex items-center gap-1 mb-1">
+                      <span>📍</span>
+                      <span className="truncate">{item.city || item.address || 'Việt Nam'}</span>
+                    </p>
+                    {item.priceEstimate && (
+                      <p className="text-[11px] text-amber-600 font-semibold truncate">
+                        {item.priceEstimate}
+                      </p>
+                    )}
+                  </div>
+                </Popup>
+              )}
+            </Marker>
           );
         })}
       </MapContainer>
 
       {/* ────────────────────────────────────────────────────────────────────────
           Ô THÔNG TIN NỔI TRÊN BẢN ĐỒ (FLOATING CARD / MOBILE BOTTOM SHEET)
-          - Chế độ 1: Bấm vào ra "thông tin nhẹ"
-          - Chế độ 2: Bấm mũi tên mở rộng ra "thông tin chi tiết hơn nữa"
-          - Tối ưu tuyệt đối cho điện thoại di động (không che map, thumb-friendly)
+          - Chỉ hiển thị ở chế độ Bản đồ lớn Explore (không hiển thị ở miniMode)
          ──────────────────────────────────────────────────────────────────────── */}
-      {selectedPlace && !isDismissed ? (
+      {!miniMode && (
+        selectedPlace && !isDismissed ? (
         <div className="absolute bottom-3 left-3 right-3 sm:left-4 sm:right-auto sm:max-w-md z-[1000] pointer-events-auto transition-all duration-300">
           <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-700/80 shadow-[0_20px_50px_rgba(0,0,0,0.35)] overflow-hidden transition-all duration-300">
             
@@ -557,7 +579,7 @@ export const RealMapView = ({
             Click vào ghim để xem thông tin • Bấm thẻ bên trái để bay camera 📍
           </div>
         </div>
-      )}
+      ))}
 
     </div>
   );

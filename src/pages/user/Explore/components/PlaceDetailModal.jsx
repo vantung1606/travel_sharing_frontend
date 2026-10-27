@@ -329,6 +329,7 @@ export const PlaceDetailModal = ({
                 <RealMapView
                   items={[item]}
                   activeItem={item}
+                  miniMode={true}
                   className="w-full h-full"
                 />
               </div>

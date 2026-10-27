@@ -329,6 +329,7 @@ export const PlaceDetailPage = () => {
             <RealMapView
               items={[place]}
               activeItem={place}
+              miniMode={true}
               className="w-full h-full"
             />
           </div>
