@@ -1462,6 +1462,22 @@ export const userApi = {
     return json.data;
   },
 
+  async changePassword(currentPassword, newPassword, confirmPassword) {
+    const res = await fetch(`${BASE_URL}/users/change-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Đổi mật khẩu không thành công');
+    }
+    return json;
+  },
+
   async toggleFollow(userId, email) {
     const user = getStoredUser() || {};
     const userEmail = email || user.email || '';
@@ -1951,6 +1967,29 @@ export const reviewApi = {
     }
   },
 
+  async updateReview(reviewId, { rating, comment }, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user?.email || '';
+      const res = await fetch(`${BASE_URL}/places/reviews/${reviewId}?email=${encodeURIComponent(userEmail)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        },
+        body: JSON.stringify({ rating: Number(rating), comment: String(comment || '').trim() })
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.message || `HTTP error ${res.status}`);
+      }
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      throw err;
+    }
+  },
+
   async deleteReview(reviewId, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
@@ -1968,6 +2007,54 @@ export const reviewApi = {
     } catch (err) {
       throw err;
     }
+  }
+};
+
+export const reportApi = {
+  async submitReport({ targetType, targetId, category, reason, description, evidenceImageUrl }) {
+    const res = await fetch(`${BASE_URL}/reports`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ targetType, targetId, category, reason, description, evidenceImageUrl })
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Gửi báo cáo vi phạm thất bại');
+    }
+    return json.data;
+  },
+
+  async getAdminSystemReports(status = 'ALL', targetType = 'ALL') {
+    const res = await fetch(`${BASE_URL}/reports/admin/system?status=${status}&targetType=${targetType}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Lấy danh sách báo cáo thất bại');
+    }
+    return json.data || [];
+  },
+
+  async resolveSystemReport(id, action, notes) {
+    const res = await fetch(`${BASE_URL}/reports/admin/system/${id}/resolve`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ action, notes })
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) {
+      throw new Error(json.message || 'Xử lý báo cáo thất bại');
+    }
+    return json.data;
   }
 };
 

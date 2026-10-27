@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
-  Star, MapPin, Copy, ExternalLink, Calendar, ArrowLeft, CheckCircle2, Phone, Camera, Heart, MessageCircle
+  Star, MapPin, Copy, ExternalLink, Calendar, ArrowLeft, CheckCircle2, Phone, Camera, Heart, MessageCircle, Edit2, Trash2, Flag, Send, X, AlertTriangle
 } from 'lucide-react';
 import { placeApi, reviewApi, postApi } from '../../../services/api';
 import { useApp } from '../../../context/AppContext';
@@ -11,6 +11,7 @@ import { fetchLiveWeather } from '../../../utils/weatherUtils';
 import { mapApiSpot } from '../../../utils/placeMap';
 import { pickFallbackImage, SHARED_PLACEHOLDER_IMAGE } from '../../../utils/placeImages';
 import { AddToTripModal } from './components/AddToTripModal';
+import { UniversalReportModal } from '../../../components/common/UniversalReportModal';
 
 export const PlaceDetailPage = () => {
   const { placeId } = useParams();
@@ -27,6 +28,87 @@ export const PlaceDetailPage = () => {
   const [isWeatherLoading, setIsWeatherLoading] = useState(false);
   const [weatherUnavailable, setWeatherUnavailable] = useState(false);
   const [isAddToTripModalOpen, setIsAddToTripModalOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+
+  // Review states
+  const [isAddingReview, setIsAddingReview] = useState(false);
+  const [newReviewRating, setNewReviewRating] = useState(5);
+  const [newReviewComment, setNewReviewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+
+  // Review edit states
+  const [editingReviewId, setEditingReviewId] = useState(null);
+  const [editRating, setEditRating] = useState(5);
+  const [editComment, setEditComment] = useState('');
+  const [isUpdatingReview, setIsUpdatingReview] = useState(false);
+
+  const handleCreateReview = async (e) => {
+    e.preventDefault();
+    if (!currentUser?.email) {
+      toast.showInfo('Vui lòng đăng nhập để viết đánh giá địa điểm!');
+      return;
+    }
+    if (!newReviewComment.trim()) {
+      toast.showError('Vui lòng nhập nội dung nhận xét!');
+      return;
+    }
+    try {
+      setIsSubmittingReview(true);
+      await reviewApi.addReview(placeId, { rating: newReviewRating, comment: newReviewComment.trim() }, currentUser.email);
+      toast.showSuccess('Cảm ơn bạn đã gửi đánh giá trải nghiệm tại địa điểm! 🎉');
+      setNewReviewComment('');
+      setNewReviewRating(5);
+      setIsAddingReview(false);
+      const updatedReviews = await reviewApi.getReviews(placeId);
+      setReviews(updatedReviews || []);
+      const updatedPlace = await placeApi.getPlaceById(placeId);
+      if (updatedPlace) setPlace(mapApiSpot(updatedPlace));
+    } catch (err) {
+      toast.showError(err.message || 'Gửi đánh giá thất bại');
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
+
+  const handleStartEditReview = (r) => {
+    setEditingReviewId(r.id);
+    setEditRating(r.rating || 5);
+    setEditComment(r.comment || '');
+  };
+
+  const handleSaveEditReview = async (reviewId) => {
+    if (!editComment.trim()) {
+      toast.showError('Nội dung nhận xét không được để trống!');
+      return;
+    }
+    try {
+      setIsUpdatingReview(true);
+      await reviewApi.updateReview(reviewId, { rating: editRating, comment: editComment.trim() }, currentUser?.email);
+      toast.showSuccess('Đã cập nhật đánh giá của bạn thành công! ✨');
+      setEditingReviewId(null);
+      const updatedReviews = await reviewApi.getReviews(placeId);
+      setReviews(updatedReviews || []);
+      const updatedPlace = await placeApi.getPlaceById(placeId);
+      if (updatedPlace) setPlace(mapApiSpot(updatedPlace));
+    } catch (err) {
+      toast.showError(err.message || 'Cập nhật đánh giá thất bại');
+    } finally {
+      setIsUpdatingReview(false);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa đánh giá này không?')) return;
+    try {
+      await reviewApi.deleteReview(reviewId, currentUser?.email);
+      toast.showSuccess('Đã xóa đánh giá thành công.');
+      setReviews(prev => prev.filter(r => r.id !== reviewId));
+      const updatedPlace = await placeApi.getPlaceById(placeId);
+      if (updatedPlace) setPlace(mapApiSpot(updatedPlace));
+    } catch (err) {
+      toast.showError(err.message || 'Xóa đánh giá thất bại');
+    }
+  };
 
   const handleAddToTrip = async (payload) => {
     if (!payload || !place) return;
@@ -275,31 +357,177 @@ export const PlaceDetailPage = () => {
           )}
 
           {/* Reviews — THẬT từ bảng reviews (GET /places/{id}/reviews) */}
-          {reviews.length > 0 ? (
-            <div className="space-y-2.5 pt-2 border-t border-slate-100">
-              <h4 className="font-bold text-xs text-slate-900">Đánh giá từ du khách ({reviews.length})</h4>
-              {reviews.slice(0, 10).map((r) => (
-                <div key={r.id || r.authorHandle} className="flex gap-2.5 items-start">
-                  <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-black text-slate-500">
-                    {r.authorAvatar ? (
-                      <img src={r.authorAvatar} alt={r.authorName} className="w-full h-full object-cover" />
-                    ) : (
-                      (r.authorName || 'W')[0]
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="text-[11px] font-bold text-slate-800">{r.authorName || 'Du khách'}</span>
-                      <span className="text-[10px] font-bold text-amber-600">{'★'.repeat(r.rating || 0)}</span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed">{r.comment}</p>
+          <div className="space-y-3 pt-3 border-t border-slate-100">
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                <span>Đánh giá từ du khách</span>
+                <span className="px-1.5 py-0.5 rounded-full bg-slate-100 text-[10px] text-slate-600 font-bold">
+                  {reviews.length}
+                </span>
+              </h4>
+              <button
+                type="button"
+                onClick={() => setIsAddingReview(!isAddingReview)}
+                className="text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline cursor-pointer flex items-center gap-1"
+              >
+                {isAddingReview ? 'Đóng form' : '+ Viết đánh giá'}
+              </button>
+            </div>
+
+            {/* Form viết đánh giá mới */}
+            {isAddingReview && (
+              <form onSubmit={handleCreateReview} className="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2.5 animate-in fade-in duration-150">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-700">Mức độ hài lòng của bạn:</span>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setNewReviewRating(star)}
+                        className="p-0.5 text-base hover:scale-110 transition-transform cursor-pointer"
+                      >
+                        <span className={star <= newReviewRating ? 'text-amber-500' : 'text-slate-300'}>★</span>
+                      </button>
+                    ))}
+                    <span className="ml-1 text-xs font-black text-amber-600">{newReviewRating} sao</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="pt-2 border-t border-slate-100 text-[11px] text-slate-400 font-semibold">Mới · chưa có đánh giá nào từ du khách</div>
-          )}
+
+                <textarea
+                  rows={2}
+                  value={newReviewComment}
+                  onChange={(e) => setNewReviewComment(e.target.value)}
+                  placeholder="Chia sẻ trải nghiệm thực tế, lưu ý giá vé, thời gian đi đẹp nhất..."
+                  className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 leading-relaxed"
+                  required
+                ></textarea>
+
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingReview(false)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-200/60 transition cursor-pointer"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmittingReview}
+                    className="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-2xs flex items-center gap-1 transition cursor-pointer"
+                  >
+                    {isSubmittingReview ? 'Đang gửi...' : 'Gửi đánh giá'}
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Danh sách đánh giá */}
+            {reviews.length > 0 ? (
+              <div className="space-y-2.5">
+                {reviews.map((r) => {
+                  const isAuthor = currentUser && (
+                    (r.authorEmail && currentUser.email && r.authorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+                    (r.authorId && currentUser.id && String(r.authorId) === String(currentUser.id))
+                  );
+                  const isEditingThis = editingReviewId === r.id;
+
+                  return (
+                    <div key={r.id || r.authorHandle} className="p-2.5 rounded-xl bg-slate-50/70 border border-slate-100 hover:border-slate-200 transition space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center text-[10px] font-black text-slate-500">
+                            {r.authorAvatar ? (
+                              <img src={r.authorAvatar} alt={r.authorName} className="w-full h-full object-cover" />
+                            ) : (
+                              (r.authorName || 'W')[0]
+                            )}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[11px] font-bold text-slate-800">{r.authorName || 'Du khách'}</span>
+                              {isAuthor && (
+                                <span className="px-1.5 py-0.2 rounded bg-sky-100 text-sky-700 text-[9px] font-bold">Bạn</span>
+                              )}
+                            </div>
+                            <span className="text-[10px] font-bold text-amber-500">{'★'.repeat(r.rating || 0)}</span>
+                          </div>
+                        </div>
+
+                        {/* Actions for Author */}
+                        {isAuthor && !isEditingThis && (
+                          <div className="flex items-center gap-1.5 text-slate-400">
+                            <button
+                              type="button"
+                              onClick={() => handleStartEditReview(r)}
+                              className="p-1 hover:text-sky-600 transition cursor-pointer"
+                              title="Sửa đánh giá"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteReview(r.id)}
+                              className="p-1 hover:text-rose-600 transition cursor-pointer"
+                              title="Xóa đánh giá"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content or Edit Form */}
+                      {isEditingThis ? (
+                        <div className="pt-1.5 space-y-2 border-t border-slate-200/60">
+                          <div className="flex items-center gap-1">
+                            <span className="text-[11px] font-semibold text-slate-600 mr-1">Chỉnh số sao:</span>
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setEditRating(star)}
+                                className="text-sm p-0.5 cursor-pointer"
+                              >
+                                <span className={star <= editRating ? 'text-amber-500' : 'text-slate-300'}>★</span>
+                              </button>
+                            ))}
+                          </div>
+                          <textarea
+                            rows={2}
+                            value={editComment}
+                            onChange={(e) => setEditComment(e.target.value)}
+                            className="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-800 outline-none focus:ring-1 focus:ring-sky-500"
+                          ></textarea>
+                          <div className="flex justify-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setEditingReviewId(null)}
+                              className="px-2.5 py-1 text-xs text-slate-500 hover:bg-slate-200 rounded cursor-pointer"
+                            >
+                              Hủy
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleSaveEditReview(r.id)}
+                              disabled={isUpdatingReview}
+                              className="px-3 py-1 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded cursor-pointer"
+                            >
+                              {isUpdatingReview ? 'Đang lưu...' : 'Lưu thay đổi'}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-[11px] text-slate-600 leading-relaxed pl-9">{r.comment}</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="py-2 text-[11px] text-slate-400 font-semibold italic">Mới · chưa có đánh giá nào từ du khách</div>
+            )}
+          </div>
         </div>
 
         {/* Right column: weather + map + actions */}
@@ -356,6 +584,12 @@ export const PlaceDetailPage = () => {
                 <Copy className="w-4 h-4" /> Copy GPS
               </button>
             )}
+            <button
+              onClick={() => setIsReportModalOpen(true)}
+              className="w-full flex items-center justify-center gap-2 bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-700 rounded-xl h-11 font-bold text-xs transition cursor-pointer"
+            >
+              <Flag className="w-4 h-4 text-rose-600" /> Báo cáo vi phạm địa điểm
+            </button>
             <button
               onClick={() => navigate('/explore')}
               className="w-full flex items-center justify-center gap-2 bg-slate-50 border border-slate-200 rounded-xl h-11 font-bold text-slate-600 text-xs hover:bg-slate-100 transition cursor-pointer"
@@ -480,6 +714,15 @@ export const PlaceDetailPage = () => {
           setIsAddToTripModalOpen(false);
           navigate('/itinerary');
         }}
+      />
+
+      {/* Universal Report Modal */}
+      <UniversalReportModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        targetType="PLACE"
+        targetId={Number(place?.rawId || place?.id || placeId)}
+        targetTitle={place?.name || 'Địa điểm du lịch'}
       />
     </div>
   );

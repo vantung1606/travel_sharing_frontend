@@ -9,6 +9,7 @@ import { useToast } from '../../../components/common/Toast';
 import { User, MapPin, Heart, Award, Sparkles, Share2, Bookmark, MessageCircle, Route, Edit, Camera, Star, PlusCircle, Zap, Globe, X, Users, UserCheck, Loader2, Copy, Eye, ArrowRight, Lock, Compass, Phone, CheckCircle2, ChevronLeft, ChevronRight, Crown, Trash2 } from 'lucide-react';
 import { TierPromotionModal } from '../../../components/common/TierPromotionModal';
 import { TravelFootprintSection } from '../../../components/profile/TravelFootprintSection';
+import { ChangePasswordModal } from '../../../components/profile/ChangePasswordModal';
 import { TIERS, calculateUserXP, getUserTier, getNextTier, calculateTierProgress, checkTierPromotion } from '../../../utils/tierSystem';
 
 export const ProfilePage = () => {
@@ -17,6 +18,7 @@ export const ProfilePage = () => {
 
   const [activeTab, setActiveTab] = useState('itineraries'); // 'itineraries' | 'posts' | 'ai-dna' | 'saved' | 'badges'
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [isPassportModalOpen, setIsPassportModalOpen] = useState(false);
   const [promotionData, setPromotionData] = useState(null);
   
@@ -51,6 +53,7 @@ export const ProfilePage = () => {
   const [profileHandle, setProfileHandle] = useState(currentUser?.handle || '');
   const [profileBio, setProfileBio] = useState(currentUser?.bio || '');
   const [profilePhone, setProfilePhone] = useState(currentUser?.phoneNumber || '');
+  const [profileAddress, setProfileAddress] = useState(currentUser?.address || '');
   const [profileTravelStyle, setProfileTravelStyle] = useState(currentUser?.travelStyle || 'Khám phá tự do');
   const [profileBudget, setProfileBudget] = useState(currentUser?.budgetPreference || 'Linh hoạt');
   
@@ -69,6 +72,7 @@ export const ProfilePage = () => {
     if (currentUser?.handle) setProfileHandle(currentUser.handle);
     if (currentUser?.bio !== undefined) setProfileBio(currentUser.bio || '');
     if (currentUser?.phoneNumber) setProfilePhone(currentUser.phoneNumber);
+    if (currentUser?.address) setProfileAddress(currentUser.address);
     if (currentUser?.travelStyle) setProfileTravelStyle(currentUser.travelStyle);
     if (currentUser?.budgetPreference) setProfileBudget(currentUser.budgetPreference);
   }, [currentUser]);
@@ -211,6 +215,7 @@ export const ProfilePage = () => {
         handle: profileHandle.trim(),
         bio: profileBio.trim(),
         phoneNumber: profilePhone.trim(),
+        address: profileAddress.trim(),
         travelStyle: profileTravelStyle,
         budgetPreference: profileBudget
       };
@@ -221,6 +226,7 @@ export const ProfilePage = () => {
         handle: profileHandle.trim(),
         bio: profileBio.trim(),
         phoneNumber: profilePhone.trim(),
+        address: profileAddress.trim(),
         travelStyle: profileTravelStyle,
         budgetPreference: profileBudget
       });
@@ -230,6 +236,8 @@ export const ProfilePage = () => {
         handle: profileHandle.trim(),
         bio: profileBio.trim(),
         phoneNumber: profilePhone.trim(),
+        address: profileAddress.trim(),
+        location: profileAddress.trim() || prev.location,
         travelStyle: profileTravelStyle,
         budgetPreference: profileBudget
       } : prev);
@@ -456,7 +464,7 @@ export const ProfilePage = () => {
                   <span className="text-ink-800 font-semibold">{profileHandle || currentUser.handle}</span>
                   <span className="text-ink-300">•</span>
                   <span className="flex items-center gap-1 text-ink-600 font-serif">
-                    <MapPin className="w-3.5 h-3.5 text-clay-600" /> {profileData?.location || 'Việt Nam'}
+                    <MapPin className="w-3.5 h-3.5 text-clay-600" /> {profileAddress || profileData?.address || profileData?.location || 'Việt Nam'}
                   </span>
                   {profileBudget && (
                     <>
@@ -498,13 +506,22 @@ export const ProfilePage = () => {
             </div>
 
             {/* Action Controls */}
-            <div className="flex items-center gap-2 pb-1 shrink-0">
+            <div className="flex items-center gap-2 pb-1 shrink-0 flex-wrap">
               <button
                 onClick={() => setIsEditModalOpen(true)}
                 className="px-3.5 py-2 rounded-[5px] bg-[#F8F4EC] hover:bg-ink-100 text-ink-800 border border-ink-200/80 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
               >
                 <Edit className="w-3.5 h-3.5 text-clay-600 shrink-0" />
                 <span>Chỉnh Sửa Hồ Sơ</span>
+              </button>
+
+              <button
+                onClick={() => setIsPasswordModalOpen(true)}
+                className="px-3.5 py-2 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-clay-700 border border-ink-200/80 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap"
+                title="Đổi mật khẩu tài khoản"
+              >
+                <Lock className="w-3.5 h-3.5 text-clay-600 shrink-0" />
+                <span>Đổi Mật Khẩu</span>
               </button>
 
               <button
@@ -1423,6 +1440,21 @@ export const ProfilePage = () => {
                 </div>
               </div>
 
+              {/* Địa chỉ thường trú */}
+              <div>
+                <label className="block mb-1 text-ink-800">Địa chỉ thường trú / Thành phố</label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={profileAddress}
+                    onChange={(e) => setProfileAddress(e.target.value)}
+                    placeholder="VD: Đà Nẵng, Việt Nam"
+                    className="w-full p-2.5 pl-8 rounded-[5px] bg-[#FFFDF8] border border-ink-200/80 text-xs font-medium text-ink-900 outline-none focus:ring-1 focus:ring-clay-500 focus:border-clay-500 transition-all"
+                  />
+                  <MapPin className="w-4 h-4 text-ink-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                </div>
+              </div>
+
               {/* Phong cách du lịch (Travel Style) */}
               <div>
                 <label className="block mb-1.5 text-ink-800">Phong cách / Gu du lịch chính</label>
@@ -1489,6 +1521,29 @@ export const ProfilePage = () => {
                   className="w-full p-2.5 rounded-[5px] bg-[#FFFDF8] border border-ink-200/80 text-xs font-serif text-ink-800 outline-none focus:ring-1 focus:ring-clay-500 focus:border-clay-500 transition-all leading-relaxed"
                 ></textarea>
               </div>
+
+              {/* Bảo mật tài khoản */}
+              <div className="pt-2 border-t border-ink-200/60">
+                <div className="flex items-center justify-between p-3 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80">
+                  <div>
+                    <p className="font-bold text-xs text-ink-800 flex items-center gap-1.5">
+                      <Lock className="w-3.5 h-3.5 text-clay-600" />
+                      <span>Mật khẩu tài khoản</span>
+                    </p>
+                    <p className="text-[11px] text-ink-500 font-serif">Đổi mật khẩu định kỳ để bảo vệ tài khoản</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEditModalOpen(false);
+                      setIsPasswordModalOpen(true);
+                    }}
+                    className="px-3 py-1.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-clay-700 text-xs font-bold border border-ink-200/80 flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
+                  >
+                    <span>Đổi mật khẩu</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-ink-200/80">
@@ -1522,6 +1577,12 @@ export const ProfilePage = () => {
           </div>
         </div>
       )}
+
+      {/* Change Password Modal (Đổi Mật Khẩu Tài Khoản) */}
+      <ChangePasswordModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+      />
 
       {/* Travel Passport QR Modal (Mã QR & Thẻ Hộ Chiếu Du Khách) */}
       {isPassportModalOpen && (

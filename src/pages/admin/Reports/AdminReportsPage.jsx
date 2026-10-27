@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '../../../components/common/Toast';
-import { adminReportApi, auditLogApi } from '../../../services/api';
+import { adminReportApi, auditLogApi, reportApi } from '../../../services/api';
 import { 
   AlertTriangle, Flame, ShieldAlert, Search, Filter, Download, CheckCircle2, 
   Eye, EyeOff, UserX, Trash2, RefreshCw, TrendingUp, FileText, ShieldCheck, 
   Bot, History, X, MapPin, Sparkles, ExternalLink, ChevronLeft, ChevronRight,
-  Shield, Globe, Laptop, Clock, ArrowRight
+  Shield, Globe, Laptop, Clock, ArrowRight, Flag, Image as ImageIcon
 } from 'lucide-react';
 
 // Helper to sanitize media image URLs and prevent Mixed Content on production HTTPS
@@ -54,6 +54,36 @@ export const AdminReportsPage = () => {
   const [auditTotalElements, setAuditTotalElements] = useState(0);
   const [auditLoading, setAuditLoading] = useState(false);
   const [auditStats, setAuditStats] = useState({ totalLogs: 0, logsToday: 0, securityCount: 0 });
+
+  // System Reports (Place, User, Review) States (Batch 1 #74, #75, #76)
+  const [systemReports, setSystemReports] = useState([]);
+  const [systemReportStatusFilter, setSystemReportStatusFilter] = useState('ALL');
+  const [systemReportTypeFilter, setSystemReportTypeFilter] = useState('ALL');
+  const [systemReportLoading, setSystemReportLoading] = useState(false);
+  const [selectedEvidenceImage, setSelectedEvidenceImage] = useState(null);
+
+  const fetchSystemReports = async (status = systemReportStatusFilter, type = systemReportTypeFilter) => {
+    setSystemReportLoading(true);
+    try {
+      const data = await reportApi.getAdminSystemReports(status, type);
+      setSystemReports(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Failed to load system reports:', err);
+      toast.error('Không thể tải danh sách báo cáo hệ thống');
+    } finally {
+      setSystemReportLoading(false);
+    }
+  };
+
+  const handleResolveSystemReport = async (id, action, notes = '') => {
+    try {
+      await reportApi.resolveSystemReport(id, action, notes);
+      toast.success(`Đã cập nhật trạng thái báo cáo #${id} (${action})!`);
+      await fetchSystemReports();
+    } catch (err) {
+      toast.error('Lỗi khi cập nhật trạng thái báo cáo: ' + err.message);
+    }
+  };
 
   // Fetch Audit Logs with Filtering & Pagination
   const fetchAuditLogs = async (pageNum = 0, query = auditSearchQuery, actionFilter = auditFilterAction) => {
@@ -145,10 +175,12 @@ export const AdminReportsPage = () => {
   useEffect(() => {
     if (activeTab === 'audit') {
       fetchAuditLogs(0);
+    } else if (activeTab === 'system_reports') {
+      fetchSystemReports(systemReportStatusFilter, systemReportTypeFilter);
     } else {
       loadData();
     }
-  }, [activeTab, auditFilterAction]);
+  }, [activeTab, auditFilterAction, systemReportStatusFilter, systemReportTypeFilter]);
 
   // Actions on Reported Posts
   const handleApprovePost = async (id, title = '') => {
@@ -641,6 +673,18 @@ export const AdminReportsPage = () => {
         >
           <History className="w-3.5 h-3.5 text-clay-600" />
           <span>Nhật ký kiểm duyệt (Audit Log)</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('system_reports')}
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-[5px] text-xs font-bold transition-all cursor-pointer ${
+            activeTab === 'system_reports'
+              ? 'bg-[#FFFDF8] text-amber-800 border border-ink-200/80 shadow-none'
+              : 'text-ink-600 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
+          }`}
+        >
+          <Flag className="w-3.5 h-3.5 text-amber-600" />
+          <span>Báo cáo Vi phạm (Địa điểm / Du khách / Bình luận)</span>
         </button>
       </div>
 
@@ -1273,6 +1317,203 @@ export const AdminReportsPage = () => {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* 6.5. Tab Content: System Reports (Batch 1: Places, Users, Reviews, Posts) */}
+      {activeTab === 'system_reports' && (
+        <div className="space-y-4">
+          {/* Filter Toolbar */}
+          <div className="bg-[#FFFDF8] rounded-[6px] p-4 border border-ink-200/80 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-ink-700">Bộ lọc loại đối tượng:</span>
+                {['ALL', 'PLACE', 'USER', 'POST', 'REVIEW'].map(type => (
+                  <button
+                    key={type}
+                    onClick={() => {
+                      setSystemReportTypeFilter(type);
+                      fetchSystemReports(systemReportStatusFilter, type);
+                    }}
+                    className={`px-2.5 py-1 rounded-[4px] text-xs font-bold cursor-pointer transition-colors ${
+                      systemReportTypeFilter === type
+                        ? 'bg-ink-800 text-[#FFFDF8]'
+                        : 'bg-[#F8F4EC] text-ink-600 hover:bg-ink-200'
+                    }`}
+                  >
+                    {type === 'ALL' ? 'Tất cả đối tượng' : type === 'PLACE' ? 'Địa điểm' : type === 'USER' ? 'Người dùng' : type === 'POST' ? 'Bài viết' : 'Đánh giá'}
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-ink-700">Trạng thái:</span>
+                {['ALL', 'PENDING', 'RESOLVED', 'DISMISSED'].map(status => (
+                  <button
+                    key={status}
+                    onClick={() => {
+                      setSystemReportStatusFilter(status);
+                      fetchSystemReports(status, systemReportTypeFilter);
+                    }}
+                    className={`px-2.5 py-1 rounded-[4px] text-xs font-bold cursor-pointer transition-colors ${
+                      systemReportStatusFilter === status
+                        ? 'bg-amber-700 text-[#FFFDF8]'
+                        : 'bg-[#F8F4EC] text-ink-600 hover:bg-ink-200'
+                    }`}
+                  >
+                    {status === 'ALL' ? 'Tất cả' : status === 'PENDING' ? 'Chờ xử lý' : status === 'RESOLVED' ? 'Đã xử lý' : 'Đã bác bỏ'}
+                  </button>
+                ))}
+
+                <button
+                  onClick={() => fetchSystemReports(systemReportStatusFilter, systemReportTypeFilter)}
+                  className="p-1.5 rounded-[4px] bg-[#F8F4EC] hover:bg-ink-200 text-ink-700 cursor-pointer"
+                  title="Tải lại"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${systemReportLoading ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* System Reports Table */}
+          <div className="bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 overflow-hidden">
+            {systemReportLoading ? (
+              <div className="p-12 text-center text-ink-400 space-y-2">
+                <RefreshCw className="w-5 h-5 animate-spin mx-auto text-amber-600" />
+                <p className="text-xs font-medium">Đang tải danh sách báo cáo hệ thống...</p>
+              </div>
+            ) : systemReports.length === 0 ? (
+              <div className="p-12 text-center text-ink-400 space-y-3">
+                <div className="w-12 h-12 rounded-[5px] bg-[#F8F4EC] text-ink-400 flex items-center justify-center mx-auto border border-ink-200/80">
+                  <ShieldCheck className="w-6 h-6 text-emerald-600" />
+                </div>
+                <div>
+                  <h4 className="font-display font-bold text-ink-800 text-sm">Không có báo cáo vi phạm nào</h4>
+                  <p className="text-xs text-ink-400 mt-1">Không có khiếu nại hoặc báo cáo vi phạm nào phù hợp với bộ lọc hiện tại.</p>
+                </div>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-ink-700">
+                  <thead className="bg-[#F8F4EC] border-b border-ink-200/80 text-[11px] font-bold text-ink-500 uppercase tracking-wider">
+                    <tr>
+                      <th className="py-3 px-4">Mã BC</th>
+                      <th className="py-3 px-4">Đối tượng</th>
+                      <th className="py-3 px-4">Người gửi</th>
+                      <th className="py-3 px-4">Lý do & Mô tả</th>
+                      <th className="py-3 px-4">Bằng chứng</th>
+                      <th className="py-3 px-4">Trạng thái</th>
+                      <th className="py-3 px-4 text-right">Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-ink-200/60">
+                    {systemReports.map(rep => (
+                      <tr key={rep.id} className="hover:bg-[#F8F4EC]/50 transition-colors">
+                        <td className="py-3.5 px-4 font-mono font-bold text-ink-500">#{rep.id}</td>
+                        <td className="py-3.5 px-4">
+                          <div className="flex items-center gap-1.5">
+                            <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
+                              rep.targetType === 'PLACE'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                : rep.targetType === 'USER'
+                                  ? 'bg-purple-50 text-purple-800 border-purple-200'
+                                  : rep.targetType === 'REVIEW'
+                                    ? 'bg-amber-50 text-amber-800 border-amber-200'
+                                    : 'bg-sky-50 text-sky-800 border-sky-200'
+                            }`}>
+                              {rep.targetType}
+                            </span>
+                            <span className="font-semibold text-ink-800 max-w-[160px] truncate" title={rep.targetTitle || `ID: ${rep.targetId}`}>
+                              {rep.targetTitle || `ID: ${rep.targetId}`}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <div className="font-medium text-ink-800">{rep.reporterName || 'Du khách'}</div>
+                          <div className="text-[10px] text-ink-400">{rep.reporterEmail || 'Không có email'}</div>
+                        </td>
+                        <td className="py-3.5 px-4 max-w-xs">
+                          <div className="font-bold text-rose-700">{rep.category || rep.reason}</div>
+                          <div className="text-ink-500 text-[11px] line-clamp-2 mt-0.5">{rep.description || 'Không có mô tả chi tiết'}</div>
+                        </td>
+                        <td className="py-3.5 px-4">
+                          {rep.evidenceImageUrl ? (
+                            <button
+                              onClick={() => setSelectedEvidenceImage(rep.evidenceImageUrl)}
+                              className="group relative w-10 h-10 rounded-[4px] overflow-hidden border border-ink-200 inline-block cursor-pointer"
+                              title="Bấm để xem ảnh bằng chứng"
+                            >
+                              <img src={rep.evidenceImageUrl} alt="Bằng chứng" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+                              <div className="absolute inset-0 bg-ink-900/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Eye className="w-3.5 h-3.5 text-white" />
+                              </div>
+                            </button>
+                          ) : (
+                            <span className="text-ink-400 text-[11px]">Không có</span>
+                          )}
+                        </td>
+                        <td className="py-3.5 px-4">
+                          <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
+                            rep.status === 'PENDING'
+                              ? 'bg-amber-50 text-amber-800 border-amber-200'
+                              : rep.status === 'RESOLVED'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                                : 'bg-ink-100 text-ink-600 border-ink-200'
+                          }`}>
+                            {rep.status === 'PENDING' ? 'Chờ duyệt' : rep.status === 'RESOLVED' ? 'Đã xử lý' : 'Đã bác bỏ'}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-4 text-right">
+                          {rep.status === 'PENDING' ? (
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                onClick={() => handleResolveSystemReport(rep.id, 'RESOLVE', 'Đã xử lý xác minh vi phạm')}
+                                className="px-2.5 py-1 rounded-[4px] bg-emerald-600 hover:bg-emerald-700 text-[#FFFDF8] text-[11px] font-bold cursor-pointer transition-colors"
+                              >
+                                Xử lý xong
+                              </button>
+                              <button
+                                onClick={() => handleResolveSystemReport(rep.id, 'DISMISS', 'Báo cáo không có căn cứ')}
+                                className="px-2.5 py-1 rounded-[4px] bg-[#F8F4EC] hover:bg-ink-200 text-ink-700 text-[11px] font-bold border border-ink-200 cursor-pointer transition-colors"
+                              >
+                                Bác bỏ
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-[11px] text-ink-400 font-mono">Đã đóng</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal xem ảnh bằng chứng báo cáo */}
+      {selectedEvidenceImage && (
+        <div className="fixed inset-0 z-50 bg-ink-900/70 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setSelectedEvidenceImage(null)}>
+          <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-4 border border-ink-200 shadow-2xl space-y-3" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between pb-2 border-b border-ink-200/60">
+              <h4 className="font-display font-bold text-ink-800 text-sm flex items-center gap-1.5">
+                <ImageIcon className="w-4 h-4 text-amber-600" />
+                <span>Ảnh bằng chứng vi phạm</span>
+              </h4>
+              <button onClick={() => setSelectedEvidenceImage(null)} className="w-6 h-6 rounded hover:bg-ink-100 flex items-center justify-center cursor-pointer">
+                <X className="w-4 h-4 text-ink-400" />
+              </button>
+            </div>
+            <img src={selectedEvidenceImage} alt="Ảnh bằng chứng" className="w-full max-h-[70vh] object-contain rounded border border-ink-200" />
+            <div className="text-right">
+              <button onClick={() => setSelectedEvidenceImage(null)} className="px-3 py-1 rounded bg-[#F8F4EC] text-ink-700 text-xs font-bold border border-ink-200 hover:bg-ink-200 cursor-pointer">
+                Đóng
+              </button>
+            </div>
           </div>
         </div>
       )}
