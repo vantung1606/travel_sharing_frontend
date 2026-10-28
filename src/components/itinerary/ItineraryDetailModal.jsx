@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useToast } from '../common/Toast';
-import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2, Globe, Lock, Edit3 } from 'lucide-react';
+import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2, Globe, Lock, Edit3, ArrowUp, ArrowDown } from 'lucide-react';
 import { ItineraryExportModal } from './ItineraryExportModal';
 import { EditItineraryModal } from './EditItineraryModal';
 import { itineraryApi } from '../../services/api';
@@ -465,6 +465,59 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
     }
   };
 
+  // Di chuyển thứ tự hoạt động trong ngày (Lên / Xuống)
+  const handleMoveActivity = async (targetDayNumber, actIndex, direction) => {
+    let reorderPayload = [];
+    const updatedDays = currentDays.map(d => {
+      const dNum = d.dayNumber || 1;
+      if (dNum === targetDayNumber) {
+        const activities = [...(d.activities || [])];
+        const targetIndex = actIndex + direction;
+        if (targetIndex < 0 || targetIndex >= activities.length) return d;
+
+        // Hoán đổi 2 vị trí
+        const temp = activities[actIndex];
+        activities[actIndex] = activities[targetIndex];
+        activities[targetIndex] = temp;
+
+        // Chuẩn bị payload reorder cho backend
+        activities.forEach((act, idx) => {
+          if (act.id && typeof act.id === 'number') {
+            reorderPayload.push({
+              detailId: act.id,
+              visitOrder: idx + 1,
+              dayNumber: targetDayNumber
+            });
+          }
+        });
+
+        return {
+          ...d,
+          activities
+        };
+      }
+      return d;
+    });
+
+    setCurrentDays(updatedDays);
+    const updatedItin = {
+      ...itinerary,
+      days: updatedDays
+    };
+    onUpdate?.(updatedItin);
+
+    toast.showSuccess(direction < 0 ? 'Đã di chuyển hoạt động lên trên 🔼' : 'Đã di chuyển hoạt động xuống dưới 🔽');
+
+    // Đồng bộ lên backend nếu lịch trình có id số
+    try {
+      if (itinerary?.id && typeof itinerary.id === 'number' && reorderPayload.length > 0) {
+        await itineraryApi.reorderItineraryDetails(itinerary.id, reorderPayload);
+      }
+    } catch (e) {
+      console.warn('Backend reorder detail warning:', e.message);
+    }
+  };
+
   // Chuẩn hóa tên điểm đến viết hoa lịch sự
   const formatDestination = (str) => {
     if (!str) return 'Việt Nam';
@@ -892,14 +945,45 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                               <span>{act.time || '08:00 – 10:00'}</span>
                             </span>
 
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[10px] sm:text-[11px] font-bold text-slate-600 bg-slate-100 px-2 sm:px-2.5 py-0.5 rounded-md">
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] sm:text-[11px] font-bold text-slate-600 bg-slate-100 px-2 sm:px-2.5 py-0.5 rounded-md mr-1">
                                 {act.category || 'Hoạt động trải nghiệm'}
                               </span>
+
+                              {/* Nút di chuyển lên */}
+                              <button
+                                type="button"
+                                disabled={actIdx === 0}
+                                onClick={() => handleMoveActivity(dayItem.dayNumber || dayIdx + 1, actIdx, -1)}
+                                className={`p-1 rounded-md transition-colors ${
+                                  actIdx === 0
+                                    ? 'text-slate-200 cursor-not-allowed'
+                                    : 'text-slate-500 hover:text-sky-600 hover:bg-sky-50 cursor-pointer'
+                                }`}
+                                title={actIdx === 0 ? 'Điểm đầu tiên trong ngày' : 'Di chuyển lên trên'}
+                              >
+                                <ArrowUp className="w-3.5 h-3.5" />
+                              </button>
+
+                              {/* Nút di chuyển xuống */}
+                              <button
+                                type="button"
+                                disabled={actIdx === dayItem.activities.length - 1}
+                                onClick={() => handleMoveActivity(dayItem.dayNumber || dayIdx + 1, actIdx, 1)}
+                                className={`p-1 rounded-md transition-colors ${
+                                  actIdx === dayItem.activities.length - 1
+                                    ? 'text-slate-200 cursor-not-allowed'
+                                    : 'text-slate-500 hover:text-sky-600 hover:bg-sky-50 cursor-pointer'
+                                }`}
+                                title={actIdx === dayItem.activities.length - 1 ? 'Điểm cuối cùng trong ngày' : 'Di chuyển xuống dưới'}
+                              >
+                                <ArrowDown className="w-3.5 h-3.5" />
+                              </button>
+
                               <button
                                 type="button"
                                 onClick={() => handleDeleteActivity(dayItem.dayNumber || dayIdx + 1, actIdx, act)}
-                                className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                                className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer ml-0.5"
                                 title="Xóa hoạt động này"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />

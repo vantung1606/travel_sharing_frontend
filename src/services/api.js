@@ -341,6 +341,25 @@ export const itineraryApi = {
     return res.data;
   },
 
+  async reorderItineraryDetails(itineraryId, items, email) {
+    const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+    const userEmail = email || user?.email || '';
+    const response = await fetch(`${BASE_URL}/itineraries/${itineraryId}/details/reorder?email=${encodeURIComponent(userEmail)}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(items)
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    const res = await response.json();
+    return res.data;
+  },
+
   async deleteItinerary(id, email) {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
     const userEmail = email || user?.email || '';
