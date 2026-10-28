@@ -17,6 +17,7 @@ import { PlaceAttachCard } from '../../../components/community/PlaceAttachCard';
 import { CustomSelect } from '../../../components/common/CustomSelect';
 import { UserAvatar } from '../../../components/common/UserAvatar';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../components/community/MentionSuggestions';
+import { RichTextToolbar, RichPostContent } from '../../../components/community/RichTextToolbar';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AtSign, Heart, MessageCircle, MessageSquare, Share2, Bookmark, MapPin, Award, TrendingUp, Compass, Route, Copy, DollarSign, Camera, Image as ImageIcon, CheckCircle2, Send, Search, SlidersHorizontal, Filter, Plus, X, Loader2, Eye, MoreHorizontal, ChevronLeft, ChevronRight, ArrowRight, Flame, Check, UserCheck, ShieldCheck, AlertCircle, AlertTriangle, ShieldAlert, Lock, Globe, Upload, Video, Trash2, Edit, UserPlus, CornerDownRight, Flag, EyeOff, BookOpen } from 'lucide-react';
 
@@ -2201,9 +2202,9 @@ export const CommunityPage = () => {
                     <div className="space-y-3">
                       {/* Sharing User's Caption/Quote */}
                       {post.content && (
-                        <p className="text-sm sm:text-base text-[#2A241D] leading-relaxed whitespace-pre-line font-normal tracking-[0.015em]">
-                          {renderTextWithMentions(post.content, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
-                        </p>
+                        <div className="text-sm sm:text-base text-[#2A241D] leading-relaxed font-normal tracking-[0.015em]">
+                          <RichPostContent content={post.content} followingUsers={followingUsers} onUserClick={(uid) => setSelectedUserIdForModal(uid)} />
+                        </div>
                       )}
 
                       {/* Embedded Shared Post Card */}
@@ -2269,9 +2270,9 @@ export const CommunityPage = () => {
                             </h4>
                           )}
                           {post.sharedPost.content && (
-                            <p className="text-xs sm:text-sm text-[#3B332A] leading-relaxed whitespace-pre-line line-clamp-4">
-                              {renderTextWithMentions(post.sharedPost.content, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
-                            </p>
+                            <div className="text-xs sm:text-sm text-[#3B332A] leading-relaxed line-clamp-4">
+                              <RichPostContent content={post.sharedPost.content} followingUsers={followingUsers} onUserClick={(uid) => setSelectedUserIdForModal(uid)} />
+                            </div>
                           )}
                         </div>
 
@@ -2371,27 +2372,29 @@ export const CommunityPage = () => {
                                 : post.content;
 
                               return (
-                                <p className="whitespace-pre-line">
-                                  {renderTextWithMentions(textToShow, followingUsers, (uid) => setSelectedUserIdForModal(uid))}
-                                  {shouldTruncate && (
-                                    <button
-                                      type="button"
-                                      onClick={() => toggleExpandPost(post.id)}
-                                      className="font-bold text-[#1E1A15] hover:text-blue-600 hover:underline cursor-pointer ml-1 inline-block"
-                                    >
-                                      ... Xem thêm
-                                    </button>
-                                  )}
-                                  {isExpanded && post.content.length > 170 && (
-                                    <button
-                                      type="button"
-                                      onClick={() => toggleExpandPost(post.id)}
-                                      className="font-bold text-[#8A7F70] hover:text-[#5A5146] hover:underline cursor-pointer ml-2 text-xs inline-block"
-                                    >
-                                      Thu gọn
-                                    </button>
-                                  )}
-                                </p>
+                                <div>
+                                  <RichPostContent content={textToShow} followingUsers={followingUsers} onUserClick={(uid) => setSelectedUserIdForModal(uid)} />
+                                  <div className="flex items-center gap-2 mt-1">
+                                    {shouldTruncate && (
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleExpandPost(post.id)}
+                                        className="font-bold text-[#1E1A15] hover:text-sky-600 hover:underline cursor-pointer inline-block text-xs"
+                                      >
+                                        ... Xem thêm
+                                      </button>
+                                    )}
+                                    {isExpanded && post.content.length > 170 && (
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleExpandPost(post.id)}
+                                        className="font-bold text-[#8A7F70] hover:text-[#5A5146] hover:underline cursor-pointer text-xs inline-block"
+                                      >
+                                        Thu gọn
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
                               );
                             })()}
                           </div>
@@ -2989,13 +2992,18 @@ export const CommunityPage = () => {
                     <span>Gắn thẻ bạn bè ({followingUsers.length})</span>
                   </button>
                 </div>
+                <RichTextToolbar
+                  textareaRef={postTextareaRef}
+                  value={postContent}
+                  onChange={(val) => setPostContent(val)}
+                />
                 <textarea
                   ref={postTextareaRef}
                   rows={4}
-                  placeholder="Chia sẻ kinh nghiệm, lưu ý quan trọng... (Gõ @ để gắn thẻ người bạn đang theo dõi)"
+                  placeholder="Chia sẻ kinh nghiệm, lưu ý quan trọng... (Hỗ trợ định dạng in đậm, nghiêng, trích dẫn, gõ @ để gắn thẻ)"
                   value={postContent}
                   onChange={handlePostContentChange}
-                  className="w-full p-3 bg-[#F8F4EC] border border-[#1E1A15]/10 rounded-sm text-xs text-[#2A241D] placeholder-[#8A7F70] focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 resize-none"
+                  className="w-full p-3 bg-[#F8F4EC] border border-[#1E1A15]/10 rounded-b-sm rounded-t-none border-t-0 text-xs text-[#2A241D] placeholder-[#8A7F70] focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 resize-none"
                   required
                 />
 

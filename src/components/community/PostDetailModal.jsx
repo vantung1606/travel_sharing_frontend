@@ -11,6 +11,7 @@ import { ImageLightboxModal } from './ImageLightboxModal';
 import { PlaceAttachCard } from './PlaceAttachCard';
 import { PostLikersModal } from './PostLikersModal';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from './MentionSuggestions';
+import { RichPostContent } from './RichTextToolbar';
 
 export const PostDetailModal = ({
   postId,
@@ -664,8 +665,8 @@ export const PostDetailModal = ({
               <div className="space-y-4">
                 {/* Sharing User's Caption */}
                 {post.content && (
-                  <div className="text-slate-800 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
-                    {renderTextWithMentions(post.content, followingUsers, onAuthorClick)}
+                  <div className="text-slate-800 text-sm sm:text-base leading-relaxed font-normal">
+                    <RichPostContent content={post.content} followingUsers={followingUsers} onUserClick={onAuthorClick} />
                   </div>
                 )}
 
@@ -725,9 +726,9 @@ export const PostDetailModal = ({
                       </h3>
                     )}
                     {post.sharedPost.content && (
-                      <p className="text-xs sm:text-sm text-slate-700 leading-relaxed whitespace-pre-line">
-                        {renderTextWithMentions(post.sharedPost.content, followingUsers, onAuthorClick)}
-                      </p>
+                      <div className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        <RichPostContent content={post.sharedPost.content} followingUsers={followingUsers} onUserClick={onAuthorClick} />
+                      </div>
                     )}
                   </div>
 
@@ -808,8 +809,8 @@ export const PostDetailModal = ({
                 </h2>
 
                 {/* Post Content */}
-                <div className="text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
-                  {renderTextWithMentions(post.content, followingUsers, onAuthorClick)}
+                <div className="text-slate-700 text-sm sm:text-base leading-relaxed font-normal">
+                  <RichPostContent content={post.content} followingUsers={followingUsers} onUserClick={onAuthorClick} />
                 </div>
 
                 {/* Multimedia: Video Player */}

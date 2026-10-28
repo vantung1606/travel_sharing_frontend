@@ -3,6 +3,7 @@ import { X, MapPin, ImageIcon, Video, Upload, Loader2, Send, ShieldCheck, Sparkl
 import { postApi, uploadApi, placeApi } from '../../services/api';
 import { useToast } from '../common/Toast';
 import { CustomSelect } from '../common/CustomSelect';
+import { RichTextToolbar } from './RichTextToolbar';
 
 export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
   const [title, setTitle] = useState(post.title || '');
@@ -31,6 +32,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
   const [moderationStep, setModerationStep] = useState(0);
 
   const fileInputRef = useRef(null);
+  const editTextareaRef = useRef(null);
   const toast = useToast();
 
   const handleFileUpload = async (e) => {
@@ -247,11 +249,18 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
           {/* Content */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">Nội dung chia sẻ *</label>
+            <RichTextToolbar
+              textareaRef={editTextareaRef}
+              value={content}
+              onChange={setContent}
+              className="rounded-t-xl"
+            />
             <textarea
+              ref={editTextareaRef}
               rows={4}
               value={content}
               onChange={e => setContent(e.target.value)}
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 resize-none"
+              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-b-xl rounded-t-none border-t-0 text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 resize-none"
               required
             />
           </div>
