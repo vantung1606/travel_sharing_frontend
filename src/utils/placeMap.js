@@ -16,6 +16,7 @@ export function mapApiSpot(p) {
     city: p.city || 'Việt Nam',
     address: p.address,
     image: resolvePlaceImage(p),
+    images: Array.isArray(p.images) && p.images.length > 0 ? p.images : (resolvePlaceImage(p) ? [resolvePlaceImage(p)] : []),
     latitude: p.latitude,
     longitude: p.longitude,
     rating: p.averageRating ? Number(p.averageRating).toFixed(1) : null,

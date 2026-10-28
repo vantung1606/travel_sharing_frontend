@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import {
-  Star, MapPin, Copy, ExternalLink, Calendar, ArrowLeft, CheckCircle2, Phone, Camera, Heart, MessageCircle, Edit2, Trash2, Flag, Send, X, AlertTriangle
+  Star, MapPin, Copy, ExternalLink, Calendar, ArrowLeft, CheckCircle2, Phone, Camera, Heart, MessageCircle, Edit2, Trash2, Flag, Send, X, AlertTriangle,
+  ChevronLeft, ChevronRight, Images, ZoomIn
 } from 'lucide-react';
 import { placeApi, reviewApi, postApi } from '../../../services/api';
 import { useApp } from '../../../context/AppContext';
@@ -29,6 +30,7 @@ export const PlaceDetailPage = () => {
   const [weatherUnavailable, setWeatherUnavailable] = useState(false);
   const [isAddToTripModalOpen, setIsAddToTripModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   // Review states
   const [isAddingReview, setIsAddingReview] = useState(false);
@@ -232,6 +234,25 @@ export const PlaceDetailPage = () => {
     else img.src = SHARED_PLACEHOLDER_IMAGE;
   };
 
+  const galleryImages = (Array.isArray(place?.images) && place.images.length > 0)
+    ? place.images
+    : (place?.image ? [place.image] : []);
+
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setLightboxIndex(null);
+      if (e.key === 'ArrowRight') {
+        setLightboxIndex((prev) => (prev !== null ? (prev + 1) % galleryImages.length : 0));
+      }
+      if (e.key === 'ArrowLeft') {
+        setLightboxIndex((prev) => (prev !== null ? (prev - 1 + galleryImages.length) % galleryImages.length : 0));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxIndex, galleryImages.length]);
+
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -255,7 +276,7 @@ export const PlaceDetailPage = () => {
     : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.city)}`;
 
   return (
-    <div className="w-full max-w-[1100px] mx-auto px-4 sm:px-6 py-6 space-y-6">
+    <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-6 space-y-6">
       {/* Breadcrumb + Back */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
@@ -275,36 +296,206 @@ export const PlaceDetailPage = () => {
         </button>
       </div>
 
-      {/* Hero */}
-      <div className="relative h-56 sm:h-80 rounded-3xl overflow-hidden border border-slate-200 shadow-sm bg-slate-900">
-        <img src={place.image} alt={place.name} onError={handleImageError} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-        <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-end justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap mb-1">
-              <span className="px-2.5 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[10px] font-bold text-white border border-white/15">{place.category}</span>
-              {place.isVerifiedHost && (
-                <span className="px-2 py-0.5 rounded-full bg-sky-500 text-[10px] font-bold text-white flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3" /> Đã xác thực
+      {/* Mosaic Gallery Hero */}
+      {galleryImages.length >= 3 ? (
+        <div className="relative h-64 sm:h-80 md:h-[400px] lg:h-[440px] rounded-3xl overflow-hidden border border-slate-200/90 shadow-sm bg-slate-950 grid grid-cols-1 sm:grid-cols-12 gap-1.5 sm:gap-2 p-1.5 sm:p-2">
+          {/* Main Hero Photo (sm:col-span-8) */}
+          <div
+            onClick={() => setLightboxIndex(0)}
+            className="relative h-full sm:col-span-8 rounded-2xl overflow-hidden cursor-pointer group select-none"
+          >
+            <img
+              src={galleryImages[0]}
+              alt={place.name}
+              onError={handleImageError}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
+
+            {/* Quick zoom hint */}
+            <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold flex items-center gap-1.5 border border-white/20">
+              <ZoomIn className="w-3.5 h-3.5" /> Phóng to
+            </div>
+
+            {/* Info overlay */}
+            <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex flex-wrap items-end justify-between gap-3 pointer-events-none">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[10px] font-bold text-white border border-white/15">
+                    {place.category}
+                  </span>
+                  {place.isVerifiedHost && (
+                    <span className="px-2 py-0.5 rounded-full bg-sky-500 text-[10px] font-bold text-white flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" /> Đã xác thực
+                    </span>
+                  )}
+                  <span className="text-[11px] font-bold text-sky-200 flex items-center gap-1">
+                    <MapPin className="w-3 h-3" /> {place.city}
+                  </span>
+                </div>
+                <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-black text-white truncate">
+                  {place.name}
+                </h1>
+              </div>
+
+              {place.rating && place.reviewsCount > 0 ? (
+                <div className="flex items-center gap-1.5 bg-amber-50/95 backdrop-blur px-3 py-1.5 rounded-xl border border-amber-200 shrink-0">
+                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  <span className="font-black text-amber-700 text-sm">{place.rating}</span>
+                  <span className="text-[11px] text-slate-500 font-semibold">({place.reviewsCount} đánh giá)</span>
+                </div>
+              ) : (
+                <span className="text-[11px] text-white/80 font-semibold bg-slate-950/60 px-3 py-1.5 rounded-xl border border-white/10">
+                  Mới · chưa có đánh giá
                 </span>
               )}
-              <span className="text-[11px] font-bold text-sky-200 flex items-center gap-1">
-                <MapPin className="w-3 h-3" /> {place.city}
-              </span>
             </div>
-            <h1 className="font-display text-2xl sm:text-3xl font-black text-white truncate">{place.name}</h1>
+
+            {/* Mobile View All button */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxIndex(0);
+              }}
+              className="sm:hidden absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[10px] font-bold flex items-center gap-1 border border-white/20"
+            >
+              <Images className="w-3 h-3" /> {galleryImages.length} ảnh
+            </button>
           </div>
-          {place.rating && place.reviewsCount > 0 ? (
-            <div className="flex items-center gap-1.5 bg-amber-50/95 backdrop-blur px-3 py-1.5 rounded-xl border border-amber-200 shrink-0">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span className="font-black text-amber-700 text-sm">{place.rating}</span>
-              <span className="text-[11px] text-slate-500 font-semibold">({place.reviewsCount} đánh giá)</span>
+
+          {/* Right Stack (sm:col-span-4) */}
+          <div className="hidden sm:grid sm:col-span-4 grid-rows-2 gap-1.5 sm:gap-2 h-full">
+            {/* Photo 2 */}
+            <div
+              onClick={() => setLightboxIndex(1)}
+              className="relative rounded-2xl overflow-hidden cursor-pointer group select-none"
+            >
+              <img
+                src={galleryImages[1]}
+                alt={`${place.name} - 2`}
+                onError={handleImageError}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
+              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-full bg-black/60 backdrop-blur-md text-white">
+                <ZoomIn className="w-3.5 h-3.5" />
+              </div>
             </div>
-          ) : (
-            <span className="text-[11px] text-white/80 font-semibold bg-slate-950/60 px-3 py-1.5 rounded-xl border border-white/10">Mới · chưa có đánh giá</span>
-          )}
+
+            {/* Photo 3 with album trigger */}
+            <div
+              onClick={() => setLightboxIndex(2)}
+              className="relative rounded-2xl overflow-hidden cursor-pointer group select-none"
+            >
+              <img
+                src={galleryImages[2]}
+                alt={`${place.name} - 3`}
+                onError={handleImageError}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-black/45 hover:bg-black/55 transition-colors flex flex-col items-center justify-center text-white gap-1 backdrop-blur-[1px]">
+                <Images className="w-6 h-6 text-white drop-shadow" />
+                <span className="text-xs sm:text-sm font-black tracking-wide drop-shadow">
+                  {galleryImages.length > 3 ? `+${galleryImages.length - 2} ảnh` : 'Xem tất cả ảnh'}
+                </span>
+                <span className="text-[10px] font-semibold text-white/80">Bộ sưu tập đầy đủ</span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      ) : galleryImages.length === 2 ? (
+        <div className="relative h-64 sm:h-80 md:h-[400px] rounded-3xl overflow-hidden border border-slate-200/90 shadow-sm bg-slate-950 grid grid-cols-1 sm:grid-cols-12 gap-1.5 sm:gap-2 p-1.5 sm:p-2">
+          {/* Photo 1 */}
+          <div
+            onClick={() => setLightboxIndex(0)}
+            className="relative h-full sm:col-span-7 rounded-2xl overflow-hidden cursor-pointer group select-none"
+          >
+            <img
+              src={galleryImages[0]}
+              alt={place.name}
+              onError={handleImageError}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
+            <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex flex-wrap items-end justify-between gap-3 pointer-events-none">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <span className="px-2.5 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[10px] font-bold text-white border border-white/15">
+                    {place.category}
+                  </span>
+                  <span className="text-[11px] font-bold text-sky-200 flex items-center gap-1">
+                    <MapPin className="w-3 h-3" /> {place.city}
+                  </span>
+                </div>
+                <h1 className="font-display text-xl sm:text-2xl font-black text-white truncate">{place.name}</h1>
+              </div>
+            </div>
+          </div>
+          {/* Photo 2 */}
+          <div
+            onClick={() => setLightboxIndex(1)}
+            className="hidden sm:block sm:col-span-5 relative h-full rounded-2xl overflow-hidden cursor-pointer group select-none"
+          >
+            <img
+              src={galleryImages[1]}
+              alt={`${place.name} - 2`}
+              onError={handleImageError}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/20 hover:bg-black/30 transition-colors flex items-center justify-center text-white gap-2">
+              <Images className="w-5 h-5" />
+              <span className="text-xs font-bold">Xem cả 2 ảnh</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Single Hero Photo */
+        <div
+          onClick={() => galleryImages[0] && setLightboxIndex(0)}
+          className="relative h-56 sm:h-80 md:h-[400px] rounded-3xl overflow-hidden border border-slate-200/90 shadow-sm bg-slate-950 cursor-pointer group select-none"
+        >
+          <img
+            src={galleryImages[0] || place.image}
+            alt={place.name}
+            onError={handleImageError}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
+          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-semibold flex items-center gap-1.5 border border-white/20">
+            <ZoomIn className="w-3.5 h-3.5" /> Phóng to
+          </div>
+          <div className="absolute bottom-4 left-4 right-4 flex flex-wrap items-end justify-between gap-3 pointer-events-none">
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <span className="px-2.5 py-0.5 rounded-full bg-slate-950/75 backdrop-blur-md text-[10px] font-bold text-white border border-white/15">
+                  {place.category}
+                </span>
+                {place.isVerifiedHost && (
+                  <span className="px-2 py-0.5 rounded-full bg-sky-500 text-[10px] font-bold text-white flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" /> Đã xác thực
+                  </span>
+                )}
+                <span className="text-[11px] font-bold text-sky-200 flex items-center gap-1">
+                  <MapPin className="w-3 h-3" /> {place.city}
+                </span>
+              </div>
+              <h1 className="font-display text-2xl sm:text-3xl font-black text-white truncate">{place.name}</h1>
+            </div>
+            {place.rating && place.reviewsCount > 0 ? (
+              <div className="flex items-center gap-1.5 bg-amber-50/95 backdrop-blur px-3 py-1.5 rounded-xl border border-amber-200 shrink-0">
+                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                <span className="font-black text-amber-700 text-sm">{place.rating}</span>
+                <span className="text-[11px] text-slate-500 font-semibold">({place.reviewsCount} đánh giá)</span>
+              </div>
+            ) : (
+              <span className="text-[11px] text-white/80 font-semibold bg-slate-950/60 px-3 py-1.5 rounded-xl border border-white/10">
+                Mới · chưa có đánh giá
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left column */}
@@ -782,6 +973,97 @@ export const PlaceDetailPage = () => {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Lightbox Modal */}
+      {lightboxIndex !== null && galleryImages.length > 0 && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-between p-4 sm:p-6"
+          onClick={() => setLightboxIndex(null)}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between text-white z-10" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center gap-3">
+              <span className="font-bold text-sm sm:text-base text-slate-100">{place.name}</span>
+              <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-xs font-semibold text-slate-300">
+                {lightboxIndex + 1} / {galleryImages.length}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setLightboxIndex(null)}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+                title="Đóng (Esc)"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Main Image Stage */}
+          <div className="relative flex-1 flex items-center justify-center my-2 select-none" onClick={(e) => e.stopPropagation()}>
+            {/* Prev Button */}
+            {galleryImages.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex((prev) => (prev !== null ? (prev - 1 + galleryImages.length) % galleryImages.length : 0));
+                }}
+                className="absolute left-2 sm:left-6 p-2.5 sm:p-3 rounded-full bg-black/60 hover:bg-black/80 text-white transition border border-white/10 hover:scale-110 cursor-pointer z-10"
+                title="Ảnh trước (Mũi tên trái)"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+            )}
+
+            <img
+              src={galleryImages[lightboxIndex]}
+              alt={`${place.name} - ảnh ${lightboxIndex + 1}`}
+              onError={handleImageError}
+              className="max-h-[72vh] max-w-[92vw] object-contain rounded-2xl shadow-2xl transition-all duration-300"
+            />
+
+            {/* Next Button */}
+            {galleryImages.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex((prev) => (prev !== null ? (prev + 1) % galleryImages.length : 0));
+                }}
+                className="absolute right-2 sm:right-6 p-2.5 sm:p-3 rounded-full bg-black/60 hover:bg-black/80 text-white transition border border-white/10 hover:scale-110 cursor-pointer z-10"
+                title="Ảnh tiếp (Mũi tên phải)"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            )}
+          </div>
+
+          {/* Thumbnails strip */}
+          {galleryImages.length > 1 && (
+            <div
+              className="flex items-center justify-center gap-2 overflow-x-auto py-2 px-4 no-scrollbar z-10"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {galleryImages.map((img, idx) => (
+                <button
+                  type="button"
+                  key={idx}
+                  onClick={() => setLightboxIndex(idx)}
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
+                    idx === lightboxIndex
+                      ? 'border-sky-400 scale-105 shadow-lg shadow-sky-500/30'
+                      : 'border-white/20 opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img src={img} alt={`thumb-${idx}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
