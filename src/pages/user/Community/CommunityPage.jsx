@@ -12,6 +12,7 @@ import { ShareModal } from '../../../components/community/ShareModal';
 import { ReportPostModal } from '../../../components/community/ReportPostModal';
 import { ImageLightboxModal } from '../../../components/community/ImageLightboxModal';
 import { BlogArticleReaderModal } from '../../../components/community/BlogArticleReaderModal';
+import { PostLikersModal } from '../../../components/community/PostLikersModal';
 import { PlaceAttachCard } from '../../../components/community/PlaceAttachCard';
 import { CustomSelect } from '../../../components/common/CustomSelect';
 import { UserAvatar } from '../../../components/common/UserAvatar';
@@ -140,6 +141,9 @@ export const CommunityPage = () => {
 
   // Single Post Detail Modal State
   const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
+
+  // Post Likers Modal State
+  const [likersPost, setLikersPost] = useState(null);
 
   // Fullscreen Photo Lightbox State
   const [lightboxState, setLightboxState] = useState({
@@ -2568,18 +2572,29 @@ export const CommunityPage = () => {
                   {/* Post Interaction Bar (Facebook Style) */}
                   <div className="flex items-center justify-between pt-2.5 sm:pt-3 border-t border-[#1E1A15]/10 text-xs sm:text-sm text-[#5A5146] font-sans flex-wrap gap-y-2">
                     <div className="flex items-center gap-1 sm:gap-2">
-                      {/* Like Button */}
-                      <button
-                        type="button"
-                        onClick={() => handleToggleLike(post.id)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-sm hover:bg-[#F3EDE2] font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
-                          post.isLiked ? 'text-rose-600 font-bold' : 'text-[#5A5146] hover:text-rose-600'
-                        }`}
-                        title={post.isLiked ? 'Bỏ thích' : 'Thích bài viết'}
-                      >
-                        <Heart className={`w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0 ${post.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
-                        <span>{post.likeCount || 0}</span>
-                      </button>
+                      {/* Like Button & Likers Count */}
+                      <div className="inline-flex items-center rounded-sm hover:bg-[#F3EDE2] transition-colors">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleLike(post.id)}
+                          className={`inline-flex items-center gap-1.5 px-2 py-1.5 font-medium transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+                            post.isLiked ? 'text-rose-600 font-bold' : 'text-[#5A5146] hover:text-rose-600'
+                          }`}
+                          title={post.isLiked ? 'Bỏ thích' : 'Thích bài viết'}
+                        >
+                          <Heart className={`w-4 h-4 sm:w-[18px] sm:h-[18px] shrink-0 ${post.isLiked ? 'fill-rose-500 text-rose-500' : ''}`} />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setLikersPost(post)}
+                          className={`pr-2.5 py-1.5 text-xs sm:text-sm font-semibold transition-colors cursor-pointer hover:underline ${
+                            post.isLiked ? 'text-rose-600' : 'text-[#5A5146] hover:text-rose-600'
+                          }`}
+                          title="Xem danh sách người đã thích"
+                        >
+                          {post.likeCount || 0}
+                        </button>
+                      </div>
 
                       {/* Comment Button */}
                       <button
@@ -3801,6 +3816,29 @@ export const CommunityPage = () => {
           }}
           onReadRelated={(relatedPost) => setReadingPost(relatedPost)}
           relatedPosts={posts.filter(p => Number(p.id) !== Number(readingPost.id)).slice(0, 4)}
+        />
+      )}
+
+      {/* ========================================================= */}
+      {/* MODAL 12: POST LIKERS MODAL (Who Liked This Post)         */}
+      {/* ========================================================= */}
+      {likersPost && (
+        <PostLikersModal
+          postId={likersPost.id}
+          postTitle={likersPost.title}
+          onClose={() => setLikersPost(null)}
+          onSelectUser={(u) => {
+            setLikersPost(null);
+            if (u?.id) setSelectedUserIdForModal(u.id);
+          }}
+          onFollowChange={(targetUserId, isNowFollowing) => {
+            setFollowingIds(prev => {
+              const next = new Set(prev);
+              if (isNowFollowing) next.add(Number(targetUserId));
+              else next.delete(Number(targetUserId));
+              return next;
+            });
+          }}
         />
       )}
 

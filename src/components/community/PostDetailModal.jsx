@@ -9,6 +9,7 @@ import { ShareModal } from './ShareModal';
 import { ReportPostModal } from './ReportPostModal';
 import { ImageLightboxModal } from './ImageLightboxModal';
 import { PlaceAttachCard } from './PlaceAttachCard';
+import { PostLikersModal } from './PostLikersModal';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from './MentionSuggestions';
 
 export const PostDetailModal = ({
@@ -26,6 +27,7 @@ export const PostDetailModal = ({
   const [isLiked, setIsLiked] = useState(initialPost?.isLiked || false);
   const [likeCount, setLikeCount] = useState(initialPost?.likeCount || 0);
   const [likeLoading, setLikeLoading] = useState(false);
+  const [showLikersModal, setShowLikersModal] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(Boolean(initialPost?.isBookmarked));
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
   const [comments, setComments] = useState([]);
@@ -962,22 +964,32 @@ export const PostDetailModal = ({
             {/* Social Interaction Buttons */}
             <div className="flex items-center justify-between py-3 border-y border-slate-100 text-xs font-semibold text-slate-600">
               <div className="flex items-center gap-2 sm:gap-4">
-                <button
-                  onClick={handleToggleLike}
-                  disabled={likeLoading}
-                  className={`px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer ${
-                    isLiked
-                      ? 'bg-rose-50 text-rose-600 font-bold'
-                      : 'hover:bg-slate-100 text-slate-600'
-                  }`}
-                >
-                  <Heart
-                    className={`w-4 h-4 ${
-                      isLiked ? 'fill-rose-500 text-rose-500' : 'text-slate-500'
+                <div className="flex items-center rounded-xl bg-slate-50 border border-slate-200/60 overflow-hidden">
+                  <button
+                    onClick={handleToggleLike}
+                    disabled={likeLoading}
+                    className={`px-3 py-2 flex items-center gap-1.5 transition-all cursor-pointer ${
+                      isLiked
+                        ? 'bg-rose-50 text-rose-600 font-bold'
+                        : 'hover:bg-slate-100 text-slate-600'
                     }`}
-                  />
-                  <span>{likeCount} Thích</span>
-                </button>
+                    title={isLiked ? 'Bỏ thích' : 'Thích bài viết'}
+                  >
+                    <Heart
+                      className={`w-4 h-4 ${
+                        isLiked ? 'fill-rose-500 text-rose-500' : 'text-slate-500'
+                      }`}
+                    />
+                    <span>Thích</span>
+                  </button>
+                  <button
+                    onClick={() => setShowLikersModal(true)}
+                    className="px-2.5 py-2 text-xs font-semibold hover:bg-slate-100 text-slate-600 hover:text-rose-600 transition-colors border-l border-slate-200/60 cursor-pointer"
+                    title="Xem danh sách người đã thích"
+                  >
+                    {likeCount}
+                  </button>
+                </div>
 
                 <div className="px-3.5 py-2 rounded-xl flex items-center gap-1.5 text-slate-600">
                   <MessageCircle className="w-4 h-4 text-sky-600" />
@@ -1309,6 +1321,21 @@ export const PostDetailModal = ({
           initialIndex={activeImageIndex}
           post={post}
           onClose={() => setIsLightboxOpen(false)}
+        />
+      )}
+
+      {/* Post Likers Modal */}
+      {showLikersModal && post && (
+        <PostLikersModal
+          postId={post.id}
+          postTitle={post.title}
+          onClose={() => setShowLikersModal(false)}
+          onSelectUser={(u) => {
+            setShowLikersModal(false);
+            if (typeof onAuthorClick === 'function' && u?.id) {
+              onAuthorClick(u.id);
+            }
+          }}
         />
       )}
     </div>

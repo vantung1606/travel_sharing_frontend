@@ -1187,6 +1187,18 @@ export const postApi = {
     return json.data;
   },
 
+  async getPostLikers(postId) {
+    const res = await fetch(`${BASE_URL}/posts/${postId}/likes`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return json.data || [];
+  },
+
   async toggleBookmark(postId, email = '') {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
     const userEmail = email || user.email || '';
