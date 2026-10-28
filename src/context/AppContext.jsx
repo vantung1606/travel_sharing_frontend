@@ -695,6 +695,9 @@ export const AppProvider = ({ children }) => {
       daysCount: daysCount,
       status: (item.status || 'ACTIVE').toLowerCase() === 'active' ? 'upcoming' : (item.status || 'upcoming').toLowerCase(),
       isAiGenerated: Boolean(item.isAiGenerated),
+      isPublic: item.isPublic !== false,
+      creatorId: item.creatorId,
+      creatorEmail: item.creatorEmail,
       countdown: item.startDate ? `Khởi hành ${item.startDate}` : 'Sắp khởi hành',
       departureDate: item.startDate ? `${item.startDate}${item.endDate ? ' – ' + item.endDate : ''}` : 'Khởi hành trong tháng tới',
       groupType: item.groupType || 'Cá nhân',
@@ -763,6 +766,7 @@ export const AppProvider = ({ children }) => {
       budgetTotal: itineraryObj.totalBudget || (itineraryObj.budgetPerPerson ? itineraryObj.budgetPerPerson * 2 : null),
       coverImageUrl: itineraryObj.coverImage || itineraryObj.coverImageUrl || null,
       isAiGenerated: Boolean(itineraryObj.isAiGenerated ?? true),
+      isPublic: itineraryObj.isPublic !== false,
       status: (itineraryObj.status || 'ACTIVE').toUpperCase(),
       groupType: itineraryObj.groupType || 'Cá nhân',
       details: (itineraryObj.days || []).flatMap(day =>
@@ -818,6 +822,12 @@ export const AppProvider = ({ children }) => {
   const createManualItinerary = async (tripData, email) => {
     setItineraries(prev => [tripData, ...prev]);
     return await saveItineraryToBackend(tripData, email);
+  };
+
+  const toggleItineraryVisibility = async (id, isPublic) => {
+    const updated = await itineraryApi.toggleVisibility(id, isPublic);
+    setItineraries(prev => prev.map(item => String(item.id) === String(id) ? { ...item, isPublic: updated.isPublic } : item));
+    return updated;
   };
 
   const markNotificationAsRead = async (id) => {
@@ -1059,6 +1069,7 @@ export const AppProvider = ({ children }) => {
         addPlaceToItinerary,
         deleteItineraryFromBackend,
         createManualItinerary,
+        toggleItineraryVisibility,
         savedPlaces,
         toggleSavePlace,
         isPlaceSaved

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useToast } from '../common/Toast';
-import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2 } from 'lucide-react';
+import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2, Globe, Lock } from 'lucide-react';
 import { ItineraryExportModal } from './ItineraryExportModal';
 import { itineraryApi } from '../../services/api';
 
@@ -303,8 +303,25 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
   const [mobileTab, setMobileTab] = useState('timeline');
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [selectedMapPoint, setSelectedMapPoint] = useState(null);
-  const [mapLayer, setMapLayer] = useState('standard'); // 'standard' | 'satellite' | 'topo'
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
+  const [isTogglingVisibility, setIsTogglingVisibility] = useState(false);
+
+  const handleToggleVisibility = async () => {
+    if (!itinerary?.id) return;
+    setIsTogglingVisibility(true);
+    try {
+      const newStatus = !(itinerary.isPublic !== false);
+      const updated = await itineraryApi.toggleVisibility(itinerary.id, newStatus);
+      toast.showSuccess(newStatus ? 'Đã chuyển sang chế độ CÔNG KHAI!' : 'Đã chuyển sang chế độ RIÊNG TƯ!');
+      if (onUpdate) {
+        onUpdate({ ...itinerary, isPublic: updated.isPublic });
+      }
+    } catch (err) {
+      toast.showError('Lỗi cập nhật hiển thị: ' + (err.message || 'Thất bại'));
+    } finally {
+      setIsTogglingVisibility(false);
+    }
+  };
 
   // Quản lý thêm hoạt động tự điền
   const [addingDayNumber, setAddingDayNumber] = useState(null);
@@ -641,6 +658,30 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
               >
                 <Download className="w-3.5 h-3.5 text-slate-600" />
                 <span>Tải PDF</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={isTogglingVisibility}
+                onClick={handleToggleVisibility}
+                className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border ${
+                  itinerary?.isPublic !== false
+                    ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                    : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
+                }`}
+                title={itinerary?.isPublic !== false ? 'Lịch trình đang Công khai. Bấm để chuyển sang Riêng tư.' : 'Lịch trình đang Riêng tư. Bấm để chia sẻ Công khai.'}
+              >
+                {itinerary?.isPublic !== false ? (
+                  <>
+                    <Globe className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Công khai</span>
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Riêng tư</span>
+                  </>
+                )}
               </button>
 
               <button

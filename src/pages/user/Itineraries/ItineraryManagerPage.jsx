@@ -4,7 +4,7 @@ import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { ItineraryExportModal } from '../../../components/itinerary/ItineraryExportModal';
-import { MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation, Download, Upload, Camera } from 'lucide-react';
+import { MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation, Download, Upload, Camera, Globe, Lock } from 'lucide-react';
 
 export const ItineraryManagerPage = () => {
   const {
@@ -20,7 +20,8 @@ export const ItineraryManagerPage = () => {
     setAiGeneratingStatus,
     fetchItineraries,
     createManualItinerary,
-    deleteItineraryFromBackend
+    deleteItineraryFromBackend,
+    toggleItineraryVisibility
   } = useApp();
   const toast = useToast();
 
@@ -77,6 +78,7 @@ export const ItineraryManagerPage = () => {
   const [manualBudgetFormatted, setManualBudgetFormatted] = useState('5,000,000');
   const [manualCover, setManualCover] = useState('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80');
   const [manualNote, setManualNote] = useState('');
+  const [manualIsPublic, setManualIsPublic] = useState(true);
 
   // Tự động tính toán số ngày giữa ngày bắt đầu và kết thúc
   const manualDaysCount = useMemo(() => {
@@ -296,6 +298,7 @@ export const ItineraryManagerPage = () => {
       daysCount: calculatedDays,
       status: 'upcoming',
       isAiGenerated: false,
+      isPublic: manualIsPublic,
       countdown: manualStartDate ? `Khởi hành ${manualStartDate.split('-').reverse().join('/')}` : 'Sắp khởi hành',
       departureDate: `${manualStartDate.split('-').reverse().join('/')} – ${manualEndDate.split('-').reverse().join('/')}`,
       groupType: manualGroup,
@@ -664,18 +667,29 @@ export const ItineraryManagerPage = () => {
 
                     {/* Top Badges */}
                     <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 flex-wrap">
-                      {itin.countdown && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-[#17130F]/85 text-white text-[11px] font-bold border border-white/15">
-                          <span className="w-1.5 h-1.5 rounded-sm bg-clay-300 "></span>
-                          {itin.countdown}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {itin.countdown && (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-[#17130F]/85 text-white text-[11px] font-bold border border-white/15">
+                            <span className="w-1.5 h-1.5 rounded-sm bg-clay-300 "></span>
+                            {itin.countdown}
+                          </span>
+                        )}
 
-                      {itin.isAiGenerated && (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-clay-600 text-white text-[11px] font-bold border border-clay-400/40">
-                          <span>WanderAI</span>
-                        </span>
-                      )}
+                        {itin.isAiGenerated && (
+                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-clay-600 text-white text-[11px] font-bold border border-clay-400/40">
+                            <span>WanderAI</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-[11px] font-bold border backdrop-blur-xs ${
+                        itin.isPublic !== false
+                          ? 'bg-emerald-700/90 text-white border-emerald-400/40'
+                          : 'bg-[#17130F]/90 text-amber-300 border-amber-400/40'
+                      }`}>
+                        {itin.isPublic !== false ? <Globe className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                        <span>{itin.isPublic !== false ? 'Công khai' : 'Riêng tư'}</span>
+                      </span>
                     </div>
 
                     {/* Destination & Days Floating on Image Bottom */}
@@ -761,6 +775,28 @@ export const ItineraryManagerPage = () => {
                       >
                         <span>Mở Lịch Trình</span>
                         <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            const nextPublic = !(itin.isPublic !== false);
+                            await toggleItineraryVisibility(itin.id, nextPublic);
+                            toast.showSuccess(nextPublic ? 'Đã bật chế độ CÔNG KHAI!' : 'Đã chuyển sang RIÊNG TƯ!');
+                          } catch (err) {
+                            toast.showError('Lỗi cập nhật hiển thị: ' + (err.message || 'Thất bại'));
+                          }
+                        }}
+                        className={`w-9 h-9 rounded-sm border flex items-center justify-center transition-colors cursor-pointer ${
+                          itin.isPublic !== false
+                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                            : 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
+                        }`}
+                        title={itin.isPublic !== false ? 'Lịch trình đang Công khai. Bấm để chuyển sang Riêng tư.' : 'Lịch trình đang Riêng tư. Bấm để Công khai.'}
+                      >
+                        {itin.isPublic !== false ? <Globe className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
                       </button>
 
                       <button
@@ -1165,6 +1201,21 @@ export const ItineraryManagerPage = () => {
                     </div>
                   </div>
                 )}
+
+                <div className="pt-2">
+                  <label className="flex items-center gap-2.5 p-3 rounded-sm bg-[#F8F4EC] border border-[#1E1A15]/12 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={manualIsPublic}
+                      onChange={(e) => setManualIsPublic(e.target.checked)}
+                      className="w-4 h-4 rounded text-clay-600 focus:ring-clay-500 border-[#1E1A15]/20 cursor-pointer"
+                    />
+                    <div>
+                      <span className="font-bold text-[#1E1A15] block text-xs">Chia sẻ công khai lịch trình (Public)</span>
+                      <span className="text-[11px] text-[#7A6F60]">Cho phép cộng đồng du khách xem và sao chép chuyến đi</span>
+                    </div>
+                  </label>
+                </div>
               </div>
 
               {/* Modal Footer Controls */}

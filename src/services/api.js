@@ -394,6 +394,25 @@ export const itineraryApi = {
     }
     const res = await response.json();
     return res.data;
+  },
+
+  async toggleVisibility(id, isPublic) {
+    const token = getAuthToken();
+    if (!token) throw new Error('Vui lòng đăng nhập!');
+    const response = await fetch(`${BASE_URL}/itineraries/${id}/visibility`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(isPublic !== undefined ? { isPublic } : {})
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `Không thể cập nhật chế độ hiển thị (${response.status})`);
+    }
+    const res = await response.json();
+    return res.data;
   }
 };
 
