@@ -6,7 +6,7 @@ import {
   MapPin, Check, X, Search, Star, Clock, ChevronRight, Eye, Trash2, 
   RefreshCw, ShieldCheck, Phone, AlertCircle, Plus, ExternalLink, 
   Filter, ChevronLeft, Building2, Tag, Compass, DollarSign, Image, 
-  Navigation, CheckCircle2, AlertTriangle, EyeOff, Sparkles, Flag
+  Navigation, CheckCircle2, AlertTriangle, EyeOff, Sparkles, Flag, Edit3
 } from 'lucide-react';
 
 export const AdminPlacesPage = () => {
@@ -67,6 +67,8 @@ export const AdminPlacesPage = () => {
   const [rejectModalData, setRejectModalData] = useState(null); // { id, name }
   const [rejectReason, setRejectReason] = useState('Thông tin địa chỉ hoặc định vị chưa chính xác');
   const [deleteModalData, setDeleteModalData] = useState(null); // { id, name }
+  const [editPlaceModalData, setEditPlaceModalData] = useState(null);
+  const [editPlaceForm, setEditPlaceForm] = useState(null);
 
   // New Place Form Data
   const initialFormState = {
@@ -292,6 +294,87 @@ export const AdminPlacesPage = () => {
       await loadData();
     } catch (err) {
       toast.error('Lỗi tạo địa điểm: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Open Edit Modal with populated data
+  const handleOpenEditModal = (p) => {
+    if (!p) return;
+    setEditPlaceModalData(p);
+    setEditPlaceForm({
+      id: p.id,
+      name: p.name || '',
+      city: p.city || 'Đà Nẵng',
+      categoryName: p.categoryName || 'Danh lam thắng cảnh',
+      address: p.address || '',
+      latitude: p.latitude != null ? String(p.latitude) : '',
+      longitude: p.longitude != null ? String(p.longitude) : '',
+      ticketPrice: p.ticketPrice != null ? String(p.ticketPrice) : '',
+      priceRange: p.priceRange || 'Miễn phí',
+      openHours: p.openHours || '07:00 - 22:00',
+      phoneNumber: p.phoneNumber || '',
+      coverImageUrl: p.coverImageUrl || '',
+      imagesText: Array.isArray(p.images) && p.images.length > 0 ? p.images.join('\n') : '',
+      amenities: p.amenities || 'Wifi miễn phí, Chỗ đậu xe, Thanh toán thẻ, Chụp ảnh check-in',
+      description: p.description || '',
+      status: p.status || 'ACTIVE',
+      isVerifiedHost: Boolean(p.isVerifiedHost)
+    });
+  };
+
+  // Handle Submit Edit Place
+  const handleUpdatePlace = async (e) => {
+    e.preventDefault();
+    if (!editPlaceForm.name.trim()) {
+      toast.error('Vui lòng nhập tên địa điểm!');
+      return;
+    }
+    const trimmedAddr = editPlaceForm.address.trim();
+    if (!trimmedAddr) {
+      toast.error('Vui lòng nhập địa chỉ địa điểm!');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const imagesList = editPlaceForm.imagesText
+        ? editPlaceForm.imagesText.split('\n').map(s => s.trim()).filter(Boolean)
+        : [];
+
+      const payload = {
+        name: editPlaceForm.name.trim(),
+        city: editPlaceForm.city.trim(),
+        categoryName: editPlaceForm.categoryName,
+        address: trimmedAddr,
+        latitude: editPlaceForm.latitude ? parseFloat(editPlaceForm.latitude) : null,
+        longitude: editPlaceForm.longitude ? parseFloat(editPlaceForm.longitude) : null,
+        ticketPrice: editPlaceForm.ticketPrice !== '' ? parseFloat(editPlaceForm.ticketPrice) : 0,
+        priceRange: editPlaceForm.priceRange?.trim() || 'Miễn phí',
+        openHours: editPlaceForm.openHours?.trim() || null,
+        phoneNumber: editPlaceForm.phoneNumber?.trim() || null,
+        coverImageUrl: editPlaceForm.coverImageUrl?.trim() || null,
+        images: imagesList,
+        amenities: editPlaceForm.amenities?.trim() || null,
+        description: editPlaceForm.description?.trim() || null,
+        status: editPlaceForm.status || 'ACTIVE',
+        isVerifiedHost: Boolean(editPlaceForm.isVerifiedHost)
+      };
+
+      const updated = await placeApi.updatePlace(editPlaceForm.id, payload);
+      toast.success(`Đã cập nhật thông tin địa điểm "${payload.name}" thành công!`);
+
+      // Update local state
+      setAllPlaces(prev => prev.map(p => p.id === updated.id ? { ...p, ...updated } : p));
+      setPendingPlaces(prev => prev.map(p => p.id === updated.id ? { ...p, ...updated } : p));
+      if (selectedPlace?.id === updated.id) {
+        setSelectedPlace(prev => ({ ...prev, ...updated }));
+      }
+      setEditPlaceModalData(null);
+      setEditPlaceForm(null);
+    } catch (err) {
+      toast.error('Lỗi khi cập nhật địa điểm: ' + (err.message || 'Thao tác thất bại'));
     } finally {
       setIsSubmitting(false);
     }
@@ -797,6 +880,15 @@ export const AdminPlacesPage = () => {
                             </button>
                             <button
                               type="button"
+                              onClick={() => handleOpenEditModal(p)}
+                              disabled={isSubmitting}
+                              className="p-1.5 rounded-[4px] bg-[#F8F4EC] text-ink-600 hover:bg-clay-600 hover:text-white border border-ink-200 transition-colors cursor-pointer"
+                              title="Chỉnh sửa thông tin địa điểm"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
                               onClick={() => setDeleteModalData({ id: p.id, name: p.name })}
                               disabled={isSubmitting}
                               className="p-1.5 rounded-[4px] bg-rose-50 text-rose-700 hover:bg-rose-700 hover:text-white border border-rose-200 transition-colors cursor-pointer"
@@ -1085,6 +1177,16 @@ export const AdminPlacesPage = () => {
                     >
                       Từ chối
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditModal(selectedPlace)}
+                      disabled={isSubmitting}
+                      className="px-3 py-2.5 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-clay-700 hover:text-clay-800 border border-ink-200/80 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1"
+                      title="Chỉnh sửa thông tin"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 text-clay-600" />
+                      <span>Sửa</span>
+                    </button>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
@@ -1107,6 +1209,17 @@ export const AdminPlacesPage = () => {
                           <CheckCircle2 className="w-4 h-4" /> Mở công khai lại
                         </>
                       )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenEditModal(selectedPlace)}
+                      disabled={isSubmitting}
+                      className="px-3 py-2.5 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-clay-700 hover:text-clay-800 border border-ink-200/80 font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                      title="Chỉnh sửa thông tin"
+                    >
+                      <Edit3 className="w-3.5 h-3.5 text-clay-600" />
+                      <span>Sửa</span>
                     </button>
 
                     <button
@@ -1329,6 +1442,263 @@ export const AdminPlacesPage = () => {
                   className="px-5 py-2.5 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold border border-clay-600 transition-colors cursor-pointer disabled:opacity-50"
                 >
                   {isSubmitting ? 'Đang lưu...' : 'Lưu & Đưa lên bản đồ'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── 5.1. MODAL: EDIT PLACE ─────────────────────────────────────────── */}
+      {editPlaceModalData && editPlaceForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-[#FFFDF8] rounded-[6px] max-w-2xl w-full max-h-[90vh] flex flex-col border border-ink-200 shadow-2xl overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-ink-200/60 bg-[#F8F4EC]/60">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-[5px] bg-clay-100 text-clay-700 flex items-center justify-center border border-clay-200">
+                  <Edit3 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-display font-black text-sm text-ink-800">Chỉnh sửa Địa điểm Du lịch</h3>
+                  <p className="text-[11px] text-ink-400">Mã #{editPlaceForm.id} • {editPlaceForm.name}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setEditPlaceModalData(null);
+                  setEditPlaceForm(null);
+                }}
+                className="w-7 h-7 rounded-[4px] hover:bg-ink-100 text-ink-400 hover:text-ink-700 flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleUpdatePlace} className="p-6 overflow-y-auto space-y-4 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="font-bold text-ink-700 block mb-1">
+                    Tên địa điểm <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editPlaceForm.name}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, name: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800 font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-ink-700 block mb-1">
+                    Tỉnh / Thành phố <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editPlaceForm.city}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, city: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800 font-medium"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-ink-700 block mb-1">
+                    Danh mục phân loại <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={editPlaceForm.categoryName}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, categoryName: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800 cursor-pointer"
+                  >
+                    <option value="Danh lam thắng cảnh">Danh lam thắng cảnh</option>
+                    <option value="Di tích lịch sử">Di tích lịch sử</option>
+                    <option value="Bãi biển">Bãi biển</option>
+                    <option value="Ẩm thực">Ẩm thực</option>
+                    <option value="Văn hóa - Nghệ thuật">Văn hóa - Nghệ thuật</option>
+                    <option value="Khu vui chơi giải trí">Khu vui chơi giải trí</option>
+                    <option value="Tự nhiên & Sinh thái">Tự nhiên & Sinh thái</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="font-bold text-ink-700 block mb-1">
+                    Trạng thái hiển thị <span className="text-rose-500">*</span>
+                  </label>
+                  <select
+                    value={editPlaceForm.status}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, status: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800 font-semibold cursor-pointer"
+                  >
+                    <option value="ACTIVE">Hoạt động (ACTIVE - Công khai)</option>
+                    <option value="PENDING_APPROVAL">Chờ duyệt (PENDING_APPROVAL)</option>
+                    <option value="HIDDEN">Tạm ẩn (HIDDEN - Đã khóa/ẩn)</option>
+                  </select>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="font-bold text-ink-700 block mb-1">
+                    Địa chỉ chi tiết <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={editPlaceForm.address}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, address: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-ink-700 block mb-1">Vĩ độ (Latitude)</label>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="VD: 16.0544"
+                    value={editPlaceForm.latitude}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, latitude: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-ink-700 block mb-1">Kinh độ (Longitude)</label>
+                  <input
+                    type="number"
+                    step="any"
+                    placeholder="VD: 108.2022"
+                    value={editPlaceForm.longitude}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, longitude: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-ink-700 block mb-1">Giá vé (VNĐ - 0 nếu miễn phí)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="1000"
+                    value={editPlaceForm.ticketPrice}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, ticketPrice: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-ink-700 block mb-1">Khoảng giá</label>
+                  <select
+                    value={editPlaceForm.priceRange}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, priceRange: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800 cursor-pointer"
+                  >
+                    <option value="Miễn phí">Miễn phí</option>
+                    <option value="Dưới 50k">Dưới 50.000 VNĐ</option>
+                    <option value="50k - 200k">50.000 - 200.000 VNĐ</option>
+                    <option value="200k - 500k">200.000 - 500.000 VNĐ</option>
+                    <option value="Trên 500k">Trên 500.000 VNĐ</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="font-bold text-ink-700 block mb-1">Giờ mở cửa</label>
+                  <input
+                    type="text"
+                    value={editPlaceForm.openHours}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, openHours: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
+                  />
+                </div>
+
+                <div>
+                  <label className="font-bold text-ink-700 block mb-1">Số điện thoại liên hệ</label>
+                  <input
+                    type="text"
+                    value={editPlaceForm.phoneNumber}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, phoneNumber: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="font-bold text-ink-700 block mb-1">Link Ảnh bìa chính (Cover Image URL)</label>
+                  <input
+                    type="url"
+                    value={editPlaceForm.coverImageUrl}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, coverImageUrl: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="font-bold text-ink-700 block mb-1">
+                    Album nhiều ảnh (Mỗi dòng 1 link URL ảnh)
+                  </label>
+                  <textarea
+                    rows={3}
+                    placeholder={"https://example.com/photo1.jpg\nhttps://example.com/photo2.jpg"}
+                    value={editPlaceForm.imagesText}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, imagesText: e.target.value })}
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800 font-mono resize-none"
+                  ></textarea>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="font-bold text-ink-700 block mb-1">Tiện ích & Dịch vụ</label>
+                  <input
+                    type="text"
+                    value={editPlaceForm.amenities}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, amenities: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800"
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="font-bold text-ink-700 block mb-1">Mô tả giới thiệu chi tiết</label>
+                  <textarea
+                    rows={4}
+                    value={editPlaceForm.description}
+                    onChange={(e) => setEditPlaceForm({ ...editPlaceForm, description: e.target.value })}
+                    className="w-full px-3.5 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800 resize-none"
+                  ></textarea>
+                </div>
+
+                <div className="md:col-span-2">
+                  <label className="flex items-center gap-2.5 p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={editPlaceForm.isVerifiedHost}
+                      onChange={(e) => setEditPlaceForm({ ...editPlaceForm, isVerifiedHost: e.target.checked })}
+                      className="w-4 h-4 rounded text-clay-600 focus:ring-clay-500 border-ink-300 cursor-pointer"
+                    />
+                    <div>
+                      <span className="font-bold text-ink-800 block">Địa điểm chính chủ / Đã xác thực (Verified Host)</span>
+                      <span className="text-[11px] text-ink-400">Hiển thị huy hiệu tích xanh uy tín của ban quản trị Wayfare</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-ink-200/60">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditPlaceModalData(null);
+                    setEditPlaceForm(null);
+                  }}
+                  className="px-4 py-2.5 rounded-[5px] bg-[#F8F4EC] hover:bg-ink-100 text-ink-700 font-bold border border-ink-200/80 transition-colors cursor-pointer"
+                >
+                  Hủy bỏ
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-5 py-2.5 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold border border-clay-600 transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Đang lưu...' : 'Lưu cập nhật'}
                 </button>
               </div>
             </form>

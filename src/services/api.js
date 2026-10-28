@@ -1703,6 +1703,27 @@ export const placeApi = {
     }
   },
 
+  async updatePlace(id, placeData) {
+    try {
+      const res = await fetch(`${BASE_URL}/places/admin/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        },
+        body: JSON.stringify(placeData)
+      });
+      if (!res.ok) {
+        const errorJson = await res.json().catch(() => ({}));
+        throw new Error(errorJson.message || `HTTP error ${res.status}`);
+      }
+      const json = await res.json();
+      return json.data;
+    } catch (err) {
+      throw err;
+    }
+  },
+
   async getPendingPlaces() {
     try {
       const res = await fetch(`${BASE_URL}/places/admin/pending`, {
