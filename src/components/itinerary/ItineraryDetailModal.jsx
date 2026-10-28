@@ -2,8 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useToast } from '../common/Toast';
-import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2, Globe, Lock } from 'lucide-react';
+import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2, Globe, Lock, Edit3 } from 'lucide-react';
 import { ItineraryExportModal } from './ItineraryExportModal';
+import { EditItineraryModal } from './EditItineraryModal';
 import { itineraryApi } from '../../services/api';
 
 // Tọa độ trung tâm các tỉnh/thành phố du lịch chính tại Việt Nam
@@ -305,6 +306,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
   const [selectedMapPoint, setSelectedMapPoint] = useState(null);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
   const [isTogglingVisibility, setIsTogglingVisibility] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const handleToggleVisibility = async () => {
     if (!itinerary?.id) return;
@@ -682,6 +684,16 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                     <span>Riêng tư</span>
                   </>
                 )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(true)}
+                className="px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border border-sky-200"
+                title="Chỉnh sửa toàn bộ chuyến đi (Tên, Điểm đến, Ngày đi, Ngân sách, Phong cách)"
+              >
+                <Edit3 className="w-3.5 h-3.5 text-sky-600" />
+                <span className="hidden sm:inline">Sửa Chuyến Đi</span>
               </button>
 
               <button
@@ -1586,6 +1598,18 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
           </div>
         </div>
       )}
+
+      {/* MODAL CHỈNH SỬA TOÀN BỘ CHUYẾN ĐI */}
+      <EditItineraryModal
+        itinerary={itinerary}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSuccess={(updated) => {
+          if (updated) {
+            onUpdate?.(updated);
+          }
+        }}
+      />
     </div>
   );
 };

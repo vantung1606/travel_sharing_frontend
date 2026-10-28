@@ -4,7 +4,8 @@ import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { ItineraryExportModal } from '../../../components/itinerary/ItineraryExportModal';
-import { MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation, Download, Upload, Camera, Globe, Lock } from 'lucide-react';
+import { EditItineraryModal } from '../../../components/itinerary/EditItineraryModal';
+import { MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation, Download, Upload, Camera, Globe, Lock, Edit3, Sparkles } from 'lucide-react';
 
 export const ItineraryManagerPage = () => {
   const {
@@ -46,6 +47,7 @@ export const ItineraryManagerPage = () => {
   // Selected Itinerary for Detail Modal
   const [selectedItinerary, setSelectedItinerary] = useState(null);
   const [exportModalItinerary, setExportModalItinerary] = useState(null);
+  const [editingItinerary, setEditingItinerary] = useState(null);
 
   // Tự động mở xem chi tiết lịch trình khi WanderAI vừa khởi tạo xong
   useEffect(() => {
@@ -79,6 +81,7 @@ export const ItineraryManagerPage = () => {
   const [manualCover, setManualCover] = useState('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80');
   const [manualNote, setManualNote] = useState('');
   const [manualIsPublic, setManualIsPublic] = useState(true);
+  const [manualTravelStyle, setManualTravelStyle] = useState('Nghỉ dưỡng & Khám phá');
 
   // Tự động tính toán số ngày giữa ngày bắt đầu và kết thúc
   const manualDaysCount = useMemo(() => {
@@ -308,7 +311,8 @@ export const ItineraryManagerPage = () => {
       totalBudget: Number(manualBudget),
       budgetProgress: 0,
       budgetNote: `Dự toán: ~${Number(manualBudget).toLocaleString('vi-VN')}đ`,
-      style: 'Lịch trình tự thiết kế',
+      style: manualTravelStyle,
+      travelStyle: manualTravelStyle,
       aiTipNote: manualNote || 'Lịch trình thủ công do bạn tự tạo và quản lý trên Wayfare.',
       days: finalDays
     };
@@ -803,6 +807,18 @@ export const ItineraryManagerPage = () => {
                         type="button"
                         onClick={(e) => {
                           e.stopPropagation();
+                          setEditingItinerary(itin);
+                        }}
+                        className="w-9 h-9 rounded-sm border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 flex items-center justify-center transition-colors cursor-pointer"
+                        title="Chỉnh sửa thông tin chuyến đi"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setExportModalItinerary(itin);
                         }}
                         className="w-9 h-9 rounded-sm border border-[#1E1A15]/12 bg-transparent hover:bg-clay-50 text-[#6B6154] hover:text-clay-700 flex items-center justify-center transition-colors cursor-pointer"
@@ -1048,6 +1064,25 @@ export const ItineraryManagerPage = () => {
 
                 <div className="space-y-1.5">
                   <label className="font-bold text-[#3A332B] flex items-center gap-1">
+                    <Sparkles className="w-4 h-4 text-amber-500" />
+                    <span>Phong cách du lịch</span>
+                  </label>
+                  <select
+                    value={manualTravelStyle}
+                    onChange={(e) => setManualTravelStyle(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#1E1A15] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600 cursor-pointer"
+                  >
+                    <option value="Nghỉ dưỡng & Khám phá">Nghỉ dưỡng & Khám phá</option>
+                    <option value="Phượt bụi & Khám phá mạo hiểm">Phượt bụi & Mạo hiểm</option>
+                    <option value="Ẩm thực & Check-in sống ảo">Ẩm thực & Check-in</option>
+                    <option value="Văn hóa & Di sản lịch sử">Văn hóa & Lịch sử</option>
+                    <option value="Gia đình & Thư giãn">Gia đình & Thư giãn</option>
+                    <option value="Sinh thái & Thiên nhiên">Sinh thái & Thiên nhiên</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-[#3A332B] flex items-center gap-1">
                     <DollarSign className="w-4 h-4 text-clay-600" />
                     <span>Dự toán ngân sách (VNĐ)</span>
                   </label>
@@ -1238,6 +1273,21 @@ export const ItineraryManagerPage = () => {
           </div>
         </div>
       )}
+
+      {/* MODAL CHỈNH SỬA TOÀN BỘ CHUYẾN ĐI */}
+      <EditItineraryModal
+        itinerary={editingItinerary}
+        isOpen={Boolean(editingItinerary)}
+        onClose={() => setEditingItinerary(null)}
+        onSuccess={(updated) => {
+          if (updated) {
+            setItineraries(prev => prev.map(item => String(item.id) === String(updated.id) ? { ...item, ...updated } : item));
+            if (selectedItinerary && String(selectedItinerary.id) === String(updated.id)) {
+              setSelectedItinerary(prev => ({ ...prev, ...updated }));
+            }
+          }
+        }}
+      />
     </div>
   );
 };

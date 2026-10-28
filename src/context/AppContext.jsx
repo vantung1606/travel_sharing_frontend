@@ -698,9 +698,12 @@ export const AppProvider = ({ children }) => {
       isPublic: item.isPublic !== false,
       creatorId: item.creatorId,
       creatorEmail: item.creatorEmail,
+      startDate: item.startDate || null,
+      endDate: item.endDate || null,
       countdown: item.startDate ? `Khởi hành ${item.startDate}` : 'Sắp khởi hành',
       departureDate: item.startDate ? `${item.startDate}${item.endDate ? ' – ' + item.endDate : ''}` : 'Khởi hành trong tháng tới',
       groupType: item.groupType || 'Cá nhân',
+      travelStyle: item.travelStyle || 'Nghỉ dưỡng & Khám phá',
       placesCount: places.length > 0 ? places.length : (daysCount * 3),
       placesList: places.length > 0 ? places : [item.destination + ' City Tour'],
       budgetPerPerson: item.budgetTotal ? Math.round(Number(item.budgetTotal) / 2) : 0,
@@ -708,7 +711,7 @@ export const AppProvider = ({ children }) => {
       budgetProgress: item.budgetTotal ? 35 : 0,
       budgetNote: item.budgetTotal ? `Dự toán: ~${Number(item.budgetTotal).toLocaleString('vi-VN')}đ` : 'Chưa có dự toán',
       pace: 'Cân bằng',
-      style: 'Trải nghiệm tổng hợp',
+      style: item.travelStyle || 'Nghỉ dưỡng & Khám phá',
       aiTipNote: 'Lịch trình được lưu trữ trên hệ thống máy chủ Wayfare.',
       days: days.length > 0 ? days : [
         {
@@ -827,6 +830,20 @@ export const AppProvider = ({ children }) => {
   const toggleItineraryVisibility = async (id, isPublic) => {
     const updated = await itineraryApi.toggleVisibility(id, isPublic);
     setItineraries(prev => prev.map(item => String(item.id) === String(id) ? { ...item, isPublic: updated.isPublic } : item));
+    return updated;
+  };
+
+  const updateItineraryInBackend = async (id, updatedFields, email) => {
+    const activeEmail = email || currentUser?.email || '';
+    if (!activeEmail) {
+      throw new Error('Vui lòng đăng nhập để cập nhật thông tin chuyến đi!');
+    }
+    const updated = await itineraryApi.updateItinerary(id, updatedFields, activeEmail);
+    if (updated && updated.id) {
+      const mapped = mapBackendItineraryToFrontend(updated);
+      setItineraries(prev => prev.map(item => String(item.id) === String(id) ? mapped : item));
+      return mapped;
+    }
     return updated;
   };
 
@@ -1070,6 +1087,7 @@ export const AppProvider = ({ children }) => {
         deleteItineraryFromBackend,
         createManualItinerary,
         toggleItineraryVisibility,
+        updateItineraryInBackend,
         savedPlaces,
         toggleSavePlace,
         isPlaceSaved
