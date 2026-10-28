@@ -2181,6 +2181,22 @@ export const chatApi = {
     }
   },
 
+  async markRoomAsRead(roomId, email) {
+    try {
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user?.email || '';
+      const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/read?email=${encodeURIComponent(userEmail)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json.data;
+    } catch {
+      return null;
+    }
+  },
+
   async sendMessage(roomId, { content, messageType = 'TEXT' }, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');

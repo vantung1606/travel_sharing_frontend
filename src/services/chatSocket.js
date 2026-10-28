@@ -235,6 +235,104 @@ class ChatSocketService {
     };
   }
 
+  subscribeToTyping(roomId, onTyping) {
+    if (!roomId || !onTyping) return () => {};
+    this.connect();
+    const topic = `/topic/room.${roomId}/typing`;
+    let sub = null;
+
+    const setupSub = () => {
+      if (!this.client || !this.client.connected) return;
+      try {
+        sub = this.client.subscribe(topic, (message) => {
+          try {
+            const body = JSON.parse(message.body);
+            onTyping(body);
+          } catch {}
+        });
+      } catch {}
+    };
+
+    if (this.client && this.client.connected) {
+      setupSub();
+    } else {
+      const checkInterval = setInterval(() => {
+        if (this.client && this.client.connected) {
+          clearInterval(checkInterval);
+          setupSub();
+        }
+      }, 150);
+      setTimeout(() => clearInterval(checkInterval), 4000);
+    }
+
+    return () => {
+      if (sub) {
+        try { sub.unsubscribe(); } catch {}
+      }
+    };
+  }
+
+  subscribeToReadReceipt(roomId, onReadReceipt) {
+    if (!roomId || !onReadReceipt) return () => {};
+    this.connect();
+    const topic = `/topic/room.${roomId}/read`;
+    let sub = null;
+
+    const setupSub = () => {
+      if (!this.client || !this.client.connected) return;
+      try {
+        sub = this.client.subscribe(topic, (message) => {
+          try {
+            const body = JSON.parse(message.body);
+            onReadReceipt(body);
+          } catch {}
+        });
+      } catch {}
+    };
+
+    if (this.client && this.client.connected) {
+      setupSub();
+    } else {
+      const checkInterval = setInterval(() => {
+        if (this.client && this.client.connected) {
+          clearInterval(checkInterval);
+          setupSub();
+        }
+      }, 150);
+      setTimeout(() => clearInterval(checkInterval), 4000);
+    }
+
+    return () => {
+      if (sub) {
+        try { sub.unsubscribe(); } catch {}
+      }
+    };
+  }
+
+  sendTyping(roomId, { email, userName, isTyping }) {
+    if (!this.client || !this.client.connected || !roomId) return;
+    try {
+      this.client.publish({
+        destination: '/app/chat.typing',
+        body: JSON.stringify({ roomId, email, userName, isTyping })
+      });
+    } catch (e) {
+      console.warn('sendTyping error:', e);
+    }
+  }
+
+  sendReadReceipt(roomId, { email, lastReadMessageId }) {
+    if (!this.client || !this.client.connected || !roomId) return;
+    try {
+      this.client.publish({
+        destination: '/app/chat.read',
+        body: JSON.stringify({ roomId, email, lastReadMessageId })
+      });
+    } catch (e) {
+      console.warn('sendReadReceipt error:', e);
+    }
+  }
+
   disconnect() {
     if (this.client) {
       try {

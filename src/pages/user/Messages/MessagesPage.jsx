@@ -199,6 +199,9 @@ export const MessagesPage = () => {
   const [filterTab, setFilterTab] = useState('all'); // 'all' | 'direct' | 'group'
   const [searchTerm, setSearchTerm] = useState('');
   const [inputText, setInputText] = useState('');
+  const [typingUsers, setTypingUsers] = useState({});
+  const typingTimeoutRef = useRef(null);
+  const isTypingRef = useRef(false);
   const [isLoadingRooms, setIsLoadingRooms] = useState(true);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -358,9 +361,13 @@ export const MessagesPage = () => {
     }
   }, [activeThreadId, loadMessages]);
 
-  // 3. Kết nối WebSocket STOMP nhận tin nhắn thời gian thực (Zero-Latency)
+  // 3. Kết nối WebSocket STOMP nhận tin nhắn, sự kiện soạn tin và xác nhận đã đọc thời gian thực
   useEffect(() => {
     if (!activeThreadId) return;
+
+    // Đánh dấu đã đọc phòng khi mở
+    chatApi.markRoomAsRead(activeThreadId, effectiveEmail);
+    chatSocket.sendReadReceipt(activeThreadId, { email: effectiveEmail, lastReadMessageId: 0 });
 
     // Đăng ký nhận tin nhắn tức thì từ WebSocket broker /topic/room.{roomId}
     const unsubscribe = chatSocket.subscribeToRoom(activeThreadId, (incomingMsg) => {
@@ -393,6 +400,12 @@ export const MessagesPage = () => {
         return [...cleanPrev, normalizedIncoming];
       });
 
+      // Nếu tin nhắn mới từ người khác gửi đến phòng đang mở, tự động đánh dấu đã đọc
+      if (!isFromMe) {
+        chatApi.markRoomAsRead(activeThreadId, effectiveEmail);
+        chatSocket.sendReadReceipt(activeThreadId, { email: effectiveEmail, lastReadMessageId: incomingMsg.id });
+      }
+
       // Cập nhật ngay preview tin nhắn cuối trong danh sách phòng
       setThreads(prev => prev.map(t => {
         if (t.id === activeThreadId) {
@@ -408,6 +421,55 @@ export const MessagesPage = () => {
       }));
     });
 
+    // Đăng ký nhận sự kiện đang soạn tin (Typing Indicator)
+    const unsubTyping = chatSocket.subscribeToTyping(activeThreadId, (payload) => {
+      if (!payload || !payload.email) return;
+      if (payload.email.toLowerCase().trim() === effectiveEmail.toLowerCase().trim()) return;
+
+      setTypingUsers(prev => {
+        const next = { ...prev };
+        if (payload.isTyping) {
+          next[payload.email] = {
+            userName: payload.userName || 'Đối phương',
+            lastTypedAt: Date.now()
+          };
+        } else {
+          delete next[payload.email];
+        }
+        return next;
+      });
+    });
+
+    // Đăng ký nhận xác nhận đã đọc (Read Receipt)
+    const unsubRead = chatSocket.subscribeToReadReceipt(activeThreadId, (receipt) => {
+      if (!receipt || !receipt.lastReadMessageId) return;
+      if (receipt.email && receipt.email.toLowerCase().trim() === effectiveEmail.toLowerCase().trim()) return;
+
+      const readId = Number(receipt.lastReadMessageId);
+      setMessages(prev => prev.map(m => {
+        if (m.id && Number(m.id) <= readId) {
+          return { ...m, isRead: true };
+        }
+        return m;
+      }));
+    });
+
+    // Tự động thu hồi typing indicator khi quá hạn 3.5s không có tín hiệu gõ phím mới
+    const typingCleanupInterval = setInterval(() => {
+      setTypingUsers(prev => {
+        const now = Date.now();
+        let changed = false;
+        const next = { ...prev };
+        for (const [em, data] of Object.entries(next)) {
+          if (now - data.lastTypedAt > 3500) {
+            delete next[em];
+            changed = true;
+          }
+        }
+        return changed ? next : prev;
+      });
+    }, 1500);
+
     // Polling phụ dự phòng (chạy mỗi 5 giây phòng khi mất kết nối mạng tạm thời)
     const interval = setInterval(() => {
       loadMessages(activeThreadId, true);
@@ -415,9 +477,21 @@ export const MessagesPage = () => {
 
     return () => {
       if (unsubscribe) unsubscribe();
+      if (unsubTyping) unsubTyping();
+      if (unsubRead) unsubRead();
       clearInterval(interval);
+      clearInterval(typingCleanupInterval);
+      setTypingUsers({});
+      if (isTypingRef.current) {
+        isTypingRef.current = false;
+        chatSocket.sendTyping(activeThreadId, {
+          email: effectiveEmail,
+          userName: currentUser?.fullName || currentUser?.email,
+          isTyping: false
+        });
+      }
     };
-  }, [activeThreadId, loadMessages, isMessageFromMe]);
+  }, [activeThreadId, loadMessages, isMessageFromMe, effectiveEmail, currentUser]);
 
   // 4. Quản lý cuộn thông minh trong khung chat (TUYỆT ĐỐI không cuộn toàn bộ trang web window)
   const chatScrollContainerRef = useRef(null);
@@ -517,6 +591,36 @@ export const MessagesPage = () => {
     }
   };
 
+  // Xử lý sự kiện gõ bàn phím gửi typing indicator
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    setInputText(val);
+
+    if (activeThreadId && currentUser) {
+      if (!isTypingRef.current && val.trim().length > 0) {
+        isTypingRef.current = true;
+        chatSocket.sendTyping(activeThreadId, {
+          email: effectiveEmail,
+          userName: currentUser.fullName || currentUser.email,
+          isTyping: true
+        });
+      }
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      typingTimeoutRef.current = setTimeout(() => {
+        isTypingRef.current = false;
+        chatSocket.sendTyping(activeThreadId, {
+          email: effectiveEmail,
+          userName: currentUser.fullName || currentUser.email,
+          isTyping: false
+        });
+      }, 2000);
+    }
+  };
+
   // 6. Gửi tin nhắn Text
   const handleSendMessage = async (e) => {
     e?.preventDefault();
@@ -525,6 +629,18 @@ export const MessagesPage = () => {
       return;
     }
     if (!inputText.trim()) return;
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    if (isTypingRef.current && activeThreadId) {
+      isTypingRef.current = false;
+      chatSocket.sendTyping(activeThreadId, {
+        email: effectiveEmail,
+        userName: currentUser?.fullName || currentUser?.email,
+        isTyping: false
+      });
+    }
 
     const contentToSend = inputText.trim();
     setInputText('');
@@ -1946,7 +2062,21 @@ export const MessagesPage = () => {
 
                           <div className="flex items-center gap-1 text-[9px] text-ink-300 px-0.5">
                             <span>{msg.time}</span>
-                            {isMe && <CheckCheck className="w-3 h-3 text-clay-600" />}
+                            {isMe && (
+                              msg.isPending ? (
+                                <Loader2 className="w-2.5 h-2.5 animate-spin text-ink-400" />
+                              ) : msg.isRead ? (
+                                <span className="flex items-center gap-0.5 text-blue-500 font-medium" title="Đã xem">
+                                  <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
+                                  <span className="text-[9px]">Đã xem</span>
+                                </span>
+                              ) : (
+                                <span className="flex items-center gap-0.5 text-ink-400" title="Đã gửi">
+                                  <Check className="w-3.5 h-3.5 text-ink-400" />
+                                  <span className="text-[9px]">Đã gửi</span>
+                                </span>
+                              )
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1971,6 +2101,20 @@ export const MessagesPage = () => {
                 onChange={handleFileUpload}
                 className="hidden"
               />
+
+              {/* Typing indicator bubble */}
+              {Object.keys(typingUsers).length > 0 && (
+                <div className="px-4 py-1.5 flex items-center gap-2 bg-[#FAF7F0] border-t border-ink-100/90 shrink-0">
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FFFDF8] border border-ink-200/60 shadow-xs">
+                    <span className="w-1.5 h-1.5 rounded-full bg-clay-500 animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-clay-500 animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-clay-500 animate-bounce"></span>
+                    <span className="ml-1 text-[11px] font-medium text-ink-600 italic">
+                      {Object.values(typingUsers).map(u => u.userName).join(', ')} đang soạn tin...
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {isRecording ? (
                 <div className="border-t border-ink-200/70 p-3 flex items-center gap-2 bg-[#FFFDF8] shrink-0">
@@ -2044,7 +2188,7 @@ export const MessagesPage = () => {
                         : 'Nhập tin nhắn...'
                     }
                     value={inputText}
-                    onChange={e => setInputText(e.target.value)}
+                    onChange={handleInputChange}
                     disabled={isUploading}
                     className="flex-1 min-w-0 h-10 px-3 rounded-[5px] border border-ink-200 text-xs text-ink-800 outline-none focus:border-clay-500 focus:bg-[#FFFDF8] bg-[#F8F4EC] transition-colors font-medium placeholder:text-ink-300 disabled:opacity-60"
                   />
