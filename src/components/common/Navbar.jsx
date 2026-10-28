@@ -43,6 +43,7 @@ export const Navbar = () => {
     isLoggedIn,
     logout,
     unreadNotificationsCount,
+    unreadMessagesCount,
     savedPlaces = []
   } = useApp();
 
@@ -79,7 +80,13 @@ export const Navbar = () => {
     { id: 'community', label: 'Cộng đồng', shortLabel: 'Cộng đồng', icon: Users, badge: 'HOT' },
     ...(isLoggedIn ? [
       { id: 'itineraries', label: 'Lịch trình', shortLabel: 'Lịch trình', icon: Calendar },
-      { id: 'messages', label: 'Trò chuyện', shortLabel: 'Trò chuyện', icon: MessageSquare }
+      {
+        id: 'messages',
+        label: 'Trò chuyện',
+        shortLabel: 'Trò chuyện',
+        icon: MessageSquare,
+        badge: unreadMessagesCount > 0 ? (unreadMessagesCount > 9 ? '9+' : String(unreadMessagesCount)) : null
+      }
     ] : [])
   ];
 

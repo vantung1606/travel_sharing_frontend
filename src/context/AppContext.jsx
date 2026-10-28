@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { notificationApi, userApi, placeApi, itineraryApi, authApi, savedPlaceApi, adminReviewApi, adminReportApi } from '../services/api';
+import { notificationApi, chatApi, userApi, placeApi, itineraryApi, authApi, savedPlaceApi, adminReviewApi, adminReportApi } from '../services/api';
 import { mapApiSpot } from '../utils/placeMap';
 
 const DEFAULT_APP_STATE = {
@@ -62,6 +62,8 @@ const DEFAULT_APP_STATE = {
   setNotifications: () => {},
   addNewNotification: () => {},
   unreadNotificationsCount: 0,
+  unreadMessagesCount: 0,
+  fetchUnreadMessages: () => {},
   isNotificationLiveBackend: false,
   markNotificationAsRead: () => {},
   markAllNotificationsAsRead: () => {},
@@ -652,6 +654,43 @@ export const AppProvider = ({ children }) => {
 
   const unreadNotificationsCount = notifications.filter(n => !n.isRead).length;
 
+  // ─── UNREAD CHAT MESSAGES COUNT (Navbar Badge) ─────────────────────────────
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+
+  const fetchUnreadMessages = useCallback(async () => {
+    if (!isLoggedIn || !currentUser?.email) {
+      setUnreadMessagesCount(0);
+      return;
+    }
+    try {
+      const count = await chatApi.getUnreadCount(currentUser.email);
+      setUnreadMessagesCount(Number(count) || 0);
+    } catch {
+      // ignore
+    }
+  }, [isLoggedIn, currentUser?.email]);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setUnreadMessagesCount(0);
+      return;
+    }
+    fetchUnreadMessages();
+    const timer = setInterval(() => {
+      fetchUnreadMessages();
+    }, 15000);
+
+    const onChatActivity = () => {
+      fetchUnreadMessages();
+    };
+    window.addEventListener('wayfare_chat_updated', onChatActivity);
+
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('wayfare_chat_updated', onChatActivity);
+    };
+  }, [fetchUnreadMessages, isLoggedIn]);
+
   // ─── ITINERARY PERSISTENCE & SYNC WITH MYSQL BACKEND ─────────────────────────
   const mapBackendItineraryToFrontend = useCallback((item) => {
     if (!item) return null;
@@ -1074,6 +1113,9 @@ export const AppProvider = ({ children }) => {
         setNotifications,
         addNewNotification,
         unreadNotificationsCount,
+        unreadMessagesCount,
+        fetchUnreadMessages,
+        setUnreadMessagesCount,
         isNotificationLiveBackend,
         markNotificationAsRead,
         markAllNotificationsAsRead,

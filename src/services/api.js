@@ -2145,6 +2145,24 @@ export const chatApi = {
     }
   },
 
+  async getUnreadCount(email) {
+    try {
+      const token = getAuthToken();
+      if (!token) return 0;
+      const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
+      const userEmail = email || user?.email || '';
+      if (!userEmail) return 0;
+      const res = await fetch(`${BASE_URL}/chat/unread-count?email=${encodeURIComponent(userEmail)}`, {
+        headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+      });
+      if (!res.ok) return 0;
+      const json = await res.json();
+      return json?.data?.unreadCount || 0;
+    } catch {
+      return 0;
+    }
+  },
+
   async getRoomMessages(roomId, email) {
     try {
       const token = getAuthToken();

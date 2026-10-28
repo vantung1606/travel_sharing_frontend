@@ -342,6 +342,8 @@ export const MessagesPage = () => {
           }
           return normalizedMsgs;
         });
+        setThreads(prev => prev.map(t => (t.id === roomId ? { ...t, unread: 0 } : t)));
+        window.dispatchEvent(new CustomEvent('wayfare_chat_updated'));
       }
     } catch (err) {
       console.warn(`Lỗi tải tin nhắn phòng ${roomId}:`, err.message);
