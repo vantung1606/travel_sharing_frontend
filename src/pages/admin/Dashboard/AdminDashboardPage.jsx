@@ -26,6 +26,10 @@ export const AdminDashboardPage = () => {
     totalLikes: 0,
     totalComments: 0,
     averagePlaceRating: 0,
+    totalReports: 0,
+    pendingReports: 0,
+    resolvedReports: 0,
+    dismissedReports: 0,
     userGrowth: [],
     postGrowth: [],
     topDestinations: [],
@@ -383,41 +387,47 @@ export const AdminDashboardPage = () => {
         </div>
 
         {/* KPI 4: Moderation & Quality Rating */}
-        <div className="bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
-          <div className="flex items-start justify-between">
-            <div className={`w-10 h-10 rounded-[5px] flex items-center justify-center shrink-0 border ${
-              pendingReports.length > 0 ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
-            }`}>
-              <ShieldAlert className="w-5 h-5" />
+        {(() => {
+          const pendingCount = stats.pendingReports ?? pendingReports.length;
+          const totalCount = stats.totalReports ?? Math.max(pendingCount, 0);
+          return (
+            <div className="bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
+              <div className="flex items-start justify-between">
+                <div className={`w-10 h-10 rounded-[5px] flex items-center justify-center shrink-0 border ${
+                  pendingCount > 0 ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                }`}>
+                  <ShieldAlert className="w-5 h-5" />
+                </div>
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
+                  pendingCount > 0 
+                    ? 'bg-rose-50 text-rose-700 border-rose-200 animate-pulse' 
+                    : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                }`}>
+                  {pendingCount > 0 ? `${pendingCount} báo cáo chờ` : 'Hệ thống an toàn'}
+                </span>
+              </div>
+              <div>
+                <span className="text-xs text-ink-400 font-medium block">Kiểm duyệt & Báo cáo vi phạm</span>
+                <div className="flex items-baseline gap-2 mt-1">
+                  <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight flex items-baseline gap-1.5">
+                    <span className={pendingCount > 0 ? 'text-rose-600' : 'text-ink-800'}>{pendingCount}</span>
+                    <span className="text-sm font-semibold text-ink-400">/ {totalCount}</span>
+                  </h2>
+                  <span className="text-[11px] text-ink-400 font-medium">báo cáo vi phạm</span>
+                </div>
+                <p className="text-[11px] text-ink-400 mt-2 flex items-center justify-between pt-2 border-t border-ink-200/50">
+                  <span>Đang chờ: <strong className="text-rose-600 font-bold">{pendingCount}</strong> / Tổng số: <strong className="text-ink-800 font-bold">{totalCount}</strong></span>
+                  <button 
+                    onClick={() => setAdminTab('reports')}
+                    className="text-clay-700 hover:text-clay-800 font-bold hover:underline cursor-pointer"
+                  >
+                    Xử lý ngay →
+                  </button>
+                </p>
+              </div>
             </div>
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
-              pendingReports.length > 0 
-                ? 'bg-rose-50 text-rose-700 border-rose-200 animate-pulse' 
-                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-            }`}>
-              {pendingReports.length > 0 ? `${pendingReports.length} báo cáo chờ` : 'Hệ thống an toàn'}
-            </span>
-          </div>
-          <div>
-            <span className="text-xs text-ink-400 font-medium block">Đánh giá & Kiểm duyệt</span>
-            <div className="flex items-baseline gap-2 mt-1">
-              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight flex items-center gap-1">
-                {stats.averagePlaceRating ? Number(stats.averagePlaceRating).toFixed(1) : '4.8'}
-                <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              </h2>
-              <span className="text-[11px] text-ink-400 font-medium">điểm hài lòng</span>
-            </div>
-            <p className="text-[11px] text-ink-400 mt-2 flex items-center justify-between pt-2 border-t border-ink-200/50">
-              <span>Kiểm duyệt vi phạm</span>
-              <button 
-                onClick={() => setAdminTab('reports')}
-                className="text-clay-700 hover:text-clay-800 font-bold hover:underline cursor-pointer"
-              >
-                Xử lý ngay →
-              </button>
-            </p>
-          </div>
-        </div>
+          );
+        })()}
 
       </div>
 
@@ -650,13 +660,13 @@ export const AdminDashboardPage = () => {
           <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-ink-200/60">
               <div className="flex items-center gap-2 font-display font-black text-base text-ink-800">
-                <span className={`w-2 h-2 rounded-full ${pendingReports.length > 0 ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`}></span>
+                <span className={`w-2 h-2 rounded-full ${(stats.pendingReports > 0 || pendingReports.length > 0) ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`}></span>
                 <span>Kiểm duyệt cần xử lý</span>
               </div>
               <span className={`px-2 py-0.5 rounded-[4px] font-bold text-xs border ${
-                pendingReports.length > 0 ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                (stats.pendingReports > 0 || pendingReports.length > 0) ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
               }`}>
-                {pendingReports.length} chờ duyệt
+                Đang chờ: {stats.pendingReports ?? pendingReports.length} / Tổng: {stats.totalReports ?? pendingReports.length}
               </span>
             </div>
 
