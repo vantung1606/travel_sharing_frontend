@@ -126,10 +126,24 @@ const AppContent = () => {
     };
   }, [isLoggedIn, currentUser?.id, currentUser?.email, addNewNotification, toast]);
 
+  // Tự động cuộn mượt lên đầu trang mỗi khi chuyển đổi giữa các trang
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [location.pathname]);
+
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900 selection:bg-sky-600 selection:text-white">
       {/* Dynamic Title Manager for Browser Tab */}
       <PageTitleManager />
+
+      {/* Top Page Progress Indicator khi bấm chuyển qua lại giữa các trang */}
+      <div
+        key={`page-progress-${location.pathname}`}
+        className="fixed top-0 left-0 right-0 h-[2.5px] z-[9999] pointer-events-none overflow-hidden"
+        aria-hidden="true"
+      >
+        <div className="h-full bg-gradient-to-r from-clay-500 via-amber-500 to-clay-600 animate-top-progress shadow-xs" />
+      </div>
 
       {!isAdminPath ? (
         /* USER PORTAL LAYOUT */
@@ -137,53 +151,59 @@ const AppContent = () => {
           <Navbar />
 
           <main className={`flex-1 ${isMessagesPath ? 'flex flex-col min-h-0' : ''}`}>
-            <Suspense fallback={<RouteLoadingFallback />}>
-              <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/home" element={<Navigate to="/" replace />} />
-              <Route path="/explore" element={<ExplorePage />} />
-              <Route path="/places/:placeId" element={<PlaceDetailPage />} />
-              <Route path="/community" element={<CommunityPage />} />
-              <Route path="/ai-planner" element={<Navigate to="/itineraries" replace />} />
-              
-              {/* Protected User Routes */}
-              <Route 
-                path="/itineraries" 
-                element={
-                  <UserAuthGuard title="Lịch trình của tôi">
-                    <ItineraryManagerPage />
-                  </UserAuthGuard>
-                } 
-              />
-              <Route 
-                path="/messages" 
-                element={
-                  <UserAuthGuard title="Hộp thư & Trò chuyện chuyến đi">
-                    <MessagesPage />
-                  </UserAuthGuard>
-                } 
-              />
-              <Route 
-                path="/profile" 
-                element={
-                  <UserAuthGuard title="Trang Hồ sơ cá nhân">
-                    <ProfilePage />
-                  </UserAuthGuard>
-                } 
-              />
-              <Route 
-                path="/notifications" 
-                element={
-                  <UserAuthGuard title="Trung tâm Thông báo">
-                    <NotificationsPage />
-                  </UserAuthGuard>
-                } 
-              />
+            {/* Page Transition Wrapper: Kích hoạt hiệu ứng animation chuyển cảnh mượt mà giữa các trang */}
+            <div
+              key={location.pathname}
+              className={`animate-page-enter flex-1 w-full ${isMessagesPath ? 'flex flex-col min-h-0 h-full' : ''}`}
+            >
+              <Suspense fallback={<RouteLoadingFallback />}>
+                <Routes location={location}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/home" element={<Navigate to="/" replace />} />
+                <Route path="/explore" element={<ExplorePage />} />
+                <Route path="/places/:placeId" element={<PlaceDetailPage />} />
+                <Route path="/community" element={<CommunityPage />} />
+                <Route path="/ai-planner" element={<Navigate to="/itineraries" replace />} />
+                
+                {/* Protected User Routes */}
+                <Route 
+                  path="/itineraries" 
+                  element={
+                    <UserAuthGuard title="Lịch trình của tôi">
+                      <ItineraryManagerPage />
+                    </UserAuthGuard>
+                  } 
+                />
+                <Route 
+                  path="/messages" 
+                  element={
+                    <UserAuthGuard title="Hộp thư & Trò chuyện chuyến đi">
+                      <MessagesPage />
+                    </UserAuthGuard>
+                  } 
+                />
+                <Route 
+                  path="/profile" 
+                  element={
+                    <UserAuthGuard title="Trang Hồ sơ cá nhân">
+                      <ProfilePage />
+                    </UserAuthGuard>
+                  } 
+                />
+                <Route 
+                  path="/notifications" 
+                  element={
+                    <UserAuthGuard title="Trung tâm Thông báo">
+                      <NotificationsPage />
+                    </UserAuthGuard>
+                  } 
+                />
 
-              {/* Catch-all redirect */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Suspense>
+                {/* Catch-all redirect */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+                </Routes>
+              </Suspense>
+            </div>
           </main>
 
           {!isMessagesPath && <BottomNav />}
@@ -204,19 +224,22 @@ const AppContent = () => {
             {/* Admin Workspace Content */}
             <div className="min-w-0 md:pl-[260px] pt-16 min-h-screen">
               <main className="min-w-0 p-4 sm:p-6 lg:p-8 bg-[#F8F4EC] min-h-[calc(100vh-64px)]">
-                <Suspense fallback={<RouteLoadingFallback />}>
-                  <Routes>
-                    <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-                    <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
-                    <Route path="/admin/places" element={<AdminPlacesPage />} />
-                    <Route path="/admin/users" element={<AdminUsersPage />} />
-                    <Route path="/admin/reports" element={<AdminReportsPage />} />
-                    <Route path="/admin/reviews" element={<AdminReviewsPage />} />
-                    <Route path="/admin/analytics" element={<AdminStatisticsPage />} />
-                    <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
-                    <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
-                  </Routes>
-                </Suspense>
+                {/* Admin Page Transition Wrapper */}
+                <div key={location.pathname} className="animate-page-enter min-w-0">
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <Routes location={location}>
+                      <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+                      <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+                      <Route path="/admin/places" element={<AdminPlacesPage />} />
+                      <Route path="/admin/users" element={<AdminUsersPage />} />
+                      <Route path="/admin/reports" element={<AdminReportsPage />} />
+                      <Route path="/admin/reviews" element={<AdminReviewsPage />} />
+                      <Route path="/admin/analytics" element={<AdminStatisticsPage />} />
+                      <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
+                      <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
+                    </Routes>
+                  </Suspense>
+                </div>
               </main>
             </div>
           </div>

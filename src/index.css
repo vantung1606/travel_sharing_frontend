@@ -371,3 +371,41 @@ select option {
   border-radius: 5px;
 }
 
+/* ==========================================================================
+   PAGE TRANSITION ANIMATION (Hiệu ứng chuyển cảnh giữa các trang)
+   ========================================================================== */
+@keyframes pageEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.996);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-page-enter {
+  animation: pageEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+@keyframes topProgressBar {
+  0% {
+    width: 0%;
+    opacity: 1;
+  }
+  60% {
+    width: 78%;
+    opacity: 1;
+  }
+  100% {
+    width: 100%;
+    opacity: 0;
+  }
+}
+
+.animate-top-progress {
+  animation: topProgressBar 0.5s cubic-bezier(0.12, 0.8, 0.2, 1) forwards;
+}
+
