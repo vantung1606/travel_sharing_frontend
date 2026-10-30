@@ -589,6 +589,9 @@ export const CommunityPage = () => {
   const topAuthors = useMemo(() => {
     const authorMap = new Map();
     posts.forEach(p => {
+      // Chỉ tính các bài viết đã được duyệt công khai (ACTIVE)
+      if (p.status && p.status !== 'ACTIVE') return;
+
       const aId = p.authorId || p.author?.id;
       if (!aId) return;
       if (!authorMap.has(aId)) {
@@ -1426,7 +1429,7 @@ export const CommunityPage = () => {
                   </div>
                   <div className="p-1 rounded-sm bg-[#FFFDF8] border border-[#1E1A15]/10">
                     <span className="font-extrabold text-sm text-amber-600 block">
-                      {posts.filter(p => p.author?.email === currentUser?.email).length}
+                      {posts.filter(p => p.author?.email === currentUser?.email && p.status === 'ACTIVE').length}
                     </span>
                     <span className="text-[10px] text-[#6B6154] font-semibold">Bài viết</span>
                   </div>
