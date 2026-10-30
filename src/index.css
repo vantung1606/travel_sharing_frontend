@@ -377,17 +377,27 @@ select option {
 @keyframes pageEnter {
   0% {
     opacity: 0;
-    transform: translateY(12px) scale(0.996);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }
 
+/*
+ * Chỉ animate opacity. Không dùng transform/will-change: transform ở đây vì
+ * chúng tạo containing block cho mọi modal `position: fixed` nằm trong page
+ * wrapper, khiến modal bị căn giữa theo chiều cao toàn trang thay vì viewport.
+ */
 .animate-page-enter {
   animation: pageEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  will-change: opacity, transform;
+}
+
+/*
+ * Overlay modal phải phủ đúng viewport. Một số page đặt modal trong container
+ * dùng space-y-* nên overlay bị kế thừa margin-top, làm hở một dải phía trên.
+ */
+.animate-page-enter .fixed.inset-0 {
+  margin: 0 !important;
 }
 
 @keyframes topProgressBar {

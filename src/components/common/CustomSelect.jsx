@@ -26,8 +26,10 @@ export const CustomSelect = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [dropdownPlacement, setDropdownPlacement] = useState('bottom');
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
+  const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -45,21 +47,57 @@ export const CustomSelect = ({
     };
   }, [isOpen]);
 
-  // Focus search input and ensure visibility on open
+  // Focus search input, then choose the side with enough room for the dropdown.
+  // This matters inside scrollable modals: opening downward can push the list
+  // outside the modal and make it look like nothing happened.
   useEffect(() => {
-    if (isOpen) {
-      if (searchable && searchInputRef.current) {
-        setTimeout(() => {
-          searchInputRef.current?.focus();
-        }, 50);
-      }
-      setTimeout(() => {
-        containerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 80);
-    }
     if (!isOpen) {
       setSearchQuery('');
+      setDropdownPlacement('bottom');
+      return;
     }
+
+    if (searchable && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 50);
+    }
+
+    const timer = setTimeout(() => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      const triggerRect = container.getBoundingClientRect();
+      const dropdownHeight = dropdownRef.current?.offsetHeight || 280;
+
+      let clipTop = 0;
+      let clipBottom = window.innerHeight;
+      let parent = container.parentElement;
+      while (parent && parent !== document.body) {
+        const style = window.getComputedStyle(parent);
+        if (/(auto|scroll)/.test(style.overflowY)) {
+          const parentRect = parent.getBoundingClientRect();
+          clipTop = Math.max(clipTop, parentRect.top);
+          clipBottom = Math.min(clipBottom, parentRect.bottom);
+          break;
+        }
+        parent = parent.parentElement;
+      }
+
+      const spaceBelow = clipBottom - triggerRect.bottom;
+      const spaceAbove = triggerRect.top - clipTop;
+
+      if (spaceBelow < dropdownHeight && spaceAbove > spaceBelow) {
+        setDropdownPlacement('top');
+      } else {
+        setDropdownPlacement('bottom');
+        if (spaceBelow < dropdownHeight) {
+          container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }, 80);
+
+    return () => clearTimeout(timer);
   }, [isOpen, searchable]);
 
   // Handle ESC key
@@ -200,7 +238,10 @@ export const CustomSelect = ({
       {/* Floating Options Dropdown */}
       {isOpen && (
         <div
-          className={`absolute left-0 right-0 mt-1.5 z-50 bg-[#FFFDF8] rounded-sm border border-[#1E1A15]/15 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 ring-1 ring-black/5 ${dropdownClassName}`}
+          ref={dropdownRef}
+          className={`absolute left-0 right-0 z-50 bg-[#FFFDF8] rounded-sm border border-[#1E1A15]/15 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 ring-1 ring-black/5 ${
+            dropdownPlacement === 'top' ? 'bottom-full mb-1.5' : 'top-full mt-1.5'
+          } ${dropdownClassName}`}
           style={{ minWidth: '100%' }}
         >
           {/* Optional Search bar */}
