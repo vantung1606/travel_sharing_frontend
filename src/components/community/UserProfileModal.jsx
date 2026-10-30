@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, MapPin, Users, UserPlus, UserCheck, Compass, Route, Heart, MessageCircle, Eye, Copy, DollarSign, Sparkles, Loader2, Lock, Globe, ArrowRight, Award, Flag } from 'lucide-react';
 import { userApi, itineraryApi } from '../../services/api';
 import { useToast } from '../common/Toast';
@@ -171,9 +172,9 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
     navigate(`/messages?${params}`);
   };
 
-  return (
-    <div className="fixed inset-0 z-[90] flex items-center justify-center p-3 sm:p-4 bg-ink-950/70 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-[#FFFDF8] rounded-[6px] max-w-3xl sm:max-w-4xl w-full shadow-2xl border border-ink-200/80 max-h-[92vh] flex flex-col overflow-hidden relative animate-in zoom-in-95 duration-200">
+  const modalContent = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-ink-950/75 backdrop-blur-xs">
+      <div className="bg-[#FFFDF8] rounded-[6px] max-w-3xl sm:max-w-4xl w-full shadow-2xl border border-ink-200/80 h-[88vh] max-h-[92vh] min-h-[500px] flex flex-col overflow-hidden relative z-10 animate-in zoom-in-95 duration-200">
         
 
         {/* Floating Close Button */}
@@ -836,6 +837,8 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
       />
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : modalContent;
 };
 
 
