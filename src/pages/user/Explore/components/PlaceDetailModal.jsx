@@ -74,9 +74,6 @@ export const PlaceDetailModal = ({
     if (r.authorId && currentUser.id && String(r.authorId) === String(currentUser.id)) {
       return true;
     }
-    if (r.authorName && currentUser.fullName && r.authorName.trim().toLowerCase() === currentUser.fullName.trim().toLowerCase()) {
-      return true;
-    }
     return false;
   };
 

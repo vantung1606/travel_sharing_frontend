@@ -447,7 +447,6 @@ export const PostDetailModal = ({
   const isSelf = Boolean(
     post?.isOwner ||
     (effectiveAuthorId && currentUser?.id && Number(effectiveAuthorId) === Number(currentUser.id)) ||
-    (currentUser?.name && authorName && authorName.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) ||
     (currentUser?.handle && authorHandle && authorHandle.trim().toLowerCase() === currentUser.handle.trim().toLowerCase()) ||
     (currentUser?.email && (post?.authorEmail || post?.author?.email) && (post?.authorEmail || post?.author?.email).toLowerCase() === currentUser.email.toLowerCase())
   );
@@ -1145,7 +1144,6 @@ export const PostDetailModal = ({
                     const isMyComment = Boolean(
                       (currentUser?.id && (Number(c.userId || c.authorId) === Number(currentUser.id))) ||
                       (currentUser?.email && c.userEmail && c.userEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
-                      (currentUser?.name && c.userName && c.userName.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) ||
                       currentUser?.role === 'ADMIN' || currentUser?.role === 'ROLE_ADMIN'
                     );
 
@@ -1212,7 +1210,6 @@ export const PostDetailModal = ({
                               const isMyReply = Boolean(
                                 (currentUser?.id && (Number(reply.userId || reply.authorId) === Number(currentUser.id))) ||
                                 (currentUser?.email && reply.userEmail && reply.userEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
-                                (currentUser?.name && (reply.userName || reply.authorName) && (reply.userName || reply.authorName).trim().toLowerCase() === currentUser.name.trim().toLowerCase()) ||
                                 currentUser?.role === 'ADMIN' || currentUser?.role === 'ROLE_ADMIN'
                               );
 

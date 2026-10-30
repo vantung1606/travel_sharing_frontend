@@ -111,8 +111,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
       (itin.creatorId && currentUser?.id && String(itin.creatorId) === String(currentUser.id)) ||
       (itin.userId && currentUser?.id && String(itin.userId) === String(currentUser.id)) ||
       (itin.creatorEmail && currentUser?.email && itin.creatorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
-      (itin.userEmail && currentUser?.email && itin.userEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
-      (itin.creatorName && (currentUser?.name || currentUser?.fullName) && itin.creatorName.trim().toLowerCase() === (currentUser.name || currentUser.fullName).trim().toLowerCase())
+      (itin.userEmail && currentUser?.email && itin.userEmail.toLowerCase() === currentUser.email.toLowerCase())
     );
 
     if (isOwner) {
@@ -239,8 +238,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                   {Boolean(
                     (currentUser?.id && profile?.id && Number(currentUser.id) === Number(profile.id)) ||
                     (currentUser?.email && profile?.email && currentUser.email.toLowerCase() === profile.email.toLowerCase()) ||
-                    (currentUser?.handle && profile?.handle && currentUser.handle.toLowerCase() === profile.handle.toLowerCase()) ||
-                    (currentUser?.name && profile?.fullName && currentUser.name.trim().toLowerCase() === profile.fullName.trim().toLowerCase())
+                    (currentUser?.handle && profile?.handle && currentUser.handle.toLowerCase() === profile.handle.toLowerCase())
                   ) ? (
                     <span className="px-3.5 py-1.5 rounded-[5px] bg-[#F8F4EC] text-ink-600 text-xs font-bold border border-ink-200/80 shadow-2xs">
                       Tài khoản của bạn
@@ -705,8 +703,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                                   (currentUser?.id && itin.creatorId && String(itin.creatorId) === String(currentUser.id)) ||
                                   (currentUser?.id && itin.userId && String(itin.userId) === String(currentUser.id)) ||
                                   (currentUser?.email && itin.creatorEmail && itin.creatorEmail.toLowerCase() === (currentUser.email || '').toLowerCase()) ||
-                                  (currentUser?.email && itin.userEmail && itin.userEmail.toLowerCase() === (currentUser.email || '').toLowerCase()) ||
-                                  ((currentUser?.name || currentUser?.fullName) && itin.creatorName && itin.creatorName.trim().toLowerCase() === (currentUser.name || currentUser.fullName).trim().toLowerCase())
+                                  (currentUser?.email && itin.userEmail && itin.userEmail.toLowerCase() === (currentUser.email || '').toLowerCase())
                                 );
 
                                 if (isItinOwner) return null;

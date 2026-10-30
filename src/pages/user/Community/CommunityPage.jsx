@@ -1875,7 +1875,6 @@ export const CommunityPage = () => {
               const isSelf = Boolean(
                 post.isOwner ||
                 (authorId && currentUser?.id && Number(authorId) === Number(currentUser.id)) ||
-                (currentUser?.name && authorName && authorName.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) ||
                 (currentUser?.handle && authorHandle && authorHandle.trim().toLowerCase() === currentUser.handle.trim().toLowerCase()) ||
                 (currentUser?.email && authorEmail && authorEmail.trim().toLowerCase() === currentUser.email.trim().toLowerCase())
               );
@@ -2732,7 +2731,6 @@ export const CommunityPage = () => {
               {topAuthors.map((author, idx) => {
                 const isMe = Boolean(
                   (currentUser?.id && Number(author.id) === Number(currentUser.id)) ||
-                  (currentUser?.name && author.name && author.name.trim().toLowerCase() === currentUser.name.trim().toLowerCase()) ||
                   (currentUser?.email && author.email && author.email.trim().toLowerCase() === currentUser.email.trim().toLowerCase()) ||
                   (currentUser?.handle && author.handle && author.handle.trim().toLowerCase() === currentUser.handle.trim().toLowerCase())
                 );
@@ -3413,8 +3411,7 @@ export const CommunityPage = () => {
                   const isMyComment = Boolean(
                     (cmt.authorId && currentUser?.id && Number(cmt.authorId) === Number(currentUser.id)) ||
                     (cmt.userId && currentUser?.id && Number(cmt.userId) === Number(currentUser.id)) ||
-                    (cmt.authorEmail && currentUser?.email && cmt.authorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
-                    (cmt.authorName && currentUser?.name && cmt.authorName.trim().toLowerCase() === currentUser.name.trim().toLowerCase())
+                    (cmt.authorEmail && currentUser?.email && cmt.authorEmail.toLowerCase() === currentUser.email.toLowerCase())
                   );
 
                   return (
@@ -3489,8 +3486,7 @@ export const CommunityPage = () => {
                             const isMyReply = Boolean(
                               (reply.authorId && currentUser?.id && Number(reply.authorId) === Number(currentUser.id)) ||
                               (reply.userId && currentUser?.id && Number(reply.userId) === Number(currentUser.id)) ||
-                              (reply.authorEmail && currentUser?.email && reply.authorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
-                              (reply.authorName && currentUser?.name && reply.authorName.trim().toLowerCase() === currentUser.name.trim().toLowerCase())
+                              (reply.authorEmail && currentUser?.email && reply.authorEmail.toLowerCase() === currentUser.email.toLowerCase())
                             );
 
                             return (
