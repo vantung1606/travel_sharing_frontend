@@ -1489,34 +1489,6 @@ export const CommunityPage = () => {
               </div>
             )}
 
-            {/* Trending Topics & Hashtags */}
-            <div className="bg-[#FFFDF8] rounded-sm p-5 border border-[#1E1A15]/10  space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-extrabold text-[#1E1A15] flex items-center gap-1.5">
-                  <TrendingUp className="w-4 h-4 text-sky-600" />
-                  <span>Chủ đề nổi bật</span>
-                </h4>
-              </div>
-              <div className="flex flex-wrap gap-2 pt-1">
-                {[
-                  { tag: '#DaNangReview', count: '2.8k' },
-                  { tag: '#SanMayDaLat', count: '1.9k' },
-                  { tag: '#HaGiangPhuot', count: '1.4k' },
-                  { tag: '#PhuQuocGiaRe', count: '980' },
-                  { tag: '#CheckInVietnam', count: '5.1k' }
-                ].map((item, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSearchQuery(item.tag.replace('#', ''))}
-                    className="px-3 py-1.5 rounded-sm bg-[#F3EDE2] text-[#3B332A] hover:bg-[#F8F4EC] hover:text-clay-700 border border-transparent hover:border-clay-600/30 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>{item.tag}</span>
-                    <span className="text-[10px] text-[#8A7F70]">{item.count}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
           </aside>
 
           {/* ========================================================= */}
