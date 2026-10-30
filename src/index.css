@@ -389,7 +389,7 @@ select option {
  * wrapper, khiến modal bị căn giữa theo chiều cao toàn trang thay vì viewport.
  */
 .animate-page-enter {
-  animation: pageEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: pageEnter 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /*
@@ -398,6 +398,40 @@ select option {
  */
 .animate-page-enter .fixed.inset-0 {
   margin: 0 !important;
+}
+
+/*
+ * Form/modal dạng hộp: che toàn bộ nền (kể cả navbar) và neo ở giữa phía trên
+ * thay vì căn giữa dọc. Nhờ vậy form dài vẫn bắt đầu từ trên xuống, không bị
+ * cắt mất phần đầu và không lộ nội dung phía sau.
+ */
+.animate-page-enter .fixed.inset-0.items-center.justify-center {
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  background-color: #1E1A15 !important;
+  overflow-y: auto !important;
+}
+
+.animate-page-enter .fixed.inset-0.items-center.justify-center > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Form toàn cục (Auth, AI Planner...) cũng dùng cùng quy chuẩn. */
+.fixed.inset-0.items-center.justify-center:has(form) {
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  background-color: #1E1A15 !important;
+  overflow-y: auto !important;
+}
+
+.fixed.inset-0.items-center.justify-center:has(form) > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
 }
 
 @keyframes topProgressBar {
