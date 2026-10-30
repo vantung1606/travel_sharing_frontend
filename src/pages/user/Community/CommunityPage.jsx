@@ -2252,7 +2252,7 @@ export const CommunityPage = () => {
                               )}
                             </div>
                             <div className="flex items-center gap-1.5 text-xs text-[#8A7F70] font-medium mt-0.5">
-                              <span>{formatDisplayDateTime(post.sharedPost.createdAt, post.sharedPost.formattedDate || post.sharedPost.timeAgo)}</span>
+                              <span>{formatDisplayTimeAgo(post.sharedPost.createdAt, post.sharedPost.timeAgo)}</span>
                               <span>•</span>
                               <Globe className="w-3 h-3 text-[#8A7F70]" />
                               {post.sharedPost.locationTag && (

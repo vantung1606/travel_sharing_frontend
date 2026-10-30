@@ -1,87 +1,109 @@
 /**
- * Utility functions for parsing and displaying timestamps in user's local timezone (e.g. Vietnam UTC+7)
- * Corrects UTC timestamps saved on cloud server so they display correctly in the browser.
+ * Utility functions for parsing and displaying timestamps according to user's device/computer clock.
+ * Rules:
+ * - < 1 minute: "Vừa xong"
+ * - < 60 minutes: "X phút trước" (e.g., "1 phút trước", "5 phút trước")
+ * - < 23 hours: "X giờ trước" (e.g., "1 giờ trước", "5 giờ trước")
+ * - >= 23 hours: Exact date & time according to user's computer: "HH:mm - DD/MM/YYYY"
  */
 
-export const formatDisplayDateTime = (dateValue, fallbackFormatted) => {
-  if (!dateValue && fallbackFormatted) return fallbackFormatted;
-  if (!dateValue) return 'Vừa xong';
+export const parseDateSafe = (dateValue) => {
+  if (!dateValue) return null;
 
-  try {
-    let date;
-    if (typeof dateValue === 'string') {
-      // If ISO string without timezone indicator, treat as UTC from backend
-      const isoStr = dateValue.endsWith('Z') || dateValue.includes('+') ? dateValue : dateValue + 'Z';
-      date = new Date(isoStr);
-    } else {
-      date = new Date(dateValue);
-    }
-
-    if (isNaN(date.getTime())) {
-      return fallbackFormatted || 'Vừa xong';
-    }
-
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-
-    return `${hours}:${minutes} - ${day}/${month}/${year}`;
-  } catch {
-    return fallbackFormatted || 'Vừa xong';
+  if (dateValue instanceof Date) {
+    return isNaN(dateValue.getTime()) ? null : dateValue;
   }
+
+  if (typeof dateValue === 'number') {
+    const d = new Date(dateValue);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  // Jackson serializer array: [year, month, day, hour, minute, second]
+  if (Array.isArray(dateValue)) {
+    const [year, month, day, hour = 0, minute = 0, second = 0] = dateValue;
+    const d = new Date(year, month - 1, day, hour, minute, second);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  if (typeof dateValue === 'string') {
+    const str = dateValue.trim();
+    if (!str) return null;
+
+    // Pattern "HH:mm - DD/MM/YYYY"
+    const ddmmyyyyMatch = str.match(/^(\d{1,2}):(\d{2})\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (ddmmyyyyMatch) {
+      const [, h, min, d, m, y] = ddmmyyyyMatch;
+      const parsed = new Date(Number(y), Number(m) - 1, Number(d), Number(h), Number(min));
+      return isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    // Standard ISO string or date string (DO NOT append 'Z', let client parse in local timezone)
+    const parsed = new Date(str);
+    if (!isNaN(parsed.getTime())) {
+      return parsed;
+    }
+  }
+
+  return null;
 };
 
+/**
+ * Hiển thị thời gian thân thiện theo giờ thực của máy tính người dùng:
+ * - Dưới 1 phút: "Vừa xong"
+ * - Dưới 60 phút: "X phút trước"
+ * - Dưới 23 giờ: "X giờ trước"
+ * - Từ 23 giờ trở lên: ngày cụ thể "HH:mm - DD/MM/YYYY"
+ */
 export const formatDisplayTimeAgo = (dateValue, fallbackTimeAgo) => {
-  if (!dateValue && fallbackTimeAgo) return fallbackTimeAgo;
-  if (!dateValue) return 'Vừa xong';
-
-  try {
-    const isoStr = typeof dateValue === 'string' && !dateValue.endsWith('Z') && !dateValue.includes('+')
-      ? dateValue + 'Z'
-      : dateValue;
-    const date = new Date(isoStr);
-
-    if (isNaN(date.getTime())) {
-      return fallbackTimeAgo || 'Vừa xong';
-    }
-
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-
-    // Within 60 seconds
-    if (diffMs < 60000 && diffMs >= -30000) {
-      return 'Vừa xong';
-    }
-
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 60 && diffMins > 0) {
-      return `${diffMins} phút trước`;
-    }
-
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24 && diffHours > 0) {
-      return `${diffHours} giờ trước`;
-    }
-
-    const diffDays = Math.floor(diffHours / 24);
-    if (diffDays === 1) {
-      return 'Hôm qua';
-    }
-    if (diffDays > 1 && diffDays < 7) {
-      return `${diffDays} ngày trước`;
-    }
-
-    // Over 7 days: format as exact date & time
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-
-    return `${hours}:${minutes} - ${day}/${month}/${year}`;
-  } catch {
+  const date = parseDateSafe(dateValue);
+  if (!date) {
     return fallbackTimeAgo || 'Vừa xong';
   }
+
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+
+  // Nếu đồng hồ server nhanh hơn hoặc lệch dưới 1 phút (hoặc lệch âm nhẹ trong 2 phút do đồng hồ)
+  if (diffMs < 60000) {
+    return 'Vừa xong';
+  }
+
+  const diffMinutes = Math.floor(diffMs / (60 * 1000));
+  if (diffMinutes < 60) {
+    return `${diffMinutes} phút trước`;
+  }
+
+  const diffHours = Math.floor(diffMs / (60 * 60 * 1000));
+  // Yêu cầu: dưới 23 giờ hiển thị "X giờ trước", qua 23 giờ ghi ngày cụ thể
+  if (diffHours < 23) {
+    return `${diffHours} giờ trước`;
+  }
+
+  // Qua 23 giờ: hiển thị ngày giờ cụ thể
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${hours}:${minutes} - ${day}/${month}/${year}`;
+};
+
+/**
+ * Format ngày giờ cụ thể theo máy tính: "HH:mm - DD/MM/YYYY"
+ */
+export const formatDisplayDateTime = (dateValue, fallbackFormatted) => {
+  const date = parseDateSafe(dateValue);
+  if (!date) {
+    return fallbackFormatted || 'Vừa xong';
+  }
+
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${hours}:${minutes} - ${day}/${month}/${year}`;
 };

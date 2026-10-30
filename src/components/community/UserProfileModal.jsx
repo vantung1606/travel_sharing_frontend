@@ -436,7 +436,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                                 </span>
                               </div>
                               <p className="text-[11px] text-ink-400 flex items-center gap-1.5 mt-0.5 font-serif">
-                                <span>{formatDisplayDateTime(post.createdAt, post.formattedDate || post.timeAgo)}</span>
+                                <span>{formatDisplayTimeAgo(post.createdAt, post.timeAgo)}</span>
                                 {post.locationTag && (
                                   <>
                                     <span>•</span>

@@ -553,7 +553,7 @@ export const PostDetailModal = ({
               <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
                 <span>{authorHandle}</span>
                 <span>•</span>
-                <span>{formatDisplayDateTime(post?.createdAt, post?.formattedDate || post?.timeAgo)}</span>
+                <span>{formatDisplayTimeAgo(post?.createdAt, post?.timeAgo)}</span>
               </div>
             </div>
           </div>
@@ -702,7 +702,7 @@ export const PostDetailModal = ({
                         )}
                       </div>
                       <div className="flex items-center gap-1.5 text-xs text-slate-400 font-medium mt-0.5">
-                        <span>{post.sharedPost.formattedDate || post.sharedPost.timeAgo || 'Vừa xong'}</span>
+                        <span>{formatDisplayTimeAgo(post.sharedPost.createdAt, post.sharedPost.timeAgo)}</span>
                         <span>•</span>
                         <Globe className="w-3 h-3 text-slate-400" />
                         {post.sharedPost.locationTag && (
