@@ -17,7 +17,7 @@ import { PlaceAttachCard } from '../../../components/community/PlaceAttachCard';
 import { CustomSelect } from '../../../components/common/CustomSelect';
 import { UserAvatar } from '../../../components/common/UserAvatar';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../components/community/MentionSuggestions';
-import { RichTextToolbar, RichPostContent } from '../../../components/community/RichTextToolbar';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ProposePlaceModal } from '../../../components/community/ProposePlaceModal';
 import { AtSign, Heart, MessageCircle, MessageSquare, Share2, Bookmark, MapPin, Award, TrendingUp, Compass, Route, Copy, DollarSign, Camera, Image as ImageIcon, CheckCircle2, Send, Search, SlidersHorizontal, Filter, Plus, PlusCircle, X, Loader2, Eye, MoreHorizontal, ChevronLeft, ChevronRight, ArrowRight, Flame, Check, UserCheck, ShieldCheck, AlertCircle, AlertTriangle, ShieldAlert, Lock, Globe, Upload, Video, Trash2, Edit, UserPlus, CornerDownRight, Flag, EyeOff, BookOpen } from 'lucide-react';
 
