@@ -155,24 +155,6 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-ink-950/70 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="bg-[#FFFDF8] rounded-[6px] max-w-3xl sm:max-w-4xl w-full shadow-2xl border border-ink-200/80 max-h-[92vh] flex flex-col overflow-hidden relative animate-in zoom-in-95 duration-200">
         
-        {/* Floating Report Button (only for other users) */}
-        {profile && !(
-          (currentUser?.id && profile?.id && Number(currentUser.id) === Number(profile.id)) ||
-          (currentUser?.email && profile?.email && currentUser.email.toLowerCase() === profile.email.toLowerCase()) ||
-          (currentUser?.handle && profile?.handle && currentUser.handle.toLowerCase() === profile.handle.toLowerCase())
-        ) && (
-          <button
-            onClick={() => {
-              if (!requireAuth('báo cáo thành viên này')) return;
-              setIsReportModalOpen(true);
-            }}
-            className="absolute top-3.5 right-13 z-30 px-3 py-1.5 rounded-[4px] bg-ink-950/60 hover:bg-rose-900/80 backdrop-blur-md text-white border border-white/20 flex items-center gap-1.5 transition-all cursor-pointer shadow-md text-xs font-bold"
-            title="Báo cáo tài khoản này vi phạm"
-          >
-            <Flag className="w-3.5 h-3.5 text-rose-400" />
-            <span className="hidden sm:inline">Báo cáo vi phạm</span>
-          </button>
-        )}
 
         {/* Floating Close Button */}
         <button
