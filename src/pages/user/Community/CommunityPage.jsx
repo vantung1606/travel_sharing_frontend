@@ -2763,8 +2763,9 @@ export const CommunityPage = () => {
                     </div>
                     
                     {isMe ? (
-                      <span className="px-2 py-0.5 rounded-sm bg-[#F3EDE2] text-[#5A5146] text-[10px] font-bold shrink-0">
-                        Bạn
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-[#F3EDE2] text-clay-800 border border-clay-300/60 text-[10.5px] font-extrabold shrink-0" title="Tài khoản của bạn đang đăng nhập">
+                        <span className="w-1.5 h-1.5 rounded-full bg-clay-600"></span>
+                        <span>Chính bạn</span>
                       </span>
                     ) : (
                       <button
@@ -2967,18 +2968,13 @@ export const CommunityPage = () => {
                     <span>Gắn thẻ bạn bè ({followingUsers.length})</span>
                   </button>
                 </div>
-                <RichTextToolbar
-                  textareaRef={postTextareaRef}
-                  value={postContent}
-                  onChange={(val) => setPostContent(val)}
-                />
                 <textarea
                   ref={postTextareaRef}
                   rows={4}
-                  placeholder="Chia sẻ kinh nghiệm, lưu ý quan trọng... (Hỗ trợ định dạng in đậm, nghiêng, trích dẫn, gõ @ để gắn thẻ)"
+                  placeholder="Chia sẻ trải nghiệm, kinh nghiệm du lịch hoặc cảm nghĩ của bạn... (Gõ @ để gắn thẻ bạn bè)"
                   value={postContent}
                   onChange={handlePostContentChange}
-                  className="w-full p-3 bg-[#F8F4EC] border border-[#1E1A15]/10 rounded-b-sm rounded-t-none border-t-0 text-xs text-[#2A241D] placeholder-[#8A7F70] focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 resize-none"
+                  className="w-full p-3.5 bg-[#F8F4EC] border border-[#1E1A15]/10 rounded-sm text-xs text-[#2A241D] placeholder-[#8A7F70] focus:outline-hidden focus:ring-2 focus:ring-clay-500/20 focus:border-clay-600 transition-all resize-none leading-relaxed"
                   required
                 />
 
@@ -3094,17 +3090,17 @@ export const CommunityPage = () => {
               </div>
 
               {/* ATTACH CHECK-IN PLACE SELECTOR */}
-              <div className="p-3.5 bg-emerald-50/70 border border-emerald-100 rounded-sm space-y-2">
+              <div className="p-3.5 bg-[#FAF6EE] border border-[#1E1A15]/10 rounded-sm space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-emerald-600" />
-                    <span>Gắn vị trí check-in địa điểm</span>
+                  <label className="text-xs font-bold text-[#1E1A15] flex items-center gap-1.5">
+                    <MapPin className="w-4 h-4 text-clay-600" />
+                    <span>Vị trí check-in địa điểm</span>
                   </label>
                   {attachedPlaceId && (
                     <button
                       type="button"
                       onClick={() => setAttachedPlaceId('')}
-                      className="text-[10px] text-rose-600 font-bold hover:underline"
+                      className="text-[10px] text-rose-600 font-bold hover:underline cursor-pointer"
                     >
                       Bỏ check-in
                     </button>
@@ -3120,7 +3116,7 @@ export const CommunityPage = () => {
                   searchPlaceholder="Tìm kiếm địa điểm hoặc gõ tên điểm mới để đề xuất..."
                   clearable={true}
                   onClear={() => setAttachedPlaceId('')}
-                  buttonClassName="bg-[#FFFDF8] border-emerald-200 py-2.5 rounded-sm text-xs font-semibold"
+                  buttonClassName="bg-[#FFFDF8] border-[#1E1A15]/15 hover:border-clay-600/50 py-2.5 rounded-sm text-xs font-semibold"
                   options={[
                     {
                       value: '',
@@ -3141,12 +3137,16 @@ export const CommunityPage = () => {
                   <div className={`p-3 rounded-sm border flex items-center gap-3 mt-2 ${
                     selectedPlacePreview.isCustom
                       ? 'bg-amber-50/80 border-amber-200'
-                      : 'bg-[#FFFDF8] border-emerald-100'
+                      : 'bg-[#FFFDF8] border-[#1E1A15]/10'
                   }`}>
                     <img
                       src={selectedPlacePreview.coverImageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'}
                       alt={selectedPlacePreview.name}
-                      className="w-12 h-12 rounded-sm object-cover flex-shrink-0"
+                      className="w-12 h-12 rounded-sm object-cover flex-shrink-0 border border-[#1E1A15]/10"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80';
+                      }}
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -3160,13 +3160,13 @@ export const CommunityPage = () => {
                         )}
                       </div>
                       <p className={`text-[11px] font-semibold truncate ${
-                        selectedPlacePreview.isCustom ? 'text-amber-800' : 'text-emerald-600'
+                        selectedPlacePreview.isCustom ? 'text-amber-800' : 'text-clay-700'
                       }`}>
                         📍 {selectedPlacePreview.address || selectedPlacePreview.city}
                       </p>
                     </div>
                     <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${
-                      selectedPlacePreview.isCustom ? 'text-amber-600' : 'text-emerald-500'
+                      selectedPlacePreview.isCustom ? 'text-amber-600' : 'text-clay-600'
                     }`} />
                   </div>
                 )}

@@ -250,34 +250,29 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
           {/* Content */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">Nội dung chia sẻ *</label>
-            <RichTextToolbar
-              textareaRef={editTextareaRef}
-              value={content}
-              onChange={setContent}
-              className="rounded-t-xl"
-            />
             <textarea
               ref={editTextareaRef}
               rows={4}
               value={content}
+              placeholder="Chia sẻ trải nghiệm, kinh nghiệm du lịch hoặc cảm nghĩ của bạn... (Gõ @ để gắn thẻ bạn bè)"
               onChange={e => setContent(e.target.value)}
-              className="w-full p-3 bg-slate-50 border border-slate-200 rounded-b-xl rounded-t-none border-t-0 text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 resize-none"
+              className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-clay-500/20 focus:border-clay-600 transition-all resize-none leading-relaxed"
               required
             />
           </div>
 
           {/* ATTACH CHECK-IN PLACE SELECTOR */}
-          <div className="p-3.5 bg-emerald-50/70 border border-emerald-100 rounded-2xl space-y-2">
+          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-emerald-600" />
-                <span>Gắn vị trí check-in địa điểm</span>
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <MapPin className="w-4 h-4 text-clay-600" />
+                <span>Vị trí check-in địa điểm</span>
               </label>
               {placeId && (
                 <button
                   type="button"
                   onClick={() => setPlaceId('')}
-                  className="text-[10px] text-rose-600 font-bold hover:underline"
+                  className="text-[10px] text-rose-600 font-bold hover:underline cursor-pointer"
                 >
                   Bỏ check-in
                 </button>
@@ -293,7 +288,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
               searchPlaceholder="Tìm kiếm địa điểm hoặc gõ tên điểm mới để đề xuất..."
               clearable={true}
               onClear={() => setPlaceId('')}
-              buttonClassName="bg-white border-emerald-200 py-2.5 rounded-xl text-xs font-semibold"
+              buttonClassName="bg-white border-slate-200 hover:border-clay-600/50 py-2.5 rounded-xl text-xs font-semibold"
               options={[
                 {
                   value: '',
@@ -314,12 +309,16 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
               <div className={`p-3 rounded-xl border flex items-center gap-3 mt-2 shadow-2xs ${
                 selectedPlace.isCustom
                   ? 'bg-amber-50/80 border-amber-200'
-                  : 'bg-white border-emerald-100'
+                  : 'bg-white border-slate-200'
               }`}>
                 <img
                   src={selectedPlace.coverImageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'}
                   alt={selectedPlace.name}
-                  className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                  className="w-12 h-12 rounded-lg object-cover flex-shrink-0 border border-slate-200"
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80';
+                  }}
                 />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 flex-wrap">
@@ -333,13 +332,13 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
                     )}
                   </div>
                   <p className={`text-[11px] font-semibold truncate ${
-                    selectedPlace.isCustom ? 'text-amber-800' : 'text-emerald-600'
+                    selectedPlace.isCustom ? 'text-amber-800' : 'text-clay-700'
                   }`}>
                     📍 {selectedPlace.address || selectedPlace.city}
                   </p>
                 </div>
                 <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${
-                  selectedPlace.isCustom ? 'text-amber-600' : 'text-emerald-500'
+                  selectedPlace.isCustom ? 'text-amber-600' : 'text-clay-600'
                 }`} />
               </div>
             )}

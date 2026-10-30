@@ -135,39 +135,43 @@ export const CustomSelect = ({
         type="button"
         disabled={disabled}
         onClick={() => !disabled && setIsOpen(prev => !prev)}
-        className={`w-full flex items-center justify-between gap-2 rounded-xl sm:rounded-2xl border transition-all cursor-pointer ${sizeClasses} ${
+        className={`w-full flex items-center justify-between gap-2 rounded-sm border transition-all cursor-pointer ${sizeClasses} ${
           disabled
-            ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed'
+            ? 'bg-[#F3EDE2] border-[#1E1A15]/10 text-[#8A7F70] cursor-not-allowed'
             : isOpen
-            ? 'bg-white border-sky-500 ring-3 ring-sky-500/15 shadow-sm text-slate-800'
-            : 'bg-white border-slate-200 hover:border-sky-300 text-slate-800 shadow-2xs hover:shadow-xs'
+            ? 'bg-[#FFFDF8] border-clay-600 ring-2 ring-clay-500/20 shadow-xs text-[#1E1A15]'
+            : 'bg-[#FFFDF8] border-[#1E1A15]/15 hover:border-clay-600/50 text-[#1E1A15] shadow-2xs hover:shadow-xs'
         } ${buttonClassName}`}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >
         <div className="flex items-center gap-2 min-w-0 flex-1 truncate">
           {LeadingIcon && (
-            <LeadingIcon className={`shrink-0 ${size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-sky-600`} />
+            <LeadingIcon className={`shrink-0 ${size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-clay-600`} />
           )}
 
           {selectedOption?.image && (
             <img
               src={selectedOption.image}
               alt=""
-              className="w-5 h-5 rounded-lg object-cover shrink-0 border border-slate-200"
+              className="w-5 h-5 rounded-sm object-cover shrink-0 border border-[#1E1A15]/10"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=150&q=80';
+              }}
             />
           )}
 
           {selectedOption?.icon && !LeadingIcon && (
-            <selectedOption.icon className={`shrink-0 ${size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-sky-600`} />
+            <selectedOption.icon className={`shrink-0 ${size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'} text-clay-600`} />
           )}
 
-          <span className={`truncate font-medium ${!selectedOption ? 'text-slate-400' : 'text-slate-800'}`}>
+          <span className={`truncate font-semibold ${!selectedOption ? 'text-[#8A7F70]' : 'text-[#1E1A15]'}`}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
 
           {selectedOption?.badge && (
-            <span className="shrink-0 text-[10px] px-1.5 py-0.2 rounded-md bg-sky-50 text-sky-700 font-bold border border-sky-100">
+            <span className="shrink-0 text-[10px] px-1.5 py-0.2 rounded-sm bg-[#F3EDE2] text-clay-800 font-extrabold border border-[#1E1A15]/10">
               {selectedOption.badge}
             </span>
           )}
@@ -179,15 +183,15 @@ export const CustomSelect = ({
               role="button"
               tabIndex={0}
               onClick={handleClear}
-              className="p-1 rounded-md text-slate-400 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+              className="p-1 rounded-sm text-[#8A7F70] hover:text-rose-600 hover:bg-rose-50 transition-colors"
               title="Xóa lựa chọn"
             >
               <X className="w-3.5 h-3.5" />
             </span>
           )}
           <ChevronDown
-            className={`w-4 h-4 text-slate-400 transition-transform duration-200 ${
-              isOpen ? 'rotate-180 text-sky-600' : ''
+            className={`w-4 h-4 text-[#8A7F70] transition-transform duration-200 ${
+              isOpen ? 'rotate-180 text-clay-600' : ''
             }`}
           />
         </div>
@@ -196,21 +200,21 @@ export const CustomSelect = ({
       {/* Floating Options Dropdown */}
       {isOpen && (
         <div
-          className={`absolute left-0 right-0 mt-1.5 z-50 bg-white rounded-2xl border border-slate-200/90 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 ring-1 ring-black/5 ${dropdownClassName}`}
+          className={`absolute left-0 right-0 mt-1.5 z-50 bg-[#FFFDF8] rounded-sm border border-[#1E1A15]/15 shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150 ring-1 ring-black/5 ${dropdownClassName}`}
           style={{ minWidth: '100%' }}
         >
           {/* Optional Search bar */}
           {searchable && (
-            <div className="p-2 border-b border-slate-100 bg-slate-50/50">
+            <div className="p-2 border-b border-[#1E1A15]/10 bg-[#FAF6EE]">
               <div className="relative">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-3.5 h-3.5 text-[#8A7F70] absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   ref={searchInputRef}
                   type="text"
                   placeholder={searchPlaceholder}
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-sky-500 focus:ring-2 focus:ring-sky-500/15"
+                  className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#FFFDF8] border border-[#1E1A15]/15 rounded-sm text-[#1E1A15] placeholder-[#8A7F70] outline-hidden focus:outline-hidden focus:border-clay-600 focus:ring-1 focus:ring-clay-500/20 font-medium"
                 />
               </div>
             </div>
@@ -219,7 +223,7 @@ export const CustomSelect = ({
           {/* Options List */}
           <div className="max-h-64 overflow-y-auto p-1.5 space-y-0.5 custom-dropdown-scroll">
             {filteredOptions.length === 0 ? (
-              <div className="px-3 py-5 text-center text-xs text-slate-400">
+              <div className="px-3 py-5 text-center text-xs text-[#8A7F70]">
                 Không tìm thấy tùy chọn phù hợp
               </div>
             ) : (
@@ -231,12 +235,12 @@ export const CustomSelect = ({
                   <div
                     key={String(opt.value)}
                     onClick={() => handleSelect(opt)}
-                    className={`flex items-center justify-between gap-2.5 px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer ${
+                    className={`flex items-center justify-between gap-2.5 px-3 py-2 rounded-sm text-xs transition-colors cursor-pointer ${
                       opt.disabled
                         ? 'opacity-40 cursor-not-allowed'
                         : isSelected
-                        ? 'bg-sky-50/80 text-sky-700 font-bold'
-                        : 'text-slate-700 hover:bg-slate-100/80 hover:text-slate-900 font-medium'
+                        ? 'bg-[#F3EDE2] text-clay-800 font-extrabold border-l-2 border-clay-600'
+                        : 'text-[#3B332A] hover:bg-[#FAF6EE] hover:text-[#1E1A15] font-medium'
                     }`}
                   >
                     <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -244,12 +248,16 @@ export const CustomSelect = ({
                         <img
                           src={opt.image}
                           alt=""
-                          className="w-7 h-7 rounded-lg object-cover shrink-0 border border-slate-200 shadow-2xs"
+                          className="w-7 h-7 rounded-sm object-cover shrink-0 border border-[#1E1A15]/10 shadow-2xs"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=150&q=80';
+                          }}
                         />
                       )}
 
                       {IconComponent && (
-                        <div className={`p-1.5 rounded-lg shrink-0 ${isSelected ? 'bg-sky-100 text-sky-700' : 'bg-slate-100 text-slate-500'}`}>
+                        <div className={`p-1.5 rounded-sm shrink-0 ${isSelected ? 'bg-clay-100 text-clay-700' : 'bg-[#F3EDE2] text-[#6B6154]'}`}>
                           <IconComponent className="w-3.5 h-3.5" />
                         </div>
                       )}
@@ -258,13 +266,13 @@ export const CustomSelect = ({
                         <div className="flex items-center gap-1.5">
                           <span className="truncate">{opt.label}</span>
                           {opt.badge && (
-                            <span className="shrink-0 text-[10px] px-1.5 py-0.2 rounded-md bg-slate-100 text-slate-600 font-bold">
+                            <span className="shrink-0 text-[10px] px-1.5 py-0.2 rounded-sm bg-[#F3EDE2] text-[#5A5146] font-bold border border-[#1E1A15]/10">
                               {opt.badge}
                             </span>
                           )}
                         </div>
                         {opt.description && (
-                          <p className="text-[11px] text-slate-400 truncate font-normal mt-0.5">
+                          <p className="text-[11px] text-[#8A7F70] truncate font-normal mt-0.5">
                             {opt.description}
                           </p>
                         )}
@@ -272,7 +280,7 @@ export const CustomSelect = ({
                     </div>
 
                     {isSelected && (
-                      <Check className="w-4 h-4 text-sky-600 shrink-0" />
+                      <Check className="w-4 h-4 text-clay-600 shrink-0" />
                     )}
                   </div>
                 );
