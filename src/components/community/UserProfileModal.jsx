@@ -440,10 +440,26 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                                 {post.locationTag && (
                                   <>
                                     <span>•</span>
-                                    <span className="flex items-center gap-0.5 text-ink-600 font-medium truncate">
-                                      <MapPin className="w-3 h-3 text-clay-600 shrink-0" />
-                                      {post.locationTag}
-                                    </span>
+                                    {post.placeId ? (
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          onClose();
+                                          navigate(`/places/${post.placeId}`);
+                                        }}
+                                        className="inline-flex items-center gap-0.5 text-blue-600 hover:text-blue-800 hover:underline font-semibold cursor-pointer truncate"
+                                        title={`Xem chi tiết địa điểm ${post.locationTag}`}
+                                      >
+                                        <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
+                                        {post.locationTag}
+                                      </button>
+                                    ) : (
+                                      <span className="flex items-center gap-0.5 text-ink-600 font-medium truncate">
+                                        <MapPin className="w-3 h-3 text-clay-600 shrink-0" />
+                                        {post.locationTag}
+                                      </span>
+                                    )}
                                   </>
                                 )}
                               </p>
@@ -486,51 +502,64 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                         </div>
 
                         {/* Image Gallery */}
-                        {post.images && post.images.length > 0 && (
-                          <div
-                            onClick={() =>
-                              setSelectedPostForDetail({
-                                ...post,
-                                authorName: profile.fullName,
-                                authorAvatar: profile.avatarUrl,
-                                authorHandle: profile.handle,
-                                authorRole: profile.role,
-                                authorId: profile.id
-                              })
-                            }
-                            className="cursor-pointer overflow-hidden rounded-[5px]"
-                          >
-                            {post.images.length === 1 ? (
-                              <img
-                                src={post.images[0]}
-                                alt="Post photo"
-                                className="w-full max-h-80 sm:max-h-96 object-cover rounded-[5px] hover:scale-[1.01] transition-transform duration-300"
-                              />
-                            ) : post.images.length === 2 ? (
-                              <div className="grid grid-cols-2 gap-2 h-52 sm:h-64 rounded-[5px] overflow-hidden">
-                                {post.images.slice(0, 2).map((img, idx) => (
-                                  <img
-                                    key={idx}
-                                    src={img}
-                                    alt={`Photo ${idx}`}
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                  />
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="grid grid-cols-3 gap-2 h-44 sm:h-52 rounded-[5px] overflow-hidden">
-                                {post.images.slice(0, 3).map((img, idx) => (
-                                  <img
-                                    key={idx}
-                                    src={img}
-                                    alt={`Photo ${idx}`}
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                  />
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
+                        {(() => {
+                          const validImages = (post.images || []).filter(img =>
+                            typeof img === 'string' &&
+                            img.trim().length > 10 &&
+                            (img.trim().startsWith('http://') || img.trim().startsWith('https://') || img.trim().startsWith('blob:') || img.trim().startsWith('data:image/'))
+                          );
+
+                          if (validImages.length === 0) return null;
+
+                          return (
+                            <div
+                              onClick={() =>
+                                setSelectedPostForDetail({
+                                  ...post,
+                                  authorName: profile.fullName,
+                                  authorAvatar: profile.avatarUrl,
+                                  authorHandle: profile.handle,
+                                  authorRole: profile.role,
+                                  authorId: profile.id
+                                })
+                              }
+                              className="cursor-pointer overflow-hidden rounded-[5px]"
+                            >
+                              {validImages.length === 1 ? (
+                                <img
+                                  src={validImages[0]}
+                                  alt="Post photo"
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                  className="w-full max-h-80 sm:max-h-96 object-cover rounded-[5px] hover:scale-[1.01] transition-transform duration-300"
+                                />
+                              ) : validImages.length === 2 ? (
+                                <div className="grid grid-cols-2 gap-2 h-52 sm:h-64 rounded-[5px] overflow-hidden">
+                                  {validImages.slice(0, 2).map((img, idx) => (
+                                    <img
+                                      key={idx}
+                                      src={img}
+                                      alt={`Photo ${idx}`}
+                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    />
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="grid grid-cols-3 gap-2 h-44 sm:h-52 rounded-[5px] overflow-hidden">
+                                  {validImages.slice(0, 3).map((img, idx) => (
+                                    <img
+                                      key={idx}
+                                      src={img}
+                                      alt={`Photo ${idx}`}
+                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
 
                         {/* Attached Itinerary Preview */}
                         {(post.itineraryId || post.itineraryTitle) && (

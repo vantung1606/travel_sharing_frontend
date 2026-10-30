@@ -435,11 +435,17 @@ export const PostDetailModal = ({
   };
 
   // Collect images
-  const images = (post?.images && post.images.length > 0)
+  const rawImages = (post?.images && post.images.length > 0)
     ? post.images
     : post?.imageUrl
     ? [post.imageUrl]
     : [];
+
+  const images = rawImages.filter(img =>
+    typeof img === 'string' &&
+    img.trim().length > 10 &&
+    (img.trim().startsWith('http://') || img.trim().startsWith('https://') || img.trim().startsWith('blob:') || img.trim().startsWith('data:image/'))
+  );
 
   const authorName = post?.authorName || post?.author?.fullName || 'Thành viên Wayfare';
   const authorAvatar = post?.authorAvatar || post?.author?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
@@ -550,10 +556,35 @@ export const PostDetailModal = ({
                   </div>
                 ) : null}
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
+              <div className="flex items-center gap-2 text-xs text-slate-400 font-medium flex-wrap">
                 <span>{authorHandle}</span>
                 <span>•</span>
                 <span>{formatDisplayTimeAgo(post?.createdAt, post?.timeAgo)}</span>
+                {post?.locationTag && (
+                  <>
+                    <span>•</span>
+                    {post?.placeId ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onClose();
+                          navigate(`/places/${post.placeId}`);
+                        }}
+                        className="inline-flex items-center gap-0.5 text-blue-600 hover:text-blue-800 hover:underline font-semibold cursor-pointer"
+                        title={`Xem chi tiết địa điểm ${post.locationTag}`}
+                      >
+                        <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
+                        <span>{post.locationTag}</span>
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-0.5 text-slate-500">
+                        <MapPin className="w-3 h-3 text-blue-500 shrink-0" />
+                        <span>{post.locationTag}</span>
+                      </span>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -787,18 +818,7 @@ export const PostDetailModal = ({
                     </div>
                   )}
 
-                  {/* Original Attached Place Check-in */}
-                  {(post.sharedPost.placeId || post.sharedPost.placeName) && (
-                    <div className="mt-2.5">
-                      <PlaceAttachCard
-                        post={post.sharedPost}
-                        onNavigatePlace={(pid) => {
-                          onClose();
-                          navigate(`/places/${pid}`);
-                        }}
-                      />
-                    </div>
-                  )}
+
                 </div>
               </div>
             ) : (
@@ -832,6 +852,7 @@ export const PostDetailModal = ({
                       <img
                         src={images[activeImageIndex]}
                         alt={`Ảnh ${activeImageIndex + 1}`}
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
                         onClick={() => setIsLightboxOpen(true)}
                         className="w-full max-h-[460px] object-contain mx-auto transition-transform duration-300 cursor-zoom-in hover:scale-[1.01]"
                         title="Bấm để xem ảnh phóng to toàn màn hình"
@@ -947,18 +968,7 @@ export const PostDetailModal = ({
                   </div>
                 )}
 
-                {/* Attached Check-in Place Card */}
-                {(post.placeId || post.placeName) && (
-                  <div className="mt-3">
-                    <PlaceAttachCard
-                      post={post}
-                      onNavigatePlace={(pid) => {
-                        onClose();
-                        navigate(`/places/${pid}`);
-                      }}
-                    />
-                  </div>
-                )}
+
               </>
             )}
 

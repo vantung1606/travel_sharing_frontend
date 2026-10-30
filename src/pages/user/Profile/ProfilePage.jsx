@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../../context/AppContext';
 import { userApi, itineraryApi, uploadApi } from '../../../services/api';
 import { FollowListModal } from '../../../components/community/FollowListModal';
@@ -14,6 +15,7 @@ import { TIERS, calculateUserXP, getUserTier, getNextTier, calculateTierProgress
 import { formatDisplayDateTime } from '../../../utils/dateUtils';
 
 export const ProfilePage = () => {
+  const navigate = useNavigate();
   const { currentUser, updateCurrentUser, itineraries, posts, destinations, savedPlaces = [], toggleSavePlace = () => {}, setIsAIGeneratorOpen, setUserTab, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
   const toast = useToast();
 
@@ -872,10 +874,25 @@ export const ProfilePage = () => {
                               {locationText && (
                                 <>
                                   <span className="text-ink-300">•</span>
-                                  <span className="flex items-center gap-0.5 text-ink-600 font-medium truncate">
-                                    <MapPin className="w-3 h-3 text-clay-600 shrink-0" />
-                                    {locationText}
-                                  </span>
+                                  {post.placeId ? (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(`/places/${post.placeId}`);
+                                      }}
+                                      className="flex items-center gap-0.5 text-clay-700 hover:text-clay-800 hover:underline font-semibold truncate transition-colors text-left"
+                                      title="Bấm để xem chi tiết địa điểm"
+                                    >
+                                      <MapPin className="w-3 h-3 text-clay-600 shrink-0" />
+                                      <span className="truncate">{locationText}</span>
+                                    </button>
+                                  ) : (
+                                    <span className="flex items-center gap-0.5 text-ink-600 font-medium truncate">
+                                      <MapPin className="w-3 h-3 text-clay-600 shrink-0" />
+                                      <span className="truncate">{locationText}</span>
+                                    </span>
+                                  )}
                                 </>
                               )}
                             </p>
@@ -909,42 +926,49 @@ export const ProfilePage = () => {
                       </div>
 
                       {/* Image Gallery */}
-                      {post.images && post.images.length > 0 && (
-                        <div
-                          onClick={() => setSelectedPostForDetail(post)}
-                          className="cursor-pointer overflow-hidden rounded-[6px]"
-                        >
-                          {post.images.length === 1 ? (
-                            <img
-                              src={post.images[0]}
-                              alt="Post photo"
-                              className="w-full max-h-72 sm:max-h-80 object-cover rounded-[6px] hover:scale-[1.01] transition-transform duration-300"
-                            />
-                          ) : post.images.length === 2 ? (
-                            <div className="grid grid-cols-2 gap-2 h-48 sm:h-56 rounded-[6px] overflow-hidden">
-                              {post.images.slice(0, 2).map((img, idx) => (
-                                <img
-                                  key={idx}
-                                  src={img}
-                                  alt={`Photo ${idx}`}
-                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                />
-                              ))}
-                            </div>
-                          ) : (
-                            <div className="grid grid-cols-3 gap-2 h-40 sm:h-48 rounded-[6px] overflow-hidden">
-                              {post.images.slice(0, 3).map((img, idx) => (
-                                <img
-                                  key={idx}
-                                  src={img}
-                                  alt={`Photo ${idx}`}
-                                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                />
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      {(() => {
+                        const validImages = (post.images || []).filter(img => typeof img === 'string' && img.trim().length > 10 && !img.includes('undefined') && !img.includes('null') && (img.startsWith('http') || img.startsWith('blob:') || img.startsWith('data:image/')));
+                        if (validImages.length === 0) return null;
+                        return (
+                          <div
+                            onClick={() => setSelectedPostForDetail(post)}
+                            className="cursor-pointer overflow-hidden rounded-[6px]"
+                          >
+                            {validImages.length === 1 ? (
+                              <img
+                                src={validImages[0]}
+                                alt="Post photo"
+                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                className="w-full max-h-72 sm:max-h-80 object-cover rounded-[6px] hover:scale-[1.01] transition-transform duration-300"
+                              />
+                            ) : validImages.length === 2 ? (
+                              <div className="grid grid-cols-2 gap-2 h-48 sm:h-56 rounded-[6px] overflow-hidden">
+                                {validImages.slice(0, 2).map((img, idx) => (
+                                  <img
+                                    key={idx}
+                                    src={img}
+                                    alt={`Photo ${idx}`}
+                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                  />
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-3 gap-2 h-40 sm:h-48 rounded-[6px] overflow-hidden">
+                                {validImages.slice(0, 3).map((img, idx) => (
+                                  <img
+                                    key={idx}
+                                    src={img}
+                                    alt={`Photo ${idx}`}
+                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                  />
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
 
                       {/* Attached Itinerary Preview */}
                       {(post.itineraryId || post.itineraryTitle) && (
