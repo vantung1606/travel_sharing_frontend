@@ -9,6 +9,7 @@ import { FollowListModal } from './FollowListModal';
 import { ItineraryDetailModal } from '../itinerary/ItineraryDetailModal';
 import { UserAvatar } from '../common/UserAvatar';
 import { getUserTier } from '../../utils/tierSystem';
+import { formatDisplayDateTime, formatDisplayTimeAgo } from '../../utils/dateUtils';
 import { UniversalReportModal } from '../common/UniversalReportModal';
 
 export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
@@ -431,11 +432,11 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
                                   {post.authorName || profile.fullName}
                                 </span>
                                 <span className="px-1.5 py-0.2 rounded-[3px] bg-clay-50 text-clay-800 text-[10px] font-bold border border-clay-200/80">
-                                  {post.authorRole || profile.role || 'Wanderer Gold'}
+                                  {profile.rank || profile.role || 'Tân Thủ Khám Phá'}
                                 </span>
                               </div>
                               <p className="text-[11px] text-ink-400 flex items-center gap-1.5 mt-0.5 font-serif">
-                                <span>{post.formattedDate || post.timeAgo || 'Vừa xong'}</span>
+                                <span>{formatDisplayDateTime(post.createdAt, post.formattedDate || post.timeAgo)}</span>
                                 {post.locationTag && (
                                   <>
                                     <span>•</span>

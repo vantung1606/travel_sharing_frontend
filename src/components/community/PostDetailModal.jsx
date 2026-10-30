@@ -12,6 +12,7 @@ import { PlaceAttachCard } from './PlaceAttachCard';
 import { PostLikersModal } from './PostLikersModal';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from './MentionSuggestions';
 import { RichPostContent } from './RichTextToolbar';
+import { formatDisplayDateTime, formatDisplayTimeAgo } from '../../utils/dateUtils';
 
 export const PostDetailModal = ({
   postId,
@@ -552,7 +553,7 @@ export const PostDetailModal = ({
               <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
                 <span>{authorHandle}</span>
                 <span>•</span>
-                <span>{post?.formattedDate || post?.timeAgo || 'Vừa xong'}</span>
+                <span>{formatDisplayDateTime(post?.createdAt, post?.formattedDate || post?.timeAgo)}</span>
               </div>
             </div>
           </div>

@@ -20,6 +20,8 @@ import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../com
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RichPostContent } from '../../../components/community/RichTextToolbar';
 import { ProposePlaceModal } from '../../../components/community/ProposePlaceModal';
+import { getUserTier } from '../../../utils/tierSystem';
+import { formatDisplayDateTime, formatDisplayTimeAgo } from '../../../utils/dateUtils';
 import { AtSign, Heart, MessageCircle, MessageSquare, Share2, Bookmark, MapPin, Award, TrendingUp, Compass, Route, Copy, DollarSign, Camera, Image as ImageIcon, CheckCircle2, Send, Search, SlidersHorizontal, Filter, Plus, PlusCircle, X, Loader2, Eye, MoreHorizontal, ChevronLeft, ChevronRight, ArrowRight, Flame, Check, UserCheck, ShieldCheck, AlertCircle, AlertTriangle, ShieldAlert, Lock, Globe, Upload, Video, Trash2, Edit, UserPlus, CornerDownRight, Flag, EyeOff, BookOpen } from 'lucide-react';
 
 const FEED_SCOPES = [
@@ -1439,10 +1441,15 @@ export const CommunityPage = () => {
                   <div className="min-w-0 flex-1">
                     <h3 className="font-extrabold text-sm text-[#1E1A15] truncate">{currentUser?.name}</h3>
                     <p className="text-xs text-[#6B6154] truncate">{currentUser?.handle || '@wanderer'}</p>
-                    <div className="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-sm bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] font-bold">
-                      <Award className="w-3 h-3 text-amber-600" />
-                      <span>Wanderer Diamond</span>
-                    </div>
+                    {(() => {
+                      const tier = getUserTier(currentUser);
+                      return (
+                        <div className={`inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-sm text-[10px] font-bold border ${tier.badgeBg}`}>
+                          <span>{tier.icon}</span>
+                          <span>{tier.name}</span>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
 
@@ -1996,7 +2003,7 @@ export const CommunityPage = () => {
 
                         {/* Row 2: Metadata (Time · Location · Category · Globe icon) */}
                         <div className="text-[11px] sm:text-xs text-[#6B6154] flex items-center gap-1 mt-0.5 font-normal flex-wrap">
-                          <span>{post.timeAgo || 'Vừa xong'}</span>
+                          <span>{formatDisplayTimeAgo(post.createdAt, post.timeAgo)}</span>
                           {post.locationTag && (
                             <>
                               <span className="text-[#B3A895]">·</span>
@@ -2245,7 +2252,7 @@ export const CommunityPage = () => {
                               )}
                             </div>
                             <div className="flex items-center gap-1.5 text-xs text-[#8A7F70] font-medium mt-0.5">
-                              <span>{post.sharedPost.formattedDate || post.sharedPost.timeAgo || 'Vừa xong'}</span>
+                              <span>{formatDisplayDateTime(post.sharedPost.createdAt, post.sharedPost.formattedDate || post.sharedPost.timeAgo)}</span>
                               <span>•</span>
                               <Globe className="w-3 h-3 text-[#8A7F70]" />
                               {post.sharedPost.locationTag && (

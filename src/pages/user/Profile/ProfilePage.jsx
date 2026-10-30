@@ -11,6 +11,7 @@ import { TierPromotionModal } from '../../../components/common/TierPromotionModa
 import { TravelFootprintSection } from '../../../components/profile/TravelFootprintSection';
 import { ChangePasswordModal } from '../../../components/profile/ChangePasswordModal';
 import { TIERS, calculateUserXP, getUserTier, getNextTier, calculateTierProgress, checkTierPromotion } from '../../../utils/tierSystem';
+import { formatDisplayDateTime } from '../../../utils/dateUtils';
 
 export const ProfilePage = () => {
   const { currentUser, updateCurrentUser, itineraries, posts, destinations, savedPlaces = [], toggleSavePlace = () => {}, setIsAIGeneratorOpen, setUserTab, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
@@ -837,8 +838,8 @@ export const ProfilePage = () => {
               {displayPosts.map(post => {
                 const authorName = post.authorName || post.author?.name || profileName || currentUser.name;
                 const authorAvatar = post.authorAvatar || post.author?.avatar || currentUser.avatar;
-                const authorRole = post.authorRole || 'Wanderer Gold';
-                const timeDisplay = post.formattedDate || post.timeAgo || 'Vừa xong';
+                const authorRole = post.authorRole || currentUser?.rank || getUserTier(currentUser).name;
+                const timeDisplay = formatDisplayDateTime(post.createdAt, post.formattedDate || post.timeAgo);
                 const locationText = post.locationTag || post.location || 'Việt Nam';
                 const likeCount = post.likeCount ?? post.likes ?? 0;
                 const commentCount = post.commentCount ?? post.commentsCount ?? 0;

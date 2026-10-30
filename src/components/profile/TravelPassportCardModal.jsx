@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { X, Copy, Check, QrCode, Download, ShieldCheck, Sparkles, MapPin, Calendar, Compass, Share2 } from 'lucide-react';
 
+import { getUserTier } from '../../utils/tierSystem';
+
 export const TravelPassportCardModal = ({ user, profileData, onClose }) => {
   const [copied, setCopied] = useState(false);
 
@@ -16,7 +18,7 @@ export const TravelPassportCardModal = ({ user, profileData, onClose }) => {
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const memberRank = profileData?.rank || profileData?.role || 'Wanderer Gold';
+  const memberRank = profileData?.rank || profileData?.role || getUserTier(profileData || user).name;
   const followersCount = profileData?.followersCount || user?.followersCount || 0;
   const itinsCount = profileData?.itineraries?.length || 0;
   const postsCount = profileData?.posts?.length || 0;

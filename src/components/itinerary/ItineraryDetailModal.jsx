@@ -305,6 +305,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [selectedMapPoint, setSelectedMapPoint] = useState(null);
   const [isMapFullscreen, setIsMapFullscreen] = useState(false);
+  const [mapLayer, setMapLayer] = useState('standard'); // 'standard' | 'satellite' | 'topo'
   const [isTogglingVisibility, setIsTogglingVisibility] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
