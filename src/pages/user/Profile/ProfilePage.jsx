@@ -4,6 +4,7 @@ import { useApp } from '../../../context/AppContext';
 import { userApi, itineraryApi, uploadApi } from '../../../services/api';
 import { FollowListModal } from '../../../components/community/FollowListModal';
 import { PostDetailModal } from '../../../components/community/PostDetailModal';
+import { UserProfileModal } from '../../../components/community/UserProfileModal';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { TravelPassportCardModal } from '../../../components/profile/TravelPassportCardModal';
 import { useToast } from '../../../components/common/Toast';
@@ -87,6 +88,7 @@ export const ProfilePage = () => {
   // Modals & cloning state
   const [selectedPostForDetail, setSelectedPostForDetail] = useState(null);
   const [selectedItineraryForModal, setSelectedItineraryForModal] = useState(null);
+  const [selectedUserIdForModal, setSelectedUserIdForModal] = useState(null);
 
 
   // Follow State & Modal
@@ -1628,6 +1630,9 @@ export const ProfilePage = () => {
             setFollowModalState(prev => ({ ...prev, isOpen: false }));
             loadFollowCounts();
           }}
+          onSelectUser={(targetUserId) => {
+            setSelectedUserIdForModal(targetUserId);
+          }}
           onFollowChange={() => {
             loadFollowCounts();
           }}
@@ -1647,8 +1652,23 @@ export const ProfilePage = () => {
         <PostDetailModal
           post={selectedPostForDetail}
           onClose={() => setSelectedPostForDetail(null)}
+          onAuthorClick={(authorId) => {
+            setSelectedUserIdForModal(authorId);
+          }}
           onSelectItinerary={(itin) => {
             setSelectedPostForDetail(null);
+            setSelectedItineraryForModal(itin);
+          }}
+        />
+      )}
+
+      {/* User Profile Modal (Xem thông tin trang cá nhân người khác) */}
+      {selectedUserIdForModal && (
+        <UserProfileModal
+          userId={selectedUserIdForModal}
+          onClose={() => setSelectedUserIdForModal(null)}
+          onSelectItinerary={(itin) => {
+            setSelectedUserIdForModal(null);
             setSelectedItineraryForModal(itin);
           }}
         />

@@ -225,7 +225,7 @@ export const FollowListModal = ({
                   <div
                     onClick={() => {
                       if (typeof onSelectUser === 'function') {
-                        onSelectUser(u.id);
+                        onSelectUser(u.id || u.userId);
                       }
                     }}
                     className="flex items-center gap-3 min-w-0 cursor-pointer group flex-1"

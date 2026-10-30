@@ -1885,7 +1885,7 @@ export const CommunityPage = () => {
               const cleanAuthorName = rawAuthorName.replace(/\s*\([^)]*\)\s*$/, '').trim();
               const authorName = cleanAuthorName;
               const authorAvatar = post.authorAvatar || post.author?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80';
-              const authorId = post.authorId || post.author?.id;
+              const authorId = post.authorId || post.author?.id || post.userId || post.author?.userId || post.creatorId;
               const authorEmail = post.authorEmail || post.author?.email || '';
               const authorHandle = post.authorHandle || post.author?.handle || '';
 
@@ -1962,7 +1962,7 @@ export const CommunityPage = () => {
                               <strong
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const origAuthorId = post.sharedPost.authorId || post.sharedPost.author?.id;
+                                  const origAuthorId = post.sharedPost.authorId || post.sharedPost.author?.id || post.sharedPost.userId || post.sharedPost.author?.userId;
                                   if (origAuthorId) setSelectedUserIdForModal(origAuthorId);
                                 }}
                                 className="font-bold text-[#1E1A15] hover:text-blue-600 hover:underline transition-colors cursor-pointer"
@@ -2235,25 +2235,35 @@ export const CommunityPage = () => {
                       >
                         {/* Original Author Header */}
                         <div className="flex items-center gap-3">
-                          <UserAvatar
-                            user={{
-                              id: post.sharedPost.authorId || post.sharedPost.author?.id,
-                              fullName: post.sharedPost.authorName || post.sharedPost.author?.fullName,
-                              avatarUrl: post.sharedPost.authorAvatar || post.sharedPost.author?.avatar,
-                              email: post.sharedPost.authorEmail || post.sharedPost.author?.email,
-                              tier: post.sharedPost.authorTier,
-                              role: post.sharedPost.authorRole,
-                              isVerified: true
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const origId = post.sharedPost.authorId || post.sharedPost.author?.id || post.sharedPost.userId || post.sharedPost.author?.userId;
+                              if (origId) setSelectedUserIdForModal(origId);
                             }}
-                            size="sm"
-                            showBadge={true}
-                          />
+                            className="cursor-pointer shrink-0"
+                            title="Xem trang cá nhân tác giả gốc"
+                          >
+                            <UserAvatar
+                              user={{
+                                id: post.sharedPost.authorId || post.sharedPost.author?.id || post.sharedPost.userId,
+                                fullName: post.sharedPost.authorName || post.sharedPost.author?.fullName,
+                                avatarUrl: post.sharedPost.authorAvatar || post.sharedPost.author?.avatar,
+                                email: post.sharedPost.authorEmail || post.sharedPost.author?.email,
+                                tier: post.sharedPost.authorTier,
+                                role: post.sharedPost.authorRole,
+                                isVerified: true
+                              }}
+                              size="sm"
+                              showBadge={true}
+                            />
+                          </div>
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const origId = post.sharedPost.authorId || post.sharedPost.author?.id;
+                                  const origId = post.sharedPost.authorId || post.sharedPost.author?.id || post.sharedPost.userId || post.sharedPost.author?.userId;
                                   if (origId) setSelectedUserIdForModal(origId);
                                 }}
                                 className="font-bold text-sm text-[#1E1A15] group-hover:text-blue-600 transition-colors cursor-pointer"
@@ -2788,7 +2798,7 @@ export const CommunityPage = () => {
                     className="flex items-center justify-between gap-2.5 p-1 rounded-sm hover:bg-[#F8F4EC] transition-colors"
                   >
                     <div
-                      onClick={() => setSelectedUserIdForModal(author.id)}
+                      onClick={() => setSelectedUserIdForModal(author.id || author.userId)}
                       className="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer group"
                       title="Bấm để xem hồ sơ"
                     >
@@ -3892,7 +3902,8 @@ export const CommunityPage = () => {
           onClose={() => setLikersPost(null)}
           onSelectUser={(u) => {
             setLikersPost(null);
-            if (u?.id) setSelectedUserIdForModal(u.id);
+            const targetId = typeof u === 'object' && u !== null ? (u.id || u.userId) : u;
+            if (targetId) setSelectedUserIdForModal(targetId);
           }}
           onFollowChange={(targetUserId, isNowFollowing) => {
             setFollowingIds(prev => {

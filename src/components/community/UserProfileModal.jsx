@@ -14,6 +14,9 @@ import { UniversalReportModal } from '../common/UniversalReportModal';
 
 export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   const navigate = useNavigate();
+  const [activeUserId, setActiveUserId] = useState(() => {
+    return typeof userId === 'object' && userId !== null ? (userId.id || userId.userId) : userId;
+  });
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [followLoading, setFollowLoading] = useState(false);
@@ -26,6 +29,14 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
 
   const toast = useToast();
   const { currentUser, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
+
+  // Keep activeUserId updated if parent prop changes
+  useEffect(() => {
+    const rawId = typeof userId === 'object' && userId !== null ? (userId.id || userId.userId) : userId;
+    if (rawId) {
+      setActiveUserId(rawId);
+    }
+  }, [userId]);
 
   // Require auth guard helper for guests
   const requireAuth = (actionName = 'thực hiện thao tác này') => {
@@ -40,28 +51,36 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
 
   useEffect(() => {
     let isMounted = true;
+    const targetId = activeUserId;
+    if (!targetId) {
+      setLoading(false);
+      setProfile(null);
+      return;
+    }
+
     const loadProfile = async () => {
       try {
         setLoading(true);
-        const data = await userApi.getProfile(userId);
+        const data = await userApi.getProfile(targetId);
         if (isMounted) {
           setProfile(data);
         }
       } catch (err) {
         console.error('Lỗi khi tải trang cá nhân:', err);
-        toast.showError('Không thể tải thông tin người dùng: ' + err.message);
+        if (isMounted) {
+          setProfile(null);
+          toast.showError('Không thể tải thông tin người dùng: ' + (err.message || 'Lỗi kết nối'));
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
     };
 
-    if (userId) {
-      loadProfile();
-    }
+    loadProfile();
     return () => {
       isMounted = false;
     };
-  }, [userId]);
+  }, [activeUserId]);
 
   const handleToggleFollow = async () => {
     if (!profile) return;
@@ -153,7 +172,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-ink-950/70 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[90] flex items-center justify-center p-3 sm:p-4 bg-ink-950/70 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="bg-[#FFFDF8] rounded-[6px] max-w-3xl sm:max-w-4xl w-full shadow-2xl border border-ink-200/80 max-h-[92vh] flex flex-col overflow-hidden relative animate-in zoom-in-95 duration-200">
         
 
@@ -746,7 +765,25 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
 
             </div>
           </div>
-        ) : null}
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center py-20 px-6 text-center space-y-3">
+            <div className="w-14 h-14 rounded-2xl bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-center text-ink-400 shadow-2xs">
+              <Users className="w-7 h-7 text-clay-600" />
+            </div>
+            <h4 className="text-base font-bold text-ink-800 font-display">
+              Không thể tải thông tin người dùng
+            </h4>
+            <p className="text-xs text-ink-500 max-w-sm font-serif">
+              Tài khoản này có thể chưa được kích hoạt hoặc thông tin cá nhân tạm thời không khả dụng trên hệ thống.
+            </p>
+            <button
+              onClick={onClose}
+              className="mt-2 px-5 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white text-xs font-bold transition-colors cursor-pointer shadow-xs"
+            >
+              Đóng hồ sơ
+            </button>
+          </div>
+        )}
 
       </div>
 
@@ -756,7 +793,12 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
           post={selectedPostForDetail}
           onClose={() => setSelectedPostForDetail(null)}
           onSelectItinerary={onSelectItinerary}
-          onAuthorClick={() => setSelectedPostForDetail(null)}
+          onAuthorClick={(authorId) => {
+            setSelectedPostForDetail(null);
+            if (authorId) {
+              setActiveUserId(authorId);
+            }
+          }}
         />
       )}
 
@@ -777,8 +819,8 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
           onClose={() => setFollowModalState(prev => ({ ...prev, isOpen: false }))}
           onSelectUser={(newUserId) => {
             setFollowModalState(prev => ({ ...prev, isOpen: false }));
-            if (typeof onClose === 'function') {
-              onClose();
+            if (newUserId) {
+              setActiveUserId(newUserId);
             }
           }}
         />

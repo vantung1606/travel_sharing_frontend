@@ -63,7 +63,7 @@ export const PostDetailModal = ({
   };
 
   const effectivePostId = post?.id || postId;
-  const effectiveAuthorId = post?.authorId || post?.author?.id;
+  const effectiveAuthorId = post?.authorId || post?.author?.id || post?.userId || post?.author?.userId || post?.creatorId;
 
   const navigate = useNavigate();
 
@@ -469,8 +469,8 @@ export const PostDetailModal = ({
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => {
-                if (typeof onAuthorClick === 'function' && authorId) {
-                  onAuthorClick(authorId);
+                if (typeof onAuthorClick === 'function' && effectiveAuthorId) {
+                  onAuthorClick(effectiveAuthorId);
                 }
               }}
               className="relative shrink-0 group cursor-pointer"
@@ -485,8 +485,8 @@ export const PostDetailModal = ({
               <div className="flex items-center gap-2 flex-wrap">
                 <button
                   onClick={() => {
-                    if (typeof onAuthorClick === 'function' && authorId) {
-                      onAuthorClick(authorId);
+                    if (typeof onAuthorClick === 'function' && effectiveAuthorId) {
+                      onAuthorClick(effectiveAuthorId);
                     }
                   }}
                   className="font-extrabold text-sm sm:text-base text-slate-900 hover:text-sky-600 transition-colors truncate cursor-pointer"
@@ -499,8 +499,9 @@ export const PostDetailModal = ({
                     <span>đã chia sẻ bài viết của</span>
                     <strong
                       onClick={() => {
-                        if (typeof onAuthorClick === 'function' && (post.sharedPost.authorId || post.sharedPost.author?.id)) {
-                          onAuthorClick(post.sharedPost.authorId || post.sharedPost.author?.id);
+                        const sharedAuthorId = post.sharedPost.authorId || post.sharedPost.author?.id || post.sharedPost.userId || post.sharedPost.author?.userId;
+                        if (typeof onAuthorClick === 'function' && sharedAuthorId) {
+                          onAuthorClick(sharedAuthorId);
                         }
                       }}
                       className="font-bold text-slate-900 hover:text-sky-600 transition-colors cursor-pointer"
@@ -1166,16 +1167,32 @@ export const PostDetailModal = ({
                       >
                         <div className="flex items-start gap-3">
                           <img
+                            onClick={() => {
+                              const cmtAuthorId = c.userId || c.authorId || c.author?.id;
+                              if (typeof onAuthorClick === 'function' && cmtAuthorId) {
+                                onAuthorClick(cmtAuthorId);
+                              }
+                            }}
                             src={
                               c.userAvatar ||
                               'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
                             }
                             alt={c.userName}
-                            className="w-8 h-8 rounded-xl object-cover shrink-0 ring-1 ring-white"
+                            className="w-8 h-8 rounded-xl object-cover shrink-0 ring-1 ring-white cursor-pointer hover:ring-2 hover:ring-sky-400 transition-all"
+                            title="Xem trang cá nhân"
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="font-bold text-xs text-slate-900">
+                              <span
+                                onClick={() => {
+                                  const cmtAuthorId = c.userId || c.authorId || c.author?.id;
+                                  if (typeof onAuthorClick === 'function' && cmtAuthorId) {
+                                    onAuthorClick(cmtAuthorId);
+                                  }
+                                }}
+                                className="font-bold text-xs text-slate-900 cursor-pointer hover:text-sky-600 transition-colors"
+                                title="Xem trang cá nhân"
+                              >
                                 {c.userName || 'Du khách Wayfare'}
                               </span>
                               <div className="flex items-center gap-2">
@@ -1231,17 +1248,33 @@ export const PostDetailModal = ({
                                   className="p-2.5 rounded-xl bg-white border border-slate-200/80 flex items-start gap-2.5 shadow-2xs"
                                 >
                                   <img
+                                    onClick={() => {
+                                      const repAuthorId = reply.userId || reply.authorId || reply.author?.id;
+                                      if (typeof onAuthorClick === 'function' && repAuthorId) {
+                                        onAuthorClick(repAuthorId);
+                                      }
+                                    }}
                                     src={
                                       reply.userAvatar ||
                                       reply.authorAvatar ||
                                       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
                                     }
                                     alt={reply.userName || reply.authorName}
-                                    className="w-7 h-7 rounded-lg object-cover shrink-0 ring-1 ring-slate-100"
+                                    className="w-7 h-7 rounded-lg object-cover shrink-0 ring-1 ring-slate-100 cursor-pointer hover:ring-2 hover:ring-sky-400 transition-all"
+                                    title="Xem trang cá nhân"
                                   />
                                   <div className="flex-1 min-w-0">
                                     <div className="flex items-center justify-between gap-2">
-                                      <span className="font-bold text-xs text-slate-900 truncate">
+                                      <span
+                                        onClick={() => {
+                                          const repAuthorId = reply.userId || reply.authorId || reply.author?.id;
+                                          if (typeof onAuthorClick === 'function' && repAuthorId) {
+                                            onAuthorClick(repAuthorId);
+                                          }
+                                        }}
+                                        className="font-bold text-xs text-slate-900 truncate cursor-pointer hover:text-sky-600 transition-colors"
+                                        title="Xem trang cá nhân"
+                                      >
                                         {reply.userName || reply.authorName || 'Du khách Wayfare'}
                                       </span>
                                       <div className="flex items-center gap-1.5">
