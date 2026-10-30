@@ -79,8 +79,8 @@ export const CustomSelect = ({
   const selectedOption = isCustomValue
     ? {
         value,
-        label: `📍 ${customLabel} (Điểm mới đề xuất)`,
-        badge: 'Mới'
+        label: `📍 ${customLabel} (Vị trí tự do)`,
+        badge: 'Tùy chỉnh'
       }
     : options.find(opt => String(opt.value) === String(value));
 
@@ -287,7 +287,7 @@ export const CustomSelect = ({
               })
             )}
 
-            {/* Custom option proposal when allowCustom is active */}
+            {/* Custom check-in location option when allowCustom is active */}
             {allowCustom && searchQuery.trim().length > 1 && (
               <div
                 onClick={() => {
@@ -299,23 +299,23 @@ export const CustomSelect = ({
                   }
                   setIsOpen(false);
                 }}
-                className="mt-1.5 p-2.5 rounded-xl border border-dashed border-emerald-400 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-950 flex items-center justify-between gap-2 transition-all cursor-pointer shadow-2xs group"
+                className="mt-1.5 p-2 rounded-sm border border-dashed border-[#1E1A15]/20 bg-[#FAF6EE] hover:bg-[#F3EDE2] text-[#1E1A15] flex items-center justify-between gap-2 transition-all cursor-pointer group"
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
-                    <Plus className="w-3.5 h-3.5" />
+                  <div className="w-5 h-5 rounded-sm bg-clay-600 text-white flex items-center justify-center shrink-0">
+                    <Plus className="w-3 h-3" />
                   </div>
                   <div className="min-w-0 text-left">
                     <p className="text-xs font-bold truncate">
-                      Đề xuất & Check-in: <span className="underline decoration-emerald-600 font-extrabold">"{searchQuery.trim()}"</span>
+                      Gắn vị trí check-in tự do: <span className="underline font-extrabold text-clay-700">"{searchQuery.trim()}"</span>
                     </p>
-                    <p className="text-[10.5px] text-emerald-700/80">
-                      Chưa có trên hệ thống? Bấm để gắn vị trí và gửi đề xuất
+                    <p className="text-[10.5px] text-[#8A7F70]">
+                      Lưu làm nhãn vị trí check-in riêng cho bài viết này
                     </p>
                   </div>
                 </div>
-                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-600 text-white shrink-0 shadow-2xs">
-                  Thêm mới
+                <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-sm bg-[#F3EDE2] text-clay-800 border border-clay-300/60 shrink-0">
+                  Gắn vị trí
                 </span>
               </div>
             )}

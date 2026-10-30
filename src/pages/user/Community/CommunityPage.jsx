@@ -18,8 +18,8 @@ import { CustomSelect } from '../../../components/common/CustomSelect';
 import { UserAvatar } from '../../../components/common/UserAvatar';
 import { MentionSuggestionsDropdown, renderTextWithMentions } from '../../../components/community/MentionSuggestions';
 import { RichTextToolbar, RichPostContent } from '../../../components/community/RichTextToolbar';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AtSign, Heart, MessageCircle, MessageSquare, Share2, Bookmark, MapPin, Award, TrendingUp, Compass, Route, Copy, DollarSign, Camera, Image as ImageIcon, CheckCircle2, Send, Search, SlidersHorizontal, Filter, Plus, X, Loader2, Eye, MoreHorizontal, ChevronLeft, ChevronRight, ArrowRight, Flame, Check, UserCheck, ShieldCheck, AlertCircle, AlertTriangle, ShieldAlert, Lock, Globe, Upload, Video, Trash2, Edit, UserPlus, CornerDownRight, Flag, EyeOff, BookOpen } from 'lucide-react';
+import { ProposePlaceModal } from '../../../components/community/ProposePlaceModal';
+import { AtSign, Heart, MessageCircle, MessageSquare, Share2, Bookmark, MapPin, Award, TrendingUp, Compass, Route, Copy, DollarSign, Camera, Image as ImageIcon, CheckCircle2, Send, Search, SlidersHorizontal, Filter, Plus, PlusCircle, X, Loader2, Eye, MoreHorizontal, ChevronLeft, ChevronRight, ArrowRight, Flame, Check, UserCheck, ShieldCheck, AlertCircle, AlertTriangle, ShieldAlert, Lock, Globe, Upload, Video, Trash2, Edit, UserPlus, CornerDownRight, Flag, EyeOff, BookOpen } from 'lucide-react';
 
 const FEED_SCOPES = [
   { id: 'all', label: 'Khám phá dành cho bạn', icon: Compass },
@@ -127,6 +127,7 @@ export const CommunityPage = () => {
   const [attachedItineraryId, setAttachedItineraryId] = useState('');
   const [places, setPlaces] = useState([]);
   const [attachedPlaceId, setAttachedPlaceId] = useState('');
+  const [isProposePlaceModalOpen, setIsProposePlaceModalOpen] = useState(false);
   const [submittingPost, setSubmittingPost] = useState(false);
   const createFileInputRef = useRef(null);
   const postTextareaRef = useRef(null);
@@ -1226,6 +1227,14 @@ export const CommunityPage = () => {
       setOpenMenuPostId(null);
     } catch (err) {
       toast.showError('Không thể xóa bài viết: ' + err.message);
+    }
+  };
+
+  // Callback when user creates a place via proposal modal
+  const handlePlaceCreatedFromProposal = (newPlace) => {
+    if (newPlace) {
+      setPlaces(prev => [newPlace, ...prev]);
+      setAttachedPlaceId(String(newPlace.id));
     }
   };
 
@@ -3111,7 +3120,7 @@ export const CommunityPage = () => {
                   placeholder="-- Chọn địa điểm du lịch muốn check-in --"
                   searchable={true}
                   allowCustom={true}
-                  searchPlaceholder="Tìm kiếm địa điểm hoặc gõ tên điểm mới để đề xuất..."
+                  searchPlaceholder="Tìm kiếm địa điểm hoặc gõ tên điểm mới..."
                   clearable={true}
                   onClear={() => setAttachedPlaceId('')}
                   buttonClassName="bg-[#FFFDF8] border-[#1E1A15]/15 hover:border-clay-600/50 py-2.5 rounded-sm text-xs font-semibold"
@@ -3131,40 +3140,61 @@ export const CommunityPage = () => {
                   ]}
                 />
 
+                {/* Subtext link for proposing a new place */}
+                <div className="flex items-center justify-between pt-0.5 px-0.5 text-[11px] text-[#6B6154]">
+                  <span>Chưa có trên Bản đồ Wayfare?</span>
+                  <button
+                    type="button"
+                    onClick={() => setIsProposePlaceModalOpen(true)}
+                    className="font-bold text-clay-700 hover:text-clay-800 hover:underline flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <PlusCircle className="w-3.5 h-3.5 text-clay-600" />
+                    <span>Đóng góp địa điểm vào CSDL</span>
+                  </button>
+                </div>
+
                 {selectedPlacePreview && (
                   <div className={`p-3 rounded-sm border flex items-center gap-3 mt-2 ${
                     selectedPlacePreview.isCustom
-                      ? 'bg-amber-50/80 border-amber-200'
+                      ? 'bg-[#FAF6EE] border-[#1E1A15]/15'
                       : 'bg-[#FFFDF8] border-[#1E1A15]/10'
                   }`}>
-                    <img
-                      src={selectedPlacePreview.coverImageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'}
-                      alt={selectedPlacePreview.name}
-                      className="w-12 h-12 rounded-sm object-cover flex-shrink-0 border border-[#1E1A15]/10"
-                      onError={(e) => {
-                        e.currentTarget.onerror = null;
-                        e.currentTarget.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80';
-                      }}
-                    />
+                    {selectedPlacePreview.isCustom ? (
+                      <div className="w-12 h-12 rounded-sm bg-clay-100/80 border border-clay-200 flex items-center justify-center shrink-0 text-clay-700">
+                        <MapPin className="w-6 h-6 text-clay-600" />
+                      </div>
+                    ) : (
+                      <img
+                        src={selectedPlacePreview.coverImageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'}
+                        alt={selectedPlacePreview.name}
+                        className="w-12 h-12 rounded-sm object-cover flex-shrink-0 border border-[#1E1A15]/10"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80';
+                        }}
+                      />
+                    )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <h5 className="font-bold text-xs text-[#1E1A15] truncate">
                           {selectedPlacePreview.name}
                         </h5>
-                        {selectedPlacePreview.isCustom && (
-                          <span className="text-[10px] px-1.5 py-0.2 rounded-sm bg-amber-100 text-amber-900 font-extrabold border border-amber-300">
-                            Điểm mới đề xuất
+                        {selectedPlacePreview.isCustom ? (
+                          <span className="text-[10px] px-1.5 py-0.2 rounded-sm bg-[#F3EDE2] text-clay-800 font-bold border border-clay-300/60">
+                            Vị trí check-in tự do
+                          </span>
+                        ) : (
+                          <span className="text-[10px] px-1.5 py-0.2 rounded-sm bg-emerald-100 text-emerald-800 font-bold border border-emerald-300/60">
+                            Địa điểm chính thức
                           </span>
                         )}
                       </div>
-                      <p className={`text-[11px] font-semibold truncate ${
-                        selectedPlacePreview.isCustom ? 'text-amber-800' : 'text-clay-700'
-                      }`}>
-                        📍 {selectedPlacePreview.address || selectedPlacePreview.city}
+                      <p className="text-[11px] font-semibold truncate text-[#6B6154]">
+                        {selectedPlacePreview.isCustom ? 'Gắn nhãn check-in riêng cho bài viết này' : `📍 ${selectedPlacePreview.address || selectedPlacePreview.city}`}
                       </p>
                     </div>
                     <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${
-                      selectedPlacePreview.isCustom ? 'text-amber-600' : 'text-clay-600'
+                      selectedPlacePreview.isCustom ? 'text-clay-600' : 'text-emerald-600'
                     }`} />
                   </div>
                 )}
@@ -3836,6 +3866,21 @@ export const CommunityPage = () => {
           }}
         />
       )}
+
+      {/* ========================================================= */}
+      {/* MODAL 13: PROPOSE NEW PLACE MODAL (Add place to DB)       */}
+      {/* ========================================================= */}
+      <ProposePlaceModal
+        isOpen={isProposePlaceModalOpen}
+        onClose={() => setIsProposePlaceModalOpen(false)}
+        initialName={
+          typeof attachedPlaceId === 'string' && attachedPlaceId.startsWith('custom:')
+            ? attachedPlaceId.replace('custom:', '').trim()
+            : ''
+        }
+        onPlaceCreated={handlePlaceCreatedFromProposal}
+        currentUser={currentUser}
+      />
 
     </div>
   );
