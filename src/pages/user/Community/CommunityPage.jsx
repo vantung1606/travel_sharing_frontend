@@ -119,7 +119,6 @@ export const CommunityPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [postTitle, setPostTitle] = useState('');
   const [postContent, setPostContent] = useState('');
-  const [postLocation, setPostLocation] = useState('');
   const [postCategory, setPostCategory] = useState('Ẩm thực & Check-in');
   const [postVisibility, setPostVisibility] = useState('PUBLIC');
   const [postImagesList, setPostImagesList] = useState([]);
@@ -1255,16 +1254,23 @@ export const CommunityPage = () => {
       await new Promise(r => setTimeout(r, 200));
       setModerationStep(3);
 
+      const isCustomPlace = typeof attachedPlaceId === 'string' && attachedPlaceId.startsWith('custom:');
+      const customPlaceName = isCustomPlace ? attachedPlaceId.replace('custom:', '').trim() : '';
+
+      const locationTagValue = isCustomPlace
+        ? customPlaceName
+        : (selectedPlacePreview ? (selectedPlacePreview.city ? `${selectedPlacePreview.name}, ${selectedPlacePreview.city}` : selectedPlacePreview.name) : 'Việt Nam');
+
       const payload = {
         title: postTitle.trim(),
         content: postContent.trim(),
-        locationTag: postLocation.trim() || 'Việt Nam',
+        locationTag: locationTagValue,
         category: postCategory,
         visibility: postVisibility,
         images: postImagesList.length > 0 ? postImagesList : [],
         videoUrl: postVideoUrl || null,
         itineraryId: attachedItineraryId ? Number(attachedItineraryId) : null,
-        placeId: attachedPlaceId ? Number(attachedPlaceId) : null
+        placeId: isCustomPlace || !attachedPlaceId ? null : Number(attachedPlaceId)
       };
 
       const result = await postApi.createPost(payload, currentUser?.email);
@@ -1273,7 +1279,6 @@ export const CommunityPage = () => {
       setIsCreateModalOpen(false);
       setPostTitle('');
       setPostContent('');
-      setPostLocation('');
       setPostCategory('Ẩm thực & Check-in');
       setPostVisibility('PUBLIC');
       setPostImagesList([]);
@@ -1339,6 +1344,16 @@ export const CommunityPage = () => {
   // Selected place check-in preview for the creator modal
   const selectedPlacePreview = useMemo(() => {
     if (!attachedPlaceId) return null;
+    if (typeof attachedPlaceId === 'string' && attachedPlaceId.startsWith('custom:')) {
+      return {
+        id: null,
+        name: attachedPlaceId.replace('custom:', '').trim(),
+        isCustom: true,
+        address: 'Địa điểm mới do bạn đề xuất',
+        city: 'Chờ duyệt chính thức',
+        coverImageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'
+      };
+    }
     return places.find(p => String(p.id) === String(attachedPlaceId));
   }, [attachedPlaceId, places]);
 
@@ -2921,36 +2936,21 @@ export const CommunityPage = () => {
                 />
               </div>
 
-              {/* Category & Location */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-bold text-[#3B332A] mb-1">Chủ đề</label>
-                  <CustomSelect
-                    value={postCategory}
-                    onChange={setPostCategory}
-                    size="sm"
-                    buttonClassName="bg-[#F8F4EC] border-[#1E1A15]/10 py-2.5 rounded-sm font-semibold text-xs"
-                    options={[
-                      { value: 'Ẩm thực & Check-in', label: 'Ẩm thực & Check-in', icon: MapPin },
-                      { value: 'Phượt & Khám phá', label: 'Phượt & Khám phá', icon: Flame },
-                      { value: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Globe },
-                      { value: 'Văn hóa & Lịch sử', label: 'Văn hóa & Lịch sử', icon: Compass }
-                    ]}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-[#3B332A] mb-1">Gắn địa điểm</label>
-                  <div className="relative">
-                    <MapPin className="w-3.5 h-3.5 text-[#8A7F70] absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      placeholder="Ví dụ: Đà Nẵng, Sa Pa..."
-                      value={postLocation}
-                      onChange={e => setPostLocation(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2.5 bg-[#F8F4EC] border border-[#1E1A15]/10 rounded-sm text-xs text-[#2A241D] placeholder-[#8A7F70] focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                    />
-                  </div>
-                </div>
+              {/* Category */}
+              <div>
+                <label className="block text-xs font-bold text-[#3B332A] mb-1">Chủ đề bài viết *</label>
+                <CustomSelect
+                  value={postCategory}
+                  onChange={setPostCategory}
+                  size="sm"
+                  buttonClassName="bg-[#F8F4EC] border-[#1E1A15]/10 py-2.5 rounded-sm font-semibold text-xs"
+                  options={[
+                    { value: 'Ẩm thực & Check-in', label: 'Ẩm thực & Check-in', icon: MapPin },
+                    { value: 'Phượt & Khám phá', label: 'Phượt & Khám phá', icon: Flame },
+                    { value: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Globe },
+                    { value: 'Văn hóa & Lịch sử', label: 'Văn hóa & Lịch sử', icon: Compass }
+                  ]}
+                />
               </div>
 
               {/* Content textarea with @mention */}
@@ -3116,7 +3116,8 @@ export const CommunityPage = () => {
                   onChange={setAttachedPlaceId}
                   placeholder="-- Chọn địa điểm du lịch muốn check-in --"
                   searchable={true}
-                  searchPlaceholder="Tìm kiếm địa điểm theo tên hoặc tỉnh thành..."
+                  allowCustom={true}
+                  searchPlaceholder="Tìm kiếm địa điểm hoặc gõ tên điểm mới để đề xuất..."
                   clearable={true}
                   onClear={() => setAttachedPlaceId('')}
                   buttonClassName="bg-[#FFFDF8] border-emerald-200 py-2.5 rounded-sm text-xs font-semibold"
@@ -3137,21 +3138,36 @@ export const CommunityPage = () => {
                 />
 
                 {selectedPlacePreview && (
-                  <div className="bg-[#FFFDF8] p-3 rounded-sm border border-emerald-100 flex items-center gap-3 mt-2 ">
+                  <div className={`p-3 rounded-sm border flex items-center gap-3 mt-2 ${
+                    selectedPlacePreview.isCustom
+                      ? 'bg-amber-50/80 border-amber-200'
+                      : 'bg-[#FFFDF8] border-emerald-100'
+                  }`}>
                     <img
                       src={selectedPlacePreview.coverImageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'}
                       alt={selectedPlacePreview.name}
                       className="w-12 h-12 rounded-sm object-cover flex-shrink-0"
                     />
                     <div className="min-w-0 flex-1">
-                      <h5 className="font-bold text-xs text-[#1E1A15] truncate">
-                        {selectedPlacePreview.name}
-                      </h5>
-                      <p className="text-[11px] text-emerald-600 font-semibold truncate">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h5 className="font-bold text-xs text-[#1E1A15] truncate">
+                          {selectedPlacePreview.name}
+                        </h5>
+                        {selectedPlacePreview.isCustom && (
+                          <span className="text-[10px] px-1.5 py-0.2 rounded-sm bg-amber-100 text-amber-900 font-extrabold border border-amber-300">
+                            Điểm mới đề xuất
+                          </span>
+                        )}
+                      </div>
+                      <p className={`text-[11px] font-semibold truncate ${
+                        selectedPlacePreview.isCustom ? 'text-amber-800' : 'text-emerald-600'
+                      }`}>
                         📍 {selectedPlacePreview.address || selectedPlacePreview.city}
                       </p>
                     </div>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                    <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${
+                      selectedPlacePreview.isCustom ? 'text-amber-600' : 'text-emerald-500'
+                    }`} />
                   </div>
                 )}
               </div>

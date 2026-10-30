@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Check, Search, X } from 'lucide-react';
+import { ChevronDown, Check, Search, X, Plus } from 'lucide-react';
 
 /**
  * Reusable Modern Custom Select Dropdown
@@ -19,7 +19,10 @@ export const CustomSelect = ({
   size = 'md', // 'sm' | 'md'
   icon: LeadingIcon = null,
   clearable = false,
-  onClear = null
+  onClear = null,
+  allowCustom = false,
+  customPrefix = 'custom:',
+  onSelectCustom = null
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,9 +73,16 @@ export const CustomSelect = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
-  const selectedOption = options.find(
-    opt => String(opt.value) === String(value)
-  );
+  const isCustomValue = typeof value === 'string' && value.startsWith(customPrefix);
+  const customLabel = isCustomValue ? value.slice(customPrefix.length) : null;
+
+  const selectedOption = isCustomValue
+    ? {
+        value,
+        label: `📍 ${customLabel} (Điểm mới đề xuất)`,
+        badge: 'Mới'
+      }
+    : options.find(opt => String(opt.value) === String(value));
 
   const normalizeText = (str) =>
     (str || '')
@@ -267,6 +277,39 @@ export const CustomSelect = ({
                   </div>
                 );
               })
+            )}
+
+            {/* Custom option proposal when allowCustom is active */}
+            {allowCustom && searchQuery.trim().length > 1 && (
+              <div
+                onClick={() => {
+                  const customVal = `${customPrefix}${searchQuery.trim()}`;
+                  if (onSelectCustom) {
+                    onSelectCustom(searchQuery.trim());
+                  } else {
+                    onChange(customVal);
+                  }
+                  setIsOpen(false);
+                }}
+                className="mt-1.5 p-2.5 rounded-xl border border-dashed border-emerald-400 bg-emerald-50/90 hover:bg-emerald-100 text-emerald-950 flex items-center justify-between gap-2 transition-all cursor-pointer shadow-2xs group"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                    <Plus className="w-3.5 h-3.5" />
+                  </div>
+                  <div className="min-w-0 text-left">
+                    <p className="text-xs font-bold truncate">
+                      Đề xuất & Check-in: <span className="underline decoration-emerald-600 font-extrabold">"{searchQuery.trim()}"</span>
+                    </p>
+                    <p className="text-[10.5px] text-emerald-700/80">
+                      Chưa có trên hệ thống? Bấm để gắn vị trí và gửi đề xuất
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-emerald-600 text-white shrink-0 shadow-2xs">
+                  Thêm mới
+                </span>
+              </div>
             )}
           </div>
         </div>

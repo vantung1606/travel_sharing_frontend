@@ -9,11 +9,10 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
   const [title, setTitle] = useState(post.title || '');
   const [content, setContent] = useState(post.content || '');
   const [category, setCategory] = useState(post.category || 'Ẩm thực & Check-in');
-  const [locationTag, setLocationTag] = useState(post.locationTag || 'Việt Nam');
   const [visibility, setVisibility] = useState(post.visibility || 'PUBLIC');
   const [images, setImages] = useState(post.images || []);
   const [videoUrl, setVideoUrl] = useState(post.videoUrl || '');
-  const [placeId, setPlaceId] = useState(post.placeId ? String(post.placeId) : '');
+  const [placeId, setPlaceId] = useState(post.placeId ? String(post.placeId) : (post.locationTag && post.locationTag !== 'Việt Nam' ? `custom:${post.locationTag}` : ''));
   const [places, setPlaces] = useState([]);
 
   useEffect(() => {
@@ -24,6 +23,16 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
 
   const selectedPlace = useMemo(() => {
     if (!placeId) return null;
+    if (typeof placeId === 'string' && placeId.startsWith('custom:')) {
+      return {
+        id: null,
+        name: placeId.replace('custom:', '').trim(),
+        isCustom: true,
+        address: 'Địa điểm mới do bạn đề xuất',
+        city: 'Chờ duyệt',
+        coverImageUrl: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'
+      };
+    }
     return places.find(p => String(p.id) === String(placeId));
   }, [placeId, places]);
 
@@ -87,15 +96,21 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
       await new Promise(r => setTimeout(r, 550));
       setModerationStep(3);
 
+      const isCustomPlace = typeof placeId === 'string' && placeId.startsWith('custom:');
+      const customPlaceName = isCustomPlace ? placeId.replace('custom:', '').trim() : '';
+      const computedLocationTag = isCustomPlace
+        ? customPlaceName
+        : (selectedPlace ? (selectedPlace.city ? `${selectedPlace.name}, ${selectedPlace.city}` : selectedPlace.name) : (post.locationTag || 'Việt Nam'));
+
       const payload = {
         title: title.trim(),
         content: content.trim(),
         category,
-        locationTag: locationTag.trim() || 'Việt Nam',
+        locationTag: computedLocationTag,
         visibility,
         images,
         videoUrl: videoUrl || null,
-        placeId: placeId ? Number(placeId) : (post.placeId ? 0 : null)
+        placeId: isCustomPlace || !placeId ? (post.placeId ? 0 : null) : Number(placeId)
       };
 
       const updated = await postApi.update(post.id, payload);
@@ -215,35 +230,21 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
             />
           </div>
 
-          {/* Category & Location */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Chủ đề</label>
-              <CustomSelect
-                value={category}
-                onChange={setCategory}
-                size="sm"
-                buttonClassName="bg-slate-50 border-slate-200 py-2.5 rounded-xl font-semibold text-xs"
-                options={[
-                  { value: 'Ẩm thực & Check-in', label: 'Ẩm thực & Check-in', icon: MapPin },
-                  { value: 'Phượt & Khám phá', label: 'Phượt & Khám phá', icon: Flame },
-                  { value: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Sparkles },
-                  { value: 'Văn hóa & Lịch sử', label: 'Văn hóa & Lịch sử', icon: Compass }
-                ]}
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Gắn địa điểm</label>
-              <div className="relative">
-                <MapPin className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={locationTag}
-                  onChange={e => setLocationTag(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
-                />
-              </div>
-            </div>
+          {/* Category */}
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">Chủ đề bài viết *</label>
+            <CustomSelect
+              value={category}
+              onChange={setCategory}
+              size="sm"
+              buttonClassName="bg-slate-50 border-slate-200 py-2.5 rounded-xl font-semibold text-xs"
+              options={[
+                { value: 'Ẩm thực & Check-in', label: 'Ẩm thực & Check-in', icon: MapPin },
+                { value: 'Phượt & Khám phá', label: 'Phượt & Khám phá', icon: Flame },
+                { value: 'Biển đảo & Nghỉ dưỡng', label: 'Biển đảo & Nghỉ dưỡng', icon: Sparkles },
+                { value: 'Văn hóa & Lịch sử', label: 'Văn hóa & Lịch sử', icon: Compass }
+              ]}
+            />
           </div>
 
           {/* Content */}
@@ -288,7 +289,8 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
               onChange={setPlaceId}
               placeholder="-- Chọn địa điểm du lịch muốn check-in --"
               searchable={true}
-              searchPlaceholder="Tìm kiếm địa điểm theo tên hoặc tỉnh thành..."
+              allowCustom={true}
+              searchPlaceholder="Tìm kiếm địa điểm hoặc gõ tên điểm mới để đề xuất..."
               clearable={true}
               onClear={() => setPlaceId('')}
               buttonClassName="bg-white border-emerald-200 py-2.5 rounded-xl text-xs font-semibold"
@@ -309,21 +311,36 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
             />
 
             {selectedPlace && (
-              <div className="bg-white p-3 rounded-xl border border-emerald-100 flex items-center gap-3 mt-2 shadow-2xs">
+              <div className={`p-3 rounded-xl border flex items-center gap-3 mt-2 shadow-2xs ${
+                selectedPlace.isCustom
+                  ? 'bg-amber-50/80 border-amber-200'
+                  : 'bg-white border-emerald-100'
+              }`}>
                 <img
                   src={selectedPlace.coverImageUrl || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80'}
                   alt={selectedPlace.name}
                   className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
                 />
                 <div className="min-w-0 flex-1">
-                  <h5 className="font-bold text-xs text-slate-900 truncate">
-                    {selectedPlace.name}
-                  </h5>
-                  <p className="text-[11px] text-emerald-600 font-semibold truncate">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h5 className="font-bold text-xs text-slate-900 truncate">
+                      {selectedPlace.name}
+                    </h5>
+                    {selectedPlace.isCustom && (
+                      <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-amber-100 text-amber-900 font-extrabold border border-amber-300">
+                        Điểm mới đề xuất
+                      </span>
+                    )}
+                  </div>
+                  <p className={`text-[11px] font-semibold truncate ${
+                    selectedPlace.isCustom ? 'text-amber-800' : 'text-emerald-600'
+                  }`}>
                     📍 {selectedPlace.address || selectedPlace.city}
                   </p>
                 </div>
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${
+                  selectedPlace.isCustom ? 'text-amber-600' : 'text-emerald-500'
+                }`} />
               </div>
             )}
           </div>
