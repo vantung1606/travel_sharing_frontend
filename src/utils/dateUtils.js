@@ -38,8 +38,14 @@ export const parseDateSafe = (dateValue) => {
       return isNaN(parsed.getTime()) ? null : parsed;
     }
 
-    // Standard ISO string or date string (DO NOT append 'Z', let client parse in local timezone)
-    const parsed = new Date(str);
+    // Standard ISO string or date string
+    let isoStr = str;
+    // Nếu chuỗi ISO chưa có offset (+07:00 hay Z), hệ thống backend chuẩn theo giờ Việt Nam (+07:00)
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(isoStr) && !/[Z+-]\d{2}(:?\d{2})?$/.test(isoStr) && !isoStr.endsWith('Z')) {
+      isoStr = `${isoStr}+07:00`;
+    }
+
+    const parsed = new Date(isoStr);
     if (!isNaN(parsed.getTime())) {
       return parsed;
     }
@@ -64,7 +70,7 @@ export const formatDisplayTimeAgo = (dateValue, fallbackTimeAgo) => {
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
 
-  // Nếu đồng hồ server nhanh hơn hoặc lệch dưới 1 phút (hoặc lệch âm nhẹ trong 2 phút do đồng hồ)
+  // Nếu bài vừa mới đăng hoặc đồng hồ client và server lệch nhau vài giây/phút:
   if (diffMs < 60000) {
     return 'Vừa xong';
   }
