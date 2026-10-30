@@ -173,32 +173,32 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Visibility Selector */}
-          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+          <div className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-100">
             <span className="text-xs font-bold text-slate-700">Quyền riêng tư:</span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200">
               <button
                 type="button"
                 onClick={() => setVisibility('PUBLIC')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-md text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                   visibility === 'PUBLIC'
-                    ? 'bg-sky-600 text-white shadow-xs'
-                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                    ? 'bg-clay-600 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
-                <Globe className="w-3.5 h-3.5" />
-                <span>Công khai 🌐</span>
+                <Globe className="w-3 h-3" />
+                <span>Công khai</span>
               </button>
               <button
                 type="button"
                 onClick={() => setVisibility('PRIVATE')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                className={`px-2.5 py-1 rounded-md text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                   visibility === 'PRIVATE'
                     ? 'bg-slate-800 text-white shadow-xs'
-                    : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-100'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 }`}
               >
-                <Lock className="w-3.5 h-3.5" />
-                <span>Chỉ mình tôi 🔒</span>
+                <Lock className="w-3 h-3" />
+                <span>Chỉ mình tôi</span>
               </button>
             </div>
           </div>

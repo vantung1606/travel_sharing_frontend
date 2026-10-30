@@ -2880,29 +2880,29 @@ export const CommunityPage = () => {
                 </div>
 
                 {/* Visibility selector */}
-                <div className="flex items-center gap-1.5 self-end sm:self-center">
+                <div className="flex items-center gap-1 bg-[#F3EDE2] p-1 rounded-md border border-[#1E1A15]/10 self-end sm:self-center">
                   <button
                     type="button"
                     onClick={() => setPostVisibility('PUBLIC')}
-                    className={`px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-sm text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                       postVisibility === 'PUBLIC'
-                        ? 'bg-sky-600 text-white '
-                        : 'bg-[#FFFDF8] text-[#5A5146] border border-[#1E1A15]/10 hover:bg-[#F3EDE2]'
+                        ? 'bg-clay-600 text-white shadow-xs'
+                        : 'text-[#6B6154] hover:text-[#1E1A15] hover:bg-white/60'
                     }`}
                   >
-                    <Globe className="w-3.5 h-3.5" />
+                    <Globe className="w-3 h-3" />
                     <span>Công khai</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setPostVisibility('PRIVATE')}
-                    className={`px-3 py-1.5 rounded-sm text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-sm text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer whitespace-nowrap ${
                       postVisibility === 'PRIVATE'
-                        ? 'bg-slate-800 text-white '
-                        : 'bg-[#FFFDF8] text-[#5A5146] border border-[#1E1A15]/10 hover:bg-[#F3EDE2]'
+                        ? 'bg-[#2A241D] text-white shadow-xs'
+                        : 'text-[#6B6154] hover:text-[#1E1A15] hover:bg-white/60'
                     }`}
                   >
-                    <Lock className="w-3.5 h-3.5" />
+                    <Lock className="w-3 h-3" />
                     <span>Chỉ mình tôi</span>
                   </button>
                 </div>
