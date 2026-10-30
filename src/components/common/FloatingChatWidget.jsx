@@ -727,7 +727,7 @@ export const FloatingChatWidget = () => {
     <div className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 select-none font-sans group/widget">
       {/* Mini Chat Window Box */}
       {isOpen && (
-        <div className="absolute bottom-16 sm:bottom-20 right-0 w-[370px] sm:w-[410px] max-w-[calc(100vw-32px)] h-[560px] max-h-[calc(100vh-110px)] bg-white/95 backdrop-blur-2xl rounded-3xl shadow-[0_25px_60px_-15px_rgba(15,23,42,0.28)] border border-slate-100 flex flex-col overflow-hidden ring-1 ring-slate-900/5 transition-all duration-300 animate-in fade-in zoom-in-95">
+        <div className="absolute bottom-14 sm:bottom-18 right-0 w-[calc(100vw-32px)] sm:w-[410px] h-[500px] sm:h-[560px] max-h-[calc(100vh-130px)] bg-white/95 backdrop-blur-2xl rounded-2xl sm:rounded-3xl shadow-[0_25px_60px_-15px_rgba(15,23,42,0.28)] border border-slate-100 flex flex-col overflow-hidden ring-1 ring-slate-900/5 transition-all duration-300 animate-in fade-in zoom-in-95">
           
           {/* Header Bar */}
           <div className="px-4 py-3.5 bg-gradient-to-r from-slate-950 via-blue-950 to-indigo-950 text-white flex items-center justify-between shrink-0 shadow-sm relative overflow-hidden border-b border-white/10">
@@ -1152,7 +1152,7 @@ export const FloatingChatWidget = () => {
         <button
           type="button"
           onClick={handleToggleOpenWithAnimation}
-          className={`w-13 h-13 sm:w-14 sm:h-14 rounded-full flex items-center justify-center cursor-pointer relative active:scale-75 transition-all duration-300 ease-out shrink-0 select-none ${
+          className={`w-11 h-11 sm:w-[52px] sm:h-[52px] rounded-full flex items-center justify-center cursor-pointer relative active:scale-75 transition-all duration-300 ease-out shrink-0 select-none ${
             isClickAnimating ? 'scale-90' : 'hover:scale-105'
           }`}
           title="Hỏi đáp & Trò chuyện Wayfare"
@@ -1171,26 +1171,26 @@ export const FloatingChatWidget = () => {
               <img
                 src="/chaticon.png"
                 alt="Wayfare Chat"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain drop-shadow-md"
               />
-              <span className="absolute bottom-0.5 right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white shadow-xs" />
+              <span className="absolute bottom-0 right-0 sm:bottom-0.5 sm:right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-400 ring-2 ring-white shadow-xs" />
             </div>
 
             {/* Close X Icon */}
             <div
-              className={`absolute transition-all duration-300 ease-out transform flex items-center justify-center w-11 h-11 rounded-full bg-slate-900/90 text-white border border-white/20 shadow-lg ${
+              className={`absolute transition-all duration-300 ease-out transform flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-slate-900/90 text-white border border-white/20 shadow-lg ${
                 isOpen
                   ? 'rotate-0 scale-100 opacity-100'
                   : '-rotate-90 scale-0 opacity-0 pointer-events-none'
               }`}
             >
-              <X className="w-5 h-5 stroke-[2.5] drop-shadow-xs" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.5] drop-shadow-xs" />
             </div>
           </div>
 
           {/* Unread badge */}
           {totalUnread > 0 && !isOpen && (
-            <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 rounded-full bg-gradient-to-r from-rose-500 to-red-600 text-white text-[10px] font-black font-mono flex items-center justify-center ring-2 ring-white shadow-sm animate-bounce">
+            <span className="absolute -top-1 -right-1 min-w-[18px] sm:min-w-[20px] h-4.5 sm:h-5 px-1 sm:px-1.5 rounded-full bg-gradient-to-r from-rose-500 to-red-600 text-white text-[9px] sm:text-[10px] font-black font-mono flex items-center justify-center ring-2 ring-white shadow-sm animate-bounce">
               {totalUnread > 99 ? '99+' : totalUnread}
             </span>
           )}
