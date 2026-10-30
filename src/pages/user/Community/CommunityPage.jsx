@@ -2382,40 +2382,41 @@ export const CommunityPage = () => {
                     </div>
                   ) : (
                     <>
-                      {/* Post Title & Content (Facebook style with '... Xem thêm' expand button) */}
+                      {/* Post Title & Content (Nổi bật hơn, bài viết ngắn tự động tăng cỡ chữ) */}
                       <div className="space-y-1.5 sm:space-y-2">
                         {post.title && (
                           <h3
                             onClick={() => setSelectedPostForDetail(post)}
-                            className="font-bold text-[15px] sm:text-base text-[#1E1A15] leading-snug hover:text-blue-600 transition-colors cursor-pointer"
+                            className="font-bold text-base sm:text-lg text-[#1E1A15] leading-snug hover:text-clay-600 transition-colors cursor-pointer tracking-tight"
                             title="Bấm để xem riêng chi tiết bài viết"
                           >
                             {post.title}
                           </h3>
                         )}
                         {post.content && (
-                          <div className="text-xs sm:text-sm text-[#2A241D] leading-relaxed font-normal tracking-[0.01em]">
+                          <div>
                             {(() => {
                               const isExpanded = expandedPostIds.has(post.id);
-                              const shouldTruncate = post.content.length > 170 && !isExpanded;
+                              const shouldTruncate = post.content.length > 200 && !isExpanded;
                               const textToShow = shouldTruncate
-                                ? post.content.slice(0, 170).trim()
+                                ? post.content.slice(0, 200).trim()
                                 : post.content;
+                              const isShortNote = post.content.length <= 120 && (!post.images || post.images.length === 0) && !post.videoUrl;
 
                               return (
-                                <div>
+                                <div className={isShortNote ? 'text-[15px] sm:text-base font-medium text-[#1E1A15] leading-relaxed' : 'text-xs sm:text-sm text-[#2A241D] leading-relaxed font-normal tracking-[0.01em]'}>
                                   <RichPostContent content={textToShow} followingUsers={followingUsers} onUserClick={(uid) => setSelectedUserIdForModal(uid)} />
                                   <div className="flex items-center gap-2 mt-1">
                                     {shouldTruncate && (
                                       <button
                                         type="button"
                                         onClick={() => toggleExpandPost(post.id)}
-                                        className="font-bold text-[#1E1A15] hover:text-sky-600 hover:underline cursor-pointer inline-block text-xs"
+                                        className="font-bold text-clay-700 hover:text-clay-900 hover:underline cursor-pointer inline-block text-xs"
                                       >
                                         ... Xem thêm
                                       </button>
                                     )}
-                                    {isExpanded && post.content.length > 170 && (
+                                    {isExpanded && post.content.length > 200 && (
                                       <button
                                         type="button"
                                         onClick={() => toggleExpandPost(post.id)}
@@ -2526,42 +2527,43 @@ export const CommunityPage = () => {
                     </>
                   )}
 
-                  {/* ATTACHED TOUR / ITINERARY CARD (Elevated Boarding Pass Style) */}
-                  {/* ATTACHED TOUR / ITINERARY CARD (Responsive Boarding Pass Style) */}
+                  {/* ATTACHED TOUR / ITINERARY CARD (Compact Accessory Style - Giảm 50% diện tích, không lấn át bài viết) */}
                   {!post.sharedPost && hasItinerary && (
-                    <div className="bg-gradient-to-br from-sky-50/90 via-blue-50/60 to-indigo-50/70 p-4 sm:p-5 rounded-sm border border-blue-200/90 space-y-3.5  font-sans">
-                      <div className="flex items-start gap-3.5">
-                        <div className="w-11 h-11 rounded-sm bg-gradient-to-br from-sky-600 to-blue-600 flex items-center justify-center text-white shrink-0  shadow-sky-600/20 mt-0.5">
-                          <Route className="w-5 h-5" />
+                    <div
+                      onClick={() => handleViewItineraryDetails(post)}
+                      className="p-3 sm:p-3.5 rounded-[6px] bg-[#FAF7F0] hover:bg-[#F3ECE0] border border-[#E8DFD1] transition-all cursor-pointer group/itin flex items-center justify-between gap-3 shadow-2xs hover:shadow-xs"
+                      title="Bấm để xem chi tiết lộ trình"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-[5px] bg-clay-600/10 border border-clay-300/60 text-clay-700 flex items-center justify-center shrink-0 group-hover/itin:bg-clay-600 group-hover/itin:text-white transition-colors">
+                          <Route className="w-4 h-4" />
                         </div>
-                        <div className="flex-1 min-w-0 space-y-1.5">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sky-600 text-white text-[10px] font-extrabold uppercase tracking-wider whitespace-nowrap ">
-                              <Route className="w-3 h-3 text-amber-300 shrink-0" />
-                              <span>Lịch trình chi tiết</span>
+                        <div className="min-w-0 space-y-0.5">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[3px] bg-clay-100 text-clay-800 text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">
+                              <span>Lịch trình</span>
                             </span>
                             {post.itineraryDuration && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-bold text-sky-900 bg-[#FFFDF8] border border-sky-200 whitespace-nowrap">
+                              <span className="text-[10px] font-bold text-ink-600 bg-white/80 px-1.5 py-0.5 rounded border border-ink-200/60 whitespace-nowrap">
                                 {post.itineraryDuration}
                               </span>
                             )}
                           </div>
-                          <h5 className="font-extrabold text-sm sm:text-base text-[#1E1A15] leading-snug line-clamp-2">
+                          <h5 className="font-bold text-xs sm:text-sm text-ink-900 truncate group-hover/itin:text-clay-700 transition-colors">
                             {post.itineraryTitle || 'Lịch trình chi tiết đính kèm'}
                           </h5>
-                          <div className="flex items-center gap-3 text-xs text-[#5A5146] flex-wrap pt-0.5 font-medium">
+                          <div className="flex items-center gap-2 text-[11px] text-ink-500 font-serif flex-wrap">
                             {post.itineraryBudget && (
-                              <span className="font-extrabold text-blue-700 inline-flex items-center gap-1 whitespace-nowrap">
-                                <DollarSign className="w-3.5 h-3.5 shrink-0" />
+                              <span className="font-semibold text-clay-700 inline-flex items-center gap-0.5 whitespace-nowrap">
                                 <span>{Number(post.itineraryBudget).toLocaleString('vi-VN')} đ/người</span>
                               </span>
                             )}
                             {post.itineraryPlacesCount > 0 && (
                               <>
-                                <span className="text-[#B3A895]">•</span>
-                                <span className="inline-flex items-center gap-1 text-[#5A5146] whitespace-nowrap">
-                                  <MapPin className="w-3.5 h-3.5 text-[#8A7F70] shrink-0" />
-                                  <span>{post.itineraryPlacesCount} điểm dừng chân</span>
+                                <span className="text-ink-300">•</span>
+                                <span className="inline-flex items-center gap-1 text-ink-600 whitespace-nowrap">
+                                  <MapPin className="w-3 h-3 text-clay-600 shrink-0" />
+                                  <span>{post.itineraryPlacesCount} điểm dừng</span>
                                 </span>
                               </>
                             )}
@@ -2569,20 +2571,8 @@ export const CommunityPage = () => {
                         </div>
                       </div>
 
-                      {/* Action Buttons for Attached Itinerary */}
-                      <div className="flex items-center gap-2.5 pt-2 border-t border-blue-100/80">
-                        {/* Action 1: View Route Details */}
-                        <button
-                          type="button"
-                          onClick={() => handleViewItineraryDetails(post)}
-                          className="flex-1 py-2 px-3 rounded-sm bg-[#FFFDF8] hover:bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold transition-all flex items-center justify-center gap-1.5  cursor-pointer active:scale-95 whitespace-nowrap"
-                          title="Xem chi tiết lộ trình và tải cẩm nang PDF"
-                        >
-                          <Eye className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                          <span>Xem chi tiết</span>
-                        </button>
-
-                        {/* Action 2: 1-Click Clone to My Itineraries (Chính chủ thì ẩn đi) */}
+                      {/* Action buttons (Gọn gàng bên phải, không chiếm nguyên 1 hàng đáy) */}
+                      <div className="flex items-center gap-2 shrink-0">
                         {!Boolean(
                           (post.authorId && currentUser?.id && String(post.authorId) === String(currentUser.id)) ||
                           (post.authorEmail && currentUser?.email && post.authorEmail.toLowerCase() === (currentUser.email || '').toLowerCase()) ||
@@ -2592,23 +2582,26 @@ export const CommunityPage = () => {
                         ) && (
                           <button
                             type="button"
-                            onClick={() => handleCloneItinerary(post)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleCloneItinerary(post);
+                            }}
                             disabled={cloningPostId === post.id}
-                            className="flex-1 py-2 px-3 rounded-sm bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold  shadow-sky-600/20 hover:shadow-none transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 active:scale-95 whitespace-nowrap"
+                            className="py-1 px-2.5 rounded-[4px] bg-clay-50 hover:bg-clay-600 text-clay-700 hover:text-white border border-clay-300/70 text-[11px] font-bold transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                            title="Sao chép lộ trình này vào tài khoản của bạn"
                           >
                             {cloningPostId === post.id ? (
-                              <>
-                                <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />
-                                <span>Đang chép...</span>
-                              </>
+                              <Loader2 className="w-3 h-3 animate-spin shrink-0" />
                             ) : (
-                              <>
-                                <Copy className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-                                <span>Sao chép Tour</span>
-                              </>
+                              <Copy className="w-3 h-3 shrink-0" />
                             )}
+                            <span className="hidden sm:inline">Sao chép</span>
                           </button>
                         )}
+                        <span className="text-xs font-bold text-clay-600 group-hover/itin:text-clay-700 flex items-center gap-0.5 transition-colors">
+                          <span className="hidden sm:inline">Xem tour</span>
+                          <ArrowRight className="w-3.5 h-3.5 group-hover/itin:translate-x-0.5 transition-transform" />
+                        </span>
                       </div>
                     </div>
                   )}

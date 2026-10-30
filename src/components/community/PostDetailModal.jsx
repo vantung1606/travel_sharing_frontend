@@ -919,52 +919,53 @@ export const PostDetailModal = ({
                   </div>
                 )}
 
-                {/* Attached Itinerary Card */}
+                {/* Attached Itinerary Card (Compact Style - Giảm 50% diện tích, bấm trực tiếp để xem) */}
                 {(post.itineraryId || post.itineraryTitle) && (
-                  <div className="p-4 rounded-2xl bg-gradient-to-br from-sky-50/70 via-indigo-50/40 to-sky-50/60 border border-sky-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-sky-600 text-white flex items-center justify-center shadow-xs shrink-0">
-                        <Route className="w-6 h-6" />
+                  <div
+                    onClick={() => {
+                      if (typeof onSelectItinerary === 'function') {
+                        onSelectItinerary({
+                          id: post.itineraryId,
+                          title: post.itineraryTitle,
+                          destination: post.itineraryDestination,
+                          budgetTotal: post.itineraryBudget
+                        });
+                      }
+                    }}
+                    className="p-3 sm:p-3.5 rounded-[8px] bg-[#FAF7F0] hover:bg-[#F3ECE0] border border-[#E8DFD1] flex items-center justify-between gap-3 shadow-2xs hover:shadow-xs transition-all cursor-pointer group/itin"
+                    title="Bấm để xem chi tiết lộ trình"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-md bg-clay-600/10 text-clay-700 flex items-center justify-center shrink-0 group-hover/itin:bg-clay-600 group-hover/itin:text-white transition-colors">
+                        <Route className="w-4 h-4" />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] font-bold text-sky-700 bg-sky-100/70 px-2 py-0.5 rounded-md">
+                      <div className="min-w-0 space-y-0.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-[10px] font-bold text-clay-800 bg-clay-100/80 px-2 py-0.5 rounded-md">
                             Lịch trình đính kèm
                           </span>
                           {post.itineraryIsAi && (
                             <span className="flex items-center gap-0.5 text-[10px] text-amber-700 font-bold">
-                              <Sparkles className="w-3 h-3 text-amber-500" /> AI Tạo
+                              <Sparkles className="w-3 h-3 text-amber-500" /> AI
                             </span>
                           )}
                         </div>
-                        <h4 className="font-extrabold text-sm sm:text-base text-slate-900 mt-0.5">
+                        <h4 className="font-bold text-sm text-ink-900 truncate group-hover/itin:text-clay-700 transition-colors">
                           {post.itineraryTitle || 'Lịch trình khám phá'}
                         </h4>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-ink-500 font-serif">
                           {post.itineraryDestination || 'Điểm đến thú vị'} • Ngân sách:{' '}
-                          <span className="font-bold text-sky-600">
+                          <span className="font-semibold text-clay-700">
                             {Number(post.itineraryBudget || 0).toLocaleString('vi-VN')} đ
                           </span>
                         </p>
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => {
-                        if (typeof onSelectItinerary === 'function') {
-                          onSelectItinerary({
-                            id: post.itineraryId,
-                            title: post.itineraryTitle,
-                            destination: post.itineraryDestination,
-                            budgetTotal: post.itineraryBudget
-                          });
-                        }
-                      }}
-                      className="px-4 py-2 rounded-xl ocean-gradient text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-sm hover:opacity-95 cursor-pointer shrink-0"
-                    >
-                      <Eye className="w-4 h-4" />
-                      <span>Xem lịch trình</span>
-                    </button>
+                    <span className="text-xs font-bold text-clay-600 group-hover/itin:text-clay-700 flex items-center gap-1 shrink-0 transition-colors">
+                      <span className="hidden sm:inline">Xem tour</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover/itin:translate-x-0.5 transition-transform" />
+                    </span>
                   </div>
                 )}
 
