@@ -64,13 +64,20 @@ export function getAuthHeader() {
   return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
 
-// Global fetch wrapper with 401/403 Unauthorized handling
+// Global fetch wrapper with 401 Unauthorized handling.
+// 401 = token invalid/expired → clear session.
+// 403 = authenticated but missing permission → keep session (do not log the user out).
+// Only clear when the failing request used the token that is still current in this tab,
+// so a stale request from another tab cannot wipe a freshly logged-in session.
 const nativeFetch = typeof window !== 'undefined' ? window.fetch.bind(window) : globalThis.fetch.bind(globalThis);
 const fetch = async (url, options) => {
+  const tokenAtRequest = getAuthToken();
   const response = await nativeFetch(url, options);
-  if (response.status === 401 || response.status === 403) {
+  if (response.status === 401) {
     const urlStr = typeof url === 'string' ? url : (url?.url || '');
-    if (!urlStr.includes('/auth/login') && !urlStr.includes('/auth/register')) {
+    const isAuthEndpoint = urlStr.includes('/auth/login') || urlStr.includes('/auth/register');
+    const isCurrentSession = Boolean(tokenAtRequest) && getAuthToken() === tokenAtRequest;
+    if (!isAuthEndpoint && isCurrentSession) {
       try {
         localStorage.removeItem('wayfare_user');
         localStorage.removeItem('wayfare_auth');
