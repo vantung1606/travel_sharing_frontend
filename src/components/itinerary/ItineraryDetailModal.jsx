@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useToast } from '../common/Toast';
-import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2, Globe, Lock, Edit3, ArrowUp, ArrowDown } from 'lucide-react';
+import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2, Globe, Lock, Edit3, ArrowUp, ArrowDown, Bus, Hotel, Utensils, ShieldCheck, FileText, Backpack, Tag, Check, AlertCircle, Sparkles, UserCheck } from 'lucide-react';
 import { ItineraryExportModal } from './ItineraryExportModal';
 import { EditItineraryModal } from './EditItineraryModal';
 import { itineraryApi } from '../../services/api';
@@ -552,14 +552,16 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
   // Danh sách hiển thị theo tab
   const displayedDays = activeTab === 'all'
     ? days
-    : [days[Number(activeTab)] || days[0]];
+    : activeTab === 'tourStandard'
+      ? days
+      : [days[Number(activeTab)] || days[0]];
 
   // Tính toán các tọa độ thực tế của các trạm dừng trên bản đồ
   const mapPoints = useMemo(() => {
     const points = [];
     let pointCount = 0;
 
-    const sourceDays = activeTab === 'all' ? days : [days[Number(activeTab)] || days[0]];
+    const sourceDays = (activeTab === 'all' || activeTab === 'tourStandard') ? days : [days[Number(activeTab)] || days[0]];
 
     sourceDays.forEach((d, dayIndex) => {
       (d.activities || []).forEach((act, actIndex) => {
@@ -656,6 +658,13 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
     }
   }, [mapLayer]);
 
+  // Helper phân tách danh sách từ chuỗi văn bản cho hồ sơ tour
+  const parseListItems = (content, fallback = '') => {
+    const text = (content || fallback || '').trim();
+    if (!text) return [];
+    return text.split(/[\n;]+/).map(s => s.trim().replace(/^[-*•\d+.]\s*/, '')).filter(Boolean);
+  };
+
   if (!itinerary) return null;
 
   return (
@@ -671,6 +680,15 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
               <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold">
                 Kế Hoạch Du Lịch
               </span>
+              {itinerary.tourCode && (
+                <>
+                  <span>•</span>
+                  <span className="px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80 font-mono font-black flex items-center gap-1">
+                    <Tag className="w-3 h-3 text-amber-600" />
+                    <span>Mã Tour: {itinerary.tourCode}</span>
+                  </span>
+                </>
+              )}
               <span>•</span>
               <span className="flex items-center gap-1 text-slate-600">
                 <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-sky-600" />
@@ -775,35 +793,35 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
         {/* ─── 2. THÔNG SỐ BAO QUÁT (RESPONSIVE GRID) ─────────────────────────── */}
         <div className="px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 bg-slate-50/90 border-b border-slate-200 grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 text-xs shrink-0">
           <div className="space-y-0.5">
-            <span className="text-slate-500 text-[10px] sm:text-[11px] font-medium block">Thời lượng</span>
-            <span className="font-extrabold text-slate-900 text-xs sm:text-sm">
-              {days.length} Ngày {days.length > 1 ? `(${days.length - 1} Đêm)` : ''}
+            <span className="text-slate-500 text-[10px] sm:text-[11px] font-medium block">Thời lượng & Lộ trình</span>
+            <span className="font-extrabold text-slate-900 text-xs sm:text-sm truncate block" title={`${itinerary.departureLocation || 'Điểm đón'} → ${destinationName} ${itinerary.endingLocation ? `→ ${itinerary.endingLocation}` : ''}`}>
+              {days.length}N{days.length > 1 ? `${days.length - 1}Đ` : ''} • {itinerary.departureLocation || 'Điểm đón'} → {itinerary.endingLocation || destinationName}
             </span>
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-slate-500 text-[10px] sm:text-[11px] font-medium block">Tổng số trạm</span>
-            <span className="font-extrabold text-slate-900 text-xs sm:text-sm">
-              {totalPlaces} điểm dừng
+            <span className="text-slate-500 text-[10px] sm:text-[11px] font-medium block">Phương tiện chính</span>
+            <span className="font-extrabold text-slate-900 text-xs sm:text-sm truncate block">
+              {itinerary.transportation || 'Xe du lịch / Máy bay'}
             </span>
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-slate-500 text-[10px] sm:text-[11px] font-medium block">Mỗi thành viên</span>
+            <span className="text-slate-500 text-[10px] sm:text-[11px] font-medium block">Mỗi khách / Giá bán</span>
             <span className="font-extrabold text-sky-700 text-xs sm:text-sm">
               ~{Number(itinerary.budgetPerPerson || Math.round(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) / 2)).toLocaleString('vi-VN')}đ
             </span>
           </div>
 
           <div className="space-y-0.5">
-            <span className="text-slate-500 text-[10px] sm:text-[11px] font-medium block">Lộ trình</span>
-            <span className="font-extrabold text-slate-900 text-xs sm:text-sm truncate block">
-              Tuyến tối ưu liên tục
+            <span className="text-slate-500 text-[10px] sm:text-[11px] font-medium block">Đoàn khách & HDV</span>
+            <span className="font-extrabold text-slate-900 text-xs sm:text-sm truncate block" title={itinerary.targetAudience || itinerary.groupType}>
+              {itinerary.targetAudience || itinerary.groupType || 'Khách lẻ / Đoàn'} {itinerary.maxGroupSize ? `(Tối đa ${itinerary.maxGroupSize}k)` : ''}
             </span>
           </div>
         </div>
 
-        {/* ─── 3. THANH ĐIỀU HƯỚNG TỪNG NGÀY (SCROLL MƯỢT TRÊN MOBILE) ─────────── */}
+        {/* ─── 3. THANH ĐIỀU HƯỚNG TỪNG NGÀY & CHUẨN TOUR LỮ HÀNH ─────────── */}
         <div className="px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 bg-white border-b border-slate-200 flex items-center gap-1.5 sm:gap-2 overflow-x-auto shrink-0 scrollbar-none touch-pan-x">
           <button
             type="button"
@@ -845,39 +863,395 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
               </button>
             );
           })}
-        </div>
-
-        {/* ─── 4. MOBILE / TABLET SEGMENTED SWITCHER (< 1024px) ───────────────── */}
-        <div className="lg:hidden px-4 sm:px-6 py-2 bg-slate-100/80 border-b border-slate-200 flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={() => setMobileTab('timeline')}
-            className={`flex-1 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              mobileTab === 'timeline'
-                ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <ListFilter className="w-3.5 h-3.5 text-sky-600" />
-            <span>Lịch Trình Chi Tiết</span>
-          </button>
 
           <button
             type="button"
-            onClick={() => setMobileTab('map')}
-            className={`flex-1 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              mobileTab === 'map'
-                ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
-                : 'text-slate-600 hover:text-slate-900'
+            onClick={() => {
+              setActiveTab('tourStandard');
+              setSelectedMapPoint(null);
+            }}
+            className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
+              activeTab === 'tourStandard'
+                ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-xs'
+                : 'bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100'
             }`}
+            title="Xem hồ sơ chuẩn 15 tiêu chí tour lữ hành thương mại"
           >
-            <MapIcon className="w-3.5 h-3.5 text-sky-600" />
-            <span>Bản Đồ & Lộ Trình ({mapPoints.length})</span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+            <span>📜 Chuẩn Tour Lữ Hành (15 Tiêu Chí)</span>
           </button>
         </div>
+
+        {/* ─── 4. MOBILE / TABLET SEGMENTED SWITCHER (< 1024px) (ẨN KHI Ở TAB CHUẨN TOUR) ── */}
+        {activeTab !== 'tourStandard' && (
+          <div className="lg:hidden px-4 sm:px-6 py-2 bg-slate-100/80 border-b border-slate-200 flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setMobileTab('timeline')}
+              className={`flex-1 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                mobileTab === 'timeline'
+                  ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <ListFilter className="w-3.5 h-3.5 text-sky-600" />
+              <span>Lịch Trình Chi Tiết</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMobileTab('map')}
+              className={`flex-1 py-1.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                mobileTab === 'map'
+                  ? 'bg-white text-slate-900 shadow-xs border border-slate-200'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <MapIcon className="w-3.5 h-3.5 text-sky-600" />
+              <span>Bản Đồ & Lộ Trình ({mapPoints.length})</span>
+            </button>
+          </div>
+        )}
 
         {/* ─── 5. NỘI DUNG CHÍNH (RESPONSIVE WORKSPACE) ────────────────────────── */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 bg-slate-50/40">
+        {activeTab === 'tourStandard' ? (
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 space-y-6 bg-slate-50/50">
+            
+            {/* Banner Header Hồ Sơ Chuẩn Tour Lữ Hành */}
+            <div className="p-4 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1 sm:space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-white/20 text-white text-[11px] font-black uppercase tracking-wider backdrop-blur-xs flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-amber-200" />
+                    Hồ Sơ Chuẩn 15 Tiêu Chí Lữ Hành Thương Mại
+                  </span>
+                  {itinerary.tourCode && (
+                    <span className="px-2.5 py-0.5 rounded-full bg-slate-950/30 text-amber-100 text-[11px] font-mono font-black">
+                      #{itinerary.tourCode}
+                    </span>
+                  )}
+                </div>
+                <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white drop-shadow-xs">
+                  {itinerary.title || `Tour Du Lịch Trọn Gói ${destinationName}`}
+                </h2>
+                <p className="text-amber-100 text-xs sm:text-sm font-medium line-clamp-2 max-w-3xl">
+                  {itinerary.description || `Lịch trình được thiết kế chuẩn mực theo 15 tiêu chuẩn khắt khe của ngành lữ hành: minh bạch biểu phí, cam kết dịch vụ bao gồm/loại trừ, chính sách cọc/hủy và kế hoạch lưu trú ẩm thực tối ưu.`}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="px-4 py-2 rounded-2xl bg-white text-orange-800 hover:bg-orange-50 font-black text-xs shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <Edit3 className="w-4 h-4 text-orange-600" />
+                  <span>Sửa Hồ Sơ Tour</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsExportModalOpen(true)}
+                  className="px-4 py-2 rounded-2xl bg-orange-700/80 hover:bg-orange-800 text-white font-black text-xs border border-white/20 transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                >
+                  <Download className="w-4 h-4" />
+                  <span className="hidden sm:inline">Xuất Cẩm Nang PDF</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Grid 1: 1. Thông Tin Tour & 2. Thời Gian & 3. Tuyến Vận Hành & 5. Phương Tiện */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              
+              {/* Thẻ 1: Thông tin tour & Chủ đề */}
+              <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                <div className="flex items-center gap-2 text-slate-800 font-extrabold text-xs uppercase tracking-wider pb-2 border-b border-slate-100">
+                  <Tag className="w-4 h-4 text-amber-600" />
+                  <span>1. Thông Tin & Chủ Đề Tour</span>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <span className="text-slate-400 font-medium block text-[11px]">Mã Tour điều hành</span>
+                    <span className="font-mono font-black text-amber-800 bg-amber-50 px-2 py-0.5 rounded text-xs inline-block mt-0.5">
+                      {itinerary.tourCode || 'WAY-FIT-STANDARD'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-medium block text-[11px]">Chủ đề hành trình</span>
+                    <span className="font-bold text-slate-900">
+                      {itinerary.theme || itinerary.travelStyle || 'Khám phá văn hóa & Thư giãn nghỉ dưỡng'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-medium block text-[11px]">Thời lượng tour</span>
+                    <span className="font-bold text-slate-900">
+                      {days.length} Ngày {days.length > 1 ? `${days.length - 1} Đêm` : 'Trong ngày'} ({itinerary.departureDate || 'Khởi hành định kỳ'})
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Thẻ 2: Tuyến đón trả & Phương tiện */}
+              <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                <div className="flex items-center gap-2 text-slate-800 font-extrabold text-xs uppercase tracking-wider pb-2 border-b border-slate-100">
+                  <Bus className="w-4 h-4 text-sky-600" />
+                  <span>2. Tuyến Đón Trả & Phương Tiện</span>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <span className="text-slate-400 font-medium block text-[11px]">Điểm đón / Xuất phát</span>
+                    <span className="font-bold text-slate-900 block truncate">
+                      {itinerary.departureLocation || 'Trung tâm TP / Sân bay chỉ định'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-medium block text-[11px]">Điểm đến chính</span>
+                    <span className="font-bold text-sky-700 block truncate">
+                      {destinationName}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-medium block text-[11px]">Điểm kết thúc tour</span>
+                    <span className="font-bold text-slate-900 block truncate">
+                      {itinerary.endingLocation || itinerary.departureLocation || destinationName}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-medium block text-[11px]">Phương tiện di chuyển chính</span>
+                    <span className="font-semibold text-slate-800">
+                      {itinerary.transportation || 'Xe ô tô du lịch đời mới máy lạnh suốt tuyến'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Thẻ 3: Đối tượng đoàn & Hướng dẫn viên */}
+              <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3 md:col-span-2 lg:col-span-1">
+                <div className="flex items-center gap-2 text-slate-800 font-extrabold text-xs uppercase tracking-wider pb-2 border-b border-slate-100">
+                  <Users className="w-4 h-4 text-indigo-600" />
+                  <span>3. Khách Hàng & Hướng Dẫn Viên</span>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <span className="text-slate-400 font-medium block text-[11px]">Đối tượng & Phân khúc</span>
+                    <span className="font-bold text-slate-900">
+                      {itinerary.targetAudience || itinerary.groupType || 'Gia đình, bạn bè, nhóm du khách mọi độ tuổi'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-medium block text-[11px]">Quy mô đoàn tối đa</span>
+                    <span className="font-bold text-indigo-700">
+                      {itinerary.maxGroupSize ? `${itinerary.maxGroupSize} khách / đoàn` : '15 - 25 khách (Đoàn tiêu chuẩn)'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-medium block text-[11px]">Hướng dẫn viên & Nhiệm vụ</span>
+                    <p className="text-slate-700 leading-relaxed font-medium">
+                      {itinerary.tourGuideInfo || 'Hướng dẫn viên thẻ quốc tế/nội địa nhiệt tình, giàu kinh nghiệm, thuyết minh lịch sử và hỗ trợ chụp ảnh suốt tuyến.'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Grid 2: 7. Ẩm Thực & 8. Lưu Trú & 11. Biểu Phí Tour */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
+              
+              {/* Cột 1 (4 cột): Biểu phí minh bạch */}
+              <div className="lg:col-span-4 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+                <div className="flex items-center gap-2 text-slate-800 font-extrabold text-xs uppercase tracking-wider pb-2 border-b border-slate-100">
+                  <DollarSign className="w-4 h-4 text-emerald-600" />
+                  <span>11. Biểu Giá Tour Trọn Gói</span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="p-3 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                    <span className="text-[11px] font-bold text-emerald-800 block">Giá Người Lớn (Từ 12 tuổi):</span>
+                    <span className="text-lg font-black text-emerald-700">
+                      ~{Number(itinerary.budgetPerPerson || Math.round(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) / 2)).toLocaleString('vi-VN')} đ
+                    </span>
+                    <span className="text-[10px] text-emerald-600 block mt-0.5">Đã bao gồm toàn bộ dịch vụ tiêu chuẩn</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <span className="text-[11px] font-bold text-slate-700 block">Giá Trẻ Em (5 - 11 tuổi):</span>
+                    <span className="text-sm font-black text-slate-900">
+                      {itinerary.childPrice ? `${Number(itinerary.childPrice).toLocaleString('vi-VN')} đ` : '75% giá người lớn (Có ghế ngồi & suất ăn riêng)'}
+                    </span>
+                    <span className="text-[10px] text-slate-500 block mt-0.5">Em bé dưới 5 tuổi: Miễn phí vé tour</span>
+                  </div>
+
+                  <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80">
+                    <span className="text-[11px] font-bold text-slate-700 block">Phụ Thu Phòng Đơn:</span>
+                    <span className="text-sm font-black text-slate-900">
+                      {itinerary.singleRoomSurcharge ? `${Number(itinerary.singleRoomSurcharge).toLocaleString('vi-VN')} đ/khách` : 'Áp dụng khi khách yêu cầu ở riêng 1 phòng'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cột 2 (8 cột): 7. Ẩm thực & 8. Lưu trú */}
+              <div className="lg:col-span-8 bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  
+                  {/* Khối Ẩm thực */}
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2 text-slate-800 font-extrabold text-xs uppercase tracking-wider pb-2 border-b border-slate-100">
+                      <Utensils className="w-4 h-4 text-orange-500" />
+                      <span>7. Kế Hoạch Ẩm Thực</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-orange-50/50 border border-orange-100 text-xs text-slate-700 leading-relaxed font-medium">
+                      {itinerary.mealPlan || 'Trọn gói các bữa ăn: Bữa sáng buffet tại khách sạn; Bữa trưa và tối thưởng thức đặc sản địa phương tại các nhà hàng tiêu chuẩn đạt chứng nhận ATTP.'}
+                    </div>
+                  </div>
+
+                  {/* Khối Lưu trú */}
+                  <div className="space-y-2.5">
+                    <div className="flex items-center gap-2 text-slate-800 font-extrabold text-xs uppercase tracking-wider pb-2 border-b border-slate-100">
+                      <Hotel className="w-4 h-4 text-sky-600" />
+                      <span>8. Tiêu Chuẩn Lưu Trú</span>
+                    </div>
+                    <div className="p-3.5 rounded-xl bg-sky-50/50 border border-sky-100 text-xs text-slate-700 leading-relaxed font-medium">
+                      {itinerary.accommodationInfo || 'Khách sạn / Resort tiêu chuẩn 3-4 sao trung tâm tiện nghi, tiêu chuẩn 2 khách/phòng (Lẻ nam/nữ ghép phòng 3 hoặc phụ thu phòng đơn).'}
+                    </div>
+                  </div>
+
+                </div>
+
+                {/* Tóm tắt 9. Điểm Tham Quan Nổi Bật */}
+                <div className="pt-3 border-t border-slate-100">
+                  <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-2">
+                    9. Các Điểm Tham Quan & Trải Nghiệm Trong Lịch Trình ({totalPlaces} Điểm Dừng)
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {mapPoints.slice(0, 12).map((pt, pIdx) => (
+                      <span key={pIdx} className="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold flex items-center gap-1">
+                        <MapPin className="w-3 h-3 text-sky-600" />
+                        <span>{pt.cleanName}</span>
+                      </span>
+                    ))}
+                    {mapPoints.length > 12 && (
+                      <span className="px-2.5 py-1 rounded-lg bg-sky-50 text-sky-700 text-xs font-bold">
+                        +{mapPoints.length - 12} điểm khác
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Grid 3: 12. Dịch Vụ Bao Gồm (Xanh) vs 13. Dịch Vụ Không Bao Gồm (Đỏ) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+              
+              {/* Bao Gồm */}
+              <div className="bg-white p-4 sm:p-5 rounded-2xl border border-emerald-200/80 shadow-2xs space-y-3">
+                <div className="flex items-center gap-2 text-emerald-800 font-extrabold text-xs uppercase tracking-wider pb-2 border-b border-emerald-100">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  <span>12. Dịch Vụ Đã Bao Gồm Trong Tour</span>
+                </div>
+                <div className="space-y-2 text-xs">
+                  {parseListItems(
+                    itinerary.servicesIncluded,
+                    'Xe vận chuyển đời mới máy lạnh suốt hành trình\nKhách sạn tiêu chuẩn 3-4 sao trung tâm (2 khách/phòng)\nVé vào cổng các điểm tham quan theo lịch trình\nCác bữa ăn sáng và ăn chính đặc sản theo chương trình\nBảo hiểm du lịch nội địa mức bồi thường tối đa 50.000.000đ/vụ\nHướng dẫn viên nhiệt tình, tận tâm theo suốt tuyến\nNước suối đóng chai 1 chai/khách/ngày và khăn lạnh'
+                  ).map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-slate-700">
+                      <span className="w-4 h-4 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black">✓</span>
+                      <span className="leading-relaxed font-medium">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Không Bao Gồm */}
+              <div className="bg-white p-4 sm:p-5 rounded-2xl border border-rose-200/80 shadow-2xs space-y-3">
+                <div className="flex items-center gap-2 text-rose-800 font-extrabold text-xs uppercase tracking-wider pb-2 border-b border-rose-100">
+                  <AlertCircle className="w-4 h-4 text-rose-600" />
+                  <span>13. Dịch Vụ Không Bao Gồm (Tự Túc)</span>
+                </div>
+                <div className="space-y-2 text-xs">
+                  {parseListItems(
+                    itinerary.servicesExcluded,
+                    'Thuế VAT 8% hoặc 10% (xuất hóa đơn theo yêu cầu)\nChi phí phòng đơn nếu khách ngủ riêng\nĐồ uống trong bữa ăn, minibar, giặt ủi, điện thoại\nVé các trò chơi cảm giác mạnh ngoài lịch trình tiêu chuẩn\nTiền tip bồi dưỡng cho hướng dẫn viên và lái xe (tùy tâm)\nChi phí cá nhân ngoài chương trình'
+                  ).map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2 text-slate-700">
+                      <span className="w-4 h-4 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-black">✕</span>
+                      <span className="leading-relaxed font-medium">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Grid 4: 14. Chính Sách Hoàn Hủy & 15. Hướng Dẫn Hành Lý */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+              
+              {/* Chính sách Cọc & Hoàn Hủy */}
+              <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                <div className="flex items-center gap-2 text-slate-800 font-extrabold text-xs uppercase tracking-wider pb-2 border-b border-slate-100">
+                  <ShieldCheck className="w-4 h-4 text-amber-600" />
+                  <span>14. Chính Sách Cọc & Hoàn Hủy Tour</span>
+                </div>
+                <div className="p-3.5 rounded-xl bg-amber-50/40 border border-amber-100 text-xs text-slate-700 leading-relaxed font-medium space-y-2">
+                  {parseListItems(
+                    itinerary.cancellationPolicy,
+                    'Đặt cọc 50% tổng chi phí ngay khi đăng ký tour\nThanh toán 50% còn lại trước ngày khởi hành 03 ngày\nHủy tour trước 07 ngày: Miễn phí hoàn 100% tiền cọc\nHủy tour từ 03 - 06 ngày trước khởi hành: Phạt 50% tiền cọc\nHủy trong vòng 48h trước giờ đi: Phạt 100% chi phí tour'
+                  ).map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0 mt-1.5" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Hướng Dẫn Hành Lý */}
+              <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                <div className="flex items-center gap-2 text-slate-800 font-extrabold text-xs uppercase tracking-wider pb-2 border-b border-slate-100">
+                  <Backpack className="w-4 h-4 text-emerald-600" />
+                  <span>15. Hướng Dẫn Hành Lý & Giấy Tờ Cần Thiết</span>
+                </div>
+                <div className="p-3.5 rounded-xl bg-emerald-50/40 border border-emerald-100 text-xs text-slate-700 leading-relaxed font-medium space-y-2">
+                  {parseListItems(
+                    itinerary.packingNotes,
+                    'Bắt buộc mang theo CCCD/Hộ chiếu gốc hoặc GPLX còn hạn sử dụng\nTrang phục gọn nhẹ, giày thể thao hoặc sandal êm chân\nChuẩn bị trang phục lịch sự, kín đáo khi tham quan đền chùa di tích\nKem chống nắng, kính râm, nón rộng vành và sạc dự phòng\nThuốc men cá nhân (say xe, đau bụng, dị ứng thời tiết)'
+                  ).map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-1.5" />
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+            {/* Khối Chuyển Nhanh Sang Lịch Trình Chi Tiết Từng Khung Giờ (Tiêu chí 6) */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-0.5">
+                <h4 className="font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-sky-600" />
+                  <span>6. Xem Lịch Trình Từng Giờ & Bản Đồ Vệ Tinh Số</span>
+                </h4>
+                <p className="text-xs text-slate-500">
+                  Khám phá toàn bộ {days.length} ngày với từng khung giờ, định vị GPS vệ tinh và quãng đường di chuyển liên tục.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('all')}
+                className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap active:scale-95"
+              >
+                <span>Xem Lộ Trình Chi Tiết Các Ngày</span>
+                <span>→</span>
+              </button>
+            </div>
+
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 bg-slate-50/40">
           
           {/* CỘT TRÁI (7 CỘT): LỊCH TRÌNH CHI TIẾT TỪNG HOẠT ĐỘNG */}
           <div className={`space-y-5 sm:space-y-6 lg:col-span-7 ${mobileTab === 'timeline' ? 'block' : 'hidden lg:block'}`}>
@@ -1475,6 +1849,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
           </div>
 
         </div>
+        )}
 
         {/* ─── 6. FOOTER RÕ RÀNG, TINH GỌN, RESPONSIVE ───────────────────────── */}
         <div className="px-4 sm:px-6 md:px-8 py-3 sm:py-4 bg-white border-t border-slate-200 flex items-center justify-between gap-2 sm:gap-3 shrink-0">

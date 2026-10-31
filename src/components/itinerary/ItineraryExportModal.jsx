@@ -58,9 +58,33 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
     let out = `====================================================\n`;
     out += `🗺️ CẨM NANG HÀNH TRÌNH DU LỊCH WAYFARE\n`;
     out += `📌 Chuyến đi: ${title}\n`;
+    if (itinerary.tourCode) {
+      out += `🏷️ Mã Tour: ${itinerary.tourCode}\n`;
+    }
     out += `📍 Điểm đến: ${destination} | ⏱️ Thời lượng: ${duration}\n`;
+    if (itinerary.departureLocation || itinerary.endingLocation) {
+      out += `🚍 Tuyến: ${itinerary.departureLocation || 'Điểm đón'} → ${destination} ${itinerary.endingLocation ? `→ ${itinerary.endingLocation}` : ''}\n`;
+    }
+    if (itinerary.transportation) {
+      out += `🚗 Phương tiện: ${itinerary.transportation}\n`;
+    }
+    if (itinerary.targetAudience || itinerary.maxGroupSize) {
+      out += `👥 Khách hàng: ${itinerary.targetAudience || 'Khách lẻ/đoàn'} (Quy mô: ${itinerary.maxGroupSize || 'Tiêu chuẩn'} khách)\n`;
+    }
+    if (itinerary.tourGuideInfo) {
+      out += `👨‍💼 Hướng dẫn viên: ${itinerary.tourGuideInfo}\n`;
+    }
+    if (itinerary.mealPlan) {
+      out += `🍲 Ẩm thực: ${itinerary.mealPlan}\n`;
+    }
+    if (itinerary.accommodationInfo) {
+      out += `🏨 Lưu trú: ${itinerary.accommodationInfo}\n`;
+    }
     if (includeBudget) {
       out += `💰 Dự toán: ~${Number(budgetPerPerson).toLocaleString('vi-VN')} đ/người (Tổng nhóm: ~${Number(totalBudget).toLocaleString('vi-VN')} đ)\n`;
+      if (itinerary.childPrice || itinerary.singleRoomSurcharge) {
+        out += `   • Giá trẻ em: ${itinerary.childPrice ? Number(itinerary.childPrice).toLocaleString('vi-VN') + 'đ' : 'Theo quy định'} | Phụ thu phòng đơn: ${itinerary.singleRoomSurcharge ? Number(itinerary.singleRoomSurcharge).toLocaleString('vi-VN') + 'đ' : 'Không có'}\n`;
+      }
     }
     out += `====================================================\n\n`;
 
@@ -78,6 +102,19 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
       }
       out += `----------------------------------------------------\n`;
     });
+
+    if (itinerary.servicesIncluded) {
+      out += `\n✅ DỊCH VỤ ĐÃ BAO GỒM:\n${itinerary.servicesIncluded}\n`;
+    }
+    if (itinerary.servicesExcluded) {
+      out += `\n❌ DỊCH VỤ KHÔNG BAO GỒM (TỰ TÚC):\n${itinerary.servicesExcluded}\n`;
+    }
+    if (itinerary.cancellationPolicy) {
+      out += `\n📜 CHÍNH SÁCH CỌC & HOÀN HỦY TOUR:\n${itinerary.cancellationPolicy}\n`;
+    }
+    if (itinerary.packingNotes) {
+      out += `\n🎒 LƯU Ý HÀNH LÝ & GIẤY TỜ ĐI TOUR:\n${itinerary.packingNotes}\n`;
+    }
 
     if (includeChecklist) {
       out += `\n🎒 HÀNH TRANG CẦN CHUẨN BỊ:\n`;
@@ -392,10 +429,17 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
         <div class="title-section">
           <h1 class="main-title">${title}</h1>
           <div class="meta-grid">
+            ${itinerary.tourCode ? `<div class="meta-item">🏷️ Mã Tour: <strong>${itinerary.tourCode}</strong></div>` : ''}
             <div class="meta-item">📍 Điểm đến: <strong>${destination}</strong></div>
             <div class="meta-item">⏱️ Thời lượng: <strong>${duration}</strong></div>
+            ${itinerary.departureLocation || itinerary.endingLocation ? `<div class="meta-item">🚍 Tuyến: <strong>${itinerary.departureLocation || 'Điểm đón'} → ${destination} ${itinerary.endingLocation ? `→ ${itinerary.endingLocation}` : ''}</strong></div>` : ''}
+            ${itinerary.transportation ? `<div class="meta-item">🚗 Phương tiện: <strong>${itinerary.transportation}</strong></div>` : ''}
             ${includeBudget ? `<div class="meta-item">💰 Ngân sách: <strong>~${Number(budgetPerPerson).toLocaleString('vi-VN')} đ/người</strong> (Tổng: ${Number(totalBudget).toLocaleString('vi-VN')} đ)</div>` : ''}
-            <div class="meta-item">✨ Phân loại: <strong>Lộ trình WanderAI Tối Ưu</strong></div>
+            ${itinerary.childPrice ? `<div class="meta-item">👶 Giá trẻ em: <strong>${Number(itinerary.childPrice).toLocaleString('vi-VN')} đ</strong></div>` : ''}
+            ${itinerary.singleRoomSurcharge ? `<div class="meta-item">🛏️ Phụ thu phòng đơn: <strong>${Number(itinerary.singleRoomSurcharge).toLocaleString('vi-VN')} đ</strong></div>` : ''}
+            ${itinerary.mealPlan ? `<div class="meta-item">🍲 Ẩm thực: <strong>${itinerary.mealPlan}</strong></div>` : ''}
+            ${itinerary.accommodationInfo ? `<div class="meta-item">🏨 Lưu trú: <strong>${itinerary.accommodationInfo}</strong></div>` : ''}
+            ${itinerary.tourGuideInfo ? `<div class="meta-item">👨‍💼 HDV: <strong>${itinerary.tourGuideInfo}</strong></div>` : ''}
           </div>
         </div>
 
@@ -416,6 +460,41 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
             `).join('')}
           </div>
         `).join('')}
+
+        <!-- TOUR STANDARD INCLUSIONS & POLICIES -->
+        ${(itinerary.servicesIncluded || itinerary.servicesExcluded) ? `
+          <div class="info-grid" style="margin-bottom: 16px;">
+            ${itinerary.servicesIncluded ? `
+              <div class="info-col" style="border-left: 3px solid #10b981;">
+                <h4 style="color: #047857;">✅ Dịch vụ đã bao gồm</h4>
+                <div style="white-space: pre-line; line-height: 1.5;">${itinerary.servicesIncluded}</div>
+              </div>
+            ` : ''}
+            ${itinerary.servicesExcluded ? `
+              <div class="info-col" style="border-left: 3px solid #ef4444;">
+                <h4 style="color: #b91c1c;">❌ Dịch vụ chưa bao gồm (Tự túc)</h4>
+                <div style="white-space: pre-line; line-height: 1.5;">${itinerary.servicesExcluded}</div>
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
+
+        ${(itinerary.cancellationPolicy || itinerary.packingNotes) ? `
+          <div class="info-grid" style="margin-bottom: 16px;">
+            ${itinerary.cancellationPolicy ? `
+              <div class="info-col" style="border-left: 3px solid #f59e0b;">
+                <h4 style="color: #b45309;">📜 Chính sách cọc & Hoàn hủy</h4>
+                <div style="white-space: pre-line; line-height: 1.5;">${itinerary.cancellationPolicy}</div>
+              </div>
+            ` : ''}
+            ${itinerary.packingNotes ? `
+              <div class="info-col" style="border-left: 3px solid #0284c7;">
+                <h4 style="color: #0369a1;">🎒 Lưu ý hành lý & Giấy tờ</h4>
+                <div style="white-space: pre-line; line-height: 1.5;">${itinerary.packingNotes}</div>
+              </div>
+            ` : ''}
+          </div>
+        ` : ''}
 
         <!-- OPTIONAL SECTIONS -->
         <div class="info-grid">
