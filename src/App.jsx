@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, lazy, Suspense } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React, { useEffect, useRef, useState, lazy, Suspense } from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { PermissionProvider } from './context/PermissionContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -14,6 +14,7 @@ import { AITripGeneratorModal } from './components/ai/AITripGeneratorModal';
 import { AuthModal } from './components/auth/AuthModal';
 import { FloatingChatWidget } from './components/common/FloatingChatWidget';
 import { PageTitleManager, AdminRouteGuard, UserAuthGuard } from './components/common/RouteGuards';
+import { Wrench } from 'lucide-react';
 
 // Resilient lazy import: tự động reload trang 1 lần nếu phát hiện chunk cũ bị 404 sau khi deploy
 const lazyRetry = (componentImport) => {
@@ -58,7 +59,12 @@ const AdminReviewsPage = lazyRetry(() => import('./pages/admin/Reviews/AdminRevi
 const AdminStatisticsPage = lazyRetry(() => import('./pages/admin/Statistics/AdminStatisticsPage').then(m => ({ default: m.AdminStatisticsPage })));
 const AdminAppearancePage = lazyRetry(() => import('./pages/admin/Appearance/AdminAppearancePage').then(m => ({ default: m.AdminAppearancePage })));
 const AdminModeratorsPage = lazyRetry(() => import('./pages/admin/Moderators/AdminModeratorsPage').then(m => ({ default: m.AdminModeratorsPage })));
+const AdminBroadcastPage = lazyRetry(() => import('./pages/admin/Broadcast/AdminBroadcastPage').then(m => ({ default: m.AdminBroadcastPage })));
+const AdminMaintenancePage = lazyRetry(() => import('./pages/admin/Maintenance/AdminMaintenancePage').then(m => ({ default: m.AdminMaintenancePage })));
 const AdminAuditLogsPage = lazyRetry(() => import('./pages/admin/AuditLogs/AdminAuditLogsPage').then(m => ({ default: m.AdminAuditLogsPage })));
+
+import { MaintenanceScreen } from './components/common/MaintenanceScreen';
+import { publicConfigApi } from './services/api';
 
 // Fallback hiển thị trong lúc tải chunk của route
 const RouteLoadingFallback = () => (
@@ -130,10 +136,54 @@ const AppContent = () => {
     };
   }, [isLoggedIn, currentUser?.id, currentUser?.email, addNewNotification, toast]);
 
+  const [maintenanceConfig, setMaintenanceConfig] = useState(null);
+
+  // Fetch site configuration (including maintenance mode)
+  useEffect(() => {
+    let isMounted = true;
+    const fetchSiteConfig = async () => {
+      try {
+        const res = await publicConfigApi.getSiteConfig();
+        const data = res?.data || res;
+        if (isMounted && data?.maintenance) {
+          setMaintenanceConfig(data.maintenance);
+        }
+      } catch (err) {
+        console.warn('[SiteConfig] Failed to fetch maintenance config:', err);
+      }
+    };
+    fetchSiteConfig();
+    const interval = setInterval(fetchSiteConfig, 30000); // Check every 30s
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
+  const isAdminUser = isLoggedIn && (roles.includes('ROLE_ADMIN') || (currentUser?.email && currentUser.email.toLowerCase().includes('admin')));
+  const isMaintenanceActive = maintenanceConfig?.enabled === true;
+
   // Tự động cuộn mượt lên đầu trang mỗi khi chuyển đổi giữa các trang
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [location.pathname]);
+
+  // Nếu hệ thống đang bật chế độ bảo trì và không phải Admin truy cập admin portal
+  if (!isAdminPath && isMaintenanceActive && !isAdminUser) {
+    return (
+      <div className="min-h-screen bg-[#F8F4EC] font-sans text-ink-900">
+        <PageTitleManager />
+        <MaintenanceScreen 
+          maintenanceData={maintenanceConfig} 
+          onAdminBypass={() => {
+            window.location.href = '/admin';
+          }} 
+        />
+        <AuthModal />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f8fafc] font-sans text-slate-900 selection:bg-sky-600 selection:text-white">
@@ -227,6 +277,12 @@ const AppContent = () => {
 
             {/* Admin Workspace Content */}
             <div className="min-w-0 md:pl-[260px] pt-16 min-h-screen">
+              {isMaintenanceActive && (
+                <div className="bg-amber-500 text-stone-900 px-4 sm:px-6 py-2.5 text-xs font-bold flex items-center gap-2.5 border-b border-amber-600 shadow-xs">
+                  <Wrench className="w-4 h-4 text-stone-900 shrink-0 animate-spin" />
+                  <span>⚠️ CHẾ ĐỘ BẢO TRÌ ĐANG BẬT: Khách du lịch đang bị chặn truy cập và đếm ngược. Bạn đang quản trị với tư cách Quản Trị Viên.</span>
+                </div>
+              )}
               <main className="min-w-0 p-4 sm:p-6 lg:p-8 bg-[#F8F4EC] min-h-[calc(100vh-64px)]">
                 {/* Admin Page Transition Wrapper */}
                 <div key={location.pathname} className="animate-page-enter min-w-0">
@@ -237,6 +293,8 @@ const AppContent = () => {
                       <Route path="/admin/places" element={<AdminPlacesPage />} />
                       <Route path="/admin/users" element={<AdminUsersPage />} />
                       <Route path="/admin/moderators" element={<AdminModeratorsPage />} />
+                      <Route path="/admin/broadcast" element={<AdminBroadcastPage />} />
+                      <Route path="/admin/maintenance" element={<AdminMaintenancePage />} />
                       <Route path="/admin/reports" element={<AdminReportsPage />} />
                       <Route path="/admin/reviews" element={<AdminReviewsPage />} />
                       <Route path="/admin/analytics" element={<AdminStatisticsPage />} />

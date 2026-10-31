@@ -21,6 +21,8 @@ export const AdminHeader = () => {
     reports: 'Bài viết & Báo cáo',
     analytics: 'Thống kê Hệ thống',
     appearance: 'Giao diện & Thương hiệu',
+    broadcast: 'Phát Thông Báo Toàn Hệ Thống',
+    maintenance: 'Quản Lý Chế Độ Bảo Trì',
     'audit-logs': 'Nhật ký Hệ thống & Hoạt động'
   };
 

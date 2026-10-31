@@ -62,7 +62,16 @@ export const ExploreSpotCard = ({
         {/* Top badges */}
         <div className="absolute top-2 left-2 right-2 flex items-start justify-between gap-2 pointer-events-none">
           <div className="flex items-center gap-1.5 min-w-0">
-            <span className="max-w-[190px] px-2 py-1 rounded-[3px] bg-[#F8F4EC]/95 text-[9px] sm:text-[10px] font-bold text-ink-700 border border-ink-200/80 truncate">
+            {item.isFeatured && (
+              <span
+                title={item.featuredBadge || 'Ghim Nổi Bật bởi Wayfare'}
+                className="px-2 py-0.5 rounded-[3px] bg-amber-500 text-stone-900 font-extrabold text-[9px] sm:text-[10px] shadow-xs flex items-center gap-1 shrink-0"
+              >
+                <span>⭐</span>
+                <span className="truncate max-w-[110px]">{item.featuredBadge || 'Nổi bật'}</span>
+              </span>
+            )}
+            <span className="max-w-[150px] px-2 py-1 rounded-[3px] bg-[#F8F4EC]/95 text-[9px] sm:text-[10px] font-bold text-ink-700 border border-ink-200/80 truncate">
               {item.category}
             </span>
             {item.isVerifiedHost && (

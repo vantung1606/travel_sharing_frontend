@@ -32,5 +32,8 @@ export function mapApiSpot(p) {
     ownerAvatar: p.ownerAvatar,
     tagline: p.description || 'Tọa độ check-in & trải nghiệm do người dùng và cơ sở bản địa chia sẻ.',
     description: p.description || '',
+    isFeatured: Boolean(p.isFeatured),
+    featuredOrder: p.featuredOrder != null ? Number(p.featuredOrder) : 0,
+    featuredBadge: p.featuredBadge || '',
   };
 }

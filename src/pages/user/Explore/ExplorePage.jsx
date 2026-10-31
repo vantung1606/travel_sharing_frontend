@@ -655,6 +655,16 @@ export const ExplorePage = () => {
         return item;
       })
       .sort((a, b) => {
+        // Điểm đến được Ghim Nổi Bật (Featured) luôn được ưu tiên lên đầu theo thứ tự ghim
+        if (a.isFeatured !== b.isFeatured) {
+          return a.isFeatured ? -1 : 1;
+        }
+        if (a.isFeatured && b.isFeatured) {
+          const orderA = a.featuredOrder ?? 999;
+          const orderB = b.featuredOrder ?? 999;
+          if (orderA !== orderB) return orderA - orderB;
+        }
+
         if (sortBy === 'nearest' && a.distanceKm && b.distanceKm) {
           return parseFloat(a.distanceKm) - parseFloat(b.distanceKm);
         }

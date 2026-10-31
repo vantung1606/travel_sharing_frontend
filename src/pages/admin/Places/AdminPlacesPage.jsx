@@ -70,6 +70,38 @@ export const AdminPlacesPage = () => {
   const [editPlaceModalData, setEditPlaceModalData] = useState(null);
   const [editPlaceForm, setEditPlaceForm] = useState(null);
 
+  // Featured / Trending Modal States
+  const [featuredModalPlace, setFeaturedModalPlace] = useState(null);
+  const [featuredForm, setFeaturedForm] = useState({ isFeatured: false, featuredOrder: 1, featuredBadge: '🔥 Xu hướng tuần này' });
+
+  useEffect(() => {
+    if (featuredModalPlace) {
+      setFeaturedForm({
+        isFeatured: featuredModalPlace.isFeatured ?? true,
+        featuredOrder: featuredModalPlace.featuredOrder || 1,
+        featuredBadge: featuredModalPlace.featuredBadge || '🔥 Xu hướng tuần này'
+      });
+    }
+  }, [featuredModalPlace]);
+
+  const handleSaveFeatured = async () => {
+    if (!featuredModalPlace) return;
+    setIsSubmitting(true);
+    try {
+      const updated = await placeApi.updateFeaturedStatus(featuredModalPlace.id, featuredForm);
+      toast.success(featuredForm.isFeatured
+        ? `Đã ghim "${featuredModalPlace.name}" lên danh sách Nổi Bật!`
+        : `Đã bỏ ghim "${featuredModalPlace.name}".`);
+      setAllPlaces(prev => prev.map(p => p.id === updated.id ? { ...p, ...updated } : p));
+      setPendingPlaces(prev => prev.map(p => p.id === updated.id ? { ...p, ...updated } : p));
+      setFeaturedModalPlace(null);
+    } catch (err) {
+      toast.error('Lỗi cập nhật ghim nổi bật: ' + err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // New Place Form Data
   const initialFormState = {
     name: '',
@@ -387,6 +419,8 @@ export const AdminPlacesPage = () => {
       sourceList = pendingPlaces;
     } else if (activeTab === 'Đang hoạt động') {
       sourceList = allPlaces.filter(p => p.status === 'ACTIVE');
+    } else if (activeTab === 'Nổi bật (Featured)') {
+      sourceList = allPlaces.filter(p => p.isFeatured);
     } else if (activeTab === 'Bị báo cáo vi phạm') {
       const reportedTargetIds = new Set(
         placeReports.map(r => String(r.targetId))
@@ -605,6 +639,7 @@ export const AdminPlacesPage = () => {
           {[
             { label: 'Đang hoạt động', count: totalActive, badgeBg: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
             { label: 'Chờ duyệt', count: pendingPlaces.length, badgeBg: 'bg-clay-50 text-clay-800 border-clay-200' },
+            { label: 'Nổi bật (Featured)', count: allPlaces.filter(p => p.isFeatured).length, badgeBg: 'bg-amber-100 text-amber-900 border-amber-300 font-bold' },
             { 
               label: 'Bị báo cáo vi phạm', 
               count: placeReports.filter(r => r.status === 'PENDING').length, 
@@ -780,6 +815,12 @@ export const AdminPlacesPage = () => {
                                     Đã xác thực
                                   </span>
                                 )}
+                                {p.isFeatured && (
+                                  <span className="px-1.5 py-0.5 rounded-[4px] bg-amber-50 text-amber-900 text-[9px] font-bold border border-amber-300 flex items-center gap-1 shadow-2xs">
+                                    <Sparkles className="w-2.5 h-2.5 fill-amber-500 text-amber-600" />
+                                    {p.featuredBadge || 'Ghim Nổi Bật'} (#{p.featuredOrder || 1})
+                                  </span>
+                                )}
                                 {p.aiModerationStatus === 'DUPLICATE_FLAGGED' && (
                                   <span className="px-1.5 py-0.5 rounded-[4px] bg-rose-50 text-rose-800 text-[9px] font-bold border border-rose-200 flex items-center gap-1">
                                     <AlertTriangle className="w-2.5 h-2.5" /> AI: Trùng lặp
@@ -877,6 +918,19 @@ export const AdminPlacesPage = () => {
                               title={p.isVerifiedHost ? 'Gỡ badge Xác thực' : 'Cấp badge Xác thực'}
                             >
                               <ShieldCheck className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setFeaturedModalPlace(p)}
+                              disabled={isSubmitting}
+                              className={`p-1.5 rounded-[4px] border transition-colors cursor-pointer disabled:opacity-40 ${
+                                p.isFeatured
+                                  ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600 shadow-2xs'
+                                  : 'bg-[#F8F4EC] text-ink-600 border-ink-200 hover:bg-amber-500 hover:text-white'
+                              }`}
+                              title={p.isFeatured ? `Đang ghim: ${p.featuredBadge || 'Nổi bật'} (Thứ tự #${p.featuredOrder || 1})` : 'Cấu hình Ghim Nổi Bật'}
+                            >
+                              <Sparkles className="w-3.5 h-3.5" />
                             </button>
                             <button
                               type="button"
@@ -1834,6 +1888,112 @@ export const AdminPlacesPage = () => {
                 className="px-4 py-1.5 rounded-[5px] bg-ink-800 text-[#FFFDF8] text-xs font-bold hover:bg-ink-900 transition-colors cursor-pointer"
               >
                 Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── 8. MODAL: CẤU HÌNH GHIM NỔI BẬT & CHIẾN DỊCH MÙA ─── */}
+      {featuredModalPlace && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/50 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between pb-3 border-b border-ink-100">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-[4px] bg-amber-100 text-amber-800 flex items-center justify-center border border-amber-200">
+                  <Sparkles className="w-4 h-4 fill-amber-400" />
+                </div>
+                <div>
+                  <h3 className="font-serif font-bold text-sm text-ink-900">
+                    Cấu hình Ghim Nổi Bật
+                  </h3>
+                  <p className="text-[11px] font-mono text-ink-400 truncate max-w-[260px]">
+                    {featuredModalPlace.name}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFeaturedModalPlace(null)}
+                className="p-1 rounded text-ink-400 hover:text-ink-800 hover:bg-[#F8F4EC] transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs font-sans">
+              {/* Toggle Switch */}
+              <label className="flex items-center justify-between p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 cursor-pointer">
+                <div>
+                  <span className="font-serif font-bold text-ink-800 block">Kích hoạt Ghim Nổi Bật</span>
+                  <span className="text-[11px] text-ink-500">Hiển thị ưu tiên tại Trang chủ & đầu trang Khám phá</span>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={featuredForm.isFeatured}
+                  onChange={(e) => setFeaturedForm(prev => ({ ...prev, isFeatured: e.target.checked }))}
+                  className="w-5 h-5 rounded-[4px] accent-amber-600 cursor-pointer"
+                />
+              </label>
+
+              {/* Order input */}
+              <div className="space-y-1.5">
+                <label className="font-serif font-bold text-ink-800">Thứ tự ưu tiên hiển thị (Số nhỏ đứng trước)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="999"
+                  value={featuredForm.featuredOrder}
+                  onChange={(e) => setFeaturedForm(prev => ({ ...prev, featuredOrder: parseInt(e.target.value) || 1 }))}
+                  className="w-full px-3 py-2 bg-[#FFFDF8] border border-ink-200 rounded-[4px] focus:outline-hidden focus:border-amber-600 font-mono text-xs"
+                />
+              </div>
+
+              {/* Badge text input */}
+              <div className="space-y-1.5">
+                <label className="font-serif font-bold text-ink-800">Huy hiệu chiến dịch / Nhãn nổi bật</label>
+                <input
+                  type="text"
+                  value={featuredForm.featuredBadge}
+                  onChange={(e) => setFeaturedForm(prev => ({ ...prev, featuredBadge: e.target.value }))}
+                  placeholder="Ví dụ: 🔥 Xu hướng tuần này, ⭐ Top điểm đến..."
+                  className="w-full px-3 py-2 bg-[#FFFDF8] border border-ink-200 rounded-[4px] focus:outline-hidden focus:border-amber-600 text-xs"
+                />
+              </div>
+
+              {/* Quick suggestions */}
+              <div className="space-y-1">
+                <span className="text-[11px] text-ink-400 font-serif">Gợi ý nhãn nhanh:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {['🔥 Xu hướng tuần này', '⭐ Top điểm đến hè', '📸 Check-in triệu view', '🌿 Du lịch sinh thái', '👑 Đề xuất của Wayfare'].map(tag => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => setFeaturedForm(prev => ({ ...prev, featuredBadge: tag }))}
+                      className="px-2 py-1 rounded-[3px] bg-[#F8F4EC] hover:bg-amber-100 text-[10px] font-bold text-ink-700 border border-ink-200/80 transition-colors cursor-pointer"
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-ink-100">
+              <button
+                type="button"
+                onClick={() => setFeaturedModalPlace(null)}
+                className="px-3.5 py-2 rounded-[5px] text-xs font-serif font-bold text-ink-600 hover:bg-[#F8F4EC] transition-colors cursor-pointer"
+              >
+                Hủy
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveFeatured}
+                disabled={isSubmitting}
+                className="px-4 py-2 rounded-[5px] text-xs font-serif font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {isSubmitting ? 'Đang lưu...' : 'Lưu Cấu Hình Ghim'}
               </button>
             </div>
           </div>

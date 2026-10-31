@@ -1029,6 +1029,22 @@ export const notificationApi = {
     if (!response.ok) throw new Error(`Phát sóng thông báo thất bại: HTTP ${response.status}`);
     const data = await response.json();
     return { isBackend: true, data };
+  },
+
+  async getBroadcastHistory() {
+    try {
+      const response = await fetch(`${BASE_URL}/notifications/broadcast/history`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!response.ok) return [];
+      const json = await response.json();
+      return Array.isArray(json) ? json : [];
+    } catch {
+      return [];
+    }
   }
 };
 
@@ -1865,6 +1881,31 @@ export const placeApi = {
     }
   },
 
+  async getFeaturedPlaces() {
+    try {
+      const res = await fetch(`${BASE_URL}/places/featured`);
+      if (!res.ok) return [];
+      const json = await res.json();
+      return json.data || [];
+    } catch {
+      return [];
+    }
+  },
+
+  async updateFeaturedStatus(id, { isFeatured, featuredOrder = 0, featuredBadge = '' }) {
+    const res = await fetch(`${BASE_URL}/places/admin/${id}/featured`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ isFeatured, featuredOrder, featuredBadge })
+    });
+    if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+    const json = await res.json();
+    return json.data;
+  },
+
   async deletePlace(id, email) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
@@ -2495,6 +2536,33 @@ export const publicConfigApi = {
     }
   }
 };
+
+// ─── Maintenance Mode APIs ───────────────────────────────────────────────────
+export const adminMaintenanceApi = {
+  async getMaintenance() {
+    const res = await fetch(`${BASE_URL}/admin/maintenance`, {
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) throw new Error('Không thể tải trạng thái bảo trì');
+    const json = await res.json();
+    return json.data || {};
+  },
+
+  async updateMaintenance(data) {
+    const res = await fetch(`${BASE_URL}/admin/maintenance`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify(data)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      throw new Error(err?.message || 'Không thể cập nhật chế độ bảo trì');
+    }
+    const json = await res.json();
+    return json.data;
+  }
+};
+
 
 
 

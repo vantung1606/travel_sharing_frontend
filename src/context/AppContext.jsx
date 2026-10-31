@@ -131,6 +131,8 @@ export const AppProvider = ({ children }) => {
     if (p.startsWith('/admin/reviews')) return 'reviews';
     if (p.startsWith('/admin/analytics')) return 'analytics';
     if (p.startsWith('/admin/appearance')) return 'appearance';
+    if (p.startsWith('/admin/broadcast')) return 'broadcast';
+    if (p.startsWith('/admin/maintenance')) return 'maintenance';
     if (p.startsWith('/admin/audit-logs')) return 'audit-logs';
     return 'dashboard';
   }, [location.pathname]);
@@ -145,6 +147,8 @@ export const AppProvider = ({ children }) => {
       reports: '/admin/reports',
       analytics: '/admin/analytics',
       appearance: '/admin/appearance',
+      broadcast: '/admin/broadcast',
+      maintenance: '/admin/maintenance',
       'audit-logs': '/admin/audit-logs'
     };
     const userRoles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];

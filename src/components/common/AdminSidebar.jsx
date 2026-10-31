@@ -12,7 +12,9 @@ import {
   ShieldCheck, 
   ChevronRight,
   ExternalLink,
-  Palette
+  Palette,
+  Megaphone,
+  Wrench
 } from 'lucide-react';
 
 export const AdminSidebar = ({ onNavigate }) => {
@@ -103,6 +105,22 @@ export const AdminSidebar = ({ onNavigate }) => {
           icon: Palette,
           description: 'Màu sắc, logo & tokens',
           permission: 'THEME_VIEW'
+        },
+        { 
+          id: 'broadcast', 
+          label: 'Phát Thông Báo', 
+          icon: Megaphone,
+          description: 'Gửi tin tức tới toàn thể du khách',
+          permission: 'USERS_VIEW',
+          adminOnly: true
+        },
+        { 
+          id: 'maintenance', 
+          label: 'Bảo Trì Hệ Thống', 
+          icon: Wrench,
+          description: 'Bật/tắt bảo trì & đếm ngược',
+          permission: 'USERS_VIEW',
+          adminOnly: true
         },
         { 
           id: 'audit-logs', 
