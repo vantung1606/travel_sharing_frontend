@@ -116,8 +116,6 @@ export const AITripGeneratorModal = () => {
   const [accommodation, setAccommodation] = useState('Khách sạn 3 sao tiện nghi, trung tâm');
   const [diningStyle, setDiningStyle] = useState('Quán ăn bản địa chuẩn vị & nổi tiếng');
   const [customPrompt, setCustomPrompt] = useState('');
-  const [departureLocation, setDepartureLocation] = useState('Hà Nội');
-  const [includeCommercialStandard, setIncludeCommercialStandard] = useState(true);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // GÓC NHỎ MÀN HÌNH: TIẾN TRÌNH TẠO LỊCH TỪ 0 TỚI 100%
@@ -454,25 +452,7 @@ export const AITripGeneratorModal = () => {
       budgetNote: `Ngân sách: ${getBudgetLabel()} • ${includeFlight ? 'Đã gồm vé khứ hồi' : 'Chưa gồm vé máy bay'}`,
       style: styleText || 'Trải nghiệm du lịch toàn diện',
       aiTipNote: parsedAI.summaryTip || `Lời khuyên WanderAI: Lịch trình ${destination} đã được AI phân tích tọa độ địa lý, ưu tiên các món ngon chuẩn vị ${diningStyle} và danh lam thắng cảnh tiêu biểu.`,
-      days: finalDays,
-
-      // ─── 15 TIÊU CHUẨN TOUR LỮ HÀNH THƯƠNG MẠI CHUYÊN NGHIỆP ───
-      tourCode: parsedAI.tourCode || `WAY-${destination.replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase() || 'TOUR'}-${Math.floor(1000 + Math.random() * 9000)}`,
-      theme: parsedAI.theme || styleText || 'Khám phá văn hóa & Thư giãn nghỉ dưỡng',
-      departureLocation: departureLocation.trim() || parsedAI.departureLocation || 'Khu vực trung tâm TP',
-      endingLocation: parsedAI.endingLocation || destination,
-      targetAudience: parsedAI.targetAudience || companionText || 'Khách du lịch tự do & Nhóm',
-      maxGroupSize: parsedAI.maxGroupSize || (companion === 'solo' ? 2 : companion === 'couple' ? 4 : companion === 'friends' ? 12 : 25),
-      transportation: parsedAI.transportation || getTransitLabel(),
-      mealPlan: parsedAI.mealPlan || `Trọn gói: Bữa sáng buffet tại nơi lưu trú; Bữa trưa và tối thưởng thức đặc sản theo gu ẩm thực ${diningStyle}`,
-      accommodationInfo: parsedAI.accommodationInfo || accommodation || 'Khách sạn/Resort tiêu chuẩn 3-4 sao trung tâm, 2 khách/phòng',
-      tourGuideInfo: parsedAI.tourGuideInfo || 'Hướng dẫn viên thẻ quốc tế/nội địa nhiệt tình, hỗ trợ chăm sóc đoàn và thuyết minh văn hóa bản địa suốt tuyến.',
-      childPrice: parsedAI.childPrice ? Number(parsedAI.childPrice) : Math.round(budgetVal * 0.75),
-      singleRoomSurcharge: parsedAI.singleRoomSurcharge ? Number(parsedAI.singleRoomSurcharge) : Math.round(budgetVal * 0.35),
-      servicesIncluded: parsedAI.servicesIncluded || 'Xe vận chuyển du lịch đời mới máy lạnh suốt hành trình\nKhách sạn tiêu chuẩn tiện nghi (2 khách/phòng)\nVé vào cổng các điểm tham quan theo lịch trình\nCác bữa ăn sáng và ăn chính đặc sản theo chương trình\nBảo hiểm du lịch nội địa mức bồi thường tối đa 50.000.000đ/vụ\nHướng dẫn viên phục vụ suốt tuyến\nNước suối đóng chai 1 chai/khách/ngày và khăn lạnh',
-      servicesExcluded: parsedAI.servicesExcluded || 'Thuế VAT (8-10%)\nChi phí phòng đơn nếu ở riêng\nĐồ uống trong bữa ăn, minibar, giặt ủi, điện thoại\nTiền tip cho hướng dẫn viên và lái xe (tùy tâm)\nChi phí cá nhân ngoài chương trình',
-      cancellationPolicy: parsedAI.cancellationPolicy || 'Đặt cọc 50% ngay sau khi đăng ký lịch trình\nThanh toán 50% còn lại trước ngày khởi hành 03 ngày\nHủy tour trước 07 ngày: Hoàn 100% tiền cọc\nHủy từ 03 - 06 ngày trước khởi hành: Phạt 50% tiền cọc\nHủy trong vòng 48h trước giờ đi: Phạt 100% chi phí',
-      packingNotes: parsedAI.packingNotes || 'Bắt buộc mang theo CCCD/Hộ chiếu gốc hoặc GPLX còn hạn sử dụng\nTrang phục gọn nhẹ, giày thể thao hoặc sandal êm chân tiện di chuyển\nChuẩn bị trang phục lịch sự, kín đáo khi tham quan đền chùa di tích\nKem chống nắng, kính râm, mũ nón và sạc dự phòng\nThuốc men cá nhân (say xe, đau bụng, cảm sốt)'
+      days: finalDays
     };
   };
 
@@ -541,12 +521,11 @@ export const AITripGeneratorModal = () => {
     try {
       // 3. BUILD PROMPT CÔ ĐỌNG, YÊU CẦU AI NGHIÊN CỨU TRỰC TIẾP ĐỊA ĐIỂM NGƯỜI DÙNG NHẬP
       // Tối ưu để không bao giờ vượt quá token limit
-      const prompt = `Bạn là chuyên gia cố vấn du lịch và điều hành tour lữ hành hàng đầu tại Việt Nam.
+      const prompt = `Bạn là chuyên gia cố vấn du lịch bản địa hàng đầu tại Việt Nam.
 Hãy nghiên cứu và phân tích điểm đến: "${destination}".
-Lập lịch trình tour du lịch chuẩn lữ hành chuyên nghiệp ${daysCount} ngày với các danh lam thắng cảnh, di tích lịch sử và quán ăn đặc sản có thật 100% tại "${destination}".
+Lập lịch trình du lịch ${daysCount} ngày với các danh lam thắng cảnh, di tích lịch sử và quán ăn đặc sản có thật 100% tại "${destination}".
 Thông tin chuyến đi:
 - Điểm đến: ${destination}
-- Điểm khởi hành/đón khách: ${departureLocation.trim() || 'Hà Nội / TP.HCM'}
 - Thời lượng: ${daysCount} ngày (${daysCount}N${Math.max(1, daysCount - 1)}Đ)
 - Đối tượng: ${getCompanionLabel()}
 - Phương tiện: ${getTransitLabel()}
@@ -560,41 +539,8 @@ QUY TẮC BẮT BUỘC:
 1. Nghiên cứu chính xác các địa điểm, quán ăn có thật 100% tại "${destination}". Tuyệt đối không dùng văn mẫu chung chung.
 2. Mỗi ngày có 3-4 hoạt động sắp xếp từ sáng đến tối.
 3. BẮT BUỘC VỀ ĐỊA CHỈ & TỌA ĐỘ: Cung cấp "location" (tên ngắn gọn của địa danh/quán ăn), "address" (ĐỊA CHỈ CỤ THỂ CHI TIẾT CÓ THẬT gồm số nhà/tên đường, xã/phường, quận/huyện tại ${destination}. Tuyệt đối KHÔNG chỉ ghi tên tỉnh thành chung chung), và "lat", "lng" (TỌA ĐỘ GPS THỰC TẾ CHÍNH XÁC CỦA ĐỊA ĐIỂM ĐÓ TẠI ${destination}, VIỆT NAM dạng số thập phân float, ví dụ Đà Nẵng: lat ~16.0xx, lng ~108.2xx; Hà Nội: lat ~21.0xx, lng ~105.8xx) để đồng bộ trực quan trên bản đồ số.
-4. BẮT BUỘC CUNG CẤP ĐẦY ĐỦ 15 TIÊU CHUẨN TOUR LỮ HÀNH THƯƠNG MẠI:
-- "tourCode": Mã tour ngắn gọn dạng WAY-${destination.replace(/[^a-zA-Z0-9]/g, '').slice(0, 4).toUpperCase() || 'TOUR'}-2026
-- "theme": Chủ đề tour hấp dẫn
-- "departureLocation": Điểm đón/xuất phát
-- "endingLocation": Điểm kết thúc tour
-- "targetAudience": Phân khúc khách phù hợp
-- "maxGroupSize": Số khách tối đa (số nguyên)
-- "transportation": Phương tiện di chuyển cụ thể
-- "mealPlan": Kế hoạch các bữa sáng, trưa, tối với đặc sản nổi bật tại ${destination}
-- "accommodationInfo": Tiêu chuẩn khách sạn, số sao, loại phòng
-- "tourGuideInfo": Thông tin & nhiệm vụ hướng dẫn viên suốt tuyến
-- "childPrice": Giá tour trẻ em (số nguyên VNĐ)
-- "singleRoomSurcharge": Phụ thu phòng đơn (số nguyên VNĐ)
-- "servicesIncluded": Chuỗi các dịch vụ đã bao gồm (phân tách bằng dấu xuống dòng \\n)
-- "servicesExcluded": Chuỗi các dịch vụ không bao gồm / tự túc (phân tách bằng dấu xuống dòng \\n)
-- "cancellationPolicy": Chính sách đặt cọc và hoàn hủy tour (phân tách bằng dấu xuống dòng \\n)
-- "packingNotes": Lưu ý hành lý, trang phục, giấy tờ cần mang theo (phân tách bằng dấu xuống dòng \\n)
-5. Trả về DUY NHẤT một chuỗi JSON hợp lệ theo định dạng:
+4. Trả về DUY NHẤT một chuỗi JSON hợp lệ theo định dạng:
 {
-  "tourCode": "WAY-TOUR-2026",
-  "theme": "Khám phá di sản và ẩm thực",
-  "departureLocation": "${departureLocation.trim() || 'Hà Nội'}",
-  "endingLocation": "${destination}",
-  "targetAudience": "Gia đình và bạn bè",
-  "maxGroupSize": 20,
-  "transportation": "${getTransitLabel()}",
-  "mealPlan": "Sáng buffet, trưa và tối đặc sản bản địa",
-  "accommodationInfo": "${accommodation}",
-  "tourGuideInfo": "Hướng dẫn viên thẻ quốc tế hỗ trợ suốt tuyến",
-  "childPrice": 1500000,
-  "singleRoomSurcharge": 800000,
-  "servicesIncluded": "Xe du lịch đời mới máy lạnh\\nKhách sạn tiêu chuẩn\\nVé tham quan\\nĂn uống theo chương trình\\nBảo hiểm du lịch",
-  "servicesExcluded": "Thuế VAT\\nChi phí cá nhân\\nĐồ uống ngoài chương trình\\nTiền tip HDV",
-  "cancellationPolicy": "Cọc 50% khi đăng ký\\nHủy trước 7 ngày hoàn 100%\\nHủy trong 48h phạt 100%",
-  "packingNotes": "Mang CCCD/Hộ chiếu gốc\\nTrang phục lịch sự khi viếng đền chùa\\nGiày thể thao êm chân\\nKem chống nắng",
   "summaryTip": "Mẹo du lịch bản địa ngắn gọn...",
   "placesList": ["Tên điểm thật 1", "Tên điểm thật 2", "Tên điểm thật 3", "Tên điểm thật 4"],
   "days": [
@@ -789,47 +735,6 @@ QUY TẮC BẮT BUỘC:
                   {tag}
                 </button>
               ))}
-            </div>
-          </div>
-
-          {/* 1b. Điểm đón / Điểm xuất phát & Tùy chọn Chuẩn Lữ Hành */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
-                <span className="flex items-center gap-1.5">
-                  <Navigation className="w-3.5 h-3.5 text-sky-600" />
-                  <span>Điểm đón / Khởi hành</span>
-                </span>
-                <span className="text-[10px] font-bold text-slate-400">Chuẩn Tour</span>
-              </label>
-              <input
-                type="text"
-                value={departureLocation}
-                onChange={(e) => setDepartureLocation(e.target.value)}
-                placeholder="Ví dụ: Hà Nội, TP.HCM, Sân bay Đà Nẵng..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 text-slate-900 text-xs font-semibold border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                <span>Hồ sơ Chuẩn Lữ Hành</span>
-              </span>
-              <div className="p-2.5 rounded-xl bg-amber-50/70 border border-amber-200/80 flex items-center justify-between gap-2">
-                <span className="text-[11px] font-bold text-amber-900">
-                  {includeCommercialStandard ? '✅ Bật đầy đủ 15 tiêu chuẩn tour' : 'Tắt chuẩn tour'}
-                </span>
-                <label className="relative inline-flex items-center cursor-pointer shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={includeCommercialStandard}
-                    onChange={(e) => setIncludeCommercialStandard(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600"></div>
-                </label>
-              </div>
             </div>
           </div>
 
