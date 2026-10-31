@@ -2368,5 +2368,134 @@ export const chatApi = {
   }
 };
 
+// ─── Dynamic RBAC & Permission APIs ──────────────────────────────────────────
+export const adminPermissionApi = {
+  async getAllPermissions() {
+    const res = await fetch(`${BASE_URL}/admin/permissions`, {
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) throw new Error('Không thể tải danh mục quyền');
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async getModerators() {
+    const res = await fetch(`${BASE_URL}/admin/moderators`, {
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) throw new Error('Không thể tải danh sách người giám sát');
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async getUserPermissions(userId) {
+    const res = await fetch(`${BASE_URL}/admin/users/${userId}/permissions`, {
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) throw new Error('Không thể tải quyền của người dùng');
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async getEffectivePermissions(userId) {
+    const res = await fetch(`${BASE_URL}/admin/users/${userId}/effective-permissions`, {
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) throw new Error('Không thể tính toán quyền hiệu lực');
+    const json = await res.json();
+    return json.data || null;
+  },
+
+  async updateUserPermissions(userId, { allow = [], deny = [] }) {
+    const res = await fetch(`${BASE_URL}/admin/users/${userId}/permissions`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ allow, deny })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      throw new Error(err?.message || 'Không thể cập nhật phân quyền người dùng');
+    }
+    const json = await res.json();
+    return json.data;
+  }
+};
+
+// ─── Site Settings & Theme Management APIs ────────────────────────────────────
+export const adminThemeApi = {
+  async getTheme() {
+    const res = await fetch(`${BASE_URL}/admin/theme`, {
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) throw new Error('Không thể tải cấu hình giao diện');
+    const json = await res.json();
+    return json.data || {};
+  },
+
+  async saveDraft(themeData, note = 'Lưu bản nháp') {
+    const res = await fetch(`${BASE_URL}/admin/theme/draft`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ theme: themeData, note })
+    });
+    if (!res.ok) throw new Error('Không thể lưu bản nháp giao diện');
+    const json = await res.json();
+    return json.data;
+  },
+
+  async publishTheme() {
+    const res = await fetch(`${BASE_URL}/admin/theme/publish`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) throw new Error('Không thể xuất bản giao diện');
+    const json = await res.json();
+    return json.data;
+  },
+
+  async resetTheme() {
+    const res = await fetch(`${BASE_URL}/admin/theme/reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) throw new Error('Không thể khôi phục giao diện mặc định');
+    const json = await res.json();
+    return json.data;
+  },
+
+  async getVersions() {
+    const res = await fetch(`${BASE_URL}/admin/theme/versions`, {
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) throw new Error('Không thể tải lịch sử phiên bản');
+    const json = await res.json();
+    return json.data || [];
+  },
+
+  async rollbackVersion(versionId) {
+    const res = await fetch(`${BASE_URL}/admin/theme/versions/${versionId}/rollback`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) throw new Error('Không thể rollback phiên bản');
+    const json = await res.json();
+    return json.data;
+  }
+};
+
+export const publicConfigApi = {
+  async getSiteConfig() {
+    try {
+      const res = await nativeFetch(`${BASE_URL}/public/site-config`);
+      if (!res.ok) return null;
+      const json = await res.json();
+      return json.data || null;
+    } catch {
+      return null;
+    }
+  }
+};
+
+
 
 

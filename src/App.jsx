@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
+import { PermissionProvider } from './context/PermissionContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { ToastProvider, useToast } from './components/common/Toast';
 import { chatSocket } from './services/chatSocket';
 import { Navbar } from './components/common/Navbar';
@@ -54,6 +56,7 @@ const AdminUsersPage = lazyRetry(() => import('./pages/admin/Users/AdminUsersPag
 const AdminReportsPage = lazyRetry(() => import('./pages/admin/Reports/AdminReportsPage').then(m => ({ default: m.AdminReportsPage })));
 const AdminReviewsPage = lazyRetry(() => import('./pages/admin/Reviews/AdminReviewsPage').then(m => ({ default: m.AdminReviewsPage })));
 const AdminStatisticsPage = lazyRetry(() => import('./pages/admin/Statistics/AdminStatisticsPage').then(m => ({ default: m.AdminStatisticsPage })));
+const AdminAppearancePage = lazyRetry(() => import('./pages/admin/Appearance/AdminAppearancePage').then(m => ({ default: m.AdminAppearancePage })));
 const AdminAuditLogsPage = lazyRetry(() => import('./pages/admin/AuditLogs/AdminAuditLogsPage').then(m => ({ default: m.AdminAuditLogsPage })));
 
 // Fallback hiển thị trong lúc tải chunk của route
@@ -235,6 +238,7 @@ const AppContent = () => {
                       <Route path="/admin/reports" element={<AdminReportsPage />} />
                       <Route path="/admin/reviews" element={<AdminReviewsPage />} />
                       <Route path="/admin/analytics" element={<AdminStatisticsPage />} />
+                      <Route path="/admin/appearance" element={<AdminAppearancePage />} />
                       <Route path="/admin/audit-logs" element={<AdminAuditLogsPage />} />
                       <Route path="/admin/*" element={<Navigate to="/admin/dashboard" replace />} />
                     </Routes>
@@ -322,9 +326,13 @@ export function App() {
   return (
     <GlobalErrorBoundary>
       <AppProvider>
-        <ToastProvider>
-          <AppContent />
-        </ToastProvider>
+        <PermissionProvider>
+          <ThemeProvider>
+            <ToastProvider>
+              <AppContent />
+            </ToastProvider>
+          </ThemeProvider>
+        </PermissionProvider>
       </AppProvider>
     </GlobalErrorBoundary>
   );

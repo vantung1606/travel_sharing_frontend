@@ -30,6 +30,7 @@ import {
   Layers
 } from 'lucide-react';
 import { UserAvatar } from '../../../components/common/UserAvatar';
+import { ModeratorPermissionDrawer } from '../../../components/admin/ModeratorPermissionDrawer';
 
 export const AdminUsersPage = () => {
   const toast = useToast();
@@ -56,6 +57,7 @@ export const AdminUsersPage = () => {
 
   // Modal: Temporary password after reset (shown once)
   const [resetPasswordResult, setResetPasswordResult] = useState(null);
+  const [permissionDrawerUser, setPermissionDrawerUser] = useState(null);
 
   // Filters & Tabs
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'staff', 'locked'
@@ -787,6 +789,15 @@ export const AdminUsersPage = () => {
                                 <UserCog className="w-3.5 h-3.5" />
                               </button>
 
+                              {/* Granular Permissions Matrix */}
+                              <button 
+                                onClick={() => setPermissionDrawerUser(user)}
+                                className="w-7 h-7 rounded-[4px] hover:bg-clay-100 text-ink-500 hover:text-clay-700 flex items-center justify-center transition-colors cursor-pointer" 
+                                title="Phân quyền chi tiết (RBAC Matrix)"
+                              >
+                                <ShieldCheck className="w-3.5 h-3.5" />
+                              </button>
+
                               {/* Toggle Status Lock / Unlock */}
                               <button 
                                 onClick={() => handleToggleStatus(user)}
@@ -1260,6 +1271,16 @@ export const AdminUsersPage = () => {
           </div>
         </div>
       )}
+      {/* 9. DRAWER: PHÂN QUYỀN NGƯỜI GIÁM SÁT (RBAC MATRIX) */}
+      <ModeratorPermissionDrawer
+        isOpen={Boolean(permissionDrawerUser)}
+        onClose={() => setPermissionDrawerUser(null)}
+        targetUser={permissionDrawerUser}
+        onUpdated={() => {
+          fetchUsers();
+          fetchMetrics();
+        }}
+      />
 
     </div>
   );

@@ -21,7 +21,8 @@ export const PAGE_TITLES = {
   '/admin/reports': 'Wayfare Admin - Kiểm duyệt Vi phạm & Báo cáo Spam',
   '/admin/reviews': 'Wayfare Admin - Kiểm duyệt Đánh giá Du khách',
   '/admin/analytics': 'Wayfare Admin - Thống kê & Phân tích Tăng trưởng',
-  '/admin/audit-logs': 'Wayfare Admin - Nhật ký Hệ thống & Hoạt động (Audit Logs)'
+  '/admin/audit-logs': 'Wayfare Admin - Nhật ký Hệ thống & Hoạt động (Audit Logs)',
+  '/admin/appearance': 'Wayfare Admin - Quản lý Giao diện & Nhận diện Thương hiệu'
 };
 
 // Component that dynamically syncs document.title on every URL change
@@ -39,13 +40,18 @@ export const PageTitleManager = () => {
   return null;
 };
 
-// Protected Route Guard for Admin Portal (/admin/*)
-/* Ranh giới quyền đã khớp backend (SecurityConfig):
- * - ROLE_ADMIN: toàn bộ /admin/*
- * - ROLE_MODERATOR ("giám sát"): chỉ kéo moderation — /admin/places, /admin/reviews, /admin/reports
- * - /admin/dashboard (stats), /admin/users, /admin/analytics, /admin/audit-logs: riêng ADMIN
- */
-const MODERATOR_ALLOWED_PATHS = ['/admin/places', '/admin/reviews', '/admin/reports'];
+// Route to Permission mapping for dynamic RBAC
+export const ROUTE_PERMISSION_MAP = {
+  '/admin': 'DASHBOARD_VIEW',
+  '/admin/dashboard': 'DASHBOARD_VIEW',
+  '/admin/places': 'PLACES_VIEW',
+  '/admin/reviews': 'REVIEWS_VIEW',
+  '/admin/reports': 'REPORTS_VIEW',
+  '/admin/users': 'USERS_VIEW',
+  '/admin/analytics': 'STATISTICS_VIEW',
+  '/admin/audit-logs': 'AUDIT_VIEW',
+  '/admin/appearance': 'THEME_VIEW'
+};
 
 export const AdminRouteGuard = ({ children }) => {
   const { isLoggedIn, currentUser, setIsAuthModalOpen, setAuthMode } = useApp();
@@ -55,13 +61,24 @@ export const AdminRouteGuard = ({ children }) => {
   const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
   const isAdmin = isLoggedIn && (roles.includes('ROLE_ADMIN') || (currentUser?.email && currentUser.email.toLowerCase().includes('admin')));
   const isModerator = isLoggedIn && !isAdmin && roles.includes('ROLE_MODERATOR');
-  const restrictedForModerator = isModerator && !MODERATOR_ALLOWED_PATHS.includes(location.pathname);
+
+  const permissions = Array.isArray(currentUser?.permissions) ? currentUser.permissions : [];
+  const requiredPermission = ROUTE_PERMISSION_MAP[location.pathname];
+
+  // Dynamic permission verification: SuperAdmin has full bypass; Moderator needs required permission
+  const hasAccess = isAdmin || (isModerator && (!requiredPermission || permissions.includes(requiredPermission)));
 
   useEffect(() => {
-    if (restrictedForModerator) {
-      navigate('/admin/places', { replace: true });
+    if (isModerator && !hasAccess) {
+      // Find the first path the moderator actually has permission to view
+      const allowedPaths = Object.entries(ROUTE_PERMISSION_MAP)
+        .filter(([_, perm]) => permissions.includes(perm))
+        .map(([path]) => path);
+
+      const fallbackPath = allowedPaths.length > 0 ? allowedPaths[0] : '/home';
+      navigate(fallbackPath, { replace: true });
     }
-  }, [restrictedForModerator, navigate]);
+  }, [isModerator, hasAccess, permissions, navigate]);
 
   // 1. Not Logged In -> Require Admin Login
   if (!isLoggedIn) {

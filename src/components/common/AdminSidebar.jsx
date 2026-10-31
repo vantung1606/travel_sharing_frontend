@@ -11,7 +11,8 @@ import {
   Star, 
   ShieldCheck, 
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Palette
 } from 'lucide-react';
 
 export const AdminSidebar = ({ onNavigate }) => {
@@ -19,13 +20,13 @@ export const AdminSidebar = ({ onNavigate }) => {
 
   const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
   const isAdminUser = roles.includes('ROLE_ADMIN');
-  const isModeratorUsersOnly = !isAdminUser && roles.includes('ROLE_MODERATOR');
+  const userPerms = Array.isArray(currentUser?.permissions) ? currentUser.permissions : [];
 
   const pendingPlacesCount = stats?.pendingPlaces || 0;
   const hiddenReviewsCount = stats?.hiddenReviews || 0;
   const reportedContentCount = stats?.reportedContent || 0;
 
-  // Grouped Navigation for even, harmonious visual balance
+  // Grouped Navigation with attached permission codes
   const navigationSections = [
     {
       title: 'TỔNG QUAN',
@@ -34,13 +35,15 @@ export const AdminSidebar = ({ onNavigate }) => {
           id: 'dashboard', 
           label: 'Dashboard tổng quan', 
           icon: LayoutDashboard,
-          description: 'Chỉ số & hoạt động chính'
+          description: 'Chỉ số & hoạt động chính',
+          permission: 'DASHBOARD_VIEW'
         },
         { 
           id: 'analytics', 
           label: 'Thống kê hệ thống', 
           icon: BarChart3,
-          description: 'Báo cáo tăng trưởng'
+          description: 'Báo cáo tăng trưởng',
+          permission: 'STATISTICS_VIEW'
         }
       ]
     },
@@ -53,7 +56,8 @@ export const AdminSidebar = ({ onNavigate }) => {
           icon: MapPin, 
           badge: pendingPlacesCount,
           badgeColor: 'clay',
-          badgeLabel: 'Chờ duyệt'
+          badgeLabel: 'Chờ duyệt',
+          permission: 'PLACES_VIEW'
         },
         { 
           id: 'reviews', 
@@ -61,7 +65,8 @@ export const AdminSidebar = ({ onNavigate }) => {
           icon: Star, 
           badge: hiddenReviewsCount,
           badgeColor: 'amber',
-          badgeLabel: 'Đã ẩn'
+          badgeLabel: 'Đã ẩn',
+          permission: 'REVIEWS_VIEW'
         },
         { 
           id: 'reports', 
@@ -69,7 +74,8 @@ export const AdminSidebar = ({ onNavigate }) => {
           icon: MessageSquare, 
           badge: reportedContentCount,
           badgeColor: 'rose',
-          badgeLabel: 'Cần xử lý'
+          badgeLabel: 'Cần xử lý',
+          permission: 'REPORTS_VIEW'
         }
       ]
     },
@@ -80,25 +86,33 @@ export const AdminSidebar = ({ onNavigate }) => {
           id: 'users', 
           label: 'Người dùng & Quyền', 
           icon: Users,
-          description: 'Phân quyền & Khóa TK'
+          description: 'Phân quyền & Khóa TK',
+          permission: 'USERS_VIEW'
+        },
+        { 
+          id: 'appearance', 
+          label: 'Giao diện & Thương hiệu', 
+          icon: Palette,
+          description: 'Màu sắc, logo & tokens',
+          permission: 'THEME_VIEW'
         },
         { 
           id: 'audit-logs', 
           label: 'Nhật ký kiểm duyệt', 
           icon: History,
-          description: 'Lịch sử thao tác (Audit)'
+          description: 'Lịch sử thao tác (Audit)',
+          permission: 'AUDIT_VIEW'
         }
       ]
     }
   ];
 
-  // Filter sections if moderator
+  // Dynamic RBAC Filter: SuperAdmin sees all; Moderator sees only items permitted to them
   const filteredSections = navigationSections.map(sec => ({
     ...sec,
     items: sec.items.filter(item => {
-      return isModeratorUsersOnly
-        ? ['places', 'reviews', 'reports'].includes(item.id)
-        : true;
+      if (isAdminUser) return true;
+      return item.permission ? userPerms.includes(item.permission) : true;
     })
   })).filter(sec => sec.items.length > 0);
 
