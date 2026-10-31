@@ -67,9 +67,10 @@ export const AdminRouteGuard = ({ children }) => {
 
   // Dynamic permission verification: SuperAdmin has full bypass; Moderator needs required permission
   const hasAccess = isAdmin || (isModerator && (!requiredPermission || permissions.includes(requiredPermission)));
+  const restrictedForModerator = isModerator && !hasAccess;
 
   useEffect(() => {
-    if (isModerator && !hasAccess) {
+    if (restrictedForModerator) {
       // Find the first path the moderator actually has permission to view
       const allowedPaths = Object.entries(ROUTE_PERMISSION_MAP)
         .filter(([_, perm]) => permissions.includes(perm))
