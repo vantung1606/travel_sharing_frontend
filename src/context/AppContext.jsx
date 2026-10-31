@@ -752,6 +752,23 @@ export const AppProvider = ({ children }) => {
       pace: 'Cân bằng',
       style: item.travelStyle || 'Nghỉ dưỡng & Khám phá',
       aiTipNote: 'Lịch trình được lưu trữ trên hệ thống máy chủ Wayfare.',
+      // 15 Tiêu chuẩn Tour lữ hành thương mại
+      tourCode: item.tourCode || null,
+      theme: item.theme || null,
+      departureLocation: item.departureLocation || null,
+      endingLocation: item.endingLocation || null,
+      targetAudience: item.targetAudience || null,
+      maxGroupSize: item.maxGroupSize || null,
+      transportation: item.transportation || null,
+      mealPlan: item.mealPlan || null,
+      accommodationInfo: item.accommodationInfo || null,
+      tourGuideInfo: item.tourGuideInfo || null,
+      childPrice: item.childPrice || null,
+      singleRoomSurcharge: item.singleRoomSurcharge || null,
+      servicesIncluded: item.servicesIncluded || null,
+      servicesExcluded: item.servicesExcluded || null,
+      cancellationPolicy: item.cancellationPolicy || null,
+      packingNotes: item.packingNotes || null,
       days: days.length > 0 ? days : [
         {
           dayNumber: 1,
@@ -811,6 +828,26 @@ export const AppProvider = ({ children }) => {
       isPublic: itineraryObj.isPublic !== false,
       status: (itineraryObj.status || 'ACTIVE').toUpperCase(),
       groupType: itineraryObj.groupType || 'Cá nhân',
+      travelStyle: itineraryObj.travelStyle || itineraryObj.style || 'Nghỉ dưỡng & Khám phá',
+      
+      // 15 Tiêu chuẩn Tour lữ hành thương mại
+      tourCode: itineraryObj.tourCode || null,
+      theme: itineraryObj.theme || null,
+      departureLocation: itineraryObj.departureLocation || null,
+      endingLocation: itineraryObj.endingLocation || null,
+      targetAudience: itineraryObj.targetAudience || null,
+      maxGroupSize: itineraryObj.maxGroupSize ? Number(itineraryObj.maxGroupSize) : null,
+      transportation: itineraryObj.transportation || null,
+      mealPlan: itineraryObj.mealPlan || null,
+      accommodationInfo: itineraryObj.accommodationInfo || null,
+      tourGuideInfo: itineraryObj.tourGuideInfo || null,
+      childPrice: itineraryObj.childPrice ? (typeof itineraryObj.childPrice === 'number' ? itineraryObj.childPrice : Number(String(itineraryObj.childPrice).replace(/\D/g, '')) || null) : null,
+      singleRoomSurcharge: itineraryObj.singleRoomSurcharge ? (typeof itineraryObj.singleRoomSurcharge === 'number' ? itineraryObj.singleRoomSurcharge : Number(String(itineraryObj.singleRoomSurcharge).replace(/\D/g, '')) || null) : null,
+      servicesIncluded: itineraryObj.servicesIncluded || null,
+      servicesExcluded: itineraryObj.servicesExcluded || null,
+      cancellationPolicy: itineraryObj.cancellationPolicy || null,
+      packingNotes: itineraryObj.packingNotes || null,
+
       details: (itineraryObj.days || []).flatMap(day =>
         (day.activities || []).map((act, idx) => ({
           dayNumber: day.dayNumber || 1,

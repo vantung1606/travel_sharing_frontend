@@ -5,7 +5,7 @@ import { useToast } from '../../../components/common/Toast';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { ItineraryExportModal } from '../../../components/itinerary/ItineraryExportModal';
 import { EditItineraryModal } from '../../../components/itinerary/EditItineraryModal';
-import { MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation, Download, Upload, Camera, Globe, Lock, Edit3, Sparkles } from 'lucide-react';
+import { MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation, Download, Upload, Camera, Globe, Lock, Edit3, Sparkles, ShieldCheck, Coffee, Hotel, Bus, FileText } from 'lucide-react';
 
 export const ItineraryManagerPage = () => {
   const {
@@ -71,6 +71,7 @@ export const ItineraryManagerPage = () => {
   }, []);
 
   const [isManualCreateOpen, setIsManualCreateOpen] = useState(false);
+  const [manualModalTab, setManualModalTab] = useState('basic'); // 'basic' | 'tourStandard'
   const [manualTitle, setManualTitle] = useState('');
   const [manualDest, setManualDest] = useState('');
   const [manualStartDate, setManualStartDate] = useState(defaultManualStart);
@@ -82,6 +83,56 @@ export const ItineraryManagerPage = () => {
   const [manualNote, setManualNote] = useState('');
   const [manualIsPublic, setManualIsPublic] = useState(true);
   const [manualTravelStyle, setManualTravelStyle] = useState('Nghỉ dưỡng & Khám phá');
+
+  // 15 Tiêu Chuẩn Tour Lữ Hành Thương Mại
+  const [manualTourCode, setManualTourCode] = useState('');
+  const [manualTheme, setManualTheme] = useState('');
+  const [manualDepartureLocation, setManualDepartureLocation] = useState('Hà Nội / TP. Hồ Chí Minh');
+  const [manualEndingLocation, setManualEndingLocation] = useState('');
+  const [manualTargetAudience, setManualTargetAudience] = useState('Đa dạng đối tượng (Gia đình, Thanh niên, Bạn bè)');
+  const [manualMaxGroupSize, setManualMaxGroupSize] = useState(20);
+  const [manualTransportation, setManualTransportation] = useState('Ô tô du lịch đời mới / Máy bay');
+  const [manualMealPlan, setManualMealPlan] = useState('');
+  const [manualAccommodationInfo, setManualAccommodationInfo] = useState('');
+  const [manualTourGuideInfo, setManualTourGuideInfo] = useState('Hướng dẫn viên tiếng Việt chuyên nghiệp, nhiệt tình thuyết minh suốt tuyến');
+  const [manualChildPrice, setManualChildPrice] = useState('');
+  const [manualSingleRoomSurcharge, setManualSingleRoomSurcharge] = useState('');
+  const [manualServicesIncluded, setManualServicesIncluded] = useState('');
+  const [manualServicesExcluded, setManualServicesExcluded] = useState('');
+  const [manualCancellationPolicy, setManualCancellationPolicy] = useState('');
+  const [manualPackingNotes, setManualPackingNotes] = useState('');
+
+  // Auto-fill thông minh chuẩn tour lữ hành
+  const handleAutoFillManualTourStandard = () => {
+    const dest = manualDest.trim() || 'Việt Nam';
+    const destCode = dest.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, 'VN') || 'TRIP';
+    const code = manualTourCode.trim() || `TOUR-${destCode}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+    setManualTourCode(code);
+    setManualTheme(manualTravelStyle || 'Khám phá & Nghỉ dưỡng');
+    setManualDepartureLocation('Sân bay Nội Bài (Hà Nội) / Tân Sơn Nhất (TP.HCM)');
+    setManualEndingLocation(dest);
+    setManualTargetAudience('Khách du lịch tự do, Gia đình có trẻ em, Nhóm bạn trẻ yêu thích khám phá');
+    setManualMaxGroupSize(20);
+    setManualTransportation('Vé máy bay khứ hồi (Vietnam Airlines / Vietjet Air) + Xe du lịch Universe 29-45 chỗ máy lạnh đón tiễn');
+    setManualMealPlan(`• Bữa sáng: Buffet tiêu chuẩn tại khách sạn\n• Bữa trưa & tối: Thưởng thức đặc sản ${dest} tại nhà hàng tiêu chuẩn (150.000đ - 250.000đ/suất)\n• Nước suối tinh khiết: 01 chai 500ml/người/ngày`);
+    setManualAccommodationInfo(`Khách sạn tiêu chuẩn 3 - 4 sao trung tâm ${dest} (hoặc resort ven biển), phòng 2 khách/phòng (tiện nghi cao cấp)`);
+    setManualTourGuideInfo('Hướng dẫn viên tiếng Việt chuyên nghiệp, kinh nghiệm, nhiệt tình và am hiểu văn hóa bản địa phục vụ đoàn suốt tuyến');
+    
+    const rawChild = Math.round(Number(manualBudget) * 0.75);
+    setManualChildPrice(rawChild.toLocaleString('en-US'));
+    setManualSingleRoomSurcharge(Math.round(Number(manualBudget) * 0.35).toLocaleString('en-US'));
+
+    setManualServicesIncluded(`✅ Vé máy bay khứ hồi kèm hành lý tiêu chuẩn\n✅ Khách sạn tiêu chuẩn 3-4 sao tiện nghi (2 khách/phòng)\n✅ Các bữa ăn theo chương trình ẩm thực địa phương phong phú\n✅ Vé vào cổng tham quan tất cả các điểm trong lịch trình\n✅ Xe du lịch đời mới máy lạnh đưa đón đúng giờ\n✅ Hướng dẫn viên chu đáo, giàu kinh nghiệm\n✅ Bảo hiểm du lịch nội địa mức bồi thường tối đa 50.000.000đ/vụ\n✅ Quà tặng nón du lịch Wayfare`);
+    
+    setManualServicesExcluded(`❌ Thuế VAT 8% (nếu lấy hóa đơn đỏ)\n❌ Chi phí cá nhân: giặt là, điện thoại, đồ uống trong bữa ăn, minibar\n❌ Phụ thu phòng đơn (nếu yêu cầu ở 1 mình/phòng)\n❌ Tiền tip bồi dưỡng cho Hướng dẫn viên và tài xế (tùy tâm)\n❌ Vé các trò chơi giải trí cảm giác mạnh hoặc chi phí tự túc ngoài chương trình`);
+
+    setManualCancellationPolicy(`• Hủy trước ngày khởi hành 07 ngày: Hoàn lại 100% chi phí cọc\n• Hủy trước ngày khởi hành 03 - 06 ngày: Phí phạt 50% tổng giá trị tour\n• Hủy trong vòng 24 - 48 giờ trước giờ khởi hành: Phí phạt 80% tổng giá trị\n• Hủy vào ngày khởi hành hoặc vắng mặt: Phí phạt 100% giá trị tour`);
+
+    setManualPackingNotes(`• Giấy tờ tùy thân bắt buộc: CCCD/Hộ chiếu bản gốc còn hạn trên 6 tháng\n• Trang phục: Mang trang phục gọn nhẹ, giày thể thao êm chân; trang phục lịch sự kín đáo khi viếng đền chùa, di tích tôn nghiêm\n• Đồ dùng cá nhân: Kem chống nắng, kính râm, thuốc chống say xe, sạc dự phòng`);
+
+    toast.showSuccess(`✨ WanderAI đã tự động chuẩn hóa đầy đủ 15 tiêu chí tour cho ${dest}! 🎉`);
+  };
 
   // Tự động tính toán số ngày giữa ngày bắt đầu và kết thúc
   const manualDaysCount = useMemo(() => {
@@ -314,6 +365,25 @@ export const ItineraryManagerPage = () => {
       style: manualTravelStyle,
       travelStyle: manualTravelStyle,
       aiTipNote: manualNote || 'Lịch trình thủ công do bạn tự tạo và quản lý trên Wayfare.',
+
+      // 15 Tiêu Chuẩn Tour Lữ Hành Thương Mại
+      tourCode: manualTourCode.trim() || `TOUR-${(manualDest.trim().substring(0, 3) || 'VN').toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      theme: manualTheme.trim() || manualTravelStyle,
+      departureLocation: manualDepartureLocation.trim() || 'Hà Nội / TP. Hồ Chí Minh',
+      endingLocation: manualEndingLocation.trim() || manualDest.trim(),
+      targetAudience: manualTargetAudience.trim() || 'Đa dạng đối tượng (Gia đình, Thanh niên, Bạn bè)',
+      maxGroupSize: Number(manualMaxGroupSize) || 20,
+      transportation: manualTransportation.trim() || 'Ô tô du lịch đời mới / Máy bay',
+      mealPlan: manualMealPlan.trim() || null,
+      accommodationInfo: manualAccommodationInfo.trim() || null,
+      tourGuideInfo: manualTourGuideInfo.trim() || null,
+      childPrice: manualChildPrice ? Number(String(manualChildPrice).replace(/\D/g, '')) : null,
+      singleRoomSurcharge: manualSingleRoomSurcharge ? Number(String(manualSingleRoomSurcharge).replace(/\D/g, '')) : null,
+      servicesIncluded: manualServicesIncluded.trim() || null,
+      servicesExcluded: manualServicesExcluded.trim() || null,
+      cancellationPolicy: manualCancellationPolicy.trim() || null,
+      packingNotes: manualPackingNotes.trim() || null,
+
       days: finalDays
     };
 
@@ -325,6 +395,23 @@ export const ItineraryManagerPage = () => {
     setManualDest('');
     setManualNote('');
     setManualDaysSchedule([]);
+    setManualTourCode('');
+    setManualTheme('');
+    setManualDepartureLocation('Hà Nội / TP. Hồ Chí Minh');
+    setManualEndingLocation('');
+    setManualTargetAudience('Đa dạng đối tượng (Gia đình, Thanh niên, Bạn bè)');
+    setManualMaxGroupSize(20);
+    setManualTransportation('Ô tô du lịch đời mới / Máy bay');
+    setManualMealPlan('');
+    setManualAccommodationInfo('');
+    setManualTourGuideInfo('Hướng dẫn viên tiếng Việt chuyên nghiệp, nhiệt tình thuyết minh suốt tuyến');
+    setManualChildPrice('');
+    setManualSingleRoomSurcharge('');
+    setManualServicesIncluded('');
+    setManualServicesExcluded('');
+    setManualCancellationPolicy('');
+    setManualPackingNotes('');
+    setManualModalTab('basic');
 
     // Persist to MySQL backend database
     if (createManualItinerary) {
@@ -930,344 +1017,663 @@ export const ItineraryManagerPage = () => {
         />
       )}
 
-      {/* ─── 7. MODAL TẠO CHUYẾN ĐI THỦ CÔNG (LUXURY POPUP) ─────────────────────── */}
+      {/* ─── 7. MODAL TẠO CHUYẾN ĐI THỦ CÔNG (LUXURY 2-TAB POPUP) ─────────────────────── */}
       {isManualCreateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#17130F]/75 overflow-y-auto animate-in fade-in duration-200">
-          <div className="bg-[#FFFDF8] rounded-sm max-w-2xl w-full border border-[#1E1A15]/15 overflow-hidden my-auto max-h-[92vh] flex flex-col">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-[#17130F]/75 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-[#FFFDF8] rounded-xl sm:rounded-2xl max-w-3xl w-full border border-[#1E1A15]/15 overflow-hidden my-auto max-h-[92vh] flex flex-col shadow-2xl">
             
             {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-[#1E1A15]/10 flex items-center justify-between shrink-0 bg-[#F8F4EC]">
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-sm bg-clay-600 text-white flex items-center justify-center">
+            <div className="px-6 py-4 border-b border-[#1E1A15]/10 flex items-center justify-between shrink-0 bg-[#F8F4EC]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-clay-600 text-white flex items-center justify-center shadow-xs">
                   <Plus className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-display font-extrabold text-lg text-[#1E1A15]">
-                    Tạo Chuyến Đi Mới
+                  <h3 className="font-display font-extrabold text-base sm:text-lg text-[#1E1A15]">
+                    Thiết Kế Chuyến Đi & Chuẩn Tour Lữ Hành
                   </h3>
-                  <p className="text-xs text-[#7A6F60]">Tự do lên kế hoạch, điểm dừng chân và dự toán ngân sách</p>
+                  <p className="text-xs text-[#7A6F60]">Tự do lên kế hoạch hoặc áp dụng trọn vẹn 15 tiêu chuẩn tour chuyên nghiệp</p>
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsManualCreateOpen(false)}
-                className="w-9 h-9 rounded-sm bg-[#E7DFD2] hover:bg-[#D9CFC0] text-[#5A5145] flex items-center justify-center cursor-pointer transition-colors"
+                className="w-8 h-8 rounded-full bg-[#E7DFD2] hover:bg-[#D9CFC0] text-[#5A5145] flex items-center justify-center cursor-pointer transition-colors"
               >
                 <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Tab Navigator */}
+            <div className="px-6 pt-2.5 pb-2 bg-[#F2ECE1]/80 border-b border-[#1E1A15]/10 flex flex-wrap items-center justify-between gap-2.5 shrink-0">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setManualModalTab('basic')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    manualModalTab === 'basic'
+                      ? 'bg-white text-[#1E1A15] shadow-xs border border-[#1E1A15]/15'
+                      : 'text-[#5A5145] hover:text-[#1E1A15]'
+                  }`}
+                >
+                  <Compass className="w-3.5 h-3.5 text-clay-600" />
+                  <span>1. Thông Tin Cơ Bản</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setManualModalTab('tourStandard')}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    manualModalTab === 'tourStandard'
+                      ? 'bg-white text-clay-700 shadow-xs border border-clay-300'
+                      : 'text-[#5A5145] hover:text-[#1E1A15]'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>2. Chuẩn Lữ Hành (15 Tiêu Chí)</span>
+                  <span className="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-amber-100 text-amber-800 font-extrabold">Đề xuất</span>
+                </button>
+              </div>
+
+              {/* Smart Auto-fill Button */}
+              <button
+                type="button"
+                onClick={handleAutoFillManualTourStandard}
+                className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-clay-600 hover:from-amber-600 hover:to-clay-700 text-white font-extrabold text-xs shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                title="Tự động điền nhanh các tiêu chuẩn lữ hành theo điểm đến"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>✨ WanderAI Điền Nhanh Chuẩn Tour</span>
               </button>
             </div>
 
             {/* Modal Form Body */}
             <form onSubmit={handleCreateManualTrip} className="p-6 overflow-y-auto flex-1 space-y-4 text-xs sm:text-sm">
               
-              {/* Trip Title */}
-              <div className="space-y-1.5">
-                <label className="font-bold text-[#3A332B] flex items-center gap-1">
-                  <span>Tên chuyến đi / Tiêu đề hành trình</span>
-                  <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={manualTitle}
-                  onChange={(e) => setManualTitle(e.target.value)}
-                  placeholder="Ví dụ: Nghỉ dưỡng biển Mỹ Khê 3N2Đ, Phượt săn mây Đà Lạt..."
-                  className="w-full px-4 py-2.5 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#1E1A15] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600 focus:ring-2 focus:ring-clay-600/15 transition-all"
-                />
-              </div>
-
-              {/* Destination */}
-              <div className="space-y-1.5">
-                <label className="font-bold text-[#3A332B] flex items-center gap-1">
-                  <MapPin className="w-4 h-4 text-clay-600" />
-                  <span>Điểm đến chính</span>
-                  <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={manualDest}
-                  onChange={(e) => setManualDest(e.target.value)}
-                  placeholder="Ví dụ: Đà Nẵng, Hà Giang, Phú Quốc, Sa Pa..."
-                  className="w-full px-4 py-2.5 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#1E1A15] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600"
-                />
-              </div>
-
-              {/* Dates & Auto-calculated Days */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="font-bold text-[#3A332B] flex items-center gap-1.5 text-xs">
-                    <Calendar className="w-3.5 h-3.5 text-clay-600" />
-                    <span>Thời gian chuyến đi</span>
-                  </label>
-                  <div className="px-3 py-1 rounded-sm bg-clay-50 border border-clay-200 text-clay-800 font-bold text-xs">
-                    {manualDaysCount} Ngày {manualDaysCount > 1 ? `(${manualDaysCount}N${manualDaysCount - 1}Đ)` : '(Đi về trong ngày)'}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <span className="text-[11px] font-semibold text-[#7A6F60] block">Ngày khởi hành</span>
+              {/* TAB 1: THÔNG TIN CƠ BẢN */}
+              {manualModalTab === 'basic' && (
+                <div className="space-y-4 animate-in fade-in duration-150">
+                  {/* Trip Title */}
+                  <div className="space-y-1.5">
+                    <label className="font-bold text-[#3A332B] flex items-center gap-1">
+                      <span>Tên chuyến đi / Tiêu đề hành trình</span>
+                      <span className="text-rose-500">*</span>
+                    </label>
                     <input
-                      type="date"
+                      type="text"
                       required
-                      value={manualStartDate}
-                      onChange={(e) => {
-                        setManualStartDate(e.target.value);
-                        if (manualEndDate && new Date(e.target.value) > new Date(manualEndDate)) {
-                          setManualEndDate(e.target.value);
-                        }
-                      }}
-                      className="w-full px-3.5 py-2.5 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#2A241D] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600 text-xs"
+                      value={manualTitle}
+                      onChange={(e) => setManualTitle(e.target.value)}
+                      placeholder="Ví dụ: Nghỉ dưỡng biển Mỹ Khê 3N2Đ, Phượt săn mây Đà Lạt..."
+                      className="w-full px-4 py-2.5 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#1E1A15] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600 focus:ring-2 focus:ring-clay-600/15 transition-all"
                     />
                   </div>
 
-                  <div className="space-y-1">
-                    <span className="text-[11px] font-semibold text-[#7A6F60] block">Ngày kết thúc</span>
+                  {/* Destination */}
+                  <div className="space-y-1.5">
+                    <label className="font-bold text-[#3A332B] flex items-center gap-1">
+                      <MapPin className="w-4 h-4 text-clay-600" />
+                      <span>Điểm đến chính</span>
+                      <span className="text-rose-500">*</span>
+                    </label>
                     <input
-                      type="date"
+                      type="text"
                       required
-                      min={manualStartDate}
-                      value={manualEndDate}
-                      onChange={(e) => {
-                        if (manualStartDate && new Date(e.target.value) < new Date(manualStartDate)) {
-                          setManualEndDate(manualStartDate);
-                        } else {
-                          setManualEndDate(e.target.value);
-                        }
-                      }}
-                      className="w-full px-3.5 py-2.5 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#2A241D] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600 text-xs"
+                      value={manualDest}
+                      onChange={(e) => setManualDest(e.target.value)}
+                      placeholder="Ví dụ: Đà Nẵng, Hà Giang, Phú Quốc, Sa Pa..."
+                      className="w-full px-4 py-2.5 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#1E1A15] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600"
                     />
                   </div>
-                </div>
-              </div>
 
-              {/* Group Type & Budget */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div className="space-y-1.5">
-                  <label className="font-bold text-[#3A332B] flex items-center gap-1">
-                    <Users className="w-4 h-4 text-clay-600" />
-                    <span>Hình thức nhóm</span>
-                  </label>
-                  <select
-                    value={manualGroup}
-                    onChange={(e) => setManualGroup(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#1E1A15] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600 cursor-pointer"
-                  >
-                    <option value="Cá nhân">Cá nhân (Solo)</option>
-                    <option value="Cặp đôi">Cặp đôi</option>
-                    <option value="Nhóm bạn">Nhóm bạn</option>
-                    <option value="Gia đình">Gia đình</option>
-                  </select>
-                </div>
+                  {/* Dates & Auto-calculated Days */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="font-bold text-[#3A332B] flex items-center gap-1.5 text-xs">
+                        <Calendar className="w-3.5 h-3.5 text-clay-600" />
+                        <span>Thời gian chuyến đi</span>
+                      </label>
+                      <div className="px-3 py-1 rounded-sm bg-clay-50 border border-clay-200 text-clay-800 font-bold text-xs">
+                        {manualDaysCount} Ngày {manualDaysCount > 1 ? `(${manualDaysCount}N${manualDaysCount - 1}Đ)` : '(Đi về trong ngày)'}
+                      </div>
+                    </div>
 
-                <div className="space-y-1.5">
-                  <label className="font-bold text-[#3A332B] flex items-center gap-1">
-                    <Sparkles className="w-4 h-4 text-amber-500" />
-                    <span>Phong cách du lịch</span>
-                  </label>
-                  <select
-                    value={manualTravelStyle}
-                    onChange={(e) => setManualTravelStyle(e.target.value)}
-                    className="w-full px-4 py-2.5 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#1E1A15] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600 cursor-pointer"
-                  >
-                    <option value="Nghỉ dưỡng & Khám phá">Nghỉ dưỡng & Khám phá</option>
-                    <option value="Phượt bụi & Khám phá mạo hiểm">Phượt bụi & Mạo hiểm</option>
-                    <option value="Ẩm thực & Check-in sống ảo">Ẩm thực & Check-in</option>
-                    <option value="Văn hóa & Di sản lịch sử">Văn hóa & Lịch sử</option>
-                    <option value="Gia đình & Thư giãn">Gia đình & Thư giãn</option>
-                    <option value="Sinh thái & Thiên nhiên">Sinh thái & Thiên nhiên</option>
-                  </select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="font-bold text-[#3A332B] flex items-center gap-1">
-                    <DollarSign className="w-4 h-4 text-clay-600" />
-                    <span>Dự toán ngân sách (VNĐ)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={manualBudgetFormatted}
-                    onChange={handleManualBudgetChange}
-                    placeholder="Ví dụ: 5,000,000"
-                    className="w-full px-4 py-2.5 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#1E1A15] font-semibold outline-none focus:bg-[#FFFDF8] focus:border-clay-600"
-                  />
-                </div>
-              </div>
-
-              {/* ─── Lập Lịch Trình Chi Tiết Từng Ngày (Tự điền mốc giờ & địa điểm) ─── */}
-              <div className="space-y-3 pt-3 border-t border-[#1E1A15]/12">
-                <div className="flex items-center justify-between">
-                  <label className="font-extrabold text-[#2A241D] flex items-center gap-1.5 text-xs sm:text-sm">
-                    <Clock className="w-4 h-4 text-clay-600" />
-                    <span>Thiết kế lịch trình từng ngày ({manualDaysCount} ngày)</span>
-                  </label>
-                  <span className="text-[11px] text-[#7A6F60] font-medium">Tự do điền mốc giờ và hoạt động</span>
-                </div>
-
-                <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
-                  {manualDaysSchedule.map((dayItem, dayIdx) => (
-                    <div key={dayIdx} className="p-3.5 rounded-sm bg-[#F8F4EC] border border-[#1E1A15]/12 space-y-2.5">
-                      <div className="flex items-center gap-2">
-                        <span className="px-2.5 py-1 rounded-sm bg-clay-600 text-white font-extrabold text-xs shrink-0">
-                          Ngày {dayIdx + 1}
-                        </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-semibold text-[#7A6F60] block">Ngày khởi hành</span>
                         <input
-                          type="text"
-                          placeholder={`Tiêu đề ngày ${dayIdx + 1} (vd: Khám phá trung tâm, Check-in đồi chè...)`}
-                          value={dayItem.title || ''}
-                          onChange={(e) => handleUpdateDayTitle(dayIdx, e.target.value)}
-                          className="flex-1 px-3 py-1.5 rounded-sm border border-[#1E1A15]/12 bg-[#FFFDF8] text-xs font-semibold text-[#2A241D] outline-none focus:border-clay-600"
+                          type="date"
+                          required
+                          value={manualStartDate}
+                          onChange={(e) => {
+                            setManualStartDate(e.target.value);
+                            if (manualEndDate && new Date(e.target.value) > new Date(manualEndDate)) {
+                              setManualEndDate(e.target.value);
+                            }
+                          }}
+                          className="w-full px-3.5 py-2 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#2A241D] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600 text-xs"
                         />
                       </div>
 
-                      {/* Danh sách hoạt động tự điền của ngày */}
-                      <div className="space-y-2 pl-2 border-l-2 border-clay-300">
-                        {(!dayItem.activities || dayItem.activities.length === 0) ? (
-                          <div className="py-2 px-3 rounded-sm bg-[#FFFDF8]/70 border border-dashed border-[#1E1A15]/20 text-[#9A8F7F] text-xs italic flex items-center justify-between">
-                            <span>Chưa có hoạt động nào trong Ngày {dayIdx + 1}.</span>
-                            <button
-                              type="button"
-                              onClick={() => handleAddActivityToDay(dayIdx)}
-                              className="inline-flex items-center gap-1 text-clay-600 font-bold hover:underline not-italic cursor-pointer"
-                            >
-                              <Plus className="w-3.5 h-3.5" />
-                              <span>+ Thêm mốc giờ</span>
-                            </button>
-                          </div>
-                        ) : (
-                          <>
-                            {dayItem.activities.map((act, actIdx) => (
-                              <div key={act.id || actIdx} className="p-2.5 rounded-sm bg-[#FFFDF8] border border-[#1E1A15]/12  space-y-2 text-xs">
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="text"
-                                    placeholder="Giờ (vd: 08:30)"
-                                    value={act.time || ''}
-                                    onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'time', e.target.value)}
-                                    className="w-24 px-2 py-1 rounded-sm border border-[#1E1A15]/12 font-mono text-xs font-bold outline-none focus:border-clay-600"
-                                  />
-                                  <input
-                                    type="text"
-                                    placeholder="Tên hoạt động / Địa điểm (Bắt buộc)"
-                                    value={act.title || ''}
-                                    onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'title', e.target.value)}
-                                    className="flex-1 px-2.5 py-1 rounded-sm border border-[#1E1A15]/12 font-semibold text-xs text-[#1E1A15] outline-none focus:border-clay-600"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => handleRemoveActivityFromDay(dayIdx, actIdx)}
-                                    className="p-1 rounded-sm text-[#9A8F7F] hover:text-rose-600 hover:bg-rose-50 transition-colors"
-                                    title="Xóa hoạt động này"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
-                                </div>
-
-                                <div className="grid grid-cols-2 gap-2">
-                                  <input
-                                    type="text"
-                                    placeholder="Ghi chú (vd: Mua vé trước, ăn sáng quán ngon...)"
-                                    value={act.note || ''}
-                                    onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'note', e.target.value)}
-                                    className="px-2.5 py-1 rounded-sm border border-[#1E1A15]/12 text-[11px] text-[#5A5145] outline-none focus:border-clay-600"
-                                  />
-                                  <input
-                                    type="text"
-                                    placeholder="Chi phí (vd: 50.000đ)"
-                                    value={act.cost || ''}
-                                    onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'cost', e.target.value)}
-                                    className="px-2.5 py-1 rounded-sm border border-[#1E1A15]/12 text-[11px] text-[#5A5145] outline-none focus:border-clay-600"
-                                  />
-                                </div>
-                              </div>
-                            ))}
-
-                            <button
-                              type="button"
-                              onClick={() => handleAddActivityToDay(dayIdx)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-clay-50 hover:bg-clay-100 text-clay-700 text-xs font-bold transition-all cursor-pointer border border-clay-200/60"
-                            >
-                              <Plus className="w-3.5 h-3.5" />
-                              <span>+ Thêm mốc giờ cho Ngày {dayIdx + 1}</span>
-                            </button>
-                          </>
-                        )}
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-semibold text-[#7A6F60] block">Ngày kết thúc</span>
+                        <input
+                          type="date"
+                          required
+                          min={manualStartDate}
+                          value={manualEndDate}
+                          onChange={(e) => {
+                            if (manualStartDate && new Date(e.target.value) < new Date(manualStartDate)) {
+                              setManualEndDate(manualStartDate);
+                            } else {
+                              setManualEndDate(e.target.value);
+                            }
+                          }}
+                          className="w-full px-3.5 py-2 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#2A241D] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600 text-xs"
+                        />
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
 
-              {/* Cover Photo: Chọn từ máy */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="font-bold text-[#3A332B] flex items-center gap-1.5 text-xs">
-                    <Camera className="w-3.5 h-3.5 text-clay-600" />
-                    <span>Ảnh bìa đại diện chuyến đi</span>
-                  </label>
-                  <label className="px-3 py-1.5 rounded-sm bg-clay-50 text-clay-700 hover:bg-clay-100 border border-clay-200 font-bold text-xs cursor-pointer transition-colors flex items-center gap-1.5">
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>Chọn ảnh từ máy</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (ev) => {
-                            setManualCover(ev.target.result);
-                          };
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                    />
-                  </label>
-                </div>
+                  {/* Group Type, Travel Style & Budget */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="space-y-1.5">
+                      <label className="font-bold text-[#3A332B] flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5 text-clay-600" />
+                        <span>Hình thức nhóm</span>
+                      </label>
+                      <select
+                        value={manualGroup}
+                        onChange={(e) => setManualGroup(e.target.value)}
+                        className="w-full px-3 py-2 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#1E1A15] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600 cursor-pointer text-xs"
+                      >
+                        <option value="Cá nhân">Cá nhân (Solo)</option>
+                        <option value="Cặp đôi">Cặp đôi</option>
+                        <option value="Nhóm bạn">Nhóm bạn</option>
+                        <option value="Gia đình">Gia đình</option>
+                      </select>
+                    </div>
 
-                {manualCover && (
-                  <div className="relative h-32 rounded-sm overflow-hidden border border-[#1E1A15]/12 bg-[#F2ECE1] ">
-                    <img src={manualCover} alt="Cover preview" className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#17130F]/70 to-transparent flex items-end p-2.5">
-                      <span className="text-white text-xs font-semibold">Xem trước ảnh bìa đã chọn</span>
+                    <div className="space-y-1.5">
+                      <label className="font-bold text-[#3A332B] flex items-center gap-1">
+                        <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Phong cách</span>
+                      </label>
+                      <select
+                        value={manualTravelStyle}
+                        onChange={(e) => setManualTravelStyle(e.target.value)}
+                        className="w-full px-3 py-2 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#1E1A15] font-medium outline-none focus:bg-[#FFFDF8] focus:border-clay-600 cursor-pointer text-xs"
+                      >
+                        <option value="Nghỉ dưỡng & Khám phá">Nghỉ dưỡng & Khám phá</option>
+                        <option value="Phượt bụi & Khám phá mạo hiểm">Phượt bụi & Mạo hiểm</option>
+                        <option value="Ẩm thực & Check-in sống ảo">Ẩm thực & Check-in</option>
+                        <option value="Văn hóa & Di sản lịch sử">Văn hóa & Lịch sử</option>
+                        <option value="Gia đình & Thư giãn">Gia đình & Thư giãn</option>
+                        <option value="Sinh thái & Thiên nhiên">Sinh thái & Thiên nhiên</option>
+                      </select>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="font-bold text-[#3A332B] flex items-center gap-1">
+                        <DollarSign className="w-3.5 h-3.5 text-clay-600" />
+                        <span>Dự toán (VNĐ)</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={manualBudgetFormatted}
+                        onChange={handleManualBudgetChange}
+                        placeholder="Ví dụ: 5,000,000"
+                        className="w-full px-3 py-2 rounded-sm border border-[#1E1A15]/12 bg-[#F8F4EC] text-[#1E1A15] font-semibold outline-none focus:bg-[#FFFDF8] focus:border-clay-600 text-xs"
+                      />
                     </div>
                   </div>
-                )}
 
-                <div className="pt-2">
-                  <label className="flex items-center gap-2.5 p-3 rounded-sm bg-[#F8F4EC] border border-[#1E1A15]/12 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={manualIsPublic}
-                      onChange={(e) => setManualIsPublic(e.target.checked)}
-                      className="w-4 h-4 rounded text-clay-600 focus:ring-clay-500 border-[#1E1A15]/20 cursor-pointer"
-                    />
-                    <div>
-                      <span className="font-bold text-[#1E1A15] block text-xs">Chia sẻ công khai lịch trình (Public)</span>
-                      <span className="text-[11px] text-[#7A6F60]">Cho phép cộng đồng du khách xem và sao chép chuyến đi</span>
+                  {/* ─── Lập Lịch Trình Chi Tiết Từng Ngày ─── */}
+                  <div className="space-y-3 pt-3 border-t border-[#1E1A15]/12">
+                    <div className="flex items-center justify-between">
+                      <label className="font-extrabold text-[#2A241D] flex items-center gap-1.5 text-xs sm:text-sm">
+                        <Clock className="w-4 h-4 text-clay-600" />
+                        <span>Thiết kế lịch trình từng ngày ({manualDaysCount} ngày)</span>
+                      </label>
+                      <span className="text-[11px] text-[#7A6F60] font-medium">Tự do điền mốc giờ và hoạt động</span>
                     </div>
-                  </label>
+
+                    <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+                      {manualDaysSchedule.map((dayItem, dayIdx) => (
+                        <div key={dayIdx} className="p-3.5 rounded-sm bg-[#F8F4EC] border border-[#1E1A15]/12 space-y-2.5">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-1 rounded-sm bg-clay-600 text-white font-extrabold text-xs shrink-0">
+                              Ngày {dayIdx + 1}
+                            </span>
+                            <input
+                              type="text"
+                              placeholder={`Tiêu đề ngày ${dayIdx + 1} (vd: Khám phá trung tâm, Check-in đồi chè...)`}
+                              value={dayItem.title || ''}
+                              onChange={(e) => handleUpdateDayTitle(dayIdx, e.target.value)}
+                              className="flex-1 px-3 py-1.5 rounded-sm border border-[#1E1A15]/12 bg-[#FFFDF8] text-xs font-semibold text-[#2A241D] outline-none focus:border-clay-600"
+                            />
+                          </div>
+
+                          {/* Danh sách hoạt động tự điền của ngày */}
+                          <div className="space-y-2 pl-2 border-l-2 border-clay-300">
+                            {(!dayItem.activities || dayItem.activities.length === 0) ? (
+                              <div className="py-2 px-3 rounded-sm bg-[#FFFDF8]/70 border border-dashed border-[#1E1A15]/20 text-[#9A8F7F] text-xs italic flex items-center justify-between">
+                                <span>Chưa có hoạt động nào trong Ngày {dayIdx + 1}.</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddActivityToDay(dayIdx)}
+                                  className="inline-flex items-center gap-1 text-clay-600 font-bold hover:underline not-italic cursor-pointer"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  <span>+ Thêm mốc giờ</span>
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                {dayItem.activities.map((act, actIdx) => (
+                                  <div key={act.id || actIdx} className="p-2.5 rounded-sm bg-[#FFFDF8] border border-[#1E1A15]/12 space-y-2 text-xs">
+                                    <div className="flex items-center gap-2">
+                                      <input
+                                        type="text"
+                                        placeholder="Giờ (vd: 08:30)"
+                                        value={act.time || ''}
+                                        onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'time', e.target.value)}
+                                        className="w-24 px-2 py-1 rounded-sm border border-[#1E1A15]/12 font-mono text-xs font-bold outline-none focus:border-clay-600"
+                                      />
+                                      <input
+                                        type="text"
+                                        placeholder="Tên hoạt động / Địa điểm (Bắt buộc)"
+                                        value={act.title || ''}
+                                        onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'title', e.target.value)}
+                                        className="flex-1 px-2.5 py-1 rounded-sm border border-[#1E1A15]/12 font-semibold text-xs text-[#1E1A15] outline-none focus:border-clay-600"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoveActivityFromDay(dayIdx, actIdx)}
+                                        className="p-1 rounded-sm text-[#9A8F7F] hover:text-rose-600 hover:bg-rose-50 transition-colors"
+                                        title="Xóa hoạt động này"
+                                      >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                      </button>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <input
+                                        type="text"
+                                        placeholder="Ghi chú (vd: Mua vé trước, ăn sáng quán ngon...)"
+                                        value={act.note || ''}
+                                        onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'note', e.target.value)}
+                                        className="px-2.5 py-1 rounded-sm border border-[#1E1A15]/12 text-[11px] text-[#5A5145] outline-none focus:border-clay-600"
+                                      />
+                                      <input
+                                        type="text"
+                                        placeholder="Chi phí (vd: 50.000đ)"
+                                        value={act.cost || ''}
+                                        onChange={(e) => handleUpdateActivityField(dayIdx, actIdx, 'cost', e.target.value)}
+                                        className="px-2.5 py-1 rounded-sm border border-[#1E1A15]/12 text-[11px] text-[#5A5145] outline-none focus:border-clay-600"
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddActivityToDay(dayIdx)}
+                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-clay-50 hover:bg-clay-100 text-clay-700 text-xs font-bold transition-all cursor-pointer border border-clay-200/60"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  <span>+ Thêm mốc giờ cho Ngày {dayIdx + 1}</span>
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Cover Photo */}
+                  <div className="space-y-2 pt-2 border-t border-[#1E1A15]/12">
+                    <div className="flex items-center justify-between">
+                      <label className="font-bold text-[#3A332B] flex items-center gap-1.5 text-xs">
+                        <Camera className="w-3.5 h-3.5 text-clay-600" />
+                        <span>Ảnh bìa đại diện chuyến đi</span>
+                      </label>
+                      <label className="px-3 py-1 rounded-sm bg-clay-50 text-clay-700 hover:bg-clay-100 border border-clay-200 font-bold text-xs cursor-pointer transition-colors flex items-center gap-1.5">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>Chọn ảnh từ máy</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (ev) => {
+                                setManualCover(ev.target.result);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+
+                    {manualCover && (
+                      <div className="relative h-28 rounded-sm overflow-hidden border border-[#1E1A15]/12 bg-[#F2ECE1]">
+                        <img src={manualCover} alt="Cover preview" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#17130F]/70 to-transparent flex items-end p-2.5">
+                          <span className="text-white text-xs font-semibold">Xem trước ảnh bìa đã chọn</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="pt-1">
+                      <label className="flex items-center gap-2.5 p-2.5 rounded-sm bg-[#F8F4EC] border border-[#1E1A15]/12 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={manualIsPublic}
+                          onChange={(e) => setManualIsPublic(e.target.checked)}
+                          className="w-4 h-4 rounded text-clay-600 focus:ring-clay-500 border-[#1E1A15]/20 cursor-pointer"
+                        />
+                        <div>
+                          <span className="font-bold text-[#1E1A15] block text-xs">Chia sẻ công khai lịch trình (Public)</span>
+                          <span className="text-[11px] text-[#7A6F60]">Cho phép cộng đồng du khách xem và sao chép chuyến đi</span>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* TAB 2: CHUẨN TOUR LỮ HÀNH 15 TIÊU CHÍ */}
+              {manualModalTab === 'tourStandard' && (
+                <div className="space-y-4 animate-in fade-in duration-150">
+                  {/* Banner giới thiệu chuẩn tour */}
+                  <div className="p-3.5 rounded-lg bg-gradient-to-r from-amber-50 to-clay-50 border border-amber-200/80 flex items-start gap-3">
+                    <ShieldCheck className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                    <div className="flex-1 text-xs">
+                      <h4 className="font-extrabold text-amber-950">Bộ 15 Tiêu Chuẩn Tour Lữ Hành Thương Mại</h4>
+                      <p className="text-amber-800 mt-0.5 leading-relaxed">
+                        Điền đầy đủ thông tin bên dưới để lịch trình được chuẩn hóa theo quy chuẩn lữ hành chuyên nghiệp, hỗ trợ in cẩm nang du lịch và tổ chức đoàn. Bạn có thể nhấn nút <strong className="text-clay-800">✨ WanderAI Điền Nhanh Chuẩn Tour</strong> ở trên để tự động điền mẫu chuẩn!
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Khối 1: Định Danh & Tuyến Điểm */}
+                  <div className="p-4 rounded-xl bg-white border border-[#1E1A15]/10 space-y-3">
+                    <div className="flex items-center gap-2 pb-2 border-b border-[#1E1A15]/10 text-xs font-extrabold text-[#1E1A15]">
+                      <Compass className="w-4 h-4 text-clay-600" />
+                      <span>1. Định Danh & Tuyến Điểm Khởi Hành - Kết Thúc</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-[#5A5145]">Mã Tour (Tour Code)</label>
+                        <input
+                          type="text"
+                          value={manualTourCode}
+                          onChange={(e) => setManualTourCode(e.target.value)}
+                          placeholder="Ví dụ: TOUR-DNG-3N2D"
+                          className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-semibold text-[#1E1A15] outline-none focus:border-clay-600 font-mono"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-[#5A5145]">Chủ Đề Tour</label>
+                        <input
+                          type="text"
+                          value={manualTheme}
+                          onChange={(e) => setManualTheme(e.target.value)}
+                          placeholder="Ví dụ: Nghỉ dưỡng biển cao cấp, Khám phá di sản..."
+                          className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-semibold text-[#1E1A15] outline-none focus:border-clay-600"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-[#5A5145]">Điểm Đón / Khởi Hành</label>
+                        <input
+                          type="text"
+                          value={manualDepartureLocation}
+                          onChange={(e) => setManualDepartureLocation(e.target.value)}
+                          placeholder="Ví dụ: Sân bay Nội Bài / Đà Nẵng"
+                          className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-semibold text-[#1E1A15] outline-none focus:border-clay-600"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-[#5A5145]">Điểm Kết Thúc Chuyến Đi</label>
+                        <input
+                          type="text"
+                          value={manualEndingLocation}
+                          onChange={(e) => setManualEndingLocation(e.target.value)}
+                          placeholder="Ví dụ: TP. Hồ Chí Minh / Hà Nội"
+                          className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-semibold text-[#1E1A15] outline-none focus:border-clay-600"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Khối 2: Đối Tượng Khách & Phương Tiện */}
+                  <div className="p-4 rounded-xl bg-white border border-[#1E1A15]/10 space-y-3">
+                    <div className="flex items-center gap-2 pb-2 border-b border-[#1E1A15]/10 text-xs font-extrabold text-[#1E1A15]">
+                      <Bus className="w-4 h-4 text-clay-600" />
+                      <span>2. Đối Tượng Khách & Phương Tiện Di Chuyển</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="space-y-1 sm:col-span-2">
+                        <label className="text-[11px] font-bold text-[#5A5145]">Đối Tượng Khách & Phân Khúc</label>
+                        <input
+                          type="text"
+                          value={manualTargetAudience}
+                          onChange={(e) => setManualTargetAudience(e.target.value)}
+                          placeholder="Ví dụ: Gia đình có trẻ nhỏ, Cặp đôi, Nhóm bạn trẻ..."
+                          className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-semibold text-[#1E1A15] outline-none focus:border-clay-600"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-[#5A5145]">Số Khách Tối Đa</label>
+                        <input
+                          type="number"
+                          value={manualMaxGroupSize}
+                          onChange={(e) => setManualMaxGroupSize(Number(e.target.value))}
+                          placeholder="20"
+                          className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-semibold text-[#1E1A15] outline-none focus:border-clay-600"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[#5A5145]">Phương Tiện Di Chuyển Chính</label>
+                      <input
+                        type="text"
+                        value={manualTransportation}
+                        onChange={(e) => setManualTransportation(e.target.value)}
+                        placeholder="Ví dụ: Máy bay khứ hồi + Xe du lịch Universe đời mới 29-45 chỗ..."
+                        className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-semibold text-[#1E1A15] outline-none focus:border-clay-600"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Khối 3: Ẩm Thực & Lưu Trú */}
+                  <div className="p-4 rounded-xl bg-white border border-[#1E1A15]/10 space-y-3">
+                    <div className="flex items-center gap-2 pb-2 border-b border-[#1E1A15]/10 text-xs font-extrabold text-[#1E1A15]">
+                      <Coffee className="w-4 h-4 text-clay-600" />
+                      <span>3. Ẩm Thực & Tiêu Chuẩn Lưu Trú</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[#5A5145]">Kế Hoạch & Thực Đơn Ăn Uống (Sáng, Trưa, Tối)</label>
+                      <textarea
+                        rows={2}
+                        value={manualMealPlan}
+                        onChange={(e) => setManualMealPlan(e.target.value)}
+                        placeholder="Ví dụ: Bữa sáng buffet tại khách sạn, bữa trưa thưởng thức đặc sản 150.000đ/suất..."
+                        className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-medium text-[#1E1A15] outline-none focus:border-clay-600"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[#5A5145]">Thông Tin Khách Sạn & Loại Phòng</label>
+                      <textarea
+                        rows={2}
+                        value={manualAccommodationInfo}
+                        onChange={(e) => setManualAccommodationInfo(e.target.value)}
+                        placeholder="Ví dụ: Khách sạn 4 sao gần biển, phòng Deluxe 2 khách/phòng tiện nghi hiện đại..."
+                        className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-medium text-[#1E1A15] outline-none focus:border-clay-600"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Khối 4: Chi Phí Phụ Thu */}
+                  <div className="p-4 rounded-xl bg-white border border-[#1E1A15]/10 space-y-3">
+                    <div className="flex items-center gap-2 pb-2 border-b border-[#1E1A15]/10 text-xs font-extrabold text-[#1E1A15]">
+                      <DollarSign className="w-4 h-4 text-clay-600" />
+                      <span>4. Chính Sách Giá Trẻ Em & Phụ Thu Phòng Đơn</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-[#5A5145]">Giá Tour Trẻ Em (VNĐ)</label>
+                        <input
+                          type="text"
+                          value={manualChildPrice}
+                          onChange={(e) => {
+                            const raw = e.target.value.replace(/\D/g, '');
+                            setManualChildPrice(raw ? Number(raw).toLocaleString('en-US') : '');
+                          }}
+                          placeholder="Ví dụ: 3,500,000"
+                          className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-semibold text-[#1E1A15] outline-none focus:border-clay-600"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-[#5A5145]">Phụ Thu Phòng Đơn (VNĐ)</label>
+                        <input
+                          type="text"
+                          value={manualSingleRoomSurcharge}
+                          onChange={(e) => {
+                            const raw = e.target.value.replace(/\D/g, '');
+                            setManualSingleRoomSurcharge(raw ? Number(raw).toLocaleString('en-US') : '');
+                          }}
+                          placeholder="Ví dụ: 1,200,000"
+                          className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-semibold text-[#1E1A15] outline-none focus:border-clay-600"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Khối 5: Dịch Vụ Bao Gồm & Không Bao Gồm */}
+                  <div className="p-4 rounded-xl bg-white border border-[#1E1A15]/10 space-y-3">
+                    <div className="flex items-center gap-2 pb-2 border-b border-[#1E1A15]/10 text-xs font-extrabold text-[#1E1A15]">
+                      <FileText className="w-4 h-4 text-clay-600" />
+                      <span>5. Danh Mục Dịch Vụ Đi Kèm</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[#5A5145]">Dịch Vụ Bao Gồm (Inclusions)</label>
+                      <textarea
+                        rows={3}
+                        value={manualServicesIncluded}
+                        onChange={(e) => setManualServicesIncluded(e.target.value)}
+                        placeholder="✅ Vé máy bay, khách sạn, vé tham quan, ăn uống theo tour, bảo hiểm du lịch..."
+                        className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-medium text-[#1E1A15] outline-none focus:border-clay-600 font-sans"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[#5A5145]">Dịch Vụ Không Bao Gồm (Exclusions)</label>
+                      <textarea
+                        rows={3}
+                        value={manualServicesExcluded}
+                        onChange={(e) => setManualServicesExcluded(e.target.value)}
+                        placeholder="❌ Thuế VAT, chi phí cá nhân, đồ uống minibar, tiền tip HDV & tài xế..."
+                        className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-medium text-[#1E1A15] outline-none focus:border-clay-600 font-sans"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Khối 6: Hướng Dẫn Viên & Chính Sách */}
+                  <div className="p-4 rounded-xl bg-white border border-[#1E1A15]/10 space-y-3">
+                    <div className="flex items-center gap-2 pb-2 border-b border-[#1E1A15]/10 text-xs font-extrabold text-[#1E1A15]">
+                      <ShieldCheck className="w-4 h-4 text-clay-600" />
+                      <span>6. Hướng Dẫn Viên, Chính Sách Hủy Tour & Hành Lý</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[#5A5145]">Thông Tin & Nhiệm Vụ Hướng Dẫn Viên</label>
+                      <input
+                        type="text"
+                        value={manualTourGuideInfo}
+                        onChange={(e) => setManualTourGuideInfo(e.target.value)}
+                        placeholder="Ví dụ: Hướng dẫn viên thẻ quốc tế nhiệt tình, thuyết minh suốt tuyến..."
+                        className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-semibold text-[#1E1A15] outline-none focus:border-clay-600"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[#5A5145]">Chính Sách Đặt Cọc, Thanh Toán & Hủy Tour</label>
+                      <textarea
+                        rows={2}
+                        value={manualCancellationPolicy}
+                        onChange={(e) => setManualCancellationPolicy(e.target.value)}
+                        placeholder="Ví dụ: Cọc 50% khi đăng ký. Hủy trước 7 ngày hoàn 100%, hủy trước 3 ngày phạt 50%..."
+                        className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-medium text-[#1E1A15] outline-none focus:border-clay-600"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[#5A5145]">Lưu Ý Hành Lý, Giấy Tờ & Trang Phục</label>
+                      <textarea
+                        rows={2}
+                        value={manualPackingNotes}
+                        onChange={(e) => setManualPackingNotes(e.target.value)}
+                        placeholder="Ví dụ: Mang CCCD/Hộ chiếu gốc còn hạn, trang phục kín đáo khi viếng chùa, kem chống nắng..."
+                        className="w-full px-3 py-2 rounded-lg border border-[#1E1A15]/12 bg-[#F8F4EC] text-xs font-medium text-[#1E1A15] outline-none focus:border-clay-600"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Modal Footer Controls */}
-              <div className="pt-4 border-t border-[#1E1A15]/10 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsManualCreateOpen(false)}
-                  className="px-5 py-2.5 rounded-sm bg-[#F2ECE1] hover:bg-[#E7DFD2] text-[#5A5145] font-bold text-xs sm:text-sm transition-colors cursor-pointer"
-                >
-                  Hủy bỏ
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 rounded-sm bg-clay-600 hover:bg-clay-700 text-white font-extrabold text-xs sm:text-sm transition-colors cursor-pointer"
-                >
-                  Tạo Chuyến Đi Ngay 🎉
-                </button>
+              <div className="pt-4 border-t border-[#1E1A15]/10 flex items-center justify-between gap-3">
+                {manualModalTab === 'basic' ? (
+                  <button
+                    type="button"
+                    onClick={() => setManualModalTab('tourStandard')}
+                    className="px-4 py-2 rounded-lg bg-clay-50 hover:bg-clay-100 text-clay-700 font-extrabold text-xs transition-colors flex items-center gap-1.5 cursor-pointer border border-clay-200"
+                  >
+                    <span>Điền chuẩn lữ hành 15 tiêu chuẩn</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setManualModalTab('basic')}
+                    className="px-4 py-2 rounded-lg bg-[#F2ECE1] hover:bg-[#E7DFD2] text-[#5A5145] font-extrabold text-xs transition-colors cursor-pointer"
+                  >
+                    ← Quay lại thông tin cơ bản
+                  </button>
+                )}
+
+                <div className="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setIsManualCreateOpen(false)}
+                    className="px-4 py-2.5 rounded-lg bg-[#F2ECE1] hover:bg-[#E7DFD2] text-[#5A5145] font-bold text-xs sm:text-sm transition-colors cursor-pointer"
+                  >
+                    Hủy bỏ
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 rounded-lg bg-clay-600 hover:bg-clay-700 text-white font-extrabold text-xs sm:text-sm transition-colors cursor-pointer shadow-sm flex items-center gap-1.5"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Tạo Chuyến Đi Ngay 🎉</span>
+                  </button>
+                </div>
               </div>
             </form>
           </div>
