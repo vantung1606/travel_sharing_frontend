@@ -830,7 +830,7 @@ export const CommunityPage = () => {
     // Optimistic Update
     setPosts(prev =>
       prev.map(p => {
-        if (p.id === postId) {
+        if (Number(p.id) === Number(postId)) {
           const willLike = !p.isLiked;
           return {
             ...p,
@@ -847,7 +847,7 @@ export const CommunityPage = () => {
       if (res?.isLiked !== undefined) {
         setPosts(prev =>
           prev.map(p => {
-            if (p.id === postId) {
+            if (Number(p.id) === Number(postId)) {
               return {
                 ...p,
                 isLiked: res.isLiked,
@@ -1009,6 +1009,42 @@ export const CommunityPage = () => {
       else if (toast?.error) toast.error('Không thể gửi bình luận: ' + err.message);
     } finally {
       setSubmittingComment(false);
+    }
+  };
+
+  // Submit a comment from the Blog Reader modal
+  const handleReaderComment = async (postId, content) => {
+    if (!requireAuth('bình luận')) return null;
+    const text = (content || '').trim();
+    if (!text) return null;
+
+    try {
+      const newComment = await postApi.addComment(
+        postId,
+        { content: text, parentId: null, replyToUserId: null },
+        currentUser?.email
+      );
+
+      setPosts(prev =>
+        prev.map(p =>
+          Number(p.id) === Number(postId)
+            ? { ...p, commentCount: (p.commentCount || 0) + 1 }
+            : p
+        )
+      );
+      setReadingPost(prev =>
+        prev && Number(prev.id) === Number(postId)
+          ? { ...prev, commentCount: (prev.commentCount || 0) + 1 }
+          : prev
+      );
+
+      if (toast?.showSuccess) toast.showSuccess('Đã gửi bình luận!');
+      else if (toast?.success) toast.success('Đã gửi bình luận!');
+      return newComment;
+    } catch (err) {
+      if (toast?.showError) toast.showError('Không thể gửi bình luận: ' + (err.message || 'Vui lòng thử lại.'));
+      else if (toast?.error) toast.error('Không thể gửi bình luận: ' + (err.message || 'Vui lòng thử lại.'));
+      return null;
     }
   };
 
@@ -1411,6 +1447,8 @@ export const CommunityPage = () => {
     });
     return Array.from(map.values()).sort((a, b) => b.count - a.count).slice(0, 10);
   }, [posts]);
+
+  const readerAuthorId = readingPost?.author?.id || readingPost?.authorId || null;
 
   return (
     <div className="community-page w-full min-h-screen bg-[#F8F4EC] text-[#1E1A15] pb-16 sm:pb-20">
@@ -3875,18 +3913,24 @@ export const CommunityPage = () => {
       {/* ========================================================= */}
       {readingPost && (
         <BlogArticleReaderModal
-          post={readingPost}
+          post={posts.find(p => Number(p.id) === Number(readingPost.id)) || readingPost}
           onClose={() => setReadingPost(null)}
-          onOpenItinerary={(itin) => {
-            setReadingPost(null);
-            setSelectedItineraryForModal(itin);
+          onLike={(postId) => handleToggleLike(postId)}
+          onBookmark={(postId) => handleToggleBookmark(postId)}
+          onComment={(postId, content) => handleReaderComment(postId, content)}
+          onShare={(postToShare) => {
+            if (!requireAuth('chia sẻ bài viết')) return;
+            setSharingPost(postToShare);
           }}
-          onToggleLike={(postId) => handleToggleLike(postId)}
-          onBookmarkToggle={(postId) => handleToggleBookmark(postId)}
-          onAuthorClick={(authorId) => {
-            setReadingPost(null);
-            setSelectedUserIdForModal(authorId);
-          }}
+          onFollowAuthor={
+            readerAuthorId && Number(readerAuthorId) !== Number(currentUser?.id)
+              ? () => handleToggleFollowAuthor(
+                  readerAuthorId,
+                  readingPost.author?.name || readingPost.author?.fullName
+                )
+              : undefined
+          }
+          isFollowingAuthor={Boolean(readerAuthorId && followingIds.has(Number(readerAuthorId)))}
           onReadRelated={(relatedPost) => setReadingPost(relatedPost)}
           relatedPosts={posts.filter(p => Number(p.id) !== Number(readingPost.id)).slice(0, 4)}
         />

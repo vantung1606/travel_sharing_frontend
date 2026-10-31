@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '../common/Toast';
+import { postApi } from '../../services/api';
 import {
   X,
   Heart,
@@ -31,6 +32,7 @@ export const BlogArticleReaderModal = ({
   onBookmark,
   onFollowAuthor,
   isFollowingAuthor,
+  onReadRelated,
   relatedPosts = []
 }) => {
   const { openAIGeneratorWithItem } = useApp();
@@ -38,6 +40,38 @@ export const BlogArticleReaderModal = ({
 
   const [commentInput, setCommentInput] = useState('');
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [submittingComment, setSubmittingComment] = useState(false);
+
+  useEffect(() => {
+    if (!post?.id) return undefined;
+
+    setCommentInput('');
+    setSelectedPhotoIndex(null);
+
+    const embeddedComments = Array.isArray(post.comments) ? post.comments : [];
+    setComments(embeddedComments);
+    setLoadingComments(false);
+    if (embeddedComments.length > 0) return undefined;
+
+    let cancelled = false;
+    setLoadingComments(true);
+    postApi.getComments(post.id)
+      .then((data) => {
+        if (!cancelled) setComments(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (!cancelled) setComments([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingComments(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [post?.id]);
 
   if (!post) return null;
 
@@ -72,12 +106,29 @@ export const BlogArticleReaderModal = ({
     return paragraphs.length > 0 ? paragraphs : [rawContent];
   }, [post.content]);
 
-  const handleSendComment = (e) => {
+  const handleSendComment = async (e) => {
     e?.preventDefault();
-    if (!commentInput.trim()) return;
-    if (onComment) {
-      onComment(post.id, commentInput.trim());
-      setCommentInput('');
+    const content = commentInput.trim();
+    if (!content || submittingComment) return;
+
+    if (!onComment) {
+      if (toast?.showInfo) toast.showInfo('Vui lòng đăng nhập để bình luận.');
+      else if (toast?.info) toast.info('Vui lòng đăng nhập để bình luận.');
+      return;
+    }
+
+    try {
+      setSubmittingComment(true);
+      const newComment = await onComment(post.id, content);
+      if (newComment) {
+        setComments(prev => [...prev, newComment]);
+        setCommentInput('');
+      }
+    } catch (err) {
+      if (toast?.showError) toast.showError('Không thể gửi bình luận: ' + (err.message || 'Vui lòng thử lại.'));
+      else if (toast?.error) toast.error('Không thể gửi bình luận: ' + (err.message || 'Vui lòng thử lại.'));
+    } finally {
+      setSubmittingComment(false);
     }
   };
 
@@ -90,9 +141,9 @@ export const BlogArticleReaderModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-slate-950/80 backdrop-blur-md overflow-y-auto animate-fade-in font-display">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-2 sm:p-4 md:p-6 bg-[#1E1A15] overflow-y-auto animate-fade-in font-display">
       {/* KHUNG MODAL ĐỌC BÀI VIẾT CHUYÊN SÂU */}
-      <div className="relative w-full max-w-4xl bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh] border border-slate-200 my-auto">
+      <div className="relative w-full max-w-4xl bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh] border border-slate-200 mt-2 sm:mt-4">
         
         {/* TOP BAR / NAVIGATION ACTIONS */}
         <div className="px-5 sm:px-8 py-3.5 bg-white border-b border-slate-100 flex items-center justify-between gap-3 shrink-0 sticky top-0 z-20">
@@ -310,7 +361,7 @@ export const BlogArticleReaderModal = ({
             <div className="flex items-center justify-between">
               <h3 className="font-extrabold text-sm text-slate-900 flex items-center gap-2">
                 <MessageCircle className="w-4 h-4 text-sky-600" />
-                <span>Bình luận & Thảo luận ({post.comments?.length || post.commentsCount || 0})</span>
+                <span>Bình luận & Thảo luận ({Math.max(Number(post.commentCount || post.commentsCount || 0), comments.length)})</span>
               </h3>
 
               {/* Nút Like nhanh */}
@@ -339,18 +390,23 @@ export const BlogArticleReaderModal = ({
               />
               <button
                 type="submit"
-                disabled={!commentInput.trim()}
+                disabled={!commentInput.trim() || submittingComment}
                 className="px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 disabled:opacity-40 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
               >
                 <Send className="w-3.5 h-3.5" />
-                <span>Gửi</span>
+                <span>{submittingComment ? 'Đang gửi...' : 'Gửi'}</span>
               </button>
             </form>
 
             {/* Danh sách bình luận */}
             <div className="space-y-3 pt-2">
-              {(post.comments && post.comments.length > 0) ? (
-                post.comments.map((cmt, cIdx) => (
+              {loadingComments ? (
+                <div className="py-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-sky-500 border-t-transparent animate-spin" />
+                  <span>Đang tải bình luận...</span>
+                </div>
+              ) : comments.length > 0 ? (
+                comments.map((cmt, cIdx) => (
                   <div
                     key={cmt.id || cIdx}
                     className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5 text-xs"
@@ -358,12 +414,12 @@ export const BlogArticleReaderModal = ({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <img
-                          src={cmt.author?.avatar || cmt.userAvatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}
+                          src={cmt.authorAvatar || cmt.author?.avatar || cmt.userAvatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}
                           alt=""
                           className="w-6 h-6 rounded-full object-cover"
                         />
                         <span className="font-bold text-slate-900">
-                          {cmt.author?.name || cmt.userName || 'Thành viên Wayfare'}
+                          {cmt.authorName || cmt.author?.name || cmt.userName || 'Thành viên Wayfare'}
                         </span>
                       </div>
                       <span className="text-[10px] text-slate-400">
@@ -396,8 +452,11 @@ export const BlogArticleReaderModal = ({
                   <div
                     key={rel.id}
                     onClick={() => {
-                      // Đổi bài viết đang xem
-                      if (onClose) onClose();
+                      if (typeof onReadRelated === 'function') {
+                        onReadRelated(rel);
+                      } else if (onClose) {
+                        onClose();
+                      }
                     }}
                     className="p-3.5 rounded-2xl border border-slate-200 hover:border-sky-300 hover:shadow-sm transition-all cursor-pointer bg-slate-50/50 hover:bg-white flex items-center gap-3 group"
                   >

@@ -52,7 +52,7 @@ export const ProposePlaceModal = ({ isOpen, onClose, initialName = '', onPlaceCr
 
     try {
       setUploadingImage(true);
-      const url = await uploadApi.uploadImage(file);
+      const url = await uploadApi.uploadSingle(file);
       if (url) {
         setCoverImageUrl(url);
         toast.showSuccess('Đã tải ảnh địa điểm lên Cloudinary CDN.');

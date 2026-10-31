@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCommunityRealtime } from '../../hooks/useCommunityRealtime';
-import { X, Heart, MessageCircle, Share2, Bookmark, MapPin, Sparkles, Route, Eye, Send, Loader2, Lock, Globe, Tag, ChevronLeft, ChevronRight, Maximize2, UserPlus, UserCheck, CornerDownRight, MoreHorizontal, Copy, Flag, Trash2, AtSign, MessageSquare } from 'lucide-react';
+import { X, Heart, MessageCircle, Share2, Bookmark, MapPin, Sparkles, Route, Eye, Send, Loader2, Lock, Globe, Tag, ChevronLeft, ChevronRight, ArrowRight, Maximize2, UserPlus, UserCheck, CornerDownRight, MoreHorizontal, Copy, Flag, Trash2, AtSign, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { postApi, userApi } from '../../services/api';
 import { useToast } from '../common/Toast';
@@ -1174,10 +1174,11 @@ export const PostDetailModal = ({
                               }
                             }}
                             src={
+                              c.authorAvatar ||
                               c.userAvatar ||
                               'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80'
                             }
-                            alt={c.userName}
+                            alt={c.authorName || c.userName || 'Thành viên Wayfare'}
                             className="w-8 h-8 rounded-xl object-cover shrink-0 ring-1 ring-white cursor-pointer hover:ring-2 hover:ring-sky-400 transition-all"
                             title="Xem trang cá nhân"
                           />
@@ -1193,7 +1194,7 @@ export const PostDetailModal = ({
                                 className="font-bold text-xs text-slate-900 cursor-pointer hover:text-sky-600 transition-colors"
                                 title="Xem trang cá nhân"
                               >
-                                {c.userName || 'Du khách Wayfare'}
+                                {c.authorName || c.userName || 'Du khách Wayfare'}
                               </span>
                               <div className="flex items-center gap-2">
                                 <span className="text-[10px] text-slate-400 font-medium">
@@ -1221,7 +1222,7 @@ export const PostDetailModal = ({
                                 setReplyingTo({
                                   commentId: c.id,
                                   authorId: c.userId || c.authorId,
-                                  authorName: c.userName || c.authorName || 'Du khách Wayfare'
+                                  authorName: c.authorName || c.userName || 'Du khách Wayfare'
                                 });
                                 setTimeout(() => commentInputRef.current?.focus(), 50);
                               }}
@@ -1259,7 +1260,7 @@ export const PostDetailModal = ({
                                       reply.authorAvatar ||
                                       'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'
                                     }
-                                    alt={reply.userName || reply.authorName}
+                                    alt={reply.authorName || reply.userName || 'Thành viên Wayfare'}
                                     className="w-7 h-7 rounded-lg object-cover shrink-0 ring-1 ring-slate-100 cursor-pointer hover:ring-2 hover:ring-sky-400 transition-all"
                                     title="Xem trang cá nhân"
                                   />
@@ -1275,7 +1276,7 @@ export const PostDetailModal = ({
                                         className="font-bold text-xs text-slate-900 truncate cursor-pointer hover:text-sky-600 transition-colors"
                                         title="Xem trang cá nhân"
                                       >
-                                        {reply.userName || reply.authorName || 'Du khách Wayfare'}
+                                        {reply.authorName || reply.userName || 'Du khách Wayfare'}
                                       </span>
                                       <div className="flex items-center gap-1.5">
                                         <span className="text-[10px] text-slate-400 shrink-0">
@@ -1308,7 +1309,7 @@ export const PostDetailModal = ({
                                         setReplyingTo({
                                           commentId: c.id,
                                           authorId: reply.userId || reply.authorId,
-                                          authorName: reply.userName || reply.authorName || 'Du khách Wayfare'
+                                          authorName: reply.authorName || reply.userName || 'Du khách Wayfare'
                                         });
                                         setTimeout(() => commentInputRef.current?.focus(), 50);
                                       }}
