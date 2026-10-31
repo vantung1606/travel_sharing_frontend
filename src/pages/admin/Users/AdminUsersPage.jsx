@@ -1277,8 +1277,7 @@ export const AdminUsersPage = () => {
         onClose={() => setPermissionDrawerUser(null)}
         targetUser={permissionDrawerUser}
         onUpdated={() => {
-          fetchUsers();
-          fetchMetrics();
+          loadData(true);
         }}
       />
 

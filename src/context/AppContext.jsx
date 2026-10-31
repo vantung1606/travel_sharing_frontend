@@ -126,9 +126,11 @@ export const AppProvider = ({ children }) => {
     if (p === '/admin' || p === '/admin/' || p.startsWith('/admin/dashboard')) return 'dashboard';
     if (p.startsWith('/admin/places')) return 'places';
     if (p.startsWith('/admin/users')) return 'users';
+    if (p.startsWith('/admin/moderators')) return 'moderators';
     if (p.startsWith('/admin/reports')) return 'reports';
     if (p.startsWith('/admin/reviews')) return 'reviews';
     if (p.startsWith('/admin/analytics')) return 'analytics';
+    if (p.startsWith('/admin/appearance')) return 'appearance';
     if (p.startsWith('/admin/audit-logs')) return 'audit-logs';
     return 'dashboard';
   }, [location.pathname]);
@@ -139,8 +141,10 @@ export const AppProvider = ({ children }) => {
       places: '/admin/places',
       reviews: '/admin/reviews',
       users: '/admin/users',
+      moderators: '/admin/moderators',
       reports: '/admin/reports',
       analytics: '/admin/analytics',
+      appearance: '/admin/appearance',
       'audit-logs': '/admin/audit-logs'
     };
     const userRoles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];

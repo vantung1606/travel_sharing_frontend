@@ -57,6 +57,7 @@ const AdminReportsPage = lazyRetry(() => import('./pages/admin/Reports/AdminRepo
 const AdminReviewsPage = lazyRetry(() => import('./pages/admin/Reviews/AdminReviewsPage').then(m => ({ default: m.AdminReviewsPage })));
 const AdminStatisticsPage = lazyRetry(() => import('./pages/admin/Statistics/AdminStatisticsPage').then(m => ({ default: m.AdminStatisticsPage })));
 const AdminAppearancePage = lazyRetry(() => import('./pages/admin/Appearance/AdminAppearancePage').then(m => ({ default: m.AdminAppearancePage })));
+const AdminModeratorsPage = lazyRetry(() => import('./pages/admin/Moderators/AdminModeratorsPage').then(m => ({ default: m.AdminModeratorsPage })));
 const AdminAuditLogsPage = lazyRetry(() => import('./pages/admin/AuditLogs/AdminAuditLogsPage').then(m => ({ default: m.AdminAuditLogsPage })));
 
 // Fallback hiển thị trong lúc tải chunk của route
@@ -235,6 +236,7 @@ const AppContent = () => {
                       <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                       <Route path="/admin/places" element={<AdminPlacesPage />} />
                       <Route path="/admin/users" element={<AdminUsersPage />} />
+                      <Route path="/admin/moderators" element={<AdminModeratorsPage />} />
                       <Route path="/admin/reports" element={<AdminReportsPage />} />
                       <Route path="/admin/reviews" element={<AdminReviewsPage />} />
                       <Route path="/admin/analytics" element={<AdminStatisticsPage />} />

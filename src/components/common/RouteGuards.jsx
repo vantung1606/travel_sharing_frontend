@@ -22,7 +22,8 @@ export const PAGE_TITLES = {
   '/admin/reviews': 'Wayfare Admin - Kiểm duyệt Đánh giá Du khách',
   '/admin/analytics': 'Wayfare Admin - Thống kê & Phân tích Tăng trưởng',
   '/admin/audit-logs': 'Wayfare Admin - Nhật ký Hệ thống & Hoạt động (Audit Logs)',
-  '/admin/appearance': 'Wayfare Admin - Quản lý Giao diện & Nhận diện Thương hiệu'
+  '/admin/appearance': 'Wayfare Admin - Quản lý Giao diện & Nhận diện Thương hiệu',
+  '/admin/moderators': 'Wayfare Admin - Phân quyền Người giám sát (RBAC)'
 };
 
 // Component that dynamically syncs document.title on every URL change
@@ -48,6 +49,7 @@ export const ROUTE_PERMISSION_MAP = {
   '/admin/reviews': 'REVIEWS_VIEW',
   '/admin/reports': 'REPORTS_VIEW',
   '/admin/users': 'USERS_VIEW',
+  '/admin/moderators': 'USERS_VIEW',
   '/admin/analytics': 'STATISTICS_VIEW',
   '/admin/audit-logs': 'AUDIT_VIEW',
   '/admin/appearance': 'THEME_VIEW'
@@ -64,9 +66,10 @@ export const AdminRouteGuard = ({ children }) => {
 
   const permissions = Array.isArray(currentUser?.permissions) ? currentUser.permissions : [];
   const requiredPermission = ROUTE_PERMISSION_MAP[location.pathname];
+  const isSuperAdminOnlyRoute = location.pathname === '/admin/moderators';
 
   // Dynamic permission verification: SuperAdmin has full bypass; Moderator needs required permission
-  const hasAccess = isAdmin || (isModerator && (!requiredPermission || permissions.includes(requiredPermission)));
+  const hasAccess = isAdmin || (!isSuperAdminOnlyRoute && isModerator && (!requiredPermission || permissions.includes(requiredPermission)));
   const restrictedForModerator = isModerator && !hasAccess;
 
   useEffect(() => {

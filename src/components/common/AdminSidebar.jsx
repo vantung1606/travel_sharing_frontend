@@ -84,10 +84,18 @@ export const AdminSidebar = ({ onNavigate }) => {
       items: [
         { 
           id: 'users', 
-          label: 'Người dùng & Quyền', 
+          label: 'Người dùng & Tài khoản', 
           icon: Users,
-          description: 'Phân quyền & Khóa TK',
+          description: 'Quản lý thành viên & Khóa TK',
           permission: 'USERS_VIEW'
+        },
+        { 
+          id: 'moderators', 
+          label: 'Phân quyền Giám sát', 
+          icon: ShieldCheck,
+          description: 'Bật/tắt quyền cho Moderator',
+          permission: 'USERS_VIEW',
+          adminOnly: true
         },
         { 
           id: 'appearance', 
@@ -111,6 +119,7 @@ export const AdminSidebar = ({ onNavigate }) => {
   const filteredSections = navigationSections.map(sec => ({
     ...sec,
     items: sec.items.filter(item => {
+      if (item.adminOnly && !isAdminUser) return false;
       if (isAdminUser) return true;
       return item.permission ? userPerms.includes(item.permission) : true;
     })
