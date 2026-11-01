@@ -52,22 +52,22 @@ export const CURATED_COLOR_THEMES = [
     badge: 'Mặc định',
     description: 'Tone màu gốm nung đất ấm kết hợp nền giấy ngà mộc mạc và mực nâu đen trang trọng.',
     colors: {
-      primary: '#B0522F',
-      primaryHover: '#93422A',
-      background: '#F8F4EC',
-      surface: '#FFFFFF',
-      text: '#1E1A15',
-      muted: '#6B6258',
-      border: '#E5DED2',
-      headerBg: '#F8F4EC',
-      sidebarBg: '#1E1A15',
-      sidebarText: '#F8F4EC',
-      buttonBg: '#B0522F',
-      buttonText: '#FFFFFF',
-      success: '#16A34A',
-      warning: '#D97706',
-      danger: '#DC2626',
-      info: '#2563EB'
+      primary: '#b0522f',
+      primaryHover: '#93422a',
+      background: '#f8f4ec',
+      surface: '#ffffff',
+      text: '#1e1a15',
+      muted: '#6b6258',
+      border: '#e5ded2',
+      headerBg: '#f8f4ec',
+      sidebarBg: '#1e1a15',
+      sidebarText: '#f8f4ec',
+      buttonBg: '#b0522f',
+      buttonText: '#ffffff',
+      success: '#16a34a',
+      warning: '#d97706',
+      danger: '#dc2626',
+      info: '#2563eb'
     }
   },
   {
@@ -77,22 +77,22 @@ export const CURATED_COLOR_THEMES = [
     badge: 'Biển đảo',
     description: 'Tone màu xanh lam ngọc bích của biển khơi mang lại cảm giác khoáng đạt, tự do và tươi mát.',
     colors: {
-      primary: '#0284C7',
-      primaryHover: '#0369A1',
-      background: '#F0F9FF',
-      surface: '#FFFFFF',
-      text: '#0F172A',
-      muted: '#64748B',
-      border: '#E0F2FE',
-      headerBg: '#F0F9FF',
-      sidebarBg: '#0F172A',
-      sidebarText: '#F0F9FF',
-      buttonBg: '#0284C7',
-      buttonText: '#FFFFFF',
+      primary: '#0284c7',
+      primaryHover: '#0369a1',
+      background: '#f0f9ff',
+      surface: '#ffffff',
+      text: '#0f172a',
+      muted: '#64748b',
+      border: '#e0f2fe',
+      headerBg: '#f0f9ff',
+      sidebarBg: '#0f172a',
+      sidebarText: '#f0f9ff',
+      buttonBg: '#0284c7',
+      buttonText: '#ffffff',
       success: '#059669',
-      warning: '#D97706',
-      danger: '#E11D48',
-      info: '#0284C7'
+      warning: '#d97706',
+      danger: '#e11d48',
+      info: '#0284c7'
     }
   },
   {
@@ -102,22 +102,22 @@ export const CURATED_COLOR_THEMES = [
     badge: 'Núi rừng',
     description: 'Tone màu xanh ngọc bích của rừng già nguyên sinh và thung lũng lúa xanh bạt ngàn.',
     colors: {
-      primary: '#15803D',
+      primary: '#15803d',
       primaryHover: '#166534',
-      background: '#F4FBF7',
-      surface: '#FFFFFF',
-      text: '#14532D',
-      muted: '#4B725A',
-      border: '#DCFCE7',
-      headerBg: '#F4FBF7',
-      sidebarBg: '#14532D',
-      sidebarText: '#F4FBF7',
-      buttonBg: '#15803D',
-      buttonText: '#FFFFFF',
-      success: '#16A34A',
-      warning: '#CA8A04',
-      danger: '#DC2626',
-      info: '#2563EB'
+      background: '#f4fbf7',
+      surface: '#ffffff',
+      text: '#14532d',
+      muted: '#4b725a',
+      border: '#dcfce7',
+      headerBg: '#f4fbf7',
+      sidebarBg: '#14532d',
+      sidebarText: '#f4fbf7',
+      buttonBg: '#15803d',
+      buttonText: '#ffffff',
+      success: '#16a34a',
+      warning: '#ca8a04',
+      danger: '#dc2626',
+      info: '#2563eb'
     }
   },
   {
@@ -127,31 +127,55 @@ export const CURATED_COLOR_THEMES = [
     badge: 'Nắng ấm',
     description: 'Tone màu nắng cam hổ phách hoàng hôn rực rỡ, ấm cúng và ngập tràn cảm xúc lãng mạn.',
     colors: {
-      primary: '#C2410C',
-      primaryHover: '#9A3412',
-      background: '#FFFBEB',
-      surface: '#FFFFFF',
-      text: '#451A03',
-      muted: '#78350F',
-      border: '#FEF3C7',
-      headerBg: '#FFFBEB',
-      sidebarBg: '#451A03',
-      sidebarText: '#FFFBEB',
-      buttonBg: '#C2410C',
-      buttonText: '#FFFFFF',
-      success: '#16A34A',
-      warning: '#D97706',
-      danger: '#DC2626',
-      info: '#2563EB'
+      primary: '#c2410c',
+      primaryHover: '#9a3412',
+      background: '#fffbeb',
+      surface: '#ffffff',
+      text: '#451a03',
+      muted: '#78350f',
+      border: '#fef3c7',
+      headerBg: '#fffbeb',
+      sidebarBg: '#451a03',
+      sidebarText: '#fffbeb',
+      buttonBg: '#c2410c',
+      buttonText: '#ffffff',
+      success: '#16a34a',
+      warning: '#d97706',
+      danger: '#dc2626',
+      info: '#2563eb'
     }
   }
 ];
 
+// Gợi ý mã màu 1-chạm cho từng thuộc tính
+export const QUICK_COLOR_SWATCHES = {
+  primary: ['#b0522f', '#0284c7', '#15803d', '#c2410c', '#7c3aed', '#db2777', '#0f766e', '#1e293b'],
+  primaryHover: ['#93422a', '#0369a1', '#166534', '#9a3412', '#6d28d9', '#be185d', '#115e59', '#0f172a'],
+  buttonBg: ['#b0522f', '#0284c7', '#15803d', '#c2410c', '#7c3aed', '#1e1a15', '#0f766e', '#dc2626'],
+  buttonText: ['#ffffff', '#f8f4ec', '#1e1a15', '#0f172a'],
+  background: ['#f8f4ec', '#ffffff', '#f0f9ff', '#f4fbf7', '#fffbeb', '#f8fafc', '#faf5ff', '#fff7ed'],
+  surface: ['#ffffff', '#fdfbf7', '#f8fafc', '#fffbeb', '#f0fdf4', '#f1f5f9'],
+  text: ['#1e1a15', '#0f172a', '#14532d', '#451a03', '#111827', '#334155'],
+  border: ['#e5ded2', '#e0f2fe', '#dcfce7', '#fef3c7', '#e2e8f0', '#cbd5e1', '#fed7aa'],
+  headerBg: ['#f8f4ec', '#ffffff', '#f0f9ff', '#f4fbf7', '#fffbeb', '#1e1a15', '#0f172a'],
+  sidebarBg: ['#1e1a15', '#0f172a', '#14532d', '#451a03', '#09090b', '#312e81', '#1e293b']
+};
+
+export function normalizeHexColor(hex, fallback = '#b0522f') {
+  if (!hex || typeof hex !== 'string') return fallback.toLowerCase();
+  let clean = hex.trim().toLowerCase();
+  if (!clean.startsWith('#')) clean = '#' + clean;
+  if (/^#[0-9a-f]{6}$/.test(clean)) return clean;
+  if (/^#[0-9a-f]{3}$/.test(clean)) {
+    return `#${clean[1]}${clean[1]}${clean[2]}${clean[2]}${clean[3]}${clean[3]}`;
+  }
+  return fallback.toLowerCase();
+};
+
 // ─── TÍNH TOÁN ĐỘ TƯƠNG PHẢN WCAG (CONTRAST CHECKER) ─────────────────────────
 function getLuminance(hex) {
-  if (!hex || typeof hex !== 'string' || !hex.startsWith('#')) return 0.5;
-  const clean = hex.replace('#', '');
-  if (clean.length < 6) return 0.5;
+  const norm = normalizeHexColor(hex, '#000000');
+  const clean = norm.replace('#', '');
   const r = parseInt(clean.substring(0, 2), 16) / 255;
   const g = parseInt(clean.substring(2, 4), 16) / 255;
   const b = parseInt(clean.substring(4, 6), 16) / 255;
@@ -380,16 +404,21 @@ export const AdminAppearancePage = () => {
 
   // Áp dụng bảng màu tuyển chọn
   const handleApplyColorTheme = (theme) => {
+    if (!theme || !theme.colors) return;
+    const cleanColors = {};
+    Object.keys(theme.colors).forEach(k => {
+      cleanColors[k] = normalizeHexColor(theme.colors[k]);
+    });
     const updated = {
       ...formData,
       colors: {
         ...formData.colors,
-        ...theme.colors
+        ...cleanColors
       }
     };
     setFormData(updated);
     applyCssTokens(updated);
-    toast.success(`Đã áp dụng chủ đề màu: ${theme.name} 🎉 (Đang xem trước trực tiếp trên giao diện)`);
+    toast.success(`Đã kích hoạt bộ phối màu "${theme.name}"! Bạn có thể xem ngay trên khung Xem Trước bên phải.`);
   };
 
   // Upload ảnh logo/banner trực tiếp lên Cloudinary
@@ -498,6 +527,64 @@ export const AdminAppearancePage = () => {
   const buttonContrast = useMemo(() => {
     return getContrastRatio(formData.colors.buttonText, formData.colors.buttonBg).toFixed(2);
   }, [formData.colors.buttonText, formData.colors.buttonBg]);
+
+  // Helper to render interactive color card with native picker and 1-click swatches
+  const renderColorCard = (colorKey, label, subtitle, fallback = '#b0522f') => {
+    const currentColor = normalizeHexColor(formData?.colors?.[colorKey], fallback);
+    const swatches = QUICK_COLOR_SWATCHES[colorKey] || [];
+
+    return (
+      <div key={colorKey} className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <span className="font-serif text-xs font-bold text-ink-800 block truncate">{label}</span>
+            <span className="font-mono text-[10px] text-ink-400 block truncate">{subtitle}</span>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <input 
+              type="color" 
+              value={currentColor} 
+              onChange={e => handleColorChange(colorKey, e.target.value)}
+              className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white shrink-0"
+              title={`Bấm để mở bảng chọn màu cho ${label}`}
+            />
+            <input
+              type="text"
+              value={formData?.colors?.[colorKey] || ''}
+              onChange={e => handleColorChange(colorKey, e.target.value)}
+              onBlur={e => {
+                const clean = normalizeHexColor(e.target.value, fallback);
+                handleColorChange(colorKey, clean);
+              }}
+              className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center uppercase"
+            />
+          </div>
+        </div>
+
+        {/* 1-Click Fast Color Swatches */}
+        {swatches.length > 0 && (
+          <div className="flex items-center gap-1.5 pt-1 border-t border-ink-200/60 flex-wrap">
+            <span className="text-[9px] font-mono text-ink-400 shrink-0">Gợi ý 1-chạm:</span>
+            {swatches.map(swatch => {
+              const isSelected = currentColor.toLowerCase() === swatch.toLowerCase();
+              return (
+                <button
+                  key={swatch}
+                  type="button"
+                  onClick={() => handleColorChange(colorKey, swatch)}
+                  style={{ backgroundColor: swatch }}
+                  className={`w-4 h-4 rounded-full border transition-all cursor-pointer shadow-2xs hover:scale-125 ${
+                    isSelected ? 'ring-2 ring-clay-700 border-white scale-110' : 'border-ink-200'
+                  }`}
+                  title={`Chọn ${swatch}`}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
@@ -957,23 +1044,26 @@ export const AdminAppearancePage = () => {
                       <span>Bộ Phối Màu Tuyển Chọn Cho Du Lịch (Theme Presets 1-Chạm)</span>
                     </h3>
                     <p className="text-[11px] text-ink-500 font-sans mt-0.5">
-                      Chọn nhanh bộ màu hài hòa đã được kiểm nghiệm độ tương phản và chuẩn mỹ thuật.
+                      Bấm vào bất kỳ bảng màu nào dưới đây để áp dụng tức thì lên toàn bộ trang web và xem trực quan bên phải.
                     </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {CURATED_COLOR_THEMES.map(theme => {
-                    const isCurrent = formData.colors.primary.toLowerCase() === theme.colors.primary.toLowerCase() &&
-                                      formData.colors.background.toLowerCase() === theme.colors.background.toLowerCase();
+                    const currentPrimary = normalizeHexColor(formData?.colors?.primary);
+                    const currentBg = normalizeHexColor(formData?.colors?.background);
+                    const themePrimary = normalizeHexColor(theme?.colors?.primary);
+                    const themeBg = normalizeHexColor(theme?.colors?.background);
+                    const isCurrent = currentPrimary === themePrimary && currentBg === themeBg;
+
                     return (
-                      <button
+                      <div
                         key={theme.id}
-                        type="button"
                         onClick={() => handleApplyColorTheme(theme)}
-                        className={`p-3.5 rounded-[6px] border text-left transition-all cursor-pointer space-y-2 group ${
+                        className={`p-3.5 rounded-[6px] border text-left transition-all cursor-pointer space-y-2.5 relative group ${
                           isCurrent
-                            ? 'bg-clay-50/90 border-clay-700 ring-1 ring-clay-700 shadow-2xs'
+                            ? 'bg-clay-50/90 border-clay-700 ring-2 ring-clay-700/80 shadow-xs'
                             : 'bg-[#F8F4EC]/60 border-ink-200 hover:bg-[#F8F4EC] hover:border-clay-400'
                         }`}
                       >
@@ -987,24 +1077,68 @@ export const AdminAppearancePage = () => {
                               {theme.name}
                             </span>
                           </div>
-                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-ink-200/70 text-ink-700">
-                            {theme.badge}
-                          </span>
+                          {isCurrent ? (
+                            <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-600 text-white font-bold flex items-center gap-1 shadow-2xs">
+                              <Check className="w-3 h-3" /> Đang áp dụng
+                            </span>
+                          ) : (
+                            <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-ink-200/70 text-ink-700">
+                              {theme.badge}
+                            </span>
+                          )}
                         </div>
 
                         {/* Palette Swatches */}
-                        <div className="flex items-center gap-1.5 py-0.5">
-                          <span style={{ backgroundColor: theme.colors.primary }} className="w-6 h-3 rounded-[2px] border border-ink-200" title="Primary" />
-                          <span style={{ backgroundColor: theme.colors.background }} className="w-6 h-3 rounded-[2px] border border-ink-200" title="Background" />
-                          <span style={{ backgroundColor: theme.colors.surface }} className="w-6 h-3 rounded-[2px] border border-ink-200" title="Surface" />
-                          <span style={{ backgroundColor: theme.colors.text }} className="w-6 h-3 rounded-[2px] border border-ink-200" title="Text" />
-                          <span style={{ backgroundColor: theme.colors.border }} className="w-6 h-3 rounded-[2px] border border-ink-200" title="Border" />
+                        <div className="grid grid-cols-5 gap-1 py-0.5">
+                          {[
+                            { label: 'Chính', color: theme.colors.primary },
+                            { label: 'Nền', color: theme.colors.background },
+                            { label: 'Thẻ', color: theme.colors.surface },
+                            { label: 'Chữ', color: theme.colors.text },
+                            { label: 'Viền', color: theme.colors.border }
+                          ].map(item => (
+                            <div key={item.label} className="text-center">
+                              <div
+                                style={{ backgroundColor: item.color }}
+                                className="h-4 rounded-[2px] border border-ink-300 shadow-2xs"
+                                title={`${item.label}: ${item.color}`}
+                              />
+                              <span className="text-[8px] font-mono text-ink-500 block truncate mt-0.5">
+                                {item.label}
+                              </span>
+                            </div>
+                          ))}
                         </div>
 
                         <p className="text-[11px] text-ink-500 font-sans leading-tight line-clamp-2">
                           {theme.description}
                         </p>
-                      </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleApplyColorTheme(theme);
+                          }}
+                          className={`w-full py-1.5 px-2 rounded-[4px] text-xs font-serif font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                            isCurrent
+                              ? 'bg-emerald-700 text-white shadow-2xs'
+                              : 'bg-clay-700 hover:bg-clay-800 text-white shadow-2xs'
+                          }`}
+                        >
+                          {isCurrent ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              <span>✓ Bộ màu đang kích hoạt</span>
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles className="w-3.5 h-3.5" />
+                              <span>Áp dụng bảng màu này ➔</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
                     );
                   })}
                 </div>
@@ -1018,92 +1152,13 @@ export const AdminAppearancePage = () => {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {/* Primary Color */}
-                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Màu chính (Primary)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Nút bấm, biểu tượng, điểm nhấn</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="color" 
-                        value={formData.colors.primary} 
-                        onChange={e => handleColorChange('primary', e.target.value)}
-                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
-                      />
-                      <input
-                        type="text"
-                        value={formData.colors.primary}
-                        onChange={e => handleColorChange('primary', e.target.value)}
-                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
-                      />
-                    </div>
-                  </div>
-
+                  {renderColorCard('primary', 'Màu chính (Primary)', 'Nút bấm, biểu tượng, điểm nhấn', '#b0522f')}
                   {/* Primary Hover */}
-                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Rê chuột (Primary Hover)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Trạng thái khi rê chuột lên nút</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="color" 
-                        value={formData.colors.primaryHover} 
-                        onChange={e => handleColorChange('primaryHover', e.target.value)}
-                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
-                      />
-                      <input
-                        type="text"
-                        value={formData.colors.primaryHover}
-                        onChange={e => handleColorChange('primaryHover', e.target.value)}
-                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
-                      />
-                    </div>
-                  </div>
-
+                  {renderColorCard('primaryHover', 'Rê chuột (Primary Hover)', 'Trạng thái khi rê chuột lên nút', '#93422a')}
                   {/* Button Bg */}
-                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Nền nút bấm (Button Bg)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Màu nền nút bấm hành động</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="color" 
-                        value={formData.colors.buttonBg} 
-                        onChange={e => handleColorChange('buttonBg', e.target.value)}
-                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
-                      />
-                      <input
-                        type="text"
-                        value={formData.colors.buttonBg}
-                        onChange={e => handleColorChange('buttonBg', e.target.value)}
-                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
-                      />
-                    </div>
-                  </div>
-
+                  {renderColorCard('buttonBg', 'Nền nút bấm (Button Bg)', 'Màu nền nút bấm hành động', '#b0522f')}
                   {/* Button Text */}
-                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Chữ nút bấm (Button Text)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Màu chữ hiển thị trên nút</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="color" 
-                        value={formData.colors.buttonText} 
-                        onChange={e => handleColorChange('buttonText', e.target.value)}
-                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
-                      />
-                      <input
-                        type="text"
-                        value={formData.colors.buttonText}
-                        onChange={e => handleColorChange('buttonText', e.target.value)}
-                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
-                      />
-                    </div>
-                  </div>
+                  {renderColorCard('buttonText', 'Chữ nút bấm (Button Text)', 'Màu chữ hiển thị trên nút', '#ffffff')}
                 </div>
               </div>
 
@@ -1115,92 +1170,13 @@ export const AdminAppearancePage = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {/* Background */}
-                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Nền trang web (Background)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Màu nền chung toàn hệ thống</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="color" 
-                        value={formData.colors.background} 
-                        onChange={e => handleColorChange('background', e.target.value)}
-                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
-                      />
-                      <input
-                        type="text"
-                        value={formData.colors.background}
-                        onChange={e => handleColorChange('background', e.target.value)}
-                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
-                      />
-                    </div>
-                  </div>
-
+                  {renderColorCard('background', 'Nền trang web (Background)', 'Màu nền chung toàn hệ thống', '#f8f4ec')}
                   {/* Surface */}
-                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Màu ô thẻ (Surface / Card)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Nền card, modal, khung nội dung</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="color" 
-                        value={formData.colors.surface} 
-                        onChange={e => handleColorChange('surface', e.target.value)}
-                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
-                      />
-                      <input
-                        type="text"
-                        value={formData.colors.surface}
-                        onChange={e => handleColorChange('surface', e.target.value)}
-                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
-                      />
-                    </div>
-                  </div>
-
+                  {renderColorCard('surface', 'Màu ô thẻ (Surface / Card)', 'Nền card, modal, khung nội dung', '#ffffff')}
                   {/* Text Color */}
-                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Màu chữ chính (Text Color)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Tiêu đề, văn bản nội dung</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="color" 
-                        value={formData.colors.text} 
-                        onChange={e => handleColorChange('text', e.target.value)}
-                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
-                      />
-                      <input
-                        type="text"
-                        value={formData.colors.text}
-                        onChange={e => handleColorChange('text', e.target.value)}
-                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
-                      />
-                    </div>
-                  </div>
-
+                  {renderColorCard('text', 'Màu chữ chính (Text Color)', 'Tiêu đề, văn bản nội dung', '#1e1a15')}
                   {/* Border Color */}
-                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Màu đường viền (Border)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Đường viền thẻ, phân cách ô</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="color" 
-                        value={formData.colors.border} 
-                        onChange={e => handleColorChange('border', e.target.value)}
-                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
-                      />
-                      <input
-                        type="text"
-                        value={formData.colors.border}
-                        onChange={e => handleColorChange('border', e.target.value)}
-                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
-                      />
-                    </div>
-                  </div>
+                  {renderColorCard('border', 'Màu đường viền (Border)', 'Đường viền thẻ, phân cách ô', '#e5ded2')}
                 </div>
               </div>
 
@@ -1212,48 +1188,9 @@ export const AdminAppearancePage = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {/* Header Background */}
-                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Nền thanh Header (Navbar)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Thanh điều hướng trên cùng</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="color" 
-                        value={formData.colors.headerBg} 
-                        onChange={e => handleColorChange('headerBg', e.target.value)}
-                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
-                      />
-                      <input
-                        type="text"
-                        value={formData.colors.headerBg}
-                        onChange={e => handleColorChange('headerBg', e.target.value)}
-                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
-                      />
-                    </div>
-                  </div>
-
+                  {renderColorCard('headerBg', 'Nền thanh Header (Navbar)', 'Thanh điều hướng trên cùng', '#f8f4ec')}
                   {/* Sidebar Background */}
-                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
-                    <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Nền menu Sidebar</span>
-                      <span className="font-mono text-[10px] text-ink-400">Thanh menu quản trị bên trái</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="color" 
-                        value={formData.colors.sidebarBg} 
-                        onChange={e => handleColorChange('sidebarBg', e.target.value)}
-                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
-                      />
-                      <input
-                        type="text"
-                        value={formData.colors.sidebarBg}
-                        onChange={e => handleColorChange('sidebarBg', e.target.value)}
-                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
-                      />
-                    </div>
-                  </div>
+                  {renderColorCard('sidebarBg', 'Nền menu Sidebar', 'Thanh menu quản trị bên trái', '#1e1a15')}
                 </div>
               </div>
 
