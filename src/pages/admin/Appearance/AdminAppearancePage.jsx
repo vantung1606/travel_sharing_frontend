@@ -2,6 +2,15 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { 
   Palette, 
   Image, 
+  Megaphone,
+  Share2,
+  Phone,
+  Mail,
+  MapPin,
+  Facebook,
+  Instagram,
+  Youtube,
+  Globe,
   Type, 
   Sliders, 
   CheckCircle2, 
@@ -186,7 +195,27 @@ export const AdminAppearancePage = () => {
       faviconUrl: '/favicon.ico',
       heroBgUrl: '',
       loginBgUrl: '',
-      footerText: '© 2026 Wayfare Travel Sharing Platform. Mọi quyền được bảo lưu.'
+      footerText: '© 2026 Wayfare Travel Sharing Platform. Mọi quyền được bảo lưu.',
+      contact: {
+        hotline: '1900 6868',
+        email: 'contact@wayfare.vn',
+        address: 'Hà Nội & TP. Hồ Chí Minh, Việt Nam',
+        facebook: 'https://facebook.com/wayfare.vietnam',
+        instagram: 'https://instagram.com/wayfare.vn',
+        tiktok: 'https://tiktok.com/@wayfare.vn',
+        youtube: 'https://youtube.com/@wayfarevn',
+        threads: 'https://threads.net/@wayfare.vn'
+      },
+      announcement: {
+        enabled: false,
+        badge: 'SỰ KIỆN',
+        text: 'Chào mừng mùa du lịch 2026 - Khám phá 500+ điểm đến đặc sắc & Lên lịch trình thông minh cùng AI!',
+        linkText: 'Khám phá ngay',
+        linkUrl: '/explore',
+        bgColor: '#B0522F',
+        textColor: '#FFFFFF',
+        isClosable: true
+      }
     },
     colors: {
       primary: '#B0522F',
@@ -240,6 +269,28 @@ export const AdminAppearancePage = () => {
         if (!sanitizedBranding.logoWhiteUrl || sanitizedBranding.logoWhiteUrl.includes('brand-logo-white.png')) {
           sanitizedBranding.logoWhiteUrl = '/wayfare-logo-white.png';
         }
+        sanitizedBranding.contact = {
+          hotline: '1900 6868',
+          email: 'contact@wayfare.vn',
+          address: 'Hà Nội & TP. Hồ Chí Minh, Việt Nam',
+          facebook: 'https://facebook.com/wayfare.vietnam',
+          instagram: 'https://instagram.com/wayfare.vn',
+          tiktok: 'https://tiktok.com/@wayfare.vn',
+          youtube: 'https://youtube.com/@wayfarevn',
+          threads: 'https://threads.net/@wayfare.vn',
+          ...(sanitizedBranding.contact || {})
+        };
+        sanitizedBranding.announcement = {
+          enabled: false,
+          badge: 'SỰ KIỆN',
+          text: 'Chào mừng mùa du lịch 2026 - Khám phá 500+ điểm đến đặc sắc & Lên lịch trình thông minh cùng AI!',
+          linkText: 'Khám phá ngay',
+          linkUrl: '/explore',
+          bgColor: '#B0522F',
+          textColor: '#FFFFFF',
+          isClosable: true,
+          ...(sanitizedBranding.announcement || {})
+        };
 
         setFormData(prev => ({
           branding: { ...prev.branding, ...sanitizedBranding },
@@ -284,6 +335,34 @@ export const AdminAppearancePage = () => {
       branding: {
         ...prev.branding,
         [key]: value
+      }
+    }));
+  };
+
+  // Handle contact change
+  const handleContactChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      branding: {
+        ...prev.branding,
+        contact: {
+          ...(prev.branding?.contact || {}),
+          [field]: value
+        }
+      }
+    }));
+  };
+
+  // Handle announcement change
+  const handleAnnouncementChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      branding: {
+        ...prev.branding,
+        announcement: {
+          ...(prev.branding?.announcement || {}),
+          [field]: value
+        }
       }
     }));
   };
@@ -521,50 +600,81 @@ export const AdminAppearancePage = () => {
         <div className="lg:col-span-7 space-y-4">
           
           {/* Tabs Navigation */}
-          <div className="flex items-center gap-1 p-1 bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] shadow-2xs font-serif text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-1 p-1 bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] shadow-2xs font-serif text-xs">
             <button
+              type="button"
               onClick={() => setActiveTab('branding')}
-              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`py-2 px-2 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
                 activeTab === 'branding' 
                   ? 'bg-clay-700 text-white shadow-xs' 
                   : 'text-ink-600 hover:text-ink-900 hover:bg-[#F8F4EC]'
               }`}
             >
-              <Image className="w-3.5 h-3.5" />
-              <span>Thương hiệu & Logo</span>
+              <Image className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Thương hiệu</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab('colors')}
-              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`py-2 px-2 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
                 activeTab === 'colors' 
                   ? 'bg-clay-700 text-white shadow-xs' 
                   : 'text-ink-600 hover:text-ink-900 hover:bg-[#F8F4EC]'
               }`}
             >
-              <Palette className="w-3.5 h-3.5" />
-              <span>Bảng màu hệ thống</span>
+              <Palette className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Bảng màu</span>
             </button>
             <button
+              type="button"
+              onClick={() => setActiveTab('social')}
+              className={`py-2 px-2 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
+                activeTab === 'social' 
+                  ? 'bg-clay-700 text-white shadow-xs' 
+                  : 'text-ink-600 hover:text-ink-900 hover:bg-[#F8F4EC]'
+              }`}
+            >
+              <Share2 className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Mạng xã hội</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('announcement')}
+              className={`py-2 px-2 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer relative ${
+                activeTab === 'announcement' 
+                  ? 'bg-clay-700 text-white shadow-xs' 
+                  : 'text-ink-600 hover:text-ink-900 hover:bg-[#F8F4EC]'
+              }`}
+            >
+              <Megaphone className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Thông báo</span>
+              {formData.branding?.announcement?.enabled && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 absolute top-1 right-1" />
+              )}
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveTab('components')}
-              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`py-2 px-2 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
                 activeTab === 'components' 
                   ? 'bg-clay-700 text-white shadow-xs' 
                   : 'text-ink-600 hover:text-ink-900 hover:bg-[#F8F4EC]'
               }`}
             >
-              <Sliders className="w-3.5 h-3.5" />
-              <span>Bo góc & Tokens</span>
+              <Sliders className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Bo góc</span>
             </button>
             <button
+              type="button"
               onClick={() => setActiveTab('history')}
-              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
+              className={`py-2 px-2 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1 cursor-pointer ${
                 activeTab === 'history' 
                   ? 'bg-clay-700 text-white shadow-xs' 
                   : 'text-ink-600 hover:text-ink-900 hover:bg-[#F8F4EC]'
               }`}
             >
-              <History className="w-3.5 h-3.5" />
-              <span>Lịch sử ({versionsList.length})</span>
+              <History className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">Lịch sử ({versionsList.length})</span>
             </button>
           </div>
 
@@ -1434,6 +1544,33 @@ export const AdminAppearancePage = () => {
               className="border-2 border-ink-300 shadow-lg p-4 transition-all duration-300 space-y-3.5 overflow-hidden"
             >
               
+              {/* Mini Announcement Ribbon Preview if enabled */}
+              {formData.branding?.announcement?.enabled && (
+                <div 
+                  style={{ 
+                    backgroundColor: formData.branding.announcement.bgColor || formData.colors.primary,
+                    color: formData.branding.announcement.textColor || '#FFFFFF',
+                    borderRadius: formData.components.radiusCard
+                  }}
+                  className="py-1 px-3 text-[10px] flex items-center justify-between gap-1 shadow-2xs font-serif mb-1"
+                >
+                  <div className="flex items-center gap-1.5 truncate">
+                    <Megaphone className="w-2.5 h-2.5 animate-bounce shrink-0" />
+                    {formData.branding.announcement.badge && (
+                      <span className="font-mono text-[8px] font-bold uppercase px-1 py-0.2 rounded bg-white/20 text-white shrink-0">
+                        {formData.branding.announcement.badge}
+                      </span>
+                    )}
+                    <span className="truncate">{formData.branding.announcement.text}</span>
+                  </div>
+                  {formData.branding.announcement.linkText && (
+                    <span className="underline font-bold shrink-0 text-[9px]">
+                      {formData.branding.announcement.linkText} ➔
+                    </span>
+                  )}
+                </div>
+              )}
+
               {/* Mini Preview Navbar Header */}
               <div 
                 style={{ 

@@ -6,6 +6,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { Compass, Sparkles, MapPin, Users, Calendar, MessageSquare, User, Shield, Bell, Menu, X, ChevronRight, LogOut, Heart } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
 import { UserAvatar } from './UserAvatar';
+import { TopAnnouncementRibbon } from './TopAnnouncementRibbon';
 
 
 export const Navbar = () => {
@@ -107,6 +108,7 @@ export const Navbar = () => {
             : 'bg-white shadow-[0_1px_0_0_rgba(15,23,42,0.06),0_4px_16px_-6px_rgba(15,23,42,0.08)] text-slate-900'
         }`}
       >
+        <TopAnnouncementRibbon />
         <div className="w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
           <div className="flex items-center justify-between h-16 gap-2 sm:gap-3">
             

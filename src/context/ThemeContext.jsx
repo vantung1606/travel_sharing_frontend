@@ -31,7 +31,27 @@ export const DEFAULT_THEME_TOKENS = {
     faviconUrl: '/favicon.ico',
     heroBgUrl: '',
     loginBgUrl: '',
-    footerText: '© 2026 Wayfare Travel. Mọi quyền được bảo lưu.'
+    footerText: '© 2026 Wayfare Travel. Mọi quyền được bảo lưu.',
+    contact: {
+      hotline: '1900 6868',
+      email: 'contact@wayfare.vn',
+      address: 'Hà Nội & TP. Hồ Chí Minh, Việt Nam',
+      facebook: 'https://facebook.com/wayfare.vietnam',
+      instagram: 'https://instagram.com/wayfare.vn',
+      tiktok: 'https://tiktok.com/@wayfare.vn',
+      youtube: 'https://youtube.com/@wayfarevn',
+      threads: 'https://threads.net/@wayfare.vn'
+    },
+    announcement: {
+      enabled: false,
+      badge: 'SỰ KIỆN',
+      text: 'Chào mừng mùa du lịch 2026 - Khám phá 500+ điểm đến đặc sắc & Lên lịch trình thông minh cùng AI!',
+      linkText: 'Khám phá ngay',
+      linkUrl: '/explore',
+      bgColor: '#B0522F',
+      textColor: '#FFFFFF',
+      isClosable: true
+    }
   },
   components: {
     radiusCard: '6px',
@@ -135,7 +155,18 @@ export function applyCssTokens(tokens) {
 
 function sanitizeBranding(branding) {
   if (!branding) return DEFAULT_THEME_TOKENS.branding;
-  const copy = { ...DEFAULT_THEME_TOKENS.branding, ...branding };
+  const copy = { 
+    ...DEFAULT_THEME_TOKENS.branding, 
+    ...branding,
+    contact: {
+      ...DEFAULT_THEME_TOKENS.branding.contact,
+      ...(branding.contact || {})
+    },
+    announcement: {
+      ...DEFAULT_THEME_TOKENS.branding.announcement,
+      ...(branding.announcement || {})
+    }
+  };
   if (!copy.logoUrl || copy.logoUrl.includes('brand-logo.png')) {
     copy.logoUrl = '/wayfare-logo.png';
   }
