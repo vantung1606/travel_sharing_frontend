@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
-import { useApp } from '../../context/AppContext';
+import { useApp, DEFAULT_MODERATOR_PERMISSIONS } from '../../context/AppContext';
 import { ShieldAlert, Lock, ArrowLeft, LogIn } from 'lucide-react';
 
 // Title dictionary mapping routes to descriptive page titles
@@ -43,14 +43,7 @@ export const PageTitleManager = () => {
   return null;
 };
 
-export const DEFAULT_MODERATOR_PERMISSIONS = [
-  'DASHBOARD_VIEW',
-  'PLACES_VIEW', 'PLACES_APPROVE', 'PLACES_REJECT',
-  'REVIEWS_VIEW', 'REVIEWS_HIDE', 'REVIEWS_RESTORE',
-  'REPORTS_VIEW', 'REPORTS_RESOLVE', 'REPORTS_DISMISS',
-  'POSTS_VIEW', 'POSTS_HIDE', 'POSTS_RESTORE',
-  'AUDIT_VIEW'
-];
+export { DEFAULT_MODERATOR_PERMISSIONS };
 
 // Route to Permission mapping for dynamic RBAC
 export const ROUTE_PERMISSION_MAP = {

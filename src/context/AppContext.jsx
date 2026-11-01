@@ -3,6 +3,15 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { notificationApi, chatApi, userApi, placeApi, itineraryApi, authApi, savedPlaceApi, adminReviewApi, adminReportApi } from '../services/api';
 import { mapApiSpot } from '../utils/placeMap';
 
+export const DEFAULT_MODERATOR_PERMISSIONS = [
+  'DASHBOARD_VIEW',
+  'PLACES_VIEW', 'PLACES_APPROVE', 'PLACES_REJECT',
+  'REVIEWS_VIEW', 'REVIEWS_HIDE', 'REVIEWS_RESTORE',
+  'REPORTS_VIEW', 'REPORTS_RESOLVE', 'REPORTS_DISMISS',
+  'POSTS_VIEW', 'POSTS_HIDE', 'POSTS_RESTORE',
+  'AUDIT_VIEW'
+];
+
 const DEFAULT_APP_STATE = {
   portalMode: 'user',
   setPortalMode: () => {},
