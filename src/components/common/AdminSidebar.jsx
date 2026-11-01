@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
+import { useTheme } from '../../context/ThemeContext';
 import { 
   LayoutDashboard, 
   MapPin, 
@@ -18,6 +19,7 @@ import {
 } from 'lucide-react';
 
 export const AdminSidebar = ({ onNavigate }) => {
+  const { branding } = useTheme();
   const { adminTab, setAdminTab, setPortalMode, stats = {}, currentUser } = useApp();
 
   const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
@@ -156,8 +158,9 @@ export const AdminSidebar = ({ onNavigate }) => {
           <div className="flex items-center gap-2.5">
             <div className="relative">
               <img
-                src="/wayfare-logo.png"
-                alt="Wayfare"
+                src={branding?.logoUrl || "/wayfare-logo.png"}
+                alt={branding?.siteTitle || "Wayfare"}
+                onError={(e) => { e.currentTarget.src = '/wayfare-logo.png'; }}
                 className="h-7 w-auto object-contain transition-transform group-hover:scale-105"
               />
               <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
@@ -167,7 +170,7 @@ export const AdminSidebar = ({ onNavigate }) => {
                 ADMIN CONSOLE
               </span>
               <span className="font-serif text-[11px] font-bold text-clay-700 leading-tight">
-                Wayfare Portal
+                {branding?.siteTitle || 'Wayfare'} Portal
               </span>
             </div>
           </div>

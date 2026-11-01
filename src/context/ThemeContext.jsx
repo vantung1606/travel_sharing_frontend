@@ -3,7 +3,7 @@ import { publicConfigApi } from '../services/api';
 
 const ThemeContext = createContext(null);
 
-const DEFAULT_THEME_TOKENS = {
+export const DEFAULT_THEME_TOKENS = {
   colors: {
     primary: '#B0522F',
     primaryHover: '#93422A',
@@ -26,8 +26,8 @@ const DEFAULT_THEME_TOKENS = {
     siteTitle: 'Wayfare',
     tagline: 'Hành trình khám phá du lịch Việt Nam theo cách riêng',
     metaDescription: 'Nền tảng chia sẻ lịch trình du lịch, khám phá địa điểm và kết nối cộng đồng phượt thủ hàng đầu Việt Nam.',
-    logoUrl: '/images/brand-logo.png',
-    logoWhiteUrl: '/images/brand-logo-white.png',
+    logoUrl: '/wayfare-logo.png',
+    logoWhiteUrl: '/wayfare-logo-white.png',
     faviconUrl: '/favicon.ico',
     heroBgUrl: '',
     loginBgUrl: '',
@@ -39,42 +39,110 @@ const DEFAULT_THEME_TOKENS = {
   }
 };
 
-function applyCssTokens(tokens) {
+export function applyCssTokens(tokens) {
   if (typeof document === 'undefined') return;
   const root = document.documentElement;
   const colors = tokens?.colors || DEFAULT_THEME_TOKENS.colors;
   const components = tokens?.components || DEFAULT_THEME_TOKENS.components;
+  const branding = tokens?.branding || DEFAULT_THEME_TOKENS.branding;
 
-  if (colors.primary) root.style.setProperty('--wf-primary', colors.primary);
-  if (colors.primaryHover) root.style.setProperty('--wf-primary-hover', colors.primaryHover);
-  if (colors.background) root.style.setProperty('--wf-background', colors.background);
-  if (colors.surface) root.style.setProperty('--wf-surface', colors.surface);
-  if (colors.text) root.style.setProperty('--wf-text', colors.text);
+  // Primary color tokens and root aliases
+  if (colors.primary) {
+    root.style.setProperty('--wf-primary', colors.primary);
+    root.style.setProperty('--primary', colors.primary);
+  }
+  if (colors.primaryHover) {
+    root.style.setProperty('--wf-primary-hover', colors.primaryHover);
+    root.style.setProperty('--primary-hover', colors.primaryHover);
+  }
+
+  // Background and surface tokens
+  if (colors.background) {
+    root.style.setProperty('--wf-background', colors.background);
+    root.style.setProperty('--surface', colors.background);
+    if (document.body) {
+      document.body.style.backgroundColor = colors.background;
+    }
+  }
+  if (colors.surface) {
+    root.style.setProperty('--wf-surface', colors.surface);
+  }
+
+  // Text tokens
+  if (colors.text) {
+    root.style.setProperty('--wf-text', colors.text);
+    root.style.setProperty('--on-surface', colors.text);
+    if (document.body) {
+      document.body.style.color = colors.text;
+    }
+  }
   if (colors.muted) root.style.setProperty('--wf-muted', colors.muted);
   if (colors.border) root.style.setProperty('--wf-border', colors.border);
+
+  // Headers & Sidebars
   if (colors.headerBg) root.style.setProperty('--wf-header-bg', colors.headerBg);
   if (colors.sidebarBg) root.style.setProperty('--wf-sidebar-bg', colors.sidebarBg);
   if (colors.sidebarText) root.style.setProperty('--wf-sidebar-text', colors.sidebarText);
+
+  // Button tokens
   if (colors.buttonBg) root.style.setProperty('--wf-button-bg', colors.buttonBg);
   if (colors.buttonText) root.style.setProperty('--wf-button-text', colors.buttonText);
+
+  // Status tokens
   if (colors.success) root.style.setProperty('--wf-success', colors.success);
   if (colors.warning) root.style.setProperty('--wf-warning', colors.warning);
   if (colors.danger) root.style.setProperty('--wf-danger', colors.danger);
   if (colors.info) root.style.setProperty('--wf-info', colors.info);
 
-  if (components.radiusCard) root.style.setProperty('--wf-radius-card', components.radiusCard);
-  if (components.radiusControl) root.style.setProperty('--wf-radius-control', components.radiusControl);
+  // Component geometry
+  if (components.radiusCard) {
+    root.style.setProperty('--wf-radius-card', components.radiusCard);
+    root.style.setProperty('--radius-card', components.radiusCard);
+  }
+  if (components.radiusControl) {
+    root.style.setProperty('--wf-radius-control', components.radiusControl);
+    root.style.setProperty('--radius-control', components.radiusControl);
+  }
 
-  // Update favicon if provided
-  if (tokens?.branding?.faviconUrl) {
+  // Update browser document title
+  if (branding?.siteTitle) {
+    const titleText = branding.tagline ? `${branding.siteTitle} - ${branding.tagline}` : branding.siteTitle;
+    document.title = titleText;
+  }
+
+  // Update favicon link if valid
+  if (branding?.faviconUrl) {
     let link = document.querySelector("link[rel~='icon']");
     if (!link) {
       link = document.createElement('link');
       link.rel = 'icon';
       document.head.appendChild(link);
     }
-    link.href = tokens.branding.faviconUrl;
+    link.href = branding.faviconUrl;
   }
+
+  // Update meta description
+  if (branding?.metaDescription) {
+    let meta = document.querySelector("meta[name='description']");
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'description';
+      document.head.appendChild(meta);
+    }
+    meta.content = branding.metaDescription;
+  }
+}
+
+function sanitizeBranding(branding) {
+  if (!branding) return DEFAULT_THEME_TOKENS.branding;
+  const copy = { ...DEFAULT_THEME_TOKENS.branding, ...branding };
+  if (!copy.logoUrl || copy.logoUrl.includes('brand-logo.png')) {
+    copy.logoUrl = '/wayfare-logo.png';
+  }
+  if (!copy.logoWhiteUrl || copy.logoWhiteUrl.includes('brand-logo-white.png')) {
+    copy.logoWhiteUrl = '/wayfare-logo-white.png';
+  }
+  return copy;
 }
 
 export const ThemeProvider = ({ children }) => {
@@ -83,6 +151,7 @@ export const ThemeProvider = ({ children }) => {
       const cached = localStorage.getItem('wayfare_theme');
       if (cached) {
         const parsed = JSON.parse(cached);
+        parsed.branding = sanitizeBranding(parsed.branding);
         applyCssTokens(parsed);
         return parsed;
       }
@@ -100,7 +169,7 @@ export const ThemeProvider = ({ children }) => {
       if (data && typeof data === 'object' && Object.keys(data).length > 0) {
         const merged = {
           colors: { ...DEFAULT_THEME_TOKENS.colors, ...(data.colors || {}) },
-          branding: { ...DEFAULT_THEME_TOKENS.branding, ...(data.branding || {}) },
+          branding: sanitizeBranding(data.branding),
           components: { ...DEFAULT_THEME_TOKENS.components, ...(data.components || {}) },
           version: data.version
         };
@@ -119,6 +188,18 @@ export const ThemeProvider = ({ children }) => {
     fetchSiteConfig();
   }, [fetchSiteConfig]);
 
+  // Set live preview theme (updates state and immediately renders across document)
+  const setLivePreviewTheme = useCallback((newTokens) => {
+    if (!newTokens) return;
+    const merged = {
+      colors: { ...(theme?.colors || DEFAULT_THEME_TOKENS.colors), ...(newTokens.colors || {}) },
+      branding: sanitizeBranding({ ...(theme?.branding || DEFAULT_THEME_TOKENS.branding), ...(newTokens.branding || {}) }),
+      components: { ...(theme?.components || DEFAULT_THEME_TOKENS.components), ...(newTokens.components || {}) }
+    };
+    setTheme(merged);
+    applyCssTokens(merged);
+  }, [theme]);
+
   const branding = useMemo(() => theme.branding || DEFAULT_THEME_TOKENS.branding, [theme]);
   const colors = useMemo(() => theme.colors || DEFAULT_THEME_TOKENS.colors, [theme]);
   const components = useMemo(() => theme.components || DEFAULT_THEME_TOKENS.components, [theme]);
@@ -130,8 +211,9 @@ export const ThemeProvider = ({ children }) => {
     components,
     isLoading,
     refreshTheme: fetchSiteConfig,
-    applyCssTokens
-  }), [theme, branding, colors, components, isLoading, fetchSiteConfig]);
+    applyCssTokens,
+    setLivePreviewTheme
+  }), [theme, branding, colors, components, isLoading, fetchSiteConfig, setLivePreviewTheme]);
 
   return (
     <ThemeContext.Provider value={value}>
@@ -150,8 +232,10 @@ export const useTheme = () => {
       components: DEFAULT_THEME_TOKENS.components,
       isLoading: false,
       refreshTheme: () => {},
-      applyCssTokens: () => {}
+      applyCssTokens: () => {},
+      setLivePreviewTheme: () => {}
     };
   }
   return ctx;
 };
+export default ThemeProvider;

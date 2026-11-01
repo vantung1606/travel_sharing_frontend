@@ -233,11 +233,19 @@ export const AdminAppearancePage = () => {
       // Use draft if exists, else published
       const source = themeRes?.draft || themeRes?.published;
       if (source) {
-        setFormData({
-          branding: { ...formData.branding, ...(source.branding || {}) },
-          colors: { ...formData.colors, ...(source.colors || {}) },
-          components: { ...formData.components, ...(source.components || {}) }
-        });
+        const sanitizedBranding = { ...(source.branding || {}) };
+        if (!sanitizedBranding.logoUrl || sanitizedBranding.logoUrl.includes('brand-logo.png')) {
+          sanitizedBranding.logoUrl = '/wayfare-logo.png';
+        }
+        if (!sanitizedBranding.logoWhiteUrl || sanitizedBranding.logoWhiteUrl.includes('brand-logo-white.png')) {
+          sanitizedBranding.logoWhiteUrl = '/wayfare-logo-white.png';
+        }
+
+        setFormData(prev => ({
+          branding: { ...prev.branding, ...sanitizedBranding },
+          colors: { ...prev.colors, ...(source.colors || {}) },
+          components: { ...prev.components, ...(source.components || {}) }
+        }));
       }
 
       setVersionsList(verRes || []);
@@ -252,6 +260,11 @@ export const AdminAppearancePage = () => {
   useEffect(() => {
     loadThemeData();
   }, [loadThemeData]);
+
+  // Real-time live synchronization: Whenever formData changes, apply CSS tokens immediately to document!
+  useEffect(() => {
+    applyCssTokens(formData);
+  }, [formData, applyCssTokens]);
 
   // Handle color change
   const handleColorChange = (key, value) => {
@@ -288,14 +301,16 @@ export const AdminAppearancePage = () => {
 
   // Áp dụng bảng màu tuyển chọn
   const handleApplyColorTheme = (theme) => {
-    setFormData(prev => ({
-      ...prev,
+    const updated = {
+      ...formData,
       colors: {
-        ...prev.colors,
+        ...formData.colors,
         ...theme.colors
       }
-    }));
-    toast.success(`Đã áp dụng chủ đề màu: ${theme.name} 🎉`);
+    };
+    setFormData(updated);
+    applyCssTokens(updated);
+    toast.success(`Đã áp dụng chủ đề màu: ${theme.name} 🎉 (Đang xem trước trực tiếp trên giao diện)`);
   };
 
   // Upload ảnh logo/banner trực tiếp lên Cloudinary
@@ -347,6 +362,9 @@ export const AdminAppearancePage = () => {
       const res = await adminThemeApi.publishTheme();
       
       applyCssTokens(formData);
+      try {
+        localStorage.setItem('wayfare_theme', JSON.stringify(formData));
+      } catch {}
       await refreshTheme();
 
       toast.success(`Đã xuất bản giao diện v${res?.versionNo || ''} thành công ra toàn hệ thống! 🚀`);
@@ -472,6 +490,27 @@ export const AdminAppearancePage = () => {
             )}
             <span>Xuất bản toàn hệ thống</span>
           </button>
+        </div>
+      </div>
+
+      {/* ─── LIVE PREVIEW ACTIVE NOTICE BAR ─────────────────────────── */}
+      <div className="bg-emerald-50/90 border border-emerald-300/80 rounded-[6px] p-3 px-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs text-emerald-950 shadow-2xs">
+        <div className="flex items-center gap-2.5">
+          <span className="relative flex h-2.5 w-2.5 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-600"></span>
+          </span>
+          <span className="font-serif font-bold text-[12.5px] text-emerald-900">
+            Chế độ Xem Trước Thời Gian Thực (Live Preview Active):
+          </span>
+          <span className="text-emerald-800 font-sans">
+            Mọi thay đổi về màu sắc, preset, logo hoặc bo góc bên dưới phản ánh TỨC THÌ lên toàn bộ trang để bạn trải nghiệm. Bấm Xuất bản khi hoàn tất.
+          </span>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="font-mono text-[10px] bg-white text-emerald-800 border border-emerald-300 px-2 py-0.5 rounded font-bold">
+            CSS Tokens :root
+          </span>
         </div>
       </div>
 

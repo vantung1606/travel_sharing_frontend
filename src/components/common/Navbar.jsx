@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useApp } from '../../context/AppContext';
+import { useTheme } from '../../context/ThemeContext';
 import { Compass, Sparkles, MapPin, Users, Calendar, MessageSquare, User, Shield, Bell, Menu, X, ChevronRight, LogOut, Heart } from 'lucide-react';
 import { NotificationDropdown } from './NotificationDropdown';
 import { UserAvatar } from './UserAvatar';
 
 
 export const Navbar = () => {
+  const { branding } = useTheme();
   const location = useLocation();
   const isHomePage = location.pathname === '/' || location.pathname === '/home';
   const [isScrolled, setIsScrolled] = useState(false);
@@ -116,8 +118,9 @@ export const Navbar = () => {
                 title="Wayfare - Trang chủ"
               >
                 <img
-                  src={isDarkHero ? '/wayfare-logo-white.png' : '/wayfare-logo.png'}
-                  alt="Wayfare"
+                  src={isDarkHero ? (branding?.logoWhiteUrl || '/wayfare-logo-white.png') : (branding?.logoUrl || '/wayfare-logo.png')}
+                  alt={branding?.siteTitle || "Wayfare"}
+                  onError={(e) => { e.currentTarget.src = isDarkHero ? '/wayfare-logo-white.png' : '/wayfare-logo.png'; }}
                   className="h-9 sm:h-10 w-auto object-contain transition-all duration-300 group-drop-shadow-sm"
                 />
               </div>
@@ -401,8 +404,9 @@ export const Navbar = () => {
                   className="cursor-pointer"
                 >
                   <img
-                    src="/wayfare-logo.png"
-                    alt="Wayfare"
+                    src={branding?.logoUrl || "/wayfare-logo.png"}
+                    alt={branding?.siteTitle || "Wayfare"}
+                    onError={(e) => { e.currentTarget.src = '/wayfare-logo.png'; }}
                     className="h-9 w-auto object-contain drop-shadow-xs"
                   />
                   <span className="block text-[9px] uppercase tracking-wider font-semibold text-slate-400 mt-1">

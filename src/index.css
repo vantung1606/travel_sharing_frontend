@@ -12,12 +12,21 @@
 
 @layer base {
   :root {
-    --primary: #B0522F;
-    --primary-hover: #93422A;
+    --wf-primary: #B0522F;
+    --wf-primary-hover: #93422A;
+    --wf-background: #F8F4EC;
+    --wf-surface: #FFFFFF;
+    --wf-text: #1E1A15;
+    --wf-muted: #6B6258;
+    --wf-border: #E5DED2;
+    --wf-button-bg: #B0522F;
+    --wf-button-text: #FFFFFF;
+    --primary: var(--wf-primary, #B0522F);
+    --primary-hover: var(--wf-primary-hover, #93422A);
     --secondary: #2B271F;
     --tertiary: #C66A45;
-    --surface: #F8F4EC;
-    --on-surface: #1E1A15;
+    --surface: var(--wf-background, #F8F4EC);
+    --on-surface: var(--wf-text, #1E1A15);
   }
 
   /* Clean, crisp & modern base font sizing with optimum readability */
@@ -41,8 +50,8 @@
 
   body {
     font-family: 'Times New Roman', Times, Georgia, serif;
-    color: #1E1A15;
-    background-color: #F8F4EC;
+    color: var(--wf-text, #1E1A15);
+    background-color: var(--wf-background, #F8F4EC) !important;
     font-weight: 400;
     letter-spacing: 0.005em;
   }
@@ -79,23 +88,24 @@
 }
 
 .sparkle-btn {
-  background: #B0522F;
+  background: var(--wf-button-bg, var(--wf-primary, #B0522F)) !important;
+  color: var(--wf-button-text, #FFFFFF) !important;
   transition: background-color 0.2s ease;
 }
 
 .sparkle-btn:hover {
-  background: #93422A;
+  background: var(--wf-primary-hover, #93422A) !important;
 }
 
 .emerald-gradient,
 .ocean-gradient {
-  background: #B0522F;
+  background: var(--wf-primary, #B0522F) !important;
   transition: background-color 0.2s ease;
 }
 
 .emerald-gradient:hover,
 .ocean-gradient:hover {
-  background: #93422A;
+  background: var(--wf-primary-hover, #93422A) !important;
 }
 
 .forest-gradient {
