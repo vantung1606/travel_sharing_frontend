@@ -330,8 +330,9 @@ export const AdminAppearancePage = () => {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, []);
 
+  // Chạy nạp dữ liệu từ máy chủ duy nhất một lần khi trang được nạp (Mount)
   useEffect(() => {
     loadThemeData();
   }, [loadThemeData]);
@@ -339,7 +340,7 @@ export const AdminAppearancePage = () => {
   // Real-time live synchronization: Whenever formData changes, apply CSS tokens immediately to document!
   useEffect(() => {
     applyCssTokens(formData);
-  }, [formData, applyCssTokens]);
+  }, [formData]);
 
   // Handle color change
   const handleColorChange = (key, value) => {
