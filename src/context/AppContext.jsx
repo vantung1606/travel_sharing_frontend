@@ -40,7 +40,8 @@ const DEFAULT_APP_STATE = {
     destinationsCount: 0,
     tripsCount: 0,
     savedItinerariesCount: 0,
-    roles: []
+    roles: [],
+    permissions: []
   },
   isLoggedIn: false,
   setIsLoggedIn: () => {},
@@ -84,9 +85,7 @@ export const AppProvider = ({ children }) => {
 
   const setPortalMode = (mode) => {
     if (mode === 'admin') {
-      const userRoles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
-      const isModOnly = userRoles.includes('ROLE_MODERATOR') && !userRoles.includes('ROLE_ADMIN');
-      navigate(isModOnly ? '/admin/places' : '/admin/dashboard');
+      navigate('/admin/dashboard');
     } else {
       navigate('/');
     }
@@ -151,9 +150,7 @@ export const AppProvider = ({ children }) => {
       maintenance: '/admin/maintenance',
       'audit-logs': '/admin/audit-logs'
     };
-    const userRoles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
-    const isModOnly = userRoles.includes('ROLE_MODERATOR') && !userRoles.includes('ROLE_ADMIN');
-    const target = pathMap[tabId] || (isModOnly ? '/admin/places' : '/admin/dashboard');
+    const target = pathMap[tabId] || '/admin/dashboard';
     navigate(target);
   };
 
@@ -438,6 +435,11 @@ export const AppProvider = ({ children }) => {
       if (auth === 'true' && stored) {
         const parsed = JSON.parse(stored);
         if (parsed && (parsed.id || parsed.email || parsed.token)) {
+          const uRoles = Array.isArray(parsed.roles) ? parsed.roles : [];
+          const isMod = uRoles.includes('ROLE_MODERATOR');
+          if (isMod && (!Array.isArray(parsed.permissions) || parsed.permissions.length === 0)) {
+            parsed.permissions = DEFAULT_MODERATOR_PERMISSIONS;
+          }
           return parsed;
         }
       }
@@ -507,7 +509,12 @@ export const AppProvider = ({ children }) => {
       tier: userData.tier || (rawEmail.startsWith('tung1@') || rawEmail.startsWith('admin@') ? 'diamond' : rawEmail.startsWith('tung2@') ? 'gold' : rawEmail.startsWith('tung3@') ? 'silver' : 'bronze'),
       roles: Array.isArray(userData.roles) && userData.roles.length > 0
         ? userData.roles
-        : ['ROLE_USER']
+        : ['ROLE_USER'],
+      permissions: Array.isArray(userData.permissions) && userData.permissions.length > 0
+        ? userData.permissions
+        : (Array.isArray(userData.roles) && userData.roles.includes('ROLE_MODERATOR')
+            ? DEFAULT_MODERATOR_PERMISSIONS
+            : [])
     };
 
     setIsLoggedIn(true);

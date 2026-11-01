@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useMemo, useCallback } from 'react';
 import { useApp } from './AppContext';
+import { DEFAULT_MODERATOR_PERMISSIONS } from '../components/common/RouteGuards';
 
 const PermissionContext = createContext(null);
 
@@ -11,11 +12,14 @@ export const PermissionProvider = ({ children }) => {
   }, [currentUser?.roles]);
 
   const permissions = useMemo(() => {
-    if (Array.isArray(currentUser?.permissions)) {
+    if (Array.isArray(currentUser?.permissions) && currentUser.permissions.length > 0) {
       return new Set(currentUser.permissions);
     }
+    if (roles.includes('ROLE_MODERATOR')) {
+      return new Set(DEFAULT_MODERATOR_PERMISSIONS);
+    }
     return new Set();
-  }, [currentUser?.permissions]);
+  }, [currentUser?.permissions, roles]);
 
   const isSuperAdmin = useMemo(() => {
     return roles.includes('ROLE_ADMIN');

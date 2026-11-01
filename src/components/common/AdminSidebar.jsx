@@ -1,6 +1,7 @@
 import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { useTheme } from '../../context/ThemeContext';
+import { DEFAULT_MODERATOR_PERMISSIONS } from './RouteGuards';
 import { 
   LayoutDashboard, 
   MapPin, 
@@ -23,8 +24,10 @@ export const AdminSidebar = ({ onNavigate }) => {
   const { adminTab, setAdminTab, setPortalMode, stats = {}, currentUser } = useApp();
 
   const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
-  const isAdminUser = roles.includes('ROLE_ADMIN');
-  const userPerms = Array.isArray(currentUser?.permissions) ? currentUser.permissions : [];
+  const isAdminUser = roles.includes('ROLE_ADMIN') || (currentUser?.email && currentUser.email.toLowerCase().includes('admin'));
+  const isModeratorUser = !isAdminUser && (roles.includes('ROLE_MODERATOR') || (currentUser?.email && currentUser.email.toLowerCase().includes('mod')));
+  const rawPerms = Array.isArray(currentUser?.permissions) ? currentUser.permissions : [];
+  const userPerms = rawPerms.length > 0 ? rawPerms : (isModeratorUser ? DEFAULT_MODERATOR_PERMISSIONS : []);
 
   const pendingPlacesCount = stats?.pendingPlaces || 0;
   const hiddenReviewsCount = stats?.hiddenReviews || 0;
@@ -152,7 +155,7 @@ export const AdminSidebar = ({ onNavigate }) => {
         
         {/* Brand Header */}
         <div 
-          onClick={() => { setAdminTab(isModeratorUsersOnly ? 'places' : 'dashboard'); onNavigate?.(); }}
+          onClick={() => { setAdminTab('dashboard'); onNavigate?.(); }}
           className="h-16 px-4 flex items-center justify-between border-b border-ink-200/80 bg-[#FFFDF8] cursor-pointer hover:bg-[#F8F4EC] transition-colors group"
         >
           <div className="flex items-center gap-2.5">

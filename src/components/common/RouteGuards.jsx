@@ -43,6 +43,15 @@ export const PageTitleManager = () => {
   return null;
 };
 
+export const DEFAULT_MODERATOR_PERMISSIONS = [
+  'DASHBOARD_VIEW',
+  'PLACES_VIEW', 'PLACES_APPROVE', 'PLACES_REJECT',
+  'REVIEWS_VIEW', 'REVIEWS_HIDE', 'REVIEWS_RESTORE',
+  'REPORTS_VIEW', 'REPORTS_RESOLVE', 'REPORTS_DISMISS',
+  'POSTS_VIEW', 'POSTS_HIDE', 'POSTS_RESTORE',
+  'AUDIT_VIEW'
+];
+
 // Route to Permission mapping for dynamic RBAC
 export const ROUTE_PERMISSION_MAP = {
   '/admin': 'DASHBOARD_VIEW',
@@ -66,9 +75,13 @@ export const AdminRouteGuard = ({ children }) => {
 
   const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
   const isAdmin = isLoggedIn && (roles.includes('ROLE_ADMIN') || (currentUser?.email && currentUser.email.toLowerCase().includes('admin')));
-  const isModerator = isLoggedIn && !isAdmin && roles.includes('ROLE_MODERATOR');
+  const isModerator = isLoggedIn && !isAdmin && (roles.includes('ROLE_MODERATOR') || (currentUser?.email && currentUser.email.toLowerCase().includes('mod')));
 
-  const permissions = Array.isArray(currentUser?.permissions) ? currentUser.permissions : [];
+  const rawPermissions = Array.isArray(currentUser?.permissions) ? currentUser.permissions : [];
+  const permissions = rawPermissions.length > 0 
+    ? rawPermissions 
+    : (isModerator ? DEFAULT_MODERATOR_PERMISSIONS : []);
+
   const requiredPermission = ROUTE_PERMISSION_MAP[location.pathname];
   const isSuperAdminOnlyRoute = location.pathname === '/admin/moderators' 
     || location.pathname === '/admin/broadcast' 
@@ -85,10 +98,10 @@ export const AdminRouteGuard = ({ children }) => {
         .filter(([_, perm]) => permissions.includes(perm))
         .map(([path]) => path);
 
-      const fallbackPath = allowedPaths.length > 0 ? allowedPaths[0] : '/home';
+      const fallbackPath = allowedPaths.length > 0 ? allowedPaths[0] : '/admin/dashboard';
       navigate(fallbackPath, { replace: true });
     }
-  }, [isModerator, hasAccess, permissions, navigate]);
+  }, [restrictedForModerator, permissions, navigate]);
 
   // 1. Not Logged In -> Require Admin Login
   if (!isLoggedIn) {

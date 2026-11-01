@@ -350,7 +350,7 @@ export const Navbar = () => {
                           <span>
                             {portalMode === 'admin' 
                               ? 'Về giao diện Người dùng' 
-                              : (isAdmin ? 'Giao diện Quản trị' : 'Giao diện Kiểm duyệt')}
+                              : (isAdmin ? 'Trang chủ Quản trị' : 'Trang chủ Kiểm duyệt')}
                           </span>
                         </button>
                       )}
@@ -519,7 +519,7 @@ export const Navbar = () => {
                     <span>
                       {portalMode === 'admin'
                         ? 'Về giao diện Người dùng'
-                        : (isAdmin ? 'Giao diện Quản trị' : 'Giao diện Kiểm duyệt')}
+                        : (isAdmin ? 'Trang chủ Quản trị' : 'Trang chủ Kiểm duyệt')}
                     </span>
                   </button>
                 )}
