@@ -1,12 +1,162 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { 
-  Palette, Image, Type, Sliders, CheckCircle2, RotateCcw, 
-  Upload, Save, Eye, Smartphone, Monitor, History, AlertCircle, 
-  ExternalLink, Sparkles, Check, ArrowRight, ShieldCheck 
+  Palette, 
+  Image, 
+  Type, 
+  Sliders, 
+  CheckCircle2, 
+  RotateCcw, 
+  Upload, 
+  Save, 
+  Eye, 
+  Smartphone, 
+  Monitor, 
+  History, 
+  AlertCircle, 
+  ExternalLink, 
+  Sparkles, 
+  Check, 
+  ArrowRight, 
+  ShieldCheck,
+  RefreshCw,
+  Sun,
+  Moon,
+  Info,
+  Layers,
+  Compass,
+  Search,
+  FileText,
+  AlertTriangle,
+  HelpCircle,
+  X
 } from 'lucide-react';
-import { adminThemeApi } from '../../../services/api';
+import { adminThemeApi, uploadApi } from '../../../services/api';
 import { useToast } from '../../../components/common/Toast';
 import { useTheme } from '../../../context/ThemeContext';
+
+// ─── 1. BỘ CHỦ ĐỀ MÀU SẮC TUYỂN CHỌN (CURATED TRAVEL THEMES) ─────────────────
+export const CURATED_COLOR_THEMES = [
+  {
+    id: 'classic-clay',
+    name: 'Đất Nung Cổ Điển',
+    subtitle: 'Chuẩn nhận diện Wayfare',
+    badge: 'Mặc định',
+    description: 'Tone màu gốm nung đất ấm kết hợp nền giấy ngà mộc mạc và mực nâu đen trang trọng.',
+    colors: {
+      primary: '#B0522F',
+      primaryHover: '#93422A',
+      background: '#F8F4EC',
+      surface: '#FFFFFF',
+      text: '#1E1A15',
+      muted: '#6B6258',
+      border: '#E5DED2',
+      headerBg: '#F8F4EC',
+      sidebarBg: '#1E1A15',
+      sidebarText: '#F8F4EC',
+      buttonBg: '#B0522F',
+      buttonText: '#FFFFFF',
+      success: '#16A34A',
+      warning: '#D97706',
+      danger: '#DC2626',
+      info: '#2563EB'
+    }
+  },
+  {
+    id: 'ocean-cyan',
+    name: 'Biển Xanh Ngọc Bích',
+    subtitle: 'Cảm hứng Vịnh Lan Hạ & Phú Quốc',
+    badge: 'Biển đảo',
+    description: 'Tone màu xanh lam ngọc bích của biển khơi mang lại cảm giác khoáng đạt, tự do và tươi mát.',
+    colors: {
+      primary: '#0284C7',
+      primaryHover: '#0369A1',
+      background: '#F0F9FF',
+      surface: '#FFFFFF',
+      text: '#0F172A',
+      muted: '#64748B',
+      border: '#E0F2FE',
+      headerBg: '#F0F9FF',
+      sidebarBg: '#0F172A',
+      sidebarText: '#F0F9FF',
+      buttonBg: '#0284C7',
+      buttonText: '#FFFFFF',
+      success: '#059669',
+      warning: '#D97706',
+      danger: '#E11D48',
+      info: '#0284C7'
+    }
+  },
+  {
+    id: 'forest-emerald',
+    name: 'Đại Ngàn Tây Bắc',
+    subtitle: 'Cảm hứng Mù Cang Chải & Pù Luông',
+    badge: 'Núi rừng',
+    description: 'Tone màu xanh ngọc bích của rừng già nguyên sinh và thung lũng lúa xanh bạt ngàn.',
+    colors: {
+      primary: '#15803D',
+      primaryHover: '#166534',
+      background: '#F4FBF7',
+      surface: '#FFFFFF',
+      text: '#14532D',
+      muted: '#4B725A',
+      border: '#DCFCE7',
+      headerBg: '#F4FBF7',
+      sidebarBg: '#14532D',
+      sidebarText: '#F4FBF7',
+      buttonBg: '#15803D',
+      buttonText: '#FFFFFF',
+      success: '#16A34A',
+      warning: '#CA8A04',
+      danger: '#DC2626',
+      info: '#2563EB'
+    }
+  },
+  {
+    id: 'sunset-amber',
+    name: 'Hoàng Hôn Cao Nguyên',
+    subtitle: 'Cảm hứng Chiều Tà Đà Lạt & Tà Xùa',
+    badge: 'Nắng ấm',
+    description: 'Tone màu nắng cam hổ phách hoàng hôn rực rỡ, ấm cúng và ngập tràn cảm xúc lãng mạn.',
+    colors: {
+      primary: '#C2410C',
+      primaryHover: '#9A3412',
+      background: '#FFFBEB',
+      surface: '#FFFFFF',
+      text: '#451A03',
+      muted: '#78350F',
+      border: '#FEF3C7',
+      headerBg: '#FFFBEB',
+      sidebarBg: '#451A03',
+      sidebarText: '#FFFBEB',
+      buttonBg: '#C2410C',
+      buttonText: '#FFFFFF',
+      success: '#16A34A',
+      warning: '#D97706',
+      danger: '#DC2626',
+      info: '#2563EB'
+    }
+  }
+];
+
+// ─── TÍNH TOÁN ĐỘ TƯƠNG PHẢN WCAG (CONTRAST CHECKER) ─────────────────────────
+function getLuminance(hex) {
+  if (!hex || typeof hex !== 'string' || !hex.startsWith('#')) return 0.5;
+  const clean = hex.replace('#', '');
+  if (clean.length < 6) return 0.5;
+  const r = parseInt(clean.substring(0, 2), 16) / 255;
+  const g = parseInt(clean.substring(2, 4), 16) / 255;
+  const b = parseInt(clean.substring(4, 6), 16) / 255;
+  const a = [r, g, b].map(v => (v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4)));
+  return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+}
+
+function getContrastRatio(hex1, hex2) {
+  const lum1 = getLuminance(hex1);
+  const lum2 = getLuminance(hex2);
+  const brightest = Math.max(lum1, lum2);
+  const darkest = Math.min(lum1, lum2);
+  return (brightest + 0.05) / (darkest + 0.05);
+}
 
 export const AdminAppearancePage = () => {
   const toast = useToast();
@@ -17,6 +167,7 @@ export const AdminAppearancePage = () => {
   const [savingDraft, setSavingDraft] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [uploadingField, setUploadingField] = useState(null);
   const [previewMode, setPreviewMode] = useState('desktop'); // desktop | mobile
 
   // Version data
@@ -29,13 +180,13 @@ export const AdminAppearancePage = () => {
     branding: {
       siteTitle: 'Wayfare',
       tagline: 'Hành trình khám phá du lịch Việt Nam theo cách riêng',
-      metaDescription: 'Nền tảng chia sẻ lịch trình du lịch, khám phá địa điểm và kết nối cộng đồng.',
-      logoUrl: '/images/brand-logo.png',
-      logoWhiteUrl: '/images/brand-logo-white.png',
+      metaDescription: 'Nền tảng chia sẻ lịch trình du lịch thông minh, khám phá 500+ địa điểm văn hóa và kết nối cộng đồng phượt thủ Việt Nam.',
+      logoUrl: '/wayfare-logo.png',
+      logoWhiteUrl: '/wayfare-logo-white.png',
       faviconUrl: '/favicon.ico',
       heroBgUrl: '',
       loginBgUrl: '',
-      footerText: '© 2026 Wayfare Travel. Mọi quyền được bảo lưu.'
+      footerText: '© 2026 Wayfare Travel Sharing Platform. Mọi quyền được bảo lưu.'
     },
     colors: {
       primary: '#B0522F',
@@ -57,9 +208,13 @@ export const AdminAppearancePage = () => {
     },
     components: {
       radiusCard: '6px',
-      radiusControl: '5px'
+      radiusControl: '5px',
+      shadowLevel: 'xs',
+      headerStyle: 'solid'
     }
   });
+
+  const fileInputRef = useRef(null);
 
   // Load theme data
   const loadThemeData = useCallback(async () => {
@@ -131,6 +286,46 @@ export const AdminAppearancePage = () => {
     }));
   };
 
+  // Áp dụng bảng màu tuyển chọn
+  const handleApplyColorTheme = (theme) => {
+    setFormData(prev => ({
+      ...prev,
+      colors: {
+        ...prev.colors,
+        ...theme.colors
+      }
+    }));
+    toast.success(`Đã áp dụng chủ đề màu: ${theme.name} 🎉`);
+  };
+
+  // Upload ảnh logo/banner trực tiếp lên Cloudinary
+  const handleTriggerUpload = (field) => {
+    setUploadingField(field);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !uploadingField) return;
+
+    try {
+      toast.info('Đang tải ảnh lên Cloudinary CDN...');
+      const uploadedUrl = await uploadApi.uploadSingle(file);
+      if (uploadedUrl) {
+        handleBrandingChange(uploadingField, uploadedUrl);
+        toast.success('Tải ảnh thành công! Đã tự động cập nhật đường dẫn CDN.');
+      }
+    } catch (err) {
+      console.error('Lỗi upload ảnh:', err);
+      toast.error('Tải ảnh thất bại: ' + (err.message || 'Không thể upload'));
+    } finally {
+      setUploadingField(null);
+    }
+  };
+
   // Save draft
   const handleSaveDraft = async () => {
     try {
@@ -148,14 +343,13 @@ export const AdminAppearancePage = () => {
   const handlePublish = async () => {
     try {
       setPublishing(true);
-      // Save current formData first
       await adminThemeApi.saveDraft(formData, 'Lưu trước khi xuất bản');
       const res = await adminThemeApi.publishTheme();
       
       applyCssTokens(formData);
       await refreshTheme();
 
-      toast.success(`Đã xuất bản giao diện v${res?.versionNo || ''} thành công ra toàn hệ thống!`);
+      toast.success(`Đã xuất bản giao diện v${res?.versionNo || ''} thành công ra toàn hệ thống! 🚀`);
       await loadThemeData();
     } catch (err) {
       toast.error(err.message || 'Không thể xuất bản giao diện');
@@ -173,7 +367,7 @@ export const AdminAppearancePage = () => {
 
     try {
       setResetting(true);
-      const res = await adminThemeApi.resetTheme();
+      await adminThemeApi.resetTheme();
       await refreshTheme();
       toast.success('Đã khôi phục giao diện về mặc định chuẩn của Wayfare thành công!');
       await loadThemeData();
@@ -199,10 +393,28 @@ export const AdminAppearancePage = () => {
     }
   };
 
+  // Contrast calculation
+  const textContrast = useMemo(() => {
+    return getContrastRatio(formData.colors.text, formData.colors.background).toFixed(2);
+  }, [formData.colors.text, formData.colors.background]);
+
+  const buttonContrast = useMemo(() => {
+    return getContrastRatio(formData.colors.buttonText, formData.colors.buttonBg).toFixed(2);
+  }, [formData.colors.buttonText, formData.colors.buttonBg]);
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       
-      {/* 1. Header Banner */}
+      {/* Hidden file input for Cloudinary upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/png,image/jpeg,image/webp,image/svg+xml,image/x-icon"
+        className="hidden"
+      />
+
+      {/* ─── 1. HEADER BANNER ────────────────────────────────────────────── */}
       <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-[5px] bg-clay-100 text-clay-700 border border-clay-300 flex items-center justify-center shrink-0">
@@ -210,28 +422,29 @@ export const AdminAppearancePage = () => {
           </div>
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-xl font-bold text-ink-800 font-serif">
-                Quản lý Giao diện & Thương hiệu
+              <h1 className="text-xl font-bold text-ink-900 font-serif tracking-tight">
+                Quản Lý Giao Diện & Bộ Nhận Diện Thương Hiệu
               </h1>
               <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 border border-emerald-300">
                 Đang chạy: v{publishedVersion}
               </span>
             </div>
             <p className="text-xs text-ink-500 font-sans mt-1 leading-relaxed">
-              Kiểm soát toàn bộ Design Tokens: Bảng màu sắc, Logo, Tiêu đề SEO, Bo góc & Trải nghiệm giao diện xuyên suốt hệ thống.
+              Kiểm soát toàn bộ Design Tokens: Bảng màu sắc, Logo, Tiêu đề SEO, Bo góc & Trải nghiệm giao diện xuyên suốt hệ thống Web và Mobile.
             </p>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0 self-start md:self-auto">
           <button
             onClick={handleReset}
             disabled={resetting || loading}
             className="px-3.5 py-2 rounded-[5px] text-xs font-serif font-medium text-ink-600 hover:text-ink-900 bg-[#F8F4EC] hover:bg-ink-100 border border-ink-200 transition-colors flex items-center gap-1.5 cursor-pointer"
             title="Khôi phục về bảng màu mặc định của Wayfare"
           >
-            <RotateCcw className="w-3.5 h-3.5" /> Khôi phục mặc định
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Khôi phục mặc định</span>
           </button>
 
           <button
@@ -244,25 +457,25 @@ export const AdminAppearancePage = () => {
             ) : (
               <Save className="w-3.5 h-3.5 text-ink-500" />
             )}
-            Lưu bản nháp
+            <span>Lưu bản nháp</span>
           </button>
 
           <button
             onClick={handlePublish}
             disabled={publishing || loading}
-            className="px-5 py-2 rounded-[5px] text-xs font-serif font-bold text-white bg-clay-600 hover:bg-clay-700 transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer"
+            className="px-5 py-2 rounded-[5px] text-xs font-serif font-bold text-white bg-clay-700 hover:bg-clay-800 transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer"
           >
             {publishing ? (
               <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
               <CheckCircle2 className="w-3.5 h-3.5" />
             )}
-            Xuất bản toàn hệ thống
+            <span>Xuất bản toàn hệ thống</span>
           </button>
         </div>
       </div>
 
-      {/* 2. Main 2-Column Layout: Controls on Left, Live Preview on Right */}
+      {/* ─── 2. MAIN 2-COLUMN WORKSPACE: Controls on Left, Live Preview on Right ─── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* LEFT COLUMN: Tabs & Form Inputs (7 cols) */}
@@ -272,165 +485,394 @@ export const AdminAppearancePage = () => {
           <div className="flex items-center gap-1 p-1 bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] shadow-2xs font-serif text-xs">
             <button
               onClick={() => setActiveTab('branding')}
-              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center ${
+              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'branding' 
-                  ? 'bg-clay-600 text-white shadow-xs' 
+                  ? 'bg-clay-700 text-white shadow-xs' 
                   : 'text-ink-600 hover:text-ink-900 hover:bg-[#F8F4EC]'
               }`}
             >
-              Thương hiệu & Logo
+              <Image className="w-3.5 h-3.5" />
+              <span>Thương hiệu & Logo</span>
             </button>
             <button
               onClick={() => setActiveTab('colors')}
-              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center ${
+              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'colors' 
-                  ? 'bg-clay-600 text-white shadow-xs' 
+                  ? 'bg-clay-700 text-white shadow-xs' 
                   : 'text-ink-600 hover:text-ink-900 hover:bg-[#F8F4EC]'
               }`}
             >
-              Bảng màu hệ thống
+              <Palette className="w-3.5 h-3.5" />
+              <span>Bảng màu hệ thống</span>
             </button>
             <button
               onClick={() => setActiveTab('components')}
-              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center ${
+              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'components' 
-                  ? 'bg-clay-600 text-white shadow-xs' 
+                  ? 'bg-clay-700 text-white shadow-xs' 
                   : 'text-ink-600 hover:text-ink-900 hover:bg-[#F8F4EC]'
               }`}
             >
-              Bo góc & Tokens
+              <Sliders className="w-3.5 h-3.5" />
+              <span>Bo góc & Tokens</span>
             </button>
             <button
               onClick={() => setActiveTab('history')}
-              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1.5 ${
+              className={`flex-1 py-2 px-3 rounded-[4px] font-bold transition-all text-center flex items-center justify-center gap-1.5 cursor-pointer ${
                 activeTab === 'history' 
-                  ? 'bg-clay-600 text-white shadow-xs' 
+                  ? 'bg-clay-700 text-white shadow-xs' 
                   : 'text-ink-600 hover:text-ink-900 hover:bg-[#F8F4EC]'
               }`}
             >
-              <History className="w-3.5 h-3.5" /> Lịch sử
+              <History className="w-3.5 h-3.5" />
+              <span>Lịch sử ({versionsList.length})</span>
             </button>
           </div>
 
-          {/* TAB 1: BRANDING */}
+          {/* ═══════════════ TAB 1: BRANDING & ASSETS ═══════════════ */}
           {activeTab === 'branding' && (
-            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-5 shadow-xs space-y-4">
-              <h3 className="font-serif font-bold text-sm text-ink-800 border-b border-ink-100 pb-2 flex items-center gap-2">
-                <Image className="w-4 h-4 text-clay-600" /> Nhận diện Thương hiệu & Logo
-              </h3>
+            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
+              
+              {/* Group 1: General Brand Info */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between border-b border-ink-100 pb-2">
+                  <h3 className="font-serif font-bold text-sm text-ink-900 flex items-center gap-2">
+                    <Type className="w-4 h-4 text-clay-700" />
+                    <span>Thông Tin Thương Hiệu & Định Danh Website</span>
+                  </h3>
+                  <span className="text-[11px] font-mono text-ink-400">SEO & Metadata</span>
+                </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="font-serif text-xs font-bold text-ink-700">Tên Website / Ứng dụng</label>
-                  <input
-                    type="text"
-                    value={formData.branding.siteTitle || ''}
-                    onChange={e => handleBrandingChange('siteTitle', e.target.value)}
-                    placeholder="VD: Wayfare"
-                    className="w-full px-3 py-2 text-xs bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8]"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="font-serif text-xs font-bold text-ink-800 block">
+                      Tên Website / Nền tảng <span className="text-rose-600">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.branding.siteTitle || ''}
+                      onChange={e => handleBrandingChange('siteTitle', e.target.value)}
+                      placeholder="VD: Wayfare"
+                      className="w-full px-3.5 py-2 text-xs bg-[#F8F4EC] border border-ink-200 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] font-sans"
+                    />
+                    <span className="text-[10px] text-ink-400 font-sans block">
+                      Hiển thị trên tiêu đề tab trình duyệt và đầu trang Navbar
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="font-serif text-xs font-bold text-ink-800 block">
+                      Khẩu hiệu Thương hiệu (Tagline)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.branding.tagline || ''}
+                      onChange={e => handleBrandingChange('tagline', e.target.value)}
+                      placeholder="VD: Khám phá Việt Nam theo cách riêng"
+                      className="w-full px-3.5 py-2 text-xs bg-[#F8F4EC] border border-ink-200 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] font-sans"
+                    />
+                    <span className="text-[10px] text-ink-400 font-sans block">
+                      Xuất hiện dưới logo và trong các chiến dịch quảng bá
+                    </span>
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-serif text-xs font-bold text-ink-700">Khẩu hiệu (Tagline)</label>
+                  <div className="flex items-center justify-between">
+                    <label className="font-serif text-xs font-bold text-ink-800 block">
+                      Mô tả SEO Meta Description
+                    </label>
+                    <span className="text-[10px] font-mono text-ink-400">
+                      {formData.branding.metaDescription?.length || 0} / 160 ký tự (Khuyến nghị: 120-160)
+                    </span>
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={formData.branding.metaDescription || ''}
+                    onChange={e => handleBrandingChange('metaDescription', e.target.value)}
+                    placeholder="Mô tả tóm tắt cho công cụ tìm kiếm Google và các mạng xã hội khi chia sẻ link..."
+                    className="w-full px-3.5 py-2 text-xs bg-[#F8F4EC] border border-ink-200 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] font-sans leading-relaxed resize-none"
+                  />
+                </div>
+
+                {/* Google Search Snippet Simulation */}
+                <div className="p-3.5 rounded-[6px] bg-[#F8F4EC]/60 border border-ink-200 space-y-1">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-ink-400 block">
+                    Mô phỏng hiển thị trên kết quả tìm kiếm Google (SERP Preview):
+                  </span>
+                  <div className="pt-1">
+                    <div className="text-[11px] font-sans text-emerald-800 truncate">
+                      https://wayfare.vn › kham-pha-viet-nam
+                    </div>
+                    <div className="font-serif font-bold text-sm text-[#1a0dab] hover:underline cursor-pointer truncate">
+                      {formData.branding.siteTitle || 'Wayfare'} • {formData.branding.tagline || 'Hành trình khám phá du lịch'}
+                    </div>
+                    <div className="text-xs text-ink-600 font-sans line-clamp-2 mt-0.5 leading-relaxed">
+                      {formData.branding.metaDescription || 'Nền tảng chia sẻ lịch trình du lịch thông minh, khám phá 500+ địa điểm văn hóa và kết nối cộng đồng phượt thủ.'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Group 2: Visual Brand Assets (Logo, White Logo, Favicon, Banner) */}
+              <div className="space-y-4 pt-2 border-t border-ink-100">
+                <div className="flex items-center justify-between border-b border-ink-100 pb-2">
+                  <h3 className="font-serif font-bold text-sm text-ink-900 flex items-center gap-2">
+                    <Image className="w-4 h-4 text-clay-700" />
+                    <span>Hình Ảnh Logo & Biểu Tượng Nhận Diện (Brand Assets)</span>
+                  </h3>
+                  <span className="text-[11px] font-mono text-ink-400">Cloudinary CDN Ready</span>
+                </div>
+
+                {/* 1. Logo Chính (Dark Logo) */}
+                <div className="p-4 rounded-[6px] bg-[#F8F4EC]/60 border border-ink-200 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="font-serif font-bold text-xs text-ink-900 block">
+                        Logo chính (Primary Dark Logo)
+                      </span>
+                      <span className="text-[11px] text-ink-500 font-sans block">
+                        Dùng trên nền sáng (Navbar, trang chủ, báo cáo). Khuyến nghị: PNG trong suốt, tỷ lệ 4:1 (240x60px).
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleTriggerUpload('logoUrl')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[#FFFDF8] hover:bg-clay-50 border border-clay-300 text-clay-800 font-serif font-bold text-xs shadow-2xs transition-colors cursor-pointer shrink-0"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-clay-700" />
+                      <span>Tải ảnh lên (Cloudinary)</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    {/* Preview Box */}
+                    <div className="w-32 h-12 rounded-[4px] bg-white border border-ink-200 flex items-center justify-center p-1.5 shrink-0 shadow-2xs">
+                      {formData.branding.logoUrl ? (
+                        <img 
+                          src={formData.branding.logoUrl} 
+                          alt="Primary Logo" 
+                          className="max-h-full max-w-full object-contain"
+                          onError={(e) => { e.target.src = '/wayfare-logo.png'; }}
+                        />
+                      ) : (
+                        <span className="text-[10px] text-ink-400 font-mono">Chưa có logo</span>
+                      )}
+                    </div>
+                    
+                    <input
+                      type="text"
+                      value={formData.branding.logoUrl || ''}
+                      onChange={e => handleBrandingChange('logoUrl', e.target.value)}
+                      placeholder="/wayfare-logo.png hoặc https://res.cloudinary.com/..."
+                      className="w-full px-3 py-2 text-xs bg-[#FFFDF8] border border-ink-200 rounded-[5px] font-mono text-[11px] text-ink-900 focus:outline-none focus:border-clay-600"
+                    />
+                  </div>
+                </div>
+
+                {/* 2. Logo Nền Tối (White Logo) */}
+                <div className="p-4 rounded-[6px] bg-[#F8F4EC]/60 border border-ink-200 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <span className="font-serif font-bold text-xs text-ink-900 block">
+                        Logo nền tối (White / Monochrome Logo)
+                      </span>
+                      <span className="text-[11px] text-ink-500 font-sans block">
+                        Dùng trên banner tối màu, màn hình bảo trì hoặc footer nền đen.
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleTriggerUpload('logoWhiteUrl')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[#FFFDF8] hover:bg-clay-50 border border-clay-300 text-clay-800 font-serif font-bold text-xs shadow-2xs transition-colors cursor-pointer shrink-0"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-clay-700" />
+                      <span>Tải ảnh lên (Cloudinary)</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    {/* Dark Preview Box */}
+                    <div className="w-32 h-12 rounded-[4px] bg-ink-900 border border-ink-700 flex items-center justify-center p-1.5 shrink-0 shadow-2xs">
+                      {formData.branding.logoWhiteUrl ? (
+                        <img 
+                          src={formData.branding.logoWhiteUrl} 
+                          alt="White Logo" 
+                          className="max-h-full max-w-full object-contain"
+                          onError={(e) => { e.target.src = '/wayfare-logo-white.png'; }}
+                        />
+                      ) : (
+                        <span className="text-[10px] text-ink-400 font-mono">Chưa có logo</span>
+                      )}
+                    </div>
+                    
+                    <input
+                      type="text"
+                      value={formData.branding.logoWhiteUrl || ''}
+                      onChange={e => handleBrandingChange('logoWhiteUrl', e.target.value)}
+                      placeholder="/wayfare-logo-white.png hoặc https://res.cloudinary.com/..."
+                      className="w-full px-3 py-2 text-xs bg-[#FFFDF8] border border-ink-200 rounded-[5px] font-mono text-[11px] text-ink-900 focus:outline-none focus:border-clay-600"
+                    />
+                  </div>
+                </div>
+
+                {/* 3. Favicon & Hero Banner in 2 cols */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Favicon */}
+                  <div className="p-3.5 rounded-[6px] bg-[#F8F4EC]/60 border border-ink-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-serif font-bold text-xs text-ink-900 block">
+                        Biểu tượng Favicon
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleTriggerUpload('faviconUrl')}
+                        className="text-[10px] font-mono text-clay-700 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <Upload className="w-3 h-3" /> Tải ảnh
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded bg-white border border-ink-200 flex items-center justify-center shrink-0">
+                        <img 
+                          src={formData.branding.faviconUrl || '/favicon.ico'} 
+                          alt="Favicon" 
+                          className="w-5 h-5 object-contain"
+                          onError={(e) => { e.target.src = '/favicon.ico'; }}
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={formData.branding.faviconUrl || ''}
+                        onChange={e => handleBrandingChange('faviconUrl', e.target.value)}
+                        placeholder="/favicon.ico"
+                        className="w-full px-2.5 py-1.5 text-xs bg-[#FFFDF8] border border-ink-200 rounded font-mono text-[11px]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Hero Banner Background */}
+                  <div className="p-3.5 rounded-[6px] bg-[#F8F4EC]/60 border border-ink-200 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-serif font-bold text-xs text-ink-900 block">
+                        Ảnh nền Hero Banner trang chủ
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleTriggerUpload('heroBgUrl')}
+                        className="text-[10px] font-mono text-clay-700 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                      >
+                        <Upload className="w-3 h-3" /> Tải ảnh
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.branding.heroBgUrl || ''}
+                      onChange={e => handleBrandingChange('heroBgUrl', e.target.value)}
+                      placeholder="https://images.unsplash.com/..."
+                      className="w-full px-2.5 py-1.5 text-xs bg-[#FFFDF8] border border-ink-200 rounded font-mono text-[11px]"
+                    />
+                  </div>
+                </div>
+
+                {/* Footer Copyright Text */}
+                <div className="space-y-1.5 pt-2">
+                  <label className="font-serif text-xs font-bold text-ink-800 block">
+                    Văn bản Bản quyền Chân trang (Footer Copyright)
+                  </label>
                   <input
                     type="text"
-                    value={formData.branding.tagline || ''}
-                    onChange={e => handleBrandingChange('tagline', e.target.value)}
-                    placeholder="VD: Khám phá Việt Nam theo cách riêng"
-                    className="w-full px-3 py-2 text-xs bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8]"
+                    value={formData.branding.footerText || ''}
+                    onChange={e => handleBrandingChange('footerText', e.target.value)}
+                    placeholder="© 2026 Wayfare Travel Sharing Platform. Mọi quyền được bảo lưu."
+                    className="w-full px-3.5 py-2 text-xs bg-[#F8F4EC] border border-ink-200 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] font-sans"
                   />
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="font-serif text-xs font-bold text-ink-700">Mô tả SEO meta description</label>
-                <textarea
-                  rows={2}
-                  value={formData.branding.metaDescription || ''}
-                  onChange={e => handleBrandingChange('metaDescription', e.target.value)}
-                  placeholder="Mô tả tóm tắt cho công cụ tìm kiếm Google..."
-                  className="w-full px-3 py-2 text-xs bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8]"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                <div className="space-y-1.5">
-                  <label className="font-serif text-xs font-bold text-ink-700">Đường dẫn Logo chính (Dark logo)</label>
-                  <input
-                    type="text"
-                    value={formData.branding.logoUrl || ''}
-                    onChange={e => handleBrandingChange('logoUrl', e.target.value)}
-                    placeholder="/images/brand-logo.png"
-                    className="w-full px-3 py-2 text-xs bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] font-mono text-[11px]"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="font-serif text-xs font-bold text-ink-700">Đường dẫn Logo nền tối (White logo)</label>
-                  <input
-                    type="text"
-                    value={formData.branding.logoWhiteUrl || ''}
-                    onChange={e => handleBrandingChange('logoWhiteUrl', e.target.value)}
-                    placeholder="/images/brand-logo-white.png"
-                    className="w-full px-3 py-2 text-xs bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] font-mono text-[11px]"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="font-serif text-xs font-bold text-ink-700">Đường dẫn Favicon Icon</label>
-                  <input
-                    type="text"
-                    value={formData.branding.faviconUrl || ''}
-                    onChange={e => handleBrandingChange('faviconUrl', e.target.value)}
-                    placeholder="/favicon.ico"
-                    className="w-full px-3 py-2 text-xs bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] font-mono text-[11px]"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="font-serif text-xs font-bold text-ink-700">Ảnh nền Banner Hero (Tùy chọn)</label>
-                  <input
-                    type="text"
-                    value={formData.branding.heroBgUrl || ''}
-                    onChange={e => handleBrandingChange('heroBgUrl', e.target.value)}
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full px-3 py-2 text-xs bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] font-mono text-[11px]"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1.5 pt-2">
-                <label className="font-serif text-xs font-bold text-ink-700">Văn bản Chân trang (Footer text)</label>
-                <input
-                  type="text"
-                  value={formData.branding.footerText || ''}
-                  onChange={e => handleBrandingChange('footerText', e.target.value)}
-                  placeholder="© 2026 Wayfare Travel. Mọi quyền được bảo lưu."
-                  className="w-full px-3 py-2 text-xs bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8]"
-                />
-              </div>
             </div>
           )}
 
-          {/* TAB 2: COLORS */}
+          {/* ═══════════════ TAB 2: SYSTEM COLORS & THEMES ═══════════════ */}
           {activeTab === 'colors' && (
-            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-5 shadow-xs space-y-6">
+            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
               
+              {/* Group 0: Curated Color Presets */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between border-b border-ink-100 pb-2">
+                  <div>
+                    <h3 className="font-serif font-bold text-sm text-ink-900 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-amber-600" />
+                      <span>Bộ Phối Màu Tuyển Chọn Cho Du Lịch (Theme Presets 1-Chạm)</span>
+                    </h3>
+                    <p className="text-[11px] text-ink-500 font-sans mt-0.5">
+                      Chọn nhanh bộ màu hài hòa đã được kiểm nghiệm độ tương phản và chuẩn mỹ thuật.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {CURATED_COLOR_THEMES.map(theme => {
+                    const isCurrent = formData.colors.primary.toLowerCase() === theme.colors.primary.toLowerCase() &&
+                                      formData.colors.background.toLowerCase() === theme.colors.background.toLowerCase();
+                    return (
+                      <button
+                        key={theme.id}
+                        type="button"
+                        onClick={() => handleApplyColorTheme(theme)}
+                        className={`p-3.5 rounded-[6px] border text-left transition-all cursor-pointer space-y-2 group ${
+                          isCurrent
+                            ? 'bg-clay-50/90 border-clay-700 ring-1 ring-clay-700 shadow-2xs'
+                            : 'bg-[#F8F4EC]/60 border-ink-200 hover:bg-[#F8F4EC] hover:border-clay-400'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div 
+                              style={{ backgroundColor: theme.colors.primary }}
+                              className="w-4 h-4 rounded-full border border-white shadow-2xs"
+                            />
+                            <span className="font-serif font-bold text-xs text-ink-900 group-hover:text-clay-800">
+                              {theme.name}
+                            </span>
+                          </div>
+                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-ink-200/70 text-ink-700">
+                            {theme.badge}
+                          </span>
+                        </div>
+
+                        {/* Palette Swatches */}
+                        <div className="flex items-center gap-1.5 py-0.5">
+                          <span style={{ backgroundColor: theme.colors.primary }} className="w-6 h-3 rounded-[2px] border border-ink-200" title="Primary" />
+                          <span style={{ backgroundColor: theme.colors.background }} className="w-6 h-3 rounded-[2px] border border-ink-200" title="Background" />
+                          <span style={{ backgroundColor: theme.colors.surface }} className="w-6 h-3 rounded-[2px] border border-ink-200" title="Surface" />
+                          <span style={{ backgroundColor: theme.colors.text }} className="w-6 h-3 rounded-[2px] border border-ink-200" title="Text" />
+                          <span style={{ backgroundColor: theme.colors.border }} className="w-6 h-3 rounded-[2px] border border-ink-200" title="Border" />
+                        </div>
+
+                        <p className="text-[11px] text-ink-500 font-sans leading-tight line-clamp-2">
+                          {theme.description}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Group 1: Brand Accent Colors */}
-              <div>
-                <h4 className="font-serif font-bold text-xs text-ink-800 uppercase tracking-wider text-clay-700 mb-3 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" /> Màu Nhận diện Thương hiệu
+              <div className="space-y-3 pt-2 border-t border-ink-100">
+                <h4 className="font-serif font-bold text-xs uppercase tracking-wider text-clay-700 flex items-center gap-1.5">
+                  <Palette className="w-3.5 h-3.5" /> Màu Nhận Diện Cốt Lõi (Core Accent Colors)
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {/* Primary Color */}
                   <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
                     <div>
                       <span className="font-serif text-xs font-bold text-ink-800 block">Màu chính (Primary)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Nút bấm, điểm nhấn, badge</span>
+                      <span className="font-mono text-[10px] text-ink-400">Nút bấm, biểu tượng, điểm nhấn</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <input 
@@ -451,8 +893,8 @@ export const AdminAppearancePage = () => {
                   {/* Primary Hover */}
                   <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
                     <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Rê chuột (Hover)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Trạng thái hover của nút</span>
+                      <span className="font-serif text-xs font-bold text-ink-800 block">Rê chuột (Primary Hover)</span>
+                      <span className="font-mono text-[10px] text-ink-400">Trạng thái khi rê chuột lên nút</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <input 
@@ -470,21 +912,64 @@ export const AdminAppearancePage = () => {
                     </div>
                   </div>
 
+                  {/* Button Bg */}
+                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
+                    <div>
+                      <span className="font-serif text-xs font-bold text-ink-800 block">Nền nút bấm (Button Bg)</span>
+                      <span className="font-mono text-[10px] text-ink-400">Màu nền nút bấm hành động</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="color" 
+                        value={formData.colors.buttonBg} 
+                        onChange={e => handleColorChange('buttonBg', e.target.value)}
+                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
+                      />
+                      <input
+                        type="text"
+                        value={formData.colors.buttonBg}
+                        onChange={e => handleColorChange('buttonBg', e.target.value)}
+                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Button Text */}
+                  <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
+                    <div>
+                      <span className="font-serif text-xs font-bold text-ink-800 block">Chữ nút bấm (Button Text)</span>
+                      <span className="font-mono text-[10px] text-ink-400">Màu chữ hiển thị trên nút</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="color" 
+                        value={formData.colors.buttonText} 
+                        onChange={e => handleColorChange('buttonText', e.target.value)}
+                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
+                      />
+                      <input
+                        type="text"
+                        value={formData.colors.buttonText}
+                        onChange={e => handleColorChange('buttonText', e.target.value)}
+                        className="w-20 px-2 py-1 text-xs font-mono bg-white border border-ink-200 rounded text-center"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Group 2: Surface & Typography Colors */}
-              <div>
-                <h4 className="font-serif font-bold text-xs text-ink-800 uppercase tracking-wider text-clay-700 mb-3 flex items-center gap-1.5">
-                  <Type className="w-3.5 h-3.5" /> Bố cục & Màu nền trang
+              {/* Group 2: Layout & Typography Colors */}
+              <div className="space-y-3 pt-2 border-t border-ink-100">
+                <h4 className="font-serif font-bold text-xs uppercase tracking-wider text-clay-700 flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5" /> Bố Cục & Màu Nền Hệ Thống (Layout & Surface)
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {/* Background */}
                   <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
                     <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Màu nền trang (Background)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Nền trang toàn hệ thống</span>
+                      <span className="font-serif text-xs font-bold text-ink-800 block">Nền trang web (Background)</span>
+                      <span className="font-mono text-[10px] text-ink-400">Màu nền chung toàn hệ thống</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <input 
@@ -505,8 +990,8 @@ export const AdminAppearancePage = () => {
                   {/* Surface */}
                   <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
                     <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Màu thẻ / Ô (Surface)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Nền card, modal, ô nội dung</span>
+                      <span className="font-serif text-xs font-bold text-ink-800 block">Màu ô thẻ (Surface / Card)</span>
+                      <span className="font-mono text-[10px] text-ink-400">Nền card, modal, khung nội dung</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <input 
@@ -527,8 +1012,8 @@ export const AdminAppearancePage = () => {
                   {/* Text Color */}
                   <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
                     <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Màu chữ chính (Text)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Tiêu đề, nội dung chính</span>
+                      <span className="font-serif text-xs font-bold text-ink-800 block">Màu chữ chính (Text Color)</span>
+                      <span className="font-mono text-[10px] text-ink-400">Tiêu đề, văn bản nội dung</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <input 
@@ -549,8 +1034,8 @@ export const AdminAppearancePage = () => {
                   {/* Border Color */}
                   <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
                     <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Màu viền (Border)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Đường viền thẻ, phân cách</span>
+                      <span className="font-serif text-xs font-bold text-ink-800 block">Màu đường viền (Border)</span>
+                      <span className="font-mono text-[10px] text-ink-400">Đường viền thẻ, phân cách ô</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <input 
@@ -567,21 +1052,20 @@ export const AdminAppearancePage = () => {
                       />
                     </div>
                   </div>
-
                 </div>
               </div>
 
-              {/* Group 3: Navigation Bar & Sidebar */}
-              <div>
-                <h4 className="font-serif font-bold text-xs text-ink-800 uppercase tracking-wider text-clay-700 mb-3 flex items-center gap-1.5">
-                  <Monitor className="w-3.5 h-3.5" /> Điều hướng & Thanh tác vụ
+              {/* Group 3: Navigation Header & Sidebar */}
+              <div className="space-y-3 pt-2 border-t border-ink-100">
+                <h4 className="font-serif font-bold text-xs uppercase tracking-wider text-clay-700 flex items-center gap-1.5">
+                  <Monitor className="w-3.5 h-3.5" /> Thanh Điều Hướng (Navbar & Sidebar)
                 </h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   {/* Header Background */}
                   <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
                     <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Nền thanh Header</span>
+                      <span className="font-serif text-xs font-bold text-ink-800 block">Nền thanh Header (Navbar)</span>
                       <span className="font-mono text-[10px] text-ink-400">Thanh điều hướng trên cùng</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -603,8 +1087,8 @@ export const AdminAppearancePage = () => {
                   {/* Sidebar Background */}
                   <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 flex items-center justify-between">
                     <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Nền thanh Sidebar</span>
-                      <span className="font-mono text-[10px] text-ink-400">Menu quản trị bên trái</span>
+                      <span className="font-serif text-xs font-bold text-ink-800 block">Nền menu Sidebar</span>
+                      <span className="font-mono text-[10px] text-ink-400">Thanh menu quản trị bên trái</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <input 
@@ -621,165 +1105,285 @@ export const AdminAppearancePage = () => {
                       />
                     </div>
                   </div>
+                </div>
+              </div>
 
+              {/* Group 4: Accessibility & Contrast Checker Box */}
+              <div className="p-4 rounded-[6px] bg-[#F8F4EC]/70 border border-ink-200 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-serif font-bold text-xs text-ink-900 flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                    <span>Kiểm Tra Độ Tương Phản Chuẩn WCAG (Accessibility Compliance)</span>
+                  </span>
+                  <span className="text-[10px] font-mono text-ink-400">Tiêu chuẩn quốc tế</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="p-3 rounded bg-white border border-ink-200 flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-serif font-bold block text-ink-800">Chữ chính trên Nền trang</span>
+                      <span className="font-mono text-[10px] text-ink-400">Tỷ lệ: {textContrast}:1</span>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                      Number(textContrast) >= 4.5 
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
+                        : 'bg-amber-50 text-amber-800 border border-amber-200'
+                    }`}>
+                      {Number(textContrast) >= 7.0 ? 'ĐẠT AAA' : Number(textContrast) >= 4.5 ? 'ĐẠT AA' : 'CẢNH BÁO MỜ'}
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded bg-white border border-ink-200 flex items-center justify-between text-xs">
+                    <div>
+                      <span className="font-serif font-bold block text-ink-800">Chữ nút trên Nền nút bấm</span>
+                      <span className="font-mono text-[10px] text-ink-400">Tỷ lệ: {buttonContrast}:1</span>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold ${
+                      Number(buttonContrast) >= 4.5 
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
+                        : 'bg-amber-50 text-amber-800 border border-amber-200'
+                    }`}>
+                      {Number(buttonContrast) >= 7.0 ? 'ĐẠT AAA' : Number(buttonContrast) >= 4.5 ? 'ĐẠT AA' : 'CẢNH BÁO MỜ'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
             </div>
           )}
 
-          {/* TAB 3: COMPONENTS & TOKENS */}
+          {/* ═══════════════ TAB 3: TOKENS & COMPONENTS ═══════════════ */}
           {activeTab === 'components' && (
-            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-5 shadow-xs space-y-5">
-              <h3 className="font-serif font-bold text-sm text-ink-800 border-b border-ink-100 pb-2 flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-clay-600" /> Bo góc & Token Thành phần (Components)
-              </h3>
+            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
+              
+              <div className="border-b border-ink-100 pb-2">
+                <h3 className="font-serif font-bold text-sm text-ink-900 flex items-center gap-2">
+                  <Sliders className="w-4 h-4 text-clay-700" />
+                  <span>Bo Góc, Đổ Bóng & Quy Chuẩn Giao Diện (Design Tokens)</span>
+                </h3>
+                <p className="text-[11px] text-ink-500 font-sans mt-0.5">
+                  Thiết lập độ bo góc và độ bóng đồng bộ trên tất cả các trang web và ứng dụng di động.
+                </p>
+              </div>
 
               <div className="space-y-4">
-                {/* Radius Card */}
-                <div className="p-4 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 space-y-2">
+                {/* 1. Radius Card */}
+                <div className="p-4 rounded-[6px] bg-[#F8F4EC] border border-ink-200/80 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Bo góc Thẻ / Card (Radius Card)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Độ cong góc của Card địa điểm, Card bài viết, Modal</span>
+                      <span className="font-serif text-xs font-bold text-ink-800 block">
+                        Bo góc Thẻ & Khung nội dung (Radius Card)
+                      </span>
+                      <span className="text-[11px] text-ink-500 font-sans">
+                        Áp dụng cho Card địa điểm du lịch, Card bài viết cộng đồng, Hộp thoại Modal
+                      </span>
                     </div>
-                    <span className="font-mono font-bold text-xs bg-white px-2.5 py-1 rounded border border-ink-200">
+                    <span className="font-mono font-bold text-xs bg-white px-2.5 py-1 rounded border border-ink-200 text-clay-700">
                       {formData.components.radiusCard}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 pt-1">
-                    {['2px', '4px', '6px', '8px', '12px', '16px'].map(r => (
+
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 pt-1">
+                    {[
+                      { val: '2px', label: 'Vuông vức' },
+                      { val: '4px', label: 'Gọn gàng' },
+                      { val: '6px', label: 'Mặc định' },
+                      { val: '8px', label: 'Mềm mại' },
+                      { val: '12px', label: 'Hiện đại' },
+                      { val: '16px', label: 'Bo tròn' }
+                    ].map(r => (
                       <button
-                        key={r}
+                        key={r.val}
                         type="button"
-                        onClick={() => handleComponentChange('radiusCard', r)}
-                        className={`px-3 py-1 text-xs rounded border transition-all ${
-                          formData.components.radiusCard === r
-                            ? 'bg-clay-600 text-white font-bold border-clay-600'
+                        onClick={() => handleComponentChange('radiusCard', r.val)}
+                        className={`p-2 text-center rounded border transition-all cursor-pointer ${
+                          formData.components.radiusCard === r.val
+                            ? 'bg-clay-700 text-white font-bold border-clay-700 shadow-2xs'
                             : 'bg-white text-ink-700 hover:bg-ink-100 border-ink-200'
                         }`}
                       >
-                        {r}
+                        <span className="font-mono text-xs block">{r.val}</span>
+                        <span className="text-[10px] font-sans opacity-80 block">{r.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Radius Control */}
-                <div className="p-4 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 space-y-2">
+                {/* 2. Radius Control */}
+                <div className="p-4 rounded-[6px] bg-[#F8F4EC] border border-ink-200/80 space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="font-serif text-xs font-bold text-ink-800 block">Bo góc Nút bấm & Ô nhập (Radius Control)</span>
-                      <span className="font-mono text-[10px] text-ink-400">Độ cong góc của Nút button, Input field, Dropdown</span>
+                      <span className="font-serif text-xs font-bold text-ink-800 block">
+                        Bo góc Nút bấm & Ô nhập liệu (Radius Control)
+                      </span>
+                      <span className="text-[11px] text-ink-500 font-sans">
+                        Áp dụng cho Button hành động, Ô tìm kiếm Input field, Thẻ lọc Dropdown
+                      </span>
                     </div>
-                    <span className="font-mono font-bold text-xs bg-white px-2.5 py-1 rounded border border-ink-200">
+                    <span className="font-mono font-bold text-xs bg-white px-2.5 py-1 rounded border border-ink-200 text-clay-700">
                       {formData.components.radiusControl}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 pt-1">
-                    {['2px', '4px', '5px', '8px', '9999px'].map(r => (
+
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 pt-1">
+                    {[
+                      { val: '2px', label: 'Cổ điển' },
+                      { val: '4px', label: 'Nhẹ nhàng' },
+                      { val: '5px', label: 'Mặc định' },
+                      { val: '8px', label: 'Bầu bĩnh' },
+                      { val: '9999px', label: 'Viên thuốc (Pill)' }
+                    ].map(r => (
                       <button
-                        key={r}
+                        key={r.val}
                         type="button"
-                        onClick={() => handleComponentChange('radiusControl', r)}
-                        className={`px-3 py-1 text-xs rounded border transition-all ${
-                          formData.components.radiusControl === r
-                            ? 'bg-clay-600 text-white font-bold border-clay-600'
+                        onClick={() => handleComponentChange('radiusControl', r.val)}
+                        className={`p-2 text-center rounded border transition-all cursor-pointer ${
+                          formData.components.radiusControl === r.val
+                            ? 'bg-clay-700 text-white font-bold border-clay-700 shadow-2xs'
                             : 'bg-white text-ink-700 hover:bg-ink-100 border-ink-200'
                         }`}
                       >
-                        {r === '9999px' ? 'Pill (Tròn)' : r}
+                        <span className="font-mono text-xs block">{r.val === '9999px' ? 'Pill' : r.val}</span>
+                        <span className="text-[10px] font-sans opacity-80 block">{r.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
+
+                {/* 3. Typography Guidelines */}
+                <div className="p-4 rounded-[6px] bg-[#F8F4EC]/70 border border-ink-200 space-y-2">
+                  <span className="font-serif font-bold text-xs text-ink-900 block">
+                    Quy chuẩn Phông chữ Hệ thống (Typography Guidelines)
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-sans">
+                    <div className="p-2.5 rounded bg-white border border-ink-200">
+                      <span className="font-serif font-bold text-ink-800 block">Font Tiêu đề: Serif (Merriweather)</span>
+                      <p className="text-[11px] text-ink-500 mt-0.5">
+                        Tạo chiều sâu văn hóa, cảm giác hoài niệm và phong vị nhật ký lữ hành.
+                      </p>
+                    </div>
+                    <div className="p-2.5 rounded bg-white border border-ink-200">
+                      <span className="font-sans font-bold text-ink-800 block">Font Nội dung: Sans-serif (Inter / System)</span>
+                      <p className="text-[11px] text-ink-500 mt-0.5">
+                        Độ tương phản cao, tối ưu hiển thị rõ nét trên màn hình Retina & Mobile.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
+
             </div>
           )}
 
-          {/* TAB 4: VERSION HISTORY */}
+          {/* ═══════════════ TAB 4: VERSION HISTORY & ROLLBACK ═══════════════ */}
           {activeTab === 'history' && (
-            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-5 shadow-xs space-y-4">
-              <h3 className="font-serif font-bold text-sm text-ink-800 border-b border-ink-100 pb-2 flex items-center gap-2">
-                <History className="w-4 h-4 text-clay-600" /> Lịch sử Phiên bản Giao diện & Rollback
-              </h3>
+            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-4">
+              
+              <div className="flex items-center justify-between border-b border-ink-100 pb-2">
+                <div>
+                  <h3 className="font-serif font-bold text-sm text-ink-900 flex items-center gap-2">
+                    <History className="w-4 h-4 text-clay-700" />
+                    <span>Lịch Sử Các Phiên Bản Giao Diện & Điểm Khôi Phục (Rollback)</span>
+                  </h3>
+                  <p className="text-[11px] text-ink-500 font-sans mt-0.5">
+                    Hệ thống tự động chụp ảnh snapshot mỗi lần xuất bản để bạn có thể quay lại bất kỳ lúc nào.
+                  </p>
+                </div>
+              </div>
 
-              <div className="divide-y divide-ink-100">
-                {versionsList.map(v => {
-                  const isCurrent = v.versionNo === publishedVersion;
-                  return (
-                    <div key={v.id} className="py-3 flex items-center justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-mono font-bold text-xs text-ink-800">
-                            Phiên bản v{v.versionNo}
-                          </span>
-                          {isCurrent && (
-                            <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">
-                              Đang áp dụng
+              {versionsList.length === 0 ? (
+                <div className="py-12 text-center text-ink-400 text-xs font-sans">
+                  Chưa có lịch sử phiên bản nào được ghi nhận.
+                </div>
+              ) : (
+                <div className="divide-y divide-ink-100">
+                  {versionsList.map(v => {
+                    const isCurrent = v.versionNo === publishedVersion;
+                    return (
+                      <div key={v.id} className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono font-bold text-xs text-ink-900">
+                              Phiên bản v{v.versionNo}
+                            </span>
+                            {isCurrent && (
+                              <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">
+                                Đang chạy thực tế
+                              </span>
+                            )}
+                            <span className="text-[10px] font-mono text-ink-400">
+                              {v.publishedAt ? new Date(v.publishedAt).toLocaleString('vi-VN') : 'Bản lưu nháp'}
+                            </span>
+                          </div>
+                          <p className="text-xs text-ink-600 font-serif mt-1">
+                            {v.note || 'Cập nhật bộ nhận diện giao diện'}
+                          </p>
+                          {v.publishedByEmail && (
+                            <span className="text-[10px] font-mono text-ink-400 block mt-0.5">
+                              Người xuất bản: {v.publishedByEmail}
                             </span>
                           )}
-                          <span className="text-[10px] font-mono text-ink-400">
-                            {v.publishedAt ? new Date(v.publishedAt).toLocaleString('vi-VN') : 'Bản nháp'}
-                          </span>
                         </div>
-                        <p className="text-xs text-ink-500 font-serif mt-0.5">
-                          {v.note || 'Không có ghi chú'}
-                        </p>
-                      </div>
 
-                      {!isCurrent && (
-                        <button
-                          onClick={() => handleRollback(v.id, v.versionNo)}
-                          className="px-3 py-1 text-xs font-serif font-medium text-clay-700 hover:text-white bg-clay-50 hover:bg-clay-600 border border-clay-300 rounded-[4px] transition-colors flex items-center gap-1 cursor-pointer"
-                        >
-                          <RotateCcw className="w-3 h-3" /> Rollback về v{v.versionNo}
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                        {!isCurrent && (
+                          <button
+                            type="button"
+                            onClick={() => handleRollback(v.id, v.versionNo)}
+                            className="px-3.5 py-1.5 text-xs font-serif font-bold text-clay-700 hover:text-white bg-clay-50 hover:bg-clay-700 border border-clay-300 rounded-[4px] transition-colors flex items-center gap-1.5 cursor-pointer self-start sm:self-auto shrink-0"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            <span>Rollback về v{v.versionNo}</span>
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
             </div>
           )}
 
         </div>
 
-        {/* RIGHT COLUMN: Interactive Real-time Preview Box (5 cols) */}
-        <div className="lg:col-span-5 sticky top-20 space-y-3">
+        {/* ═══════════════ RIGHT COLUMN: LIVE INTERACTIVE PREVIEW (5 cols) ═══════════════ */}
+        <div className="lg:col-span-5 sticky top-20 space-y-4">
           
           {/* Preview Controller Bar */}
-          <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-3 shadow-2xs flex items-center justify-between">
-            <span className="font-serif font-bold text-xs text-ink-800 flex items-center gap-1.5">
-              <Eye className="w-3.5 h-3.5 text-clay-600" /> Xem trước Thời gian thực
+          <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-3.5 shadow-2xs flex items-center justify-between">
+            <span className="font-serif font-bold text-xs text-ink-900 flex items-center gap-1.5">
+              <Eye className="w-4 h-4 text-clay-700" />
+              <span>Xem Trước Trực Quan Thời Gian Thực</span>
             </span>
 
-            {/* Desktop / Mobile toggle */}
+            {/* Desktop / Mobile Switcher */}
             <div className="flex items-center gap-1 bg-[#F8F4EC] p-0.5 rounded-[4px] border border-ink-200">
               <button
                 type="button"
                 onClick={() => setPreviewMode('desktop')}
-                className={`p-1.5 rounded-[3px] text-xs transition-all ${
+                className={`p-1.5 rounded-[3px] text-xs transition-all cursor-pointer flex items-center gap-1 ${
                   previewMode === 'desktop' ? 'bg-white text-ink-900 shadow-2xs font-bold' : 'text-ink-400 hover:text-ink-700'
                 }`}
-                title="Xem trước màn hình Máy tính"
+                title="Xem trước màn hình Máy tính (Desktop)"
               >
                 <Monitor className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-mono hidden sm:inline">Máy tính</span>
               </button>
               <button
                 type="button"
                 onClick={() => setPreviewMode('mobile')}
-                className={`p-1.5 rounded-[3px] text-xs transition-all ${
+                className={`p-1.5 rounded-[3px] text-xs transition-all cursor-pointer flex items-center gap-1 ${
                   previewMode === 'mobile' ? 'bg-white text-ink-900 shadow-2xs font-bold' : 'text-ink-400 hover:text-ink-700'
                 }`}
-                title="Xem trước màn hình Điện thoại (375px)"
+                title="Xem trước màn hình Điện thoại (Mobile 360px)"
               >
                 <Smartphone className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-mono hidden sm:inline">Điện thoại</span>
               </button>
             </div>
           </div>
 
-          {/* Real-time Preview Container */}
+          {/* Real-time Preview Stage Container */}
           <div className="flex justify-center">
             <div 
               style={{
@@ -788,30 +1392,39 @@ export const AdminAppearancePage = () => {
                 width: previewMode === 'mobile' ? '360px' : '100%',
                 borderRadius: '8px'
               }}
-              className="border border-ink-300 shadow-md p-4 transition-all duration-300 space-y-4 overflow-hidden"
+              className="border-2 border-ink-300 shadow-lg p-4 transition-all duration-300 space-y-3.5 overflow-hidden"
             >
               
-              {/* Mini Preview Header */}
+              {/* Mini Preview Navbar Header */}
               <div 
                 style={{ 
-                  backgroundColor: formData.colors.surface,
+                  backgroundColor: formData.colors.headerBg,
                   borderColor: formData.colors.border,
                   borderRadius: formData.components.radiusCard
                 }}
                 className="p-3 border flex items-center justify-between shadow-2xs"
               >
-                <div className="flex items-center gap-2">
-                  <div 
-                    style={{ backgroundColor: formData.colors.primary }}
-                    className="w-7 h-7 rounded flex items-center justify-center text-white font-serif font-black text-xs"
-                  >
-                    W
-                  </div>
-                  <div>
-                    <h5 className="font-serif font-bold text-xs leading-none">
+                <div className="flex items-center gap-2 min-w-0">
+                  {formData.branding.logoUrl ? (
+                    <img 
+                      src={formData.branding.logoUrl} 
+                      alt="Logo" 
+                      className="h-6 w-auto object-contain"
+                      onError={(e) => { e.target.src = '/wayfare-logo.png'; }}
+                    />
+                  ) : (
+                    <div 
+                      style={{ backgroundColor: formData.colors.primary }}
+                      className="w-6 h-6 rounded flex items-center justify-center text-white font-serif font-black text-xs shrink-0"
+                    >
+                      W
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <h5 className="font-serif font-bold text-xs leading-none truncate">
                       {formData.branding.siteTitle || 'Wayfare'}
                     </h5>
-                    <span className="font-sans text-[9px] text-ink-400">
+                    <span className="font-sans text-[9px] text-ink-500 block truncate mt-0.5">
                       {formData.branding.tagline || 'Khám phá Việt Nam'}
                     </span>
                   </div>
@@ -824,7 +1437,7 @@ export const AdminAppearancePage = () => {
                     color: formData.colors.buttonText,
                     borderRadius: formData.components.radiusControl
                   }}
-                  className="px-2.5 py-1 text-[11px] font-bold shadow-2xs transition-all flex items-center gap-1 cursor-pointer"
+                  className="px-2.5 py-1 text-[10px] font-bold shadow-2xs transition-all shrink-0 cursor-pointer"
                 >
                   Khám phá
                 </button>
@@ -839,9 +1452,9 @@ export const AdminAppearancePage = () => {
                 }}
                 className="border overflow-hidden shadow-xs space-y-2.5"
               >
-                <div className="h-28 bg-ink-200 relative overflow-hidden">
+                <div className="h-32 bg-ink-200 relative overflow-hidden">
                   <img 
-                    src="https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80" 
+                    src={formData.branding.heroBgUrl || "https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=600&q=80"} 
                     alt="Sample destination"
                     className="w-full h-full object-cover"
                   />
@@ -857,23 +1470,27 @@ export const AdminAppearancePage = () => {
                   </div>
                 </div>
 
-                <div className="p-3 space-y-2">
+                <div className="p-3.5 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-ink-400 uppercase">Vịnh Hạ Long · Quảng Ninh</span>
-                    <span className="text-[11px] font-bold text-amber-600">★ 4.9</span>
+                    <span className="text-[10px] font-mono text-ink-500 uppercase">
+                      Vịnh Hạ Long • Quảng Ninh
+                    </span>
+                    <span className="text-[11px] font-bold text-amber-600">
+                      ★ 4.9 (12 đánh giá)
+                    </span>
                   </div>
 
-                  <h6 className="font-serif font-bold text-xs line-clamp-1">
+                  <h6 className="font-serif font-bold text-xs line-clamp-1 text-ink-900">
                     Du ngoạn ngắm hoàng hôn trên du thuyền Vịnh Lan Hạ
                   </h6>
 
-                  <p className="text-[11px] text-ink-500 font-sans line-clamp-2 leading-relaxed">
+                  <p className="text-[11px] text-ink-600 font-sans line-clamp-2 leading-relaxed">
                     Trải nghiệm chèo kayak ngắm hang Sáng Tối, hòa mình vào thiên nhiên hùng vĩ của di sản thế giới.
                   </p>
 
                   <div className="pt-2 border-t border-ink-100 flex items-center justify-between">
                     <div>
-                      <span className="text-[9px] text-ink-400 block font-mono">Ngân sách dự tính:</span>
+                      <span className="text-[9px] text-ink-400 block font-mono">Chi phí dự tính:</span>
                       <span 
                         style={{ color: formData.colors.primary }}
                         className="font-mono font-bold text-xs"
@@ -889,7 +1506,7 @@ export const AdminAppearancePage = () => {
                         color: formData.colors.buttonText,
                         borderRadius: formData.components.radiusControl
                       }}
-                      className="px-2.5 py-1 text-[10px] font-serif font-bold transition-all shadow-2xs"
+                      className="px-3 py-1 text-[10px] font-serif font-bold transition-all shadow-2xs cursor-pointer"
                     >
                       Lên lịch ngay
                     </button>
@@ -897,14 +1514,14 @@ export const AdminAppearancePage = () => {
                 </div>
               </div>
 
-              {/* Sample Buttons & Alert States */}
+              {/* Sample Buttons & Badges Sandbox */}
               <div 
                 style={{ 
                   backgroundColor: formData.colors.surface,
                   borderColor: formData.colors.border,
                   borderRadius: formData.components.radiusCard
                 }}
-                className="p-3 border space-y-2 text-xs"
+                className="p-3 border space-y-2.5 text-xs"
               >
                 <div className="flex items-center justify-between gap-2">
                   <button
@@ -914,10 +1531,11 @@ export const AdminAppearancePage = () => {
                       color: formData.colors.buttonText,
                       borderRadius: formData.components.radiusControl
                     }}
-                    className="flex-1 py-1.5 font-bold shadow-2xs text-[11px]"
+                    className="flex-1 py-1.5 font-bold shadow-2xs text-[11px] cursor-pointer"
                   >
                     Nút Chính (Primary)
                   </button>
+                  
                   <button
                     type="button"
                     style={{
@@ -926,33 +1544,40 @@ export const AdminAppearancePage = () => {
                       borderColor: formData.colors.border,
                       borderRadius: formData.components.radiusControl
                     }}
-                    className="flex-1 py-1.5 font-medium border text-[11px]"
+                    className="flex-1 py-1.5 font-medium border text-[11px] cursor-pointer"
                   >
                     Nút Phụ (Secondary)
                   </button>
                 </div>
 
                 {/* Status Badges */}
-                <div className="flex items-center gap-1.5 pt-1">
+                <div className="flex items-center justify-between gap-1 pt-1">
                   <span 
-                    style={{ backgroundColor: `${formData.colors.success}20`, color: formData.colors.success }}
+                    style={{ backgroundColor: `${formData.colors.success}18`, color: formData.colors.success }}
                     className="px-2 py-0.5 rounded text-[10px] font-bold font-mono"
                   >
-                    Hoạt động
+                    ● Hoạt động
                   </span>
                   <span 
-                    style={{ backgroundColor: `${formData.colors.warning}20`, color: formData.colors.warning }}
+                    style={{ backgroundColor: `${formData.colors.warning}18`, color: formData.colors.warning }}
                     className="px-2 py-0.5 rounded text-[10px] font-bold font-mono"
                   >
-                    Chờ duyệt
+                    ● Chờ duyệt
                   </span>
                   <span 
-                    style={{ backgroundColor: `${formData.colors.danger}20`, color: formData.colors.danger }}
+                    style={{ backgroundColor: `${formData.colors.danger}18`, color: formData.colors.danger }}
                     className="px-2 py-0.5 rounded text-[10px] font-bold font-mono"
                   >
-                    Đã ẩn
+                    ● Đã ẩn
                   </span>
                 </div>
+              </div>
+
+              {/* Mini Footer Preview */}
+              <div className="pt-1 text-center">
+                <span className="text-[9px] font-mono text-ink-400 block truncate">
+                  {formData.branding.footerText || '© 2026 Wayfare Travel Sharing Platform'}
+                </span>
               </div>
 
             </div>
