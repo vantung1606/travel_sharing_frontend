@@ -1301,6 +1301,442 @@ export const AdminAppearancePage = () => {
             </div>
           )}
 
+                    {/* ═══════════════ TAB: SOCIAL MEDIA & CONTACT CHANNELS ═══════════════ */}
+          {activeTab === 'social' && (
+            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
+              
+              <div className="border-b border-ink-200/80 pb-4">
+                <div className="flex items-center gap-2">
+                  <Share2 className="w-4 h-4 text-clay-700" />
+                  <h3 className="font-serif font-bold text-base text-ink-900">
+                    Kênh Mạng Xã Hội & Thông Tin Liên Hệ
+                  </h3>
+                </div>
+                <p className="text-xs text-ink-500 font-sans mt-1">
+                  Thiết lập các kênh liên hệ trực tiếp và liên kết mạng xã hội chính thức của Wayfare. Dữ liệu này sẽ tự động hiển thị đồng bộ dưới Chân trang (Footer) và trang Liên hệ của hệ thống.
+                </p>
+              </div>
+
+              {/* Group 1: Direct Contact Information */}
+              <div className="space-y-4">
+                <h4 className="font-serif font-bold text-xs uppercase tracking-wider text-clay-800 flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>1. Thông tin liên hệ trực tiếp</span>
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Hotline */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-serif font-bold text-ink-800">
+                      Đường dây nóng / Hotline du khách
+                    </label>
+                    <div className="relative">
+                      <Phone className="w-3.5 h-3.5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        value={formData.branding?.contact?.hotline || ''}
+                        onChange={(e) => handleContactChange('hotline', e.target.value)}
+                        placeholder="1900 6868 hoặc 0912 345 678"
+                        className="w-full pl-9 pr-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-mono text-ink-900 outline-none focus:border-clay-600 focus:bg-white"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Email */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-serif font-bold text-ink-800">
+                      Hộp thư hỗ trợ (Email)
+                    </label>
+                    <div className="relative">
+                      <Mail className="w-3.5 h-3.5 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="email"
+                        value={formData.branding?.contact?.email || ''}
+                        onChange={(e) => handleContactChange('email', e.target.value)}
+                        placeholder="contact@wayfare.vn"
+                        className="w-full pl-9 pr-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-mono text-ink-900 outline-none focus:border-clay-600 focus:bg-white"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Headquarters Address */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-serif font-bold text-ink-800">
+                    Địa chỉ trụ sở văn phòng đại diện
+                  </label>
+                  <div className="relative">
+                    <MapPin className="w-3.5 h-3.5 text-ink-400 absolute left-3 top-2.5" />
+                    <textarea
+                      rows={2}
+                      value={formData.branding?.contact?.address || ''}
+                      onChange={(e) => handleContactChange('address', e.target.value)}
+                      placeholder="Tòa nhà Wayfare, Ba Đình, Hà Nội & Quận 1, TP. Hồ Chí Minh, Việt Nam"
+                      className="w-full pl-9 pr-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-serif text-ink-900 outline-none focus:border-clay-600 focus:bg-white resize-none"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Group 2: Social Media Platforms */}
+              <div className="space-y-4 pt-4 border-t border-ink-200/80">
+                <h4 className="font-serif font-bold text-xs uppercase tracking-wider text-clay-800 flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5" />
+                  <span>2. Kênh Mạng Xã Hội Chính Thức</span>
+                </h4>
+
+                <div className="space-y-3">
+                  {/* Facebook */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-serif font-bold text-ink-800 flex items-center gap-1.5">
+                        <Facebook className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Facebook Fanpage / Cộng đồng</span>
+                      </label>
+                      {formData.branding?.contact?.facebook && (
+                        <a 
+                          href={formData.branding.contact.facebook} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-[10px] text-clay-700 hover:underline flex items-center gap-0.5"
+                        >
+                          <span>Thử liên kết</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      )}
+                    </div>
+                    <input
+                      type="url"
+                      value={formData.branding?.contact?.facebook || ''}
+                      onChange={(e) => handleContactChange('facebook', e.target.value)}
+                      placeholder="https://facebook.com/wayfare.vietnam"
+                      className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-mono text-ink-900 outline-none focus:border-clay-600 focus:bg-white"
+                    />
+                  </div>
+
+                  {/* Instagram */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-serif font-bold text-ink-800 flex items-center gap-1.5">
+                        <Instagram className="w-3.5 h-3.5 text-pink-600" />
+                        <span>Instagram Du lịch</span>
+                      </label>
+                      {formData.branding?.contact?.instagram && (
+                        <a 
+                          href={formData.branding.contact.instagram} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-[10px] text-clay-700 hover:underline flex items-center gap-0.5"
+                        >
+                          <span>Thử liên kết</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      )}
+                    </div>
+                    <input
+                      type="url"
+                      value={formData.branding?.contact?.instagram || ''}
+                      onChange={(e) => handleContactChange('instagram', e.target.value)}
+                      placeholder="https://instagram.com/wayfare.vn"
+                      className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-mono text-ink-900 outline-none focus:border-clay-600 focus:bg-white"
+                    />
+                  </div>
+
+                  {/* TikTok */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-serif font-bold text-ink-800 flex items-center gap-1.5">
+                        <span className="font-mono font-bold text-[10px] px-1 bg-black text-white rounded">TT</span>
+                        <span>TikTok Kênh video trải nghiệm</span>
+                      </label>
+                      {formData.branding?.contact?.tiktok && (
+                        <a 
+                          href={formData.branding.contact.tiktok} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-[10px] text-clay-700 hover:underline flex items-center gap-0.5"
+                        >
+                          <span>Thử liên kết</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      )}
+                    </div>
+                    <input
+                      type="url"
+                      value={formData.branding?.contact?.tiktok || ''}
+                      onChange={(e) => handleContactChange('tiktok', e.target.value)}
+                      placeholder="https://tiktok.com/@wayfare.vn"
+                      className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-mono text-ink-900 outline-none focus:border-clay-600 focus:bg-white"
+                    />
+                  </div>
+
+                  {/* YouTube */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-serif font-bold text-ink-800 flex items-center gap-1.5">
+                        <Youtube className="w-3.5 h-3.5 text-red-600" />
+                        <span>YouTube Vlogs du lịch</span>
+                      </label>
+                      {formData.branding?.contact?.youtube && (
+                        <a 
+                          href={formData.branding.contact.youtube} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-[10px] text-clay-700 hover:underline flex items-center gap-0.5"
+                        >
+                          <span>Thử liên kết</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      )}
+                    </div>
+                    <input
+                      type="url"
+                      value={formData.branding?.contact?.youtube || ''}
+                      onChange={(e) => handleContactChange('youtube', e.target.value)}
+                      placeholder="https://youtube.com/@wayfarevn"
+                      className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-mono text-ink-900 outline-none focus:border-clay-600 focus:bg-white"
+                    />
+                  </div>
+
+                  {/* Threads */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-serif font-bold text-ink-800 flex items-center gap-1.5">
+                        <span className="font-mono font-bold text-[10px] px-1 bg-ink-800 text-white rounded">@</span>
+                        <span>Threads / Nhóm thảo luận</span>
+                      </label>
+                      {formData.branding?.contact?.threads && (
+                        <a 
+                          href={formData.branding.contact.threads} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-[10px] text-clay-700 hover:underline flex items-center gap-0.5"
+                        >
+                          <span>Thử liên kết</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      )}
+                    </div>
+                    <input
+                      type="url"
+                      value={formData.branding?.contact?.threads || ''}
+                      onChange={(e) => handleContactChange('threads', e.target.value)}
+                      placeholder="https://threads.net/@wayfare.vn"
+                      className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-mono text-ink-900 outline-none focus:border-clay-600 focus:bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ═══════════════ TAB: TOP ANNOUNCEMENT RIBBON ═══════════════ */}
+          {activeTab === 'announcement' && (
+            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
+              
+              <div className="border-b border-ink-200/80 pb-4">
+                <div className="flex items-center gap-2">
+                  <Megaphone className="w-4 h-4 text-clay-700" />
+                  <h3 className="font-serif font-bold text-base text-ink-900">
+                    Thanh Thông Báo Nổi Bật Đầu Trang (Announcement Ribbon)
+                  </h3>
+                </div>
+                <p className="text-xs text-ink-500 font-sans mt-1">
+                  Quản lý dải thông báo mảnh chạy trên cùng của website (nằm trên thanh Navbar). Thường dùng cho các chiến dịch phát động mùa du lịch, ưu đãi đặc biệt hoặc thông báo tính năng AI mới.
+                </p>
+              </div>
+
+              {/* Master Switch */}
+              <div className="p-4 rounded-[6px] bg-[#F8F4EC] border border-ink-200 flex items-center justify-between gap-4">
+                <div>
+                  <span className="font-serif font-bold text-sm text-ink-900 block">
+                    Kích hoạt thanh thông báo trên toàn hệ thống
+                  </span>
+                  <span className="text-[11px] text-ink-500 font-sans mt-0.5 block">
+                    Khi bật, banner sẽ hiển thị trên đỉnh toàn bộ các trang công khai cho du khách.
+                  </span>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={formData.branding?.announcement?.enabled || false}
+                    onChange={(e) => handleAnnouncementChange('enabled', e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-ink-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-ink-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+              </div>
+
+              {/* Announcement Content Config */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Badge Text */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-serif font-bold text-ink-800">
+                      Huy hiệu nhãn (Badge)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.branding?.announcement?.badge || ''}
+                      onChange={(e) => handleAnnouncementChange('badge', e.target.value)}
+                      placeholder="SỰ KIỆN, HOT, MỚI..."
+                      className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-serif font-bold text-ink-900 outline-none focus:border-clay-600 focus:bg-white"
+                    />
+                    {/* Quick Badge Presets */}
+                    <div className="flex items-center gap-1 flex-wrap pt-1">
+                      {['SỰ KIỆN', 'MỚI', 'HOT', 'ƯU ĐÃI', 'BẢO TRÌ'].map(b => (
+                        <button
+                          key={b}
+                          type="button"
+                          onClick={() => handleAnnouncementChange('badge', b)}
+                          className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-ink-200/70 hover:bg-clay-100 hover:text-clay-800 transition-colors cursor-pointer"
+                        >
+                          {b}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* CTA Button Text */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-serif font-bold text-ink-800">
+                      Chữ nút kêu gọi (CTA Text)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.branding?.announcement?.linkText || ''}
+                      onChange={(e) => handleAnnouncementChange('linkText', e.target.value)}
+                      placeholder="Khám phá ngay"
+                      className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-serif text-ink-900 outline-none focus:border-clay-600 focus:bg-white"
+                    />
+                  </div>
+
+                  {/* Target URL */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-serif font-bold text-ink-800">
+                      Đường dẫn liên kết (Target Link)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.branding?.announcement?.linkUrl || ''}
+                      onChange={(e) => handleAnnouncementChange('linkUrl', e.target.value)}
+                      placeholder="/explore hoặc /community"
+                      className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-mono text-ink-900 outline-none focus:border-clay-600 focus:bg-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Main Message Text */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-serif font-bold text-ink-800">
+                    Nội dung thông điệp chính
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={formData.branding?.announcement?.text || ''}
+                    onChange={(e) => handleAnnouncementChange('text', e.target.value)}
+                    placeholder="Chào mừng mùa du lịch 2026 - Khám phá 500+ điểm đến đặc sắc & Lên lịch trình thông minh cùng AI!"
+                    className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-serif text-ink-900 outline-none focus:border-clay-600 focus:bg-white resize-none"
+                  />
+                </div>
+
+                {/* Color Styling */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-ink-200/80">
+                  {/* Background Color */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-serif font-bold text-ink-800">
+                      Màu nền thanh thông báo
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={formData.branding?.announcement?.bgColor || formData.colors.primary}
+                        onChange={(e) => handleAnnouncementChange('bgColor', e.target.value)}
+                        className="w-8 h-8 rounded border border-ink-300 cursor-pointer p-0.5 bg-white"
+                      />
+                      <input
+                        type="text"
+                        value={formData.branding?.announcement?.bgColor || formData.colors.primary}
+                        onChange={(e) => handleAnnouncementChange('bgColor', e.target.value)}
+                        className="w-32 px-3 py-1.5 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-mono uppercase text-ink-900"
+                      />
+                      <div className="flex items-center gap-1">
+                        {[formData.colors.primary, '#D97706', '#0284C7', '#15803D', '#1E1A15', '#DC2626'].map((c, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => handleAnnouncementChange('bgColor', c)}
+                            style={{ backgroundColor: c }}
+                            className="w-5 h-5 rounded-full border border-white shadow-2xs cursor-pointer hover:scale-110 transition-transform"
+                            title={c}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Allow dismiss */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-serif font-bold text-ink-800">
+                      Cho phép du khách đóng thông báo
+                    </label>
+                    <div className="flex items-center gap-2 pt-1.5">
+                      <input
+                        type="checkbox"
+                        id="announcementClosable"
+                        checked={formData.branding?.announcement?.isClosable !== false}
+                        onChange={(e) => handleAnnouncementChange('isClosable', e.target.checked)}
+                        className="rounded border-ink-300 text-clay-700 focus:ring-clay-500 w-4 h-4 cursor-pointer"
+                      />
+                      <label htmlFor="announcementClosable" className="text-xs text-ink-700 font-sans cursor-pointer select-none">
+                        Hiển thị nút (X) để du khách có thể tắt thông báo trong phiên truy cập
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Preview Box inside tab */}
+              <div className="pt-4 border-t border-ink-200/80 space-y-2">
+                <span className="font-serif font-bold text-xs uppercase tracking-wider text-ink-700 block">
+                  Khung xem trước thanh thông báo thực tế
+                </span>
+                
+                <div 
+                  style={{
+                    backgroundColor: formData.branding?.announcement?.bgColor || formData.colors.primary,
+                    color: formData.branding?.announcement?.textColor || '#FFFFFF'
+                  }}
+                  className="rounded-[6px] py-2.5 px-4 shadow-sm flex items-center justify-between gap-3 text-xs"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Megaphone className="w-3.5 h-3.5 shrink-0 animate-bounce" />
+                    {formData.branding?.announcement?.badge && (
+                      <span className="font-mono text-[9px] font-black uppercase px-2 py-0.5 rounded bg-white/20 text-white border border-white/30 shrink-0">
+                        {formData.branding.announcement.badge}
+                      </span>
+                    )}
+                    <span className="font-serif font-medium truncate">
+                      {formData.branding?.announcement?.text || 'Nội dung thông báo mẫu...'}
+                    </span>
+                    {formData.branding?.announcement?.linkText && (
+                      <span className="underline font-bold text-[11px] shrink-0 ml-1 cursor-pointer">
+                        {formData.branding.announcement.linkText} ➔
+                      </span>
+                    )}
+                  </div>
+                  {formData.branding?.announcement?.isClosable !== false && (
+                    <span className="p-0.5 rounded-full hover:bg-black/20 shrink-0 cursor-pointer">
+                      <X className="w-3.5 h-3.5" />
+                    </span>
+                  )}
+                </div>
+              </div>
+
+            </div>
+          )}
+
+
           {/* ═══════════════ TAB 3: TOKENS & COMPONENTS ═══════════════ */}
           {activeTab === 'components' && (
             <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
