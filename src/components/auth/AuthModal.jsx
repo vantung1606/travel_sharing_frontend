@@ -75,6 +75,8 @@ export const AuthModal = () => {
           handle: raw.handle || ('@' + email.split('@')[0]),
           avatar: raw.avatar || raw.avatarUrl,
           roles: Array.isArray(raw.roles) ? raw.roles : (raw.roles ? Array.from(raw.roles) : ['ROLE_USER']),
+          permissions: Array.isArray(raw.permissions) ? raw.permissions : [],
+          tier: raw.tier || 'bronze',
           token: raw.token
         };
         login(userData);
@@ -121,6 +123,8 @@ export const AuthModal = () => {
         handle: raw.handle || ('@' + raw.email.split('@')[0]),
         avatar: raw.avatar || raw.avatarUrl,
         roles: Array.isArray(raw.roles) ? raw.roles : (raw.roles ? Array.from(raw.roles) : ['ROLE_USER']),
+        permissions: Array.isArray(raw.permissions) ? raw.permissions : [],
+        tier: raw.tier || 'bronze',
         token: raw.token
       };
       login(userData);
@@ -281,9 +285,9 @@ export const AuthModal = () => {
               <div className="relative">
                 <Mail className="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
-                  type="email"
+                  type={authMode === 'login' ? 'text' : 'email'}
                   required
-                  placeholder="Địa chỉ Email"
+                  placeholder={authMode === 'login' ? 'Email hoặc Tên tài khoản' : 'Địa chỉ Email'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full h-[52px] pl-12 pr-5 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
