@@ -12,6 +12,8 @@ import {
   ArrowLeft,
   CheckCheck,
   Sparkles,
+  Bot,
+  Pin,
   Image as ImageIcon,
   Film,
   Paperclip,
@@ -970,7 +972,7 @@ export const MessagesPage = () => {
         filterTab === 'all'
           ? true
           : filterTab === 'direct'
-          ? t.type === 'DIRECT'
+          ? (t.type === 'DIRECT' || t.type === 'AI')
           : t.type === 'GROUP';
 
       if (!matchesFilter) return false;
@@ -979,6 +981,13 @@ export const MessagesPage = () => {
       const normName = normalizeVietnamese(t.name);
       const normLastMsg = normalizeVietnamese(t.lastMsg);
       return normName.includes(normSearch) || normLastMsg.includes(normSearch);
+    }).sort((a, b) => {
+      // ĐẢM BẢO PHÒNG TRỢ LÝ WAYFARE (isPinned hoặc type === 'AI') LUÔN ĐƯỢC GHIM ĐẦU!
+      const p1 = Boolean(a.isPinned || a.type === 'AI');
+      const p2 = Boolean(b.isPinned || b.type === 'AI');
+      if (p1 && !p2) return -1;
+      if (!p1 && p2) return 1;
+      return 0;
     });
   }, [threads, filterTab, searchTerm]);
 
@@ -1846,9 +1855,17 @@ export const MessagesPage = () => {
                     <img
                       src={thread.avatar}
                       alt={thread.name}
-                      className="w-10 h-10 rounded-full object-cover border border-ink-200/70"
+                      className={`w-10 h-10 rounded-full object-cover border ${
+                        thread.type === 'AI' || thread.isPinned
+                          ? 'border-indigo-400 ring-2 ring-indigo-200'
+                          : 'border-ink-200/70'
+                      }`}
                     />
-                    {thread.type === 'DIRECT' ? (
+                    {thread.type === 'AI' || thread.isPinned ? (
+                      <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-indigo-600 text-[#FFFDF8] border-2 border-[#FFFDF8] flex items-center justify-center shadow-xs" title="Trợ lý du lịch AI">
+                        <Sparkles className="w-2.5 h-2.5 text-white" />
+                      </span>
+                    ) : thread.type === 'DIRECT' ? (
                       <span
                         className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#FFFDF8] ${
                           thread.isOnline ? 'bg-emerald-500' : 'bg-ink-300'
@@ -1864,7 +1881,15 @@ export const MessagesPage = () => {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-1">
-                      <h4 className="font-bold text-[12px] text-ink-800 truncate">{thread.name}</h4>
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <h4 className="font-bold text-[12px] text-ink-800 truncate">{thread.name}</h4>
+                        {(thread.type === 'AI' || thread.isPinned) && (
+                          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[9px] font-bold shrink-0">
+                            <Pin className="w-2.5 h-2.5 text-indigo-600" />
+                            <span>Ghim</span>
+                          </span>
+                        )}
+                      </div>
                       <span className="text-[9px] text-ink-300 shrink-0">{thread.time}</span>
                     </div>
                     <div className="flex items-center justify-between gap-2 mt-0.5">
@@ -1908,7 +1933,12 @@ export const MessagesPage = () => {
                       {currentThreadObj?.name}
                     </h3>
                     <div className="text-[10px] text-ink-400 flex items-center gap-1.5 mt-0.5 min-w-0">
-                      {currentThreadObj?.type === 'DIRECT' ? (
+                      {currentThreadObj?.type === 'AI' || currentThreadObj?.isPinned ? (
+                        <span className="text-indigo-700 font-bold flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
+                          <span>Trợ lý du lịch AI • Luôn trực tuyến</span>
+                        </span>
+                      ) : currentThreadObj?.type === 'DIRECT' ? (
                         currentThreadObj?.isOnline ? (
                           <span className="text-emerald-700 font-bold flex items-center gap-1">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -2146,62 +2176,90 @@ export const MessagesPage = () => {
                   </button>
                 </div>
               ) : (
-                <form
-                  onSubmit={handleSendMessage}
-                  className="border-t border-ink-200/70 p-3 flex items-center gap-1.5 bg-[#FFFDF8] shrink-0"
-                >
-                  <button
-                    type="button"
-                    disabled={isUploading}
-                    onClick={() => fileInputRef.current?.click()}
-                    title="Đính kèm ảnh, video hoặc tệp tài liệu"
-                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-ink-400 hover:text-clay-700 hover:bg-[#F8F4EC] transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
-                  >
-                    <Paperclip className="w-4 h-4" />
-                  </button>
+                <div className="border-t border-ink-200/70 bg-[#FFFDF8] shrink-0">
+                  {/* Thanh gợi ý câu hỏi nhanh (Quick Prompts) cho Trợ lý Wayfare */}
+                  {(currentThreadObj?.type === 'AI' || currentThreadObj?.isPinned) && (
+                    <div className="px-3 pt-2.5 pb-1 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-ink-200/40">
+                      {[
+                        '🌤️ Thời tiết & săn mây Đà Lạt',
+                        '🍲 Top 5 món ngon Sa Pa',
+                        '🏖️ Lịch trình 3N2Đ Phú Quốc tiết kiệm',
+                        '🛵 Cung đường phượt Hà Giang',
+                        '🏮 Check-in phố cổ Hội An'
+                      ].map((promptText, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setInputText(promptText);
+                          }}
+                          className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-clay-50 hover:bg-clay-100 text-clay-800 border border-clay-200 whitespace-nowrap transition-colors cursor-pointer shrink-0 shadow-2xs"
+                        >
+                          {promptText}
+                        </button>
+                      ))}
+                    </div>
+                  )}
 
-                  <button
-                    type="button"
-                    disabled={isUploading}
-                    onClick={handleStartRecording}
-                    title="Ghi âm tin nhắn thoại"
-                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-ink-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
+                  <form
+                    onSubmit={handleSendMessage}
+                    className="p-3 flex items-center gap-1.5"
                   >
-                    <Mic className="w-4 h-4" />
-                  </button>
+                    <button
+                      type="button"
+                      disabled={isUploading}
+                      onClick={() => fileInputRef.current?.click()}
+                      title="Đính kèm ảnh, video hoặc tệp tài liệu"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-ink-400 hover:text-clay-700 hover:bg-[#F8F4EC] transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
+                    >
+                      <Paperclip className="w-4 h-4" />
+                    </button>
 
-                  <button
-                    type="button"
-                    disabled={isUploading}
-                    onClick={() => setIsItineraryPickerOpen(true)}
-                    title="Gửi lịch trình vào cuộc trò chuyện"
-                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-clay-600 hover:bg-clay-50 transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
-                  >
-                    <Route className="w-4 h-4" />
-                  </button>
+                    <button
+                      type="button"
+                      disabled={isUploading}
+                      onClick={handleStartRecording}
+                      title="Ghi âm tin nhắn thoại"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-ink-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
+                    >
+                      <Mic className="w-4 h-4" />
+                    </button>
 
-                  <input
-                    type="text"
-                    placeholder={
-                      currentThreadObj?.type === 'DIRECT'
-                        ? `Nhắn tin cho ${currentThreadObj.name}...`
-                        : 'Nhập tin nhắn...'
-                    }
-                    value={inputText}
-                    onChange={handleInputChange}
-                    disabled={isUploading}
-                    className="flex-1 min-w-0 h-10 px-3 rounded-[5px] border border-ink-200 text-xs text-ink-800 outline-none focus:border-clay-500 focus:bg-[#FFFDF8] bg-[#F8F4EC] transition-colors font-medium placeholder:text-ink-300 disabled:opacity-60"
-                  />
+                    <button
+                      type="button"
+                      disabled={isUploading}
+                      onClick={() => setIsItineraryPickerOpen(true)}
+                      title="Gửi lịch trình vào cuộc trò chuyện"
+                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-clay-600 hover:bg-clay-50 transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
+                    >
+                      <Route className="w-4 h-4" />
+                    </button>
 
-                  <button
-                    type="submit"
-                    disabled={!inputText.trim() || isUploading}
-                    className="h-10 px-3 sm:px-4 rounded-[5px] bg-clay-600 hover:bg-clay-700 disabled:opacity-40 disabled:cursor-not-allowed text-[#FFFDF8] text-xs font-bold shrink-0 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Gửi</span>
-                  </button>
-                </form>
+                    <input
+                      type="text"
+                      placeholder={
+                        currentThreadObj?.type === 'AI' || currentThreadObj?.isPinned
+                          ? 'Hỏi Trợ lý Wayfare về điểm đến, ẩm thực, lịch trình...'
+                          : currentThreadObj?.type === 'DIRECT'
+                          ? `Nhắn tin cho ${currentThreadObj.name}...`
+                          : 'Nhập tin nhắn...'
+                      }
+                      value={inputText}
+                      onChange={handleInputChange}
+                      disabled={isUploading}
+                      className="flex-1 min-w-0 h-10 px-3 rounded-[5px] border border-ink-200 text-xs text-ink-800 outline-none focus:border-clay-500 focus:bg-[#FFFDF8] bg-[#F8F4EC] transition-colors font-medium placeholder:text-ink-300 disabled:opacity-60"
+                    />
+
+                    <button
+                      type="submit"
+                      disabled={!inputText.trim() || isUploading}
+                      className="h-10 px-3 sm:px-4 rounded-[5px] bg-clay-600 hover:bg-clay-700 disabled:opacity-40 disabled:cursor-not-allowed text-[#FFFDF8] text-xs font-bold shrink-0 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Send className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Gửi</span>
+                    </button>
+                  </form>
+                </div>
               )}
             </>
           ) : (
