@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useApp } from '../../context/AppContext';
-import { Search, Plus, Bell, Menu, X, Shield } from 'lucide-react';
+import { Search, Bell, Menu, X, Shield } from 'lucide-react';
 import { AdminSidebar } from './AdminSidebar';
 import { NotificationDropdown } from './NotificationDropdown';
 import { BASE_URL } from '../../services/api';
 
 export const AdminHeader = () => {
-  const { setPortalMode, setAdminTab, adminTab, unreadNotificationsCount, currentUser } = useApp();
+  const { setPortalMode, adminTab, unreadNotificationsCount, currentUser } = useApp();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [serverHealth, setServerHealth] = useState('checking'); // checking | online | offline
@@ -87,17 +87,8 @@ export const AdminHeader = () => {
           <span>{ADMIN_TAB_NAMES[adminTab] || 'Quản trị hệ thống'}</span>
         </div>
 
-        {/* Right Section: Action button, Server status, Notifications, User Mode switcher */}
+        {/* Right Section: Server status, Notifications, User Mode switcher */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          
-          {/* Add Place Quick Action */}
-          <button
-            onClick={() => setAdminTab('places')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white text-xs font-serif font-bold transition-colors shadow-xs cursor-pointer"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Thêm địa điểm</span>
-          </button>
 
           {/* Real Backend Server Health */}
           <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-ink-700 text-xs font-mono font-medium">
