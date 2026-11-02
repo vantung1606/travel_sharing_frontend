@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useToast } from '../../../components/common/Toast';
 import { adminReportApi, auditLogApi, reportApi } from '../../../services/api';
+import { formatVietnam24h, formatVietnamRelativeTime } from '../../../utils/dateUtils';
 import { 
   AlertTriangle, Flame, ShieldAlert, Search, Filter, Download, CheckCircle2, 
   Eye, EyeOff, UserX, Trash2, RefreshCw, TrendingUp, FileText, ShieldCheck, 
@@ -348,30 +349,8 @@ export const AdminReportsPage = () => {
     };
   };
 
-  const formatAuditTime = (dateStr) => {
-    if (!dateStr) return 'Vừa xong';
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' - ' + d.toLocaleDateString('vi-VN');
-    } catch {
-      return dateStr;
-    }
-  };
-
-  const formatAuditRelative = (dateStr) => {
-    if (!dateStr) return '';
-    try {
-      const d = new Date(dateStr);
-      const diff = Math.floor((Date.now() - d.getTime()) / 1000);
-      if (diff < 60) return 'Vừa xong';
-      if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
-      if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
-      if (diff < 86400 * 2) return 'Hôm qua';
-      return `${Math.floor(diff / 86400)} ngày trước`;
-    } catch {
-      return '';
-    }
-  };
+  const formatAuditTime = (dateStr) => formatVietnam24h(dateStr, 'Vừa xong');
+  const formatAuditRelative = (dateStr) => formatVietnamRelativeTime(dateStr);
 
   const parseClientDevice = (userAgent) => {
     if (!userAgent) return 'Web Client';

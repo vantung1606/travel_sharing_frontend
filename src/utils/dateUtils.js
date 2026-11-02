@@ -30,28 +30,88 @@ export const parseDateSafe = (dateValue) => {
     const str = dateValue.trim();
     if (!str) return null;
 
-    // Pattern "HH:mm - DD/MM/YYYY"
-    const ddmmyyyyMatch = str.match(/^(\d{1,2}):(\d{2})\s*-\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    // Pattern "HH:mm - DD/MM/YYYY" hoặc "HH:mm:ss DD/MM/YYYY"
+    const ddmmyyyyMatch = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*[-/ ]\s*(\d{1,2})\/(\d{1,2})\/(\d{4})/);
     if (ddmmyyyyMatch) {
-      const [, h, min, d, m, y] = ddmmyyyyMatch;
-      const parsed = new Date(Number(y), Number(m) - 1, Number(d), Number(h), Number(min));
+      const [, h, min, sec, d, m, y] = ddmmyyyyMatch;
+      const parsed = new Date(Number(y), Number(m) - 1, Number(d), Number(h), Number(min), Number(sec || 0));
       return isNaN(parsed.getTime()) ? null : parsed;
     }
 
-    // Standard ISO string or date string
-    let isoStr = str;
-    // Nếu chuỗi ISO chưa có offset (+07:00 hay Z), hệ thống backend chuẩn theo giờ Việt Nam (+07:00)
-    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(isoStr) && !/[Z+-]\d{2}(:?\d{2})?$/.test(isoStr) && !isoStr.endsWith('Z')) {
-      isoStr = `${isoStr}+07:00`;
+    // Nếu chuỗi đã có chỉ định múi giờ rõ ràng (Z hoặc +07:00, -05:00)
+    if (str.endsWith('Z') || /[+-]\d{2}(:?\d{2})?$/.test(str)) {
+      const parsed = new Date(str);
+      return isNaN(parsed.getTime()) ? null : parsed;
     }
 
-    const parsed = new Date(isoStr);
-    if (!isNaN(parsed.getTime())) {
-      return parsed;
+    // Nếu là chuỗi ISO chuẩn "YYYY-MM-DDTHH:mm:ss" không có múi giờ (từ server Railway chạy UTC)
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(str)) {
+      const now = Date.now();
+      const asUtc = new Date(str + 'Z');
+      const asLocal = new Date(str);
+
+      if (!isNaN(asUtc.getTime()) && !isNaN(asLocal.getTime())) {
+        const diffUtc = now - asUtc.getTime();
+        const diffLocal = now - asLocal.getTime();
+
+        // Nếu parse theo UTC cho mốc thời gian trong tương lai (> 2 phút), chứng tỏ chuỗi đã là giờ local
+        if (diffUtc < -120000) {
+          return asLocal;
+        }
+
+        // Nếu parse theo local bị lệch hơn 6 tiếng (do server UTC bị chậm 7 tiếng so với giờ VN),
+        // trong khi parse theo UTC rơi vào khoảng hợp lý
+        if (diffLocal >= 6 * 3600 * 1000 && diffUtc >= -60000 && diffUtc < diffLocal) {
+          return asUtc;
+        }
+
+        return asUtc;
+      }
     }
+
+    const d = new Date(str);
+    return isNaN(d.getTime()) ? null : d;
   }
 
   return null;
+};
+
+/**
+ * Phân tích và chuẩn hóa thời gian theo múi giờ Việt Nam (UTC+7)
+ */
+export const parseVietnamDate = parseDateSafe;
+
+/**
+ * Định dạng ngày giờ chuẩn 24 giờ Việt Nam: "HH:mm:ss DD/MM/YYYY"
+ */
+export const formatVietnam24h = (dateValue, fallback = '—') => {
+  const d = parseVietnamDate(dateValue);
+  if (!d) return fallback;
+  return d.toLocaleString('vi-VN', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    hour12: false,
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+};
+
+/**
+ * Định dạng thời gian tương đối chuẩn xác theo múi giờ Việt Nam:
+ * "Vừa xong", "X phút trước", "X giờ trước", "Hôm qua", "X ngày trước"
+ */
+export const formatVietnamRelativeTime = (dateValue, fallback = 'Vừa xong') => {
+  const d = parseVietnamDate(dateValue);
+  if (!d) return fallback;
+  const diff = Math.floor((Date.now() - d.getTime()) / 1000);
+  if (diff < 60) return 'Vừa xong';
+  if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
+  if (diff < 86400 * 2) return 'Hôm qua';
+  return `${Math.floor(diff / 86400)} ngày trước`;
 };
 
 /**

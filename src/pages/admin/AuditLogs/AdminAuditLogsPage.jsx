@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { auditLogApi, adminUserApi } from '../../../services/api';
+import { formatVietnam24h, formatVietnamRelativeTime } from '../../../utils/dateUtils';
 import {
   History,
   Search,
@@ -254,37 +255,8 @@ export const AdminAuditLogsPage = () => {
     }
   };
 
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '—';
-    try {
-      const d = new Date(dateStr);
-      return d.toLocaleString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
-    } catch {
-      return dateStr;
-    }
-  };
-
-  const formatRelativeTime = (dateStr) => {
-    if (!dateStr) return '';
-    try {
-      const d = new Date(dateStr);
-      const diff = Math.floor((Date.now() - d.getTime()) / 1000);
-      if (diff < 60) return 'Vừa xong';
-      if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
-      if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
-      if (diff < 86400 * 2) return 'Hôm qua';
-      return `${Math.floor(diff / 86400)} ngày trước`;
-    } catch {
-      return '';
-    }
-  };
+  const formatDate = (dateStr) => formatVietnam24h(dateStr);
+  const formatRelativeTime = (dateStr) => formatVietnamRelativeTime(dateStr);
 
   const parseDevice = (userAgent) => {
     if (!userAgent) return 'Thiết bị Web';
