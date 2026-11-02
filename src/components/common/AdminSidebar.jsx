@@ -25,7 +25,7 @@ export const AdminSidebar = ({ onNavigate }) => {
 
   const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
   const isAdminUser = roles.includes('ROLE_ADMIN') || (currentUser?.email && currentUser.email.toLowerCase().includes('admin'));
-  const isModeratorUser = !isAdminUser && (roles.includes('ROLE_MODERATOR') || (currentUser?.email && currentUser.email.toLowerCase().includes('mod')));
+  const isModeratorUser = !isAdminUser && (roles.includes('ROLE_MODERATOR') || (currentUser?.email && (currentUser.email.toLowerCase().includes('mod') || currentUser.email.toLowerCase().includes('manager'))));
   const rawPerms = Array.isArray(currentUser?.permissions) ? currentUser.permissions : [];
   const userPerms = rawPerms.length > 0 ? rawPerms : (isModeratorUser ? DEFAULT_MODERATOR_PERMISSIONS : []);
 

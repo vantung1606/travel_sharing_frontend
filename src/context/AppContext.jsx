@@ -445,7 +445,7 @@ export const AppProvider = ({ children }) => {
         const parsed = JSON.parse(stored);
         if (parsed && (parsed.id || parsed.email || parsed.token)) {
           const uRoles = Array.isArray(parsed.roles) ? parsed.roles : [];
-          const isMod = uRoles.includes('ROLE_MODERATOR');
+          const isMod = uRoles.includes('ROLE_MODERATOR') || (parsed.email && (parsed.email.toLowerCase().includes('mod') || parsed.email.toLowerCase().includes('manager')));
           if (isMod && (!Array.isArray(parsed.permissions) || parsed.permissions.length === 0)) {
             parsed.permissions = DEFAULT_MODERATOR_PERMISSIONS;
           }
@@ -521,7 +521,7 @@ export const AppProvider = ({ children }) => {
         : ['ROLE_USER'],
       permissions: Array.isArray(userData.permissions) && userData.permissions.length > 0
         ? userData.permissions
-        : (Array.isArray(userData.roles) && userData.roles.includes('ROLE_MODERATOR')
+        : ((Array.isArray(userData.roles) && userData.roles.includes('ROLE_MODERATOR')) || (rawEmail && (rawEmail.toLowerCase().includes('mod') || rawEmail.toLowerCase().includes('manager')))
             ? DEFAULT_MODERATOR_PERMISSIONS
             : [])
     };
@@ -603,7 +603,31 @@ export const AppProvider = ({ children }) => {
             if (profile.email && prev.email && profile.email.toLowerCase() !== prev.email.toLowerCase()) {
               return prev;
             }
-            if (prev.id === profile.id && prev.name === (profile.fullName || prev.name)) return prev;
+            const newPerms = Array.isArray(profile.permissions) 
+              ? profile.permissions 
+              : (profile.permissions ? Array.from(profile.permissions) : null);
+            const newRoles = Array.isArray(profile.roles)
+              ? profile.roles
+              : (profile.roles ? Array.from(profile.roles) : null);
+
+            const prevPerms = Array.isArray(prev.permissions) ? prev.permissions : [];
+            const prevRoles = Array.isArray(prev.roles) ? prev.roles : [];
+
+            const isPermsSame = newPerms === null || (
+              newPerms.length === prevPerms.length &&
+              newPerms.every(p => prevPerms.includes(p))
+            );
+            const isRolesSame = newRoles === null || (
+              newRoles.length === prevRoles.length &&
+              newRoles.every(r => prevRoles.includes(r))
+            );
+            const isBasicSame = prev.id === profile.id &&
+              prev.name === (profile.fullName || prev.name) &&
+              prev.avatar === (profile.avatarUrl || prev.avatar) &&
+              prev.handle === (profile.handle || prev.handle) &&
+              prev.bio === profile.bio;
+
+            if (isBasicSame && isPermsSame && isRolesSame) return prev;
             const updated = {
               ...prev,
               id: profile.id,
@@ -611,7 +635,9 @@ export const AppProvider = ({ children }) => {
               fullName: profile.fullName || prev.fullName,
               avatar: profile.avatarUrl || prev.avatar,
               handle: profile.handle || prev.handle,
-              bio: profile.bio !== undefined ? profile.bio : prev.bio
+              bio: profile.bio !== undefined ? profile.bio : prev.bio,
+              roles: newRoles || prev.roles,
+              permissions: newPerms !== null ? newPerms : prev.permissions
             };
             try {
               localStorage.setItem('wayfare_user', JSON.stringify(updated));

@@ -93,7 +93,7 @@ const MODULE_CONFIGS = [
     accentBorder: 'border-purple-200',
     accentBg: 'bg-purple-50/70',
     accentText: 'text-purple-700',
-    permissionCodes: ['THEME_VIEW', 'THEME_MANAGE']
+    permissionCodes: ['THEME_VIEW', 'THEME_EDIT', 'THEME_PUBLISH', 'THEME_RESET']
   },
   {
     key: 'USERS',
