@@ -757,7 +757,7 @@ export const AdminPlacesPage = () => {
                             onClick={() => setActiveTab('Đang hoạt động')}
                             className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer"
                           >
-                            Xem {totalActive} địa điểm đang hoạt động
+                            Xem {totalActive} địa điểm đang hoạt động →
                           </button>
                         </div>
                       ) : activeTab === 'Bị báo cáo vi phạm' ? (
@@ -770,7 +770,7 @@ export const AdminPlacesPage = () => {
                             onClick={() => setActiveTab('Đang hoạt động')}
                             className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer"
                           >
-                            Xem {totalActive} địa điểm đang hoạt động
+                            Xem {totalActive} địa điểm đang hoạt động →
                           </button>
                         </div>
                       ) : (
@@ -817,7 +817,7 @@ export const AdminPlacesPage = () => {
                                 )}
                                 {p.isFeatured && (
                                   <span className="px-1.5 py-0.5 rounded-[4px] bg-amber-50 text-amber-900 text-[9px] font-bold border border-amber-300 flex items-center gap-1 shadow-2xs">
-                                    <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-600" />
+                                    <Sparkles className="w-2.5 h-2.5 fill-amber-500 text-amber-600" />
                                     {p.featuredBadge || 'Ghim Nổi Bật'} (#{p.featuredOrder || 1})
                                   </span>
                                 )}
@@ -833,7 +833,7 @@ export const AdminPlacesPage = () => {
                                 )}
                                 {p.aiModerationStatus === 'APPROVED_BY_AI' && (
                                   <span className="px-1.5 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[9px] font-bold border border-emerald-200 flex items-center gap-1">
-                                    <CheckCircle2 className="w-2.5 h-2.5" /> Hợp lệ
+                                    <Sparkles className="w-2.5 h-2.5" /> AI: Hợp lệ
                                   </span>
                                 )}
                                 {(() => {
@@ -930,7 +930,7 @@ export const AdminPlacesPage = () => {
                               }`}
                               title={p.isFeatured ? `Đang ghim: ${p.featuredBadge || 'Nổi bật'} (Thứ tự #${p.featuredOrder || 1})` : 'Cấu hình Ghim Nổi Bật'}
                             >
-                              <Star className="w-3.5 h-3.5" />
+                              <Sparkles className="w-3.5 h-3.5" />
                             </button>
                             <button
                               type="button"
@@ -1065,8 +1065,8 @@ export const AdminPlacesPage = () => {
                 }`}>
                   <div className="flex items-center justify-between">
                     <span className="font-bold flex items-center gap-1.5 text-[11px] uppercase tracking-wide">
-                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
-                      Hệ thống Thẩm định & Xác thực
+                      <Sparkles className="w-3.5 h-3.5" />
+                      WanderAI Thẩm định & Xác thực
                     </span>
                     <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${
                       selectedPlace.aiModerationStatus === 'DUPLICATE_FLAGGED'

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Navigation, Phone, Eye, Star, Compass, MapPin, Clock, ChevronUp, X, CheckCircle2 } from 'lucide-react';
+import { Navigation, Phone, Eye, Star, Sparkles, MapPin, Clock, ChevronUp, X, CheckCircle2 } from 'lucide-react';
 
 // Custom Map Controller to smoothly fly to active item or user location
 function MapFlyController({ activeItem, userCoords, miniMode = false }) {
@@ -525,8 +525,8 @@ export const RealMapView = ({
                 {/* Tiện ích nổi bật (Chips) */}
                 {selectedPlace.amenities && (
                   <div>
-                    <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                      <Compass className="w-3.5 h-3.5 text-sky-600" /> Tiện ích nổi bật
+                    <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 text-amber-500" /> Tiện ích nổi bật
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {(Array.isArray(selectedPlace.amenities)

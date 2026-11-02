@@ -564,14 +564,23 @@ export const HomePage = () => {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="lg:col-span-7 relative z-10 min-w-0 flex flex-col items-center text-center lg:items-start lg:text-left max-w-[600px] mx-auto lg:mx-0 space-y-4 sm:space-y-6"
           >
-            {/* Expansive Grand Headline with Natural Editorial Typography */}
-            <h1 className="font-display text-[clamp(2.2rem,4vw,3.8rem)] font-extrabold tracking-tight leading-[1.12] text-white">
-              Kiến Tạo Chuyến Đi Mơ Ước Cùng Wayfare
+            {/* Top Pill Accent */}
+            <div className="inline-flex items-center gap-2.5 pl-3 py-0.5 border-l-2 border-clay-500 rounded-none bg-transparent text-clay-200 text-xs font-semibold tracking-[0.16em]">
+              <span>Nền Tảng Lên Lịch Trình Du Lịch Thông Minh</span>
+            </div>
+
+            {/* Expansive Grand Headline with Harmonious Flow */}
+            <h1 className="font-display text-[clamp(1.9rem,3.4vw,3.6rem)] font-extrabold tracking-[-0.02em] leading-[1.12] text-white">
+              Kiến Tạo Chuyến Đi Mơ Ước <br className="hidden sm:inline" />
+              <span className="text-clay-200">
+                Cùng Wayfare
+              </span>{' '}
             </h1>
 
-            {/* Subtitle with High Legibility & Authentic Travel Tone */}
-            <p className="text-slate-100/95 text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed font-normal tracking-[0.015em] drop-shadow-sm px-2">
-              Khám phá điểm đến đặc sắc, lên lịch trình chi tiết và đồng hành cùng cộng đồng đam mê xê dịch khắp mọi miền.
+            {/* Subtitle with High Legibility & Warm Editorial Typography */}
+            <p className="text-slate-200/95 text-sm sm:text-base md:text-lg max-w-2xl leading-relaxed font-normal tracking-[0.015em] drop-shadow-sm px-2">
+              Từ ý tưởng mơ hồ đến lịch trình chi tiết từng phút, dự toán ngân sách chính xác theo
+              thời gian thực và cá nhân hóa theo gu riêng của bạn chỉ với một chạm.
             </p>
 
             {/* Action Buttons: Harmonious Royal Blue & Translucent White */}

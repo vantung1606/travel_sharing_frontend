@@ -411,9 +411,9 @@ export const AdminDashboardPage = () => {
                   <span>Đang chờ: <strong className="text-rose-600 font-bold">{pendingCount}</strong> / Tổng số: <strong className="text-ink-800 font-bold">{totalCount}</strong></span>
                   <button 
                     onClick={() => setAdminTab('reports')}
-                    className="text-sky-700 hover:text-sky-800 font-bold hover:underline cursor-pointer"
+                    className="text-clay-700 hover:text-clay-800 font-bold hover:underline cursor-pointer"
                   >
-                    Xử lý ngay
+                    Xử lý ngay →
                   </button>
                 </p>
               </div>
@@ -714,9 +714,9 @@ export const AdminDashboardPage = () => {
               </div>
               <button 
                 onClick={() => setAdminTab('audit-logs')}
-                className="text-[11px] text-sky-700 hover:text-sky-800 font-bold hover:underline cursor-pointer"
+                className="text-[11px] text-clay-700 hover:text-clay-800 font-bold hover:underline cursor-pointer"
               >
-                Xem tất cả
+                Tất cả →
               </button>
             </div>
 
@@ -884,8 +884,8 @@ export const AdminDashboardPage = () => {
                         <div className="font-display font-bold text-ink-800 truncate">{row.title}</div>
                         <span className="text-ink-400 text-[11px] flex items-center gap-1">
                           {row.isAiGenerated ? (
-                            <span className="text-sky-700 font-semibold flex items-center gap-1">
-                              <Compass className="w-3 h-3 text-sky-600" /> Tạo tự động
+                            <span className="text-clay-600 font-bold flex items-center gap-0.5">
+                              <Sparkles className="w-2.5 h-2.5" /> Tạo bởi WanderAI
                             </span>
                           ) : (
                             'Thành viên tự thiết kế'

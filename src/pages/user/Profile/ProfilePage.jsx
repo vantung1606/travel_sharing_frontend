@@ -558,15 +558,15 @@ export const ProfilePage = () => {
               <span className="font-display font-black text-xl text-rose-600 mt-0.5 block flex items-center gap-1 group-hover:scale-105 transition-transform">
                 {totalLikesReceived} <Heart className="w-4 h-4 fill-rose-500 text-rose-500" />
               </span>
-              <span className="text-[10px] text-rose-600 font-medium group-hover:underline">Tương tác bài viết</span>
+              <span className="text-[10px] text-rose-600 font-serif font-semibold group-hover:underline">Tương tác bài viết &rarr;</span>
             </div>
 
             <div className="p-2 border-l border-ink-200/80">
               <span className="text-ink-500 block text-[11px] font-bold uppercase tracking-wider">Lịch Trình Đã Tạo</span>
-              <span className="font-display font-black text-xl text-sky-700 mt-0.5 block flex items-center gap-1">
-                {displayItineraries.length} <Route className="w-4 h-4 text-sky-600" />
+              <span className="font-display font-black text-xl text-clay-700 mt-0.5 block flex items-center gap-1">
+                {displayItineraries.length} <Sparkles className="w-4 h-4 text-amber-500" />
               </span>
-              <span className="text-[10px] text-ink-400">Đã đồng bộ GPS</span>
+              <span className="text-[10px] text-ink-400 font-serif">Đã đồng bộ GPS</span>
             </div>
 
             <div className="p-2 border-l border-ink-200/80">
@@ -638,7 +638,7 @@ export const ProfilePage = () => {
             {[
               { id: 'itineraries', label: 'Lịch Trình Của Tôi', count: displayItineraries.length, icon: Route },
               { id: 'posts', label: 'Bài Viết & Review', count: displayPosts.length, icon: Globe },
-              { id: 'ai-dna', label: 'Gu Du Lịch & Sở Thích', icon: Compass },
+              { id: 'ai-dna', label: 'Gu Du Lịch & AI DNA', badge: 'AI', icon: Sparkles },
               { id: 'saved', label: 'Địa Điểm Đã Lưu', count: savedPlaces.length, icon: Bookmark },
               { id: 'badges', label: 'Huy Hiệu & Khung Avatar', count: achievements.length, icon: Award }
             ].map(tab => {
