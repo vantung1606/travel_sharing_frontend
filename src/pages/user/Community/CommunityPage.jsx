@@ -157,13 +157,35 @@ export const CommunityPage = () => {
     post: null
   });
 
-  const handleOpenLightbox = (post, initialIndex = 0, e = null) => {
+  const handleOpenLightbox = (post, initialIndex = 0, e = null, customImages = null) => {
     if (e) e.stopPropagation();
-    if (!post?.images || post.images.length === 0) return;
+    let imgs = customImages;
+    if (!imgs || !Array.isArray(imgs) || imgs.length === 0) {
+      if (Array.isArray(post?.images) && post.images.length > 0) imgs = post.images;
+      else if (typeof post?.images === 'string' && post.images.trim()) {
+        try {
+          const parsed = JSON.parse(post.images);
+          if (Array.isArray(parsed)) imgs = parsed;
+          else imgs = [post.images];
+        } catch {
+          imgs = post.images.includes(';;;')
+            ? post.images.split(';;;')
+            : (post.images.includes(',') ? post.images.split(',') : [post.images]);
+        }
+      } else if (post?.imageUrl) {
+        imgs = [post.imageUrl];
+      } else {
+        imgs = [];
+      }
+    }
+    const cleanImgs = imgs
+      .map(i => (typeof i === 'string' ? i.trim() : ''))
+      .filter(i => i.length > 5);
+    if (cleanImgs.length === 0) return;
     setLightboxState({
       isOpen: true,
-      images: post.images,
-      initialIndex: initialIndex,
+      images: cleanImgs,
+      initialIndex: Math.min(Math.max(0, initialIndex), cleanImgs.length - 1),
       post: post
     });
   };
@@ -1937,7 +1959,9 @@ export const CommunityPage = () => {
               return (
                 <article
                   key={post.id}
-                  className="bg-[#FFFDF8] rounded-sm sm:rounded-sm p-3 sm:p-5 border border-[#1E1A15]/10  hover:shadow-none transition-all space-y-3 relative overflow-hidden"
+                  className={`bg-[#FFFDF8] rounded-sm sm:rounded-sm p-3 sm:p-5 border border-[#1E1A15]/10 hover:shadow-none transition-all space-y-3 relative ${
+                    openMenuPostId === post.id ? 'z-40' : 'z-0'
+                  }`}
                 >
                   {/* Status Banner for Posts Pending Review */}
                   {post.status === 'PENDING_REVIEW' && (
@@ -2129,7 +2153,7 @@ export const CommunityPage = () => {
                         {openMenuPostId === post.id && (
                           <div
                             onClick={(e) => e.stopPropagation()}
-                            className="absolute right-0 top-full mt-1 w-52 bg-[#FFFDF8] rounded-sm  border border-[#1E1A15]/10 py-1.5 z-30 animate-in fade-in zoom-in-95 duration-150"
+                            className="absolute right-0 top-full mt-1.5 w-64 sm:w-72 bg-[#FFFDF8] rounded-[6px] shadow-2xl border border-[#1E1A15]/15 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
                           >
                             {isSelf ? (
                               <>
@@ -2140,10 +2164,10 @@ export const CommunityPage = () => {
                                     setPostToEdit(post);
                                     setOpenMenuPostId(null);
                                   }}
-                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-[#3B332A] hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 cursor-pointer"
+                                  className="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-[#3B332A] hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2.5 transition-colors cursor-pointer"
                                 >
-                                  <Edit className="w-3.5 h-3.5 text-blue-600" />
-                                  <span>Chỉnh sửa bài viết</span>
+                                  <Edit className="w-4 h-4 text-blue-600 shrink-0" />
+                                  <span className="flex-1 truncate">Chỉnh sửa bài viết</span>
                                 </button>
                                 <button
                                   type="button"
@@ -2152,17 +2176,17 @@ export const CommunityPage = () => {
                                     setOpenMenuPostId(null);
                                     handleToggleVisibility(post);
                                   }}
-                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-[#3B332A] hover:bg-[#F8F4EC] flex items-center gap-2 cursor-pointer"
+                                  className="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-[#3B332A] hover:bg-[#F8F4EC] flex items-center gap-2.5 transition-colors cursor-pointer"
                                 >
                                   {post.visibility === 'PRIVATE' ? (
                                     <>
-                                      <Globe className="w-3.5 h-3.5 text-sky-600" />
-                                      <span>Đặt làm Công khai 🌐</span>
+                                      <Globe className="w-4 h-4 text-sky-600 shrink-0" />
+                                      <span className="flex-1 truncate">Đặt làm Công khai 🌐</span>
                                     </>
                                   ) : (
                                     <>
-                                      <Lock className="w-3.5 h-3.5 text-amber-600" />
-                                      <span>Đặt Chỉ mình tôi 🔒</span>
+                                      <Lock className="w-4 h-4 text-amber-600 shrink-0" />
+                                      <span className="flex-1 truncate">Đặt Chỉ mình tôi 🔒</span>
                                     </>
                                   )}
                                 </button>
@@ -2173,10 +2197,10 @@ export const CommunityPage = () => {
                                     setOpenMenuPostId(null);
                                     handleCopyPostLink(post);
                                   }}
-                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-[#3B332A] hover:bg-[#F8F4EC] flex items-center gap-2 cursor-pointer"
+                                  className="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-[#3B332A] hover:bg-[#F8F4EC] flex items-center gap-2.5 transition-colors cursor-pointer"
                                 >
-                                  <Copy className="w-3.5 h-3.5 text-[#6B6154]" />
-                                  <span>Sao chép liên kết</span>
+                                  <Copy className="w-4 h-4 text-[#6B6154] shrink-0" />
+                                  <span className="flex-1 truncate">Sao chép liên kết</span>
                                 </button>
                                 <div className="border-t border-[#1E1A15]/10 my-1"></div>
                                 <button
@@ -2186,10 +2210,10 @@ export const CommunityPage = () => {
                                     setOpenMenuPostId(null);
                                     handleDeletePost(post);
                                   }}
-                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
+                                  className="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors cursor-pointer"
                                 >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                  <span>Xóa bài viết</span>
+                                  <Trash2 className="w-4 h-4 shrink-0" />
+                                  <span className="flex-1 truncate">Xóa bài viết</span>
                                 </button>
                               </>
                             ) : (
@@ -2201,10 +2225,10 @@ export const CommunityPage = () => {
                                     setOpenMenuPostId(null);
                                     handleDirectMessage(post.author);
                                   }}
-                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-[#3B332A] hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2 cursor-pointer"
+                                  className="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-[#3B332A] hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2.5 transition-colors cursor-pointer"
                                 >
-                                  <MessageSquare className="w-3.5 h-3.5 text-sky-600" />
-                                  <span>Nhắn tin cho {post.author?.name || 'tác giả'}</span>
+                                  <MessageSquare className="w-4 h-4 text-sky-600 shrink-0" />
+                                  <span className="flex-1 truncate">Nhắn tin cho {post.author?.name || 'tác giả'}</span>
                                 </button>
                                 <button
                                   type="button"
@@ -2213,10 +2237,10 @@ export const CommunityPage = () => {
                                     setOpenMenuPostId(null);
                                     handleCopyPostLink(post);
                                   }}
-                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-[#3B332A] hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2 cursor-pointer"
+                                  className="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-[#3B332A] hover:bg-blue-50 hover:text-blue-700 flex items-center gap-2.5 transition-colors cursor-pointer"
                                 >
-                                  <Copy className="w-3.5 h-3.5 text-blue-600" />
-                                  <span>Sao chép liên kết bài viết</span>
+                                  <Copy className="w-4 h-4 text-blue-600 shrink-0" />
+                                  <span className="flex-1 truncate">Sao chép liên kết bài viết</span>
                                 </button>
                                 <button
                                   type="button"
@@ -2227,10 +2251,10 @@ export const CommunityPage = () => {
                                     if (toast?.showInfo) toast.showInfo('Đã ẩn bài viết khỏi bảng tin của bạn');
                                     else if (toast?.info) toast.info('Đã ẩn bài viết khỏi bảng tin của bạn');
                                   }}
-                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-[#3B332A] hover:bg-[#F8F4EC] flex items-center gap-2 cursor-pointer"
+                                  className="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-[#3B332A] hover:bg-[#F8F4EC] flex items-center gap-2.5 transition-colors cursor-pointer"
                                 >
-                                  <EyeOff className="w-3.5 h-3.5 text-[#6B6154]" />
-                                  <span>Ẩn bài viết khỏi bảng tin</span>
+                                  <EyeOff className="w-4 h-4 text-[#6B6154] shrink-0" />
+                                  <span className="flex-1 truncate">Ẩn bài viết khỏi bảng tin</span>
                                 </button>
                                 <div className="border-t border-[#1E1A15]/10 my-1"></div>
                                 <button
@@ -2241,10 +2265,10 @@ export const CommunityPage = () => {
                                     setPostToReport(post);
                                     setOpenMenuPostId(null);
                                   }}
-                                  className="w-full px-3.5 py-2 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 cursor-pointer"
+                                  className="w-full px-3.5 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors cursor-pointer"
                                 >
-                                  <Flag className="w-3.5 h-3.5 text-rose-500" />
-                                  <span>Báo cáo bài viết vi phạm</span>
+                                  <Flag className="w-4 h-4 text-rose-500 shrink-0" />
+                                  <span className="flex-1 truncate">Báo cáo bài viết vi phạm</span>
                                 </button>
                               </>
                             )}
@@ -2506,66 +2530,103 @@ export const CommunityPage = () => {
                         </div>
                       )}
 
-                      {/* Post Photos Display */}
+                      {/* Post Photos Display - Smart Photo Grid (1, 2, 3, 4, 5, 6+ ảnh) */}
                       {(() => {
-                        const validImages = (post.images || []).filter(img =>
-                          typeof img === 'string' &&
-                          img.trim().length > 10 &&
-                          (img.trim().startsWith('http://') || img.trim().startsWith('https://') || img.trim().startsWith('blob:') || img.trim().startsWith('data:image/'))
-                        );
+                        let rawImagesList = [];
+                        if (Array.isArray(post.images)) {
+                          rawImagesList = post.images;
+                        } else if (typeof post.images === 'string' && post.images.trim()) {
+                          try {
+                            const parsed = JSON.parse(post.images);
+                            if (Array.isArray(parsed)) rawImagesList = parsed;
+                            else rawImagesList = [post.images];
+                          } catch {
+                            rawImagesList = post.images.includes(';;;')
+                              ? post.images.split(';;;')
+                              : (post.images.includes(',') ? post.images.split(',') : [post.images]);
+                          }
+                        } else if (post.imageUrl) {
+                          rawImagesList = [post.imageUrl];
+                        }
+
+                        const validImages = rawImagesList
+                          .map(img => (typeof img === 'string' ? img.trim() : ''))
+                          .filter(img =>
+                            img.length > 5 &&
+                            (img.startsWith('http://') ||
+                             img.startsWith('https://') ||
+                             img.startsWith('/') ||
+                             img.startsWith('blob:') ||
+                             img.startsWith('data:image/'))
+                          );
 
                         if (validImages.length === 0) return null;
 
                         return (
                           <div
-                            className="rounded-sm overflow-hidden border border-[#1E1A15]/10 bg-[#F8F4EC] cursor-pointer"
+                            className="rounded-[6px] overflow-hidden border border-[#1E1A15]/10 bg-[#F8F4EC] cursor-pointer select-none"
                             title="Bấm vào ảnh để phóng to toàn màn hình"
                           >
+                            {/* CASE 1: 1 PHOTO */}
                             {validImages.length === 1 ? (
-                              <img
-                                src={validImages[0]}
-                                alt="Post photo"
-                                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                onClick={(e) => handleOpenLightbox(post, 0, e)}
-                                className="w-full max-h-96 object-cover hover:scale-[1.01] transition-transform duration-300"
-                              />
+                              <div
+                                className="w-full max-h-[460px] overflow-hidden bg-black/5 flex items-center justify-center"
+                                onClick={(e) => handleOpenLightbox(post, 0, e, validImages)}
+                              >
+                                <img
+                                  src={validImages[0]}
+                                  alt="Post photo"
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                  className="w-full max-h-[460px] object-cover hover:scale-[1.01] transition-transform duration-300"
+                                />
+                              </div>
                             ) : validImages.length === 2 ? (
+                              /* CASE 2: 2 PHOTOS (Balanced 50/50 Split) */
                               <div className="grid grid-cols-2 gap-1.5 h-64 sm:h-80">
                                 {validImages.map((img, i) => (
-                                  <img
+                                  <div
                                     key={i}
-                                    src={img}
-                                    alt={`Post photo ${i}`}
-                                    onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                    onClick={(e) => handleOpenLightbox(post, i, e)}
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                  />
+                                    className="h-full overflow-hidden"
+                                    onClick={(e) => handleOpenLightbox(post, i, e, validImages)}
+                                  >
+                                    <img
+                                      src={img}
+                                      alt={`Post photo ${i + 1}`}
+                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    />
+                                  </div>
                                 ))}
                               </div>
-                            ) : (
+                            ) : validImages.length === 3 ? (
+                              /* CASE 3: 3 PHOTOS (1 Large 8-col + 2 Stacked 4-col) */
                               <div className="grid grid-cols-12 gap-1.5 h-72 sm:h-84">
-                                <div className="col-span-8 h-full overflow-hidden">
+                                <div
+                                  className="col-span-8 h-full overflow-hidden"
+                                  onClick={(e) => handleOpenLightbox(post, 0, e, validImages)}
+                                >
                                   <img
                                     src={validImages[0]}
                                     alt="Post photo 1"
                                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                    onClick={(e) => handleOpenLightbox(post, 0, e)}
                                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                   />
                                 </div>
                                 <div className="col-span-4 grid grid-rows-2 gap-1.5 h-full">
-                                  <div className="h-full overflow-hidden">
+                                  <div
+                                    className="h-full overflow-hidden"
+                                    onClick={(e) => handleOpenLightbox(post, 1, e, validImages)}
+                                  >
                                     <img
                                       src={validImages[1]}
                                       alt="Post photo 2"
                                       onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                      onClick={(e) => handleOpenLightbox(post, 1, e)}
                                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                     />
                                   </div>
                                   <div
-                                    className="relative h-full overflow-hidden"
-                                    onClick={(e) => handleOpenLightbox(post, 2, e)}
+                                    className="h-full overflow-hidden"
+                                    onClick={(e) => handleOpenLightbox(post, 2, e, validImages)}
                                   >
                                     <img
                                       src={validImages[2]}
@@ -2573,9 +2634,98 @@ export const CommunityPage = () => {
                                       onError={(e) => { e.currentTarget.style.display = 'none'; }}
                                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                                     />
-                                    {validImages.length > 3 && (
-                                      <div className="absolute inset-0 bg-[#1E1A15]/60 backdrop-blur-xs flex items-center justify-center text-white text-xs font-bold hover:bg-[#1E1A15]/70 transition-colors">
-                                        +{validImages.length - 3} ảnh
+                                  </div>
+                                </div>
+                              </div>
+                            ) : validImages.length === 4 ? (
+                              /* CASE 4: 4 PHOTOS (Harmonious 2x2 Grid) */
+                              <div className="grid grid-cols-2 grid-rows-2 gap-1.5 h-72 sm:h-88">
+                                {validImages.map((img, i) => (
+                                  <div
+                                    key={i}
+                                    className="h-full overflow-hidden"
+                                    onClick={(e) => handleOpenLightbox(post, i, e, validImages)}
+                                  >
+                                    <img
+                                      src={img}
+                                      alt={`Post photo ${i + 1}`}
+                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              /* CASE 5 & 6+: 5 OR 6+ PHOTOS (Mosaic Layout: Top 2 + Bottom 3 with +N Badge on 5th photo) */
+                              <div className="space-y-1.5">
+                                {/* Top 2 Photos */}
+                                <div className="grid grid-cols-2 gap-1.5 h-48 sm:h-56">
+                                  <div
+                                    className="h-full overflow-hidden"
+                                    onClick={(e) => handleOpenLightbox(post, 0, e, validImages)}
+                                  >
+                                    <img
+                                      src={validImages[0]}
+                                      alt="Post photo 1"
+                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    />
+                                  </div>
+                                  <div
+                                    className="h-full overflow-hidden"
+                                    onClick={(e) => handleOpenLightbox(post, 1, e, validImages)}
+                                  >
+                                    <img
+                                      src={validImages[1]}
+                                      alt="Post photo 2"
+                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    />
+                                  </div>
+                                </div>
+
+                                {/* Bottom 3 Photos */}
+                                <div className="grid grid-cols-3 gap-1.5 h-36 sm:h-44">
+                                  <div
+                                    className="h-full overflow-hidden"
+                                    onClick={(e) => handleOpenLightbox(post, 2, e, validImages)}
+                                  >
+                                    <img
+                                      src={validImages[2]}
+                                      alt="Post photo 3"
+                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    />
+                                  </div>
+                                  <div
+                                    className="h-full overflow-hidden"
+                                    onClick={(e) => handleOpenLightbox(post, 3, e, validImages)}
+                                  >
+                                    <img
+                                      src={validImages[3]}
+                                      alt="Post photo 4"
+                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    />
+                                  </div>
+                                  <div
+                                    className="relative h-full overflow-hidden group/more"
+                                    onClick={(e) => handleOpenLightbox(post, 4, e, validImages)}
+                                  >
+                                    <img
+                                      src={validImages[4]}
+                                      alt="Post photo 5"
+                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    />
+                                    {validImages.length > 5 && (
+                                      <div className="absolute inset-0 bg-[#1E1A15]/65 backdrop-blur-[1px] flex flex-col items-center justify-center text-white font-bold group-hover/more:bg-[#1E1A15]/75 transition-all">
+                                        <span className="text-lg sm:text-2xl font-black leading-none drop-shadow-md">
+                                          +{validImages.length - 4}
+                                        </span>
+                                        <span className="text-[10px] sm:text-xs font-semibold text-white/90 mt-1">
+                                          ảnh
+                                        </span>
                                       </div>
                                     )}
                                   </div>

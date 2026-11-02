@@ -617,7 +617,7 @@ export const PostDetailModal = ({
               {isPostMenuOpen && (
                 <div
                   onClick={(e) => e.stopPropagation()}
-                  className="absolute right-0 top-11 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
+                  className="absolute right-0 top-11 w-60 bg-white rounded-xl shadow-2xl border border-slate-100 py-1.5 z-50 animate-in fade-in zoom-in-95 duration-150"
                 >
                   <button
                     type="button"
@@ -627,8 +627,8 @@ export const PostDetailModal = ({
                     }}
                     className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-700 hover:bg-slate-50 flex items-center gap-2.5 transition-colors cursor-pointer"
                   >
-                    <Copy className="w-4 h-4 text-slate-400" />
-                    <span>Sao chép liên kết</span>
+                    <Copy className="w-4 h-4 text-slate-400 shrink-0" />
+                    <span className="flex-1 truncate">Sao chép liên kết</span>
                   </button>
 
                   {!isSelf && (
@@ -645,8 +645,8 @@ export const PostDetailModal = ({
                       }}
                       className="w-full px-4 py-2.5 text-left text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition-colors cursor-pointer"
                     >
-                      <Flag className="w-4 h-4 text-rose-500" />
-                      <span>Báo cáo bài viết</span>
+                      <Flag className="w-4 h-4 text-rose-500 shrink-0" />
+                      <span className="flex-1 truncate">Báo cáo bài viết</span>
                     </button>
                   )}
                 </div>
