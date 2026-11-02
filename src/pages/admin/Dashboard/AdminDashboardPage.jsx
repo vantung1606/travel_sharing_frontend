@@ -1232,7 +1232,13 @@ export const AdminDashboardPage = () => {
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
                           {row.creatorAvatar ? (
-                            <img src={row.creatorAvatar} alt="" className="w-6 h-6 rounded-full object-cover shrink-0 border border-ink-200/80" />
+                            <img 
+                              src={row.creatorAvatar} 
+                              alt="" 
+                              crossOrigin="anonymous" 
+                              referrerPolicy="no-referrer" 
+                              className="w-6 h-6 rounded-full object-cover shrink-0 border border-ink-200/80" 
+                            />
                           ) : (
                             <div className="w-6 h-6 rounded-full bg-clay-700 text-[#FFFDF8] font-bold text-[10px] flex items-center justify-center shrink-0">
                               {row.creatorName ? row.creatorName.charAt(0) : 'U'}
@@ -1331,7 +1337,13 @@ export const AdminDashboardPage = () => {
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
                           {user.avatar ? (
-                            <img src={user.avatar} alt="" className="w-7 h-7 rounded-full object-cover shrink-0 border border-ink-200/80" />
+                            <img 
+                              src={user.avatar} 
+                              alt="" 
+                              crossOrigin="anonymous" 
+                              referrerPolicy="no-referrer" 
+                              className="w-7 h-7 rounded-full object-cover shrink-0 border border-ink-200/80" 
+                            />
                           ) : (
                             <div className="w-7 h-7 rounded-full bg-ink-800 text-[#FFFDF8] font-bold text-[10px] flex items-center justify-center shrink-0">
                               {(user.name || user.fullName || 'U').charAt(0).toUpperCase()}
