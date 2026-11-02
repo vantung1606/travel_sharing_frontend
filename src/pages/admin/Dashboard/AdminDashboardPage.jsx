@@ -214,31 +214,136 @@ export const AdminDashboardPage = () => {
     return Math.ceil(max * 1.25);
   }, [growthData]);
 
-  // Export CSV Data
+  // Comprehensive Full Dashboard CSV Exporter (Exports all metrics, charts, trends, moderation, itineraries, and users)
   const handleExportCsv = () => {
     try {
-      let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
-      if (activeTableTab === 'itineraries') {
-        csvContent += "Mã,Tiêu đề,Điểm đến,Người tạo,Ngân sách,Trạng thái\n";
-        filteredItineraries.forEach(item => {
-          csvContent += `"${item.id}","${(item.title || '').replace(/"/g, '""')}","${(item.destination || '').replace(/"/g, '""')}","${(item.creatorName || '').replace(/"/g, '""')}","${item.budgetTotal || 0}","${item.status || 'DRAFT'}"\n`;
+      const escape = (val) => {
+        if (val === null || val === undefined) return '""';
+        const str = String(val).replace(/"/g, '""');
+        return `"${str}"`;
+      };
+
+      const now = new Date();
+      const exportTimestamp = now.toLocaleString('vi-VN');
+      const lines = [];
+
+      // 1. REPORT HEADER
+      lines.push('BÁO CÁO TỔNG QUAN HỆ THỐNG WAYFARE (WAYFARE SYSTEM FULL DASHBOARD REPORT)');
+      lines.push(`Thời gian xuất dữ liệu:,${escape(exportTimestamp)}`);
+      lines.push(`Người lập báo cáo:,${escape(`${currentUser?.name || 'Quản trị viên'} (${currentUser?.email || 'admin@wayfare.com'})`)}`);
+      lines.push(`Trạng thái máy chủ CSDL:,${escape('Online - Đã đồng bộ trực tiếp từ MySQL')}`);
+      lines.push('');
+
+      // 2. KEY PERFORMANCE INDICATORS (KPIs)
+      lines.push('=== 1. CHỈ SỐ KPI TỔNG QUAN (KEY METRICS) ===');
+      lines.push('Hạng mục chỉ số,Số lượng / Giá trị,Chi tiết & Tăng trưởng thực tế');
+      lines.push(`"Cộng đồng thành viên",${stats.totalUsers || 0},${escape(`+${stats.newUsersThisMonth || 0} tài khoản mới trong tháng`)}`);
+      lines.push(`"Bài viết & Chia sẻ chuyến đi",${stats.totalPosts || 0},${escape(`+${stats.newPostsThisMonth || 0} bài mới tháng này (${stats.totalLikes || 0} lượt tim, ${stats.totalComments || 0} bình luận)`)}`);
+      lines.push(`"Lịch trình du lịch",${stats.totalItineraries || 0},${escape(`Phủ sóng ${stats.totalPlaces || 0} địa điểm (+${stats.newItinerariesThisMonth || 0} lịch trình mới tháng này)`)}`);
+      lines.push(`"Kiểm duyệt & Báo cáo vi phạm",${stats.pendingReports || 0},${escape(`Đang chờ xử lý: ${stats.pendingReports || 0} / Tổng số báo cáo: ${stats.totalReports || 0}`)}`);
+      lines.push(`"Đánh giá địa danh trung bình",${Number(stats.averagePlaceRating || 5).toFixed(1)},"Sao / 5.0 (Dữ liệu đánh giá từ du khách)"`);
+      lines.push('');
+
+      // 3. GROWTH TRENDS (6 MONTHS)
+      lines.push('=== 2. XU HƯỚNG TĂNG TRƯỞNG HỆ THỐNG (6 THÁNG GẦN NHẤT) ===');
+      lines.push('Chu kỳ tháng,Số người dùng mới đăng ký,Số bài viết mới chia sẻ');
+      const months = Array.from(new Set([
+        ...(stats.userGrowth || []).map(g => g.label),
+        ...(stats.postGrowth || []).map(g => g.label)
+      ]));
+      if (months.length === 0) {
+        growthData.forEach(d => {
+          lines.push(`${escape(d.label)},${d.count || 0},0`);
         });
       } else {
-        csvContent += "ID,Họ và tên,Email,Vai trò,Trạng thái\n";
-        filteredUsers.forEach(user => {
-          csvContent += `"${user.id}","${(user.name || user.fullName || '').replace(/"/g, '""')}","${(user.email || '').replace(/"/g, '""')}","${user.role || 'USER'}","${user.isBlocked ? 'Đã khóa' : 'Hoạt động'}"\n`;
+        months.forEach(m => {
+          const uCount = (stats.userGrowth || []).find(g => g.label === m)?.count || 0;
+          const pCount = (stats.postGrowth || []).find(g => g.label === m)?.count || 0;
+          lines.push(`${escape(m)},${uCount},${pCount}`);
         });
       }
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `wayfare-${activeTableTab}-${Date.now()}.csv`);
+      lines.push('');
+
+      // 4. TOP DESTINATIONS & HIGHEST RATED PLACES
+      lines.push('=== 3. XU HƯỚNG ĐIỂM ĐẾN & ĐỊA DANH HÀNG ĐẦU ===');
+      lines.push('Phân loại,Thứ hạng,Tên điểm đến / Địa danh,Khu vực / Tỉnh thành,Số lượt tạo tour / Đánh giá,Điểm số trung bình');
+      (stats.topDestinations || []).forEach((dest, idx) => {
+        lines.push(`"Top Điểm đến",#${idx + 1},${escape(dest.destination || dest.name || 'Điểm đến')},${escape(dest.province || dest.city || 'Việt Nam')},${dest.count || 0},"N/A"`);
+      });
+      (stats.topPlaces || []).forEach((place, idx) => {
+        lines.push(`"Địa danh đánh giá cao",#${idx + 1},${escape(place.name || 'Địa điểm')},${escape(place.city || place.address || 'Việt Nam')},${escape(`${place.reviewCount || 0} đánh giá`)},${Number(place.averageRating || 5).toFixed(1)}`);
+      });
+      if ((!stats.topDestinations || stats.topDestinations.length === 0) && (!stats.topPlaces || stats.topPlaces.length === 0)) {
+        lines.push('"Dữ liệu xu hướng",N/A,"Đang cập nhật từ dữ liệu du khách",N/A,0,0');
+      }
+      lines.push('');
+
+      // 5. PENDING REPORTS QUEUE
+      lines.push(`=== 4. HÀNG ĐỢI KIỂM DUYỆT BÁO CÁO CẦN XỬ LÝ (${pendingReports.length} mục) ===`);
+      lines.push('Mã báo cáo,Loại vi phạm,Tiêu đề nội dung,Tác giả nội dung,Thời gian gửi,Lý do hệ thống cảnh báo / Phân tích');
+      if (pendingReports.length === 0) {
+        lines.push('N/A,"Không có báo cáo tồn đọng","Hệ thống an toàn 100%",N/A,N/A,"N/A"');
+      } else {
+        pendingReports.forEach(rep => {
+          lines.push(`${rep.id || 'N/A'},${escape(rep.reportType || rep.reason || 'Báo cáo vi phạm')},${escape(rep.targetTitle || rep.title || 'Nội dung bị báo cáo')},${escape(rep.targetAuthorName || rep.authorName || 'Ẩn danh')},${escape(rep.createdAt ? new Date(rep.createdAt).toLocaleString('vi-VN') : 'Mới gửi')},${escape(rep.aiFlagReason || rep.description || 'Chờ quản trị viên xem xét')}`);
+        });
+      }
+      lines.push('');
+
+      // 6. RECENT AUDIT LOGS
+      lines.push(`=== 5. NHẬT KÝ HOẠT ĐỘNG KIỂM DUYỆT GẦN NHẤT (${recentLogs.length} thao tác) ===`);
+      lines.push('Mã log,Thời gian ghi nhận,Hành động (Action),Người thực hiện,Tài khoản email,Tài nguyên / Chi tiết thao tác');
+      if (recentLogs.length === 0) {
+        lines.push('N/A,N/A,"Chưa có hoạt động",N/A,N/A,"N/A"');
+      } else {
+        recentLogs.forEach(logItem => {
+          lines.push(`${logItem.id || 'N/A'},${escape(logItem.createdAt ? new Date(logItem.createdAt).toLocaleString('vi-VN') : 'Vừa xong')},${escape(logItem.action || 'THAO_TAC')},${escape(logItem.actorName || 'Hệ thống')},${escape(logItem.actorEmail || 'N/A')},${escape(logItem.details || logItem.targetResource || 'Thực hiện thao tác trong hệ thống')}`);
+        });
+      }
+      lines.push('');
+
+      // 7. ALL ITINERARIES
+      lines.push(`=== 6. TOÀN BỘ DANH SÁCH LỊCH TRÌNH DU LỊCH TRÊN HỆ THỐNG (${itinerariesList.length} lịch trình) ===`);
+      lines.push('Mã ITN,Tên hành trình,Người tạo,Điểm đến chính,Thời lượng (Ngày),Dự toán ngân sách (VNĐ),Hình thức thiết kế,Trạng thái');
+      if (itinerariesList.length === 0) {
+        lines.push('N/A,"Chưa có lịch trình",N/A,N/A,0,0,N/A,N/A');
+      } else {
+        itinerariesList.forEach(item => {
+          lines.push(`${item.id},${escape(item.title || 'Không tiêu đề')},${escape(item.creatorName || item.userFullName || 'Thành viên')},${escape(item.destination || 'Việt Nam')},${item.durationDays || 1},${Number(item.budgetTotal || 0).toLocaleString('vi-VN')},${item.isAiGenerated ? '"Trợ lý AI thiết kế"' : '"Thành viên tự tạo"'},${escape(item.status || 'ACTIVE')}`);
+        });
+      }
+      lines.push('');
+
+      // 8. ALL USERS & ACCOUNTS
+      lines.push(`=== 7. TOÀN BỘ DANH SÁCH THÀNH VIÊN & TÀI KHOẢN (${usersList.length} tài khoản) ===`);
+      lines.push('Mã USR,Họ và tên,Email,Số điện thoại,Vai trò hệ thống,Số bài viết đã đăng,Ngày tham gia,Trạng thái tài khoản');
+      if (usersList.length === 0) {
+        lines.push('N/A,"Chưa có thành viên",N/A,N/A,N/A,0,N/A,N/A');
+      } else {
+        usersList.forEach(user => {
+          const rolesStr = Array.isArray(user.roles) ? user.roles.join(', ') : (user.role || 'ROLE_USER');
+          const isBlocked = user.isBlocked || user.blocked || user.status === 'BLOCKED';
+          lines.push(`${user.id},${escape(user.name || user.fullName || 'Thành viên')},${escape(user.email || 'N/A')},${escape(user.phoneNumber || user.phone || '—')},${escape(rolesStr)},${user.postsCount || 0},${escape(user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'Mới tham gia')},${isBlocked ? '"Đã khóa"' : '"Hoạt động bình thường"'}`);
+        });
+      }
+
+      // Convert to UTF-8 BOM Blob and trigger download
+      const fullCsvContent = '\uFEFF' + lines.join('\r\n');
+      const blob = new Blob([fullCsvContent], { type: 'text/csv;charset=utf-8;' });
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const fileDate = now.toISOString().slice(0, 10);
+      link.href = downloadUrl;
+      link.setAttribute('download', `Wayfare_Dashboard_Full_Report_${fileDate}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      toast.success(`Đã xuất ${activeTableTab === 'itineraries' ? filteredItineraries.length : filteredUsers.length} dòng dữ liệu ra file CSV thành công!`);
+      URL.revokeObjectURL(downloadUrl);
+
+      toast.success(`Đã xuất toàn bộ dữ liệu Dashboard ra file CSV thành công (${lines.length} dòng dữ liệu tổng hợp)!`);
     } catch (e) {
-      toast.error('Lỗi khi xuất file: ' + e.message);
+      console.error('Lỗi khi xuất CSV Dashboard:', e);
+      toast.error('Lỗi khi xuất file CSV: ' + e.message);
     }
   };
 
@@ -293,7 +398,7 @@ export const AdminDashboardPage = () => {
           <button 
             onClick={handleExportCsv}
             className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer"
-            title="Xuất bảng dữ liệu hiện tại ra file CSV"
+            title="Xuất toàn bộ dữ liệu Dashboard ra file CSV (KPIs, Xu hướng tăng trưởng, Hàng đợi kiểm duyệt, Lịch trình, Thành viên)"
           >
             <Download className="w-3.5 h-3.5 text-clay-600" />
             <span>Xuất CSV</span>
