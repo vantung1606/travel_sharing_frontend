@@ -147,12 +147,99 @@ export const AdminDashboardPage = () => {
     setCurrentPage(1);
   }, [activeTableTab, tableSearch, tableStatusFilter]);
 
+  // Helper tính toán trạng thái Lịch trình (kết hợp CSDL `status` và Dòng thời gian `startDate`/`endDate`)
+  const getItineraryTimelineStatus = (item) => {
+    if (!item) return { label: 'Không xác định', subLabel: '', dbStatus: 'N/A', timeline: 'unknown', badgeClass: 'bg-ink-100 text-ink-700 border-ink-200' };
+
+    const dbStatus = (item.status || 'ACTIVE').toUpperCase();
+
+    // 1. Nếu là bản nháp
+    if (dbStatus === 'DRAFT') {
+      return {
+        label: 'Bản nháp',
+        subLabel: 'Chưa công bố',
+        dbStatus: 'DRAFT',
+        timeline: 'draft',
+        badgeClass: 'bg-zinc-100 text-zinc-700 border-zinc-300'
+      };
+    }
+
+    // 2. Nếu đã bị hủy
+    if (dbStatus === 'CANCELLED') {
+      return {
+        label: 'Đã hủy',
+        subLabel: 'Không thực hiện',
+        dbStatus: 'CANCELLED',
+        timeline: 'cancelled',
+        badgeClass: 'bg-rose-50 text-rose-800 border-rose-200'
+      };
+    }
+
+    // 3. Nếu đã đánh dấu COMPLETED trong CSDL
+    if (dbStatus === 'COMPLETED') {
+      return {
+        label: 'Đã hoàn thành',
+        subLabel: 'Chuyến đi kết thúc',
+        dbStatus: 'COMPLETED',
+        timeline: 'completed',
+        badgeClass: 'bg-blue-50 text-blue-800 border-blue-200'
+      };
+    }
+
+    // 4. Nếu là ACTIVE: Phân loại theo mốc ngày bắt đầu / kết thúc so với ngày hôm nay
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const startStr = item.startDate ? String(item.startDate).slice(0, 10) : null;
+    const endStr = item.endDate ? String(item.endDate).slice(0, 10) : null;
+
+    if (startStr && startStr > todayStr) {
+      return {
+        label: 'Sắp tới (Upcoming)',
+        subLabel: `Khởi hành ${startStr}`,
+        dbStatus: 'ACTIVE',
+        timeline: 'upcoming',
+        badgeClass: 'bg-amber-50 text-amber-900 border-amber-300'
+      };
+    }
+
+    if (endStr && endStr < todayStr) {
+      return {
+        label: 'Đã hoàn thành',
+        subLabel: `Đã kết thúc ${endStr}`,
+        dbStatus: 'ACTIVE',
+        timeline: 'completed',
+        badgeClass: 'bg-sky-50 text-sky-800 border-sky-200'
+      };
+    }
+
+    if (startStr && endStr && todayStr >= startStr && todayStr <= endStr) {
+      return {
+        label: 'Đang diễn ra',
+        subLabel: 'Hành trình đang đi',
+        dbStatus: 'ACTIVE',
+        timeline: 'ongoing',
+        badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-300'
+      };
+    }
+
+    // Mặc định ACTIVE khi không có ngày cụ thể
+    return {
+      label: 'Đang hoạt động',
+      subLabel: 'Khả dụng',
+      dbStatus: 'ACTIVE',
+      timeline: 'active',
+      badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200'
+    };
+  };
+
   // Filter Itineraries
   const filteredItineraries = useMemo(() => {
     return itinerariesList.filter(item => {
+      const st = getItineraryTimelineStatus(item);
       if (tableStatusFilter !== 'all') {
         if (tableStatusFilter === 'active' && item.status !== 'ACTIVE') return false;
+        if (tableStatusFilter === 'upcoming' && st.timeline !== 'upcoming') return false;
         if (tableStatusFilter === 'draft' && item.status === 'ACTIVE') return false;
+        if (tableStatusFilter === 'completed' && st.timeline !== 'completed') return false;
       }
       if (tableSearch.trim()) {
         const q = tableSearch.toLowerCase();
@@ -344,6 +431,83 @@ export const AdminDashboardPage = () => {
     } catch (e) {
       console.error('Lỗi khi xuất CSV Dashboard:', e);
       toast.error('Lỗi khi xuất file CSV: ' + e.message);
+    }
+  };
+
+  // Export Real Detail CSV for a single selected itinerary
+  const handleExportSingleItinerary = (itin) => {
+    if (!itin) {
+      toast.error('Không tìm thấy thông tin lịch trình để xuất file!');
+      return;
+    }
+    try {
+      const escape = (val) => {
+        if (val === null || val === undefined) return '""';
+        const str = String(val).replace(/"/g, '""');
+        return `"${str}"`;
+      };
+
+      const now = new Date();
+      const statusInfo = getItineraryTimelineStatus(itin);
+      const lines = [];
+
+      // Tiêu đề & Thông tin kết xuất
+      lines.push('BÁO CÁO HỒ SƠ CHI TIẾT LỊCH TRÌNH DU LỊCH WAYFARE');
+      lines.push(`Thời gian trích xuất dữ liệu:,${escape(now.toLocaleString('vi-VN'))}`);
+      lines.push(`Cán bộ kiểm tra / Quản trị viên:,${escape(`${currentUser?.name || 'Quản trị viên'} (${currentUser?.email || 'admin@wayfare.com'})`)}`);
+      lines.push(`Nguồn cơ sở dữ liệu:,${escape('Hệ quản trị CSDL Wayfare MySQL (Single Source of Truth)')}`);
+      lines.push('');
+
+      // 1. Thông tin định danh & CSDL
+      lines.push('=== 1. THÔNG TIN ĐỊNH DANH & TIẾN ĐỘ HÀNH TRÌNH ===');
+      lines.push('Thuộc tính,Chi tiết / Giá trị ghi nhận');
+      lines.push(`"Mã số lịch trình (ID)",${itin.id}`);
+      lines.push(`"Tên lịch trình du lịch",${escape(itin.title || 'Không có tiêu đề')}`);
+      lines.push(`"Điểm đến chính",${escape(itin.destination || 'Việt Nam')}`);
+      lines.push(`"Tác giả tạo",${escape(itin.creatorName || itin.userFullName || 'Thành viên')}`);
+      lines.push(`"Email tác giả",${escape(itin.creatorEmail || 'N/A')}`);
+      lines.push(`"Thời lượng chuyến đi",${escape(`${itin.durationDays || 1} ngày`)}`);
+      lines.push(`"Ngày bắt đầu (Start Date)",${escape(itin.startDate || 'Chưa định ngày cụ thể')}`);
+      lines.push(`"Ngày kết thúc (End Date)",${escape(itin.endDate || 'Chưa định ngày cụ thể')}`);
+      lines.push(`"Trạng thái hệ thống CSDL (status)",${escape(statusInfo.dbStatus)}`);
+      lines.push(`"Tiến độ hành trình thực tế (Timeline)",${escape(statusInfo.label)}`);
+      lines.push(`"Tổng dự toán ngân sách",${escape(itin.budgetTotal ? Number(itin.budgetTotal).toLocaleString('vi-VN') + ' VNĐ' : 'Chưa nhập')}`);
+      lines.push(`"Phương thức thiết lập",${escape(itin.isAiGenerated ? 'Trợ lý AI Gemini thiết kế' : 'Người dùng tự tạo')}`);
+      lines.push(`"Chế độ hiển thị",${escape(itin.isPublic === false ? 'Riêng tư (Chỉ tác giả / nhóm xem)' : 'Công khai toàn hệ thống')}`);
+      lines.push(`"Phong cách du lịch",${escape(itin.travelStyle || 'Khám phá & Nghỉ dưỡng')}`);
+      lines.push(`"Nhóm đối tượng",${escape(itin.groupType || 'Cá nhân')}`);
+      lines.push(`"Ngày tạo hồ sơ trên hệ thống",${escape(itin.createdAt ? new Date(itin.createdAt).toLocaleString('vi-VN') : 'N/A')}`);
+      lines.push('');
+
+      // 2. Kế hoạch phân rã các ngày hoạt động (details)
+      lines.push('=== 2. KẾ HOẠCH LỊCH TRÌNH CHI TIẾT THEO NGÀY ===');
+      lines.push('Ngày thứ,Khung giờ,Hoạt động / Điểm tham quan,Địa chỉ cụ thể,Chi phí dự kiến (VNĐ),Ghi chú kinh nghiệm');
+
+      if (itin.details && Array.isArray(itin.details) && itin.details.length > 0) {
+        itin.details.forEach(act => {
+          lines.push(`"Ngày ${act.dayNumber || 1}",${escape(act.timeSlot || act.time || 'Cả ngày')},${escape(act.activityTitle || act.placeName || 'Tham quan danh lam thắng cảnh')},${escape(act.placeAddress || itin.destination || 'Việt Nam')},${escape(act.estimatedCost ? Number(act.estimatedCost).toLocaleString('vi-VN') : '0')},${escape(act.notes || 'Không có ghi chú')}`);
+        });
+      } else {
+        lines.push(`"Ngày 1","08:30 - 18:00",${escape(`Trải nghiệm khám phá các điểm nổi bật tại ${itin.destination || 'Việt Nam'}`)},${escape(itin.destination || 'Việt Nam')},"Tùy chọn","Lịch trình tổng thể chưa phân rã chi tiết từng giờ."`);
+      }
+
+      // Tạo Blob UTF-8 BOM và kích hoạt tải về
+      const csvContent = '\uFEFF' + lines.join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const cleanTitle = (itin.title || 'LichTrinh').replace(/[^a-zA-Z0-9_\u00C0-\u024F\u1E00-\u1EFF]/g, '_').slice(0, 35);
+      link.href = downloadUrl;
+      link.setAttribute('download', `Wayfare_Itinerary_${itin.id}_${cleanTitle}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(downloadUrl);
+
+      toast.success(`Đã tải xuống file CSV chi tiết lịch trình #${itin.id} thành công!`);
+    } catch (err) {
+      console.error('Lỗi khi xuất chi tiết lịch trình:', err);
+      toast.error('Không thể xuất file chi tiết: ' + err.message);
     }
   };
 
@@ -927,7 +1091,9 @@ export const AdminDashboardPage = () => {
                 {activeTableTab === 'itineraries' ? (
                   <>
                     <option value="all">Tất cả trạng thái</option>
+                    <option value="upcoming">Sắp tới (Upcoming)</option>
                     <option value="active">Đang hoạt động (ACTIVE)</option>
+                    <option value="completed">Đã hoàn thành</option>
                     <option value="draft">Bản nháp / Chưa duyệt</option>
                   </>
                 ) : (
@@ -1028,14 +1194,26 @@ export const AdminDashboardPage = () => {
                       </td>
 
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] text-[10px] font-bold border ${
-                          row.status === 'ACTIVE'
-                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                            : 'bg-ink-100 text-ink-700 border-ink-200'
-                        }`}>
-                          <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                          {row.status === 'ACTIVE' ? 'Hoạt động' : (row.status || 'Bản nháp')}
-                        </span>
+                        {(() => {
+                          const st = getItineraryTimelineStatus(row);
+                          return (
+                            <div className="space-y-0.5">
+                              <span 
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${st.badgeClass}`} 
+                                title={`Trạng thái CSDL: ${st.dbStatus} | Tiến độ: ${st.subLabel || st.label}`}
+                              >
+                                <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
+                                {st.label}
+                              </span>
+                              {row.startDate && (
+                                <div className="text-[10px] text-ink-400 font-mono flex items-center gap-1">
+                                  <Calendar className="w-2.5 h-2.5 text-ink-400 shrink-0" />
+                                  <span>{row.startDate}</span>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
                       </td>
 
                       <td className="py-3 px-4 text-right">
@@ -1215,16 +1393,23 @@ export const AdminDashboardPage = () => {
                 <span className="text-ink-400">Điểm đến chính:</span>
                 <strong className="text-ink-800 font-bold flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-clay-600" />
-                  {selectedItinerary.destination}
+                  {selectedItinerary.destination || 'Chưa cập nhật'}
                 </strong>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-ink-400">Tác giả tạo:</span>
-                <strong className="text-ink-800 font-bold">{selectedItinerary.creatorName || 'Người dùng'} ({selectedItinerary.creatorEmail || 'N/A'})</strong>
+                <strong className="text-ink-800 font-bold">{selectedItinerary.creatorName || selectedItinerary.userFullName || 'Người dùng'} ({selectedItinerary.creatorEmail || 'N/A'})</strong>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-ink-400">Thời lượng dự kiến:</span>
-                <strong className="text-ink-800 font-bold">{selectedItinerary.durationDays || 'Chưa định rõ'} ngày</strong>
+                <strong className="text-ink-800 font-bold">{selectedItinerary.durationDays || 1} ngày</strong>
+              </div>
+              <div className="flex justify-between py-1">
+                <span className="text-ink-400">Lịch trình khởi hành:</span>
+                <span className="font-mono font-bold text-ink-800 flex items-center gap-1">
+                  <Calendar className="w-3.5 h-3.5 text-clay-600" />
+                  {selectedItinerary.startDate ? `${selectedItinerary.startDate} ${selectedItinerary.endDate ? '➜ ' + selectedItinerary.endDate : ''}` : 'Chưa định ngày cụ thể'}
+                </span>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-ink-400">Tổng ngân sách dự toán:</span>
@@ -1233,39 +1418,63 @@ export const AdminDashboardPage = () => {
                 </strong>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-ink-400">Phương thức tạo:</span>
+                <span className="text-ink-400">Phương thức thiết lập:</span>
                 <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${
                   selectedItinerary.isAiGenerated ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-ink-100 text-ink-700 border-ink-200'
                 }`}>
-                  {selectedItinerary.isAiGenerated ? 'Trợ lý AI Gemini' : 'Người dùng tự lập'}
+                  {selectedItinerary.isAiGenerated ? 'Trợ lý AI Gemini thiết kế' : 'Người dùng tự lập'}
                 </span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-ink-400">Trạng thái phát hành:</span>
+                <span className="text-ink-400">Trạng thái CSDL (MySQL):</span>
                 <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${
-                  selectedItinerary.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-ink-100 text-ink-700 border-ink-200'
+                  (selectedItinerary.status || 'ACTIVE') === 'ACTIVE' 
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+                    : 'bg-zinc-100 text-zinc-700 border-zinc-300'
                 }`}>
-                  {selectedItinerary.status === 'ACTIVE' ? 'Đang hoạt động (Công khai)' : 'Bản nháp / Riêng tư'}
+                  {selectedItinerary.status || 'ACTIVE'} (Hệ thống ghi nhận)
                 </span>
+              </div>
+              <div className="flex justify-between py-1">
+                <span className="text-ink-400">Tiến độ chuyến đi (Timeline):</span>
+                {(() => {
+                  const st = getItineraryTimelineStatus(selectedItinerary);
+                  return (
+                    <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${st.badgeClass}`}>
+                      {st.label} {st.subLabel ? `(${st.subLabel})` : ''}
+                    </span>
+                  );
+                })()}
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button
-                onClick={() => setSelectedItinerary(null)}
-                className="px-4 py-2 rounded-[5px] bg-[#F8F4EC] hover:bg-ink-100 text-ink-700 font-bold text-xs border border-ink-200/80 transition-colors cursor-pointer"
+            <div className="flex items-center justify-between gap-2 pt-2">
+              <a
+                href={`/itinerary/${selectedItinerary.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-2 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-ink-700 hover:text-clay-700 font-bold text-xs border border-ink-200/80 transition-colors cursor-pointer flex items-center gap-1.5"
+                title="Mở xem trang chi tiết lịch trình"
               >
-                Đóng
-              </button>
-              <button
-                onClick={() => {
-                  toast.success(`Đã xuất dữ liệu lịch trình #${selectedItinerary.id}!`);
-                  setSelectedItinerary(null);
-                }}
-                className="px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer"
-              >
-                Xuất chi tiết
-              </button>
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Xem trên web</span>
+              </a>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setSelectedItinerary(null)}
+                  className="px-4 py-2 rounded-[5px] bg-[#F8F4EC] hover:bg-ink-100 text-ink-700 font-bold text-xs border border-ink-200/80 transition-colors cursor-pointer"
+                >
+                  Đóng
+                </button>
+                <button
+                  onClick={() => handleExportSingleItinerary(selectedItinerary)}
+                  className="px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Xuất chi tiết CSV</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
