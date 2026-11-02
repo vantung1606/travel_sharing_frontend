@@ -344,23 +344,56 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
   ]);
 
   // Quản lý danh sách ngày linh hoạt (tôn trọng 100% dữ liệu người dùng tự nhập)
-  const [currentDays, setCurrentDays] = useState(() => {
-    if (itinerary?.days && itinerary.days.length > 0) {
-      return itinerary.days;
+  const resolveDays = useCallback((itin) => {
+    if (!itin) return [];
+    let targetDaysCount = itin.daysCount || 1;
+    if (itin.startDate && itin.endDate) {
+      const s = new Date(itin.startDate);
+      const e = new Date(itin.endDate);
+      if (!isNaN(s) && !isNaN(e) && e >= s) {
+        targetDaysCount = Math.max(targetDaysCount, Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1);
+      }
     }
-    const daysCount = itinerary?.daysCount || 1;
-    return Array.from({ length: daysCount }).map((_, i) => ({
-      dayNumber: i + 1,
-      title: `Ngày ${i + 1}: Kế hoạch khám phá ${itinerary?.destination || 'Điểm đến'}`,
-      activities: []
-    }));
-  });
+    if (itin.title) {
+      const m = itin.title.match(/(\d+)\s*(?:N|n|ngày|ngay)/i);
+      if (m && Number(m[1]) > 0 && Number(m[1]) <= 60) {
+        targetDaysCount = Math.max(targetDaysCount, Number(m[1]));
+      }
+    }
+    if (Array.isArray(itin.days) && itin.days.length > 0) {
+      targetDaysCount = Math.max(targetDaysCount, ...itin.days.map(d => d.dayNumber || 1));
+    }
+
+    const dayMap = {};
+    for (let i = 1; i <= targetDaysCount; i++) {
+      dayMap[i] = {
+        dayNumber: i,
+        title: `Ngày ${i}: Kế hoạch khám phá ${itin.destination || 'Điểm đến'}`,
+        activities: []
+      };
+    }
+
+    if (Array.isArray(itin.days)) {
+      itin.days.forEach(d => {
+        const dNum = d.dayNumber || 1;
+        dayMap[dNum] = {
+          dayNumber: dNum,
+          title: d.title || `Ngày ${dNum}: Kế hoạch khám phá ${itin.destination || 'Điểm đến'}`,
+          activities: d.activities || []
+        };
+      });
+    }
+
+    return Object.values(dayMap).sort((a, b) => a.dayNumber - b.dayNumber);
+  }, []);
+
+  const [currentDays, setCurrentDays] = useState(() => resolveDays(itinerary));
 
   useEffect(() => {
-    if (itinerary?.days) {
-      setCurrentDays(itinerary.days);
+    if (itinerary) {
+      setCurrentDays(resolveDays(itinerary));
     }
-  }, [itinerary]);
+  }, [itinerary, resolveDays]);
 
   const days = currentDays;
 

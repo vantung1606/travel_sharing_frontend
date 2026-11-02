@@ -748,10 +748,40 @@ export const AppProvider = ({ children }) => {
     if (!item) return null;
     const places = (item.details || []).map(d => d.locationName).filter(Boolean);
     const dayNumbers = (item.details || []).map(d => d.dayNumber).filter(Boolean);
-    const daysCount = dayNumbers.length > 0 ? Math.max(...dayNumbers, 1) : 3;
 
-    // Group activities by day
+    // 1. Tính toán số ngày chính xác theo CSDL backend
+    let daysCount = 1;
+    if (item.durationDays && Number(item.durationDays) > 0) {
+      daysCount = Number(item.durationDays);
+    } else if (item.startDate && item.endDate) {
+      const s = new Date(item.startDate);
+      const e = new Date(item.endDate);
+      if (!isNaN(s) && !isNaN(e) && e >= s) {
+        daysCount = Math.round((e - s) / (1000 * 60 * 60 * 24)) + 1;
+      }
+    }
+    if (item.title) {
+      const match = item.title.match(/(\d+)\s*(?:N|n|ngày|ngay)/i);
+      if (match && Number(match[1]) > 0 && Number(match[1]) <= 60) {
+        daysCount = Number(match[1]);
+      }
+    }
+    if (dayNumbers.length > 0) {
+      daysCount = Math.max(daysCount, ...dayNumbers);
+    }
+    daysCount = Math.max(1, daysCount);
+
+    // 2. Khởi tạo đầy đủ danh sách các ngày theo đúng daysCount (từ Ngày 1 đến Ngày daysCount)
     const dayMap = {};
+    for (let i = 1; i <= daysCount; i++) {
+      dayMap[i] = {
+        dayNumber: i,
+        title: `Ngày ${i}: Khám phá ${item.destination || 'Điểm đến'}`,
+        activities: []
+      };
+    }
+
+    // 3. Phân bổ các hoạt động trong details vào đúng ngày tương ứng
     (item.details || []).forEach(d => {
       const dayNum = d.dayNumber || 1;
       if (!dayMap[dayNum]) {
@@ -768,9 +798,9 @@ export const AppProvider = ({ children }) => {
         location: d.locationName || item.destination,
         address: d.locationAddress || `${item.destination || 'Việt Nam'}`,
         category: d.category || 'Khám phá',
-        note: d.note || d.transitInfo || 'Trải nghiệm du lịch bản địa',
+        note: d.note || d.transitInfo || '',
         aiTip: d.aiTip || '',
-        cost: d.estimatedCost ? `${Number(d.estimatedCost).toLocaleString('vi-VN')}đ` : 'Tùy chọn'
+        cost: d.estimatedCost ? `${Number(d.estimatedCost).toLocaleString('vi-VN')} ₫` : ''
       });
     });
 
@@ -795,26 +825,16 @@ export const AppProvider = ({ children }) => {
       departureDate: item.startDate ? `${item.startDate}${item.endDate ? ' – ' + item.endDate : ''}` : 'Khởi hành trong tháng tới',
       groupType: item.groupType || 'Cá nhân',
       travelStyle: item.travelStyle || 'Nghỉ dưỡng & Khám phá',
-      placesCount: places.length > 0 ? places.length : (daysCount * 3),
-      placesList: places.length > 0 ? places : [item.destination + ' City Tour'],
+      placesCount: places.length,
+      placesList: places.length > 0 ? places : [item.destination || 'Điểm đến'],
       budgetPerPerson: item.budgetTotal ? Math.round(Number(item.budgetTotal) / 2) : 0,
       totalBudget: item.budgetTotal ? Number(item.budgetTotal) : 0,
       budgetProgress: item.budgetTotal ? 35 : 0,
-      budgetNote: item.budgetTotal ? `Dự toán: ~${Number(item.budgetTotal).toLocaleString('vi-VN')}đ` : 'Chưa có dự toán',
+      budgetNote: item.budgetTotal ? `Dự toán: ~${Number(item.budgetTotal).toLocaleString('vi-VN')} ₫` : 'Chưa có dự toán',
       pace: 'Cân bằng',
       style: item.travelStyle || 'Nghỉ dưỡng & Khám phá',
       aiTipNote: 'Lịch trình được lưu trữ trên hệ thống máy chủ Wayfare.',
-      days: days.length > 0 ? days : [
-        {
-          dayNumber: 1,
-          title: `Ngày 1: Khám phá điểm nhấn ${item.destination || 'Việt Nam'}`,
-          activities: [
-            { time: '08:30', title: `Bắt đầu lịch trình tại ${item.destination}`, note: 'Khởi hành khám phá', cost: '150.000đ' },
-            { time: '14:00', title: 'Tham quan điểm check-in nổi bật', note: 'Trải nghiệm danh lam thắng cảnh', cost: 'Tùy chọn' },
-            { time: '18:30', title: 'Thưởng thức ẩm thực và dạo phố đêm', note: 'Không khí về đêm rực rỡ', cost: '200.000đ' }
-          ]
-        }
-      ]
+      days: days
     };
   }, []);
 

@@ -208,7 +208,7 @@ export const AITripGeneratorModal = () => {
                 <h3 className="text-sm font-extrabold text-white flex items-center gap-1.5">
                   <span>WanderAI Live Inspector</span>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/20 text-sky-300 font-mono font-bold">
-                    Gemini 1.5 Flash
+                    Gemini 3.8 Flash
                   </span>
                 </h3>
                 <p className="text-[11px] text-slate-400">
@@ -399,20 +399,25 @@ export const AITripGeneratorModal = () => {
       .filter(Boolean)
       .join(', ');
 
-    const finalDays = parsedAI.days && Array.isArray(parsedAI.days) && parsedAI.days.length > 0
-      ? parsedAI.days
-      : [
-        {
-          dayNumber: 1,
-          title: `Ngày 1: Khám phá điểm nhấn văn hóa & danh lam tại ${destination}`,
-          activities: [
-            { time: '08:00 – 09:30', category: 'Ẩm thực buổi sáng', title: `Thưởng thức điểm tâm đặc sản tại trung tâm ${destination}`, address: `Khu phố ẩm thực ${destination}`, note: 'Hương vị truyền thống địa phương', cost: '50.000đ' },
-            { time: '10:00 – 12:00', category: 'Tham quan danh thắng', title: `Khám phá danh thắng nổi tiếng tại ${destination}`, address: `Trung tâm ${destination}`, note: 'Điểm check-in biểu tượng', cost: '80.000đ' },
-            { time: '14:30 – 17:00', category: 'Trải nghiệm sinh thái', title: `Tham quan cảnh quan thiên nhiên & thư giãn`, address: `Khu sinh thái ${destination}`, note: 'Ngắm cảnh và chụp ảnh', cost: '60.000đ' },
-            { time: '19:00 – 21:30', category: 'Phố đêm & Ẩm thực', title: `Khám phá chợ đêm & ẩm thực đường phố`, address: `Phố đi bộ ${destination}`, note: 'Thưởng thức món ăn vặt về đêm', cost: '120.000đ' }
-          ]
-        }
-      ];
+    const dayMap = {};
+    for (let i = 1; i <= daysCount; i++) {
+      dayMap[i] = {
+        dayNumber: i,
+        title: `Ngày ${i}: Khám phá điểm nhấn ${destination}`,
+        activities: []
+      };
+    }
+    if (parsedAI.days && Array.isArray(parsedAI.days) && parsedAI.days.length > 0) {
+      parsedAI.days.forEach(d => {
+        const dNum = d.dayNumber || 1;
+        dayMap[dNum] = {
+          dayNumber: dNum,
+          title: d.title || `Ngày ${dNum}: Khám phá điểm nhấn ${destination}`,
+          activities: Array.isArray(d.activities) ? d.activities : []
+        };
+      });
+    }
+    const finalDays = Object.values(dayMap).sort((a, b) => a.dayNumber - b.dayNumber);
 
     let finalPlacesList = [];
     if (parsedAI.placesList && Array.isArray(parsedAI.placesList) && parsedAI.placesList.length > 0) {
@@ -485,7 +490,7 @@ export const AITripGeneratorModal = () => {
       currentStep: `Đang kết nối Google Gemini & Định vị địa lý "${destination}"...`,
       logs: [
         { time: getTimeString(), message: `Bắt đầu phiên phân tích WanderAI cho điểm đến: "${destination}" (${daysCount} ngày)` },
-        { time: getTimeString(), message: `Kết nối mô hình Google Gemini 3.5 Flash...` }
+        { time: getTimeString(), message: `Kết nối mô hình Google Gemini 3.8 Flash...` }
       ]
     });
 
