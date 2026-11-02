@@ -151,7 +151,7 @@ export const AdminItinerariesPage = () => {
     for (let i = 1; i <= daysCount; i++) {
       dayMap[i] = {
         dayNumber: i,
-        title: `Ngày ${i}: Khám phá ${dto.destination || 'Điểm đến'}`,
+        title: '',
         activities: []
       };
     }
@@ -161,10 +161,19 @@ export const AdminItinerariesPage = () => {
       if (!dayMap[dayNum]) {
         dayMap[dayNum] = {
           dayNumber: dayNum,
-          title: `Ngày ${dayNum}: Khám phá ${dto.destination || 'Điểm đến'}`,
+          title: '',
           activities: []
         };
       }
+      if (d.dayTitle && !dayMap[dayNum].title) {
+        dayMap[dayNum].title = d.dayTitle.trim();
+      }
+
+      // Nếu là bản ghi placeholder, chỉ dùng để lấy tiêu đề ngày
+      if (d.category === 'Kế hoạch ngày' && d.locationName === d.dayTitle) {
+        return;
+      }
+
       dayMap[dayNum].activities.push({
         id: d.id || Math.random(),
         time: d.startTime ? d.startTime.substring(0, 5) : '08:30',
@@ -176,6 +185,12 @@ export const AdminItinerariesPage = () => {
         cost: d.estimatedCost ? `${Number(d.estimatedCost).toLocaleString('vi-VN')} ₫` : ''
       });
     });
+
+    for (let i = 1; i <= daysCount; i++) {
+      if (!dayMap[i].title) {
+        dayMap[i].title = `Ngày ${i}: Khám phá ${dto.destination || 'Điểm đến'}`;
+      }
+    }
 
     const days = Object.values(dayMap).sort((a, b) => a.dayNumber - b.dayNumber);
 

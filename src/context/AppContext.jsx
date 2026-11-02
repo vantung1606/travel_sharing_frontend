@@ -776,7 +776,7 @@ export const AppProvider = ({ children }) => {
     for (let i = 1; i <= daysCount; i++) {
       dayMap[i] = {
         dayNumber: i,
-        title: `Ngày ${i}: Khám phá ${item.destination || 'Điểm đến'}`,
+        title: '',
         activities: []
       };
     }
@@ -787,10 +787,19 @@ export const AppProvider = ({ children }) => {
       if (!dayMap[dayNum]) {
         dayMap[dayNum] = {
           dayNumber: dayNum,
-          title: `Ngày ${dayNum}: Khám phá ${item.destination || 'Điểm đến'}`,
+          title: '',
           activities: []
         };
       }
+      if (d.dayTitle && !dayMap[dayNum].title) {
+        dayMap[dayNum].title = d.dayTitle.trim();
+      }
+
+      // Nếu là bản ghi placeholder lưu giữ tiêu đề ngày trống, không đưa vào danh sách mốc giờ activities
+      if (d.category === 'Kế hoạch ngày' && d.locationName === d.dayTitle) {
+        return;
+      }
+
       dayMap[dayNum].activities.push({
         id: d.id,
         time: d.startTime ? d.startTime.substring(0, 5) : '08:30',
@@ -803,6 +812,13 @@ export const AppProvider = ({ children }) => {
         cost: d.estimatedCost ? `${Number(d.estimatedCost).toLocaleString('vi-VN')} ₫` : ''
       });
     });
+
+    // 4. Nếu ngày nào chưa có tiêu đề riêng, tự động tạo tiêu đề chuẩn
+    for (let i = 1; i <= daysCount; i++) {
+      if (!dayMap[i].title) {
+        dayMap[i].title = `Ngày ${i}: Khám phá ${item.destination || 'Điểm đến'}`;
+      }
+    }
 
     const days = Object.values(dayMap).sort((a, b) => a.dayNumber - b.dayNumber);
 
@@ -883,20 +899,46 @@ export const AppProvider = ({ children }) => {
       isPublic: itineraryObj.isPublic !== false,
       status: (itineraryObj.status || 'ACTIVE').toUpperCase(),
       groupType: itineraryObj.groupType || 'Cá nhân',
-      details: (itineraryObj.days || []).flatMap(day =>
-        (day.activities || []).map((act, idx) => ({
+      travelStyle: itineraryObj.travelStyle || 'Nghỉ dưỡng & Khám phá',
+      details: (itineraryObj.days || []).flatMap(day => {
+        const rawTitle = day.title?.trim() || '';
+        const dayTitle = rawTitle.startsWith(`Ngày ${day.dayNumber}`)
+          ? rawTitle
+          : (rawTitle ? `Ngày ${day.dayNumber}: ${rawTitle}` : `Ngày ${day.dayNumber}: Khám phá ${itineraryObj.destination || 'Điểm đến'}`);
+
+        const validActivities = (day.activities || []).filter(act => act.title && act.title.trim());
+
+        if (validActivities.length > 0) {
+          return validActivities.map((act, idx) => ({
+            dayNumber: day.dayNumber || 1,
+            dayTitle: dayTitle,
+            visitOrder: idx + 1,
+            startTime: act.time ? (act.time.length === 5 ? `${act.time}:00` : (act.time.includes(':') ? act.time.substring(0, 5) + ':00' : '08:30:00')) : '08:30:00',
+            locationName: act.title || act.location || 'Điểm dừng chân',
+            locationAddress: act.address || itineraryObj.destination || 'Việt Nam',
+            category: act.category || 'Khám phá',
+            estimatedCost: typeof act.cost === 'number' ? act.cost : (parseInt((act.cost || '').replace(/\D/g, '')) || 0),
+            aiTip: act.aiTip || '',
+            transitInfo: act.transit || '',
+            note: act.note || ''
+          }));
+        }
+
+        // Nếu ngày chưa có hoạt động mốc giờ, lưu 1 bản ghi placeholder giữ trọn vẹn dayTitle vào CSDL MySQL
+        return [{
           dayNumber: day.dayNumber || 1,
-          visitOrder: idx + 1,
-          startTime: act.time ? (act.time.length === 5 ? `${act.time}:00` : (act.time.includes(':') ? act.time.substring(0, 5) + ':00' : '08:30:00')) : '08:30:00',
-          locationName: act.title || act.location || 'Điểm dừng chân',
-          locationAddress: act.address || itineraryObj.destination || 'Việt Nam',
-          category: act.category || 'Khám phá',
-          estimatedCost: typeof act.cost === 'number' ? act.cost : (parseInt((act.cost || '').replace(/\D/g, '')) || 100000),
-          aiTip: act.aiTip || '',
-          transitInfo: act.transit || '',
-          note: act.note || ''
-        }))
-      )
+          dayTitle: dayTitle,
+          visitOrder: 1,
+          startTime: '08:00:00',
+          locationName: dayTitle,
+          locationAddress: itineraryObj.destination || 'Việt Nam',
+          category: 'Kế hoạch ngày',
+          estimatedCost: 0,
+          aiTip: '',
+          transitInfo: '',
+          note: ''
+        }];
+      })
     };
 
     const saved = await itineraryApi.createItinerary(payload, activeEmail);

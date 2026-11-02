@@ -328,7 +328,10 @@ export const ItineraryManagerPage = () => {
 
     // Persist to MySQL backend database
     if (createManualItinerary) {
-      await createManualItinerary(newTrip);
+      const persisted = await createManualItinerary(newTrip);
+      if (persisted && persisted.id) {
+        setSelectedItinerary(persisted);
+      }
     } else {
       setItineraries(prev => [newTrip, ...prev]);
     }
