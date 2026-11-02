@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { useApp } from '../../../context/AppContext';
 import { placeApi, reportApi } from '../../../services/api';
+import { formatVietnamDateOnly } from '../../../utils/dateUtils';
 import { 
   MapPin, Check, X, Search, Star, Clock, ChevronRight, Eye, Trash2, 
   RefreshCw, ShieldCheck, Phone, AlertCircle, Plus, ExternalLink, 
@@ -1124,7 +1125,7 @@ export const AdminPlacesPage = () => {
 
                             <div className="text-[10px] text-ink-400 flex items-center justify-between">
                               <span>Người báo: <strong className="text-ink-700">{rep.reporterName || rep.reporterEmail || 'Du khách'}</strong></span>
-                              <span>{rep.createdAt ? new Date(rep.createdAt).toLocaleDateString('vi-VN') : ''}</span>
+                              <span>{rep.createdAt ? formatVietnamDateOnly(rep.createdAt) : ''}</span>
                             </div>
 
                             {rep.evidenceImageUrl && (

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { adminReviewApi } from '../../../services/api';
+import { formatVietnamDateOnly } from '../../../utils/dateUtils';
 import { Star, Eye, EyeOff, Trash2, Search, RefreshCw, ChevronLeft, ChevronRight, MessageSquare, ShieldAlert, ExternalLink, X, ChevronDown } from 'lucide-react';
 import { UserAvatar } from '../../../components/common/UserAvatar';
 
@@ -110,11 +111,7 @@ export const AdminReviewsPage = () => {
     }
   };
 
-  const fmtDate = (d) => {
-    if (!d) return '—';
-    const date = new Date(d);
-    return date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  };
+  const fmtDate = (d) => formatVietnamDateOnly(d);
 
   const kpis = useMemo(() => ([
     { label: 'Tổng số đánh giá', value: metrics.totalReviews ?? 0, icon: MessageSquare, sub: 'Ghi nhận từ khách du lịch' },

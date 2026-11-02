@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
+import { formatVietnam24h, formatVietnamRelativeTime } from '../../../utils/dateUtils';
 import {
   Bell,
   Sparkles,
@@ -188,14 +189,7 @@ export const NotificationsPage = () => {
     }
   };
 
-  const formatRelativeTime = (isoString) => {
-    if (!isoString) return 'Vừa xong';
-    const diff = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000);
-    if (diff < 60) return 'Vừa xong';
-    if (diff < 3600) return `${Math.floor(diff / 60)} phút trước`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} giờ trước`;
-    return `${Math.floor(diff / 86400)} ngày trước`;
-  };
+  const formatRelativeTime = (isoString) => formatVietnamRelativeTime(isoString);
 
   // Filter Logic
   const filteredNotifications = useMemo(() => {
@@ -652,7 +646,7 @@ export const NotificationsPage = () => {
                       </span>
                       <span>•</span>
                       <span>
-                        {new Date(item.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })} - {new Date(item.createdAt).toLocaleDateString('vi-VN')}
+                        {formatVietnam24h(item.createdAt)}
                       </span>
                     </div>
                   </div>

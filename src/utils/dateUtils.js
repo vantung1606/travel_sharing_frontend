@@ -82,7 +82,7 @@ export const parseDateSafe = (dateValue) => {
 export const parseVietnamDate = parseDateSafe;
 
 /**
- * Định dạng ngày giờ chuẩn 24 giờ Việt Nam: "HH:mm:ss DD/MM/YYYY"
+ * Định dạng ngày giờ chuẩn 24 giờ Việt Nam (không cần giây): "HH:mm DD/MM/YYYY"
  */
 export const formatVietnam24h = (dateValue, fallback = '—') => {
   const d = parseVietnamDate(dateValue);
@@ -94,8 +94,21 @@ export const formatVietnam24h = (dateValue, fallback = '—') => {
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
+    minute: '2-digit'
+  });
+};
+
+/**
+ * Định dạng chỉ ngày theo chuẩn Việt Nam: "DD/MM/YYYY"
+ */
+export const formatVietnamDateOnly = (dateValue, fallback = '—') => {
+  const d = parseVietnamDate(dateValue);
+  if (!d) return fallback;
+  return d.toLocaleDateString('vi-VN', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
   });
 };
 

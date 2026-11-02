@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { adminApi, adminReportApi, auditLogApi, adminUserApi } from '../../../services/api';
+import { formatVietnamDateOnly } from '../../../utils/dateUtils';
 import { 
   Users, MapPin, Sparkles, TrendingUp, CheckCircle2, Calendar, 
   ChevronRight, Search, Filter, Flag, Eye, Download, ArrowRight, RefreshCw, 
@@ -473,7 +474,7 @@ export const AdminDashboardPage = () => {
         usersList.forEach(user => {
           const rolesStr = Array.isArray(user.roles) ? user.roles.join(', ') : (user.role || 'ROLE_USER');
           const isBlocked = user.isBlocked || user.blocked || user.status === 'BLOCKED';
-          lines.push(`${user.id},${escape(user.name || user.fullName || 'Thành viên')},${escape(user.email || 'N/A')},${escape(user.phoneNumber || user.phone || '—')},${escape(rolesStr)},${user.postsCount || 0},${escape(user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'Mới tham gia')},${isBlocked ? '"Đã khóa"' : '"Hoạt động bình thường"'}`);
+          lines.push(`${user.id},${escape(user.name || user.fullName || 'Thành viên')},${escape(user.email || 'N/A')},${escape(user.phoneNumber || user.phone || '—')},${escape(rolesStr)},${user.postsCount || 0},${escape(user.createdAt ? formatVietnamDateOnly(user.createdAt, 'Mới tham gia') : 'Mới tham gia')},${isBlocked ? '"Đã khóa"' : '"Hoạt động bình thường"'}`);
         });
       }
 
@@ -1393,7 +1394,7 @@ export const AdminDashboardPage = () => {
                       </td>
 
                       <td className="py-3 px-4 text-ink-500 text-[11px]">
-                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'Mới tham gia'}
+                        {user.createdAt ? formatVietnamDateOnly(user.createdAt, 'Mới tham gia') : 'Mới tham gia'}
                       </td>
 
                       <td className="py-3 px-4 text-right">
