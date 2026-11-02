@@ -3,7 +3,7 @@ import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { adminApi, adminReportApi, auditLogApi, adminUserApi } from '../../../services/api';
 import { 
-  Users, MapPin, Sparkles, TrendingUp, CheckCircle2, Calendar, Plus, 
+  Users, MapPin, Sparkles, TrendingUp, CheckCircle2, Calendar, 
   ChevronRight, Search, Filter, Flag, Eye, Download, ArrowRight, RefreshCw, 
   FileText, Compass, ShieldAlert, Clock, History, UserCheck, ChevronLeft, 
   X, Star, ExternalLink, BarChart3, AlertTriangle
@@ -299,14 +299,6 @@ export const AdminDashboardPage = () => {
             <span>Xuất CSV</span>
           </button>
 
-          <button
-            onClick={() => setAdminTab('places')}
-            className="h-9 flex items-center gap-1.5 px-4 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs border border-clay-600 transition-colors cursor-pointer"
-            title="Đi đến trang Quản lý Điểm đến"
-          >
-            <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>Quản lý điểm đến</span>
-          </button>
         </div>
       </div>
 
