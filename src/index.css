@@ -12,21 +12,21 @@
 
 @layer base {
   :root {
-    --wf-primary: #B0522F;
-    --wf-primary-hover: #93422A;
-    --wf-background: #F8F4EC;
+    --wf-primary: #0284C7;
+    --wf-primary-hover: #0369A1;
+    --wf-background: #F8FAFC;
     --wf-surface: #FFFFFF;
-    --wf-text: #1E1A15;
-    --wf-muted: #6B6258;
-    --wf-border: #E5DED2;
-    --wf-button-bg: #B0522F;
+    --wf-text: #0F172A;
+    --wf-muted: #64748B;
+    --wf-border: #E2E8F0;
+    --wf-button-bg: #0284C7;
     --wf-button-text: #FFFFFF;
-    --primary: var(--wf-primary, #B0522F);
-    --primary-hover: var(--wf-primary-hover, #93422A);
-    --secondary: #2B271F;
-    --tertiary: #C66A45;
-    --surface: var(--wf-background, #F8F4EC);
-    --on-surface: var(--wf-text, #1E1A15);
+    --primary: var(--wf-primary, #0284C7);
+    --primary-hover: var(--wf-primary-hover, #0369A1);
+    --secondary: #0F172A;
+    --tertiary: #0EA5E9;
+    --surface: var(--wf-background, #F8FAFC);
+    --on-surface: var(--wf-text, #0F172A);
   }
 
   /* Clean, crisp & modern base font sizing with optimum readability */
@@ -49,16 +49,16 @@
   }
 
   body {
-    font-family: 'Times New Roman', Times, Georgia, serif;
-    color: var(--wf-text, #1E1A15);
-    background-color: var(--wf-background, #F8F4EC) !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--wf-text, #0F172A);
+    background-color: var(--wf-background, #F8FAFC) !important;
     font-weight: 400;
     letter-spacing: 0.005em;
   }
 
   ::selection {
-    background: #EFCDBC;
-    color: #3B1A12;
+    background: #BAE6FD;
+    color: #0369A1;
   }
 }
 
@@ -88,24 +88,28 @@
 }
 
 .sparkle-btn {
-  background: var(--wf-button-bg, var(--wf-primary, #B0522F)) !important;
+  background: var(--wf-button-bg, var(--wf-primary, #0284C7)) !important;
   color: var(--wf-button-text, #FFFFFF) !important;
   transition: background-color 0.2s ease;
 }
 
 .sparkle-btn:hover {
-  background: var(--wf-primary-hover, #93422A) !important;
+  background: var(--wf-primary-hover, #0369A1) !important;
 }
 
-.emerald-gradient,
+.emerald-gradient {
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%) !important;
+  transition: opacity 0.2s ease;
+}
+
 .ocean-gradient {
-  background: var(--wf-primary, #B0522F) !important;
-  transition: background-color 0.2s ease;
+  background: linear-gradient(135deg, #0284C7 0%, #0EA5E9 100%) !important;
+  transition: opacity 0.2s ease;
 }
 
 .emerald-gradient:hover,
 .ocean-gradient:hover {
-  background: var(--wf-primary-hover, #93422A) !important;
+  opacity: 0.95;
 }
 
 .forest-gradient {

@@ -15,6 +15,7 @@ import {
   BadgeCheck,
   RefreshCw,
   Sparkles,
+  Database,
   ChevronLeft,
   Lock,
   Unlock,
@@ -923,10 +924,10 @@ export const AdminUsersPage = () => {
                 {/* Thống kê hoạt động THẬT từ DB */}
                 <div className="p-3.5 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-serif font-bold text-xs text-ink-800 flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-clay-600" /> Hoạt động CSDL
+                    <span className="font-semibold text-xs text-slate-800 flex items-center gap-1.5">
+                      <Database className="w-3.5 h-3.5 text-sky-600" /> Hoạt động CSDL
                     </span>
-                    <span className="font-mono text-[10px] text-clay-700 font-bold">
+                    <span className="text-xs text-sky-700 font-semibold">
                       {activitySummary ? 'Thời gian thực' : 'Đang truy vấn…'}
                     </span>
                   </div>

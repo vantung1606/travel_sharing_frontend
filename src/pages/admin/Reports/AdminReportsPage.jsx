@@ -1564,8 +1564,8 @@ export const AdminReportsPage = () => {
 
             <div className="p-3 bg-amber-50 rounded-[5px] border border-amber-200 text-xs text-amber-900 space-y-1">
               <div className="flex items-center justify-between font-bold">
-                <span className="flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-600" /> WanderAI Security Analysis
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-700" /> Đánh giá an toàn nội dung
                 </span>
                 <span>Điểm an toàn: {selectedPostModal.aiSafetyScore || 98}/100</span>
               </div>
