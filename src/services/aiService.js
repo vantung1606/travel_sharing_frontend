@@ -46,6 +46,9 @@ export const aiService = {
       }
 
       if (!res.ok) {
+        if (res.status === 502 || res.status === 504) {
+          throw new Error('Máy chủ Backend đang kết nối tới AI hoặc đang triển khai lại. Vui lòng bấm thử lại sau giây lát!');
+        }
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.message || `Lỗi máy chủ AI (${res.status}). Vui lòng kiểm tra lại cấu hình GEMINI_API_KEY trên Backend.`);
       }
@@ -58,6 +61,9 @@ export const aiService = {
       return data.data.text;
     } catch (err) {
       console.error('[WanderAI] Backend AI generate error:', err);
+      if (err.message === 'Failed to fetch') {
+        throw new Error('Không thể kết nối đến máy chủ Backend (Mạng gián đoạn hoặc Railway đang khởi động lại). Vui lòng thử lại sau 15-30 giây!');
+      }
       throw err;
     }
   }

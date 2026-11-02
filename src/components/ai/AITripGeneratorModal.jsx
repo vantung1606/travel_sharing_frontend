@@ -570,11 +570,11 @@ QUY TẮC BẮT BUỘC:
   ]
 }`;
 
-      // 4. GỌI GEMINI 3.8 FLASH QUA BACKEND PROXY (MAX TOKENS 8192)
+      // 4. GỌI GEMINI FLASH QUA BACKEND PROXY (TỐI ƯU TOKENS 3072 ĐỂ PHẢN HỒI SIÊU TỐC)
       const aiResponse = await aiService.generateText({
         prompt,
         model: 'gemini-3.8-flash',
-        maxTokens: 8192,
+        maxTokens: 3072,
         temperature: 0.3
       });
 
