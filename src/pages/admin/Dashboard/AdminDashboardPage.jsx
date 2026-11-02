@@ -231,6 +231,69 @@ export const AdminDashboardPage = () => {
     };
   };
 
+  // Helper tính toán số ngày & thời lượng chuẩn xác của lịch trình
+  const getItineraryDuration = (item) => {
+    if (!item) return { days: 1, label: '1 ngày (Đi về trong ngày)', shortLabel: '1N' };
+
+    // 1. Trích xuất từ tiêu đề nếu có pattern "3N2Đ", "4N3D", "2 ngày 1 đêm", "5 ngày", "3N"
+    if (item.title) {
+      const fullMatch = item.title.match(/(\d+)\s*(?:N|n)\s*(\d+)\s*(?:Đ|đ|D|d)/);
+      if (fullMatch && Number(fullMatch[1]) > 0) {
+        const d = Number(fullMatch[1]);
+        const n = Number(fullMatch[2]);
+        return { days: d, label: `${d} ngày (${d}N${n}Đ)`, shortLabel: `${d}N${n}Đ` };
+      }
+      const simpleMatch = item.title.match(/(\d+)\s*(?:ngày|ngay|N|n)(?!\w)/i);
+      if (simpleMatch && Number(simpleMatch[1]) > 0 && Number(simpleMatch[1]) <= 60) {
+        const d = Number(simpleMatch[1]);
+        return { days: d, label: d > 1 ? `${d} ngày (${d}N${d - 1}Đ)` : '1 ngày (Đi về trong ngày)', shortLabel: `${d}N${Math.max(0, d - 1)}Đ` };
+      }
+    }
+
+    // 2. Tính toán từ khoảng ngày startDate và endDate (endDate = startDate + daysCount - 1)
+    if (item.startDate && item.endDate) {
+      const start = new Date(item.startDate);
+      const end = new Date(item.endDate);
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime()) && end >= start) {
+        const diffMs = end.getTime() - start.getTime();
+        const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+        const calculatedDays = diffDays + 1;
+        if (calculatedDays > 1) {
+          return {
+            days: calculatedDays,
+            label: `${calculatedDays} ngày (${calculatedDays}N${calculatedDays - 1}Đ)`,
+            shortLabel: `${calculatedDays}N${calculatedDays - 1}Đ`
+          };
+        }
+        return { days: 1, label: '1 ngày (Đi về trong ngày)', shortLabel: '1N' };
+      }
+    }
+
+    // 3. Nếu có details các ngày
+    if (item.details && Array.isArray(item.details) && item.details.length > 0) {
+      const maxDay = Math.max(...item.details.map(d => Number(d.dayNumber) || 1));
+      if (maxDay > 0) {
+        return {
+          days: maxDay,
+          label: maxDay > 1 ? `${maxDay} ngày (${maxDay}N${maxDay - 1}Đ)` : '1 ngày (Đi về trong ngày)',
+          shortLabel: `${maxDay}N${Math.max(0, maxDay - 1)}Đ`
+        };
+      }
+    }
+
+    // 4. Nếu có daysCount hoặc durationDays hợp lệ > 0
+    if (item.daysCount && Number(item.daysCount) > 0) {
+      const d = Number(item.daysCount);
+      return { days: d, label: d > 1 ? `${d} ngày (${d}N${d - 1}Đ)` : '1 ngày (Đi về trong ngày)', shortLabel: `${d}N${Math.max(0, d - 1)}Đ` };
+    }
+    if (item.durationDays && Number(item.durationDays) > 0) {
+      const d = Number(item.durationDays);
+      return { days: d, label: d > 1 ? `${d} ngày (${d}N${d - 1}Đ)` : '1 ngày (Đi về trong ngày)', shortLabel: `${d}N${Math.max(0, d - 1)}Đ` };
+    }
+
+    return { days: 1, label: '1 ngày (Đi về trong ngày)', shortLabel: '1N' };
+  };
+
   // Filter Itineraries
   const filteredItineraries = useMemo(() => {
     return itinerariesList.filter(item => {
@@ -396,7 +459,7 @@ export const AdminDashboardPage = () => {
         lines.push('N/A,"Chưa có lịch trình",N/A,N/A,0,0,N/A,N/A');
       } else {
         itinerariesList.forEach(item => {
-          lines.push(`${item.id},${escape(item.title || 'Không tiêu đề')},${escape(item.creatorName || item.userFullName || 'Thành viên')},${escape(item.destination || 'Việt Nam')},${item.durationDays || 1},${Number(item.budgetTotal || 0).toLocaleString('vi-VN')},${item.isAiGenerated ? '"Trợ lý AI thiết kế"' : '"Thành viên tự tạo"'},${escape(item.status || 'ACTIVE')}`);
+          lines.push(`${item.id},${escape(item.title || 'Không tiêu đề')},${escape(item.creatorName || item.userFullName || 'Thành viên')},${escape(item.destination || 'Việt Nam')},${getItineraryDuration(item).days},${Number(item.budgetTotal || 0).toLocaleString('vi-VN')},${item.isAiGenerated ? '"Trợ lý AI thiết kế"' : '"Thành viên tự tạo"'},${escape(item.status || 'ACTIVE')}`);
         });
       }
       lines.push('');
@@ -466,7 +529,7 @@ export const AdminDashboardPage = () => {
       lines.push(`"Điểm đến chính",${escape(itin.destination || 'Việt Nam')}`);
       lines.push(`"Tác giả tạo",${escape(itin.creatorName || itin.userFullName || 'Thành viên')}`);
       lines.push(`"Email tác giả",${escape(itin.creatorEmail || 'N/A')}`);
-      lines.push(`"Thời lượng chuyến đi",${escape(`${itin.durationDays || 1} ngày`)}`);
+      lines.push(`"Thời lượng chuyến đi",${escape(getItineraryDuration(itin).label)}`);
       lines.push(`"Ngày bắt đầu (Start Date)",${escape(itin.startDate || 'Chưa định ngày cụ thể')}`);
       lines.push(`"Ngày kết thúc (End Date)",${escape(itin.endDate || 'Chưa định ngày cụ thể')}`);
       lines.push(`"Trạng thái hệ thống CSDL (status)",${escape(statusInfo.dbStatus)}`);
@@ -1162,7 +1225,7 @@ export const AdminDashboardPage = () => {
                           ) : (
                             'Thành viên tự thiết kế'
                           )}
-                          {row.durationDays && <span>• {row.durationDays} ngày</span>}
+                          <span>• {getItineraryDuration(row).shortLabel}</span>
                         </span>
                       </td>
 
@@ -1402,7 +1465,7 @@ export const AdminDashboardPage = () => {
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-ink-400">Thời lượng dự kiến:</span>
-                <strong className="text-ink-800 font-bold">{selectedItinerary.durationDays || 1} ngày</strong>
+                <strong className="text-ink-800 font-bold">{getItineraryDuration(selectedItinerary).label}</strong>
               </div>
               <div className="flex justify-between py-1">
                 <span className="text-ink-400">Lịch trình khởi hành:</span>
