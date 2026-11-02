@@ -364,43 +364,72 @@ export const PlaceDetailModal = ({
                 )}
               </div>
 
-              {/* Review Input */}
-              <form onSubmit={onSubmitReview} className="p-3 rounded-[6px] bg-[#F8F4EC] border border-ink-200/70 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-bold text-ink-600">Chấm điểm:</span>
-                  <div className="flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
+              {/* Review Input or Already Reviewed Banner */}
+              {(() => {
+                const myExistingReview = reviews.find(r => isAuthorOfReview(r));
+                if (myExistingReview) {
+                  return (
+                    <div className="p-3.5 rounded-[6px] bg-[#F8F4EC] border border-ink-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 font-bold text-ink-800">
+                          <span className="text-amber-500 font-bold">★ {myExistingReview.rating} sao</span>
+                          <span>• Bạn đã đánh giá địa điểm này</span>
+                        </div>
+                        <p className="text-[11px] text-ink-500 leading-relaxed">
+                          Mỗi tài khoản được đánh giá 1 lần duy nhất. Bạn có thể chỉnh sửa nhận xét của mình bên dưới.
+                        </p>
+                      </div>
                       <button
-                        key={star}
                         type="button"
-                        onClick={() => setReviewRating(star)}
-                        className="p-0.5 text-ink-300 hover:text-amber-400 cursor-pointer"
+                        onClick={() => handleStartEdit(myExistingReview)}
+                        className="self-start sm:self-auto px-3 py-1.5 bg-[#FFFDF8] hover:bg-[#F5F0E6] text-sky-700 border border-ink-200/90 rounded-[5px] font-bold text-xs flex items-center gap-1.5 transition-colors cursor-pointer shadow-2xs"
                       >
-                        <Star className={`w-3.5 h-3.5 ${star <= reviewRating ? 'fill-amber-400 text-amber-400' : ''}`} />
+                        <Edit2 className="w-3.5 h-3.5 text-sky-600" />
+                        <span>Sửa đánh giá</span>
                       </button>
-                    ))}
-                  </div>
-                </div>
+                    </div>
+                  );
+                }
 
-                <textarea
-                  rows={2}
-                  placeholder="Chia sẻ cảm nhận, góc chụp đẹp hoặc lưu ý cho người đi sau..."
-                  value={reviewComment}
-                  onChange={(e) => setReviewComment(e.target.value)}
-                  className="w-full p-2 bg-[#FFFDF8] text-ink-800 rounded-[5px] text-xs placeholder:text-ink-300 border border-ink-200 outline-none focus:ring-1 focus:ring-sky-500 resize-none"
-                />
+                return (
+                  <form onSubmit={onSubmitReview} className="p-3 rounded-[6px] bg-[#F8F4EC] border border-ink-200/70 space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-ink-600">Chấm điểm:</span>
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setReviewRating(star)}
+                            className="p-0.5 text-ink-300 hover:text-amber-400 cursor-pointer"
+                          >
+                            <Star className={`w-3.5 h-3.5 ${star <= reviewRating ? 'fill-amber-400 text-amber-400' : ''}`} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={isSubmittingReview || !reviewComment.trim()}
-                    className="px-3.5 py-1.5 rounded-[5px] bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white font-bold text-[11px] flex items-center gap-1.5 transition-all cursor-pointer"
-                  >
-                    <Send className="w-3 h-3" />
-                    <span>{isSubmittingReview ? 'Đang gửi...' : 'Gửi nhận xét'}</span>
-                  </button>
-                </div>
-              </form>
+                    <textarea
+                      rows={2}
+                      placeholder="Chia sẻ cảm nhận, góc chụp đẹp hoặc lưu ý cho người đi sau..."
+                      value={reviewComment}
+                      onChange={(e) => setReviewComment(e.target.value)}
+                      className="w-full p-2 bg-[#FFFDF8] text-ink-800 rounded-[5px] text-xs placeholder:text-ink-300 border border-ink-200 outline-none focus:ring-1 focus:ring-sky-500 resize-none"
+                    />
+
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={isSubmittingReview || !reviewComment.trim()}
+                        className="px-3.5 py-1.5 rounded-[5px] bg-sky-600 hover:bg-sky-700 disabled:opacity-50 text-white font-bold text-[11px] flex items-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <Send className="w-3 h-3" />
+                        <span>{isSubmittingReview ? 'Đang gửi...' : 'Gửi nhận xét'}</span>
+                      </button>
+                    </div>
+                  </form>
+                );
+              })()}
 
               {/* Danh sách đánh giá THẬT từ GET /places/{id}/reviews */}
               {reviews.length > 0 ? (

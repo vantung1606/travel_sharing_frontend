@@ -411,6 +411,16 @@ export const ExplorePage = () => {
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!detailModalItem?.rawId) return;
+    const hasReviewed = placeReviews.some(r =>
+      currentUser && (
+        (r.authorEmail && currentUser.email && r.authorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+        (r.authorId && currentUser.id && String(r.authorId) === String(currentUser.id))
+      )
+    );
+    if (hasReviewed) {
+      toast.warn('Bạn đã đánh giá địa điểm này rồi! Mỗi tài khoản chỉ được đánh giá 1 lần duy nhất.');
+      return;
+    }
     if (!reviewComment.trim()) {
       toast.warn('Vui lòng viết đôi lời nhận xét về địa điểm này!');
       return;

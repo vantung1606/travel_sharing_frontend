@@ -44,10 +44,24 @@ export const PlaceDetailPage = () => {
   const [editComment, setEditComment] = useState('');
   const [isUpdatingReview, setIsUpdatingReview] = useState(false);
 
+  // Mỗi tài khoản chỉ được đánh giá 1 lần duy nhất cho mỗi địa điểm
+  const myExistingReview = reviews.find((r) =>
+    currentUser && (
+      (r.authorEmail && currentUser.email && r.authorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+      (r.authorId && currentUser.id && String(r.authorId) === String(currentUser.id))
+    )
+  );
+
   const handleCreateReview = async (e) => {
     e.preventDefault();
     if (!currentUser?.email) {
       toast.showInfo('Vui lòng đăng nhập để viết đánh giá địa điểm!');
+      return;
+    }
+    if (myExistingReview) {
+      toast.showInfo('Bạn đã đánh giá địa điểm này rồi! Mỗi tài khoản chỉ được đánh giá 1 lần duy nhất. Hãy chỉnh sửa đánh giá hiện có.');
+      setIsAddingReview(false);
+      handleStartEditReview(myExistingReview);
       return;
     }
     if (!newReviewComment.trim()) {
@@ -569,13 +583,24 @@ export const PlaceDetailPage = () => {
                   {reviews.length}
                 </span>
               </h4>
-              <button
-                type="button"
-                onClick={() => setIsAddingReview(!isAddingReview)}
-                className="text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline cursor-pointer flex items-center gap-1"
-              >
-                {isAddingReview ? 'Đóng form' : '+ Viết đánh giá'}
-              </button>
+              {myExistingReview ? (
+                <button
+                  type="button"
+                  onClick={() => handleStartEditReview(myExistingReview)}
+                  className="text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline cursor-pointer flex items-center gap-1"
+                  title="Mỗi tài khoản được đánh giá 1 lần duy nhất - Bấm để chỉnh sửa đánh giá của bạn"
+                >
+                  <Edit2 className="w-3.5 h-3.5" /> Sửa đánh giá của bạn
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsAddingReview(!isAddingReview)}
+                  className="text-xs font-bold text-sky-600 hover:text-sky-700 hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  {isAddingReview ? 'Đóng form' : '+ Viết đánh giá'}
+                </button>
+              )}
             </div>
 
             {/* Form viết đánh giá mới */}
