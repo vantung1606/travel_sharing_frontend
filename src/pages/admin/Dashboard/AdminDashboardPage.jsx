@@ -279,11 +279,11 @@ export const AdminDashboardPage = () => {
         </div>
 
         {/* Action Toolbar */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 xl:pt-0">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 pt-2 xl:pt-0 w-full sm:w-auto">
           <button 
             onClick={() => loadDashboardData(true)}
             disabled={refreshing}
-            className="h-9 flex items-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer disabled:opacity-50"
+            className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer disabled:opacity-50"
             title="Đồng bộ dữ liệu thời gian thực từ CSDL"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-clay-600 ${refreshing ? 'animate-spin' : ''}`} />
@@ -292,13 +292,12 @@ export const AdminDashboardPage = () => {
 
           <button 
             onClick={handleExportCsv}
-            className="h-9 flex items-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer"
+            className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer"
             title="Xuất bảng dữ liệu hiện tại ra file CSV"
           >
             <Download className="w-3.5 h-3.5 text-clay-600" />
             <span>Xuất CSV</span>
           </button>
-
         </div>
       </div>
 
@@ -441,11 +440,11 @@ export const AdminDashboardPage = () => {
               </div>
 
               {/* Metric Toggle Tabs */}
-              <div className="inline-flex items-center p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80 shrink-0 text-xs">
+              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80 shrink-0 text-xs">
                 <button
                   type="button"
                   onClick={() => setChartMetric('users')}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     chartMetric === 'users'
                       ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
@@ -457,7 +456,7 @@ export const AdminDashboardPage = () => {
                 <button
                   type="button"
                   onClick={() => setChartMetric('posts')}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     chartMetric === 'posts'
                       ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
@@ -513,7 +512,7 @@ export const AdminDashboardPage = () => {
               </div>
 
               {/* Chart Footer Summary Cards */}
-              <div className="grid grid-cols-3 gap-3 mt-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-4 pt-2">
                 <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
                   <span className="text-[11px] text-ink-400 block font-medium">Tổng 6 tháng qua</span>
                   <span className="text-base font-display font-black text-ink-800 mt-0.5 block">
@@ -548,11 +547,11 @@ export const AdminDashboardPage = () => {
               </div>
 
               {/* Subtabs for Trends */}
-              <div className="inline-flex items-center p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80 shrink-0 text-xs">
+              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80 shrink-0 text-xs">
                 <button
                   type="button"
                   onClick={() => setTopTab('destinations')}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     topTab === 'destinations'
                       ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
@@ -564,7 +563,7 @@ export const AdminDashboardPage = () => {
                 <button
                   type="button"
                   onClick={() => setTopTab('places')}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     topTab === 'places'
                       ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
@@ -800,48 +799,50 @@ export const AdminDashboardPage = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full md:w-auto">
             {/* Search Input */}
-            <div className="relative">
+            <div className="relative w-full sm:w-64">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
               <input
                 type="text"
                 placeholder={activeTableTab === 'itineraries' ? "Tìm theo tên, điểm đến, tác giả..." : "Tìm tên, email thành viên..."}
                 value={tableSearch}
                 onChange={(e) => setTableSearch(e.target.value)}
-                className="pl-8 pr-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs text-ink-800 placeholder:text-ink-300 outline-none focus:border-clay-600 w-56 sm:w-64 transition-all"
+                className="pl-8 pr-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs text-ink-800 placeholder:text-ink-300 outline-none focus:border-clay-600 w-full transition-all"
               />
             </div>
 
-            {/* Filter Dropdown */}
-            <select
-              value={tableStatusFilter}
-              onChange={(e) => setTableStatusFilter(e.target.value)}
-              className="px-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs font-bold text-ink-700 outline-none cursor-pointer hover:bg-[#F8F4EC]/80 transition-colors"
-            >
-              {activeTableTab === 'itineraries' ? (
-                <>
-                  <option value="all">Tất cả trạng thái</option>
-                  <option value="active">Đang hoạt động (ACTIVE)</option>
-                  <option value="draft">Bản nháp / Chưa duyệt</option>
-                </>
-              ) : (
-                <>
-                  <option value="all">Tất cả vai trò</option>
-                  <option value="user">Người dùng (USER)</option>
-                  <option value="admin">Quản trị viên (ADMIN)</option>
-                </>
-              )}
-            </select>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              {/* Filter Dropdown */}
+              <select
+                value={tableStatusFilter}
+                onChange={(e) => setTableStatusFilter(e.target.value)}
+                className="flex-1 sm:flex-none px-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs font-bold text-ink-700 outline-none cursor-pointer hover:bg-[#F8F4EC]/80 transition-colors"
+              >
+                {activeTableTab === 'itineraries' ? (
+                  <>
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="active">Đang hoạt động (ACTIVE)</option>
+                    <option value="draft">Bản nháp / Chưa duyệt</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="all">Tất cả vai trò</option>
+                    <option value="user">Người dùng (USER)</option>
+                    <option value="admin">Quản trị viên (ADMIN)</option>
+                  </>
+                )}
+              </select>
 
-            <button 
-              onClick={() => loadDashboardData(true)}
-              disabled={refreshing}
-              className="p-2 rounded-[5px] bg-[#FFFDF8] border border-ink-200/80 text-ink-600 hover:text-clay-700 hover:bg-[#F8F4EC] transition-colors cursor-pointer disabled:opacity-50" 
-              title="Làm mới bảng"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-clay-600' : ''}`} />
-            </button>
+              <button 
+                onClick={() => loadDashboardData(true)}
+                disabled={refreshing}
+                className="p-2 rounded-[5px] bg-[#FFFDF8] border border-ink-200/80 text-ink-600 hover:text-clay-700 hover:bg-[#F8F4EC] transition-colors cursor-pointer disabled:opacity-50 shrink-0" 
+                title="Làm mới bảng"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-clay-600' : ''}`} />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1055,8 +1056,8 @@ export const AdminDashboardPage = () => {
 
         {/* Pagination Bar */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-2 text-xs text-ink-500">
-            <span>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-ink-500">
+            <span className="text-center sm:text-left">
               Hiển thị {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, currentRecords.length)} trong số {currentRecords.length} kết quả
             </span>
             <div className="flex items-center gap-1.5">

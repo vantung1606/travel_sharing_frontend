@@ -70,13 +70,13 @@ export const AdminHeader = () => {
             {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
 
-          {/* Search Box - Distinct width, generous margins */}
-          <div className="relative w-56 sm:w-72 md:w-80 lg:w-96">
+          {/* Search Box - Fluid on small mobile to prevent header overflow */}
+          <div className="relative min-w-0 flex-1 max-w-[190px] sm:max-w-none sm:w-72 md:w-80 lg:w-96">
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-ink-400 pointer-events-none" />
             <input
               type="text"
-              placeholder="Tìm kiếm người dùng, địa điểm, bài viết..."
-              className="w-full pl-8 pr-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 text-ink-800 rounded-[5px] text-xs placeholder:text-ink-400 focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] transition-colors font-sans"
+              placeholder="Tìm kiếm người dùng, địa điểm..."
+              className="w-full pl-8 pr-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 text-ink-800 rounded-[5px] text-xs placeholder:text-ink-400 focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] transition-colors font-sans truncate"
             />
           </div>
         </div>
