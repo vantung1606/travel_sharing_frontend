@@ -168,7 +168,7 @@ export const PlaceDetailModal = ({
   if (!item) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-ink-900/55  animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/35 backdrop-blur-[2px] animate-fade-in overflow-y-auto">
       <div className="bg-[#FFFDF8] rounded-[6px] max-w-4xl w-full shadow-none border border-ink-200 overflow-hidden my-6 max-h-[92vh] flex flex-col">
         
         {/* 1. Modal Image Panorama Header */}
@@ -617,7 +617,7 @@ export const PlaceDetailModal = ({
 
       {/* Styled Delete Review Confirmation Modal */}
       {deleteConfirmReviewId && (
-        <div className="fixed inset-0 z-60 bg-ink-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-60 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4 animate-in fade-in duration-150">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-sm w-full p-5 border border-ink-200/80 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150">
             <div className="flex items-start gap-3.5">
               <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">

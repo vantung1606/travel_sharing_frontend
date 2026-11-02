@@ -1034,7 +1034,7 @@ export const AdminUsersPage = () => {
 
       {/* 6. MODAL: PHÂN QUYỀN VAI TRÒ (CHANGE ROLE RBAC) */}
       {showRoleModal && userToChangeRole && (
-        <div className="fixed inset-0 z-50 bg-ink-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4">
           <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] max-w-md w-full p-6 shadow-xl space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-ink-200/80">
               <div className="flex items-center gap-2">
@@ -1119,7 +1119,7 @@ export const AdminUsersPage = () => {
 
       {/* 7. MODAL: THÊM NHÂN SỰ MỚI (CREATE USER / INVITE STAFF) */}
       {showAddUserModal && (
-        <div className="fixed inset-0 z-50 bg-ink-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4">
           <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] max-w-lg w-full p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-ink-200/80">
               <div className="flex items-center gap-2">
@@ -1234,7 +1234,7 @@ export const AdminUsersPage = () => {
 
       {/* 8. MODAL: MẬT KHẨU TẠM SAU KHI RESET */}
       {resetPasswordResult && (
-        <div className="fixed inset-0 z-50 bg-ink-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4">
           <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] max-w-md w-full p-6 shadow-xl space-y-4">
             <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center">
               <KeyRound className="w-5 h-5" />

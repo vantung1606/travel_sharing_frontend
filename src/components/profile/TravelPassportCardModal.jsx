@@ -24,7 +24,7 @@ export const TravelPassportCardModal = ({ user, profileData, onClose }) => {
   const postsCount = profileData?.posts?.length || 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
       <div className="bg-[#FFFDF8] rounded-[6px] max-w-md w-full overflow-hidden shadow-2xl border border-ink-200/80 flex flex-col relative animate-in zoom-in-95 duration-200">
         
         {/* Header Bar */}

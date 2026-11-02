@@ -654,7 +654,7 @@ QUY TẮC BẮT BUỘC:
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 py-8 sm:py-12 bg-slate-950/70 backdrop-blur-md overflow-y-auto animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 py-8 sm:py-12 bg-black/35 backdrop-blur-[2px] overflow-y-auto animate-fade-in">
       {/* COMPACT MODAL CARD (Max-w: 620px, thoáng đãng, lề trên rộng rãi) */}
       <div className="relative w-full max-w-[620px] bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[90vh] border border-slate-200">
 

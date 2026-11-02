@@ -1302,7 +1302,7 @@ export const AdminPlacesPage = () => {
 
       {/* ─── 5. MODAL: CREATE NEW PLACE ───────────────────────────────────────── */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-2xl w-full p-6 border border-ink-200 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between border-b border-ink-200/60 pb-3">
               <div>
@@ -1505,7 +1505,7 @@ export const AdminPlacesPage = () => {
 
       {/* ─── 5.1. MODAL: EDIT PLACE ─────────────────────────────────────────── */}
       {editPlaceModalData && editPlaceForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-2xl w-full max-h-[90vh] flex flex-col border border-ink-200 shadow-2xl overflow-hidden">
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-ink-200/60 bg-[#F8F4EC]/60">
@@ -1762,7 +1762,7 @@ export const AdminPlacesPage = () => {
 
       {/* ─── 6. MODAL: REJECT CONFIRMATION ───────────────────────────────────── */}
       {rejectModalData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-[5px] bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0">
@@ -1822,7 +1822,7 @@ export const AdminPlacesPage = () => {
 
       {/* ─── 7. MODAL: DELETE CONFIRMATION ───────────────────────────────────── */}
       {deleteModalData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center shrink-0">
@@ -1859,7 +1859,7 @@ export const AdminPlacesPage = () => {
 
       {/* ─── 8. MODAL: EVIDENCE IMAGE PREVIEW ─────────────────────────────────── */}
       {selectedEvidenceModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/70 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-150">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-4 border border-ink-200 shadow-2xl space-y-3">
             <div className="flex items-center justify-between border-b border-ink-200/60 pb-2">
               <span className="font-display font-black text-sm text-ink-800 flex items-center gap-1.5">
@@ -1896,7 +1896,7 @@ export const AdminPlacesPage = () => {
 
       {/* ─── 8. MODAL: CẤU HÌNH GHIM NỔI BẬT & CHIẾN DỊCH MÙA ─── */}
       {featuredModalPlace && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/50 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-150">
           <div className="bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-3 border-b border-ink-100">
               <div className="flex items-center gap-2">

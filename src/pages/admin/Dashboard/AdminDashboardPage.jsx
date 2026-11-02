@@ -1444,7 +1444,7 @@ export const AdminDashboardPage = () => {
 
       {/* ─── QUICK VIEW ITINERARY MODAL ────────────────────────────────────── */}
       {selectedItinerary && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 border border-ink-200 shadow-xl space-y-4">
             <div className="flex items-start justify-between">
               <div>

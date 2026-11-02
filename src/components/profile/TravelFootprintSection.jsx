@@ -527,7 +527,7 @@ export const TravelFootprintSection = ({ posts = [], itineraries = [], userId = 
       {/* MODAL: PROVINCE STORIES & ITINERARIES DRAWER              */}
       {/* ========================================================= */}
       {selectedProvinceForStories && selectedStories && (
-        <div className="fixed inset-0 z-50 bg-ink-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full max-h-[85vh] flex flex-col shadow-2xl border border-ink-200/80 animate-in fade-in zoom-in-95 duration-200">
             <div className="p-4 sm:p-5 border-b border-ink-200/80 bg-[#F8F4EC] rounded-t-[6px] flex items-center justify-between">
               <div className="flex items-center gap-2.5">

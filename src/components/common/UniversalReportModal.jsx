@@ -119,7 +119,7 @@ export const UniversalReportModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-950/70 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
       <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full max-h-[90vh] overflow-y-auto p-6 shadow-2xl border border-ink-200/80 space-y-4 animate-in zoom-in-95 duration-200">
         <div className="flex items-center justify-between pb-3 border-b border-ink-200/80">
           <h3 className="font-display font-black text-base text-rose-700 flex items-center gap-2">

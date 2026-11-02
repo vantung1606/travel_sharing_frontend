@@ -112,7 +112,7 @@ export const EditItineraryModal = ({ itinerary, isOpen, onClose, onSuccess }) =>
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/75 backdrop-blur-sm overflow-y-auto animate-fade-in font-display">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/35 backdrop-blur-[2px] overflow-y-auto animate-fade-in font-display">
       <div className="relative w-full max-w-2xl bg-white text-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] border border-slate-200 my-auto">
         {/* Modal Header */}
         <div className="px-6 py-4 sm:py-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">

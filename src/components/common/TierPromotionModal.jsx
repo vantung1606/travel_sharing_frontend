@@ -8,7 +8,7 @@ export const TierPromotionModal = ({ promotion, user, onClose, onViewBadges }) =
   const { newTier, oldTier } = promotion;
 
   return (
-    <div className="fixed inset-0 z-50 bg-ink-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4 animate-in fade-in duration-200">
       <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] max-w-md w-full p-6 sm:p-7 text-ink-800 shadow-2xl relative overflow-hidden animate-in zoom-in-95 duration-200 text-center space-y-5">
         
         {/* Subtle decorative warm clay glows */}

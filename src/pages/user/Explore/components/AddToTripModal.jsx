@@ -147,7 +147,7 @@ export const AddToTripModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-ink-900/55  animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/35 backdrop-blur-[2px] animate-fade-in overflow-y-auto">
       <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full shadow-none border border-ink-200 overflow-hidden my-auto">
         {/* Header */}
         <div className="px-5 py-4 border-b border-ink-200/70 flex items-center justify-between bg-[#F8F4EC]">

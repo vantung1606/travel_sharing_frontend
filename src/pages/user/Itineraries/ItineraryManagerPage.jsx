@@ -932,7 +932,7 @@ export const ItineraryManagerPage = () => {
 
       {/* ─── 7. MODAL TẠO CHUYẾN ĐI THỦ CÔNG (LUXURY POPUP) ─────────────────────── */}
       {isManualCreateOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#17130F]/75 overflow-y-auto animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] overflow-y-auto animate-in fade-in duration-200">
           <div className="bg-[#FFFDF8] rounded-sm max-w-2xl w-full border border-[#1E1A15]/15 overflow-hidden my-auto max-h-[92vh] flex flex-col">
             
             {/* Modal Header */}

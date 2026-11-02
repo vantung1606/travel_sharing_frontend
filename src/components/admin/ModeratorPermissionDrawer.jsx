@@ -177,7 +177,7 @@ export const ModeratorPermissionDrawer = ({ isOpen, onClose, targetUser, onUpdat
     <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-ink-900/40 backdrop-blur-xs transition-opacity animate-in fade-in"
+        className="fixed inset-0 bg-black/35 backdrop-blur-[2px] transition-opacity animate-in fade-in"
         onClick={onClose}
       />
 

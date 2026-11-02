@@ -115,7 +115,7 @@ export const FollowListModal = ({
   });
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-ink-950/70 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
       <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full shadow-2xl border border-ink-200/80 max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
         
         {/* Header */}

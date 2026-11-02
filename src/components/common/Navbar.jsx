@@ -394,7 +394,7 @@ export const Navbar = () => {
         <div className="fixed inset-0 z-50 lg:hidden flex justify-end">
           <div
             onClick={() => setIsMobileMenuOpen(false)}
-            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+            className="fixed inset-0 bg-black/35 backdrop-blur-[2px] transition-opacity"
           />
 
           <div className="relative z-10 w-[310px] max-w-[85vw] bg-white h-full shadow-2xl flex flex-col justify-between p-6 overflow-y-auto animate-in slide-in-from-right duration-300">

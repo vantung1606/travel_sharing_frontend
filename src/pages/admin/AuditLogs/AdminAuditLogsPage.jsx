@@ -810,7 +810,7 @@ export const AdminAuditLogsPage = () => {
 
       {/* 6. Log Detail Modal (Paper-Ink-Clay) */}
       {selectedLog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-150">
           <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] max-w-lg w-full p-6 shadow-xl space-y-4 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-3 border-b border-ink-200/80">
               <div className="flex items-center gap-2.5">

@@ -1497,7 +1497,7 @@ export const AdminReportsPage = () => {
 
       {/* Modal xem ảnh bằng chứng báo cáo */}
       {selectedEvidenceImage && (
-        <div className="fixed inset-0 z-50 bg-ink-900/70 backdrop-blur-xs flex items-center justify-center p-4" onClick={() => setSelectedEvidenceImage(null)}>
+        <div className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4" onClick={() => setSelectedEvidenceImage(null)}>
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-4 border border-ink-200 shadow-2xl space-y-3" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between pb-2 border-b border-ink-200/60">
               <h4 className="font-display font-bold text-ink-800 text-sm flex items-center gap-1.5">
@@ -1520,7 +1520,7 @@ export const AdminReportsPage = () => {
 
       {/* 7. Modal: Xem chi tiết bài viết (Post Preview Modal) */}
       {selectedPostModal && (
-        <div className="fixed inset-0 z-50 bg-ink-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-2xl w-full p-6 border border-ink-200 shadow-xl space-y-4 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-ink-200/60">
               <div className="flex items-center gap-2">
@@ -1675,7 +1675,7 @@ export const AdminReportsPage = () => {
 
       {/* 8. Action Confirmation Modal */}
       {confirmModal && (
-        <div className="fixed inset-0 z-[9998] bg-ink-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9998] bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start gap-3">
               <div className={`p-2.5 rounded-[5px] shrink-0 border ${

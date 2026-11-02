@@ -139,7 +139,7 @@ export const AddPlaceModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-ink-900/55  animate-fade-in overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/35 backdrop-blur-[2px] animate-fade-in overflow-y-auto">
       <div className="bg-[#FFFDF8] rounded-[6px] max-w-xl w-full shadow-none border border-ink-200/70 overflow-hidden my-auto max-h-[92vh] flex flex-col">
         
         {/* Header with Visual Banner */}

@@ -87,7 +87,7 @@ export const ReportPostModal = ({ post, onClose, onReportSubmitted, onReportSucc
   };
 
   return (
-    <div className="fixed inset-0 z-[9998] bg-slate-950/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9998] bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">

@@ -138,7 +138,7 @@ export const AdminHeader = () => {
 
       {/* Mobile Slide-Over Drawer for Admin Menu */}
       {isMobileMenuOpen && (
-        <dialog ref={mobileDialog} aria-label="Điều hướng quản trị" onCancel={() => setIsMobileMenuOpen(false)} className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none border-0 bg-transparent p-0 backdrop:bg-ink-900/60 backdrop:backdrop-blur-xs">
+        <dialog ref={mobileDialog} aria-label="Điều hướng quản trị" onCancel={() => setIsMobileMenuOpen(false)} className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none border-0 bg-transparent p-0 backdrop:bg-black/35 backdrop:backdrop-blur-[2px]">
           <button type="button" tabIndex={-1} aria-label="Đóng menu" className="absolute inset-0 h-full w-full" onClick={() => setIsMobileMenuOpen(false)} />
           <AdminSidebar onNavigate={() => setIsMobileMenuOpen(false)} />
           <button autoFocus type="button" aria-label="Đóng menu Admin" className="fixed right-3 top-3 z-[60] flex h-9 w-9 items-center justify-center rounded-[5px] bg-[#FFFDF8] border border-ink-200/80 text-ink-800 shadow-lg cursor-pointer" onClick={() => setIsMobileMenuOpen(false)}>

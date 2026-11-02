@@ -543,7 +543,7 @@ export const AdminMaintenancePage = () => {
 
       {/* ─── 4. FULLSCREEN PREVIEW MODAL ─────────────────────────────────── */}
       {previewOpen && (
-        <div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/70 flex flex-col animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-[9999] overflow-y-auto bg-black/35 backdrop-blur-[2px] flex flex-col animate-in fade-in duration-150">
           <div className="bg-ink-900 text-white px-6 py-2.5 flex items-center justify-between shrink-0 shadow-md">
             <div className="flex items-center gap-2">
               <Eye className="w-4 h-4 text-amber-400" />

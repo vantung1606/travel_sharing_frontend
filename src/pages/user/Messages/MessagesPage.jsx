@@ -1150,7 +1150,7 @@ export const MessagesPage = () => {
 
       {/* Modal Tạo Nhóm Trò Chuyện Mới */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 bg-ink-900/55  flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 shadow-none border border-ink-200 animate-in zoom-in-95 duration-200 space-y-4 max-h-[92vh] flex flex-col">
             
             {/* Modal Header */}
@@ -1350,7 +1350,7 @@ export const MessagesPage = () => {
 
       {/* Modal Quản Lý Thành Viên Nhóm (Xem danh sách, Kick, Thêm người, Rời nhóm) */}
       {isMembersModalOpen && (
-        <div className="fixed inset-0 z-50 bg-ink-900/55  flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 shadow-none border border-ink-200 animate-in zoom-in-95 duration-200 space-y-4 max-h-[92vh] flex flex-col">
             
             {/* Modal Header */}

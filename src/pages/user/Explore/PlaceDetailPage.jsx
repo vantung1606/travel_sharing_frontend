@@ -931,7 +931,7 @@ export const PlaceDetailPage = () => {
 
       {/* Styled Delete Review Confirmation Modal */}
       {deleteConfirmReviewId && (
-        <div className="fixed inset-0 z-60 bg-ink-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-60 bg-black/35 backdrop-blur-[2px] flex items-center justify-center p-4 animate-in fade-in duration-150">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-sm w-full p-5 border border-ink-200/80 shadow-2xl space-y-4 animate-in zoom-in-95 duration-150">
             <div className="flex items-start gap-3.5">
               <div className="w-10 h-10 rounded-full bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">

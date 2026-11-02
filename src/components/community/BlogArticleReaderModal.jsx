@@ -141,7 +141,7 @@ export const BlogArticleReaderModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center p-2 sm:p-4 md:p-6 bg-[#1E1A15] overflow-y-auto animate-fade-in font-display">
+    <div className="fixed inset-0 z-50 flex items-start justify-center p-2 sm:p-4 md:p-6 bg-black/35 backdrop-blur-[2px] overflow-y-auto animate-fade-in font-display">
       {/* KHUNG MODAL ĐỌC BÀI VIẾT CHUYÊN SÂU */}
       <div className="relative w-full max-w-4xl bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh] border border-slate-200 mt-2 sm:mt-4">
         

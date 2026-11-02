@@ -641,7 +641,7 @@ export const AdminBroadcastPage = () => {
 
       {/* ─── 4. CONFIRMATION DIALOG MODAL ─────────────────────────────────── */}
       {confirmModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/50 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-150">
           <div className="bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-150">
             <div className="flex items-center gap-3 text-clay-700">
               <div className="w-10 h-10 rounded-full bg-clay-100 flex items-center justify-center shrink-0">
@@ -694,7 +694,7 @@ export const AdminBroadcastPage = () => {
 
       {/* ─── 5. TARGET URL & PLACE PICKER MODAL ───────────────────────────── */}
       {isPickerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-150">
           <div className="bg-[#FFFDF8] rounded-[8px] border border-ink-200/90 shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
             
             {/* Modal Header */}

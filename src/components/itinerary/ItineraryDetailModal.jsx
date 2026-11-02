@@ -659,7 +659,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
   if (!itinerary) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8 bg-slate-950/75 backdrop-blur-sm overflow-y-auto animate-fade-in font-display">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 lg:p-8 bg-black/35 backdrop-blur-[2px] overflow-y-auto animate-fade-in font-display">
       {/* MODAL CARD CHÍNH - RESPONSIVE TOÀN DIỆN: MOBILE, TABLET & DESKTOP */}
       <div className="relative w-full max-w-5xl bg-white text-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col h-[95vh] sm:h-[92vh] max-h-[96vh] border border-slate-200 my-auto">
         

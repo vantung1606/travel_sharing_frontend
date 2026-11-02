@@ -173,7 +173,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
   };
 
   const modalContent = (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-ink-950/75 backdrop-blur-xs">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/35 backdrop-blur-[2px]">
       <div className="bg-[#FFFDF8] rounded-[6px] max-w-3xl sm:max-w-4xl w-full shadow-2xl border border-ink-200/80 h-[88vh] max-h-[92vh] min-h-[500px] flex flex-col overflow-hidden relative z-10 animate-in zoom-in-95 duration-200">
         
 

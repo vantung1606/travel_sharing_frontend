@@ -202,7 +202,7 @@ export const AuthModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 lg:p-8 bg-slate-950/70 backdrop-blur-md transition-opacity duration-300 animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 lg:p-8 bg-black/35 backdrop-blur-[2px] transition-opacity duration-300 animate-fadeIn">
       
       {/* Container Dialog Card strictly matching CNPM template layout */}
       <div className="relative w-full max-w-5xl bg-[#eef1f6] rounded-[24px] shadow-2xl overflow-hidden border border-slate-300/40 flex flex-col lg:flex-row max-h-[92vh]">

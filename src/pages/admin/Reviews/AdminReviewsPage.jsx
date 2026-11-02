@@ -352,7 +352,7 @@ export const AdminReviewsPage = () => {
 
       {/* ── Review Detail Modal ── */}
       {detailReview && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200" onClick={() => setDetailReview(null)}>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200" onClick={() => setDetailReview(null)}>
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 border border-ink-200 shadow-xl space-y-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-3 border-b border-ink-200/60 pb-3">
               <div className="flex items-center gap-3">
@@ -411,7 +411,7 @@ export const AdminReviewsPage = () => {
 
       {/* ── Confirm Delete Modal ── */}
       {confirmDelete && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-ink-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center shrink-0">

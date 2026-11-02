@@ -31,7 +31,7 @@ export const ExploreFilterDrawer = ({
   const idleClass = 'bg-[#F8F4EC] text-ink-500 border-ink-200 hover:border-clay-300 hover:text-clay-700';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-end bg-ink-900/45 animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/35 backdrop-blur-[2px] animate-fade-in">
       {/* Backdrop click to close */}
       <div className="absolute inset-0" onClick={onClose} />
 

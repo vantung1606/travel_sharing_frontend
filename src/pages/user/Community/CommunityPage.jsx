@@ -2920,7 +2920,7 @@ export const CommunityPage = () => {
       {/* MODAL 1: CREATE POST WITH ATTACHED ITINERARY SELECTOR    */}
       {/* ========================================================= */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#1E1A15]/60 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/30 backdrop-blur-[2px]">
           <div className="bg-[#FFFDF8] rounded-sm sm:rounded-sm max-w-xl w-full p-4 sm:p-6  border border-[#1E1A15]/10 max-h-[90vh] overflow-y-auto space-y-4 animate-in fade-in zoom-in-95 duration-200 relative">
             
             {/* AI Moderation & Shield Scanning Overlay */}
@@ -3420,7 +3420,7 @@ export const CommunityPage = () => {
       {/* MODAL: AI MODERATION & SAFETY REVIEW FEEDBACK             */}
       {/* ========================================================= */}
       {moderationFeedback && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#1E1A15]/60 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/30 backdrop-blur-[2px]">
           <div className="bg-[#FFFDF8] rounded-sm sm:rounded-sm max-w-md w-full p-4 sm:p-6  border border-[#1E1A15]/10 space-y-4 animate-in fade-in zoom-in-95 duration-200 text-center">
             <div
               className="w-16 h-16 rounded-sm mx-auto flex items-center justify-center  transition-transform duration-300 scale-105"
@@ -3488,7 +3488,7 @@ export const CommunityPage = () => {
       {/* MODAL 2: COMMENTS DRAWER / MODAL                          */}
       {/* ========================================================= */}
       {activeCommentPost && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1E1A15]/60 backdrop-blur-xs">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-[2px]">
           <div className="bg-[#FFFDF8] rounded-sm max-w-lg w-full p-6  border border-[#1E1A15]/10 max-h-[85vh] flex flex-col space-y-4 animate-in fade-in zoom-in-95 duration-200">
             {/* Drawer Header */}
             <div className="flex items-center justify-between pb-3 border-b border-[#1E1A15]/10">
