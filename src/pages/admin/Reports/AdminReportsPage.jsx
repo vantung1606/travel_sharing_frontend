@@ -9,6 +9,7 @@ import {
   Bot, History, X, MapPin, Sparkles, ExternalLink, ChevronLeft, ChevronRight,
   Shield, Globe, Laptop, Clock, ArrowRight, Flag, Image as ImageIcon
 } from 'lucide-react';
+import { getUserTier } from '../../../utils/tierSystem';
 
 // Helper to sanitize media image URLs and prevent Mixed Content on production HTTPS
 const getSafeImageUrl = (url) => {
@@ -793,8 +794,17 @@ export const AdminReportsPage = () => {
                       </h3>
 
                       {/* Author Meta */}
-                      <div className="flex items-center gap-2 mb-3 text-xs text-ink-600">
+                      <div className="flex items-center gap-2 mb-3 text-xs text-ink-600 flex-wrap">
                         <span className="font-bold text-ink-800">{report.authorName}</span>
+                        {(() => {
+                          const t = getUserTier({ tier: report.authorTier, role: report.authorRole });
+                          return (
+                            <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold inline-flex items-center gap-0.5 border ${t.badgeBg}`}>
+                              <span>{t.icon}</span>
+                              <span>{t.name}</span>
+                            </span>
+                          );
+                        })()}
                         <span className="text-ink-400">{report.authorHandle}</span>
                         <span className="w-1 h-1 rounded-full bg-ink-300"></span>
                         <span className="text-ink-400 font-medium">{report.authorAccountAge}</span>
@@ -817,6 +827,15 @@ export const AdminReportsPage = () => {
                               <p className="text-[11px] text-ink-500 mt-1 flex items-center gap-1.5 flex-wrap">
                                 <span className="font-semibold text-ink-700">Người gửi báo cáo:</span>
                                 <span className="font-bold text-rose-700">{report.reporterName}</span>
+                                {(() => {
+                                  const t = getUserTier({ tier: report.reporterTier, role: report.reporterRole });
+                                  return (
+                                    <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold inline-flex items-center gap-0.5 border ${t.badgeBg}`}>
+                                      <span>{t.icon}</span>
+                                      <span>{t.name}</span>
+                                    </span>
+                                  );
+                                })()}
                                 {report.reporterEmail && <span className="text-ink-400">({report.reporterEmail})</span>}
                               </p>
                             )}
@@ -938,7 +957,20 @@ export const AdminReportsPage = () => {
                         <p className="font-display font-bold text-ink-800 truncate">{art.title}</p>
                         <span className="text-[11px] text-ink-400">{art.locationTag}</span>
                       </td>
-                      <td className="py-3.5 px-4 whitespace-nowrap font-bold text-ink-800">{art.authorName}</td>
+                      <td className="py-3.5 px-4 whitespace-nowrap font-bold text-ink-800">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span>{art.authorName}</span>
+                          {(() => {
+                            const t = getUserTier({ tier: art.authorTier, role: art.authorRole });
+                            return (
+                              <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold inline-flex items-center gap-0.5 border ${t.badgeBg}`}>
+                                <span>{t.icon}</span>
+                                <span>{t.name}</span>
+                              </span>
+                            );
+                          })()}
+                        </div>
+                      </td>
                       <td className="py-3.5 px-4 whitespace-nowrap text-ink-400">{art.timeAgo}</td>
                       <td className="py-3.5 px-4 whitespace-nowrap">
                         <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] text-[10px] font-bold border ${
@@ -1533,6 +1565,19 @@ export const AdminReportsPage = () => {
                   <MapPin className="w-3.5 h-3.5 text-clay-600" /> {selectedPostModal.locationTag}
                 </span>
               </div>
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <span className="font-bold text-xs text-ink-800">{selectedPostModal.authorName}</span>
+                {(() => {
+                  const t = getUserTier({ tier: selectedPostModal.authorTier, role: selectedPostModal.authorRole });
+                  return (
+                    <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold inline-flex items-center gap-0.5 border ${t.badgeBg}`}>
+                      <span>{t.icon}</span>
+                      <span>{t.name}</span>
+                    </span>
+                  );
+                })()}
+                {selectedPostModal.authorHandle && <span className="text-xs text-ink-400">{selectedPostModal.authorHandle}</span>}
+              </div>
               <h2 className="text-xl font-display font-black text-ink-800 mb-2">
                 {selectedPostModal.title}
               </h2>
@@ -1565,8 +1610,18 @@ export const AdminReportsPage = () => {
                   {selectedPostModal.reportReason}
                 </p>
                 {selectedPostModal.reporterName && (
-                  <p className="text-[10px] text-ink-500 pt-0.5">
-                    Người gửi báo cáo: <strong className="text-ink-800">{selectedPostModal.reporterName}</strong> {selectedPostModal.reporterEmail && `(${selectedPostModal.reporterEmail})`}
+                  <p className="text-[10px] text-ink-500 pt-0.5 flex items-center gap-1 flex-wrap">
+                    <span>Người gửi báo cáo:</span> <strong className="text-ink-800">{selectedPostModal.reporterName}</strong>
+                    {(() => {
+                      const t = getUserTier({ tier: selectedPostModal.reporterTier, role: selectedPostModal.reporterRole });
+                      return (
+                        <span className={`px-1.5 py-0.2 rounded text-[9px] font-bold inline-flex items-center gap-0.5 border ${t.badgeBg}`}>
+                          <span>{t.icon}</span>
+                          <span>{t.name}</span>
+                        </span>
+                      );
+                    })()}
+                    {selectedPostModal.reporterEmail && `(${selectedPostModal.reporterEmail})`}
                   </p>
                 )}
               </div>

@@ -1279,8 +1279,8 @@ export const ProfilePage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {TIERS.map(tier => {
-                const isUnlocked = userTotalXP >= tier.minXP;
                 const isCurrent = currentTier.id === tier.id;
+                const isUnlocked = userTotalXP >= tier.minXP || tier.level <= currentTier.level || isCurrent;
 
                 return (
                   <div

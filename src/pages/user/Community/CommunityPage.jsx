@@ -1978,7 +1978,7 @@ export const CommunityPage = () => {
                             isVerified: true
                           }}
                           size="md"
-                          showBadge={false}
+                          showBadge={true}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -1993,6 +1993,19 @@ export const CommunityPage = () => {
                           >
                             {authorName}
                           </h4>
+
+                          {(() => {
+                            const authorTierObj = getUserTier({
+                              tier: post.authorTier,
+                              role: post.authorRole
+                            });
+                            return (
+                              <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold inline-flex items-center gap-0.5 border ${authorTierObj.badgeBg}`}>
+                                <span>{authorTierObj.icon}</span>
+                                <span>{authorTierObj.name}</span>
+                              </span>
+                            );
+                          })()}
 
                           {post.sharedPost && (
                             <span className="text-xs font-normal text-[#6B6154] flex items-center gap-1">

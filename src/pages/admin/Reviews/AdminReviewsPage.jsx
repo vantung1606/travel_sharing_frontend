@@ -4,6 +4,7 @@ import { adminReviewApi } from '../../../services/api';
 import { formatVietnamDateOnly } from '../../../utils/dateUtils';
 import { Star, Eye, EyeOff, Trash2, Search, RefreshCw, ChevronLeft, ChevronRight, MessageSquare, ShieldAlert, ExternalLink, X, ChevronDown } from 'lucide-react';
 import { UserAvatar } from '../../../components/common/UserAvatar';
+import { getUserTier } from '../../../utils/tierSystem';
 
 const TABS = [
   { id: 'all', label: 'Tất cả' },
@@ -260,9 +261,28 @@ export const AdminReviewsPage = () => {
 
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-2">
-                        <UserAvatar user={{ avatar: review.authorAvatar, name: review.authorName }} size={28} />
+                        <UserAvatar 
+                          user={{ 
+                            avatar: review.authorAvatar, 
+                            name: review.authorName,
+                            tier: review.authorTier,
+                            role: review.authorRole
+                          }} 
+                          size={28} 
+                        />
                         <div className="min-w-0">
-                          <p className="font-bold text-ink-800 truncate max-w-[140px]">{review.authorName}</p>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <p className="font-bold text-ink-800 truncate max-w-[130px]">{review.authorName}</p>
+                            {(() => {
+                              const t = getUserTier({ tier: review.authorTier, role: review.authorRole });
+                              return (
+                                <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold inline-flex items-center gap-0.5 border ${t.badgeBg}`}>
+                                  <span>{t.icon}</span>
+                                  <span>{t.name}</span>
+                                </span>
+                              );
+                            })()}
+                          </div>
                           {review.authorHandle && (
                             <p className="text-[10px] text-ink-400 truncate max-w-[140px]">{review.authorHandle}</p>
                           )}
@@ -353,9 +373,28 @@ export const AdminReviewsPage = () => {
           <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 border border-ink-200 shadow-xl space-y-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-3 border-b border-ink-200/60 pb-3">
               <div className="flex items-center gap-3">
-                <UserAvatar user={{ avatar: detailReview.authorAvatar, name: detailReview.authorName }} size={40} />
+                <UserAvatar 
+                  user={{ 
+                    avatar: detailReview.authorAvatar, 
+                    name: detailReview.authorName,
+                    tier: detailReview.authorTier,
+                    role: detailReview.authorRole
+                  }} 
+                  size={40} 
+                />
                 <div>
-                  <p className="font-display font-black text-base text-ink-800">{detailReview.authorName}</p>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <p className="font-display font-black text-base text-ink-800">{detailReview.authorName}</p>
+                    {(() => {
+                      const t = getUserTier({ tier: detailReview.authorTier, role: detailReview.authorRole });
+                      return (
+                        <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold inline-flex items-center gap-0.5 border ${t.badgeBg}`}>
+                          <span>{t.icon}</span>
+                          <span>{t.name}</span>
+                        </span>
+                      );
+                    })()}
+                  </div>
                   <div className="flex items-center gap-2 mt-0.5">
                     <RatingStars rating={detailReview.rating} />
                     <span className="text-[11px] text-ink-400">{fmtDate(detailReview.createdAt)}</span>
