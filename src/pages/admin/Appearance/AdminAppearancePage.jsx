@@ -147,6 +147,19 @@ export const CURATED_COLOR_THEMES = [
   }
 ];
 
+// Ngăn chặn vòng lặp vô hạn nếu ảnh fallback cũng không tải được
+export const handleImageErrorSafe = (e, fallbackSrc = '/wayfare-logo.png') => {
+  if (!e || !e.target) return;
+  if (e.target.dataset.fallbackApplied) {
+    e.target.onerror = null;
+    e.target.style.display = 'none';
+    return;
+  }
+  e.target.dataset.fallbackApplied = 'true';
+  e.target.onerror = null;
+  e.target.src = fallbackSrc;
+};
+
 // Gợi ý mã màu 1-chạm cho từng thuộc tính
 export const QUICK_COLOR_SWATCHES = {
   primary: ['#b0522f', '#0284c7', '#15803d', '#c2410c', '#7c3aed', '#db2777', '#0f766e', '#1e293b'],
@@ -891,7 +904,7 @@ export const AdminAppearancePage = () => {
                           src={formData.branding.logoUrl} 
                           alt="Primary Logo" 
                           className="max-h-full max-w-full object-contain"
-                          onError={(e) => { e.target.src = '/wayfare-logo.png'; }}
+                          onError={(e) => handleImageErrorSafe(e, '/wayfare-logo.png')}
                         />
                       ) : (
                         <span className="text-[10px] text-ink-400 font-mono">Chưa có logo</span>
@@ -938,7 +951,7 @@ export const AdminAppearancePage = () => {
                           src={formData.branding.logoWhiteUrl} 
                           alt="White Logo" 
                           className="max-h-full max-w-full object-contain"
-                          onError={(e) => { e.target.src = '/wayfare-logo-white.png'; }}
+                          onError={(e) => handleImageErrorSafe(e, '/wayfare-logo-white.png')}
                         />
                       ) : (
                         <span className="text-[10px] text-ink-400 font-mono">Chưa có logo</span>
@@ -977,7 +990,7 @@ export const AdminAppearancePage = () => {
                           src={formData.branding.faviconUrl || '/favicon.ico'} 
                           alt="Favicon" 
                           className="w-5 h-5 object-contain"
-                          onError={(e) => { e.target.src = '/favicon.ico'; }}
+                          onError={(e) => handleImageErrorSafe(e, '/wayfare-logo.png')}
                         />
                       </div>
                       <input
@@ -1960,7 +1973,7 @@ export const AdminAppearancePage = () => {
                       src={formData.branding.logoUrl} 
                       alt="Logo" 
                       className="h-6 w-auto object-contain"
-                      onError={(e) => { e.target.src = '/wayfare-logo.png'; }}
+                      onError={(e) => handleImageErrorSafe(e, '/wayfare-logo.png')}
                     />
                   ) : (
                     <div 
