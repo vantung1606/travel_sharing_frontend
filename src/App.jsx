@@ -53,6 +53,7 @@ const NotificationsPage = lazyRetry(() => import('./pages/user/Notifications/Not
 // Admin Pages - lazy loaded, chỉ tải khi vào khu vực /admin
 const AdminDashboardPage = lazyRetry(() => import('./pages/admin/Dashboard/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })));
 const AdminPlacesPage = lazyRetry(() => import('./pages/admin/Places/AdminPlacesPage').then(m => ({ default: m.AdminPlacesPage })));
+const AdminItinerariesPage = lazyRetry(() => import('./pages/admin/Itineraries/AdminItinerariesPage').then(m => ({ default: m.AdminItinerariesPage })));
 const AdminUsersPage = lazyRetry(() => import('./pages/admin/Users/AdminUsersPage').then(m => ({ default: m.AdminUsersPage })));
 const AdminReportsPage = lazyRetry(() => import('./pages/admin/Reports/AdminReportsPage').then(m => ({ default: m.AdminReportsPage })));
 const AdminReviewsPage = lazyRetry(() => import('./pages/admin/Reviews/AdminReviewsPage').then(m => ({ default: m.AdminReviewsPage })));
@@ -291,6 +292,7 @@ const AppContent = () => {
                       <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                       <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                       <Route path="/admin/places" element={<AdminPlacesPage />} />
+                      <Route path="/admin/itineraries" element={<AdminItinerariesPage />} />
                       <Route path="/admin/users" element={<AdminUsersPage />} />
                       <Route path="/admin/moderators" element={<AdminModeratorsPage />} />
                       <Route path="/admin/broadcast" element={<AdminBroadcastPage />} />

@@ -565,10 +565,10 @@ QUY TẮC BẮT BUỘC:
   ]
 }`;
 
-      // 4. GỌI TRỰC TIẾP GEMINI 1.5 FLASH (MAX TOKENS 8192)
+      // 4. GỌI GEMINI 3.8 FLASH QUA BACKEND PROXY (MAX TOKENS 8192)
       const aiResponse = await aiService.generateText({
         prompt,
-        model: 'gemini-1.5-flash',
+        model: 'gemini-3.8-flash',
         maxTokens: 8192,
         temperature: 0.3
       });

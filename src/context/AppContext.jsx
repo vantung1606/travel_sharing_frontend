@@ -133,6 +133,7 @@ export const AppProvider = ({ children }) => {
     const p = location.pathname;
     if (p === '/admin' || p === '/admin/' || p.startsWith('/admin/dashboard')) return 'dashboard';
     if (p.startsWith('/admin/places')) return 'places';
+    if (p.startsWith('/admin/itineraries')) return 'itineraries';
     if (p.startsWith('/admin/users')) return 'users';
     if (p.startsWith('/admin/moderators')) return 'moderators';
     if (p.startsWith('/admin/reports')) return 'reports';
@@ -149,6 +150,7 @@ export const AppProvider = ({ children }) => {
     const pathMap = {
       dashboard: '/admin/dashboard',
       places: '/admin/places',
+      itineraries: '/admin/itineraries',
       reviews: '/admin/reviews',
       users: '/admin/users',
       moderators: '/admin/moderators',

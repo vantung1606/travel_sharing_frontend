@@ -5,6 +5,7 @@ import { DEFAULT_MODERATOR_PERMISSIONS } from './RouteGuards';
 import { 
   LayoutDashboard, 
   MapPin, 
+  Route,
   Users, 
   BarChart3, 
   LogOut, 
@@ -64,6 +65,13 @@ export const AdminSidebar = ({ onNavigate }) => {
           badge: pendingPlacesCount,
           badgeColor: 'clay',
           badgeLabel: 'Chờ duyệt',
+          permission: 'PLACES_VIEW'
+        },
+        { 
+          id: 'itineraries', 
+          label: 'Quản lý Lịch trình', 
+          icon: Route,
+          description: 'Lộ trình du khách & AI tạo',
           permission: 'PLACES_VIEW'
         },
         { 

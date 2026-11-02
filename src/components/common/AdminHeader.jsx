@@ -15,6 +15,7 @@ export const AdminHeader = () => {
   const ADMIN_TAB_NAMES = {
     dashboard: 'Dashboard Tổng quan',
     places: 'Quản lý Địa điểm',
+    itineraries: 'Quản lý Lịch trình Du lịch',
     reviews: 'Kiểm duyệt Đánh giá',
     users: 'Người dùng & Tài khoản',
     moderators: 'Phân quyền Người giám sát (RBAC)',
