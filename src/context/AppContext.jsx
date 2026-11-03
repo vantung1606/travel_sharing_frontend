@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { notificationApi, chatApi, userApi, placeApi, itineraryApi, authApi, savedPlaceApi, adminReviewApi, adminReportApi } from '../services/api';
+import chatSocket from '../services/chatSocket';
 import { mapApiSpot } from '../utils/placeMap';
 
 export const DEFAULT_MODERATOR_PERMISSIONS = [
@@ -737,11 +738,21 @@ export const AppProvider = ({ children }) => {
     };
     window.addEventListener('wayfare_chat_updated', onChatActivity);
 
+    // Lắng nghe WebSocket thời gian thực cho mọi tin nhắn/phòng mới gửi đến user
+    const unsubSocket = chatSocket.subscribeToUserChat(
+      currentUser?.id,
+      currentUser?.email,
+      () => {
+        fetchUnreadMessages();
+      }
+    );
+
     return () => {
       clearInterval(timer);
       window.removeEventListener('wayfare_chat_updated', onChatActivity);
+      unsubSocket();
     };
-  }, [fetchUnreadMessages, isLoggedIn]);
+  }, [fetchUnreadMessages, isLoggedIn, currentUser?.id, currentUser?.email]);
 
   // ─── ITINERARY PERSISTENCE & SYNC WITH MYSQL BACKEND ─────────────────────────
   const mapBackendItineraryToFrontend = useCallback((item) => {

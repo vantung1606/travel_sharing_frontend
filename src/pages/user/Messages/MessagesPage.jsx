@@ -363,6 +363,55 @@ export const MessagesPage = () => {
     }
   }, [activeThreadId, loadMessages]);
 
+  // 3.0. Lắng nghe cập nhật phòng chat và tin nhắn mới từ mọi phòng (Realtime Hộp thư bên ngoài)
+  useEffect(() => {
+    if (!currentUser && !effectiveEmail) return;
+
+    const unsubscribeUserChat = chatSocket.subscribeToUserChat(
+      currentUser?.id,
+      effectiveEmail,
+      (roomUpdate) => {
+        if (!roomUpdate || !roomUpdate.id) return;
+
+        setThreads(prev => {
+          const existingIndex = prev.findIndex(t => t.id === roomUpdate.id);
+          const isCurrentActive = String(roomUpdate.id) === String(activeThreadId);
+
+          const updatedRoom = {
+            ...(existingIndex !== -1 ? prev[existingIndex] : {}),
+            ...roomUpdate,
+            // Nếu đang mở chính phòng này thì unread luôn là 0, ngược lại nếu phòng khác thì giữ unread từ roomUpdate hoặc tăng lên
+            unread: isCurrentActive ? 0 : (roomUpdate.unread ?? ((prev[existingIndex]?.unread || 0) + 1))
+          };
+
+          let nextThreads = [...prev];
+          if (existingIndex !== -1) {
+            nextThreads.splice(existingIndex, 1);
+          }
+
+          // Ghim AI Assistant luôn ở vị trí đầu tiên nếu có
+          const aiIndex = nextThreads.findIndex(t => t.type === 'AI' || t.isPinned);
+          if (updatedRoom.type === 'AI' || updatedRoom.isPinned) {
+            nextThreads.unshift(updatedRoom);
+          } else if (aiIndex === 0) {
+            nextThreads.splice(1, 0, updatedRoom);
+          } else {
+            nextThreads.unshift(updatedRoom);
+          }
+
+          return nextThreads;
+        });
+
+        // Bắn sự kiện toàn cục để cập nhật badge số tin nhắn trên Navbar ngoài cùng
+        window.dispatchEvent(new CustomEvent('wayfare_chat_updated'));
+      }
+    );
+
+    return () => {
+      unsubscribeUserChat();
+    };
+  }, [currentUser?.id, effectiveEmail, activeThreadId]);
+
   // 3. Kết nối WebSocket STOMP nhận tin nhắn, sự kiện soạn tin và xác nhận đã đọc thời gian thực
   useEffect(() => {
     if (!activeThreadId) return;
