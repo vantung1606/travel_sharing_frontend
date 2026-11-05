@@ -1,6 +1,6 @@
 import { BASE_URL, getAuthHeader } from './api';
 
-const DEFAULT_MODEL = 'gemini-2.5-flash';
+const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
 
 /**
  * WanderAI Core Service - 100% Tập trung bảo mật tại Backend Proxy
@@ -19,7 +19,7 @@ export const aiService = {
     responseMimeType = 'application/json'
   }) {
     let targetModel = model || DEFAULT_MODEL;
-    if (!targetModel.startsWith('gemini-') || targetModel.includes('3.8') || targetModel.includes('3.5')) {
+    if (!targetModel.startsWith('gemini-')) {
       targetModel = DEFAULT_MODEL;
     }
 
