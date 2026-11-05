@@ -2221,10 +2221,14 @@ export const chatApi = {
       const res = await fetch(`${BASE_URL}/chat/rooms/${roomId}/messages?email=${encodeURIComponent(userEmail)}`, {
         headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
       });
+      if (res.status === 404 || res.status === 403) {
+        throw new Error('ROOM_UNAVAILABLE');
+      }
       if (!res.ok) return [];
       const json = await res.json();
       return json.data || [];
-    } catch {
+    } catch (err) {
+      if (err.message === 'ROOM_UNAVAILABLE') throw err;
       return [];
     }
   },

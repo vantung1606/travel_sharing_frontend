@@ -352,10 +352,24 @@ export const MessagesPage = () => {
       }
     } catch (err) {
       console.warn(`Lỗi tải tin nhắn phòng ${roomId}:`, err.message);
+      // Tự động khôi phục chuyển về phòng chat hợp lệ nếu phòng hiện tại không tồn tại hoặc bị từ chối
+      if (err.message === 'ROOM_UNAVAILABLE') {
+        setThreads(prev => {
+          const valid = prev.filter(t => t.id !== roomId);
+          if (valid.length > 0) {
+            setActiveThreadId(valid[0].id);
+          } else {
+            setActiveThreadId(null);
+            setMessages([]);
+          }
+          return valid;
+        });
+        loadRooms();
+      }
     } finally {
       if (!silent) setIsLoadingMessages(false);
     }
-  }, [effectiveEmail, isMessageFromMe]);
+  }, [effectiveEmail, isMessageFromMe, loadRooms]);
 
   useEffect(() => {
     if (activeThreadId) {
@@ -607,23 +621,31 @@ export const MessagesPage = () => {
 
   useEffect(() => {
     const targetUserId = searchParams.get('userId');
-    if (targetUserId && openingDirectUserIdRef.current !== targetUserId) {
-      openingDirectUserIdRef.current = targetUserId;
-      (async () => {
-        try {
-          const room = await chatApi.openDirectRoom(targetUserId, effectiveEmail);
-          if (room) {
+    if (targetUserId) {
+      if (currentUser?.id && String(targetUserId) === String(currentUser.id)) {
+        toast.showInfo('Bạn đang xem hòm thư tin nhắn của chính mình.');
+        setSearchParams({}, { replace: true });
+        return;
+      }
+      if (openingDirectUserIdRef.current !== targetUserId) {
+        openingDirectUserIdRef.current = targetUserId;
+        (async () => {
+          try {
+            const room = await chatApi.openDirectRoom(targetUserId, effectiveEmail);
+            if (room) {
+              setSearchParams({}, { replace: true });
+              await loadRooms();
+              setActiveThreadId(room.id);
+              setShowMobileChat(true);
+            }
+          } catch (err) {
+            console.error('Không thể mở cuộc trò chuyện trực tiếp:', err);
             setSearchParams({}, { replace: true });
-            await loadRooms();
-            setActiveThreadId(room.id);
-            setShowMobileChat(true);
           }
-        } catch (err) {
-          console.error('Không thể mở cuộc trò chuyện trực tiếp:', err);
-        }
-      })();
+        })();
+      }
     }
-  }, [searchParams, effectiveEmail, loadRooms, setSearchParams]);
+  }, [searchParams, currentUser?.id, effectiveEmail, loadRooms, setSearchParams, toast]);
 
   // Xóa vĩnh viễn một cuộc trò chuyện
   const handleDeleteRoom = async (roomId) => {

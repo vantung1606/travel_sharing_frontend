@@ -270,10 +270,15 @@ export const FloatingChatWidget = () => {
       }
     } catch (err) {
       console.warn(`Lỗi tải tin nhắn phòng ${roomId}:`, err.message);
+      if (err.message === 'ROOM_UNAVAILABLE') {
+        setActiveThreadId(null);
+        setMessages([]);
+        loadRooms();
+      }
     } finally {
       if (!silent) setIsLoadingMessages(false);
     }
-  }, [effectiveEmail, isMessageFromMe]);
+  }, [effectiveEmail, isMessageFromMe, loadRooms]);
 
   useEffect(() => {
     if (activeThreadId) {
