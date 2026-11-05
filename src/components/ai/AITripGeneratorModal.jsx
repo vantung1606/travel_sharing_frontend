@@ -573,7 +573,7 @@ QUY TẮC BẮT BUỘC:
       // 4. GỌI GEMINI FLASH QUA BACKEND PROXY (TỐI ƯU TOKENS 3072 ĐỂ PHẢN HỒI SIÊU TỐC)
       const aiResponse = await aiService.generateText({
         prompt,
-        model: 'gemini-3.8-flash',
+        model: 'gemini-2.5-flash',
         maxTokens: 3072,
         temperature: 0.3
       });
