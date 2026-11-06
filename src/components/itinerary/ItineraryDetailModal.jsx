@@ -582,17 +582,19 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
   // Tính tổng số địa điểm dừng chân
   const totalPlaces = days.reduce((acc, d) => acc + (d.activities?.length || 0), 0);
 
-  // Danh sách hiển thị theo tab
-  const displayedDays = activeTab === 'all'
-    ? days
-    : [days[Number(activeTab)] || days[0]];
+  // Danh sách hiển thị theo tab (chuẩn hóa theo dayNumber chuẩn 100%)
+  const displayedDays = useMemo(() => {
+    if (activeTab === 'all') return days;
+    const match = days.filter(d => String(d.dayNumber != null ? d.dayNumber : 1) === String(activeTab));
+    return match.length > 0 ? match : days;
+  }, [days, activeTab]);
 
   // Tính toán các tọa độ thực tế của các trạm dừng trên bản đồ
   const mapPoints = useMemo(() => {
     const points = [];
     let pointCount = 0;
 
-    const sourceDays = activeTab === 'all' ? days : [days[Number(activeTab)] || days[0]];
+    const sourceDays = displayedDays;
 
     sourceDays.forEach((d, dayIndex) => {
       (d.activities || []).forEach((act, actIndex) => {
@@ -871,14 +873,15 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
           </button>
 
           {days.map((d, index) => {
-            const isSelected = activeTab === String(index);
+            const dayNum = d.dayNumber != null ? d.dayNumber : index + 1;
+            const isSelected = activeTab === String(dayNum);
             const count = d.activities?.length || 0;
             return (
               <button
-                key={index}
+                key={dayNum}
                 type="button"
                 onClick={() => {
-                  setActiveTab(String(index));
+                  setActiveTab(String(dayNum));
                   setSelectedMapPoint(null);
                 }}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
@@ -887,7 +890,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                 }`}
               >
-                <span>Ngày {index + 1}</span>
+                <span>Ngày {dayNum}</span>
                 <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-extrabold ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-700'}`}>
                   {count}
                 </span>
@@ -1240,7 +1243,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                 <div className="min-w-0">
                   <h4 className="text-xs font-black text-slate-900 tracking-wide flex items-center gap-1.5">
                     <Navigation className="w-3.5 h-3.5 text-sky-600 shrink-0" />
-                    <span>Lộ trình {activeTab === 'all' ? 'Toàn Chuyến' : `Ngày ${Number(activeTab) + 1}`}</span>
+                    <span>Lộ trình {activeTab === 'all' ? 'Toàn Chuyến' : `Ngày ${activeTab}`}</span>
                   </h4>
                   {totalRouteDistanceKm > 0 && (
                     <p className="text-[11px] text-slate-500 font-medium mt-0.5 flex items-center gap-1">
