@@ -10,6 +10,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
   const [content, setContent] = useState(post.content || '');
   const [category, setCategory] = useState(post.category || 'Ẩm thực & Check-in');
   const [visibility, setVisibility] = useState(post.visibility || 'PUBLIC');
+  const [commentLocked, setCommentLocked] = useState(Boolean(post.commentLocked));
   const [images, setImages] = useState(post.images || []);
   const [videoUrl, setVideoUrl] = useState(post.videoUrl || '');
   const [placeId, setPlaceId] = useState(post.placeId ? String(post.placeId) : (post.locationTag && post.locationTag !== 'Việt Nam' ? `custom:${post.locationTag}` : ''));
@@ -108,6 +109,7 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
         category,
         locationTag: computedLocationTag,
         visibility,
+        commentLocked,
         images,
         videoUrl: videoUrl || null,
         placeId: isCustomPlace || !placeId ? (post.placeId ? 0 : null) : Number(placeId)
@@ -216,6 +218,28 @@ export const EditPostModal = ({ post, onClose, onPostUpdated }) => {
                 <span>Chỉ mình tôi</span>
               </button>
             </div>
+          </div>
+
+          {/* Comment Locking Option */}
+          <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200 rounded-xl">
+            <div>
+              <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Lock className="w-3.5 h-3.5 text-amber-600" />
+                <span>Tắt tính năng bình luận</span>
+              </span>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                Không cho phép người khác bình luận hoặc đặt câu hỏi vào bài viết này
+              </p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+              <input
+                type="checkbox"
+                checked={commentLocked}
+                onChange={(e) => setCommentLocked(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-600"></div>
+            </label>
           </div>
 
           {/* Title */}

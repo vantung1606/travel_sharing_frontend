@@ -1412,6 +1412,19 @@ export const postApi = {
     return json.data;
   },
 
+  async toggleCommentLock(id) {
+    const res = await fetch(`${BASE_URL}/posts/${id}/toggle-comment-lock`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.message || `HTTP error ${res.status}`);
+    return normalizePost(json.data);
+  },
+
   async delete(id, email = '') {
     const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');
     const userEmail = email || user.email || '';
