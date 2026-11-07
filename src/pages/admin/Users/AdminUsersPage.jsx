@@ -75,6 +75,7 @@ export const AdminUsersPage = () => {
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [userToChangeRole, setUserToChangeRole] = useState(null);
   const [newSelectedRole, setNewSelectedRole] = useState('ROLE_USER');
+  const [isSavingRole, setIsSavingRole] = useState(false);
 
   // Modal: Create / Invite User
   const [showAddUserModal, setShowAddUserModal] = useState(false);
@@ -252,6 +253,7 @@ export const AdminUsersPage = () => {
   const handleSaveRole = async () => {
     if (!userToChangeRole) return;
     try {
+      setIsSavingRole(true);
       await adminUserApi.updateUserRole(userToChangeRole.id, newSelectedRole);
       
       setUsersList(prev => prev.map(u => {
@@ -271,6 +273,8 @@ export const AdminUsersPage = () => {
     } catch (err) {
       console.error('Update role error:', err);
       toast.error('Không thể cập nhật quyền hạn: ' + err.message);
+    } finally {
+      setIsSavingRole(false);
     }
   };
 
@@ -1108,9 +1112,11 @@ export const AdminUsersPage = () => {
               <button
                 type="button"
                 onClick={handleSaveRole}
-                className="px-4 py-2 rounded-[5px] text-xs font-serif font-bold bg-clay-600 hover:bg-clay-700 text-white shadow-xs transition-colors cursor-pointer"
+                disabled={isSavingRole}
+                className="px-4 py-2 rounded-[5px] text-xs font-serif font-bold bg-clay-600 hover:bg-clay-700 text-white shadow-xs transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
               >
-                Lưu phân quyền
+                {isSavingRole && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
+                {isSavingRole ? 'Đang lưu...' : 'Lưu phân quyền'}
               </button>
             </div>
           </div>

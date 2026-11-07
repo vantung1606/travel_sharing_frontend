@@ -62,6 +62,7 @@ export const AdminReportsPage = () => {
   const [systemReportStatusFilter, setSystemReportStatusFilter] = useState('ALL');
   const [systemReportTypeFilter, setSystemReportTypeFilter] = useState('ALL');
   const [systemReportLoading, setSystemReportLoading] = useState(false);
+  const [resolvingReportId, setResolvingReportId] = useState(null);
   const [selectedEvidenceImage, setSelectedEvidenceImage] = useState(null);
 
   const fetchSystemReports = async (status = systemReportStatusFilter, type = systemReportTypeFilter) => {
@@ -79,11 +80,14 @@ export const AdminReportsPage = () => {
 
   const handleResolveSystemReport = async (id, action, notes = '') => {
     try {
+      setResolvingReportId(id);
       await reportApi.resolveReport(id, action, notes);
       toast.success(`Đã cập nhật trạng thái báo cáo #${id} (${action})!`);
       await fetchSystemReports();
     } catch (err) {
       toast.error('Lỗi khi cập nhật trạng thái báo cáo: ' + err.message);
+    } finally {
+      setResolvingReportId(null);
     }
   };
 
@@ -1481,13 +1485,15 @@ export const AdminReportsPage = () => {
                             <div className="flex items-center justify-end gap-1.5">
                               <button
                                 onClick={() => handleResolveSystemReport(rep.id, 'RESOLVE', 'Đã xử lý xác minh vi phạm')}
-                                className="px-2.5 py-1 rounded-[4px] bg-emerald-600 hover:bg-emerald-700 text-[#FFFDF8] text-[11px] font-bold cursor-pointer transition-colors"
+                                disabled={resolvingReportId === rep.id}
+                                className="px-2.5 py-1 rounded-[4px] bg-emerald-600 hover:bg-emerald-700 text-[#FFFDF8] text-[11px] font-bold cursor-pointer transition-colors disabled:opacity-50"
                               >
-                                Xử lý xong
+                                {resolvingReportId === rep.id ? 'Đang lưu...' : 'Xử lý xong'}
                               </button>
                               <button
                                 onClick={() => handleResolveSystemReport(rep.id, 'DISMISS', 'Báo cáo không có căn cứ')}
-                                className="px-2.5 py-1 rounded-[4px] bg-[#F8F4EC] hover:bg-ink-200 text-ink-700 text-[11px] font-bold border border-ink-200 cursor-pointer transition-colors"
+                                disabled={resolvingReportId === rep.id}
+                                className="px-2.5 py-1 rounded-[4px] bg-[#F8F4EC] hover:bg-ink-200 text-ink-700 text-[11px] font-bold border border-ink-200 cursor-pointer transition-colors disabled:opacity-50"
                               >
                                 Bác bỏ
                               </button>

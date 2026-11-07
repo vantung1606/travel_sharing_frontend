@@ -921,11 +921,12 @@ QUY TẮC BẮT BUỘC:
 
             <button
               type="button"
+              disabled={aiGeneratingStatus?.isGenerating}
               onClick={() => handleGenerate(false)}
-              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>Khởi Tạo Lịch Trình ✨</span>
+              <span>{aiGeneratingStatus?.isGenerating ? 'Đang Khởi Tạo...' : 'Khởi Tạo Lịch Trình ✨'}</span>
             </button>
           </div>
         </div>
