@@ -16,7 +16,25 @@
           var hash = window.location.hash || '';
           if (hash.indexOf('access_token=') !== -1 || hash.indexOf('id_token=') !== -1) {
             var searchParams = new URLSearchParams(hash.substring(1));
+            var token = searchParams.get('id_token') || searchParams.get('access_token');
             var rawState = searchParams.get('state');
+
+            // 1. Nếu mở từ popup web (Expo Web / localhost:8081 / browser):
+            if (window.opener && token) {
+              try {
+                window.opener.postMessage({
+                  type: 'WAYFARE_GOOGLE_AUTH_SUCCESS',
+                  token: token,
+                  hash: hash
+                }, '*');
+                window.close();
+                return;
+              } catch (e) {
+                console.warn('Popup postMessage error:', e);
+              }
+            }
+
+            // 2. Nếu mở từ native mobile: Chuyển tiếp deep link về app
             var targetScheme = 'wayfare://oauth';
             if (rawState) {
               try {
