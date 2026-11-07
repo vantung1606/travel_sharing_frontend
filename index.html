@@ -9,6 +9,32 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Mobile OAuth Redirect Bridge: Chuyển tiếp token từ Google OAuth về ứng dụng Wayfare Mobile -->
+    <script>
+      (function() {
+        try {
+          var hash = window.location.hash || '';
+          if (hash.indexOf('access_token=') !== -1 || hash.indexOf('id_token=') !== -1) {
+            var searchParams = new URLSearchParams(hash.substring(1));
+            var rawState = searchParams.get('state');
+            var targetScheme = 'wayfare://oauth';
+            if (rawState) {
+              try {
+                var decoded = decodeURIComponent(rawState);
+                if (decoded.indexOf('://') !== -1) {
+                  targetScheme = decoded;
+                }
+              } catch (e) {}
+            }
+            var separator = targetScheme.indexOf('?') !== -1 ? '&' : (targetScheme.indexOf('#') !== -1 ? '&' : '#');
+            var redirectTarget = targetScheme + separator + hash.substring(1);
+            window.location.replace(redirectTarget);
+          }
+        } catch (err) {
+          console.warn('OAuth redirect bridge error', err);
+        }
+      })();
+    </script>
     <!-- Google Identity Services (OAuth 2.0 Sign-In) -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
   </head>
