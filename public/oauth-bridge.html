@@ -97,18 +97,47 @@
             type: 'WAYFARE_GOOGLE_AUTH_SUCCESS',
             token: token
           }, '*');
+          setTimeout(function() {
+            window.close();
+          }, 300);
+          return;
         }
       } catch (err) {
         console.error('Lỗi khi gửi message về opener:', err);
       }
 
+      // Nếu không có opener (mở từ WebBrowser / Chrome Custom Tabs trên Mobile Native):
+      var rawState = new URLSearchParams(window.location.search || window.location.hash.substring(1)).get('state');
+      var targetScheme = 'wayfare://oauth';
+      if (rawState) {
+        try {
+          var decoded = decodeURIComponent(rawState);
+          if (decoded.indexOf('://') !== -1) targetScheme = decoded;
+        } catch (e) {}
+      }
+      var separator = targetScheme.indexOf('?') !== -1 ? '&' : (targetScheme.indexOf('#') !== -1 ? '&' : '#');
+      var redirectTarget = targetScheme + separator + 'access_token=' + encodeURIComponent(token);
+      var androidIntent = 'intent://oauth#access_token=' + encodeURIComponent(token) + '#Intent;scheme=wayfare;package=com.wayfare.travelmobile;end;';
+
+      var retryBtn = document.getElementById('retryBtn');
+      if (retryBtn) {
+        retryBtn.innerText = '🚀 Mở ứng dụng Wayfare ngay';
+        retryBtn.style.display = 'inline-block';
+        retryBtn.onclick = function() {
+          try { window.location.href = androidIntent; } catch(e) {}
+          setTimeout(function() { window.location.href = redirectTarget; }, 300);
+        };
+      }
+
       try {
-        localStorage.setItem('wayfare_oauth_token', token);
-      } catch (e) {}
+        if (/Android/i.test(navigator.userAgent)) {
+          window.location.href = androidIntent;
+        }
+      } catch (e1) {}
 
       setTimeout(function() {
-        window.close();
-      }, 500);
+        try { window.location.replace(redirectTarget); } catch (e2) {}
+      }, 200);
     }
 
     function triggerGsi() {
