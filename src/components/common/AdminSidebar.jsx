@@ -17,7 +17,8 @@ import {
   ExternalLink,
   Palette,
   Megaphone,
-  Wrench
+  Wrench,
+  Activity
 } from 'lucide-react';
 
 export const AdminSidebar = ({ onNavigate }) => {
@@ -118,6 +119,14 @@ export const AdminSidebar = ({ onNavigate }) => {
           icon: Palette,
           description: 'Màu sắc, logo & tokens',
           permission: 'THEME_VIEW'
+        },
+        { 
+          id: 'system', 
+          label: 'Giám Sát Hệ Thống', 
+          icon: Activity,
+          description: 'Phiên bản Java, JVM & Bảng CSDL',
+          permission: 'USERS_VIEW',
+          adminOnly: true
         },
         { 
           id: 'broadcast', 

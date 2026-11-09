@@ -2580,6 +2580,47 @@ export const adminMaintenanceApi = {
   }
 };
 
+// ─── Admin System & Database Monitoring API ──────────────────────────────────
+export const adminSystemApi = {
+  async getOverview() {
+    const res = await fetch(`${BASE_URL}/admin/system/overview`, {
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      throw new Error(err?.message || 'Không thể lấy thông tin giám sát hệ thống');
+    }
+    const json = await res.json();
+    return json.data;
+  },
+
+  async getTableDetails(tableName) {
+    const res = await fetch(`${BASE_URL}/admin/system/tables/${encodeURIComponent(tableName)}`, {
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      throw new Error(err?.message || `Không thể lấy cấu trúc bảng ${tableName}`);
+    }
+    const json = await res.json();
+    return json.data;
+  },
+
+  async triggerGc() {
+    const res = await fetch(`${BASE_URL}/admin/system/gc`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() }
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      throw new Error(err?.message || 'Không thể gửi yêu cầu GC');
+    }
+    const json = await res.json();
+    return json.data;
+  }
+};
+
+
 
 
 

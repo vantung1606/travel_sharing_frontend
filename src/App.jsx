@@ -62,6 +62,7 @@ const AdminAppearancePage = lazyRetry(() => import('./pages/admin/Appearance/Adm
 const AdminModeratorsPage = lazyRetry(() => import('./pages/admin/Moderators/AdminModeratorsPage').then(m => ({ default: m.AdminModeratorsPage })));
 const AdminBroadcastPage = lazyRetry(() => import('./pages/admin/Broadcast/AdminBroadcastPage').then(m => ({ default: m.AdminBroadcastPage })));
 const AdminMaintenancePage = lazyRetry(() => import('./pages/admin/Maintenance/AdminMaintenancePage').then(m => ({ default: m.AdminMaintenancePage })));
+const AdminSystemMonitoringPage = lazyRetry(() => import('./pages/admin/SystemMonitoring/AdminSystemMonitoringPage').then(m => ({ default: m.AdminSystemMonitoringPage })));
 const AdminAuditLogsPage = lazyRetry(() => import('./pages/admin/AuditLogs/AdminAuditLogsPage').then(m => ({ default: m.AdminAuditLogsPage })));
 
 import { MaintenanceScreen } from './components/common/MaintenanceScreen';
@@ -297,6 +298,7 @@ const AppContent = () => {
                       <Route path="/admin/moderators" element={<AdminModeratorsPage />} />
                       <Route path="/admin/broadcast" element={<AdminBroadcastPage />} />
                       <Route path="/admin/maintenance" element={<AdminMaintenancePage />} />
+                      <Route path="/admin/system" element={<AdminSystemMonitoringPage />} />
                       <Route path="/admin/reports" element={<AdminReportsPage />} />
                       <Route path="/admin/reviews" element={<AdminReviewsPage />} />
                       <Route path="/admin/analytics" element={<AdminStatisticsPage />} />
