@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import {
   Bell,
@@ -22,6 +23,7 @@ import {
 
 export const NotificationDropdown = ({ isOpen, onClose }) => {
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
   const {
     isLoggedIn,
     notifications,
@@ -103,30 +105,95 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
     }
     onClose();
 
-    // Route depending on targetUrl
-    if (item.targetUrl) {
-      if (item.targetUrl.includes('admin/reports') || item.targetUrl.includes('reports')) {
-        setPortalMode('admin');
-        window.location.href = '/admin/reports';
-      } else if (item.targetUrl.includes('itinerar')) {
-        setPortalMode('user');
-        setUserTab('itineraries');
-      } else if (item.targetUrl.includes('community')) {
-        setPortalMode('user');
-        setUserTab('community');
-      } else if (item.targetUrl.includes('messages')) {
-        setPortalMode('user');
-        setUserTab('messages');
-      } else if (item.targetUrl.includes('explore')) {
-        setPortalMode('user');
-        setUserTab('explore');
-      } else if (item.targetUrl.includes('ai-config')) {
-        setPortalMode('admin');
-        window.location.href = '/admin/audit-logs';
+    const targetUrl = item.targetUrl || '';
+    const type = item.type || '';
+
+    // 1. Chat: trỏ trực tiếp đến cuộc trò chuyện cụ thể
+    if (type === 'CHAT_MESSAGE' || type === 'CHAT_INVITE' || targetUrl.includes('messages')) {
+      setPortalMode('user');
+      setUserTab('messages');
+      if (targetUrl && targetUrl.startsWith('/')) {
+        navigate(targetUrl);
+      } else if (item.actorId) {
+        navigate(`/messages?userId=${item.actorId}`);
       } else {
-        setPortalMode('user');
-        setUserTab('notifications');
+        navigate('/messages');
       }
+      return;
+    }
+
+    // 2. Bài viết: like, comment, tag, duyệt bài -> trỏ trực tiếp đến bài viết đó
+    if (
+      type === 'LIKE' ||
+      type === 'COMMENT' ||
+      type === 'COMMENT_REPLY' ||
+      type === 'TAG' ||
+      type === 'POST_APPROVED' ||
+      type === 'REPORT_DISMISSED' ||
+      targetUrl.includes('community') ||
+      targetUrl.includes('postId=')
+    ) {
+      setPortalMode('user');
+      setUserTab('community');
+      if (targetUrl && targetUrl.startsWith('/')) {
+        navigate(targetUrl);
+      } else {
+        navigate('/community');
+      }
+      return;
+    }
+
+    // 3. Admin reports
+    if (targetUrl.includes('admin/reports') || targetUrl.includes('reports') || type === 'REPORT_ALERT') {
+      setPortalMode('admin');
+      window.location.href = '/admin/reports';
+      return;
+    }
+
+    // 4. Lịch trình
+    if (targetUrl.includes('itinerar') || type === 'AI_READY' || type === 'ITINERARY_SHARED') {
+      setPortalMode('user');
+      setUserTab('itineraries');
+      if (targetUrl && targetUrl.startsWith('/')) {
+        navigate(targetUrl);
+      } else {
+        navigate('/itineraries');
+      }
+      return;
+    }
+
+    // 5. Hồ sơ người dùng / Theo dõi
+    if (targetUrl.includes('profile') || type === 'FOLLOW') {
+      setPortalMode('user');
+      setUserTab('profile');
+      if (targetUrl && targetUrl.startsWith('/')) {
+        navigate(targetUrl);
+      } else if (item.actorId) {
+        navigate(`/profile/${item.actorId}`);
+      } else {
+        navigate('/profile');
+      }
+      return;
+    }
+
+    // 6. Địa điểm
+    if (targetUrl.includes('places') || type === 'PLACE_APPROVED') {
+      setPortalMode('user');
+      if (targetUrl.startsWith('/')) {
+        navigate(targetUrl);
+      } else {
+        navigate('/explore');
+      }
+      return;
+    }
+
+    // 7. Mặc định
+    if (targetUrl.startsWith('/')) {
+      navigate(targetUrl);
+    } else {
+      setPortalMode('user');
+      setUserTab('notifications');
+      navigate('/notifications');
     }
   };
 

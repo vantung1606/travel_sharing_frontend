@@ -620,6 +620,20 @@ export const MessagesPage = () => {
   const openingDirectUserIdRef = useRef(null);
 
   useEffect(() => {
+    const targetRoomId = searchParams.get('roomId');
+    if (targetRoomId) {
+      const parsedId = Number(targetRoomId) || targetRoomId;
+      setActiveThreadId(parsedId);
+      setShowMobileChat(true);
+      loadMessages(parsedId);
+      setSearchParams(prev => {
+        const next = new URLSearchParams(prev);
+        next.delete('roomId');
+        return next;
+      }, { replace: true });
+      return;
+    }
+
     const targetUserId = searchParams.get('userId');
     if (targetUserId) {
       if (currentUser?.id && String(targetUserId) === String(currentUser.id)) {
@@ -645,7 +659,7 @@ export const MessagesPage = () => {
         })();
       }
     }
-  }, [searchParams, currentUser?.id, effectiveEmail, loadRooms, setSearchParams, toast]);
+  }, [searchParams, currentUser?.id, effectiveEmail, loadRooms, loadMessages, setSearchParams, toast]);
 
   // Xóa vĩnh viễn một cuộc trò chuyện
   const handleDeleteRoom = async (roomId) => {
