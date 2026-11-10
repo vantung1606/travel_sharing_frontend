@@ -91,10 +91,7 @@ export const AuthModal = () => {
       setIsLoading(false);
       setForgotStep(2);
       setCountdown(60);
-      toast.success(res.message || 'Mã xác thực OTP đã được gửi đến email của bạn!');
-      if (res.data?.devOtp) {
-        toast.info(`📬 Mã OTP thử nghiệm: ${res.data.devOtp}`, { duration: 10000 });
-      }
+      toast.success(res.message || 'Mã xác thực OTP đã được gửi về hòm thư của bạn! Vui lòng kiểm tra hộp thư đến hoặc mục Spam.');
     } catch (err) {
       setIsLoading(false);
       toast.error(err.message || 'Không thể gửi mã OTP. Vui lòng kiểm tra lại email.');
