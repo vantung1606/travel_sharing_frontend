@@ -112,17 +112,24 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
     if (type === 'CHAT_MESSAGE' || type === 'CHAT_INVITE' || targetUrl.includes('messages')) {
       setPortalMode('user');
       setUserTab('messages');
-      if (targetUrl && targetUrl.startsWith('/')) {
-        navigate(targetUrl);
-      } else if (item.actorId) {
-        navigate(`/messages?userId=${item.actorId}`);
+      const roomIdMatch = targetUrl.match(/[?&]roomId=([0-9a-zA-Z_-]+)/);
+      const roomId = roomIdMatch ? roomIdMatch[1] : null;
+      const userIdMatch = targetUrl.match(/[?&]userId=([0-9a-zA-Z_-]+)/);
+      const userId = userIdMatch ? userIdMatch[1] : item.actorId;
+
+      if (roomId) {
+        navigate(`/messages?roomId=${roomId}`);
+        window.dispatchEvent(new CustomEvent('wayfare_open_chat', { detail: { roomId } }));
+      } else if (userId) {
+        navigate(`/messages?userId=${userId}`);
+        window.dispatchEvent(new CustomEvent('wayfare_open_chat', { detail: { userId } }));
       } else {
         navigate('/messages');
       }
       return;
     }
 
-    // 2. Bài viết: like, comment, tag, duyệt bài -> trỏ trực tiếp đến bài viết đó
+    // 2. Bài viết: like, comment, tag, duyệt bài, chia sẻ -> trỏ trực tiếp đến bài viết đó
     if (
       type === 'LIKE' ||
       type === 'COMMENT' ||
@@ -130,12 +137,22 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
       type === 'TAG' ||
       type === 'POST_APPROVED' ||
       type === 'REPORT_DISMISSED' ||
+      type === 'SHARE' ||
+      type === 'COMMUNITY_SHARE' ||
       targetUrl.includes('community') ||
-      targetUrl.includes('postId=')
+      targetUrl.includes('postId=') ||
+      targetUrl.includes('post=')
     ) {
       setPortalMode('user');
       setUserTab('community');
-      if (targetUrl && targetUrl.startsWith('/')) {
+
+      const postIdMatch = targetUrl.match(/[?&](?:postId|post)=([0-9]+)/);
+      const postId = postIdMatch ? postIdMatch[1] : null;
+
+      if (postId) {
+        navigate(`/community?postId=${postId}`);
+        window.dispatchEvent(new CustomEvent('wayfare_open_post', { detail: { postId } }));
+      } else if (targetUrl && targetUrl.startsWith('/')) {
         navigate(targetUrl);
       } else {
         navigate('/community');
@@ -146,7 +163,7 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
     // 3. Admin reports
     if (targetUrl.includes('admin/reports') || targetUrl.includes('reports') || type === 'REPORT_ALERT') {
       setPortalMode('admin');
-      window.location.href = '/admin/reports';
+      navigate('/admin/reports');
       return;
     }
 
@@ -154,7 +171,14 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
     if (targetUrl.includes('itinerar') || type === 'AI_READY' || type === 'ITINERARY_SHARED') {
       setPortalMode('user');
       setUserTab('itineraries');
-      if (targetUrl && targetUrl.startsWith('/')) {
+
+      const itinIdMatch = targetUrl.match(/[?&](?:itineraryId|id)=([0-9a-zA-Z_-]+)/);
+      const itineraryId = itinIdMatch ? itinIdMatch[1] : null;
+
+      if (itineraryId) {
+        navigate(`/itineraries?itineraryId=${itineraryId}`);
+        window.dispatchEvent(new CustomEvent('wayfare_open_itinerary', { detail: { itineraryId } }));
+      } else if (targetUrl && targetUrl.startsWith('/')) {
         navigate(targetUrl);
       } else {
         navigate('/itineraries');
@@ -177,9 +201,17 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
     }
 
     // 6. Địa điểm
-    if (targetUrl.includes('places') || type === 'PLACE_APPROVED') {
+    if (targetUrl.includes('places') || targetUrl.includes('explore') || type === 'PLACE_APPROVED') {
       setPortalMode('user');
-      if (targetUrl.startsWith('/')) {
+      setUserTab('explore');
+
+      const placeIdMatch = targetUrl.match(/(?:places\/|[?&]placeId=)([0-9]+)/);
+      const placeId = placeIdMatch ? placeIdMatch[1] : null;
+
+      if (placeId) {
+        navigate(`/explore?placeId=${placeId}`);
+        window.dispatchEvent(new CustomEvent('wayfare_open_place', { detail: { placeId } }));
+      } else if (targetUrl && targetUrl.startsWith('/')) {
         navigate(targetUrl);
       } else {
         navigate('/explore');

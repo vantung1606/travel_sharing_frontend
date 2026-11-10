@@ -233,17 +233,24 @@ export const NotificationsPage = () => {
     if (type === 'CHAT_MESSAGE' || type === 'CHAT_INVITE' || targetUrl.includes('messages')) {
       setPortalMode('user');
       setUserTab('messages');
-      if (targetUrl && targetUrl.startsWith('/')) {
-        navigate(targetUrl);
-      } else if (item.actorId) {
-        navigate(`/messages?userId=${item.actorId}`);
+      const roomIdMatch = targetUrl.match(/[?&]roomId=([0-9a-zA-Z_-]+)/);
+      const roomId = roomIdMatch ? roomIdMatch[1] : null;
+      const userIdMatch = targetUrl.match(/[?&]userId=([0-9a-zA-Z_-]+)/);
+      const userId = userIdMatch ? userIdMatch[1] : item.actorId;
+
+      if (roomId) {
+        navigate(`/messages?roomId=${roomId}`);
+        window.dispatchEvent(new CustomEvent('wayfare_open_chat', { detail: { roomId } }));
+      } else if (userId) {
+        navigate(`/messages?userId=${userId}`);
+        window.dispatchEvent(new CustomEvent('wayfare_open_chat', { detail: { userId } }));
       } else {
         navigate('/messages');
       }
       return;
     }
 
-    // 2. Bài viết: like, comment, tag, duyệt bài -> trỏ trực tiếp đến bài viết đó
+    // 2. Bài viết: like, comment, tag, duyệt bài, chia sẻ -> trỏ trực tiếp đến bài viết đó
     if (
       type === 'LIKE' ||
       type === 'COMMENT' ||
@@ -251,12 +258,22 @@ export const NotificationsPage = () => {
       type === 'TAG' ||
       type === 'POST_APPROVED' ||
       type === 'REPORT_DISMISSED' ||
+      type === 'SHARE' ||
+      type === 'COMMUNITY_SHARE' ||
       targetUrl.includes('community') ||
-      targetUrl.includes('postId=')
+      targetUrl.includes('postId=') ||
+      targetUrl.includes('post=')
     ) {
       setPortalMode('user');
       setUserTab('community');
-      if (targetUrl && targetUrl.startsWith('/')) {
+
+      const postIdMatch = targetUrl.match(/[?&](?:postId|post)=([0-9]+)/);
+      const postId = postIdMatch ? postIdMatch[1] : null;
+
+      if (postId) {
+        navigate(`/community?postId=${postId}`);
+        window.dispatchEvent(new CustomEvent('wayfare_open_post', { detail: { postId } }));
+      } else if (targetUrl && targetUrl.startsWith('/')) {
         navigate(targetUrl);
       } else {
         navigate('/community');
@@ -267,7 +284,7 @@ export const NotificationsPage = () => {
     // 3. Admin reports
     if (targetUrl.includes('admin/reports') || targetUrl.includes('reports') || type === 'REPORT_ALERT') {
       setPortalMode('admin');
-      window.location.href = '/admin/reports';
+      navigate('/admin/reports');
       return;
     }
 
@@ -275,7 +292,14 @@ export const NotificationsPage = () => {
     if (targetUrl.includes('itinerar') || type === 'AI_READY' || type === 'ITINERARY_SHARED') {
       setPortalMode('user');
       setUserTab('itineraries');
-      if (targetUrl && targetUrl.startsWith('/')) {
+
+      const itinIdMatch = targetUrl.match(/[?&](?:itineraryId|id)=([0-9a-zA-Z_-]+)/);
+      const itineraryId = itinIdMatch ? itinIdMatch[1] : null;
+
+      if (itineraryId) {
+        navigate(`/itineraries?itineraryId=${itineraryId}`);
+        window.dispatchEvent(new CustomEvent('wayfare_open_itinerary', { detail: { itineraryId } }));
+      } else if (targetUrl && targetUrl.startsWith('/')) {
         navigate(targetUrl);
       } else {
         navigate('/itineraries');
@@ -298,9 +322,17 @@ export const NotificationsPage = () => {
     }
 
     // 6. Địa điểm
-    if (targetUrl.includes('places') || type === 'PLACE_APPROVED') {
+    if (targetUrl.includes('places') || targetUrl.includes('explore') || type === 'PLACE_APPROVED') {
       setPortalMode('user');
-      if (targetUrl.startsWith('/')) {
+      setUserTab('explore');
+
+      const placeIdMatch = targetUrl.match(/(?:places\/|[?&]placeId=)([0-9]+)/);
+      const placeId = placeIdMatch ? placeIdMatch[1] : null;
+
+      if (placeId) {
+        navigate(`/explore?placeId=${placeId}`);
+        window.dispatchEvent(new CustomEvent('wayfare_open_place', { detail: { placeId } }));
+      } else if (targetUrl && targetUrl.startsWith('/')) {
         navigate(targetUrl);
       } else {
         navigate('/explore');
@@ -655,10 +687,11 @@ export const NotificationsPage = () => {
             return (
               <div
                 key={item.id}
-                className={`bg-[#FFFDF8] rounded-[6px] p-4 sm:p-5 border transition-colors flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative shadow-2xs ${
+                onClick={() => handleActionClick(item)}
+                className={`bg-[#FFFDF8] rounded-[6px] p-4 sm:p-5 border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative shadow-2xs cursor-pointer group hover:border-clay-400 hover:bg-[#FDFBF7] ${
                   !item.isRead
                     ? 'border-clay-300/80 bg-clay-50/15 border-l-4 border-l-clay-600'
-                    : 'border-ink-200/80 hover:bg-[#FDFBF7]'
+                    : 'border-ink-200/80'
                 }`}
               >
                 {/* Left Side: Avatar & Message Details */}
@@ -686,7 +719,7 @@ export const NotificationsPage = () => {
                   {/* Main Info */}
                   <div className="space-y-1 min-w-0 pr-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-serif font-bold text-xs sm:text-sm text-ink-800">
+                      <span className="font-serif font-bold text-xs sm:text-sm text-ink-800 group-hover:text-clay-700 transition-colors">
                         {item.type === 'SYSTEM' || !item.actorId ? 'Hệ Thống Wayfare (WanderAI Shield)' : item.actorName}
                       </span>
                       {item.type !== 'SYSTEM' && item.actorId && item.actorHandle && (
@@ -723,7 +756,10 @@ export const NotificationsPage = () => {
                 <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
                   <button
                     type="button"
-                    onClick={() => handleActionClick(item)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleActionClick(item);
+                    }}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-100 text-clay-700 hover:text-clay-800 font-serif font-bold text-xs border border-ink-200/80 transition-colors shadow-2xs cursor-pointer"
                   >
                     <span>{meta.actionText}</span>
@@ -732,7 +768,8 @@ export const NotificationsPage = () => {
 
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       if (!item.isRead) {
                         markNotificationAsRead(item.id);
                         toast.info('Đã đánh dấu đã đọc.');
@@ -751,7 +788,8 @@ export const NotificationsPage = () => {
 
                   <button
                     type="button"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       deleteNotification(item.id);
                       toast.info('Đã xóa thông báo.');
                     }}

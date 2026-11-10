@@ -567,6 +567,30 @@ export const CommunityPage = () => {
   // Handle URL query ?postId=<id> or ?post=<id> to auto-open post detail modal from notification or share link
   const lastOpenedDeepLinkPostIdRef = useRef(null);
 
+  const handleOpenPostDetail = useCallback((targetPostId) => {
+    if (!targetPostId) return;
+    const found = posts.find(p => String(p.id) === String(targetPostId));
+    if (found) {
+      setSelectedPostForDetail(found);
+    } else {
+      postApi.getById(targetPostId, currentUser?.email)
+        .then(data => {
+          if (data) setSelectedPostForDetail(data);
+        })
+        .catch(err => console.warn('Could not fetch target deep link post:', err));
+    }
+  }, [posts, currentUser?.email]);
+
+  useEffect(() => {
+    const onOpenPostEvent = (e) => {
+      if (e.detail?.postId) {
+        handleOpenPostDetail(e.detail.postId);
+      }
+    };
+    window.addEventListener('wayfare_open_post', onOpenPostEvent);
+    return () => window.removeEventListener('wayfare_open_post', onOpenPostEvent);
+  }, [handleOpenPostDetail]);
+
   useEffect(() => {
     const targetPostId = searchParams.get('postId') || searchParams.get('post');
     if (targetPostId) {
@@ -574,18 +598,9 @@ export const CommunityPage = () => {
         return;
       }
       lastOpenedDeepLinkPostIdRef.current = targetPostId;
-      const found = posts.find(p => String(p.id) === String(targetPostId));
-      if (found) {
-        setSelectedPostForDetail(found);
-      } else {
-        postApi.getById(targetPostId, currentUser?.email)
-          .then(data => {
-            if (data) setSelectedPostForDetail(data);
-          })
-          .catch(err => console.warn('Could not fetch target deep link post:', err));
-      }
+      handleOpenPostDetail(targetPostId);
     }
-  }, [searchParams, posts, currentUser?.email]);
+  }, [searchParams, handleOpenPostDetail, selectedPostForDetail?.id]);
 
   // Real System Itineraries for "Tour được sao chép nhiều"
   const [trendingTours, setTrendingTours] = useState([]);
@@ -3970,7 +3985,16 @@ export const CommunityPage = () => {
       {selectedPostForDetail && (
         <PostDetailModal
           post={selectedPostForDetail}
-          onClose={() => setSelectedPostForDetail(null)}
+          onClose={() => {
+            setSelectedPostForDetail(null);
+            lastOpenedDeepLinkPostIdRef.current = null;
+            setSearchParams(prev => {
+              const next = new URLSearchParams(prev);
+              next.delete('postId');
+              next.delete('post');
+              return next;
+            }, { replace: true });
+          }}
           onAuthorClick={(authorId) => {
             setSelectedPostForDetail(null);
             setSelectedUserIdForModal(authorId);

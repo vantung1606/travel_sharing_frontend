@@ -620,6 +620,34 @@ export const MessagesPage = () => {
   const openingDirectUserIdRef = useRef(null);
 
   useEffect(() => {
+    const onOpenChatEvent = (e) => {
+      if (e.detail?.roomId) {
+        const parsedId = Number(e.detail.roomId) || e.detail.roomId;
+        setActiveThreadId(parsedId);
+        setShowMobileChat(true);
+        loadMessages(parsedId);
+      } else if (e.detail?.userId) {
+        const targetUserId = e.detail.userId;
+        if (currentUser?.id && String(targetUserId) === String(currentUser.id)) return;
+        (async () => {
+          try {
+            const room = await chatApi.openDirectRoom(targetUserId, effectiveEmail);
+            if (room) {
+              await loadRooms();
+              setActiveThreadId(room.id);
+              setShowMobileChat(true);
+            }
+          } catch (err) {
+            console.error('Không thể mở cuộc trò chuyện trực tiếp từ event:', err);
+          }
+        })();
+      }
+    };
+    window.addEventListener('wayfare_open_chat', onOpenChatEvent);
+    return () => window.removeEventListener('wayfare_open_chat', onOpenChatEvent);
+  }, [currentUser?.id, effectiveEmail, loadRooms, loadMessages]);
+
+  useEffect(() => {
     const targetRoomId = searchParams.get('roomId');
     if (targetRoomId) {
       const parsedId = Number(targetRoomId) || targetRoomId;

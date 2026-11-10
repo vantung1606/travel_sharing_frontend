@@ -1,7 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
+import { itineraryApi } from '../../../services/api';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { ItineraryExportModal } from '../../../components/itinerary/ItineraryExportModal';
 import { EditItineraryModal } from '../../../components/itinerary/EditItineraryModal';
@@ -48,6 +50,44 @@ export const ItineraryManagerPage = () => {
   const [selectedItinerary, setSelectedItinerary] = useState(null);
   const [exportModalItinerary, setExportModalItinerary] = useState(null);
   const [editingItinerary, setEditingItinerary] = useState(null);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const lastOpenedItineraryIdRef = useRef(null);
+
+  const handleOpenItineraryDetail = useCallback((targetItinId) => {
+    if (!targetItinId) return;
+    const found = itineraries.find(i => String(i.id) === String(targetItinId));
+    if (found) {
+      setSelectedItinerary(found);
+    } else {
+      itineraryApi.getItineraryById(targetItinId)
+        .then(data => {
+          if (data) setSelectedItinerary(data);
+        })
+        .catch(err => console.warn('Could not fetch target itinerary deep link:', err));
+    }
+  }, [itineraries]);
+
+  useEffect(() => {
+    const onOpenItinEvent = (e) => {
+      if (e.detail?.itineraryId) {
+        handleOpenItineraryDetail(e.detail.itineraryId);
+      }
+    };
+    window.addEventListener('wayfare_open_itinerary', onOpenItinEvent);
+    return () => window.removeEventListener('wayfare_open_itinerary', onOpenItinEvent);
+  }, [handleOpenItineraryDetail]);
+
+  useEffect(() => {
+    const targetId = searchParams.get('itineraryId') || searchParams.get('id');
+    if (targetId) {
+      if (lastOpenedItineraryIdRef.current === targetId && selectedItinerary?.id === Number(targetId)) {
+        return;
+      }
+      lastOpenedItineraryIdRef.current = targetId;
+      handleOpenItineraryDetail(targetId);
+    }
+  }, [searchParams, handleOpenItineraryDetail, selectedItinerary?.id]);
 
   // Tự động mở xem chi tiết lịch trình khi WanderAI vừa khởi tạo xong
   useEffect(() => {
@@ -917,7 +957,16 @@ export const ItineraryManagerPage = () => {
       {selectedItinerary && (
         <ItineraryDetailModal
           itinerary={selectedItinerary}
-          onClose={() => setSelectedItinerary(null)}
+          onClose={() => {
+            setSelectedItinerary(null);
+            lastOpenedItineraryIdRef.current = null;
+            setSearchParams(prev => {
+              const next = new URLSearchParams(prev);
+              next.delete('itineraryId');
+              next.delete('id');
+              return next;
+            }, { replace: true });
+          }}
           onUpdate={(updatedItin) => {
             setSelectedItinerary(updatedItin);
             setItineraries(prev => prev.map(item => String(item.id) === String(updatedItin.id) ? updatedItin : item));

@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { RealMapView } from '../../../components/map/RealMapView';
@@ -134,6 +135,46 @@ export const ExplorePage = () => {
   // 6. Active Item for Map & Detail Modal
   const [activeItem, setActiveItem] = useState(null);
   const [detailModalItem, setDetailModalItem] = useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const lastOpenedPlaceIdRef = useRef(null);
+
+  const handleOpenPlaceDetail = useCallback(async (targetPlaceId) => {
+    if (!targetPlaceId) return;
+    const found = (places || []).find(p => String(p.id) === String(targetPlaceId) || String(p.rawId) === String(targetPlaceId));
+    if (found) {
+      setDetailModalItem(mapApiSpot(found));
+    } else {
+      try {
+        const place = await placeApi.getPlaceById(targetPlaceId);
+        if (place) {
+          setDetailModalItem(mapApiSpot(place));
+        }
+      } catch (err) {
+        console.warn('Could not load place details:', err);
+      }
+    }
+  }, [places]);
+
+  useEffect(() => {
+    const onOpenPlaceEvent = (e) => {
+      if (e.detail?.placeId) {
+        handleOpenPlaceDetail(e.detail.placeId);
+      }
+    };
+    window.addEventListener('wayfare_open_place', onOpenPlaceEvent);
+    return () => window.removeEventListener('wayfare_open_place', onOpenPlaceEvent);
+  }, [handleOpenPlaceDetail]);
+
+  useEffect(() => {
+    const targetPlaceId = searchParams.get('placeId') || searchParams.get('place');
+    if (targetPlaceId) {
+      if (lastOpenedPlaceIdRef.current === targetPlaceId && detailModalItem?.rawId === Number(targetPlaceId)) {
+        return;
+      }
+      lastOpenedPlaceIdRef.current = targetPlaceId;
+      handleOpenPlaceDetail(targetPlaceId);
+    }
+  }, [searchParams, handleOpenPlaceDetail, detailModalItem?.rawId]);
 
   // 7. Reviews State for Active Place in Detail Modal
   const [placeReviews, setPlaceReviews] = useState([]);
@@ -1099,7 +1140,16 @@ export const ExplorePage = () => {
       {detailModalItem && (
         <PlaceDetailModal
           item={detailModalItem}
-          onClose={() => setDetailModalItem(null)}
+          onClose={() => {
+            setDetailModalItem(null);
+            lastOpenedPlaceIdRef.current = null;
+            setSearchParams(prev => {
+              const next = new URLSearchParams(prev);
+              next.delete('placeId');
+              next.delete('place');
+              return next;
+            }, { replace: true });
+          }}
           reviews={placeReviews}
           setReviews={setPlaceReviews}
           isReviewsLoading={isReviewsLoading}
