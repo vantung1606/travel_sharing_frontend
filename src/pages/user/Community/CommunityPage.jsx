@@ -565,10 +565,15 @@ export const CommunityPage = () => {
   });
 
   // Handle URL query ?postId=<id> or ?post=<id> to auto-open post detail modal from notification or share link
+  const lastOpenedDeepLinkPostIdRef = useRef(null);
+
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const targetPostId = urlParams.get('postId') || urlParams.get('post');
+    const targetPostId = searchParams.get('postId') || searchParams.get('post');
     if (targetPostId) {
+      if (lastOpenedDeepLinkPostIdRef.current === targetPostId && selectedPostForDetail?.id === Number(targetPostId)) {
+        return;
+      }
+      lastOpenedDeepLinkPostIdRef.current = targetPostId;
       const found = posts.find(p => String(p.id) === String(targetPostId));
       if (found) {
         setSelectedPostForDetail(found);
@@ -580,7 +585,7 @@ export const CommunityPage = () => {
           .catch(err => console.warn('Could not fetch target deep link post:', err));
       }
     }
-  }, [posts, currentUser?.email]);
+  }, [searchParams, posts, currentUser?.email]);
 
   // Real System Itineraries for "Tour được sao chép nhiều"
   const [trendingTours, setTrendingTours] = useState([]);
