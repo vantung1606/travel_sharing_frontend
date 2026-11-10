@@ -7,6 +7,7 @@ import { itineraryApi } from '../../../services/api';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { ItineraryExportModal } from '../../../components/itinerary/ItineraryExportModal';
 import { EditItineraryModal } from '../../../components/itinerary/EditItineraryModal';
+import { computeItineraryStatus } from '../../../utils/itineraryUtils';
 import { MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, ChevronRight, Share2, Plus, Compass, X, ArrowRight, Layers, Trash2, Check, Filter, Navigation, Download, Upload, Camera, Globe, Lock, Edit3, Sparkles } from 'lucide-react';
 
 export const ItineraryManagerPage = () => {
@@ -230,11 +231,13 @@ export const ItineraryManagerPage = () => {
   // Filter and Sort Logic
   const filteredItineraries = useMemo(() => {
     return (itineraries || []).filter(itin => {
-      // Tab matching
-      if (activeTab === 'upcoming' && itin.status !== 'upcoming') return false;
-      if (activeTab === 'completed' && itin.status !== 'completed') return false;
-      if (activeTab === 'drafts' && itin.status !== 'drafts') return false;
-      if (activeTab === 'cancelled' && itin.status !== 'cancelled') return false;
+      const { statusKey } = computeItineraryStatus(itin);
+
+      // Tab matching: Chuyến đi sắp tới bao gồm cả chuyến đi tương lai và đang diễn ra
+      if (activeTab === 'upcoming' && statusKey !== 'upcoming' && statusKey !== 'ongoing') return false;
+      if (activeTab === 'completed' && statusKey !== 'completed') return false;
+      if (activeTab === 'drafts' && statusKey !== 'drafts') return false;
+      if (activeTab === 'cancelled' && statusKey !== 'cancelled') return false;
 
       // Filter tag
       if (activeFilterTag === 'ai' && !itin.isAiGenerated) return false;
@@ -265,11 +268,24 @@ export const ItineraryManagerPage = () => {
   // Tab counts
   const tabCounts = useMemo(() => {
     const list = itineraries || [];
+    let upcomingCount = 0;
+    let completedCount = 0;
+    let draftsCount = 0;
+    let cancelledCount = 0;
+
+    list.forEach(i => {
+      const { statusKey } = computeItineraryStatus(i);
+      if (statusKey === 'completed') completedCount++;
+      else if (statusKey === 'upcoming' || statusKey === 'ongoing') upcomingCount++;
+      else if (statusKey === 'drafts') draftsCount++;
+      else if (statusKey === 'cancelled') cancelledCount++;
+    });
+
     return {
-      upcoming: list.filter(i => i.status === 'upcoming').length,
-      completed: list.filter(i => i.status === 'completed').length,
-      drafts: list.filter(i => i.status === 'drafts').length,
-      cancelled: list.filter(i => i.status === 'cancelled').length
+      upcoming: upcomingCount,
+      completed: completedCount,
+      drafts: draftsCount,
+      cancelled: cancelledCount
     };
   }, [itineraries]);
 
@@ -697,6 +713,7 @@ export const ItineraryManagerPage = () => {
           /* Grid / List Cards */
           <div className={`grid gap-6 sm:gap-7 ${layoutMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
             {filteredItineraries.map((itin) => {
+              const statusInfo = computeItineraryStatus(itin);
               return (
                 <div
                   key={itin.id}
@@ -715,6 +732,20 @@ export const ItineraryManagerPage = () => {
                     {/* Top Badges */}
                     <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-1.5 flex-wrap">
+                        {/* Status Badge */}
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-[11px] font-bold border backdrop-blur-xs ${
+                          statusInfo.statusKey === 'ongoing'
+                            ? 'bg-blue-600/90 text-white border-blue-400/40'
+                            : statusInfo.statusKey === 'completed'
+                            ? 'bg-slate-700/90 text-slate-200 border-slate-500/40'
+                            : statusInfo.statusKey === 'cancelled'
+                            ? 'bg-rose-700/90 text-white border-rose-400/40'
+                            : 'bg-emerald-700/90 text-white border-emerald-400/40'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.statusKey === 'ongoing' ? 'bg-white animate-pulse' : 'bg-white'}`}></span>
+                          <span>{statusInfo.label}</span>
+                        </span>
+
                         {itin.countdown && (
                           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-[#17130F]/85 text-white text-[11px] font-bold border border-white/15">
                             <span className="w-1.5 h-1.5 rounded-sm bg-clay-300 "></span>
