@@ -326,14 +326,36 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
     }
   };
 
-  // Quản lý thêm hoạt động tự điền
+  // Quản lý thêm / sửa hoạt động tự điền
   const [addingDayNumber, setAddingDayNumber] = useState(null);
+  const [editingActivityId, setEditingActivityId] = useState(null);
   const [newActTime, setNewActTime] = useState('');
   const [newActTitle, setNewActTitle] = useState('');
   const [newActLocation, setNewActLocation] = useState('');
   const [newActCategory, setNewActCategory] = useState('Tham quan');
   const [newActCost, setNewActCost] = useState('');
   const [newActNote, setNewActNote] = useState('');
+
+  const handleStartEditActivity = (dayNumber, act) => {
+    setEditingActivityId(act.id || act.title);
+    setAddingDayNumber(dayNumber);
+    setNewActTime(act.time || '08:30');
+    setNewActTitle(act.title || '');
+    setNewActLocation(act.location || act.address || '');
+    setNewActCategory(act.category || 'Tham quan');
+    setNewActCost(act.cost ? String(act.cost) : '');
+    setNewActNote(act.note || act.tips || '');
+  };
+
+  const handleCancelActivityForm = () => {
+    setAddingDayNumber(null);
+    setEditingActivityId(null);
+    setNewActTime('');
+    setNewActTitle('');
+    setNewActLocation('');
+    setNewActCost('');
+    setNewActNote('');
+  };
 
   // Checklist chuẩn bị hành trang cơ bản
   const [checklist, setChecklist] = useState([
@@ -397,15 +419,14 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
 
   const days = currentDays;
 
-  // Thêm hoạt động vào ngày cụ thể
+  // Thêm / Cập nhật hoạt động vào ngày cụ thể
   const handleSaveNewActivity = async (targetDayNumber) => {
     if (!newActTitle.trim()) {
       toast.showWarning('Vui lòng nhập tên hoạt động hoặc điểm dừng chân!');
       return;
     }
 
-    const createdActivity = {
-      id: Date.now(),
+    const activityData = {
       time: newActTime.trim() || '08:30',
       title: newActTitle.trim(),
       location: newActLocation.trim() || newActTitle.trim(),
@@ -417,26 +438,47 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
       note: newActNote.trim() || ''
     };
 
-    const updatedDays = currentDays.map(d => {
-      const dNum = d.dayNumber || 1;
-      if (dNum === targetDayNumber) {
-        return {
-          ...d,
-          activities: [...(d.activities || []), createdActivity]
-        };
-      }
-      return d;
-    });
+    let updatedDays;
+    let savedActivityId = editingActivityId;
+
+    if (editingActivityId) {
+      updatedDays = currentDays.map(d => {
+        const dNum = d.dayNumber || 1;
+        if (dNum === targetDayNumber) {
+          return {
+            ...d,
+            activities: (d.activities || []).map(act => {
+              if (act.id === editingActivityId || act.title === editingActivityId) {
+                savedActivityId = act.id;
+                return { ...act, ...activityData };
+              }
+              return act;
+            })
+          };
+        }
+        return d;
+      });
+      toast.showSuccess(`Đã cập nhật hoạt động "${activityData.title}"! 🎉`);
+    } else {
+      const createdActivity = {
+        id: Date.now(),
+        ...activityData
+      };
+      updatedDays = currentDays.map(d => {
+        const dNum = d.dayNumber || 1;
+        if (dNum === targetDayNumber) {
+          return {
+            ...d,
+            activities: [...(d.activities || []), createdActivity]
+          };
+        }
+        return d;
+      });
+      toast.showSuccess(`Đã thêm "${createdActivity.title}" vào Ngày ${targetDayNumber}! 🎉`);
+    }
 
     setCurrentDays(updatedDays);
-    setAddingDayNumber(null);
-    setNewActTime('');
-    setNewActTitle('');
-    setNewActLocation('');
-    setNewActCost('');
-    setNewActNote('');
-
-    toast.showSuccess(`Đã thêm "${createdActivity.title}" vào Ngày ${targetDayNumber}! 🎉`);
+    handleCancelActivityForm();
 
     const updatedItin = {
       ...itinerary,
@@ -448,18 +490,32 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
     // Đồng bộ lên backend nếu lịch trình đã có ID trên MySQL
     try {
       if (itinerary?.id && typeof itinerary.id === 'number') {
-        const timeFormatted = createdActivity.time.includes(':')
-          ? (createdActivity.time.length === 5 ? `${createdActivity.time}:00` : createdActivity.time)
+        const timeFormatted = activityData.time.includes(':')
+          ? (activityData.time.length === 5 ? `${activityData.time}:00` : activityData.time)
           : '08:30:00';
-        await itineraryApi.addItineraryDetail(itinerary.id, {
-          dayNumber: targetDayNumber,
-          startTime: timeFormatted,
-          locationName: createdActivity.title,
-          locationAddress: createdActivity.address,
-          category: createdActivity.category,
-          estimatedCost: parseInt(createdActivity.cost.replace(/\D/g, '')) || 0,
-          note: createdActivity.note
-        });
+        const costNum = parseInt(activityData.cost.replace(/\D/g, '')) || 0;
+
+        if (editingActivityId && typeof savedActivityId === 'number') {
+          await itineraryApi.updateItineraryDetail(savedActivityId, {
+            dayNumber: targetDayNumber,
+            startTime: timeFormatted,
+            locationName: activityData.title,
+            locationAddress: activityData.address,
+            category: activityData.category,
+            estimatedCost: costNum,
+            note: activityData.note
+          });
+        } else if (!editingActivityId) {
+          await itineraryApi.addItineraryDetail(itinerary.id, {
+            dayNumber: targetDayNumber,
+            startTime: timeFormatted,
+            locationName: activityData.title,
+            locationAddress: activityData.address,
+            category: activityData.category,
+            estimatedCost: costNum,
+            note: activityData.note
+          });
+        }
       }
     } catch (e) {
       console.warn('Backend sync detail warning:', e.message);
@@ -570,12 +626,25 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
     );
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
+    const shareUrl = `${window.location.origin}/itineraries?id=${itinerary.id}`;
+    const title = itinerary.title || destinationName || 'Lịch trình du lịch Wayfare';
+    const text = `Khám phá kế hoạch lịch trình "${title}" trên Wayfare Travel! 🌟`;
+
+    if (navigator.share && typeof navigator.share === 'function') {
+      try {
+        await navigator.share({ title, text, url: shareUrl });
+        return;
+      } catch (err) {
+        if (err?.name === 'AbortError') return;
+      }
+    }
+
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      toast.showSuccess(`Đã sao chép liên kết lịch trình "${itinerary.title || destinationName}"!`);
+      await navigator.clipboard.writeText(shareUrl);
+      toast.showSuccess(`Đã sao chép liên kết chia sẻ lịch trình vào bộ nhớ tạm! 🎉`);
     } else {
-      toast.showInfo('Đã tạo liên kết chia sẻ lịch trình!');
+      toast.showInfo(`Liên kết chia sẻ: ${shareUrl}`);
     }
   };
 
@@ -971,7 +1040,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-xs transition-all cursor-pointer"
                         >
                           <Plus className="w-3.5 h-3.5" />
-                          <span>+ Thêm hoạt động đầu tiên</span>
+                          <span>Thêm hoạt động đầu tiên</span>
                         </button>
                       )}
                     </div>
@@ -1034,6 +1103,15 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                                 title={actIdx === dayItem.activities.length - 1 ? 'Điểm cuối cùng trong ngày' : 'Di chuyển xuống dưới'}
                               >
                                 <ArrowDown className="w-3.5 h-3.5" />
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => handleStartEditActivity(dayItem.dayNumber || dayIdx + 1, act)}
+                                className="p-1.5 rounded-lg text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-colors cursor-pointer"
+                                title="Chỉnh sửa hoạt động này"
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
                               </button>
 
                               <button
@@ -1104,17 +1182,17 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                     })
                   )}
 
-                  {/* Form thêm hoạt động inline */}
+                  {/* Form thêm / sửa hoạt động inline */}
                   {addingDayNumber === (dayItem.dayNumber || dayIdx + 1) ? (
                     <div className="p-4 rounded-2xl bg-sky-50/70 border border-sky-200 space-y-3 animate-in fade-in duration-150">
                       <div className="flex items-center justify-between">
                         <span className="font-extrabold text-xs text-sky-900 flex items-center gap-1.5">
                           <Plus className="w-4 h-4 text-sky-600" />
-                          <span>Thêm hoạt động mới vào Ngày {dayItem.dayNumber || dayIdx + 1}</span>
+                          <span>{editingActivityId ? `Chỉnh sửa hoạt động (Ngày ${dayItem.dayNumber || dayIdx + 1})` : `Thêm hoạt động mới vào Ngày ${dayItem.dayNumber || dayIdx + 1}`}</span>
                         </span>
                         <button
                           type="button"
-                          onClick={() => setAddingDayNumber(null)}
+                          onClick={handleCancelActivityForm}
                           className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-white cursor-pointer"
                         >
                           <X className="w-3.5 h-3.5" />
@@ -1197,7 +1275,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                       <div className="flex items-center justify-end gap-2 pt-1">
                         <button
                           type="button"
-                          onClick={() => setAddingDayNumber(null)}
+                          onClick={handleCancelActivityForm}
                           className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold cursor-pointer"
                         >
                           Hủy
@@ -1207,7 +1285,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                           onClick={() => handleSaveNewActivity(dayItem.dayNumber || dayIdx + 1)}
                           className="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-extrabold shadow-xs transition-all cursor-pointer"
                         >
-                          Lưu hoạt động 🎉
+                          {editingActivityId ? 'Lưu thay đổi' : 'Lưu hoạt động 🎉'}
                         </button>
                       </div>
                     </div>
@@ -1215,6 +1293,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                     <button
                       type="button"
                       onClick={() => {
+                        setEditingActivityId(null);
                         setAddingDayNumber(dayItem.dayNumber || dayIdx + 1);
                         setNewActTime('');
                         setNewActTitle('');
@@ -1225,7 +1304,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                       className="w-full py-2.5 rounded-xl bg-sky-50/60 hover:bg-sky-100/70 border border-dashed border-sky-300 text-sky-700 font-extrabold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                     >
                       <Plus className="w-4 h-4 text-sky-600" />
-                      <span>+ Thêm hoạt động vào Ngày {dayItem.dayNumber || dayIdx + 1}</span>
+                      <span>Thêm hoạt động vào Ngày {dayItem.dayNumber || dayIdx + 1}</span>
                     </button>
                   )}
                 </div>
