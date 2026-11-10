@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useToast } from '../common/Toast';
-import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, CheckCircle2, Square, CheckSquare, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2, Globe, Lock, Edit3, ArrowUp, ArrowDown } from 'lucide-react';
+import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2, Globe, Lock, Edit3, ArrowUp, ArrowDown } from 'lucide-react';
 import { ItineraryExportModal } from './ItineraryExportModal';
 import { EditItineraryModal } from './EditItineraryModal';
 import { itineraryApi } from '../../services/api';
@@ -357,14 +357,6 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
     setNewActNote('');
   };
 
-  // Checklist chuẩn bị hành trang cơ bản
-  const [checklist, setChecklist] = useState([
-    { id: 1, text: 'CCCD / Hộ chiếu bản gốc còn hạn', done: true },
-    { id: 2, text: 'Trang phục & phụ kiện phù hợp thời tiết', done: true },
-    { id: 3, text: 'Sạc pin dự phòng & dây sạc thiết bị', done: true },
-    { id: 4, text: 'Thuốc cá nhân cơ bản (dị ứng, đau đầu, tiêu hóa)', done: false }
-  ]);
-
   // Quản lý danh sách ngày linh hoạt (tôn trọng 100% dữ liệu người dùng tự nhập)
   const resolveDays = useCallback((itin) => {
     if (!itin) return [];
@@ -619,12 +611,6 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
 
   const destinationName = formatDestination(itinerary?.destination || 'Điểm Đến');
   const baseCoords = useMemo(() => getDestinationCoordinates(itinerary?.destination), [itinerary?.destination]);
-
-  const toggleChecklist = (id) => {
-    setChecklist(prev =>
-      prev.map(item => item.id === id ? { ...item, done: !item.done } : item)
-    );
-  };
 
   const handleShare = async () => {
     const shareUrl = `${window.location.origin}/itineraries?id=${itinerary.id}`;
@@ -1562,46 +1548,17 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
               </div>
             </div>
 
-            {/* 4. LƯU Ý & CHECKLIST CHUẨN BỊ */}
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 text-slate-600" />
-                  <span>Checklist chuẩn bị</span>
-                </h4>
-                <span className="text-[11px] text-slate-500 font-semibold">
-                  {checklist.filter(c => c.done).length}/{checklist.length} mục
-                </span>
-              </div>
-
-              <div className="space-y-2 text-xs">
-                {checklist.map(item => (
-                  <div
-                    key={item.id}
-                    onClick={() => toggleChecklist(item.id)}
-                    className="flex items-center gap-2 cursor-pointer select-none py-1 hover:text-sky-600 transition-colors"
-                  >
-                    {item.done ? (
-                      <CheckSquare className="w-4 h-4 text-sky-600 shrink-0" />
-                    ) : (
-                      <Square className="w-4 h-4 text-slate-300 shrink-0" />
-                    )}
-                    <span className={item.done ? 'line-through text-slate-400' : 'text-slate-700 font-medium'}>
-                      {item.text}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              {itinerary.aiTipNote && (
-                <div className="p-2.5 sm:p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-start gap-2 mt-2">
+            {/* 4. LƯU Ý & GHI CHÚ CHUYẾN ĐI (nếu có) */}
+            {itinerary.aiTipNote ? (
+              <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
+                <div className="p-2.5 sm:p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-start gap-2">
                   <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
                   <p className="leading-relaxed">
-                    <strong>Ghi chú:</strong> {itinerary.aiTipNote}
+                    <strong>Ghi chú chuyến đi:</strong> {itinerary.aiTipNote}
                   </p>
                 </div>
-              )}
-            </div>
+              </div>
+            ) : null}
 
           </div>
 
