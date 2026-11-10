@@ -23,7 +23,6 @@
 
           var searchParams = new URLSearchParams(fragment);
           var token = searchParams.get('id_token') || searchParams.get('access_token');
-          var rawState = searchParams.get('state');
 
           // 1. Nếu mở từ popup web (Expo Web / localhost:8081 / browser):
           if (window.opener && token) {
@@ -40,88 +39,10 @@
             }
           }
 
-          // 2. Chuyển tiếp deep link về native mobile app
-          var targetScheme = 'wayfare://oauth';
-          if (rawState) {
-            try {
-              var decoded = decodeURIComponent(rawState);
-              if (decoded.indexOf('://') !== -1) {
-                targetScheme = decoded;
-              }
-            } catch (e) {}
-          }
-          var separator = targetScheme.indexOf('?') !== -1 ? '&' : (targetScheme.indexOf('#') !== -1 ? '&' : '#');
-          var redirectTarget = targetScheme + separator + fragment;
-
-          // Android Intent URI (Vượt qua hoàn toàn rào cản chặn custom scheme của Android Chrome)
-          var androidIntent = 'intent://oauth#' + fragment + '#Intent;scheme=wayfare;package=com.wayfare.travelmobile;end;';
-
-          // Hiển thị giao diện chuyển tiếp ngay lập tức, giải phóng RAM không tải React SPA
-          var renderBridgeUI = function() {
-            var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Wayfare - Đang chuyển tiếp...</title>'
-              + '<style>'
-              + 'body{margin:0;padding:24px;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#FAF8F5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;box-sizing:border-box;}'
-              + '.card{background:#FFFFFF;border:1px solid #E8E2D9;border-radius:24px;padding:36px 24px;max-width:400px;width:100%;text-align:center;box-shadow:0 12px 32px rgba(30,26,21,0.08);}'
-              + '.logo{font-size:28px;font-weight:900;color:#C07040;margin-bottom:8px;letter-spacing:-0.5px;}'
-              + '.spinner{width:40px;height:40px;border:3px solid rgba(192,112,64,0.2);border-top-color:#C07040;border-radius:50%;animation:spin 0.8s linear infinite;margin:20px auto;}'
-              + '@keyframes spin{to{transform:rotate(360deg);}}'
-              + '.title{font-size:17px;font-weight:700;color:#1E1A15;margin-bottom:6px;}'
-              + '.sub{font-size:13px;color:#7D7368;line-height:1.5;margin-bottom:24px;}'
-              + '.btn{display:block;background:#C07040;color:#FFFFFF;padding:14px 24px;border-radius:9999px;text-decoration:none;font-size:15px;font-weight:700;box-shadow:0 6px 16px rgba(192,112,64,0.35);border:none;cursor:pointer;}'
-              + '.hint{margin-top:14px;font-size:11px;color:#A8A095;}'
-              + '</style></head><body>'
-              + '<div class="card">'
-              + '<div class="logo">Wayfare</div>'
-              + '<div class="spinner"></div>'
-              + '<div class="title">Đăng nhập Google thành công! 🎉</div>'
-              + '<div class="sub">Đang đưa bạn quay lại ứng dụng Wayfare...</div>'
-              + '<a id="openAppBtn" href="' + redirectTarget + '" class="btn">🚀 Chạm để mở ứng dụng ngay</a>'
-              + '<div class="hint">Nếu ứng dụng không tự mở trong 2 giây, vui lòng nhấn nút trên.</div>'
-              + '</div></body></html>';
-
-            document.open();
-            document.write(html);
-            document.close();
-
-            var btn = document.getElementById('openAppBtn');
-            if (btn) {
-              btn.onclick = function(e) {
-                try { window.location.href = androidIntent; } catch(err) {}
-                setTimeout(function() { window.location.href = redirectTarget; }, 300);
-              };
-            }
-          };
-
-          if (document.body) {
-            renderBridgeUI();
-          } else {
-            document.addEventListener('DOMContentLoaded', renderBridgeUI);
-          }
-
-          // Tự động kích hoạt chuyển hướng song song
-          try {
-            if (/Android/i.test(navigator.userAgent)) {
-              window.location.href = androidIntent;
-            }
-          } catch (e1) {}
-
-          setTimeout(function() {
-            try {
-              window.location.replace(redirectTarget);
-            } catch (e2) {}
-          }, 200);
-
-          setTimeout(function() {
-            try {
-              var a = document.createElement('a');
-              a.href = redirectTarget;
-              document.body.appendChild(a);
-              a.click();
-            } catch (e3) {}
-          }, 500);
-
+          // 2. Chuyển tiếp an toàn sang trang oauth-bridge chuyên dụng xử lý Native Deep Link
+          window.location.replace('/oauth-bridge.html' + (hash ? hash : ('#' + fragment)));
         } catch (err) {
-          console.warn('OAuth redirect bridge error', err);
+          console.warn('OAuth redirect check error', err);
         }
       })();
     </script>
