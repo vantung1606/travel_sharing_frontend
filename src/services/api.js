@@ -186,6 +186,48 @@ export const authApi = {
     }
 
     return data;
+  },
+
+  // Forgot Password: Gửi mã OTP qua Resend Email
+  async forgotPassword(email) {
+    const res = await fetch(`${BASE_URL}/auth/forgot-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Không thể gửi mã xác thực. Vui lòng kiểm tra lại email.');
+    }
+    return data;
+  },
+
+  // Verify OTP: Xác thực mã 6 số
+  async verifyOtp(email, otp) {
+    const res = await fetch(`${BASE_URL}/auth/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, otp })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Mã OTP không hợp lệ hoặc đã hết hạn.');
+    }
+    return data;
+  },
+
+  // Reset Password: Thiết lập mật khẩu mới
+  async resetPassword(email, resetToken, newPassword) {
+    const res = await fetch(`${BASE_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, resetToken, newPassword })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || !data.success) {
+      throw new Error(data.message || 'Không thể đặt lại mật khẩu. Vui lòng thử lại.');
+    }
+    return data;
   }
 };
 

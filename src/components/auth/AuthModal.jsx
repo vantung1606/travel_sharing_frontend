@@ -8,9 +8,13 @@ import {
   Lock,
   Eye,
   EyeOff,
-  User
+  User,
+  ArrowLeft,
+  KeyRound,
+  ShieldCheck,
+  CheckCircle2,
+  RefreshCw
 } from 'lucide-react';
-
 
 export const AuthModal = () => {
   const { isAuthModalOpen, setIsAuthModalOpen, authMode, setAuthMode, login } = useApp();
@@ -22,6 +26,25 @@ export const AuthModal = () => {
   const [fullName, setFullName] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Forgot Password States
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [forgotStep, setForgotStep] = useState(1); // 1: Email, 2: OTP, 3: New Password
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+  const [resetToken, setResetToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (countdown > 0) {
+      timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [countdown]);
 
   // Auto-rotating 3-slide travel carousel (3.5 seconds per slide)
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -55,6 +78,73 @@ export const AuthModal = () => {
   }, [isAuthModalOpen, bannerSlides.length]);
 
   if (!isAuthModalOpen) return null;
+
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) {
+      toast.error('Vui lòng nhập địa chỉ email của bạn!');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const res = await authApi.forgotPassword(forgotEmail.trim());
+      setIsLoading(false);
+      setForgotStep(2);
+      setCountdown(60);
+      toast.success(res.message || 'Mã xác thực OTP đã được gửi đến email của bạn!');
+      if (res.data?.devOtp) {
+        toast.info(`📬 Mã OTP thử nghiệm: ${res.data.devOtp}`, { duration: 10000 });
+      }
+    } catch (err) {
+      setIsLoading(false);
+      toast.error(err.message || 'Không thể gửi mã OTP. Vui lòng kiểm tra lại email.');
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if (!otpCode.trim() || otpCode.trim().length !== 6) {
+      toast.error('Vui lòng nhập đủ 6 chữ số mã OTP!');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const res = await authApi.verifyOtp(forgotEmail.trim(), otpCode.trim());
+      setIsLoading(false);
+      setResetToken(res.data?.resetToken || '');
+      setForgotStep(3);
+      toast.success('Xác thực mã OTP thành công! Vui lòng đặt mật khẩu mới.');
+    } catch (err) {
+      setIsLoading(false);
+      toast.error(err.message || 'Mã OTP không chính xác hoặc đã hết hạn.');
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      toast.error('Mật khẩu mới phải có tối thiểu 6 ký tự!');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast.error('Mật khẩu xác nhận không trùng khớp!');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await authApi.resetPassword(forgotEmail.trim(), resetToken, newPassword);
+      setIsLoading(false);
+      toast.success('Đặt lại mật khẩu thành công! Bạn có thể đăng nhập bằng mật khẩu mới.');
+      setIsForgotPassword(false);
+      setForgotStep(1);
+      setEmail(forgotEmail);
+      setPassword('');
+      setAuthMode('login');
+    } catch (err) {
+      setIsLoading(false);
+      toast.error(err.message || 'Không thể đặt lại mật khẩu. Vui lòng thử lại.');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -234,118 +324,274 @@ export const AuthModal = () => {
 
             {/* Heading */}
             <h3 className="text-2xl font-semibold text-[#3c4043] mb-3">
-              {authMode === 'login' ? 'Đăng Nhập Tài Khoản' : 'Đăng Ký Tài Khoản'}
+              {isForgotPassword
+                ? (forgotStep === 1 ? 'Khôi Phục Mật Khẩu' : forgotStep === 2 ? 'Xác Thực Mã OTP' : 'Mật Khẩu Mới')
+                : (authMode === 'login' ? 'Đăng Nhập Tài Khoản' : 'Đăng Ký Tài Khoản')}
             </h3>
 
-            {/* Mode Switcher Tabs */}
-            <div className="flex bg-slate-200/80 p-1 rounded-full mb-5 max-w-[260px] mx-auto">
-              <button
-                type="button"
-                onClick={() => setAuthMode('login')}
-                className={`flex-1 py-1.5 text-xs sm:text-sm font-semibold rounded-full transition-all cursor-pointer ${
-                  authMode === 'login'
-                    ? 'bg-white text-[#3c4043] shadow-xs'
-                    : 'text-slate-500 hover:text-[#3c4043]'
-                }`}
-              >
-                Đăng nhập
-              </button>
-              <button
-                type="button"
-                onClick={() => setAuthMode('register')}
-                className={`flex-1 py-1.5 text-xs sm:text-sm font-semibold rounded-full transition-all cursor-pointer ${
-                  authMode === 'register'
-                    ? 'bg-white text-[#3c4043] shadow-xs'
-                    : 'text-slate-500 hover:text-[#3c4043]'
-                }`}
-              >
-                Đăng ký
-              </button>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-3.5 text-left">
-              
-              {/* Full Name (when Register) */}
-              {authMode === 'register' && (
-                <div className="relative">
-                  <User className="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Họ và tên của bạn"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full h-[50px] pl-12 pr-5 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
-                  />
-                </div>
-              )}
-
-              {/* Email / Code */}
-              <div className="relative">
-                <Mail className="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type={authMode === 'login' ? 'text' : 'email'}
-                  required
-                  placeholder={authMode === 'login' ? 'Email hoặc Tên tài khoản' : 'Địa chỉ Email'}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full h-[52px] pl-12 pr-5 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
-                />
-              </div>
-
-              {/* Password */}
-              <div className="relative">
-                <Lock className="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  required
-                  placeholder="Mật Khẩu"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full h-[52px] pl-12 pr-12 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
-                />
+            {isForgotPassword ? (
+              /* ========================================================= */
+              /* FORGOT PASSWORD 3-STEP FLOW                               */
+              /* ========================================================= */
+              <div className="space-y-4 text-left">
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#3c4043] cursor-pointer"
+                  onClick={() => {
+                    setIsForgotPassword(false);
+                    setForgotStep(1);
+                  }}
+                  className="inline-flex items-center gap-1.5 text-xs text-sky-600 hover:text-sky-700 font-medium mb-1 cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Quay lại đăng nhập</span>
                 </button>
-              </div>
 
-              {/* Remember Me & Forgot Password Row */}
-              <div className="flex items-center justify-between text-xs text-[#3c4043] pt-1 px-2">
-                <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300 cursor-pointer"
-                  />
-                  <span>Nhớ Mật Khẩu</span>
-                </label>
-                {authMode === 'login' && (
-                  <a href="#" className="hover:text-sky-600 transition-colors">
-                    Quên Mật Khẩu?
-                  </a>
+                {forgotStep === 1 && (
+                  <form onSubmit={handleSendOtp} className="space-y-3.5">
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      Nhập địa chỉ email tài khoản của bạn. Hệ thống Wayfare sẽ gửi mã OTP gồm 6 chữ số qua hòm thư Resend.
+                    </p>
+                    <div className="relative">
+                      <Mail className="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="email"
+                        required
+                        placeholder="Địa chỉ Email của bạn"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        className="w-full h-[52px] pl-12 pr-5 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full h-[50px] rounded-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-medium text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      {isLoading ? (
+                        <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      ) : (
+                        <span>Gửi Mã OTP Xác Thực</span>
+                      )}
+                    </button>
+                  </form>
+                )}
+
+                {forgotStep === 2 && (
+                  <form onSubmit={handleVerifyOtp} className="space-y-3.5">
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      Mã xác nhận 6 số đã được gửi tới <strong className="text-slate-700">{forgotEmail}</strong>. Vui lòng nhập mã OTP để tiếp tục:
+                    </p>
+                    <div className="relative">
+                      <KeyRound className="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        required
+                        maxLength={6}
+                        placeholder="• • • • • •"
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                        className="w-full h-[52px] pl-12 pr-5 rounded-full bg-white border border-white text-lg font-mono font-bold tracking-[6px] text-center text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
+                      />
+                    </div>
+                    <div className="flex items-center justify-between text-xs px-2 text-slate-500">
+                      <span>Chưa nhận được mã?</span>
+                      {countdown > 0 ? (
+                        <span className="text-slate-400 font-medium">Gửi lại ({countdown}s)</span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={handleSendOtp}
+                          disabled={isLoading}
+                          className="text-sky-600 hover:text-sky-700 font-semibold cursor-pointer flex items-center gap-1"
+                        >
+                          <RefreshCw className="w-3 h-3" />
+                          <span>Gửi lại mã</span>
+                        </button>
+                      )}
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full h-[50px] rounded-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-medium text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      {isLoading ? (
+                        <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      ) : (
+                        <span>Xác Nhận Mã OTP</span>
+                      )}
+                    </button>
+                  </form>
+                )}
+
+                {forgotStep === 3 && (
+                  <form onSubmit={handleResetPassword} className="space-y-3.5">
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      Mã xác nhận hợp lệ. Vui lòng thiết lập mật khẩu mới (tối thiểu 6 ký tự) cho tài khoản:
+                    </p>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Mật khẩu mới (tối thiểu 6 ký tự)"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="w-full h-[52px] pl-12 pr-12 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                        className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#3c4043] cursor-pointer"
+                      >
+                        {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <ShieldCheck className="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type={showNewPassword ? 'text' : 'password'}
+                        required
+                        placeholder="Xác nhận lại mật khẩu mới"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full h-[52px] pl-12 pr-5 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full h-[50px] rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-medium text-sm shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+                    >
+                      {isLoading ? (
+                        <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                      ) : (
+                        <span>Lưu Mật Khẩu & Đăng Nhập</span>
+                      )}
+                    </button>
+                  </form>
                 )}
               </div>
+            ) : (
+              <>
+                {/* Mode Switcher Tabs */}
+                <div className="flex bg-slate-200/80 p-1 rounded-full mb-5 max-w-[260px] mx-auto">
+                  <button
+                    type="button"
+                    onClick={() => setAuthMode('login')}
+                    className={`flex-1 py-1.5 text-xs sm:text-sm font-semibold rounded-full transition-all cursor-pointer ${
+                      authMode === 'login'
+                        ? 'bg-white text-[#3c4043] shadow-xs'
+                        : 'text-slate-500 hover:text-[#3c4043]'
+                    }`}
+                  >
+                    Đăng nhập
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setAuthMode('register')}
+                    className={`flex-1 py-1.5 text-xs sm:text-sm font-semibold rounded-full transition-all cursor-pointer ${
+                      authMode === 'register'
+                        ? 'bg-white text-[#3c4043] shadow-xs'
+                        : 'text-slate-500 hover:text-[#3c4043]'
+                    }`}
+                  >
+                    Đăng ký
+                  </button>
+                </div>
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-[52px] rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-medium text-base shadow-md shadow-blue-600/25 transition-all transform active:scale-98 cursor-pointer mt-2"
-              >
-                {isLoading ? (
-                  <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                ) : (
-                  authMode === 'login' ? 'Đăng Nhập' : 'Tạo Tài Khoản'
-                )}
-              </button>
+                {/* Form */}
+                <form onSubmit={handleSubmit} className="space-y-3.5 text-left">
+                  
+                  {/* Full Name (when Register) */}
+                  {authMode === 'register' && (
+                    <div className="relative">
+                      <User className="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        type="text"
+                        required
+                        placeholder="Họ và tên của bạn"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        className="w-full h-[50px] pl-12 pr-5 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
+                      />
+                    </div>
+                  )}
 
-            </form>
+                  {/* Email / Code */}
+                  <div className="relative">
+                    <Mail className="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type={authMode === 'login' ? 'text' : 'email'}
+                      required
+                      placeholder={authMode === 'login' ? 'Email hoặc Tên tài khoản' : 'Địa chỉ Email'}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full h-[52px] pl-12 pr-5 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
+                    />
+                  </div>
+
+                  {/* Password */}
+                  <div className="relative">
+                    <Lock className="w-4 h-4 absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      placeholder="Mật Khẩu"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full h-[52px] pl-12 pr-12 rounded-full bg-white border border-white text-sm text-[#3c4043] shadow-2xs focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all placeholder:text-slate-400"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#3c4043] cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+
+                  {/* Remember Me & Forgot Password Row */}
+                  <div className="flex items-center justify-between text-xs text-[#3c4043] pt-1 px-2">
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="w-4 h-4 rounded text-sky-600 focus:ring-sky-500 border-slate-300 cursor-pointer"
+                      />
+                      <span>Nhớ Mật Khẩu</span>
+                    </label>
+                    {authMode === 'login' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsForgotPassword(true);
+                          setForgotStep(1);
+                          setForgotEmail(email);
+                        }}
+                        className="text-xs text-sky-600 hover:text-sky-700 font-medium cursor-pointer"
+                      >
+                        Quên Mật Khẩu?
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full h-[52px] rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-medium text-base shadow-md shadow-blue-600/25 transition-all transform active:scale-98 cursor-pointer mt-2"
+                  >
+                    {isLoading ? (
+                      <span className="inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    ) : (
+                      authMode === 'login' ? 'Đăng Nhập' : 'Tạo Tài Khoản'
+                    )}
+                  </button>
+
+                </form>
+              </>
+            )}
 
             {/* Social Divider */}
             <div className="relative my-6 flex items-center justify-center">
