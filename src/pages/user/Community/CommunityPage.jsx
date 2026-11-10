@@ -2683,99 +2683,36 @@ export const CommunityPage = () => {
                                   </div>
                                 </div>
                               </div>
-                            ) : validImages.length === 4 ? (
-                              /* CASE 4: 4 PHOTOS (Harmonious 2x2 Grid) */
-                              <div className="grid grid-cols-2 grid-rows-2 gap-1.5 h-72 sm:h-88">
-                                {validImages.map((img, i) => (
-                                  <div
-                                    key={i}
-                                    className="h-full overflow-hidden"
-                                    onClick={(e) => handleOpenLightbox(post, i, e, validImages)}
-                                  >
-                                    <img
-                                      src={img}
-                                      alt={`Post photo ${i + 1}`}
-                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                    />
-                                  </div>
-                                ))}
-                              </div>
                             ) : (
-                              /* CASE 5 & 6+: 5 OR 6+ PHOTOS (Mosaic Layout: Top 2 + Bottom 3 with +N Badge on 5th photo) */
-                              <div className="space-y-1.5">
-                                {/* Top 2 Photos */}
-                                <div className="grid grid-cols-2 gap-1.5 h-48 sm:h-56">
-                                  <div
-                                    className="h-full overflow-hidden"
-                                    onClick={(e) => handleOpenLightbox(post, 0, e, validImages)}
-                                  >
-                                    <img
-                                      src={validImages[0]}
-                                      alt="Post photo 1"
-                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                    />
-                                  </div>
-                                  <div
-                                    className="h-full overflow-hidden"
-                                    onClick={(e) => handleOpenLightbox(post, 1, e, validImages)}
-                                  >
-                                    <img
-                                      src={validImages[1]}
-                                      alt="Post photo 2"
-                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                    />
-                                  </div>
-                                </div>
-
-                                {/* Bottom 3 Photos */}
-                                <div className="grid grid-cols-3 gap-1.5 h-36 sm:h-44">
-                                  <div
-                                    className="h-full overflow-hidden"
-                                    onClick={(e) => handleOpenLightbox(post, 2, e, validImages)}
-                                  >
-                                    <img
-                                      src={validImages[2]}
-                                      alt="Post photo 3"
-                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                    />
-                                  </div>
-                                  <div
-                                    className="h-full overflow-hidden"
-                                    onClick={(e) => handleOpenLightbox(post, 3, e, validImages)}
-                                  >
-                                    <img
-                                      src={validImages[3]}
-                                      alt="Post photo 4"
-                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                    />
-                                  </div>
-                                  <div
-                                    className="relative h-full overflow-hidden group/more"
-                                    onClick={(e) => handleOpenLightbox(post, 4, e, validImages)}
-                                  >
-                                    <img
-                                      src={validImages[4]}
-                                      alt="Post photo 5"
-                                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                                    />
-                                    {validImages.length > 5 && (
-                                      <div className="absolute inset-0 bg-[#1E1A15]/65 backdrop-blur-[1px] flex flex-col items-center justify-center text-white font-bold group-hover/more:bg-[#1E1A15]/75 transition-all">
-                                        <span className="text-lg sm:text-2xl font-black leading-none drop-shadow-md">
-                                          +{validImages.length - 4}
-                                        </span>
-                                        <span className="text-[10px] sm:text-xs font-semibold text-white/90 mt-1">
-                                          ảnh
-                                        </span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
+                              /* CASE 4 & 5+: 4 HOẶC NHIỀU HƠN (Lưới 2x2 cân xứng, ô thứ 4 phủ +N nếu có > 4 ảnh) */
+                              <div className="grid grid-cols-2 grid-rows-2 gap-1.5 h-72 sm:h-88">
+                                {validImages.slice(0, 4).map((img, i) => {
+                                  const isLast = i === 3 && validImages.length > 4;
+                                  return (
+                                    <div
+                                      key={i}
+                                      className="relative h-full overflow-hidden group/item cursor-pointer"
+                                      onClick={(e) => handleOpenLightbox(post, i, e, validImages)}
+                                    >
+                                      <img
+                                        src={img}
+                                        alt={`Post photo ${i + 1}`}
+                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                      />
+                                      {isLast && (
+                                        <div className="absolute inset-0 bg-[#1E1A15]/65 backdrop-blur-[1px] flex flex-col items-center justify-center text-white font-bold group-hover/item:bg-[#1E1A15]/75 transition-all">
+                                          <span className="text-xl sm:text-3xl font-black leading-none drop-shadow-md">
+                                            +{validImages.length - 4}
+                                          </span>
+                                          <span className="text-xs sm:text-sm font-semibold text-white/90 mt-1">
+                                            ảnh
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  );
+                                })}
                               </div>
                             )}
                           </div>
