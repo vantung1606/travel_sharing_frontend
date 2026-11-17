@@ -49,6 +49,7 @@ const ItineraryManagerPage = lazyRetry(() => import('./pages/user/Itineraries/It
 const MessagesPage = lazyRetry(() => import('./pages/user/Messages/MessagesPage').then(m => ({ default: m.MessagesPage })));
 const ProfilePage = lazyRetry(() => import('./pages/user/Profile/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const NotificationsPage = lazyRetry(() => import('./pages/user/Notifications/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
+const NotFoundPage = lazyRetry(() => import('./pages/NotFoundPage'));
 
 // Admin Pages - lazy loaded, chỉ tải khi vào khu vực /admin
 const AdminDashboardPage = lazyRetry(() => import('./pages/admin/Dashboard/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })));
@@ -255,8 +256,8 @@ const AppContent = () => {
                   } 
                 />
 
-                {/* Catch-all redirect */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                {/* Catch-all 404 page */}
+                <Route path="*" element={<NotFoundPage />} />
                 </Routes>
               </Suspense>
             </div>
