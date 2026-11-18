@@ -179,8 +179,8 @@ export const AdminDashboardPage = () => {
     // 3. Nếu đã đánh dấu COMPLETED trong CSDL
     if (dbStatus === 'COMPLETED') {
       return {
-        label: 'Đã hoàn thành',
-        subLabel: 'Chuyến đi kết thúc',
+        label: 'Hoàn thành',
+        subLabel: 'Đã kết thúc',
         dbStatus: 'COMPLETED',
         timeline: 'completed',
         badgeClass: 'bg-blue-50 text-blue-800 border-blue-200'
@@ -194,7 +194,7 @@ export const AdminDashboardPage = () => {
 
     if (startStr && startStr > todayStr) {
       return {
-        label: 'Sắp tới (Upcoming)',
+        label: 'Sắp tới',
         subLabel: `Khởi hành ${startStr}`,
         dbStatus: 'ACTIVE',
         timeline: 'upcoming',
@@ -204,8 +204,8 @@ export const AdminDashboardPage = () => {
 
     if (endStr && endStr < todayStr) {
       return {
-        label: 'Đã hoàn thành',
-        subLabel: `Đã kết thúc ${endStr}`,
+        label: 'Hoàn thành',
+        subLabel: `Kết thúc ${endStr}`,
         dbStatus: 'ACTIVE',
         timeline: 'completed',
         badgeClass: 'bg-sky-50 text-sky-800 border-sky-200'
@@ -224,7 +224,7 @@ export const AdminDashboardPage = () => {
 
     // Mặc định ACTIVE khi không có ngày cụ thể
     return {
-      label: 'Đang hoạt động',
+      label: 'Hoạt động',
       subLabel: 'Khả dụng',
       dbStatus: 'ACTIVE',
       timeline: 'active',
@@ -234,7 +234,7 @@ export const AdminDashboardPage = () => {
 
   // Helper tính toán số ngày & thời lượng chuẩn xác của lịch trình
   const getItineraryDuration = (item) => {
-    if (!item) return { days: 1, label: '1 ngày (Đi về trong ngày)', shortLabel: '1N' };
+    if (!item) return { days: 1, label: '1 ngày', shortLabel: '1N' };
 
     // 1. Trích xuất từ tiêu đề nếu có pattern "3N2Đ", "4N3D", "2 ngày 1 đêm", "5 ngày", "3N"
     if (item.title) {
@@ -242,12 +242,12 @@ export const AdminDashboardPage = () => {
       if (fullMatch && Number(fullMatch[1]) > 0) {
         const d = Number(fullMatch[1]);
         const n = Number(fullMatch[2]);
-        return { days: d, label: `${d} ngày (${d}N${n}Đ)`, shortLabel: `${d}N${n}Đ` };
+        return { days: d, label: `${d}N${n}Đ`, shortLabel: `${d}N${n}Đ` };
       }
       const simpleMatch = item.title.match(/(\d+)\s*(?:ngày|ngay|N|n)(?!\w)/i);
       if (simpleMatch && Number(simpleMatch[1]) > 0 && Number(simpleMatch[1]) <= 60) {
         const d = Number(simpleMatch[1]);
-        return { days: d, label: d > 1 ? `${d} ngày (${d}N${d - 1}Đ)` : '1 ngày (Đi về trong ngày)', shortLabel: `${d}N${Math.max(0, d - 1)}Đ` };
+        return { days: d, label: d > 1 ? `${d}N${d - 1}Đ` : '1 ngày', shortLabel: `${d}N${Math.max(0, d - 1)}Đ` };
       }
     }
 
@@ -262,11 +262,11 @@ export const AdminDashboardPage = () => {
         if (calculatedDays > 1) {
           return {
             days: calculatedDays,
-            label: `${calculatedDays} ngày (${calculatedDays}N${calculatedDays - 1}Đ)`,
+            label: `${calculatedDays}N${calculatedDays - 1}Đ`,
             shortLabel: `${calculatedDays}N${calculatedDays - 1}Đ`
           };
         }
-        return { days: 1, label: '1 ngày (Đi về trong ngày)', shortLabel: '1N' };
+        return { days: 1, label: '1 ngày', shortLabel: '1N' };
       }
     }
 
@@ -276,7 +276,7 @@ export const AdminDashboardPage = () => {
       if (maxDay > 0) {
         return {
           days: maxDay,
-          label: maxDay > 1 ? `${maxDay} ngày (${maxDay}N${maxDay - 1}Đ)` : '1 ngày (Đi về trong ngày)',
+          label: maxDay > 1 ? `${maxDay}N${maxDay - 1}Đ` : '1 ngày',
           shortLabel: `${maxDay}N${Math.max(0, maxDay - 1)}Đ`
         };
       }
@@ -285,14 +285,14 @@ export const AdminDashboardPage = () => {
     // 4. Nếu có daysCount hoặc durationDays hợp lệ > 0
     if (item.daysCount && Number(item.daysCount) > 0) {
       const d = Number(item.daysCount);
-      return { days: d, label: d > 1 ? `${d} ngày (${d}N${d - 1}Đ)` : '1 ngày (Đi về trong ngày)', shortLabel: `${d}N${Math.max(0, d - 1)}Đ` };
+      return { days: d, label: d > 1 ? `${d}N${d - 1}Đ` : '1 ngày', shortLabel: `${d}N${Math.max(0, d - 1)}Đ` };
     }
     if (item.durationDays && Number(item.durationDays) > 0) {
       const d = Number(item.durationDays);
-      return { days: d, label: d > 1 ? `${d} ngày (${d}N${d - 1}Đ)` : '1 ngày (Đi về trong ngày)', shortLabel: `${d}N${Math.max(0, d - 1)}Đ` };
+      return { days: d, label: d > 1 ? `${d}N${d - 1}Đ` : '1 ngày', shortLabel: `${d}N${Math.max(0, d - 1)}Đ` };
     }
 
-    return { days: 1, label: '1 ngày (Đi về trong ngày)', shortLabel: '1N' };
+    return { days: 1, label: '1 ngày', shortLabel: '1N' };
   };
 
   // Filter Itineraries
@@ -600,14 +600,14 @@ export const AdminDashboardPage = () => {
             <Compass className="w-3.5 h-3.5 text-clay-600 shrink-0" />
             <span>Quản trị hệ thống</span>
             <span className="text-ink-300">/</span>
-            <span className="text-clay-700 font-bold">Dashboard tổng quan</span>
+            <span className="text-clay-700 font-bold">Tổng quan</span>
           </nav>
           <h1 className="font-display text-2xl sm:text-3xl font-black text-ink-800 tracking-tight flex items-center gap-2">
             Chào mừng trở lại, {currentUser?.name || 'Quản trị viên'}! <span>👋</span>
           </h1>
           <p className="text-xs text-ink-400 flex items-center gap-2 flex-wrap font-medium">
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            Hệ thống đang phục vụ <strong className="text-ink-800 font-bold">{stats.totalUsers}</strong> thành viên, <strong className="text-ink-800 font-bold">{stats.totalPosts}</strong> bài viết chia sẻ và <strong className="text-ink-800 font-bold">{stats.totalItineraries}</strong> lịch trình du lịch.
+            <span>Hệ thống hoạt động ổn định • Dữ liệu thời gian thực</span>
           </p>
         </div>
 
@@ -617,16 +617,16 @@ export const AdminDashboardPage = () => {
             onClick={() => loadDashboardData(true)}
             disabled={refreshing}
             className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer disabled:opacity-50"
-            title="Đồng bộ dữ liệu thời gian thực từ CSDL"
+            title="Đồng bộ dữ liệu mới nhất"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-clay-600 ${refreshing ? 'animate-spin' : ''}`} />
-            <span>{refreshing ? 'Đang đồng bộ...' : 'Làm mới CSDL'}</span>
+            <span>{refreshing ? 'Đang đồng bộ...' : 'Làm mới'}</span>
           </button>
 
           <button 
             onClick={handleExportCsv}
             className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer"
-            title="Xuất toàn bộ dữ liệu Dashboard ra file CSV (KPIs, Xu hướng tăng trưởng, Hàng đợi kiểm duyệt, Lịch trình, Thành viên)"
+            title="Xuất báo cáo tổng quan ra file CSV"
           >
             <Download className="w-3.5 h-3.5 text-clay-600" />
             <span>Xuất CSV</span>
@@ -634,7 +634,7 @@ export const AdminDashboardPage = () => {
         </div>
       </div>
 
-      {/* ─── ROW 1: 4 KEY METRIC KPI CARDS (AUTHENTIC REPOSITORY DATA) ──────── */}
+      {/* ─── ROW 1: 4 KEY METRIC KPI CARDS ─────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* KPI 1: Users Metric */}
@@ -649,14 +649,13 @@ export const AdminDashboardPage = () => {
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Cộng đồng thành viên</span>
-            <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-xs text-ink-400 font-medium block">Thành viên</span>
+            <div className="mt-1">
               <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalUsers.toLocaleString('vi-VN')}</h2>
-              <span className="text-[11px] text-ink-400 font-medium">tài khoản</span>
             </div>
             <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
               <UserCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Tài khoản xác thực hệ thống</span>
+              <span>Tài khoản trên hệ thống</span>
             </p>
           </div>
         </div>
@@ -669,17 +668,16 @@ export const AdminDashboardPage = () => {
             </div>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[10px] font-bold border border-clay-200">
               <TrendingUp className="w-3 h-3 text-clay-600" />
-              +{stats.newPostsThisMonth} bài mới
+              +{stats.newPostsThisMonth} tháng này
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Bài viết & Chia sẻ chuyến đi</span>
-            <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-xs text-ink-400 font-medium block">Bài viết cộng đồng</span>
+            <div className="mt-1">
               <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalPosts.toLocaleString('vi-VN')}</h2>
-              <span className="text-[11px] text-ink-400 font-medium">bài đăng</span>
             </div>
             <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
-              <span className="font-bold text-clay-700">{(stats.totalLikes || 0).toLocaleString('vi-VN')}</span> tim
+              <span className="font-bold text-clay-700">{(stats.totalLikes || 0).toLocaleString('vi-VN')}</span> thích
               <span className="text-ink-300">•</span>
               <span className="font-bold text-clay-700">{(stats.totalComments || 0).toLocaleString('vi-VN')}</span> bình luận
             </p>
@@ -694,18 +692,17 @@ export const AdminDashboardPage = () => {
             </div>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[10px] font-bold border border-clay-200">
               <Compass className="w-3 h-3 text-clay-600" />
-              {stats.activeItineraries} hoạt động
+              {stats.activeItineraries} đang chạy
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Lịch trình & Điểm đến</span>
-            <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-xs text-ink-400 font-medium block">Lịch trình du lịch</span>
+            <div className="mt-1">
               <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalItineraries.toLocaleString('vi-VN')}</h2>
-              <span className="text-[11px] text-ink-400 font-medium">hành trình</span>
             </div>
             <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
               <MapPin className="w-3.5 h-3.5 text-clay-600 shrink-0" />
-              <span>Phủ sóng <strong className="text-ink-800 font-bold">{stats.totalPlaces}</strong> địa điểm</span>
+              <span>{stats.totalPlaces} địa điểm tham quan</span>
             </p>
           </div>
         </div>
@@ -727,25 +724,24 @@ export const AdminDashboardPage = () => {
                     ? 'bg-rose-50 text-rose-700 border-rose-200 animate-pulse' 
                     : 'bg-emerald-50 text-emerald-700 border-emerald-200'
                 }`}>
-                  {pendingCount > 0 ? `${pendingCount} báo cáo chờ` : 'Hệ thống an toàn'}
+                  {pendingCount > 0 ? `${pendingCount} chờ xử lý` : 'An toàn'}
                 </span>
               </div>
               <div>
-                <span className="text-xs text-ink-400 font-medium block">Kiểm duyệt & Báo cáo vi phạm</span>
+                <span className="text-xs text-ink-400 font-medium block">Kiểm duyệt nội dung</span>
                 <div className="flex items-baseline gap-2 mt-1">
-                  <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight flex items-baseline gap-1.5">
+                  <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight flex items-baseline gap-1.5">
                     <span className={pendingCount > 0 ? 'text-rose-600' : 'text-ink-800'}>{pendingCount}</span>
                     <span className="text-sm font-semibold text-ink-400">/ {totalCount}</span>
                   </h2>
-                  <span className="text-[11px] text-ink-400 font-medium">báo cáo vi phạm</span>
                 </div>
                 <p className="text-[11px] text-ink-400 mt-2 flex items-center justify-between pt-2 border-t border-ink-200/50">
-                  <span>Đang chờ: <strong className="text-rose-600 font-bold">{pendingCount}</strong> / Tổng số: <strong className="text-ink-800 font-bold">{totalCount}</strong></span>
+                  <span>{totalCount > 0 ? `${totalCount} báo cáo tổng số` : 'Không có vi phạm'}</span>
                   <button 
                     onClick={() => setAdminTab('reports')}
                     className="text-clay-700 hover:text-clay-800 font-bold hover:underline cursor-pointer"
                   >
-                    Xử lý ngay →
+                    Xem báo cáo →
                   </button>
                 </p>
               </div>
@@ -755,21 +751,21 @@ export const AdminDashboardPage = () => {
 
       </div>
 
-      {/* ─── ROW 2: AUTHENTIC CHARTS & INTELLIGENCE WIDGETS (COL 8 vs COL 4) ─── */}
+      {/* ─── ROW 2: REAL CHARTS & INTELLIGENCE WIDGETS ────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* LEFT COLUMN: REAL DATA CHARTS & TOP TRENDS (8 Cols) */}
         <div className="lg:col-span-8 space-y-6">
           
-          {/* Dynamic Growth Chart (Built with Backend Monthly Stats) */}
+          {/* Dynamic Growth Chart */}
           <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="font-display font-black text-lg text-ink-800 flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-clay-600" />
-                  Xu hướng Tăng trưởng Hệ thống (6 Tháng gần nhất)
+                  Tăng trưởng 6 tháng gần nhất
                 </h3>
-                <p className="text-xs text-ink-400 mt-0.5">Dữ liệu thực tế tổng hợp từ cơ sở dữ liệu MySQL theo từng chu kỳ tháng</p>
+                <p className="text-xs text-ink-400 mt-0.5">Số lượng người dùng và bài viết mới theo từng tháng</p>
               </div>
 
               {/* Metric Toggle Tabs */}
@@ -784,7 +780,7 @@ export const AdminDashboardPage = () => {
                   }`}
                 >
                   <Users className="w-3.5 h-3.5" />
-                  <span>Người dùng mới</span>
+                  <span>Người dùng</span>
                 </button>
                 <button
                   type="button"
@@ -796,7 +792,7 @@ export const AdminDashboardPage = () => {
                   }`}
                 >
                   <FileText className="w-3.5 h-3.5" />
-                  <span>Bài viết mới</span>
+                  <span>Bài viết</span>
                 </button>
               </div>
             </div>
@@ -847,19 +843,19 @@ export const AdminDashboardPage = () => {
               {/* Chart Footer Summary Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-4 pt-2">
                 <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Tổng 6 tháng qua</span>
+                  <span className="text-[11px] text-ink-400 block font-medium">Tổng 6 tháng</span>
                   <span className="text-base font-display font-black text-ink-800 mt-0.5 block">
                     {growthData.reduce((acc, cur) => acc + (Number(cur.count) || 0), 0).toLocaleString('vi-VN')}
                   </span>
                 </div>
                 <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Tháng cao điểm</span>
+                  <span className="text-[11px] text-ink-400 block font-medium">Cao điểm nhất</span>
                   <span className="text-base font-display font-black text-clay-700 mt-0.5 block">
                     {Math.max(...growthData.map(d => Number(d.count) || 0)).toLocaleString('vi-VN')}
                   </span>
                 </div>
                 <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Chu kỳ tháng này</span>
+                  <span className="text-[11px] text-ink-400 block font-medium">Tháng này</span>
                   <span className="text-base font-display font-black text-emerald-700 mt-0.5 block">
                     +{growthData[growthData.length - 1]?.count || 0} mới
                   </span>
@@ -868,15 +864,15 @@ export const AdminDashboardPage = () => {
             </div>
           </div>
 
-          {/* Top Trends & Places (Real DB Top Destinations & Top Places) */}
+          {/* Top Trends & Places */}
           <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="font-display font-black text-lg text-ink-800 flex items-center gap-2">
                   <Compass className="w-4 h-4 text-clay-600" />
-                  Địa danh & Xu hướng Du lịch Hàng đầu
+                  Điểm đến & Địa danh nổi bật
                 </h3>
-                <p className="text-xs text-ink-400 mt-0.5">Xếp hạng các điểm đến được tạo lịch trình nhiều nhất và địa điểm đánh giá cao</p>
+                <p className="text-xs text-ink-400 mt-0.5">Xếp hạng theo lượt tạo lịch trình và đánh giá thực tế</p>
               </div>
 
               {/* Subtabs for Trends */}
@@ -891,7 +887,7 @@ export const AdminDashboardPage = () => {
                   }`}
                 >
                   <MapPin className="w-3.5 h-3.5" />
-                  <span>Top Điểm đến ({stats.topDestinations?.length || 0})</span>
+                  <span>Điểm đến ({stats.topDestinations?.length || 0})</span>
                 </button>
                 <button
                   type="button"
@@ -913,7 +909,7 @@ export const AdminDashboardPage = () => {
               <div className="space-y-3">
                 {(!stats.topDestinations || stats.topDestinations.length === 0) ? (
                   <div className="p-8 text-center text-ink-400 text-xs">
-                    Chưa ghi nhận đủ dữ liệu lịch trình để xếp hạng điểm đến thịnh hành.
+                    Chưa có dữ liệu điểm đến.
                   </div>
                 ) : (
                   stats.topDestinations.map((dest, idx) => {
@@ -949,7 +945,7 @@ export const AdminDashboardPage = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {(!stats.topPlaces || stats.topPlaces.length === 0) ? (
                   <div className="col-span-2 p-8 text-center text-ink-400 text-xs">
-                    Chưa có địa danh nào nhận đánh giá trong hệ thống.
+                    Chưa có đánh giá địa danh.
                   </div>
                 ) : (
                   stats.topPlaces.map((place, idx) => (
@@ -985,12 +981,12 @@ export const AdminDashboardPage = () => {
             <div className="flex items-center justify-between pb-3 border-b border-ink-200/60">
               <div className="flex items-center gap-2 font-display font-black text-base text-ink-800">
                 <span className={`w-2 h-2 rounded-full ${(stats.pendingReports > 0 || pendingReports.length > 0) ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`}></span>
-                <span>Kiểm duyệt cần xử lý</span>
+                <span>Cần kiểm duyệt</span>
               </div>
               <span className={`px-2 py-0.5 rounded-[4px] font-bold text-xs border ${
                 (stats.pendingReports > 0 || pendingReports.length > 0) ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
               }`}>
-                Đang chờ: {stats.pendingReports ?? pendingReports.length} / Tổng: {stats.totalReports ?? pendingReports.length}
+                {(stats.pendingReports ?? pendingReports.length) > 0 ? `${stats.pendingReports ?? pendingReports.length} chờ xử lý` : 'Bình thường'}
               </span>
             </div>
 
@@ -998,27 +994,27 @@ export const AdminDashboardPage = () => {
               {pendingReports.length === 0 ? (
                 <div className="p-5 rounded-[5px] bg-emerald-50/60 border border-emerald-200 text-emerald-800 text-center font-semibold space-y-1">
                   <CheckCircle2 className="w-5 h-5 mx-auto text-emerald-600 mb-1" />
-                  <div className="font-bold">Cộng đồng trong sạch!</div>
-                  <p className="text-[11px] text-emerald-700 font-normal">Không có bài viết hoặc báo cáo vi phạm nào tồn đọng.</p>
+                  <div className="font-bold">Hệ thống an toàn</div>
+                  <p className="text-[11px] text-emerald-700 font-normal">Không có báo cáo vi phạm chờ duyệt.</p>
                 </div>
               ) : (
                 pendingReports.slice(0, 3).map((r) => (
-                  <div key={r.id} className="p-3.5 rounded-[5px] bg-rose-50/70 border border-rose-200/80 space-y-2">
+                  <div key={r.id} className="p-3 rounded-[5px] bg-rose-50/70 border border-rose-200/80 space-y-1.5">
                     <div className="flex items-center justify-between text-rose-800 font-bold">
                       <span className="flex items-center gap-1">
-                        <Flag className="w-3.5 h-3.5 text-rose-600" /> {r.category || 'Vi phạm'} ({r.reportsCount || 1} cờ)
+                        <Flag className="w-3.5 h-3.5 text-rose-600" /> {r.category || 'Vi phạm'}
                       </span>
                       <span className="text-[10px] text-ink-400 font-normal">{r.timeAgo || 'Gần đây'}</span>
                     </div>
-                    <h4 className="font-display font-bold text-ink-800 line-clamp-1">{r.title || 'Bài viết không tiêu đề'}</h4>
-                    <p className="text-[11px] text-ink-600 line-clamp-2">
-                      {r.aiFlagReason || r.reportReason || r.snippet || 'Nội dung chứa dấu hiệu vi phạm tiêu chuẩn cộng đồng.'}
+                    <h4 className="font-display font-bold text-ink-800 line-clamp-1">{r.title || 'Bài viết báo cáo'}</h4>
+                    <p className="text-[11px] text-ink-600 line-clamp-1">
+                      {r.aiFlagReason || r.reportReason || r.snippet || 'Dấu hiệu vi phạm tiêu chuẩn cộng đồng.'}
                     </p>
                     <div className="flex items-center justify-between pt-1">
-                      <span className="text-[10px] text-ink-500 truncate max-w-[120px]">Tác giả: {r.authorName || 'Ẩn danh'}</span>
+                      <span className="text-[10px] text-ink-500 truncate max-w-[130px]">{r.authorName || 'Ẩn danh'}</span>
                       <button
                         onClick={() => setAdminTab('reports')}
-                        className="px-3 py-1 rounded-[5px] bg-rose-700 hover:bg-rose-800 text-white font-bold text-[11px] transition-colors cursor-pointer"
+                        className="px-2.5 py-0.5 rounded-[4px] bg-rose-700 hover:bg-rose-800 text-white font-bold text-[10px] transition-colors cursor-pointer"
                       >
                         Kiểm duyệt
                       </button>
@@ -1032,7 +1028,7 @@ export const AdminDashboardPage = () => {
               onClick={() => setAdminTab('reports')}
               className="w-full pt-1 text-center text-clay-700 hover:text-clay-800 font-bold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
             >
-              <span>Xem toàn bộ trung tâm báo cáo</span>
+              <span>Xem tất cả báo cáo</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -1042,7 +1038,7 @@ export const AdminDashboardPage = () => {
             <div className="flex items-center justify-between pb-3 border-b border-ink-200/60">
               <div className="flex items-center gap-2 font-display font-black text-base text-ink-800">
                 <History className="w-4 h-4 text-clay-600" />
-                <span>Nhật ký Hoạt động Gần đây</span>
+                <span>Nhật ký hoạt động</span>
               </div>
               <button 
                 onClick={() => setAdminTab('audit-logs')}
@@ -1052,18 +1048,18 @@ export const AdminDashboardPage = () => {
               </button>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {recentLogs.length === 0 ? (
                 <div className="p-4 text-center text-ink-400 text-xs">
-                  Chưa có nhật ký hoạt động nào được ghi nhận.
+                  Chưa có hoạt động gần đây.
                 </div>
               ) : (
                 recentLogs.map((logItem) => {
                   const badge = formatActionBadge(logItem.action);
                   return (
-                    <div key={logItem.id} className="p-3 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200/60 text-xs space-y-1.5 hover:bg-[#F8F4EC] transition-colors">
+                    <div key={logItem.id} className="p-2.5 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200/60 text-xs space-y-1 hover:bg-[#F8F4EC] transition-colors">
                       <div className="flex items-center justify-between">
-                        <span className={`px-2 py-0.5 rounded-[4px] font-mono text-[10px] font-bold border ${badge.bg}`}>
+                        <span className={`px-1.5 py-0.5 rounded-[3px] font-mono text-[9px] font-bold border ${badge.bg}`}>
                           {badge.label}
                         </span>
                         <span className="text-[10px] text-ink-400 flex items-center gap-1">
@@ -1071,10 +1067,10 @@ export const AdminDashboardPage = () => {
                           {logItem.createdAt ? new Date(logItem.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Vừa xong'}
                         </span>
                       </div>
-                      <div className="font-bold text-ink-800 line-clamp-1">
+                      <div className="font-bold text-ink-800 line-clamp-1 text-[11px]">
                         {logItem.actorName || logItem.actorEmail || 'Hệ thống'}
                       </div>
-                      <p className="text-[11px] text-ink-500 line-clamp-1">
+                      <p className="text-[10px] text-ink-500 line-clamp-1">
                         {logItem.details || logItem.targetResource || 'Thực hiện thao tác trong hệ thống'}
                       </p>
                     </div>
@@ -1087,7 +1083,7 @@ export const AdminDashboardPage = () => {
               onClick={() => setAdminTab('audit-logs')}
               className="w-full pt-1 text-center text-ink-500 hover:text-ink-800 font-bold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
             >
-              <span>Xem toàn bộ nhật ký chi tiết</span>
+              <span>Xem tất cả nhật ký</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -1096,40 +1092,33 @@ export const AdminDashboardPage = () => {
 
       </div>
 
-      {/* ─── ROW 3: INTERACTIVE CENTRAL DATA TABLE ───────────────────────────── */}
+      {/* ─── ROW 3: CENTRAL DATA TABLE ────────────────────────────────────── */}
       <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-5">
         
         {/* Table Header & Functional Bar */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-ink-200/60">
-          <div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setActiveTableTab('itineraries')}
-                className={`font-display font-black text-base transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
-                  activeTableTab === 'itineraries' 
-                    ? 'text-clay-700 border-clay-600' 
-                    : 'text-ink-400 border-transparent hover:text-ink-700'
-                }`}
-              >
-                Lịch trình du lịch ({filteredItineraries.length})
-              </button>
-              <span className="text-ink-200">|</span>
-              <button
-                onClick={() => setActiveTableTab('users')}
-                className={`font-display font-black text-base transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
-                  activeTableTab === 'users' 
-                    ? 'text-clay-700 border-clay-600' 
-                    : 'text-ink-400 border-transparent hover:text-ink-700'
-                }`}
-              >
-                Thành viên mới ({filteredUsers.length})
-              </button>
-            </div>
-            <p className="text-xs text-ink-400 mt-2">
-              {activeTableTab === 'itineraries' 
-                ? 'Giám sát chi tiết các hành trình do trợ lý AI và người dùng thiết kế' 
-                : 'Quản lý thông tin tài khoản người dùng và vai trò phân quyền'}
-            </p>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setActiveTableTab('itineraries')}
+              className={`font-display font-black text-base transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
+                activeTableTab === 'itineraries' 
+                  ? 'text-clay-700 border-clay-600' 
+                  : 'text-ink-400 border-transparent hover:text-ink-700'
+              }`}
+            >
+              Lịch trình ({filteredItineraries.length})
+            </button>
+            <span className="text-ink-200">|</span>
+            <button
+              onClick={() => setActiveTableTab('users')}
+              className={`font-display font-black text-base transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
+                activeTableTab === 'users' 
+                  ? 'text-clay-700 border-clay-600' 
+                  : 'text-ink-400 border-transparent hover:text-ink-700'
+              }`}
+            >
+              Thành viên ({filteredUsers.length})
+            </button>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full md:w-auto">
@@ -1155,16 +1144,16 @@ export const AdminDashboardPage = () => {
                 {activeTableTab === 'itineraries' ? (
                   <>
                     <option value="all">Tất cả trạng thái</option>
-                    <option value="upcoming">Sắp tới (Upcoming)</option>
-                    <option value="active">Đang hoạt động (ACTIVE)</option>
+                    <option value="upcoming">Sắp tới</option>
+                    <option value="active">Đang hoạt động</option>
                     <option value="completed">Đã hoàn thành</option>
-                    <option value="draft">Bản nháp / Chưa duyệt</option>
+                    <option value="draft">Bản nháp</option>
                   </>
                 ) : (
                   <>
                     <option value="all">Tất cả vai trò</option>
-                    <option value="user">Người dùng (USER)</option>
-                    <option value="admin">Quản trị viên (ADMIN)</option>
+                    <option value="user">Người dùng</option>
+                    <option value="admin">Quản trị viên</option>
                   </>
                 )}
               </select>
@@ -1188,11 +1177,11 @@ export const AdminDashboardPage = () => {
             <table className="w-full text-left text-xs">
               <thead className="bg-[#F8F4EC] text-ink-600 font-bold border-b border-ink-200/80 uppercase text-[11px] tracking-wider">
                 <tr>
-                  <th className="py-3 px-4">Mã ITN</th>
-                  <th className="py-3 px-4">Tên hành trình</th>
+                  <th className="py-3 px-4">Mã</th>
+                  <th className="py-3 px-4">Lịch trình</th>
                   <th className="py-3 px-4">Tác giả</th>
-                  <th className="py-3 px-4">Điểm đến chính</th>
-                  <th className="py-3 px-4">Dự toán ngân sách</th>
+                  <th className="py-3 px-4">Điểm đến</th>
+                  <th className="py-3 px-4">Ngân sách</th>
                   <th className="py-3 px-4">Trạng thái</th>
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
@@ -1202,13 +1191,13 @@ export const AdminDashboardPage = () => {
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-ink-400">
                       <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-clay-600" />
-                      Đang đồng bộ dữ liệu lịch trình từ máy chủ...
+                      Đang đồng bộ dữ liệu lịch trình...
                     </td>
                   </tr>
                 ) : paginatedRecords.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-ink-400">
-                      Không tìm thấy lịch trình nào khớp với bộ lọc tìm kiếm.
+                      Không tìm thấy lịch trình nào khớp với bộ lọc.
                     </td>
                   </tr>
                 ) : (
@@ -1221,10 +1210,10 @@ export const AdminDashboardPage = () => {
                         <span className="text-ink-400 text-[11px] flex items-center gap-1">
                           {row.isAiGenerated ? (
                             <span className="text-clay-600 font-bold flex items-center gap-0.5">
-                              <Sparkles className="w-2.5 h-2.5" /> Tạo bởi WanderAI
+                              <Sparkles className="w-2.5 h-2.5" /> WanderAI
                             </span>
                           ) : (
-                            'Thành viên tự thiết kế'
+                            'Tự tạo'
                           )}
                           <span>• {getItineraryDuration(row).shortLabel}</span>
                         </span>
@@ -1245,10 +1234,7 @@ export const AdminDashboardPage = () => {
                               {row.creatorName ? row.creatorName.charAt(0) : 'U'}
                             </div>
                           )}
-                          <div className="min-w-0">
-                            <div className="font-bold text-ink-800 truncate">{row.creatorName || 'Người dùng'}</div>
-                            <span className="text-ink-400 text-[10px] block truncate">{row.creatorEmail || '@user'}</span>
-                          </div>
+                          <span className="font-bold text-ink-800 truncate max-w-[130px]">{row.creatorName || 'Người dùng'}</span>
                         </div>
                       </td>
 
@@ -1270,7 +1256,6 @@ export const AdminDashboardPage = () => {
                             <div className="space-y-0.5">
                               <span 
                                 className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${st.badgeClass}`} 
-                                title={`Trạng thái CSDL: ${st.dbStatus} | Tiến độ: ${st.subLabel || st.label}`}
                               >
                                 <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                                 {st.label}
@@ -1291,7 +1276,7 @@ export const AdminDashboardPage = () => {
                           <button 
                             onClick={() => setSelectedItinerary(row)}
                             className="p-1.5 hover:text-clay-700 hover:bg-clay-50 rounded-[4px] transition-colors cursor-pointer" 
-                            title="Xem chi tiết hành trình"
+                            title="Xem chi tiết"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
@@ -1307,12 +1292,12 @@ export const AdminDashboardPage = () => {
             <table className="w-full text-left text-xs">
               <thead className="bg-[#F8F4EC] text-ink-600 font-bold border-b border-ink-200/80 uppercase text-[11px] tracking-wider">
                 <tr>
-                  <th className="py-3 px-4">Mã UID</th>
+                  <th className="py-3 px-4">Mã</th>
                   <th className="py-3 px-4">Thành viên</th>
                   <th className="py-3 px-4">Email</th>
                   <th className="py-3 px-4">Vai trò</th>
                   <th className="py-3 px-4">Trạng thái</th>
-                  <th className="py-3 px-4">Ngày đăng ký</th>
+                  <th className="py-3 px-4">Ngày tham gia</th>
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
@@ -1450,7 +1435,7 @@ export const AdminDashboardPage = () => {
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-[11px] font-bold text-clay-700 uppercase tracking-wider block">
-                  Mã lịch trình #{selectedItinerary.id}
+                  #ITN-{selectedItinerary.id}
                 </span>
                 <h3 className="font-display font-black text-xl text-ink-800 mt-0.5">
                   {selectedItinerary.title}
@@ -1466,58 +1451,58 @@ export const AdminDashboardPage = () => {
 
             <div className="space-y-3 py-2 text-xs border-y border-ink-200/60">
               <div className="flex justify-between py-1">
-                <span className="text-ink-400">Điểm đến chính:</span>
+                <span className="text-ink-400">Điểm đến:</span>
                 <strong className="text-ink-800 font-bold flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-clay-600" />
                   {selectedItinerary.destination || 'Chưa cập nhật'}
                 </strong>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-ink-400">Tác giả tạo:</span>
-                <strong className="text-ink-800 font-bold">{selectedItinerary.creatorName || selectedItinerary.userFullName || 'Người dùng'} ({selectedItinerary.creatorEmail || 'N/A'})</strong>
+                <span className="text-ink-400">Tác giả:</span>
+                <strong className="text-ink-800 font-bold">{selectedItinerary.creatorName || selectedItinerary.userFullName || 'Người dùng'}</strong>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-ink-400">Thời lượng dự kiến:</span>
+                <span className="text-ink-400">Thời lượng:</span>
                 <strong className="text-ink-800 font-bold">{getItineraryDuration(selectedItinerary).label}</strong>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-ink-400">Lịch trình khởi hành:</span>
+                <span className="text-ink-400">Khởi hành:</span>
                 <span className="font-mono font-bold text-ink-800 flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-clay-600" />
                   {selectedItinerary.startDate ? `${selectedItinerary.startDate} ${selectedItinerary.endDate ? '➜ ' + selectedItinerary.endDate : ''}` : 'Chưa định ngày cụ thể'}
                 </span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-ink-400">Tổng ngân sách dự toán:</span>
+                <span className="text-ink-400">Ngân sách dự kiến:</span>
                 <strong className="text-clay-700 font-display font-black text-sm">
-                  {selectedItinerary.budgetTotal ? Number(selectedItinerary.budgetTotal).toLocaleString('vi-VN') + ' VNĐ' : 'Chưa nhập'}
+                  {selectedItinerary.budgetTotal ? Number(selectedItinerary.budgetTotal).toLocaleString('vi-VN') + ' đ' : 'Chưa nhập'}
                 </strong>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-ink-400">Phương thức thiết lập:</span>
+                <span className="text-ink-400">Hình thức tạo:</span>
                 <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${
                   selectedItinerary.isAiGenerated ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-ink-100 text-ink-700 border-ink-200'
                 }`}>
-                  {selectedItinerary.isAiGenerated ? 'Trợ lý AI Gemini thiết kế' : 'Người dùng tự lập'}
+                  {selectedItinerary.isAiGenerated ? 'WanderAI' : 'Tự tạo'}
                 </span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-ink-400">Trạng thái CSDL (MySQL):</span>
+                <span className="text-ink-400">Trạng thái:</span>
                 <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${
                   (selectedItinerary.status || 'ACTIVE') === 'ACTIVE' 
                     ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
                     : 'bg-zinc-100 text-zinc-700 border-zinc-300'
                 }`}>
-                  {selectedItinerary.status || 'ACTIVE'} (Hệ thống ghi nhận)
+                  {selectedItinerary.status || 'ACTIVE'}
                 </span>
               </div>
               <div className="flex justify-between py-1">
-                <span className="text-ink-400">Tiến độ chuyến đi (Timeline):</span>
+                <span className="text-ink-400">Tiến độ:</span>
                 {(() => {
                   const st = getItineraryTimelineStatus(selectedItinerary);
                   return (
                     <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${st.badgeClass}`}>
-                      {st.label} {st.subLabel ? `(${st.subLabel})` : ''}
+                      {st.label}
                     </span>
                   );
                 })()}
@@ -1530,7 +1515,7 @@ export const AdminDashboardPage = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-3 py-2 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-ink-700 hover:text-clay-700 font-bold text-xs border border-ink-200/80 transition-colors cursor-pointer flex items-center gap-1.5"
-                title="Mở xem trang chi tiết lịch trình"
+                title="Mở xem trang chi tiết"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>Xem trên web</span>
@@ -1548,7 +1533,7 @@ export const AdminDashboardPage = () => {
                   className="px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Xuất chi tiết CSV</span>
+                  <span>Xuất CSV</span>
                 </button>
               </div>
             </div>
