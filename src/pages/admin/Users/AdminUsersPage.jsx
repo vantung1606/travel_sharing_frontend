@@ -375,7 +375,7 @@ export const AdminUsersPage = () => {
     if (!roles || roles.length === 0 || roles.includes('ROLE_USER')) {
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-700 border border-ink-200/80 font-mono text-[10px] font-semibold">
-          Wanderer
+          Thành viên
         </span>
       );
     }
@@ -403,52 +403,55 @@ export const AdminUsersPage = () => {
   return (
     <div className="space-y-6 pb-12">
       
-      {/* 1. HEADER & TOOLBAR (Paper-Ink-Clay) */}
+      {/* 1. HEADER & TOOLBAR */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-ink-200/80">
         <div>
-          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-ink-500 mb-1">
+          <div className="flex items-center gap-2 text-xs font-semibold text-ink-400 mb-1">
             <Shield className="w-3.5 h-3.5 text-clay-600" />
-            <span>Wayfare Security & RBAC</span>
-            <span>•</span>
-            <span className="text-clay-600 font-bold">Quản trị người dùng</span>
+            <span>Quản trị hệ thống</span>
+            <span>/</span>
+            <span className="text-clay-700 font-bold">Người dùng</span>
           </div>
-          <h1 className="font-display font-black text-2xl lg:text-3xl text-ink-800 tracking-tight flex items-center gap-3">
-            Người Dùng & Phân Quyền
+          <div className="flex items-center gap-3 flex-wrap">
+            <h1 className="font-display font-black text-2xl lg:text-3xl text-ink-800 tracking-tight">
+              Người dùng & Tài khoản
+            </h1>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[4px] text-[10px] font-mono uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-300/80">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping"></span>
-              Live DB
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
+              Thời gian thực
             </span>
-          </h1>
-          <p className="text-xs text-ink-500 mt-1 max-w-2xl">
-            Quản lý định danh thành viên, cấu hình vai trò RBAC và theo dõi lịch sử an toàn cộng đồng từ cơ sở dữ liệu hệ thống.
+          </div>
+          <p className="text-xs text-ink-400 mt-1 max-w-2xl">
+            Quản lý danh sách thành viên và phân quyền vai trò trong hệ thống.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <button 
             onClick={handleExportCSV}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[5px] bg-[#FFFDF8] hover:bg-[#F3EFE6] text-ink-700 font-serif font-bold text-xs border border-ink-200/80 shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[5px] bg-[#FFFDF8] hover:bg-[#F3EFE6] text-ink-700 font-bold text-xs border border-ink-200/80 shadow-xs transition-colors cursor-pointer"
+            title="Xuất danh sách ra file CSV"
           >
             <Download className="w-3.5 h-3.5 text-ink-500" />
-            Xuất CSV ({usersList.length})
+            Xuất CSV
           </button>
           
           <button 
             onClick={() => loadData(true)}
             disabled={refreshing}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[5px] bg-[#FFFDF8] hover:bg-[#F3EFE6] text-ink-700 font-serif font-bold text-xs border border-ink-200/80 shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[5px] bg-[#FFFDF8] hover:bg-[#F3EFE6] text-ink-700 font-bold text-xs border border-ink-200/80 shadow-xs transition-colors cursor-pointer disabled:opacity-50"
             title="Làm mới dữ liệu từ CSDL"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-clay-600 ${refreshing ? 'animate-spin' : ''}`} />
-            Đồng bộ
+            Làm mới
           </button>
 
           <button 
             onClick={() => setShowAddUserModal(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white font-serif font-bold text-xs shadow-xs transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-white font-bold text-xs shadow-xs transition-colors cursor-pointer"
           >
             <UserPlus className="w-3.5 h-3.5" />
-            + Thêm nhân sự / Phân quyền
+            Thêm tài khoản
           </button>
         </div>
       </div>
@@ -460,9 +463,9 @@ export const AdminUsersPage = () => {
         <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
             <div>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-ink-500 block">Tổng người dùng đăng ký</span>
+              <span className="text-xs text-ink-400 font-medium block">Tổng thành viên</span>
               <div className="font-display font-black text-2xl lg:text-3xl text-ink-800 mt-1">
-                {metrics.totalUsers} <span className="text-xs font-serif font-normal text-ink-400">tài khoản</span>
+                {metrics.totalUsers}
               </div>
             </div>
             <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center">
@@ -470,11 +473,11 @@ export const AdminUsersPage = () => {
             </div>
           </div>
           <div className="space-y-1.5 pt-1 border-t border-ink-100">
-            <div className="flex items-center justify-between text-[11px] font-mono">
-              <span className="text-clay-600 font-bold flex items-center gap-1">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-clay-600 font-bold">
                 +{metrics.newUsersToday} mới hôm nay
               </span>
-              <span className="text-ink-600 font-semibold">{metrics.activeUsers} đang hoạt động</span>
+              <span className="text-ink-600 font-semibold">{metrics.activeUsers} hoạt động</span>
             </div>
             <div className="w-full bg-[#F0EBE1] h-1.5 rounded-[3px] overflow-hidden">
               <div 
@@ -489,9 +492,9 @@ export const AdminUsersPage = () => {
         <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
             <div>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-ink-500 block">Ban quản trị & Nhân sự</span>
+              <span className="text-xs text-ink-400 font-medium block">Ban quản trị</span>
               <div className="font-display font-black text-2xl lg:text-3xl text-ink-800 mt-1">
-                {metrics.adminCount} <span className="text-xs font-serif font-normal text-ink-400">tài khoản RBAC</span>
+                {metrics.adminCount}
               </div>
             </div>
             <div className="w-9 h-9 rounded-[5px] bg-amber-50 border border-amber-200/80 text-amber-700 flex items-center justify-center">
@@ -499,8 +502,8 @@ export const AdminUsersPage = () => {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-ink-100 text-[10px] font-mono">
-            <span className="px-2 py-0.5 rounded-[4px] bg-amber-100/70 text-amber-900 border border-amber-200">ADMIN: {metrics.adminCount}</span>
-            <span className="px-2 py-0.5 rounded-[4px] bg-clay-100/70 text-clay-900 border border-clay-200">MOD: {metrics.moderatorCount || 0}</span>
+            <span className="px-2 py-0.5 rounded-[4px] bg-amber-100/70 text-amber-900 border border-amber-200">Admin: {metrics.adminCount}</span>
+            <span className="px-2 py-0.5 rounded-[4px] bg-clay-100/70 text-clay-900 border border-clay-200">Mod: {metrics.moderatorCount || 0}</span>
           </div>
         </div>
 
@@ -508,9 +511,9 @@ export const AdminUsersPage = () => {
         <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
             <div>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-rose-600 font-bold block">Tài khoản vi phạm / Khóa</span>
+              <span className="text-xs text-rose-600 font-medium block">Tài khoản bị khóa</span>
               <div className="font-display font-black text-2xl lg:text-3xl text-rose-700 mt-1">
-                {metrics.lockedUsers} <span className="text-xs font-serif font-normal text-rose-400">bị hạn chế</span>
+                {metrics.lockedUsers}
               </div>
             </div>
             <div className="w-9 h-9 rounded-[5px] bg-rose-50 border border-rose-200/80 text-rose-600 flex items-center justify-center">
@@ -518,8 +521,8 @@ export const AdminUsersPage = () => {
             </div>
           </div>
           <div className="pt-1 border-t border-ink-100 text-[11px] text-ink-500 flex items-center justify-between">
-            <span>Tỷ lệ khóa hệ thống:</span>
-            <span className="font-mono font-bold text-ink-700">
+            <span>Tỷ lệ khóa:</span>
+            <span className="font-bold text-ink-700">
               {metrics.totalUsers > 0 ? ((metrics.lockedUsers / metrics.totalUsers) * 100).toFixed(1) : 0}%
             </span>
           </div>
@@ -529,18 +532,18 @@ export const AdminUsersPage = () => {
         <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
             <div>
-              <span className="font-mono text-[10px] uppercase tracking-wider text-ink-500 block">Đăng ký mới hôm nay</span>
+              <span className="text-xs text-ink-400 font-medium block">Mới trong ngày</span>
               <div className="font-display font-black text-2xl lg:text-3xl text-clay-700 mt-1">
-                +{metrics.newUsersToday} <span className="text-xs font-serif font-normal text-ink-400">thành viên</span>
+                +{metrics.newUsersToday}
               </div>
             </div>
             <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center">
               <Award className="w-4 h-4" />
             </div>
           </div>
-          <div className="pt-1 border-t border-ink-100 text-[11px] text-ink-600 flex items-center justify-between font-mono">
+          <div className="pt-1 border-t border-ink-100 text-[11px] text-ink-600 flex items-center justify-between">
             <span>Kiểm duyệt viên:</span>
-            <span className="text-clay-700 font-bold">{metrics.moderatorCount || 0} MODERATOR</span>
+            <span className="text-clay-700 font-bold">{metrics.moderatorCount || 0}</span>
           </div>
         </div>
 
@@ -550,16 +553,16 @@ export const AdminUsersPage = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-ink-200/80 pb-3">
         <div className="flex items-center gap-1.5 p-1 bg-[#EBE5D8] rounded-[5px]">
           {[
-            { id: 'all', label: 'Tất cả tài khoản', count: pagination.totalElements || usersList.length },
-            { id: 'staff', label: 'Phân quyền & Ban quản trị', count: metrics.adminCount },
-            { id: 'locked', label: 'Tài khoản tạm khóa / Ban', count: metrics.lockedUsers, isUrgent: true }
+            { id: 'all', label: 'Tất cả', count: pagination.totalElements || usersList.length },
+            { id: 'staff', label: 'Ban quản trị', count: metrics.adminCount },
+            { id: 'locked', label: 'Bị khóa', count: metrics.lockedUsers, isUrgent: true }
           ].map(t => (
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id)}
-              className={`px-3 py-1.5 rounded-[4px] font-serif text-xs transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-[4px] font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
                 activeTab === t.id
-                  ? 'bg-[#FFFDF8] text-ink-800 font-bold shadow-xs border border-ink-200/80'
+                  ? 'bg-[#FFFDF8] text-ink-800 shadow-xs border border-ink-200/80'
                   : 'text-ink-600 hover:text-ink-900 hover:bg-[#E2DACB] font-medium'
               }`}
             >
@@ -574,11 +577,6 @@ export const AdminUsersPage = () => {
             </button>
           ))}
         </div>
-
-        <div className="hidden lg:flex items-center gap-2 text-xs font-mono text-ink-500">
-          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span>REST API: /api/v1/admin/users</span>
-        </div>
       </div>
 
       {/* 4. FILTER & SEARCH TOOLBAR */}
@@ -589,7 +587,7 @@ export const AdminUsersPage = () => {
           <Search className="w-3.5 h-3.5 text-ink-400 mr-2 shrink-0" />
           <input
             type="text"
-            placeholder="Tìm theo Tên, Email, @handle, Số điện thoại hoặc ID #USR..."
+            placeholder="Tìm kiếm theo tên, email, số điện thoại..."
             value={searchUser}
             onChange={(e) => setSearchUser(e.target.value)}
             className="bg-transparent border-0 outline-none w-full text-xs text-ink-800 placeholder:text-ink-400 font-sans"
@@ -608,12 +606,12 @@ export const AdminUsersPage = () => {
             <select
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value)}
-              className="bg-transparent border-0 outline-none text-xs font-serif font-bold text-ink-700 cursor-pointer pr-2"
+              className="bg-transparent border-0 outline-none text-xs font-bold text-ink-700 cursor-pointer pr-2"
             >
               <option value="all">Tất cả vai trò</option>
-              <option value="ROLE_ADMIN">Quản trị viên (Admin)</option>
-              <option value="ROLE_MODERATOR">Kiểm duyệt viên (Mod)</option>
-              <option value="ROLE_USER">Thành viên (Wanderer)</option>
+              <option value="ROLE_ADMIN">Quản trị viên</option>
+              <option value="ROLE_MODERATOR">Kiểm duyệt viên</option>
+              <option value="ROLE_USER">Thành viên</option>
             </select>
           </div>
 
@@ -621,11 +619,11 @@ export const AdminUsersPage = () => {
             <select 
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-transparent border-0 outline-none text-xs font-serif font-bold text-ink-700 cursor-pointer pr-2"
+              className="bg-transparent border-0 outline-none text-xs font-bold text-ink-700 cursor-pointer pr-2"
             >
               <option value="all">Tất cả trạng thái</option>
-              <option value="ACTIVE">Hoạt động (Active)</option>
-              <option value="LOCKED">Đã khóa (Locked/Banned)</option>
+              <option value="ACTIVE">Hoạt động</option>
+              <option value="LOCKED">Đã khóa</option>
             </select>
           </div>
 
@@ -677,12 +675,12 @@ export const AdminUsersPage = () => {
                 <thead className="bg-[#F8F4EC]/60 text-ink-500 font-mono text-[10px] uppercase tracking-wider border-b border-ink-200/80">
                   <tr>
                     <th className="py-2.5 px-3 w-8 text-center"></th>
-                    <th className="py-2.5 px-3">Người dùng & Định danh</th>
-                    <th className="py-2.5 px-3">Vai trò RBAC</th>
+                    <th className="py-2.5 px-3">Thành viên</th>
+                    <th className="py-2.5 px-3">Vai trò</th>
                     <th className="py-2.5 px-3 text-center">Chuyến đi & Bài viết</th>
                     <th className="py-2.5 px-3 text-center">Đánh giá</th>
                     <th className="py-2.5 px-3">Trạng thái</th>
-                    <th className="py-2.5 px-3 text-right">Tác vụ</th>
+                    <th className="py-2.5 px-3 text-right">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-ink-100">
@@ -691,13 +689,13 @@ export const AdminUsersPage = () => {
                     <tr>
                       <td colSpan={7} className="py-12 text-center text-ink-400">
                         <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-clay-600" />
-                        Đang đồng bộ dữ liệu người dùng từ cơ sở dữ liệu...
+                        Đang tải danh sách người dùng...
                       </td>
                     </tr>
                   ) : filteredUsers.length === 0 ? (
                     <tr>
                       <td colSpan={7} className="py-12 text-center text-ink-400 font-serif">
-                        Không tìm thấy tài khoản nào khớp với bộ lọc hiện tại.
+                        Không có tài khoản nào phù hợp.
                       </td>
                     </tr>
                   ) : (
@@ -779,7 +777,7 @@ export const AdminUsersPage = () => {
                               <button 
                                 onClick={() => setSelectedAuditUser(user)}
                                 className="w-7 h-7 rounded-[4px] hover:bg-[#EBE5D8] text-ink-500 hover:text-clay-600 flex items-center justify-center transition-colors cursor-pointer" 
-                                title="Xem hồ sơ & Hoạt động thực tế"
+                                title="Xem chi tiết"
                               >
                                 <Eye className="w-3.5 h-3.5" />
                               </button>
@@ -788,7 +786,7 @@ export const AdminUsersPage = () => {
                               <button 
                                 onClick={() => openRoleModal(user)}
                                 className="w-7 h-7 rounded-[4px] hover:bg-amber-100 text-ink-500 hover:text-amber-800 flex items-center justify-center transition-colors cursor-pointer" 
-                                title="Phân quyền vai trò RBAC"
+                                title="Đổi vai trò"
                               >
                                 <UserCog className="w-3.5 h-3.5" />
                               </button>
@@ -797,7 +795,7 @@ export const AdminUsersPage = () => {
                               <button 
                                 onClick={() => setPermissionDrawerUser(user)}
                                 className="w-7 h-7 rounded-[4px] hover:bg-clay-100 text-ink-500 hover:text-clay-700 flex items-center justify-center transition-colors cursor-pointer" 
-                                title="Phân quyền chi tiết (RBAC Matrix)"
+                                title="Phân quyền chi tiết"
                               >
                                 <ShieldCheck className="w-3.5 h-3.5" />
                               </button>
@@ -828,7 +826,7 @@ export const AdminUsersPage = () => {
             {/* Pagination Controls — server-side */}
             <div className="px-4 py-2.5 bg-[#F8F4EC] border-t border-ink-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-500 font-mono">
               <div>
-                Bản ghi <strong className="text-ink-800">{pagination.totalElements === 0 ? 0 : pagination.number * 20 + 1} - {pagination.number * 20 + usersList.length}</strong> / <strong className="text-ink-800">{pagination.totalElements}</strong> tài khoản
+                Hiển thị <strong className="text-ink-800">{pagination.totalElements === 0 ? 0 : pagination.number * 20 + 1} - {pagination.number * 20 + usersList.length}</strong> / <strong className="text-ink-800">{pagination.totalElements}</strong> tài khoản
               </div>
               <div className="flex items-center gap-1">
                 <button
@@ -863,16 +861,16 @@ export const AdminUsersPage = () => {
               <div className="flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-full ${selectedAuditUser?.status === 'LOCKED' ? 'bg-rose-600 animate-ping' : 'bg-emerald-500'}`}></span>
                 <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-ink-700">
-                  Hồ Sơ & Thao Tác Quản Trị
+                  Hồ sơ thành viên
                 </span>
               </div>
               {selectedAuditUser?.status === 'LOCKED' ? (
                 <span className="px-2 py-0.5 rounded-[4px] bg-rose-50 text-rose-800 border border-rose-200 text-[10px] font-mono font-bold">
-                  Bị hạn chế
+                  Đã khóa
                 </span>
               ) : (
                 <span className="px-2 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-mono font-bold">
-                  Hợp lệ
+                  Hoạt động
                 </span>
               )}
             </div>
@@ -905,19 +903,19 @@ export const AdminUsersPage = () => {
                     <div className="mt-1.5 flex items-center gap-2 text-xs">
                       {selectedAuditUser.status === 'LOCKED' ? (
                         <span className="text-rose-700 font-mono text-[11px] font-bold flex items-center gap-1">
-                          <Ban className="w-3 h-3" /> Tài khoản bị khóa
+                          <Ban className="w-3 h-3" /> Đã khóa
                         </span>
                       ) : (
                         <span className="text-emerald-700 font-mono text-[11px] font-bold flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" /> Đang hoạt động
+                          <CheckCircle2 className="w-3 h-3" /> Hoạt động
                         </span>
                       )}
                       <span className="text-ink-400">•</span>
                       <span className="text-ink-600 font-serif text-[11px] font-bold flex items-center gap-0.5">
                         {selectedAuditUser.isVerified ? (
-                          <><BadgeCheck className="w-3 h-3 text-clay-600" /> Đã xác minh</>
+                          <><BadgeCheck className="w-3 h-3 text-clay-600" /> Đã xác thực</>
                         ) : (
-                          'Chưa xác minh'
+                          'Chưa xác thực'
                         )}
                       </span>
                     </div>
@@ -928,10 +926,10 @@ export const AdminUsersPage = () => {
                 <div className="p-3.5 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-serif font-bold text-xs text-ink-800 flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-clay-600" /> Hoạt động CSDL
+                      <Sparkles className="w-3.5 h-3.5 text-clay-600" /> Thống kê hoạt động
                     </span>
                     <span className="font-mono text-[10px] text-clay-700 font-bold">
-                      {activitySummary ? 'Thời gian thực' : 'Đang truy vấn…'}
+                      {activitySummary ? 'Thời gian thực' : 'Đang tải…'}
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-1.5 pt-1">
@@ -954,11 +952,11 @@ export const AdminUsersPage = () => {
                 {/* Extra Profile Details */}
                 <div className="space-y-1.5">
                   <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-ink-500 block">
-                    Chi tiết định danh
+                    Thông tin tài khoản
                   </span>
                   <div className="p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 space-y-1.5 text-xs">
                     <div className="flex justify-between py-1 border-b border-ink-100">
-                      <span className="text-ink-500">Vai trò RBAC:</span>
+                      <span className="text-ink-500">Vai trò:</span>
                       <span className="font-mono font-bold text-ink-800">{(selectedAuditUser.roles || []).join(', ') || 'ROLE_USER'}</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-ink-100">
@@ -970,7 +968,7 @@ export const AdminUsersPage = () => {
                       <span className="font-serif font-bold text-ink-800">{selectedAuditUser.tripsCount || 0} chuyến</span>
                     </div>
                     <div className="flex justify-between py-1">
-                      <span className="text-ink-500">Tiểu sử (Bio):</span>
+                      <span className="text-ink-500">Tiểu sử:</span>
                       <span className="font-serif italic text-ink-800 truncate max-w-[170px]">{selectedAuditUser.bio || 'Chưa cập nhật'}</span>
                     </div>
                   </div>
@@ -988,11 +986,11 @@ export const AdminUsersPage = () => {
                   >
                     {selectedAuditUser.status === 'LOCKED' ? (
                       <>
-                        <Unlock className="w-3.5 h-3.5" /> Mở khóa tài khoản (Active)
+                        <Unlock className="w-3.5 h-3.5" /> Mở khóa tài khoản
                       </>
                     ) : (
                       <>
-                        <Ban className="w-3.5 h-3.5" /> Khóa tài khoản (Banned)
+                        <Ban className="w-3.5 h-3.5" /> Khóa tài khoản
                       </>
                     )}
                   </button>
@@ -1002,13 +1000,13 @@ export const AdminUsersPage = () => {
                       onClick={() => openRoleModal(selectedAuditUser)}
                       className="py-2 rounded-[5px] bg-[#F8F4EC] hover:bg-[#EBE5D8] text-ink-700 font-serif font-bold text-xs border border-ink-200/80 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <UserCog className="w-3.5 h-3.5 text-amber-700" /> Phân quyền
+                      <UserCog className="w-3.5 h-3.5 text-amber-700" /> Đổi vai trò
                     </button>
                     <button
                       onClick={() => handleResetPassword(selectedAuditUser)}
                       className="py-2 rounded-[5px] bg-[#FFFDF8] hover:bg-[#F3EFE6] text-ink-700 font-serif font-bold text-xs border border-ink-200/80 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
                     >
-                      <Lock className="w-3.5 h-3.5 text-clay-600" /> Reset mật khẩu
+                      <Lock className="w-3.5 h-3.5 text-clay-600" /> Đặt lại mật khẩu
                     </button>
                   </div>
 
@@ -1021,13 +1019,13 @@ export const AdminUsersPage = () => {
                     }`}
                   >
                     <BadgeCheck className={`w-3.5 h-3.5 ${selectedAuditUser.isVerified ? 'text-amber-700' : 'text-ink-400'}`} />
-                    {selectedAuditUser.isVerified ? 'Đã xác thực — nhấn để gỡ badge' : 'Chưa xác thực — nhấn để cấp badge'}
+                    {selectedAuditUser.isVerified ? 'Gỡ huy hiệu xác thực' : 'Cấp huy hiệu xác thực'}
                   </button>
                 </div>
               </>
             ) : (
               <div className="py-12 text-center text-ink-400 font-serif text-xs">
-                Chọn một người dùng từ bảng bên trái để xem audit chi tiết.
+                Chọn người dùng để xem thông tin chi tiết.
               </div>
             )}
 
@@ -1045,7 +1043,7 @@ export const AdminUsersPage = () => {
                 <div className="w-7 h-7 rounded-[4px] bg-amber-100 text-amber-800 flex items-center justify-center">
                   <UserCog className="w-4 h-4" />
                 </div>
-                <h3 className="font-serif font-bold text-ink-800 text-sm">Phân quyền vai trò RBAC</h3>
+                <h3 className="font-serif font-bold text-ink-800 text-sm">Phân quyền vai trò</h3>
               </div>
               <button 
                 onClick={() => setShowRoleModal(false)}
@@ -1064,13 +1062,13 @@ export const AdminUsersPage = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="font-serif font-bold text-xs text-ink-800 block">Chọn vai trò hệ thống chuẩn (RBAC):</label>
+              <label className="font-serif font-bold text-xs text-ink-800 block">Chọn vai trò hệ thống:</label>
               
               <div className="space-y-2">
                 {[
-                  { role: 'ROLE_ADMIN', title: 'Quản trị viên (Admin)', desc: 'Toàn quyền cấu hình hệ thống, quản trị người dùng, duyệt địa điểm và kiểm duyệt báo cáo vi phạm.' },
-                  { role: 'ROLE_MODERATOR', title: 'Kiểm duyệt viên (Moderator)', desc: 'Kiểm duyệt bài viết, đánh giá và địa điểm chờ duyệt. KHÔNG có quyền can thiệp quản trị người dùng.' },
-                  { role: 'ROLE_USER', title: 'Người dùng tiêu chuẩn (Wanderer)', desc: 'Tạo lịch trình du lịch cá nhân, chia sẻ bài viết, đánh giá địa điểm và tham gia cộng đồng.' }
+                  { role: 'ROLE_ADMIN', title: 'Quản trị viên (Admin)', desc: 'Toàn quyền cấu hình hệ thống, quản lý người dùng, duyệt địa điểm và xử lý báo cáo.' },
+                  { role: 'ROLE_MODERATOR', title: 'Kiểm duyệt viên (Moderator)', desc: 'Kiểm duyệt bài viết, đánh giá và địa điểm chờ duyệt.' },
+                  { role: 'ROLE_USER', title: 'Thành viên (Wanderer)', desc: 'Tạo lịch trình cá nhân, chia sẻ bài viết, đánh giá địa điểm và tham gia cộng đồng.' }
                 ].map((item) => (
                   <label
                     key={item.role}
@@ -1116,7 +1114,7 @@ export const AdminUsersPage = () => {
                 className="px-4 py-2 rounded-[5px] text-xs font-serif font-bold bg-clay-600 hover:bg-clay-700 text-white shadow-xs transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
               >
                 {isSavingRole && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                {isSavingRole ? 'Đang lưu...' : 'Lưu phân quyền'}
+                {isSavingRole ? 'Đang lưu...' : 'Lưu thay đổi'}
               </button>
             </div>
           </div>
@@ -1132,7 +1130,7 @@ export const AdminUsersPage = () => {
                 <div className="w-7 h-7 rounded-[4px] bg-clay-100 text-clay-700 flex items-center justify-center">
                   <UserPlus className="w-4 h-4" />
                 </div>
-                <h3 className="font-serif font-bold text-ink-800 text-sm">Thêm nhân sự / Phân quyền mới</h3>
+                <h3 className="font-serif font-bold text-ink-800 text-sm">Thêm tài khoản mới</h3>
               </div>
               <button 
                 onClick={() => setShowAddUserModal(false)}
@@ -1148,7 +1146,7 @@ export const AdminUsersPage = () => {
                 <input 
                   type="text" 
                   required
-                  placeholder="Ví dụ: Lê Bảo Hoàng"
+                  placeholder="Ví dụ: Nguyễn Văn A"
                   value={newUserForm.fullName}
                   onChange={(e) => setNewUserForm({ ...newUserForm, fullName: e.target.value })}
                   className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none text-ink-800 focus:border-clay-600 font-sans"
@@ -1204,13 +1202,13 @@ export const AdminUsersPage = () => {
               </div>
 
               <div>
-                <label className="font-serif font-bold text-ink-700 block mb-1">Vai trò cấp phát</label>
+                <label className="font-serif font-bold text-ink-700 block mb-1">Vai trò</label>
                 <select
                   value={newUserForm.role}
                   onChange={(e) => setNewUserForm({ ...newUserForm, role: e.target.value })}
                   className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none font-serif font-semibold text-ink-800"
                 >
-                  <option value="ROLE_USER">Thành viên thông thường (Wanderer)</option>
+                  <option value="ROLE_USER">Thành viên (User)</option>
                   <option value="ROLE_MODERATOR">Kiểm duyệt viên (Moderator)</option>
                   <option value="ROLE_ADMIN">Quản trị viên (Admin)</option>
                 </select>
@@ -1230,7 +1228,7 @@ export const AdminUsersPage = () => {
                   className="px-4 py-2 rounded-[5px] text-xs font-serif font-bold bg-clay-600 hover:bg-clay-700 text-white shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
                 >
                   {isSubmittingUser && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                  Tạo tài khoản & Phân quyền
+                  Tạo tài khoản
                 </button>
               </div>
             </form>
@@ -1246,10 +1244,10 @@ export const AdminUsersPage = () => {
               <KeyRound className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-display font-black text-ink-800 text-sm">Đã đặt lại mật khẩu thành công</h3>
+              <h3 className="font-display font-black text-ink-800 text-sm">Đặt lại mật khẩu thành công</h3>
               <p className="text-xs text-ink-500 mt-1 leading-relaxed">
-                Mật khẩu tạm dưới đây chỉ hiển thị <b>một lần duy nhất</b>. Hãy sao chép và gửi trực tiếp cho
-                người dùng <b>{resetPasswordResult.email}</b>. Cơ sở dữ liệu chỉ lưu chuỗi mã hóa BCrypt.
+                Mật khẩu tạm chỉ hiển thị <b>một lần duy nhất</b>. Hãy sao chép và gửi trực tiếp cho
+                tài khoản <b>{resetPasswordResult.email}</b>.
               </p>
             </div>
             <div className="p-3 rounded-[5px] bg-ink-800 border border-ink-900 text-center">
@@ -1271,7 +1269,7 @@ export const AdminUsersPage = () => {
                 onClick={() => setResetPasswordResult(null)}
                 className="px-4 py-2 rounded-[5px] text-xs font-serif font-bold bg-clay-600 hover:bg-clay-700 text-white shadow-xs cursor-pointer"
               >
-                Tôi đã lưu mật khẩu
+                Đã lưu mật khẩu
               </button>
             </div>
           </div>
