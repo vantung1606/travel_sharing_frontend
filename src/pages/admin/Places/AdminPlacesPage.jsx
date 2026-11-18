@@ -488,19 +488,19 @@ export const AdminPlacesPage = () => {
           <nav className="flex items-center gap-2 text-xs font-semibold text-ink-400">
             <span>Quản trị hệ thống</span>
             <ChevronRight className="w-3.5 h-3.5 text-ink-300" />
-            <span className="text-clay-700 font-bold">Địa điểm & Điểm tham quan</span>
+            <span className="text-clay-700 font-bold">Địa điểm</span>
           </nav>
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="font-display text-2xl sm:text-3xl font-black text-ink-800 tracking-tight">
-              Quản lý Địa điểm & Phê duyệt Điểm Đến
+              Quản lý địa điểm
             </h1>
             <span className="px-2.5 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-700 font-bold text-xs border border-ink-200/80 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span>
-              Đồng bộ CSDL thực tế
+              Thời gian thực
             </span>
           </div>
           <p className="text-xs text-ink-400">
-            Hệ thống đang quản lý <strong className="text-ink-800 font-bold">{allPlaces.length}</strong> địa điểm du lịch, trong đó có <strong className="text-clay-700 font-bold">{pendingPlaces.length}</strong> yêu cầu gửi lên đang chờ kiểm duyệt.
+            Quản trị danh mục địa điểm và phê duyệt các điểm đến từ cộng đồng.
           </p>
         </div>
 
@@ -511,10 +511,10 @@ export const AdminPlacesPage = () => {
             onClick={() => loadData(true)}
             disabled={isLoading}
             className="flex items-center gap-2 px-3.5 py-2 rounded-[5px] bg-[#FFFDF8] hover:bg-[#F8F4EC] text-ink-700 font-bold text-xs border border-ink-200/80 transition-colors cursor-pointer disabled:opacity-50"
-            title="Làm mới dữ liệu từ CSDL"
+            title="Đồng bộ lại danh sách địa điểm"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-ink-400 ${isLoading ? 'animate-spin text-clay-600' : ''}`} />
-            <span>{isLoading ? 'Đang tải...' : 'Làm mới CSDL'}</span>
+            <span>{isLoading ? 'Đang tải...' : 'Làm mới'}</span>
           </button>
 
           <button
@@ -525,7 +525,7 @@ export const AdminPlacesPage = () => {
             title="Tự động đồng bộ tọa độ GPS cho các địa điểm còn thiếu"
           >
             <Compass className="w-3.5 h-3.5 text-sky-600" />
-            <span>Đồng bộ GPS thiếu</span>
+            <span>Đồng bộ GPS</span>
           </button>
 
           <button
@@ -535,7 +535,7 @@ export const AdminPlacesPage = () => {
             title="Thêm địa điểm mới"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>Thêm địa điểm mới</span>
+            <span>Thêm địa điểm</span>
           </button>
         </div>
       </div>
@@ -551,7 +551,7 @@ export const AdminPlacesPage = () => {
             </div>
             {pendingPlaces.length > 0 ? (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-rose-50 text-rose-800 text-[10px] font-bold border border-rose-200 animate-pulse">
-                Cần xử lý gấp
+                Cần xử lý
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
@@ -560,12 +560,11 @@ export const AdminPlacesPage = () => {
             )}
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Địa điểm chờ phê duyệt</span>
-            <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-xs text-ink-400 font-medium block">Chờ phê duyệt</span>
+            <div className="mt-1">
               <span className="font-display text-3xl font-black text-clay-700">{pendingPlaces.length}</span>
-              <span className="text-xs text-ink-400 font-medium">yêu cầu mới</span>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2">Được gửi từ chủ quán & cộng đồng</p>
+            <p className="text-[11px] text-ink-400 mt-2">Yêu cầu từ cộng đồng</p>
           </div>
         </div>
 
@@ -576,16 +575,15 @@ export const AdminPlacesPage = () => {
               <ShieldCheck className="w-4 h-4" />
             </div>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
-              Đang công khai
+              Hoạt động
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Địa điểm chính thức (Active)</span>
-            <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-xs text-ink-400 font-medium block">Đang hoạt động</span>
+            <div className="mt-1">
               <span className="font-display text-3xl font-black text-ink-800">{totalActive}</span>
-              <span className="text-xs text-ink-400 font-medium">điểm đến</span>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2">Hiển thị cho du khách trên bản đồ</p>
+            <p className="text-[11px] text-ink-400 mt-2">Hiển thị trên bản đồ</p>
           </div>
         </div>
 
@@ -600,12 +598,11 @@ export const AdminPlacesPage = () => {
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Độ phủ sóng địa lý</span>
-            <div className="flex items-baseline gap-2 mt-1">
+            <span className="text-xs text-ink-400 font-medium block">Tỉnh thành phủ sóng</span>
+            <div className="mt-1">
               <span className="font-display text-3xl font-black text-ink-800">{dynamicCities.length}</span>
-              <span className="text-xs text-ink-400 font-medium">tỉnh thành</span>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2">Trải dài khắp 3 miền Bắc - Trung - Nam</p>
+            <p className="text-[11px] text-ink-400 mt-2">Phủ sóng trên toàn quốc</p>
           </div>
         </div>
 
@@ -616,7 +613,7 @@ export const AdminPlacesPage = () => {
               <Star className="w-4 h-4 fill-amber-300" />
             </div>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-amber-50 text-amber-800 text-[10px] font-bold border border-amber-200">
-              Chất lượng cao
+              Đánh giá tốt
             </span>
           </div>
           <div>
@@ -627,7 +624,7 @@ export const AdminPlacesPage = () => {
               </span>
               <span className="text-xs text-ink-400 font-medium">/ 5.0</span>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2">Dựa trên nhận xét từ cộng đồng du khách</p>
+            <p className="text-[11px] text-ink-400 mt-2">Đánh giá từ du khách</p>
           </div>
         </div>
 
@@ -640,9 +637,9 @@ export const AdminPlacesPage = () => {
           {[
             { label: 'Đang hoạt động', count: totalActive, badgeBg: 'bg-emerald-50 text-emerald-800 border-emerald-200' },
             { label: 'Chờ duyệt', count: pendingPlaces.length, badgeBg: 'bg-clay-50 text-clay-800 border-clay-200' },
-            { label: 'Nổi bật (Featured)', count: allPlaces.filter(p => p.isFeatured).length, badgeBg: 'bg-amber-100 text-amber-900 border-amber-300 font-bold' },
+            { label: 'Nổi bật', count: allPlaces.filter(p => p.isFeatured).length, badgeBg: 'bg-amber-100 text-amber-900 border-amber-300 font-bold' },
             { 
-              label: 'Bị báo cáo vi phạm', 
+              label: 'Bị báo cáo', 
               count: placeReports.filter(r => r.status === 'PENDING').length, 
               badgeBg: placeReports.some(r => r.status === 'PENDING') ? 'bg-rose-100 text-rose-800 border-rose-300 font-bold' : 'bg-ink-100 text-ink-600 border-ink-200' 
             },
@@ -675,7 +672,7 @@ export const AdminPlacesPage = () => {
             <Search className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
             <input
               type="text"
-              placeholder="Tìm theo tên địa điểm, địa chỉ, số điện thoại, người gửi..."
+              placeholder="Tìm kiếm địa điểm, địa chỉ, người gửi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-[#F8F4EC] text-ink-800 rounded-[5px] text-xs placeholder:text-ink-300 outline-none focus:border-clay-600 border border-ink-200/80 transition-all"
@@ -722,7 +719,7 @@ export const AdminPlacesPage = () => {
               Danh sách địa điểm ({filteredPlaces.length})
             </span>
             <span className="text-xs text-ink-400">
-              Nhấp vào một dòng để xem chi tiết bên phải
+              Chọn dòng để xem chi tiết
             </span>
           </div>
 
@@ -730,11 +727,11 @@ export const AdminPlacesPage = () => {
             <table className="w-full text-left text-xs">
               <thead className="bg-[#F8F4EC] text-ink-600 font-bold border-b border-ink-200/80 uppercase text-[11px] tracking-wider">
                 <tr>
-                  <th className="py-3 px-4">Tên Địa Điểm</th>
-                  <th className="py-3 px-4">Tỉnh / Thành</th>
-                  <th className="py-3 px-4">Đánh Giá</th>
-                  <th className="py-3 px-4">Trạng Thái</th>
-                  <th className="py-3 px-4 text-right">Thao Tác</th>
+                  <th className="py-3 px-4">Địa điểm</th>
+                  <th className="py-3 px-4">Khu vực</th>
+                  <th className="py-3 px-4">Đánh giá</th>
+                  <th className="py-3 px-4">Trạng thái</th>
+                  <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-ink-200/60 bg-[#FFFDF8]">
@@ -742,7 +739,7 @@ export const AdminPlacesPage = () => {
                   <tr>
                     <td colSpan="5" className="py-12 text-center text-ink-400">
                       <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-clay-600" />
-                      Đang tải danh sách địa điểm từ cơ sở dữ liệu...
+                      Đang đồng bộ dữ liệu địa điểm...
                     </td>
                   </tr>
                 ) : paginatedPlaces.length === 0 ? (
@@ -751,27 +748,27 @@ export const AdminPlacesPage = () => {
                       {activeTab === 'Chờ duyệt' ? (
                         <div className="space-y-2">
                           <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
-                          <p className="font-display font-bold text-ink-800 text-sm">Không có địa điểm nào đang chờ phê duyệt!</p>
-                          <p className="text-xs text-ink-400">Tất cả yêu cầu gửi lên đã được xử lý xong.</p>
+                          <p className="font-display font-bold text-ink-800 text-sm">Không có địa điểm chờ phê duyệt!</p>
+                          <p className="text-xs text-ink-400">Tất cả yêu cầu đã được xử lý hoàn tất.</p>
                           <button
                             type="button"
                             onClick={() => setActiveTab('Đang hoạt động')}
                             className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer"
                           >
-                            Xem {totalActive} địa điểm đang hoạt động →
+                            Xem địa điểm đang hoạt động →
                           </button>
                         </div>
-                      ) : activeTab === 'Bị báo cáo vi phạm' ? (
+                      ) : activeTab === 'Bị báo cáo' || activeTab === 'Bị báo cáo vi phạm' ? (
                         <div className="space-y-2">
                           <ShieldCheck className="w-8 h-8 text-emerald-600 mx-auto" />
-                          <p className="font-display font-bold text-ink-800 text-sm">Không có địa điểm nào bị báo cáo vi phạm!</p>
-                          <p className="text-xs text-ink-400">Tất cả địa điểm đều trong trạng thái hoạt động an toàn và tích cực.</p>
+                          <p className="font-display font-bold text-ink-800 text-sm">Không có địa điểm nào bị báo cáo!</p>
+                          <p className="text-xs text-ink-400">Toàn bộ địa điểm đều trong trạng thái an toàn.</p>
                           <button
                             type="button"
                             onClick={() => setActiveTab('Đang hoạt động')}
                             className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer"
                           >
-                            Xem {totalActive} địa điểm đang hoạt động →
+                            Xem địa điểm đang hoạt động →
                           </button>
                         </div>
                       ) : (
@@ -809,7 +806,7 @@ export const AdminPlacesPage = () => {
                               <h4 className="font-display font-bold text-ink-800 truncate max-w-[170px] sm:max-w-[200px]">{p.name}</h4>
                               <div className="flex items-center gap-1.5 flex-wrap">
                                 <span className="px-1.5 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-600 text-[10px] font-bold border border-ink-200/60">
-                                  {p.categoryName || 'Tọa độ du lịch'}
+                                  {p.categoryName || 'Địa điểm'}
                                 </span>
                                 {p.isVerifiedHost && (
                                   <span className="px-1.5 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[9px] font-bold border border-emerald-200">
@@ -819,22 +816,22 @@ export const AdminPlacesPage = () => {
                                 {p.isFeatured && (
                                   <span className="px-1.5 py-0.5 rounded-[4px] bg-amber-50 text-amber-900 text-[9px] font-bold border border-amber-300 flex items-center gap-1 shadow-2xs">
                                     <Sparkles className="w-2.5 h-2.5 fill-amber-500 text-amber-600" />
-                                    {p.featuredBadge || 'Ghim Nổi Bật'} (#{p.featuredOrder || 1})
+                                    {p.featuredBadge || 'Nổi bật'}
                                   </span>
                                 )}
                                 {p.aiModerationStatus === 'DUPLICATE_FLAGGED' && (
                                   <span className="px-1.5 py-0.5 rounded-[4px] bg-rose-50 text-rose-800 text-[9px] font-bold border border-rose-200 flex items-center gap-1">
-                                    <AlertTriangle className="w-2.5 h-2.5" /> AI: Trùng lặp
+                                    <AlertTriangle className="w-2.5 h-2.5" /> Trùng lặp
                                   </span>
                                 )}
                                 {p.aiModerationStatus === 'UNVERIFIED_SUSPECTED' && (
                                   <span className="px-1.5 py-0.5 rounded-[4px] bg-amber-50 text-amber-800 text-[9px] font-bold border border-amber-200 flex items-center gap-1">
-                                    <AlertCircle className="w-2.5 h-2.5" /> AI: Nghi vấn
+                                    <AlertCircle className="w-2.5 h-2.5" /> Cần xác minh
                                   </span>
                                 )}
                                 {p.aiModerationStatus === 'APPROVED_BY_AI' && (
                                   <span className="px-1.5 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[9px] font-bold border border-emerald-200 flex items-center gap-1">
-                                    <Sparkles className="w-2.5 h-2.5" /> AI: Hợp lệ
+                                    <Sparkles className="w-2.5 h-2.5" /> AI duyệt
                                   </span>
                                 )}
                                 {(() => {
@@ -842,7 +839,7 @@ export const AdminPlacesPage = () => {
                                   if (pendingReps.length > 0) {
                                     return (
                                       <span className="px-1.5 py-0.5 rounded-[4px] bg-rose-100 text-rose-800 text-[9px] font-bold border border-rose-300 flex items-center gap-1 animate-pulse">
-                                        <Flag className="w-2.5 h-2.5 fill-rose-600 text-rose-600" /> Bị báo cáo ({pendingReps.length})
+                                        <Flag className="w-2.5 h-2.5 fill-rose-600 text-rose-600" /> {pendingReps.length} báo cáo
                                       </span>
                                     );
                                   }
@@ -878,7 +875,7 @@ export const AdminPlacesPage = () => {
                               : 'bg-rose-50 text-rose-800 border-rose-200'
                           }`}>
                             <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
-                            {isPending ? 'Chờ duyệt' : p.status === 'ACTIVE' ? 'Đã công khai' : 'Tạm ẩn'}
+                            {isPending ? 'Chờ duyệt' : p.status === 'ACTIVE' ? 'Hoạt động' : 'Tạm ẩn'}
                           </span>
                         </td>
 
@@ -929,7 +926,7 @@ export const AdminPlacesPage = () => {
                                   ? 'bg-amber-500 text-white border-amber-600 hover:bg-amber-600 shadow-2xs'
                                   : 'bg-[#F8F4EC] text-ink-600 border-ink-200 hover:bg-amber-500 hover:text-white'
                               }`}
-                              title={p.isFeatured ? `Đang ghim: ${p.featuredBadge || 'Nổi bật'} (Thứ tự #${p.featuredOrder || 1})` : 'Cấu hình Ghim Nổi Bật'}
+                              title={p.isFeatured ? `Đang ghim: ${p.featuredBadge || 'Nổi bật'}` : 'Ghim nổi bật'}
                             >
                               <Sparkles className="w-3.5 h-3.5" />
                             </button>
@@ -938,7 +935,7 @@ export const AdminPlacesPage = () => {
                               onClick={() => handleOpenEditModal(p)}
                               disabled={isSubmitting}
                               className="p-1.5 rounded-[4px] bg-[#F8F4EC] text-ink-600 hover:bg-clay-600 hover:text-white border border-ink-200 transition-colors cursor-pointer"
-                              title="Chỉnh sửa thông tin địa điểm"
+                              title="Chỉnh sửa thông tin"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
                             </button>
@@ -997,7 +994,7 @@ export const AdminPlacesPage = () => {
           <div className="flex items-center justify-between border-b border-ink-200/60 pb-3">
             <span className="font-display font-black text-base text-ink-800 flex items-center gap-2">
               <Eye className="w-4 h-4 text-clay-600" />
-              Chi Tiết Địa Điểm
+              Chi tiết địa điểm
             </span>
             {selectedPlace && (
               <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
@@ -1007,7 +1004,7 @@ export const AdminPlacesPage = () => {
                   ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                   : 'bg-rose-50 text-rose-800 border-rose-200'
               }`}>
-                {selectedPlace.status === 'PENDING_APPROVAL' ? 'Chờ phê duyệt' : selectedPlace.status === 'ACTIVE' ? 'Đã công khai' : 'Tạm ẩn'}
+                {selectedPlace.status === 'PENDING_APPROVAL' ? 'Chờ duyệt' : selectedPlace.status === 'ACTIVE' ? 'Hoạt động' : 'Tạm ẩn'}
               </span>
             )}
           </div>
@@ -1022,7 +1019,7 @@ export const AdminPlacesPage = () => {
                   className="w-full h-full object-cover"
                 />
                 <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-[4px] bg-ink-900/80 text-[#FFFDF8] text-[10px] font-bold border border-ink-800">
-                  {selectedPlace.categoryName || 'Tọa độ du lịch'}
+                  {selectedPlace.categoryName || 'Địa điểm'}
                 </span>
                 <span className="absolute top-2 right-2 px-2 py-0.5 rounded-[4px] bg-ink-900/80 text-amber-300 text-[10px] font-bold flex items-center gap-1 border border-ink-800">
                   <Star className="w-3 h-3 fill-amber-400" />
@@ -1048,7 +1045,7 @@ export const AdminPlacesPage = () => {
                       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-[#F8F4EC] hover:bg-clay-50 text-clay-700 text-[11px] font-bold transition-colors border border-ink-200/80"
                     >
                       <Navigation className="w-3 h-3" />
-                      <span>Xem trên Google Maps ({selectedPlace.latitude}, {selectedPlace.longitude})</span>
+                      <span>Xem trên Google Maps</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
@@ -1067,7 +1064,7 @@ export const AdminPlacesPage = () => {
                   <div className="flex items-center justify-between">
                     <span className="font-bold flex items-center gap-1.5 text-[11px] uppercase tracking-wide">
                       <Sparkles className="w-3.5 h-3.5" />
-                      WanderAI Thẩm định & Xác thực
+                      Thẩm định WanderAI
                     </span>
                     <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${
                       selectedPlace.aiModerationStatus === 'DUPLICATE_FLAGGED'
@@ -1098,7 +1095,7 @@ export const AdminPlacesPage = () => {
                       <div className="flex items-center justify-between border-b border-rose-200 pb-2">
                         <span className="font-bold flex items-center gap-1.5 text-xs text-rose-900 uppercase tracking-wide">
                           <Flag className="w-3.5 h-3.5 fill-rose-600 text-rose-600" />
-                          Báo cáo vi phạm từ cộng đồng ({currentPlaceReports.length})
+                          Báo cáo vi phạm ({currentPlaceReports.length})
                         </span>
                         <span className="px-2 py-0.5 rounded-[4px] bg-rose-200 text-rose-900 text-[10px] font-black">
                           CẦN DUYỆT
@@ -1135,7 +1132,7 @@ export const AdminPlacesPage = () => {
                                   onClick={() => setSelectedEvidenceModal(rep.evidenceImageUrl)}
                                   className="inline-flex items-center gap-1 text-[10px] font-bold text-clay-700 hover:text-clay-900 underline cursor-pointer"
                                 >
-                                  <Eye className="w-3 h-3" /> Xem ảnh bằng chứng vi phạm
+                                  <Eye className="w-3 h-3" /> Xem ảnh bằng chứng
                                 </button>
                               </div>
                             )}
@@ -1147,7 +1144,7 @@ export const AdminPlacesPage = () => {
                                   onClick={() => handleResolvePlaceReport(rep.id, 'RESOLVE', 'Đã xử lý và nhắc nhở địa điểm')}
                                   className="flex-1 py-1 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] transition-colors cursor-pointer"
                                 >
-                                  Đánh dấu Đã xử lý
+                                  Đã xử lý
                                 </button>
                                 <button
                                   type="button"
@@ -1173,17 +1170,17 @@ export const AdminPlacesPage = () => {
                   <span className="font-bold text-ink-800">{selectedPlace.openHours || '07:00 - 22:00'}</span>
                 </div>
                 <div>
-                  <span className="text-[10px] text-ink-400 font-bold uppercase block">Điện thoại liên hệ</span>
+                  <span className="text-[10px] text-ink-400 font-bold uppercase block">Điện thoại</span>
                   <span className="font-bold text-ink-800">{selectedPlace.phoneNumber || 'Chưa cập nhật'}</span>
                 </div>
                 <div className="pt-1">
-                  <span className="text-[10px] text-ink-400 font-bold uppercase block">Giá vé / Chi phí</span>
+                  <span className="text-[10px] text-ink-400 font-bold uppercase block">Giá vé</span>
                   <span className="font-display font-black text-clay-700">
                     {selectedPlace.ticketPrice ? `${Number(selectedPlace.ticketPrice).toLocaleString('vi-VN')} đ` : (selectedPlace.priceRange || 'Miễn phí')}
                   </span>
                 </div>
                 <div className="pt-1">
-                  <span className="text-[10px] text-ink-400 font-bold uppercase block">Người gửi / Host</span>
+                  <span className="text-[10px] text-ink-400 font-bold uppercase block">Người tạo</span>
                   <span className="font-bold text-ink-800 truncate block">
                     {selectedPlace.ownerName || 'Ban Quản trị'}
                   </span>
@@ -1206,7 +1203,7 @@ export const AdminPlacesPage = () => {
 
               {/* Description */}
               <div>
-                <span className="text-[10px] text-ink-400 font-bold uppercase block mb-1">Mô tả chi tiết</span>
+                <span className="text-[10px] text-ink-400 font-bold uppercase block mb-1">Mô tả</span>
                 <p className="text-ink-600 bg-[#F8F4EC] p-3 rounded-[5px] border border-ink-200/60 leading-relaxed text-[11px] max-h-32 overflow-y-auto">
                   {selectedPlace.description || 'Chưa có thông tin mô tả chi tiết từ người đăng.'}
                 </p>
@@ -1222,7 +1219,7 @@ export const AdminPlacesPage = () => {
                       disabled={isSubmitting}
                       className="flex-1 py-2.5 rounded-[5px] bg-emerald-700 hover:bg-emerald-800 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer flex items-center justify-center gap-1.5"
                     >
-                      <Check className="w-4 h-4" /> Phê duyệt lên bản đồ
+                      <Check className="w-4 h-4" /> Phê duyệt
                     </button>
                     <button
                       type="button"
@@ -1257,11 +1254,11 @@ export const AdminPlacesPage = () => {
                     >
                       {selectedPlace.status === 'ACTIVE' ? (
                         <>
-                          <EyeOff className="w-4 h-4 text-ink-500" /> Tạm ẩn địa điểm
+                          <EyeOff className="w-4 h-4 text-ink-500" /> Tạm ẩn
                         </>
                       ) : (
                         <>
-                          <CheckCircle2 className="w-4 h-4" /> Mở công khai lại
+                          <CheckCircle2 className="w-4 h-4" /> Mở công khai
                         </>
                       )}
                     </button>
@@ -1294,7 +1291,7 @@ export const AdminPlacesPage = () => {
           ) : (
             <div className="py-16 text-center text-ink-400 text-xs">
               <Compass className="w-8 h-8 mx-auto mb-2 text-ink-300" />
-              Chọn một địa điểm ở bảng bên trái để xem đầy đủ thông tin chi tiết.
+              Chọn địa điểm bên trái để xem chi tiết.
             </div>
           )}
         </div>
@@ -1308,10 +1305,10 @@ export const AdminPlacesPage = () => {
             <div className="flex items-start justify-between border-b border-ink-200/60 pb-3">
               <div>
                 <span className="text-[11px] font-bold text-clay-700 uppercase tracking-wider block">
-                  Quản lý Địa điểm Du lịch
+                  Địa điểm
                 </span>
                 <h3 className="font-display font-black text-xl text-ink-800 mt-0.5">
-                  Thêm mới Địa điểm
+                  Thêm địa điểm mới
                 </h3>
               </div>
               <button
@@ -1353,7 +1350,7 @@ export const AdminPlacesPage = () => {
 
                 {/* Category */}
                 <div>
-                  <label className="font-bold text-ink-700 block mb-1">Danh mục phân loại *</label>
+                  <label className="font-bold text-ink-700 block mb-1">Danh mục *</label>
                   <select
                     value={newPlaceForm.categoryName}
                     onChange={(e) => setNewPlaceForm({ ...newPlaceForm, categoryName: e.target.value })}
@@ -1370,7 +1367,7 @@ export const AdminPlacesPage = () => {
                   <div className="flex items-center justify-between mb-1">
                     <label className="font-bold text-ink-700 block">Địa chỉ cụ thể *</label>
                     <span className="text-[10px] text-clay-700 font-bold bg-clay-50 px-2 py-0.5 rounded-[4px] border border-clay-200">
-                      Bắt buộc kèm Quận/Huyện & Tỉnh/Thành
+                      Kèm Quận/Huyện, Tỉnh/Thành
                     </span>
                   </div>
                   <input
@@ -1515,8 +1512,8 @@ export const AdminPlacesPage = () => {
                   <Edit3 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-display font-black text-sm text-ink-800">Chỉnh sửa Địa điểm Du lịch</h3>
-                  <p className="text-[11px] text-ink-400">Mã #{editPlaceForm.id} • {editPlaceForm.name}</p>
+                  <h3 className="font-display font-black text-sm text-ink-800">Chỉnh sửa địa điểm</h3>
+                  <p className="text-[11px] text-ink-400">#{editPlaceForm.id} • {editPlaceForm.name}</p>
                 </div>
               </div>
               <button
@@ -1562,7 +1559,7 @@ export const AdminPlacesPage = () => {
 
                 <div>
                   <label className="font-bold text-ink-700 block mb-1">
-                    Danh mục phân loại <span className="text-rose-500">*</span>
+                    Danh mục <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={editPlaceForm.categoryName}
@@ -1581,16 +1578,16 @@ export const AdminPlacesPage = () => {
 
                 <div>
                   <label className="font-bold text-ink-700 block mb-1">
-                    Trạng thái hiển thị <span className="text-rose-500">*</span>
+                    Trạng thái <span className="text-rose-500">*</span>
                   </label>
                   <select
                     value={editPlaceForm.status}
                     onChange={(e) => setEditPlaceForm({ ...editPlaceForm, status: e.target.value })}
                     className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] outline-none focus:border-clay-600 text-xs text-ink-800 font-semibold cursor-pointer"
                   >
-                    <option value="ACTIVE">Hoạt động (ACTIVE - Công khai)</option>
-                    <option value="PENDING_APPROVAL">Chờ duyệt (PENDING_APPROVAL)</option>
-                    <option value="HIDDEN">Tạm ẩn (HIDDEN - Đã khóa/ẩn)</option>
+                    <option value="ACTIVE">Hoạt động</option>
+                    <option value="PENDING_APPROVAL">Chờ duyệt</option>
+                    <option value="HIDDEN">Tạm ẩn</option>
                   </select>
                 </div>
 
@@ -1770,7 +1767,7 @@ export const AdminPlacesPage = () => {
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-display font-black text-base text-ink-800">Từ chối phê duyệt địa điểm</h3>
+                <h3 className="font-display font-black text-base text-ink-800">Từ chối địa điểm</h3>
                 <p className="text-xs text-ink-400 mt-0.5">
                   Địa điểm: <strong className="text-ink-800">{rejectModalData.name}</strong>
                 </p>
@@ -1786,7 +1783,7 @@ export const AdminPlacesPage = () => {
               >
                 <option value="Thông tin địa chỉ hoặc định vị chưa chính xác">Thông tin địa chỉ hoặc định vị chưa chính xác</option>
                 <option value="Hình ảnh không rõ ràng hoặc vi phạm tiêu chuẩn cộng đồng">Hình ảnh không rõ ràng hoặc vi phạm tiêu chuẩn</option>
-                <option value="Địa điểm bị trùng lặp với địa điểm đã có trong hệ thống">Địa điểm bị trùng lặp với địa điểm đã có</option>
+                <option value="Địa điểm bị trùng lặp với địa điểm đã có trong hệ thống">Địa điểm bị trùng lặp</option>
                 <option value="Thiếu thông tin liên hệ hoặc giờ hoạt động">Thiếu thông tin liên hệ hoặc giờ hoạt động</option>
                 <option value="Địa điểm không còn hoạt động hoặc thông tin sai lệch">Địa điểm không còn hoạt động hoặc thông tin sai lệch</option>
               </select>
@@ -1830,9 +1827,9 @@ export const AdminPlacesPage = () => {
                 <Trash2 className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="font-display font-black text-base text-ink-800">Xóa vĩnh viễn địa điểm?</h3>
+                <h3 className="font-display font-black text-base text-ink-800">Xóa địa điểm?</h3>
                 <p className="text-xs text-ink-400 mt-1 leading-relaxed">
-                  Bạn có chắc chắn muốn xóa địa điểm <strong className="text-ink-800 font-bold">"{deleteModalData.name}"</strong>? Dữ liệu đánh giá và hình ảnh liên quan sẽ bị xóa khỏi cơ sở dữ liệu và không thể hoàn tác.
+                  Bạn có chắc muốn xóa <strong className="text-ink-800 font-bold">"{deleteModalData.name}"</strong>? Thao tác này không thể hoàn tác.
                 </p>
               </div>
             </div>
@@ -1851,7 +1848,7 @@ export const AdminPlacesPage = () => {
                 disabled={isSubmitting}
                 className="px-4 py-2 rounded-[5px] bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs transition-colors cursor-pointer disabled:opacity-50"
               >
-                {isSubmitting ? 'Đang xóa...' : 'Xác nhận xóa vĩnh viễn'}
+                {isSubmitting ? 'Đang xóa...' : 'Xác nhận xóa'}
               </button>
             </div>
           </div>
@@ -1865,7 +1862,7 @@ export const AdminPlacesPage = () => {
             <div className="flex items-center justify-between border-b border-ink-200/60 pb-2">
               <span className="font-display font-black text-sm text-ink-800 flex items-center gap-1.5">
                 <Flag className="w-4 h-4 text-rose-600" />
-                Ảnh bằng chứng vi phạm của địa điểm
+                Ảnh bằng chứng vi phạm
               </span>
               <button
                 type="button"
@@ -1906,7 +1903,7 @@ export const AdminPlacesPage = () => {
                 </div>
                 <div>
                   <h3 className="font-serif font-bold text-sm text-ink-900">
-                    Cấu hình Ghim Nổi Bật
+                    Cấu hình ghim nổi bật
                   </h3>
                   <p className="text-[11px] font-mono text-ink-400 truncate max-w-[260px]">
                     {featuredModalPlace.name}
@@ -1926,8 +1923,8 @@ export const AdminPlacesPage = () => {
               {/* Toggle Switch */}
               <label className="flex items-center justify-between p-3 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 cursor-pointer">
                 <div>
-                  <span className="font-serif font-bold text-ink-800 block">Kích hoạt Ghim Nổi Bật</span>
-                  <span className="text-[11px] text-ink-500">Hiển thị ưu tiên tại Trang chủ & đầu trang Khám phá</span>
+                  <span className="font-serif font-bold text-ink-800 block">Kích hoạt nổi bật</span>
+                  <span className="text-[11px] text-ink-500">Ưu tiên hiển thị tại Trang chủ & Khám phá</span>
                 </div>
                 <input
                   type="checkbox"
@@ -1939,7 +1936,7 @@ export const AdminPlacesPage = () => {
 
               {/* Order input */}
               <div className="space-y-1.5">
-                <label className="font-serif font-bold text-ink-800">Thứ tự ưu tiên hiển thị (Số nhỏ đứng trước)</label>
+                <label className="font-serif font-bold text-ink-800">Thứ tự ưu tiên (Số nhỏ hiển thị trước)</label>
                 <input
                   type="number"
                   min="1"
@@ -1952,7 +1949,7 @@ export const AdminPlacesPage = () => {
 
               {/* Badge text input */}
               <div className="space-y-1.5">
-                <label className="font-serif font-bold text-ink-800">Huy hiệu chiến dịch / Nhãn nổi bật</label>
+                <label className="font-serif font-bold text-ink-800">Nhãn nổi bật</label>
                 <input
                   type="text"
                   value={featuredForm.featuredBadge}
@@ -1994,7 +1991,7 @@ export const AdminPlacesPage = () => {
                 disabled={isSubmitting}
                 className="px-4 py-2 rounded-[5px] text-xs font-serif font-bold bg-amber-600 hover:bg-amber-700 text-white shadow-xs transition-colors cursor-pointer disabled:opacity-50"
               >
-                {isSubmitting ? 'Đang lưu...' : 'Lưu Cấu Hình Ghim'}
+                {isSubmitting ? 'Đang lưu...' : 'Lưu cấu hình'}
               </button>
             </div>
           </div>
