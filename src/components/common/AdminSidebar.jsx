@@ -176,15 +176,12 @@ export const AdminSidebar = ({ onNavigate }) => {
           className="h-16 px-4 flex items-center justify-between border-b border-ink-200/90 bg-white cursor-pointer hover:bg-[#FAF7F0] transition-colors group"
         >
           <div className="flex items-center gap-2.5">
-            <div className="relative">
-              <img
-                src={branding?.logoUrl || "/wayfare-logo.png"}
-                alt={branding?.siteTitle || "Wayfare"}
-                onError={(e) => { e.currentTarget.src = '/wayfare-logo.png'; }}
-                className="h-7 w-auto object-contain transition-transform group-hover:scale-105"
-              />
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-            </div>
+            <img
+              src={branding?.logoUrl || "/wayfare-logo.png"}
+              alt={branding?.siteTitle || "Wayfare"}
+              onError={(e) => { e.currentTarget.src = '/wayfare-logo.png'; }}
+              className="h-7 w-auto object-contain transition-transform group-hover:scale-105"
+            />
             <div className="flex flex-col">
               <span className="font-mono text-[9px] font-black tracking-widest text-clay-700 uppercase leading-none">
                 ADMIN CONSOLE
