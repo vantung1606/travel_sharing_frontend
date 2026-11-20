@@ -57,14 +57,14 @@ export const AdminHeader = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 md:left-[260px] right-0 h-16 bg-[#FFFDF8] border-b border-ink-200/80 z-40 flex items-center justify-between px-4 sm:px-6 shadow-none">
+      <header className="fixed top-0 left-0 md:left-[260px] right-0 h-16 bg-white border-b border-ink-200/90 z-40 flex items-center justify-between px-4 sm:px-6 shadow-2xs">
         
         {/* Left Section: Mobile Hamburger & Search Bar with fixed max width to prevent colliding */}
         <div className="flex items-center gap-3 min-w-0 mr-4">
           {/* Mobile Hamburger Drawer Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-[5px] text-ink-700 bg-[#F8F4EC] border border-ink-200/80 hover:bg-[#EBE5D8] transition-colors cursor-pointer shrink-0"
+            className="md:hidden p-2 rounded-[5px] text-ink-700 bg-[#F4EFE6] border border-ink-200 hover:bg-[#ECE5D8] transition-colors cursor-pointer shrink-0"
             title="Mở menu Admin"
             aria-label="Mở menu Admin"
             aria-expanded={isMobileMenuOpen}
@@ -78,13 +78,13 @@ export const AdminHeader = () => {
             <input
               type="text"
               placeholder="Tìm kiếm người dùng, địa điểm..."
-              className="w-full pl-8 pr-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 text-ink-800 rounded-[5px] text-xs placeholder:text-ink-400 focus:outline-none focus:border-clay-600 focus:bg-[#FFFDF8] transition-colors font-sans truncate"
+              className="w-full pl-8 pr-3 py-1.5 bg-[#FAF7F0] border border-ink-200 text-ink-900 rounded-[5px] text-xs placeholder:text-ink-400 focus:outline-none focus:border-clay-600 focus:bg-white transition-colors font-sans truncate shadow-xs"
             />
           </div>
         </div>
 
         {/* Center / Breadcrumb: Active Tab Title */}
-        <div className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-xs font-serif font-bold text-ink-700 shrink-0">
+        <div className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] bg-[#FAF7F0] border border-ink-200 text-xs font-serif font-bold text-ink-800 shrink-0 shadow-xs">
           <Shield className="w-3.5 h-3.5 text-clay-600" />
           <span>{ADMIN_TAB_NAMES[adminTab] || 'Quản trị hệ thống'}</span>
         </div>
@@ -93,7 +93,7 @@ export const AdminHeader = () => {
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
 
           {/* Real Backend Server Health */}
-          <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-ink-700 text-xs font-mono font-medium">
+          <div className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[5px] bg-[#FAF7F0] border border-ink-200 text-ink-700 text-xs font-mono font-medium shadow-xs">
             <span className={`w-1.5 h-1.5 rounded-full ${serverHealth === 'online' ? 'bg-emerald-600 animate-pulse' : serverHealth === 'checking' ? 'bg-amber-500' : 'bg-rose-500'}`}></span>
             <span>{serverHealth === 'online' ? 'Server: Online' : serverHealth === 'checking' ? 'Kiểm tra...' : 'Offline'}</span>
           </div>
@@ -103,7 +103,7 @@ export const AdminHeader = () => {
             <button
               type="button"
               onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-              className="relative w-8 h-8 rounded-[5px] bg-[#F8F4EC] hover:bg-[#EBE5D8] border border-ink-200/80 text-ink-700 flex items-center justify-center transition-colors cursor-pointer"
+              className="relative w-8 h-8 rounded-[5px] bg-[#FAF7F0] hover:bg-[#F4EFE6] border border-ink-200 text-ink-700 flex items-center justify-center transition-colors cursor-pointer shadow-xs"
               title="Thông báo hệ thống"
             >
               <Bell className="w-4 h-4 text-ink-700" />
