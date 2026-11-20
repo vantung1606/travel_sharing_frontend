@@ -594,29 +594,31 @@ export const AdminDashboardPage = () => {
     <div className="space-y-6 pb-12">
       
       {/* ─── PAGE HEADER & ACTION TOOLBAR ────────────────────────────────────── */}
-      <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      <div className="bg-white p-5 sm:p-6 rounded-[8px] border border-ink-200 shadow-sm border-l-4 border-l-clay-600 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div className="space-y-1.5">
-          <nav className="flex items-center gap-2 text-[11px] font-semibold text-ink-400">
+          <nav className="flex items-center gap-2 text-[11px] font-semibold text-ink-500">
             <Compass className="w-3.5 h-3.5 text-clay-600 shrink-0" />
             <span>Quản trị hệ thống</span>
             <span className="text-ink-300">/</span>
             <span className="text-clay-700 font-bold">Tổng quan</span>
           </nav>
-          <h1 className="font-display text-2xl sm:text-3xl font-black text-ink-800 tracking-tight flex items-center gap-2">
+          <h1 className="font-display text-2xl sm:text-3xl font-black text-ink-900 tracking-tight flex items-center gap-2">
             Chào mừng trở lại, {currentUser?.name || 'Quản trị viên'}! <span>👋</span>
           </h1>
-          <p className="text-xs text-ink-400 flex items-center gap-2 flex-wrap font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>Hệ thống hoạt động ổn định • Dữ liệu thời gian thực</span>
+          <p className="text-xs text-ink-500 flex items-center gap-2 flex-wrap font-medium">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-4 ring-emerald-100 animate-pulse"></span>
+            <span className="text-emerald-800 font-semibold">Hệ thống hoạt động ổn định</span>
+            <span className="text-ink-300">•</span>
+            <span>Dữ liệu thời gian thực từ CSDL</span>
           </p>
         </div>
 
         {/* Action Toolbar */}
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 pt-2 xl:pt-0 w-full sm:w-auto">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2.5 pt-2 xl:pt-0 w-full sm:w-auto">
           <button 
             onClick={() => loadDashboardData(true)}
             disabled={refreshing}
-            className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer disabled:opacity-50"
+            className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-4 rounded-[6px] bg-[#FAF7F0] hover:bg-clay-50 text-ink-800 font-bold text-xs border border-ink-200 hover:border-clay-400 shadow-xs transition-all cursor-pointer disabled:opacity-50"
             title="Đồng bộ dữ liệu mới nhất"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-clay-600 ${refreshing ? 'animate-spin' : ''}`} />
@@ -625,121 +627,129 @@ export const AdminDashboardPage = () => {
 
           <button 
             onClick={handleExportCsv}
-            className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer"
+            className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-4 rounded-[6px] bg-clay-700 hover:bg-clay-800 text-white font-bold text-xs shadow-xs hover:shadow transition-all cursor-pointer"
             title="Xuất báo cáo tổng quan ra file CSV"
           >
-            <Download className="w-3.5 h-3.5 text-clay-600" />
+            <Download className="w-3.5 h-3.5 text-white/90" />
             <span>Xuất CSV</span>
           </button>
         </div>
       </div>
 
-      {/* ─── ROW 1: 4 KEY METRIC KPI CARDS ─────────────────────────────────── */}
+      {/* ─── ROW 1: 4 KEY METRIC KPI CARDS (ĐỊNH DANH MÀU SẮC NÉT RIÊNG TỪNG PHẦN) ─── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        {/* KPI 1: Users Metric */}
-        <div className="bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
+        {/* KPI 1: Users Metric (SẮC XANH DƯƠNG / BLUE) */}
+        <div className="bg-white p-5 rounded-[8px] border border-blue-200/90 border-t-[3.5px] border-t-blue-600 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-[5px] bg-clay-50 text-clay-700 border border-clay-200 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-[6px] bg-blue-50 text-blue-700 border border-blue-200 flex items-center justify-center shrink-0 shadow-xs">
               <Users className="w-5 h-5" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[10px] font-bold border border-clay-200">
-              <TrendingUp className="w-3 h-3 text-clay-600" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-blue-50 text-blue-800 text-[10px] font-bold border border-blue-200">
+              <TrendingUp className="w-3 h-3 text-blue-600" />
               +{stats.newUsersThisMonth} tháng này
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Thành viên</span>
+            <span className="text-xs text-blue-900/70 font-bold uppercase tracking-wider block">Thành viên</span>
             <div className="mt-1">
-              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalUsers.toLocaleString('vi-VN')}</h2>
+              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-900 tracking-tight">{stats.totalUsers.toLocaleString('vi-VN')}</h2>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
-              <UserCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <p className="text-[11px] text-ink-500 mt-2 flex items-center gap-1.5 pt-2 border-t border-blue-100">
+              <UserCheck className="w-3.5 h-3.5 text-blue-600 shrink-0" />
               <span>Tài khoản trên hệ thống</span>
             </p>
           </div>
         </div>
 
-        {/* KPI 2: Community Posts & Engagement Metric */}
-        <div className="bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
+        {/* KPI 2: Community Posts & Engagement Metric (SẮC XANH LÁ / EMERALD) */}
+        <div className="bg-white p-5 rounded-[8px] border border-emerald-200/90 border-t-[3.5px] border-t-emerald-600 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-[5px] bg-clay-50 text-clay-700 border border-clay-200 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-[6px] bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center shrink-0 shadow-xs">
               <FileText className="w-5 h-5" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[10px] font-bold border border-clay-200">
-              <TrendingUp className="w-3 h-3 text-clay-600" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
+              <TrendingUp className="w-3 h-3 text-emerald-600" />
               +{stats.newPostsThisMonth} tháng này
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Bài viết cộng đồng</span>
+            <span className="text-xs text-emerald-900/70 font-bold uppercase tracking-wider block">Bài viết cộng đồng</span>
             <div className="mt-1">
-              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalPosts.toLocaleString('vi-VN')}</h2>
+              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-900 tracking-tight">{stats.totalPosts.toLocaleString('vi-VN')}</h2>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
-              <span className="font-bold text-clay-700">{(stats.totalLikes || 0).toLocaleString('vi-VN')}</span> thích
+            <p className="text-[11px] text-ink-500 mt-2 flex items-center gap-1.5 pt-2 border-t border-emerald-100">
+              <span className="font-bold text-emerald-800">{(stats.totalLikes || 0).toLocaleString('vi-VN')}</span> thích
               <span className="text-ink-300">•</span>
-              <span className="font-bold text-clay-700">{(stats.totalComments || 0).toLocaleString('vi-VN')}</span> bình luận
+              <span className="font-bold text-emerald-800">{(stats.totalComments || 0).toLocaleString('vi-VN')}</span> bình luận
             </p>
           </div>
         </div>
 
-        {/* KPI 3: Itineraries & Places Metric */}
-        <div className="bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
+        {/* KPI 3: Itineraries & Places Metric (SẮC ĐẤT NUNG / CLAY ĐẶC TRƯNG WAYFARE) */}
+        <div className="bg-white p-5 rounded-[8px] border border-amber-300/80 border-t-[3.5px] border-t-clay-600 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-[5px] bg-clay-50 text-clay-700 border border-clay-200 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-[6px] bg-clay-100 text-clay-800 border border-clay-300 flex items-center justify-center shrink-0 shadow-xs">
               <Compass className="w-5 h-5" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[10px] font-bold border border-clay-200">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] bg-amber-50 text-clay-800 text-[10px] font-bold border border-amber-200">
               <Compass className="w-3 h-3 text-clay-600" />
               {stats.activeItineraries} đang chạy
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Lịch trình du lịch</span>
+            <span className="text-xs text-clay-900/70 font-bold uppercase tracking-wider block">Lịch trình du lịch</span>
             <div className="mt-1">
-              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalItineraries.toLocaleString('vi-VN')}</h2>
+              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-900 tracking-tight">{stats.totalItineraries.toLocaleString('vi-VN')}</h2>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
+            <p className="text-[11px] text-ink-500 mt-2 flex items-center gap-1.5 pt-2 border-t border-amber-100">
               <MapPin className="w-3.5 h-3.5 text-clay-600 shrink-0" />
-              <span>{stats.totalPlaces} địa điểm tham quan</span>
+              <span className="font-semibold text-clay-800">{stats.totalPlaces}</span>
+              <span>địa điểm tham quan</span>
             </p>
           </div>
         </div>
 
-        {/* KPI 4: Moderation & Quality Rating */}
+        {/* KPI 4: Moderation & Quality Rating (SẮC ĐỎ CẢNH BÁO / ROSE HOẶC TEAL AN TOÀN) */}
         {(() => {
           const pendingCount = stats.pendingReports ?? pendingReports.length;
           const totalCount = stats.totalReports ?? Math.max(pendingCount, 0);
+          const isWarning = pendingCount > 0;
           return (
-            <div className="bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
+            <div className={`bg-white p-5 rounded-[8px] border shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-3 ${
+              isWarning 
+                ? 'border-rose-300 border-t-[3.5px] border-t-rose-600' 
+                : 'border-teal-200 border-t-[3.5px] border-t-teal-600'
+            }`}>
               <div className="flex items-start justify-between">
-                <div className={`w-10 h-10 rounded-[5px] flex items-center justify-center shrink-0 border ${
-                  pendingCount > 0 ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
+                <div className={`w-10 h-10 rounded-[6px] flex items-center justify-center shrink-0 border shadow-xs ${
+                  isWarning ? 'bg-rose-100 text-rose-700 border-rose-300' : 'bg-teal-50 text-teal-700 border-teal-200'
                 }`}>
                   <ShieldAlert className="w-5 h-5" />
                 </div>
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
-                  pendingCount > 0 
-                    ? 'bg-rose-50 text-rose-700 border-rose-200 animate-pulse' 
-                    : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-[4px] text-[10px] font-bold border ${
+                  isWarning 
+                    ? 'bg-rose-50 text-rose-800 border-rose-200 animate-pulse' 
+                    : 'bg-teal-50 text-teal-800 border-teal-200'
                 }`}>
-                  {pendingCount > 0 ? `${pendingCount} chờ xử lý` : 'An toàn'}
+                  {isWarning ? `${pendingCount} chờ xử lý` : 'An toàn'}
                 </span>
               </div>
               <div>
-                <span className="text-xs text-ink-400 font-medium block">Kiểm duyệt nội dung</span>
+                <span className={`text-xs font-bold uppercase tracking-wider block ${isWarning ? 'text-rose-900/80' : 'text-teal-900/80'}`}>
+                  Kiểm duyệt nội dung
+                </span>
                 <div className="flex items-baseline gap-2 mt-1">
                   <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight flex items-baseline gap-1.5">
-                    <span className={pendingCount > 0 ? 'text-rose-600' : 'text-ink-800'}>{pendingCount}</span>
+                    <span className={isWarning ? 'text-rose-600' : 'text-ink-900'}>{pendingCount}</span>
                     <span className="text-sm font-semibold text-ink-400">/ {totalCount}</span>
                   </h2>
                 </div>
-                <p className="text-[11px] text-ink-400 mt-2 flex items-center justify-between pt-2 border-t border-ink-200/50">
+                <p className="text-[11px] text-ink-500 mt-2 flex items-center justify-between pt-2 border-t border-ink-100">
                   <span>{totalCount > 0 ? `${totalCount} báo cáo tổng số` : 'Không có vi phạm'}</span>
                   <button 
                     onClick={() => setAdminTab('reports')}
-                    className="text-clay-700 hover:text-clay-800 font-bold hover:underline cursor-pointer"
+                    className="text-rose-700 hover:text-rose-900 font-bold hover:underline cursor-pointer"
                   >
                     Xem báo cáo →
                   </button>
@@ -758,40 +768,44 @@ export const AdminDashboardPage = () => {
         <div className="lg:col-span-8 space-y-6">
           
           {/* Dynamic Growth Chart */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h3 className="font-display font-black text-lg text-ink-800 flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-clay-600" />
-                  Tăng trưởng 6 tháng gần nhất
-                </h3>
-                <p className="text-xs text-ink-400 mt-0.5">Số lượng người dùng và bài viết mới theo từng tháng</p>
+          <div className="bg-white p-5 sm:p-6 rounded-[8px] border border-ink-200/90 shadow-sm space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-ink-100">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-[6px] bg-indigo-50 text-indigo-700 border border-indigo-200 flex items-center justify-center shrink-0 shadow-xs">
+                  <BarChart3 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-display font-black text-lg text-ink-900 tracking-tight">
+                    Tăng trưởng 6 tháng gần nhất
+                  </h3>
+                  <p className="text-xs text-ink-500 mt-0.5">Số lượng người dùng và bài viết mới theo từng tháng</p>
+                </div>
               </div>
 
               {/* Metric Toggle Tabs */}
-              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80 shrink-0 text-xs">
+              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F4EFE6] rounded-[6px] border border-ink-200/80 shrink-0 text-xs">
                 <button
                   type="button"
                   onClick={() => setChartMetric('users')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     chartMetric === 'users'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
-                      : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
+                      ? 'bg-white text-indigo-950 border border-indigo-200 shadow-xs font-black'
+                      : 'text-ink-600 hover:text-ink-900 hover:bg-white/60 border border-transparent'
                   }`}
                 >
-                  <Users className="w-3.5 h-3.5" />
+                  <Users className="w-3.5 h-3.5 text-indigo-600" />
                   <span>Người dùng</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setChartMetric('posts')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     chartMetric === 'posts'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
-                      : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
+                      ? 'bg-white text-emerald-950 border border-emerald-200 shadow-xs font-black'
+                      : 'text-ink-600 hover:text-ink-900 hover:bg-white/60 border border-transparent'
                   }`}
                 >
-                  <FileText className="w-3.5 h-3.5" />
+                  <FileText className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Bài viết</span>
                 </button>
               </div>
@@ -799,7 +813,7 @@ export const AdminDashboardPage = () => {
 
             {/* Dynamic Interactive Bar & Gradient Chart Container */}
             <div className="pt-2">
-              <div className="h-52 w-full flex items-end justify-between gap-2 sm:gap-6 px-2 sm:px-4 border-b border-ink-200/60 pb-2">
+              <div className="h-52 w-full flex items-end justify-between gap-2 sm:gap-6 px-2 sm:px-4 border-b border-ink-200/80 pb-2">
                 {growthData.map((item, idx) => {
                   const count = Number(item.count) || 0;
                   const percent = Math.min(100, Math.max(12, Math.round((count / maxChartValue) * 100)));
@@ -808,7 +822,7 @@ export const AdminDashboardPage = () => {
                   return (
                     <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group relative">
                       {/* Floating Tooltip */}
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-ink-900 text-[#FFFDF8] px-2.5 py-1 rounded-[4px] text-[10px] font-bold whitespace-nowrap pointer-events-none z-10 border border-ink-800">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-ink-900 text-white px-2.5 py-1 rounded-[4px] text-[10px] font-bold whitespace-nowrap pointer-events-none z-10 shadow-md">
                         {count.toLocaleString('vi-VN')} {chartMetric === 'users' ? 'thành viên' : 'bài viết'}
                       </div>
 
@@ -820,19 +834,19 @@ export const AdminDashboardPage = () => {
                       </span>
 
                       {/* Bar Column Graphic */}
-                      <div className="w-full max-w-[48px] bg-[#F8F4EC] rounded-t-[3px] border-t border-x border-ink-200/60 overflow-hidden flex flex-col justify-end h-full">
+                      <div className="w-full max-w-[48px] bg-[#F4EFE6] rounded-t-[4px] border-t border-x border-ink-200/80 overflow-hidden flex flex-col justify-end h-full shadow-inner">
                         <div 
-                          className={`w-full rounded-t-[3px] transition-all duration-500 ease-out ${
+                          className={`w-full rounded-t-[4px] transition-all duration-500 ease-out ${
                             isLatest 
-                              ? 'bg-gradient-to-t from-clay-700 to-clay-500 group-hover:brightness-110' 
-                              : 'bg-gradient-to-t from-ink-300 to-ink-200 group-hover:from-clay-400 group-hover:to-clay-300'
+                              ? 'bg-gradient-to-t from-clay-700 via-clay-600 to-clay-500 group-hover:brightness-110 shadow-sm' 
+                              : 'bg-gradient-to-t from-slate-400 to-slate-300 group-hover:from-clay-400 group-hover:to-clay-300'
                           }`}
                           style={{ height: `${percent}%` }}
                         ></div>
                       </div>
 
                       {/* Month Label */}
-                      <span className="text-[11px] text-ink-500 font-semibold mt-2.5 block text-center truncate w-full">
+                      <span className="text-[11px] text-ink-600 font-bold mt-2.5 block text-center truncate w-full">
                         {item.label}
                       </span>
                     </div>
@@ -841,22 +855,22 @@ export const AdminDashboardPage = () => {
               </div>
 
               {/* Chart Footer Summary Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-4 pt-2">
-                <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Tổng 6 tháng</span>
-                  <span className="text-base font-display font-black text-ink-800 mt-0.5 block">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3 mt-4 pt-1">
+                <div className="p-3 bg-[#FAF7F0] rounded-[6px] border border-ink-200/80 text-center shadow-xs">
+                  <span className="text-[11px] text-ink-500 block font-semibold uppercase tracking-wider">Tổng 6 tháng</span>
+                  <span className="text-base font-display font-black text-ink-900 mt-0.5 block">
                     {growthData.reduce((acc, cur) => acc + (Number(cur.count) || 0), 0).toLocaleString('vi-VN')}
                   </span>
                 </div>
-                <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Cao điểm nhất</span>
-                  <span className="text-base font-display font-black text-clay-700 mt-0.5 block">
+                <div className="p-3 bg-amber-50/70 rounded-[6px] border border-amber-200/80 text-center shadow-xs">
+                  <span className="text-[11px] text-amber-900/80 block font-semibold uppercase tracking-wider">Cao điểm nhất</span>
+                  <span className="text-base font-display font-black text-amber-900 mt-0.5 block">
                     {Math.max(...growthData.map(d => Number(d.count) || 0)).toLocaleString('vi-VN')}
                   </span>
                 </div>
-                <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Tháng này</span>
-                  <span className="text-base font-display font-black text-emerald-700 mt-0.5 block">
+                <div className="p-3 bg-emerald-50/70 rounded-[6px] border border-emerald-200/80 text-center shadow-xs">
+                  <span className="text-[11px] text-emerald-900/80 block font-semibold uppercase tracking-wider">Tháng này</span>
+                  <span className="text-base font-display font-black text-emerald-800 mt-0.5 block">
                     +{growthData[growthData.length - 1]?.count || 0} mới
                   </span>
                 </div>
@@ -865,40 +879,44 @@ export const AdminDashboardPage = () => {
           </div>
 
           {/* Top Trends & Places */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h3 className="font-display font-black text-lg text-ink-800 flex items-center gap-2">
-                  <Compass className="w-4 h-4 text-clay-600" />
-                  Điểm đến & Địa danh nổi bật
-                </h3>
-                <p className="text-xs text-ink-400 mt-0.5">Xếp hạng theo lượt tạo lịch trình và đánh giá thực tế</p>
+          <div className="bg-white p-5 sm:p-6 rounded-[8px] border border-ink-200/90 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-ink-100">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-[6px] bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0 shadow-xs">
+                  <Compass className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-display font-black text-lg text-ink-900 tracking-tight">
+                    Điểm đến & Địa danh nổi bật
+                  </h3>
+                  <p className="text-xs text-ink-500 mt-0.5">Xếp hạng theo lượt tạo lịch trình và đánh giá thực tế</p>
+                </div>
               </div>
 
               {/* Subtabs for Trends */}
-              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80 shrink-0 text-xs">
+              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F4EFE6] rounded-[6px] border border-ink-200/80 shrink-0 text-xs">
                 <button
                   type="button"
                   onClick={() => setTopTab('destinations')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     topTab === 'destinations'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
-                      : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
+                      ? 'bg-white text-clay-800 border border-clay-300 shadow-xs font-black'
+                      : 'text-ink-600 hover:text-ink-900 hover:bg-white/60 border border-transparent'
                   }`}
                 >
-                  <MapPin className="w-3.5 h-3.5" />
+                  <MapPin className="w-3.5 h-3.5 text-clay-600" />
                   <span>Điểm đến ({stats.topDestinations?.length || 0})</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setTopTab('places')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     topTab === 'places'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
-                      : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
+                      ? 'bg-white text-amber-800 border border-amber-300 shadow-xs font-black'
+                      : 'text-ink-600 hover:text-ink-900 hover:bg-white/60 border border-transparent'
                   }`}
                 >
-                  <Star className="w-3.5 h-3.5" />
+                  <Star className="w-3.5 h-3.5 text-amber-500" />
                   <span>Đánh giá cao ({stats.topPlaces?.length || 0})</span>
                 </button>
               </div>
@@ -916,23 +934,27 @@ export const AdminDashboardPage = () => {
                     const highestCount = Number(stats.topDestinations[0]?.count) || 1;
                     const percent = Math.min(100, Math.round((Number(dest.count) / highestCount) * 100));
                     return (
-                      <div key={idx} className="p-3.5 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200/60 hover:bg-[#F8F4EC] transition-colors">
-                        <div className="flex items-center justify-between font-bold text-xs text-ink-800 mb-1.5">
+                      <div key={idx} className="p-3.5 rounded-[6px] bg-[#FAF7F0] border border-ink-200/70 hover:bg-white hover:border-clay-300 transition-all shadow-xs">
+                        <div className="flex items-center justify-between font-bold text-xs text-ink-900 mb-1.5">
                           <span className="flex items-center gap-2">
-                            <span className={`w-5 h-5 rounded-[4px] flex items-center justify-center text-[10px] font-extrabold border ${
-                              idx === 0 ? 'bg-amber-100 text-amber-800 border-amber-300' :
-                              idx === 1 ? 'bg-ink-100 text-ink-700 border-ink-300' :
-                              idx === 2 ? 'bg-clay-100 text-clay-800 border-clay-300' : 'bg-[#FFFDF8] text-ink-600 border-ink-200'
+                            <span className={`w-5 h-5 rounded-[4px] flex items-center justify-center text-[10px] font-black border shadow-xs ${
+                              idx === 0 ? 'bg-amber-100 text-amber-900 border-amber-400' :
+                              idx === 1 ? 'bg-slate-100 text-slate-800 border-slate-300' :
+                              idx === 2 ? 'bg-clay-100 text-clay-900 border-clay-300' : 'bg-white text-ink-700 border-ink-200'
                             }`}>
                               #{idx + 1}
                             </span>
-                            <span className="font-display font-bold text-ink-800">{dest.destination || 'Không xác định'}</span>
+                            <span className="font-display font-bold text-ink-900">{dest.destination || 'Không xác định'}</span>
                           </span>
-                          <span className="text-clay-700 font-extrabold">{dest.count} chuyến đi</span>
+                          <span className="text-clay-700 font-black">{dest.count} chuyến đi</span>
                         </div>
-                        <div className="w-full bg-ink-200/60 rounded-full h-1.5">
+                        <div className="w-full bg-ink-200/50 rounded-full h-2 overflow-hidden">
                           <div 
-                            className="bg-clay-600 h-1.5 rounded-full transition-all duration-500" 
+                            className={`h-2 rounded-full transition-all duration-500 ${
+                              idx === 0 ? 'bg-gradient-to-r from-amber-500 to-amber-600' :
+                              idx === 1 ? 'bg-gradient-to-r from-slate-500 to-slate-600' :
+                              'bg-gradient-to-r from-clay-500 to-clay-600'
+                            }`} 
                             style={{ width: `${percent}%` }}
                           ></div>
                         </div>
@@ -949,20 +971,20 @@ export const AdminDashboardPage = () => {
                   </div>
                 ) : (
                   stats.topPlaces.map((place, idx) => (
-                    <div key={idx} className="p-3.5 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200/60 flex items-center justify-between gap-3 hover:bg-[#F8F4EC] transition-colors">
+                    <div key={idx} className="p-3.5 rounded-[6px] bg-[#FAF7F0] border border-ink-200/70 flex items-center justify-between gap-3 hover:bg-white hover:border-amber-300 transition-all shadow-xs">
                       <div className="min-w-0">
-                        <div className="font-display font-bold text-xs text-ink-800 truncate">{place.name}</div>
-                        <div className="text-[11px] text-ink-400 flex items-center gap-1 mt-0.5">
+                        <div className="font-display font-bold text-xs text-ink-900 truncate">{place.name}</div>
+                        <div className="text-[11px] text-ink-500 flex items-center gap-1 mt-0.5">
                           <MapPin className="w-3 h-3 text-clay-600 shrink-0" />
                           <span className="truncate">{place.city || 'Việt Nam'}</span>
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-[#FFFDF8] text-ink-800 font-bold text-xs border border-ink-200/80">
+                        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-white text-ink-900 font-black text-xs border border-ink-200/90 shadow-xs">
                           <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                           <span>{Number(place.rating || 0).toFixed(1)}</span>
                         </div>
-                        <span className="block text-[10px] text-ink-400 mt-0.5">{place.reviewCount || 0} đánh giá</span>
+                        <span className="block text-[10px] text-ink-500 font-semibold mt-0.5">{place.reviewCount || 0} đánh giá</span>
                       </div>
                     </div>
                   ))
@@ -976,15 +998,19 @@ export const AdminDashboardPage = () => {
         {/* RIGHT COLUMN: ACTION REQUIRED & RECENT AUDIT LOGS (4 Cols) */}
         <div className="lg:col-span-4 space-y-6">
           
-          {/* Action Required: Pending Moderation Reports */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-ink-200/60">
-              <div className="flex items-center gap-2 font-display font-black text-base text-ink-800">
-                <span className={`w-2 h-2 rounded-full ${(stats.pendingReports > 0 || pendingReports.length > 0) ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`}></span>
-                <span>Cần kiểm duyệt</span>
+          {/* Action Required: Pending Moderation Reports (ĐỈNH ĐỎ CẢNH BÁO NỔI BẬT) */}
+          <div className="bg-white p-5 sm:p-6 rounded-[8px] border border-rose-200 border-t-[3.5px] border-t-rose-600 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-rose-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-[6px] bg-rose-100 text-rose-700 border border-rose-300 flex items-center justify-center shrink-0">
+                  <ShieldAlert className="w-4 h-4" />
+                </div>
+                <div className="font-display font-black text-base text-rose-950">
+                  Cần kiểm duyệt
+                </div>
               </div>
-              <span className={`px-2 py-0.5 rounded-[4px] font-bold text-xs border ${
-                (stats.pendingReports > 0 || pendingReports.length > 0) ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+              <span className={`px-2.5 py-1 rounded-[4px] font-bold text-xs border ${
+                (stats.pendingReports > 0 || pendingReports.length > 0) ? 'bg-rose-50 text-rose-800 border-rose-300 animate-pulse' : 'bg-emerald-50 text-emerald-800 border-emerald-200'
               }`}>
                 {(stats.pendingReports ?? pendingReports.length) > 0 ? `${stats.pendingReports ?? pendingReports.length} chờ xử lý` : 'Bình thường'}
               </span>
@@ -992,29 +1018,29 @@ export const AdminDashboardPage = () => {
 
             <div className="space-y-3 text-xs">
               {pendingReports.length === 0 ? (
-                <div className="p-5 rounded-[5px] bg-emerald-50/60 border border-emerald-200 text-emerald-800 text-center font-semibold space-y-1">
+                <div className="p-5 rounded-[6px] bg-emerald-50/70 border border-emerald-200 text-emerald-800 text-center font-semibold space-y-1">
                   <CheckCircle2 className="w-5 h-5 mx-auto text-emerald-600 mb-1" />
-                  <div className="font-bold">Hệ thống an toàn</div>
+                  <div className="font-bold text-emerald-900">Hệ thống an toàn</div>
                   <p className="text-[11px] text-emerald-700 font-normal">Không có báo cáo vi phạm chờ duyệt.</p>
                 </div>
               ) : (
                 pendingReports.slice(0, 3).map((r) => (
-                  <div key={r.id} className="p-3 rounded-[5px] bg-rose-50/70 border border-rose-200/80 space-y-1.5">
+                  <div key={r.id} className="p-3.5 rounded-[6px] bg-rose-50/60 border border-rose-200 hover:border-rose-300 transition-colors space-y-1.5 shadow-xs">
                     <div className="flex items-center justify-between text-rose-800 font-bold">
-                      <span className="flex items-center gap-1">
+                      <span className="flex items-center gap-1 text-[11px]">
                         <Flag className="w-3.5 h-3.5 text-rose-600" /> {r.category || 'Vi phạm'}
                       </span>
                       <span className="text-[10px] text-ink-400 font-normal">{r.timeAgo || 'Gần đây'}</span>
                     </div>
-                    <h4 className="font-display font-bold text-ink-800 line-clamp-1">{r.title || 'Bài viết báo cáo'}</h4>
+                    <h4 className="font-display font-bold text-ink-900 line-clamp-1">{r.title || 'Bài viết báo cáo'}</h4>
                     <p className="text-[11px] text-ink-600 line-clamp-1">
                       {r.aiFlagReason || r.reportReason || r.snippet || 'Dấu hiệu vi phạm tiêu chuẩn cộng đồng.'}
                     </p>
                     <div className="flex items-center justify-between pt-1">
-                      <span className="text-[10px] text-ink-500 truncate max-w-[130px]">{r.authorName || 'Ẩn danh'}</span>
+                      <span className="text-[10px] text-ink-500 truncate max-w-[130px] font-medium">{r.authorName || 'Ẩn danh'}</span>
                       <button
                         onClick={() => setAdminTab('reports')}
-                        className="px-2.5 py-0.5 rounded-[4px] bg-rose-700 hover:bg-rose-800 text-white font-bold text-[10px] transition-colors cursor-pointer"
+                        className="px-3 py-1 rounded-[4px] bg-rose-700 hover:bg-rose-800 text-white font-bold text-[10px] shadow-xs transition-colors cursor-pointer"
                       >
                         Kiểm duyệt
                       </button>
@@ -1026,23 +1052,27 @@ export const AdminDashboardPage = () => {
 
             <button
               onClick={() => setAdminTab('reports')}
-              className="w-full pt-1 text-center text-clay-700 hover:text-clay-800 font-bold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
+              className="w-full pt-1 text-center text-rose-700 hover:text-rose-900 font-bold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
             >
               <span>Xem tất cả báo cáo</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
-          {/* Recent Audit Logs Feed */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-ink-200/60">
-              <div className="flex items-center gap-2 font-display font-black text-base text-ink-800">
-                <History className="w-4 h-4 text-clay-600" />
-                <span>Nhật ký hoạt động</span>
+          {/* Recent Audit Logs Feed (ĐỈNH XANH TRỜI ĐỊNH DANH NHẬT KÝ) */}
+          <div className="bg-white p-5 sm:p-6 rounded-[8px] border border-sky-200 border-t-[3.5px] border-t-sky-600 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-sky-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-[6px] bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center shrink-0">
+                  <History className="w-4 h-4" />
+                </div>
+                <div className="font-display font-black text-base text-sky-950">
+                  Nhật ký hoạt động
+                </div>
               </div>
               <button 
                 onClick={() => setAdminTab('audit-logs')}
-                className="text-[11px] text-clay-700 hover:text-clay-800 font-bold hover:underline cursor-pointer"
+                className="text-[11px] text-sky-700 hover:text-sky-900 font-bold hover:underline cursor-pointer"
               >
                 Tất cả →
               </button>
@@ -1057,17 +1087,17 @@ export const AdminDashboardPage = () => {
                 recentLogs.map((logItem) => {
                   const badge = formatActionBadge(logItem.action);
                   return (
-                    <div key={logItem.id} className="p-2.5 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200/60 text-xs space-y-1 hover:bg-[#F8F4EC] transition-colors">
+                    <div key={logItem.id} className="p-2.5 rounded-[6px] bg-[#FAF7F0] border border-ink-200/70 text-xs space-y-1 hover:bg-white hover:border-sky-300 transition-all shadow-xs">
                       <div className="flex items-center justify-between">
                         <span className={`px-1.5 py-0.5 rounded-[3px] font-mono text-[9px] font-bold border ${badge.bg}`}>
                           {badge.label}
                         </span>
-                        <span className="text-[10px] text-ink-400 flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
+                        <span className="text-[10px] text-ink-500 font-medium flex items-center gap-1">
+                          <Clock className="w-3 h-3 text-ink-400" />
                           {logItem.createdAt ? new Date(logItem.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Vừa xong'}
                         </span>
                       </div>
-                      <div className="font-bold text-ink-800 line-clamp-1 text-[11px]">
+                      <div className="font-bold text-ink-900 line-clamp-1 text-[11px]">
                         {logItem.actorName || logItem.actorEmail || 'Hệ thống'}
                       </div>
                       <p className="text-[10px] text-ink-500 line-clamp-1">
@@ -1081,7 +1111,7 @@ export const AdminDashboardPage = () => {
 
             <button
               onClick={() => setAdminTab('audit-logs')}
-              className="w-full pt-1 text-center text-ink-500 hover:text-ink-800 font-bold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
+              className="w-full pt-1 text-center text-sky-700 hover:text-sky-900 font-bold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
             >
               <span>Xem tất cả nhật ký</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -1092,32 +1122,34 @@ export const AdminDashboardPage = () => {
 
       </div>
 
-      {/* ─── ROW 3: CENTRAL DATA TABLE ────────────────────────────────────── */}
-      <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-5">
+      {/* ─── ROW 3: CENTRAL DATA TABLE (PHÂN TÁCH RÕ RÀNG VỚI SEGMENTED PILL TABS) ─── */}
+      <div className="bg-white p-5 sm:p-6 rounded-[8px] border border-ink-200/90 shadow-sm space-y-5">
         
         {/* Table Header & Functional Bar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-ink-200/60">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-3 border-b border-ink-200">
+          {/* Segmented Pill Tabs */}
+          <div className="inline-flex items-center p-1 bg-[#F4EFE6] rounded-[6px] border border-ink-200/90 shrink-0">
             <button
               onClick={() => setActiveTableTab('itineraries')}
-              className={`font-display font-black text-base transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-[5px] font-display font-black text-xs transition-all cursor-pointer ${
                 activeTableTab === 'itineraries' 
-                  ? 'text-clay-700 border-clay-600' 
-                  : 'text-ink-400 border-transparent hover:text-ink-700'
+                  ? 'bg-clay-700 text-white shadow-xs' 
+                  : 'text-ink-600 hover:text-ink-900 hover:bg-white/50'
               }`}
             >
-              Lịch trình ({filteredItineraries.length})
+              <Compass className="w-3.5 h-3.5" />
+              <span>Lịch trình ({filteredItineraries.length})</span>
             </button>
-            <span className="text-ink-200">|</span>
             <button
               onClick={() => setActiveTableTab('users')}
-              className={`font-display font-black text-base transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-[5px] font-display font-black text-xs transition-all cursor-pointer ${
                 activeTableTab === 'users' 
-                  ? 'text-clay-700 border-clay-600' 
-                  : 'text-ink-400 border-transparent hover:text-ink-700'
+                  ? 'bg-clay-700 text-white shadow-xs' 
+                  : 'text-ink-600 hover:text-ink-900 hover:bg-white/50'
               }`}
             >
-              Thành viên ({filteredUsers.length})
+              <Users className="w-3.5 h-3.5" />
+              <span>Thành viên ({filteredUsers.length})</span>
             </button>
           </div>
 
@@ -1130,7 +1162,7 @@ export const AdminDashboardPage = () => {
                 placeholder={activeTableTab === 'itineraries' ? "Tìm theo tên, điểm đến, tác giả..." : "Tìm tên, email thành viên..."}
                 value={tableSearch}
                 onChange={(e) => setTableSearch(e.target.value)}
-                className="pl-8 pr-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs text-ink-800 placeholder:text-ink-300 outline-none focus:border-clay-600 w-full transition-all"
+                className="pl-8 pr-3 py-1.5 bg-[#FAF7F0] border border-ink-200 rounded-[5px] text-xs text-ink-900 placeholder:text-ink-400 outline-none focus:border-clay-600 focus:bg-white w-full transition-all"
               />
             </div>
 
@@ -1139,7 +1171,7 @@ export const AdminDashboardPage = () => {
               <select
                 value={tableStatusFilter}
                 onChange={(e) => setTableStatusFilter(e.target.value)}
-                className="flex-1 sm:flex-none px-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs font-bold text-ink-700 outline-none cursor-pointer hover:bg-[#F8F4EC]/80 transition-colors"
+                className="flex-1 sm:flex-none px-3 py-1.5 bg-[#FAF7F0] border border-ink-200 rounded-[5px] text-xs font-bold text-ink-800 outline-none cursor-pointer hover:bg-white transition-colors"
               >
                 {activeTableTab === 'itineraries' ? (
                   <>
@@ -1161,7 +1193,7 @@ export const AdminDashboardPage = () => {
               <button 
                 onClick={() => loadDashboardData(true)}
                 disabled={refreshing}
-                className="p-2 rounded-[5px] bg-[#FFFDF8] border border-ink-200/80 text-ink-600 hover:text-clay-700 hover:bg-[#F8F4EC] transition-colors cursor-pointer disabled:opacity-50 shrink-0" 
+                className="p-2 rounded-[5px] bg-[#FAF7F0] border border-ink-200 text-ink-700 hover:text-clay-700 hover:bg-white transition-colors cursor-pointer disabled:opacity-50 shrink-0 shadow-xs" 
                 title="Làm mới bảng"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-clay-600' : ''}`} />
@@ -1171,11 +1203,11 @@ export const AdminDashboardPage = () => {
         </div>
 
         {/* Data Table Container */}
-        <div className="overflow-x-auto rounded-[5px] border border-ink-200/80">
+        <div className="overflow-x-auto rounded-[6px] border border-ink-200 shadow-xs">
           {activeTableTab === 'itineraries' ? (
             /* ITINERARIES TABLE */
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F4EC] text-ink-600 font-bold border-b border-ink-200/80 uppercase text-[11px] tracking-wider">
+              <thead className="bg-[#F4EFE6] text-ink-800 font-display font-black border-b-2 border-ink-300 uppercase text-[11px] tracking-wider">
                 <tr>
                   <th className="py-3 px-4">Mã</th>
                   <th className="py-3 px-4">Lịch trình</th>
@@ -1186,7 +1218,7 @@ export const AdminDashboardPage = () => {
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ink-200/60 bg-[#FFFDF8]">
+              <tbody className="divide-y divide-ink-100 bg-white">
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-ink-400">
@@ -1202,12 +1234,12 @@ export const AdminDashboardPage = () => {
                   </tr>
                 ) : (
                   paginatedRecords.map((row) => (
-                    <tr key={row.id} className="hover:bg-[#F8F4EC]/50 transition-colors">
-                      <td className="py-3 px-4 font-mono font-bold text-clay-700">#{row.id}</td>
+                    <tr key={row.id} className="hover:bg-amber-50/50 transition-colors">
+                      <td className="py-3.5 px-4 font-mono font-bold text-clay-700">#{row.id}</td>
 
-                      <td className="py-3 px-4 max-w-xs">
-                        <div className="font-display font-bold text-ink-800 truncate">{row.title}</div>
-                        <span className="text-ink-400 text-[11px] flex items-center gap-1">
+                      <td className="py-3.5 px-4 max-w-xs">
+                        <div className="font-display font-bold text-ink-900 truncate">{row.title}</div>
+                        <span className="text-ink-500 text-[11px] flex items-center gap-1 mt-0.5">
                           {row.isAiGenerated ? (
                             <span className="text-clay-600 font-bold flex items-center gap-0.5">
                               <Sparkles className="w-2.5 h-2.5" /> WanderAI
@@ -1219,7 +1251,7 @@ export const AdminDashboardPage = () => {
                         </span>
                       </td>
 
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2">
                           {row.creatorAvatar ? (
                             <img 
@@ -1227,41 +1259,41 @@ export const AdminDashboardPage = () => {
                               alt="" 
                               crossOrigin="anonymous" 
                               referrerPolicy="no-referrer" 
-                              className="w-6 h-6 rounded-full object-cover shrink-0 border border-ink-200/80" 
+                              className="w-6 h-6 rounded-full object-cover shrink-0 border border-ink-200" 
                             />
                           ) : (
-                            <div className="w-6 h-6 rounded-full bg-clay-700 text-[#FFFDF8] font-bold text-[10px] flex items-center justify-center shrink-0">
+                            <div className="w-6 h-6 rounded-full bg-clay-700 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
                               {row.creatorName ? row.creatorName.charAt(0) : 'U'}
                             </div>
                           )}
-                          <span className="font-bold text-ink-800 truncate max-w-[130px]">{row.creatorName || 'Người dùng'}</span>
+                          <span className="font-bold text-ink-900 truncate max-w-[130px]">{row.creatorName || 'Người dùng'}</span>
                         </div>
                       </td>
 
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-1 text-ink-800 font-medium">
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center gap-1 text-ink-900 font-semibold">
                           <MapPin className="w-3.5 h-3.5 text-clay-600 shrink-0" />
                           <span className="truncate">{row.destination || 'Chưa cập nhật'}</span>
                         </div>
                       </td>
 
-                      <td className="py-3 px-4 font-bold text-ink-800">
+                      <td className="py-3.5 px-4 font-black text-ink-900">
                         {row.budgetTotal ? Number(row.budgetTotal).toLocaleString('vi-VN') + ' đ' : 'Chưa nhập'}
                       </td>
 
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-4">
                         {(() => {
                           const st = getItineraryTimelineStatus(row);
                           return (
                             <div className="space-y-0.5">
                               <span 
-                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${st.badgeClass}`} 
+                                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] text-[10px] font-bold border ${st.badgeClass}`} 
                               >
                                 <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                                 {st.label}
                               </span>
                               {row.startDate && (
-                                <div className="text-[10px] text-ink-400 font-mono flex items-center gap-1">
+                                <div className="text-[10px] text-ink-500 font-mono flex items-center gap-1 font-medium">
                                   <Calendar className="w-2.5 h-2.5 text-ink-400 shrink-0" />
                                   <span>{row.startDate}</span>
                                 </div>
@@ -1271,11 +1303,11 @@ export const AdminDashboardPage = () => {
                         })()}
                       </td>
 
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1 text-ink-400">
+                      <td className="py-3.5 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
                           <button 
                             onClick={() => setSelectedItinerary(row)}
-                            className="p-1.5 hover:text-clay-700 hover:bg-clay-50 rounded-[4px] transition-colors cursor-pointer" 
+                            className="p-1.5 hover:text-clay-800 hover:bg-clay-100 rounded-[4px] transition-colors cursor-pointer text-ink-500" 
                             title="Xem chi tiết"
                           >
                             <Eye className="w-4 h-4" />
@@ -1290,7 +1322,7 @@ export const AdminDashboardPage = () => {
           ) : (
             /* USERS TABLE */
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F4EC] text-ink-600 font-bold border-b border-ink-200/80 uppercase text-[11px] tracking-wider">
+              <thead className="bg-[#F4EFE6] text-ink-800 font-display font-black border-b-2 border-ink-300 uppercase text-[11px] tracking-wider">
                 <tr>
                   <th className="py-3 px-4">Mã</th>
                   <th className="py-3 px-4">Thành viên</th>
@@ -1301,7 +1333,7 @@ export const AdminDashboardPage = () => {
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ink-200/60 bg-[#FFFDF8]">
+              <tbody className="divide-y divide-ink-100 bg-white">
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-ink-400">
@@ -1317,10 +1349,10 @@ export const AdminDashboardPage = () => {
                   </tr>
                 ) : (
                   paginatedRecords.map((user) => (
-                    <tr key={user.id} className="hover:bg-[#F8F4EC]/50 transition-colors">
-                      <td className="py-3 px-4 font-mono font-bold text-clay-700">#{user.id}</td>
+                    <tr key={user.id} className="hover:bg-amber-50/50 transition-colors">
+                      <td className="py-3.5 px-4 font-mono font-bold text-clay-700">#{user.id}</td>
 
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2">
                           {user.avatar ? (
                             <img 
@@ -1328,46 +1360,46 @@ export const AdminDashboardPage = () => {
                               alt="" 
                               crossOrigin="anonymous" 
                               referrerPolicy="no-referrer" 
-                              className="w-7 h-7 rounded-full object-cover shrink-0 border border-ink-200/80" 
+                              className="w-7 h-7 rounded-full object-cover shrink-0 border border-ink-200" 
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded-full bg-ink-800 text-[#FFFDF8] font-bold text-[10px] flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-ink-800 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
                               {(user.name || user.fullName || 'U').charAt(0).toUpperCase()}
                             </div>
                           )}
-                          <span className="font-bold text-ink-800">{user.name || user.fullName || 'Thành viên'}</span>
+                          <span className="font-bold text-ink-900">{user.name || user.fullName || 'Thành viên'}</span>
                         </div>
                       </td>
 
-                      <td className="py-3 px-4 text-ink-600 font-mono text-[11px]">{user.email}</td>
+                      <td className="py-3.5 px-4 text-ink-600 font-mono text-[11px]">{user.email}</td>
 
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-4">
                         {(() => {
                           const isAdmin = (user.roles && user.roles.includes('ROLE_ADMIN')) || user.role === 'ROLE_ADMIN' || user.role === 'ADMIN';
                           const isMod = (user.roles && user.roles.includes('ROLE_MODERATOR')) || user.role === 'ROLE_MODERATOR';
                           if (isAdmin) {
                             return (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-bold border bg-amber-50 text-amber-900 border-amber-300">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[4px] text-[10px] font-black border bg-amber-50 text-amber-900 border-amber-300">
                                 ADMIN
                               </span>
                             );
                           }
                           if (isMod) {
                             return (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-bold border bg-clay-50 text-clay-800 border-clay-300">
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[4px] text-[10px] font-black border bg-clay-50 text-clay-800 border-clay-300">
                                 MODERATOR
                               </span>
                             );
                           }
                           return (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-bold border bg-[#F8F4EC] text-ink-700 border-ink-200">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-[4px] text-[10px] font-bold border bg-[#FAF7F0] text-ink-700 border-ink-200">
                               USER
                             </span>
                           );
                         })()}
                       </td>
 
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-4">
                         <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] text-[10px] font-bold border ${
                           user.isBlocked
                             ? 'bg-rose-50 text-rose-800 border-rose-200'
@@ -1378,14 +1410,14 @@ export const AdminDashboardPage = () => {
                         </span>
                       </td>
 
-                      <td className="py-3 px-4 text-ink-500 text-[11px]">
+                      <td className="py-3.5 px-4 text-ink-500 font-medium text-[11px]">
                         {user.createdAt ? formatVietnamDateOnly(user.createdAt, 'Mới tham gia') : 'Mới tham gia'}
                       </td>
 
-                      <td className="py-3 px-4 text-right">
+                      <td className="py-3.5 px-4 text-right">
                         <button
                           onClick={() => setAdminTab('users')}
-                          className="px-2.5 py-1 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-ink-700 hover:text-clay-700 font-bold text-[11px] border border-ink-200/80 transition-colors cursor-pointer"
+                          className="px-3 py-1 rounded-[5px] bg-[#FAF7F0] hover:bg-clay-100 text-ink-800 hover:text-clay-800 font-bold text-[11px] border border-ink-200 transition-colors cursor-pointer shadow-xs"
                         >
                           Quản lý
                         </button>
@@ -1400,25 +1432,25 @@ export const AdminDashboardPage = () => {
 
         {/* Pagination Bar */}
         {totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-ink-500">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-xs text-ink-500 font-medium">
             <span className="text-center sm:text-left">
-              Hiển thị {(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, currentRecords.length)} trong số {currentRecords.length} kết quả
+              Hiển thị <strong className="text-ink-900">{(currentPage - 1) * pageSize + 1} - {Math.min(currentPage * pageSize, currentRecords.length)}</strong> trong số <strong className="text-ink-900">{currentRecords.length}</strong> kết quả
             </span>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="p-1.5 rounded-[5px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-[#F8F4EC] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-ink-700"
+                className="p-1.5 rounded-[5px] border border-ink-200 bg-white hover:bg-clay-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-ink-700 shadow-xs"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="px-3 py-1 font-bold text-ink-800">
-                Trang {currentPage} / {totalPages}
+              <span className="px-3 py-1 rounded-[5px] bg-clay-700 text-white font-mono font-bold text-xs shadow-xs">
+                {currentPage} / {totalPages}
               </span>
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="p-1.5 rounded-[5px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-[#F8F4EC] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-ink-700"
+                className="p-1.5 rounded-[5px] border border-ink-200 bg-white hover:bg-clay-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-ink-700 shadow-xs"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -1430,64 +1462,64 @@ export const AdminDashboardPage = () => {
 
       {/* ─── QUICK VIEW ITINERARY MODAL ────────────────────────────────────── */}
       {selectedItinerary && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
-          <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 border border-ink-200 shadow-xl space-y-4">
-            <div className="flex items-start justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-200">
+          <div className="bg-white rounded-[8px] max-w-lg w-full p-6 border border-ink-200 shadow-2xl space-y-4">
+            <div className="flex items-start justify-between pb-2 border-b border-ink-100">
               <div>
-                <span className="text-[11px] font-bold text-clay-700 uppercase tracking-wider block">
+                <span className="text-[11px] font-mono font-bold text-clay-700 uppercase tracking-wider block">
                   #ITN-{selectedItinerary.id}
                 </span>
-                <h3 className="font-display font-black text-xl text-ink-800 mt-0.5">
+                <h3 className="font-display font-black text-xl text-ink-900 mt-0.5">
                   {selectedItinerary.title}
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedItinerary(null)}
-                className="p-1.5 rounded-[5px] hover:bg-[#F8F4EC] text-ink-400 hover:text-ink-700 transition-colors cursor-pointer"
+                className="p-1.5 rounded-[5px] hover:bg-[#FAF7F0] text-ink-400 hover:text-ink-800 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-3 py-2 text-xs border-y border-ink-200/60">
-              <div className="flex justify-between py-1">
-                <span className="text-ink-400">Điểm đến:</span>
-                <strong className="text-ink-800 font-bold flex items-center gap-1">
+            <div className="space-y-3 py-2 text-xs divide-y divide-ink-100">
+              <div className="flex justify-between py-1.5">
+                <span className="text-ink-500 font-medium">Điểm đến:</span>
+                <strong className="text-ink-900 font-bold flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-clay-600" />
                   {selectedItinerary.destination || 'Chưa cập nhật'}
                 </strong>
               </div>
-              <div className="flex justify-between py-1">
-                <span className="text-ink-400">Tác giả:</span>
-                <strong className="text-ink-800 font-bold">{selectedItinerary.creatorName || selectedItinerary.userFullName || 'Người dùng'}</strong>
+              <div className="flex justify-between py-1.5">
+                <span className="text-ink-500 font-medium">Tác giả:</span>
+                <strong className="text-ink-900 font-bold">{selectedItinerary.creatorName || selectedItinerary.userFullName || 'Người dùng'}</strong>
               </div>
-              <div className="flex justify-between py-1">
-                <span className="text-ink-400">Thời lượng:</span>
-                <strong className="text-ink-800 font-bold">{getItineraryDuration(selectedItinerary).label}</strong>
+              <div className="flex justify-between py-1.5">
+                <span className="text-ink-500 font-medium">Thời lượng:</span>
+                <strong className="text-ink-900 font-bold">{getItineraryDuration(selectedItinerary).label}</strong>
               </div>
-              <div className="flex justify-between py-1">
-                <span className="text-ink-400">Khởi hành:</span>
-                <span className="font-mono font-bold text-ink-800 flex items-center gap-1">
+              <div className="flex justify-between py-1.5">
+                <span className="text-ink-500 font-medium">Khởi hành:</span>
+                <span className="font-mono font-bold text-ink-900 flex items-center gap-1">
                   <Calendar className="w-3.5 h-3.5 text-clay-600" />
                   {selectedItinerary.startDate ? `${selectedItinerary.startDate} ${selectedItinerary.endDate ? '➜ ' + selectedItinerary.endDate : ''}` : 'Chưa định ngày cụ thể'}
                 </span>
               </div>
-              <div className="flex justify-between py-1">
-                <span className="text-ink-400">Ngân sách dự kiến:</span>
+              <div className="flex justify-between py-1.5">
+                <span className="text-ink-500 font-medium">Ngân sách dự kiến:</span>
                 <strong className="text-clay-700 font-display font-black text-sm">
                   {selectedItinerary.budgetTotal ? Number(selectedItinerary.budgetTotal).toLocaleString('vi-VN') + ' đ' : 'Chưa nhập'}
                 </strong>
               </div>
-              <div className="flex justify-between py-1">
-                <span className="text-ink-400">Hình thức tạo:</span>
+              <div className="flex justify-between py-1.5">
+                <span className="text-ink-500 font-medium">Hình thức tạo:</span>
                 <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${
-                  selectedItinerary.isAiGenerated ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-ink-100 text-ink-700 border-ink-200'
+                  selectedItinerary.isAiGenerated ? 'bg-amber-50 text-amber-900 border-amber-300' : 'bg-[#FAF7F0] text-ink-700 border-ink-200'
                 }`}>
                   {selectedItinerary.isAiGenerated ? 'WanderAI' : 'Tự tạo'}
                 </span>
               </div>
-              <div className="flex justify-between py-1">
-                <span className="text-ink-400">Trạng thái:</span>
+              <div className="flex justify-between py-1.5">
+                <span className="text-ink-500 font-medium">Trạng thái:</span>
                 <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${
                   (selectedItinerary.status || 'ACTIVE') === 'ACTIVE' 
                     ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
@@ -1496,8 +1528,8 @@ export const AdminDashboardPage = () => {
                   {selectedItinerary.status || 'ACTIVE'}
                 </span>
               </div>
-              <div className="flex justify-between py-1">
-                <span className="text-ink-400">Tiến độ:</span>
+              <div className="flex justify-between py-1.5">
+                <span className="text-ink-500 font-medium">Tiến độ:</span>
                 {(() => {
                   const st = getItineraryTimelineStatus(selectedItinerary);
                   return (
@@ -1509,12 +1541,12 @@ export const AdminDashboardPage = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between gap-2 pt-2">
+            <div className="flex items-center justify-between gap-2 pt-2 border-t border-ink-100">
               <a
                 href={`/itinerary/${selectedItinerary.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-2 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-ink-700 hover:text-clay-700 font-bold text-xs border border-ink-200/80 transition-colors cursor-pointer flex items-center gap-1.5"
+                className="px-3.5 py-2 rounded-[5px] bg-[#FAF7F0] hover:bg-clay-50 text-ink-800 hover:text-clay-800 font-bold text-xs border border-ink-200 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
                 title="Mở xem trang chi tiết"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -1524,13 +1556,13 @@ export const AdminDashboardPage = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setSelectedItinerary(null)}
-                  className="px-4 py-2 rounded-[5px] bg-[#F8F4EC] hover:bg-ink-100 text-ink-700 font-bold text-xs border border-ink-200/80 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-[5px] bg-[#FAF7F0] hover:bg-ink-100 text-ink-700 font-bold text-xs border border-ink-200 transition-colors cursor-pointer"
                 >
                   Đóng
                 </button>
                 <button
                   onClick={() => handleExportSingleItinerary(selectedItinerary)}
-                  className="px-4 py-2 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
+                  className="px-4 py-2 rounded-[5px] bg-clay-700 hover:bg-clay-800 text-white font-bold text-xs transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs"
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Xuất CSV</span>
