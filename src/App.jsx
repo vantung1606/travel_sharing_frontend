@@ -269,7 +269,7 @@ const AppContent = () => {
       ) : (
         /* ADMIN PORTAL SECURED LAYOUT */
         <AdminRouteGuard>
-          <div className="min-h-screen bg-[#ECE5D8]">
+          <div className="min-h-screen bg-[#F7F5EE]">
             {/* Fixed Sidebar */}
             <div className="hidden md:block">
               <AdminSidebar />
@@ -286,7 +286,7 @@ const AppContent = () => {
                   <span>⚠️ CHẾ ĐỘ BẢO TRÌ ĐANG BẬT: Khách du lịch đang bị chặn truy cập và đếm ngược. Bạn đang quản trị với tư cách Quản Trị Viên.</span>
                 </div>
               )}
-              <main className="min-w-0 p-4 sm:p-6 lg:p-8 bg-[#ECE5D8] min-h-[calc(100vh-64px)]">
+              <main className="min-w-0 p-4 sm:p-6 lg:p-8 bg-[#F7F5EE] min-h-[calc(100vh-64px)]">
                 {/* Admin Page Transition Wrapper */}
                 <div key={location.pathname} className="animate-page-enter min-w-0">
                   <Suspense fallback={<RouteLoadingFallback />}>
