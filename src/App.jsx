@@ -167,7 +167,7 @@ const AppContent = () => {
   }, []);
 
   const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
-  const isAdminUser = isLoggedIn && (roles.includes('ROLE_ADMIN') || (currentUser?.email && currentUser.email.toLowerCase().includes('admin')));
+  const isAdminUser = isLoggedIn && roles.includes('ROLE_ADMIN');
   const isMaintenanceActive = maintenanceConfig?.enabled === true;
 
   // Tự động cuộn mượt lên đầu trang mỗi khi chuyển đổi giữa các trang
@@ -246,6 +246,14 @@ const AppContent = () => {
                   path="/profile" 
                   element={
                     <UserAuthGuard title="Trang Hồ sơ cá nhân">
+                      <ProfilePage />
+                    </UserAuthGuard>
+                  } 
+                />
+                <Route 
+                  path="/profile/:userId" 
+                  element={
+                    <UserAuthGuard title="Trang Hồ sơ người dùng">
                       <ProfilePage />
                     </UserAuthGuard>
                   } 

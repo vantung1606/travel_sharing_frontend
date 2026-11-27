@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useApp } from '../../../context/AppContext';
 import { userApi, itineraryApi, uploadApi } from '../../../services/api';
 import { FollowListModal } from '../../../components/community/FollowListModal';
@@ -17,6 +17,7 @@ import { formatDisplayDateTime } from '../../../utils/dateUtils';
 
 export const ProfilePage = () => {
   const navigate = useNavigate();
+  const { userId: routeUserId } = useParams();
   const { currentUser, updateCurrentUser, itineraries, posts, destinations, savedPlaces = [], toggleSavePlace = () => {}, setIsAIGeneratorOpen, setUserTab, setItineraries, isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
   const toast = useToast();
 
@@ -1663,12 +1664,16 @@ export const ProfilePage = () => {
       )}
 
       {/* User Profile Modal (Xem thông tin trang cá nhân người khác) */}
-      {selectedUserIdForModal && (
+      {(selectedUserIdForModal || (routeUserId && String(routeUserId) !== String(currentUser?.id))) && (
         <UserProfileModal
-          userId={selectedUserIdForModal}
-          onClose={() => setSelectedUserIdForModal(null)}
+          userId={selectedUserIdForModal || Number(routeUserId) || routeUserId}
+          onClose={() => {
+            setSelectedUserIdForModal(null);
+            if (routeUserId) navigate('/profile', { replace: true });
+          }}
           onSelectItinerary={(itin) => {
             setSelectedUserIdForModal(null);
+            if (routeUserId) navigate('/profile', { replace: true });
             setSelectedItineraryForModal(itin);
           }}
         />

@@ -2222,7 +2222,7 @@ export const MessagesPage = () => {
                               content={msg.content}
                               isMe={isMe}
                               onViewItinerary={(itinData) => {
-                                navigate(`/itinerary?id=${itinData.id || ''}`);
+                                navigate(`/itineraries?id=${itinData.id || ''}`);
                               }}
                             />
                           ) : msg.messageType === 'AI_RICH' || (!isMe && (currentThreadObj?.type === 'AI' || msg.senderEmail === 'assistant@wayfare.com') && msg.messageType === 'TEXT') ? (

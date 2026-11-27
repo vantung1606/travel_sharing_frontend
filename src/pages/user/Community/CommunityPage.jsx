@@ -574,7 +574,7 @@ export const CommunityPage = () => {
     if (found) {
       setSelectedPostForDetail(found);
     } else {
-      postApi.getById(targetPostId, currentUser?.email)
+      postApi.getPostById(targetPostId, currentUser?.email)
         .then(data => {
           if (data) setSelectedPostForDetail(data);
         })

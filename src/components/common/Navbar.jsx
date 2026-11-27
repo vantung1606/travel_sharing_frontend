@@ -57,7 +57,7 @@ export const Navbar = () => {
 
   // RBAC checks for Navbar
   const userRoles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
-  const isAdmin = isLoggedIn && (userRoles.includes('ROLE_ADMIN') || (currentUser?.email && currentUser.email.toLowerCase().includes('admin')));
+  const isAdmin = isLoggedIn && userRoles.includes('ROLE_ADMIN');
   const isModerator = isLoggedIn && !isAdmin && userRoles.includes('ROLE_MODERATOR');
   const isStaff = isAdmin || isModerator;
 

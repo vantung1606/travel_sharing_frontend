@@ -55,6 +55,7 @@ export const NotificationsPage = () => {
   const [isTestDispatcherOpen, setIsTestDispatcherOpen] = useState(false);
   const [dispatchMode, setDispatchMode] = useState('test'); // 'test' | 'broadcast'
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const isAdmin = Array.isArray(currentUser?.roles) && currentUser.roles.includes('ROLE_ADMIN');
 
   // Test Notification Form States
   const [testType, setTestType] = useState('AI_READY');
@@ -454,14 +455,16 @@ export const NotificationsPage = () => {
             <RotateCcw className={`w-3.5 h-3.5 text-clay-600 ${isRefreshing ? 'animate-spin' : ''}`} />
           </button>
 
-          <button
-            type="button"
-            onClick={() => setIsTestDispatcherOpen(!isTestDispatcherOpen)}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[5px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-[#F3EFE6] text-ink-700 font-serif font-bold text-xs transition-colors shadow-xs cursor-pointer"
-          >
-            <PlusCircle className="w-3.5 h-3.5 text-clay-600" />
-            <span>Phát tin / Thử nghiệm</span>
-          </button>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => setIsTestDispatcherOpen(!isTestDispatcherOpen)}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[5px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-[#F3EFE6] text-ink-700 font-serif font-bold text-xs transition-colors shadow-xs cursor-pointer"
+            >
+              <PlusCircle className="w-3.5 h-3.5 text-clay-600" />
+              <span>Phát tin / Thử nghiệm</span>
+            </button>
+          )}
 
           {unreadNotificationsCount > 0 && (
             <button
@@ -486,7 +489,7 @@ export const NotificationsPage = () => {
       </div>
 
       {/* ─── 2. LIVE PUSH / DISPATCHER CARD ────────────────────────────────────── */}
-      {isTestDispatcherOpen && (
+      {isAdmin && isTestDispatcherOpen && (
         <div className="bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 shadow-xs animate-in fade-in slide-in-from-top-2 duration-150 space-y-4">
           <div className="flex items-center justify-between border-b border-ink-200/80 pb-3">
             <div className="flex items-center gap-2.5">

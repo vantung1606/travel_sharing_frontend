@@ -69,8 +69,8 @@ export const AdminRouteGuard = ({ children }) => {
   const location = useLocation();
 
   const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
-  const isAdmin = isLoggedIn && (roles.includes('ROLE_ADMIN') || (currentUser?.email && currentUser.email.toLowerCase().includes('admin')));
-  const isModerator = isLoggedIn && !isAdmin && (roles.includes('ROLE_MODERATOR') || (currentUser?.email && (currentUser.email.toLowerCase().includes('mod') || currentUser.email.toLowerCase().includes('manager'))));
+  const isAdmin = isLoggedIn && roles.includes('ROLE_ADMIN');
+  const isModerator = isLoggedIn && !isAdmin && roles.includes('ROLE_MODERATOR');
 
   const rawPermissions = Array.isArray(currentUser?.permissions) ? currentUser.permissions : [];
   const permissions = rawPermissions.length > 0 

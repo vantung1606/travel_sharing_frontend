@@ -989,7 +989,7 @@ export const FloatingChatWidget = () => {
                               isMe={isMe}
                               onViewItinerary={(itinData) => {
                                 setIsOpen(false);
-                                navigate(`/itinerary?id=${itinData.id || ''}`);
+                                navigate(`/itineraries?id=${itinData.id || ''}`);
                               }}
                             />
                           ) : (

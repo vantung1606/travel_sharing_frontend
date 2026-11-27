@@ -89,7 +89,7 @@ export const PlaceDetailModal = ({
 
   const handleSaveEdit = async (reviewId) => {
     if (!editComment.trim()) {
-      toast.warn('Nội dung nhận xét không được để trống!');
+      toast.showWarning('Nội dung nhận xét không được để trống!');
       return;
     }
     setIsUpdatingReview(true);

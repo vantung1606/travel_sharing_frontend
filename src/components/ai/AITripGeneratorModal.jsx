@@ -328,20 +328,24 @@ export const AITripGeneratorModal = () => {
 
   // Handle Duration Change
   const handleSelectDuration = (count) => {
-    setDaysCount(count);
+    const base = startDate ? new Date(startDate) : new Date(defaultStartDate);
+    if (!Number.isNaN(base.getTime())) {
+      const end = new Date(base);
+      end.setDate(end.getDate() + Math.max(1, Number(count) || 1) - 1);
+      setEndDate(end.toISOString().split('T')[0]);
+    }
   };
 
   // Reset Form
   const handleReset = () => {
     setDestination('Đà Nẵng - Hội An, Việt Nam');
-    setDaysCount(3);
     setStartDate(defaultStartDate);
+    setEndDate(defaultEndDate);
     setCompanion('couple');
     setTransit('taxi');
     setBudgetTier(2);
     setIncludeFlight(true);
     setSelectedInterests(['checkin', 'food', 'culture']);
-    setPacing('balanced');
     setAccommodation('Khách sạn 3 sao tiện nghi, trung tâm');
     setDiningStyle('Quán ăn bản địa chuẩn vị & nổi tiếng');
     setCustomPrompt('');

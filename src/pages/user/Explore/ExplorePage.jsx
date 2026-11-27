@@ -459,11 +459,11 @@ export const ExplorePage = () => {
       )
     );
     if (hasReviewed) {
-      toast.warn('Bạn đã đánh giá địa điểm này rồi! Mỗi tài khoản chỉ được đánh giá 1 lần duy nhất.');
+      toast.showWarning('Bạn đã đánh giá địa điểm này rồi! Mỗi tài khoản chỉ được đánh giá 1 lần duy nhất.');
       return;
     }
     if (!reviewComment.trim()) {
-      toast.warn('Vui lòng viết đôi lời nhận xét về địa điểm này!');
+      toast.showWarning('Vui lòng viết đôi lời nhận xét về địa điểm này!');
       return;
     }
     setIsSubmittingReview(true);

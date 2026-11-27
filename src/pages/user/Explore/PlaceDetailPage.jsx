@@ -963,7 +963,7 @@ export const PlaceDetailPage = () => {
         onAddToTrip={handleAddToTrip}
         onCreateNewTripWithItem={() => {
           setIsAddToTripModalOpen(false);
-          navigate('/itinerary');
+          navigate('/itineraries');
         }}
       />
 

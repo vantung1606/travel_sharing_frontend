@@ -450,7 +450,7 @@ export const AppProvider = ({ children }) => {
         const parsed = JSON.parse(stored);
         if (parsed && (parsed.id || parsed.email || parsed.token)) {
           const uRoles = Array.isArray(parsed.roles) ? parsed.roles : [];
-          const isMod = uRoles.includes('ROLE_MODERATOR') || (parsed.email && (parsed.email.toLowerCase().includes('mod') || parsed.email.toLowerCase().includes('manager')));
+          const isMod = uRoles.includes('ROLE_MODERATOR');
           if (isMod && (!Array.isArray(parsed.permissions) || parsed.permissions.length === 0)) {
             parsed.permissions = DEFAULT_MODERATOR_PERMISSIONS;
           }
@@ -499,10 +499,16 @@ export const AppProvider = ({ children }) => {
       localStorage.removeItem('wayfare_user');
       localStorage.removeItem('wayfare_auth');
       localStorage.removeItem('wayfare_portal_mode');
+      localStorage.removeItem('wayfare_saved_places');
       localStorage.removeItem('token');
+      sessionStorage.removeItem('wayfare_my_itineraries_cache');
+      sessionStorage.removeItem('wayfare_community_posts_cache');
     } catch {
       // Clean storage safely
     }
+    setSavedPlaces([]);
+    setItineraries([]);
+    setNotifications([]);
 
     // 2. KHỞI TẠO USER MỚI HOÀN TOÀN ĐỘC LẬP TỪ DỮ LIỆU BACKEND
     const rawEmail = userData.email ? String(userData.email).trim() : '';
@@ -526,7 +532,7 @@ export const AppProvider = ({ children }) => {
         : ['ROLE_USER'],
       permissions: Array.isArray(userData.permissions) && userData.permissions.length > 0
         ? userData.permissions
-        : ((Array.isArray(userData.roles) && userData.roles.includes('ROLE_MODERATOR')) || (rawEmail && (rawEmail.toLowerCase().includes('mod') || rawEmail.toLowerCase().includes('manager')))
+        : (Array.isArray(userData.roles) && userData.roles.includes('ROLE_MODERATOR')
             ? DEFAULT_MODERATOR_PERMISSIONS
             : [])
     };
@@ -550,13 +556,20 @@ export const AppProvider = ({ children }) => {
     }
     setIsLoggedIn(false);
     setCurrentUser(GUEST_USER);
+    setSavedPlaces([]);
+    setItineraries([]);
+    setNotifications([]);
+    setUnreadMessagesCount(0);
     setPortalMode('user');
     setUserTab('home');
     try {
       localStorage.removeItem('wayfare_auth');
       localStorage.removeItem('wayfare_user');
       localStorage.removeItem('wayfare_portal_mode');
+      localStorage.removeItem('wayfare_saved_places');
       localStorage.removeItem('token');
+      sessionStorage.removeItem('wayfare_my_itineraries_cache');
+      sessionStorage.removeItem('wayfare_community_posts_cache');
     } catch {
       // Ignore localStorage error
     }
@@ -581,12 +594,20 @@ export const AppProvider = ({ children }) => {
     const onUnauthorized = () => {
       setIsLoggedIn(false);
       setCurrentUser(GUEST_USER);
+      setSavedPlaces([]);
+      setItineraries([]);
+      setNotifications([]);
+      setUnreadMessagesCount(0);
       setPortalMode('user');
       setUserTab('home');
       try {
         localStorage.removeItem('wayfare_auth');
         localStorage.removeItem('wayfare_user');
+        localStorage.removeItem('wayfare_portal_mode');
+        localStorage.removeItem('wayfare_saved_places');
         localStorage.removeItem('token');
+        sessionStorage.removeItem('wayfare_my_itineraries_cache');
+        sessionStorage.removeItem('wayfare_community_posts_cache');
       } catch {}
       setAuthMode('login');
       setIsAuthModalOpen(true);
@@ -1215,6 +1236,7 @@ export const AppProvider = ({ children }) => {
         addNewPlace,
         posts,
         itineraries,
+        setItineraries,
         pendingPlaces,
         users,
         reports,

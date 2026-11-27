@@ -212,6 +212,14 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
   };
 
   // Action: Print / Save to PDF via styled printable window
+  const escapeHtml = (value) =>
+    String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
   const handlePrintPDF = () => {
     setIsExporting(true);
     toast.info('Đang chuẩn bị bản in / PDF chuẩn A4 sắc nét...');
@@ -223,12 +231,16 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
       return;
     }
 
+    const safeTitle = escapeHtml(title);
+    const safeDestination = escapeHtml(destination);
+    const safeDuration = escapeHtml(duration);
+
     const htmlContent = `
       <!DOCTYPE html>
       <html lang="vi">
       <head>
         <meta charset="UTF-8">
-        <title>Cẩm nang Hành trình - ${title} - Wayfare</title>
+        <title>Cẩm nang Hành trình - ${safeTitle} - Wayfare</title>
         <style>
           @page {
             size: A4;
@@ -390,10 +402,10 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
         </div>
 
         <div class="title-section">
-          <h1 class="main-title">${title}</h1>
+          <h1 class="main-title">${safeTitle}</h1>
           <div class="meta-grid">
-            <div class="meta-item">📍 Điểm đến: <strong>${destination}</strong></div>
-            <div class="meta-item">⏱️ Thời lượng: <strong>${duration}</strong></div>
+            <div class="meta-item">📍 Điểm đến: <strong>${safeDestination}</strong></div>
+            <div class="meta-item">⏱️ Thời lượng: <strong>${safeDuration}</strong></div>
             ${includeBudget ? `<div class="meta-item">💰 Ngân sách: <strong>~${Number(budgetPerPerson).toLocaleString('vi-VN')} đ/người</strong> (Tổng: ${Number(totalBudget).toLocaleString('vi-VN')} đ)</div>` : ''}
             <div class="meta-item">✨ Phân loại: <strong>Lộ trình WanderAI Tối Ưu</strong></div>
           </div>
@@ -402,16 +414,16 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
         <!-- DAYS ITINERARY -->
         ${days.map((d, dIdx) => `
           <div class="day-card">
-            <div class="day-header">${d.title || `Ngày ${dIdx + 1}: Lộ trình khám phá`}</div>
+            <div class="day-header">${escapeHtml(d.title || `Ngày ${dIdx + 1}: Lộ trình khám phá`)}</div>
             ${(d.activities || []).map(act => `
               <div class="activity-row">
-                <div class="act-title">${act.time || '08:30'} • ${act.title}</div>
+                <div class="act-title">${escapeHtml(act.time || '08:30')} • ${escapeHtml(act.title)}</div>
                 <div class="act-meta">
-                  📍 <strong>${act.location || ''}</strong>: ${act.address || 'Khu vực trung tâm'} 
-                  ${includeBudget && act.cost ? `| 💵 ${act.cost}` : ''}
+                  📍 <strong>${escapeHtml(act.location || '')}</strong>: ${escapeHtml(act.address || 'Khu vực trung tâm')} 
+                  ${includeBudget && act.cost ? `| 💵 ${escapeHtml(act.cost)}` : ''}
                 </div>
-                ${act.note ? `<div class="act-note">${act.note}</div>` : ''}
-                ${includeTips && act.aiTip ? `<div class="act-tip">💡 <strong>Mẹo WanderAI:</strong> ${act.aiTip}</div>` : ''}
+                ${act.note ? `<div class="act-note">${escapeHtml(act.note)}</div>` : ''}
+                ${includeTips && act.aiTip ? `<div class="act-tip">💡 <strong>Mẹo WanderAI:</strong> ${escapeHtml(act.aiTip)}</div>` : ''}
               </div>
             `).join('')}
           </div>
@@ -432,7 +444,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
 
           ${includeEmergency ? `
             <div class="info-col">
-              <h4>🚨 Hỗ trợ khẩn cấp tại ${destination}</h4>
+              <h4>🚨 Hỗ trợ khẩn cấp tại ${safeDestination}</h4>
               <div>• Cảnh sát / An ninh trật tự: <strong>113</strong></div>
               <div>• Cứu hộ / Cứu nạn: <strong>114</strong></div>
               <div>• Cấp cứu y tế: <strong>115</strong></div>
