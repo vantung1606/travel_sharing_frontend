@@ -22,6 +22,7 @@ export const ItineraryExpensesMembersPanel = ({
   const [loading, setLoading] = useState(false);
   const [expenses, setExpenses] = useState([]);
   const [members, setMembers] = useState([]);
+  const [detailCreator, setDetailCreator] = useState({ name: '', email: '' });
 
   const [expAmount, setExpAmount] = useState('');
   const [expCategory, setExpCategory] = useState('Ăn uống');
@@ -38,6 +39,10 @@ export const ItineraryExpensesMembersPanel = ({
       const detail = await itineraryApi.getItineraryById(numericId);
       setExpenses(Array.isArray(detail?.expenses) ? detail.expenses : []);
       setMembers(Array.isArray(detail?.members) ? detail.members : []);
+      setDetailCreator({
+        name: detail?.creatorName || detail?.authorName || '',
+        email: detail?.creatorEmail || ''
+      });
     } catch {
       // ignore
     } finally {
@@ -57,8 +62,29 @@ export const ItineraryExpensesMembersPanel = ({
     );
   }
 
+  // Deduplicate owner so owner never appears twice (once as Owner and once in members list)
+  const rawOwnerEmail = (detailCreator.email || creatorEmail || '').trim().toLowerCase();
+  const ownerFromMembers = members.find(
+    (m) =>
+      String(m.role || '').toUpperCase() === 'OWNER' ||
+      (rawOwnerEmail && String(m.email || '').trim().toLowerCase() === rawOwnerEmail)
+  );
+  const ownerDisplayName = ownerFromMembers?.fullName || detailCreator.name || creatorName || 'Chủ chuyến đi';
+  const ownerDisplayEmail = ownerFromMembers?.email || detailCreator.email || creatorEmail || '';
+  const ownerEmailKey = ownerDisplayEmail.trim().toLowerCase();
+
+  const companions = [];
+  const seenKeys = new Set(ownerEmailKey ? [ownerEmailKey] : []);
+  for (const m of members) {
+    if (String(m.role || '').toUpperCase() === 'OWNER') continue;
+    const key = String(m.email || m.userId || m.id || '').trim().toLowerCase();
+    if (!key || seenKeys.has(key)) continue;
+    seenKeys.add(key);
+    companions.push(m);
+  }
+
   const actualTotal = expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-  const totalPeople = 1 + members.length;
+  const totalPeople = 1 + companions.length;
   const perPerson = Math.round(actualTotal / Math.max(1, totalPeople));
   const budgetNum = Number(budgetTotal) || 0;
   const remaining = budgetNum - actualTotal;
@@ -67,7 +93,7 @@ export const ItineraryExpensesMembersPanel = ({
 
   const isMember = Boolean(
     currentUser &&
-      members.some(
+      companions.some(
         (m) =>
           (m.email && currentUser.email && m.email.toLowerCase() === currentUser.email.toLowerCase()) ||
           (m.userId != null && currentUser.id != null && String(m.userId) === String(currentUser.id))
@@ -183,10 +209,10 @@ export const ItineraryExpensesMembersPanel = ({
           <div className="px-4 py-3 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <div className="text-sm font-bold text-slate-900 truncate">
-                {creatorName || 'Chủ chuyến đi'}
+                {ownerDisplayName}
               </div>
-              {creatorEmail && (
-                <div className="text-xs text-slate-400 truncate">{creatorEmail}</div>
+              {ownerDisplayEmail && (
+                <div className="text-xs text-slate-400 truncate">{ownerDisplayEmail}</div>
               )}
             </div>
             <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-bold shrink-0">
@@ -195,12 +221,12 @@ export const ItineraryExpensesMembersPanel = ({
           </div>
 
           {/* Bạn đồng hành */}
-          {members.length === 0 ? (
+          {companions.length === 0 ? (
             <div className="px-4 py-6 text-center text-xs text-slate-400">
               Chưa có bạn đồng hành nào. {isOwner ? 'Nhập email phía trên để mời bạn bè cùng theo dõi và ghi chi tiêu.' : ''}
             </div>
           ) : (
-            members.map((m) => (
+            companions.map((m) => (
               <div key={m.id || m.userId} className="px-4 py-3 flex items-center justify-between gap-3">
                 <div className="min-w-0">
                   <div className="text-sm font-semibold text-slate-800 truncate">{m.fullName || m.email}</div>
