@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
-import { itineraryApi } from '../../../services/api';
+import { itineraryApi, uploadApi } from '../../../services/api';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { ItineraryExportModal } from '../../../components/itinerary/ItineraryExportModal';
 import { EditItineraryModal } from '../../../components/itinerary/EditItineraryModal';
@@ -12,6 +12,7 @@ import { MapPin, Calendar, Clock, DollarSign, Users, Search, SlidersHorizontal, 
 
 export const ItineraryManagerPage = () => {
   const {
+    currentUser,
     itineraries,
     setItineraries,
     setIsAIGeneratorOpen,
@@ -248,8 +249,9 @@ export const ItineraryManagerPage = () => {
 
       // Filter tag
       if (activeFilterTag === 'ai' && !itin.isAiGenerated) return false;
-      if (activeFilterTag === 'group' && !itin.groupType?.toLowerCase().includes('nhóm')) return false;
-      if (activeFilterTag === 'family' && !itin.groupType?.toLowerCase().includes('gia đình')) return false;
+      const groupLower = (itin.groupType || '').toLowerCase();
+      if (activeFilterTag === 'group' && !groupLower.includes('nhóm') && !groupLower.includes('bạn bè')) return false;
+      if (activeFilterTag === 'family' && !groupLower.includes('gia đình')) return false;
 
       // Search Query
       if (searchQuery.trim()) {
@@ -263,14 +265,37 @@ export const ItineraryManagerPage = () => {
       return true;
     }).sort((a, b) => {
       if (sortOption === 'budget_low') {
-        return (a.budgetPerPerson || 0) - (b.budgetPerPerson || 0);
+        return (a.budgetPerPerson || a.totalBudget || 0) - (b.budgetPerPerson || b.totalBudget || 0);
       }
       if (sortOption === 'duration') {
         return (b.daysCount || 0) - (a.daysCount || 0);
       }
-      return 0; // Default order
+      if (sortOption === 'nearest') {
+        const tA = a.startDate ? new Date(a.startDate).getTime() : Number.MAX_SAFE_INTEGER;
+        const tB = b.startDate ? new Date(b.startDate).getTime() : Number.MAX_SAFE_INTEGER;
+        return tA - tB;
+      }
+      if (sortOption === 'newest') {
+        const cA = a.createdAt ? new Date(a.createdAt).getTime() : Number(a.id) || 0;
+        const cB = b.createdAt ? new Date(b.createdAt).getTime() : Number(b.id) || 0;
+        return cB - cA;
+      }
+      return 0;
     });
   }, [itineraries, activeTab, activeFilterTag, searchQuery, sortOption]);
+
+  const nextUpcomingTrip = useMemo(() => {
+    const candidates = (itineraries || []).filter((i) => {
+      const { statusKey } = computeItineraryStatus(i);
+      return statusKey === 'upcoming' || statusKey === 'ongoing';
+    });
+    if (candidates.length === 0) return null;
+    return [...candidates].sort((a, b) => {
+      const tA = a.startDate ? new Date(a.startDate).getTime() : Number.MAX_SAFE_INTEGER;
+      const tB = b.startDate ? new Date(b.startDate).getTime() : Number.MAX_SAFE_INTEGER;
+      return tA - tB;
+    })[0];
+  }, [itineraries]);
 
   // Tab counts
   const tabCounts = useMemo(() => {
@@ -546,10 +571,10 @@ export const ItineraryManagerPage = () => {
             <div className="min-w-0">
               <p className="text-[10px] font-bold text-clay-200 uppercase tracking-[0.1em] whitespace-nowrap">Kế Hoạch Sắp Tới</p>
               <p className="font-display text-base sm:text-lg font-extrabold text-white truncate mt-0.5">
-                {(itineraries && itineraries[0]) ? itineraries[0].destination : 'Sắp khởi hành'}
+                {nextUpcomingTrip ? nextUpcomingTrip.destination : 'Chưa có lịch sắp tới'}
               </p>
               <p className="text-xs text-[#B8AD9C] truncate">
-                {(itineraries && itineraries[0]) ? (itineraries[0].duration || '3N2Đ') : 'Chưa có lịch'}
+                {nextUpcomingTrip ? (nextUpcomingTrip.duration || `${nextUpcomingTrip.daysCount || 1} ngày`) : 'Tạo chuyến đi ngay'}
               </p>
             </div>
           </div>
@@ -852,80 +877,96 @@ export const ItineraryManagerPage = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex items-center gap-2 pt-2">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedItinerary(itin)}
-                        className="flex-1 py-2.5 px-3 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-xs font-extrabold transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer"
-                      >
-                        <span>Mở Lịch Trình</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
+                    {(() => {
+                      const isCardOwner = Boolean(
+                        !currentUser ||
+                        (!itin.creatorEmail && itin.creatorId == null) ||
+                        (itin.creatorEmail && currentUser.email && itin.creatorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+                        (itin.creatorId != null && currentUser.id != null && String(itin.creatorId) === String(currentUser.id))
+                      );
+                      return (
+                        <div className="flex items-center gap-2 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedItinerary(itin)}
+                            className="flex-1 py-2.5 px-3 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-xs font-extrabold transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer"
+                          >
+                            <span>Mở Lịch Trình</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
 
-                      <button
-                        type="button"
-                        onClick={async (e) => {
-                          e.stopPropagation();
-                          try {
-                            const nextPublic = !(itin.isPublic !== false);
-                            await toggleItineraryVisibility(itin.id, nextPublic);
-                            toast.showSuccess(nextPublic ? 'Đã bật chế độ CÔNG KHAI!' : 'Đã chuyển sang RIÊNG TƯ!');
-                          } catch (err) {
-                            toast.showError('Lỗi cập nhật hiển thị: ' + (err.message || 'Thất bại'));
-                          }
-                        }}
-                        className={`w-9 h-9 rounded-sm border flex items-center justify-center transition-colors cursor-pointer ${
-                          itin.isPublic !== false
-                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                            : 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
-                        }`}
-                        title={itin.isPublic !== false ? 'Lịch trình đang Công khai. Bấm để chuyển sang Riêng tư.' : 'Lịch trình đang Riêng tư. Bấm để Công khai.'}
-                      >
-                        {itin.isPublic !== false ? <Globe className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                      </button>
+                          {isCardOwner && (
+                            <button
+                              type="button"
+                              onClick={async (e) => {
+                                e.stopPropagation();
+                                try {
+                                  const nextPublic = !(itin.isPublic !== false);
+                                  await toggleItineraryVisibility(itin.id, nextPublic);
+                                  toast.showSuccess(nextPublic ? 'Đã bật chế độ CÔNG KHAI!' : 'Đã chuyển sang RIÊNG TƯ!');
+                                } catch (err) {
+                                  toast.showError('Lỗi cập nhật hiển thị: ' + (err.message || 'Thất bại'));
+                                }
+                              }}
+                              className={`w-9 h-9 rounded-sm border flex items-center justify-center transition-colors cursor-pointer ${
+                                itin.isPublic !== false
+                                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                  : 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
+                              }`}
+                              title={itin.isPublic !== false ? 'Lịch trình đang Công khai. Bấm để chuyển sang Riêng tư.' : 'Lịch trình đang Riêng tư. Bấm để Công khai.'}
+                            >
+                              {itin.isPublic !== false ? <Globe className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+                            </button>
+                          )}
 
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditingItinerary(itin);
-                        }}
-                        className="w-9 h-9 rounded-sm border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 flex items-center justify-center transition-colors cursor-pointer"
-                        title="Chỉnh sửa thông tin chuyến đi"
-                      >
-                        <Edit3 className="w-4 h-4" />
-                      </button>
+                          {isCardOwner && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingItinerary(itin);
+                              }}
+                              className="w-9 h-9 rounded-sm border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 flex items-center justify-center transition-colors cursor-pointer"
+                              title="Chỉnh sửa thông tin chuyến đi"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                          )}
 
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setExportModalItinerary(itin);
-                        }}
-                        className="w-9 h-9 rounded-sm border border-[#1E1A15]/12 bg-transparent hover:bg-clay-50 text-[#6B6154] hover:text-clay-700 flex items-center justify-center transition-colors cursor-pointer"
-                        title="Tải lịch trình (PDF, Lịch Google, In ấn)"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setExportModalItinerary(itin);
+                            }}
+                            className="w-9 h-9 rounded-sm border border-[#1E1A15]/12 bg-transparent hover:bg-clay-50 text-[#6B6154] hover:text-clay-700 flex items-center justify-center transition-colors cursor-pointer"
+                            title="Tải lịch trình (PDF, Lịch Google, In ấn)"
+                          >
+                            <Download className="w-4 h-4" />
+                          </button>
 
-                      <button
-                        type="button"
-                        onClick={(e) => handleShareItinerary(itin, e)}
-                        className="w-9 h-9 rounded-sm border border-[#1E1A15]/12 bg-transparent hover:bg-[#1E1A15]/5 text-[#6B6154] flex items-center justify-center transition-colors cursor-pointer"
-                        title="Chia sẻ chuyến đi"
-                      >
-                        <Share2 className="w-4 h-4" />
-                      </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleShareItinerary(itin, e)}
+                            className="w-9 h-9 rounded-sm border border-[#1E1A15]/12 bg-transparent hover:bg-[#1E1A15]/5 text-[#6B6154] flex items-center justify-center transition-colors cursor-pointer"
+                            title="Chia sẻ chuyến đi"
+                          >
+                            <Share2 className="w-4 h-4" />
+                          </button>
 
-                      <button
-                        type="button"
-                        onClick={(e) => handleDeleteItinerary(itin.id, itin.title, e)}
-                        className="w-9 h-9 rounded-sm border border-[#1E1A15]/12 bg-transparent hover:bg-rose-50 text-[#9A8F7F] hover:text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
-                        title="Xóa lịch trình"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                          {isCardOwner && (
+                            <button
+                              type="button"
+                              onClick={(e) => handleDeleteItinerary(itin.id, itin.title, e)}
+                              className="w-9 h-9 rounded-sm border border-[#1E1A15]/12 bg-transparent hover:bg-rose-50 text-[#9A8F7F] hover:text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
+                              title="Xóa lịch trình"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               );
@@ -1304,14 +1345,25 @@ export const ItineraryManagerPage = () => {
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (ev) => {
-                            setManualCover(ev.target.result);
-                          };
-                          reader.readAsDataURL(file);
+                        if (!file) return;
+                        if (file.size > 10 * 1024 * 1024) {
+                          toast.showError('Ảnh bìa vượt quá 10MB. Vui lòng chọn ảnh nhẹ hơn.');
+                          return;
+                        }
+                        try {
+                          toast.showInfo('Đang tải ảnh bìa lên Cloudinary...');
+                          const res = await uploadApi.uploadSingle(file);
+                          const uploadedUrl = typeof res === 'string' ? res : (res?.url || res?.secure_url || res?.data?.url);
+                          if (uploadedUrl) {
+                            setManualCover(uploadedUrl);
+                            toast.showSuccess('Đã tải ảnh bìa thành công!');
+                          } else {
+                            toast.showError('Không nhận được URL ảnh từ máy chủ.');
+                          }
+                        } catch (err) {
+                          toast.showError(err?.message || 'Lỗi tải ảnh bìa lên máy chủ.');
                         }
                       }}
                     />

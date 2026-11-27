@@ -501,8 +501,9 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
       });
       toast.showSuccess(`Đã cập nhật hoạt động "${activityData.title}"! 🎉`);
     } else {
+      const tempId = Date.now();
       const createdActivity = {
-        id: Date.now(),
+        id: tempId,
         ...activityData
       };
       updatedDays = currentDays.map(d => {
@@ -547,7 +548,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
             note: activityData.note
           });
         } else if (!editingActivityId) {
-          await itineraryApi.addItineraryDetail(itinerary.id, {
+          const savedDetail = await itineraryApi.addItineraryDetail(itinerary.id, {
             dayNumber: targetDayNumber,
             startTime: timeFormatted,
             locationName: activityData.title,
@@ -556,6 +557,23 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
             estimatedCost: costNum,
             note: activityData.note
           });
+          if (savedDetail?.id) {
+            setCurrentDays((prevDays) => {
+              const syncedDays = prevDays.map((d) => {
+                if ((d.dayNumber || 1) !== targetDayNumber) return d;
+                return {
+                  ...d,
+                  activities: (d.activities || []).map((a) =>
+                    a.id === updatedDays.find((ud) => (ud.dayNumber || 1) === targetDayNumber)?.activities?.slice(-1)?.[0]?.id
+                      ? { ...a, id: savedDetail.id }
+                      : a
+                  )
+                };
+              });
+              onUpdate?.({ ...updatedItin, days: syncedDays });
+              return syncedDays;
+            });
+          }
         }
       }
     } catch (e) {
@@ -1718,7 +1736,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
                   <Marker
                     key={pt.id}
                     position={[pt.lat, pt.lng]}
-                    icon={createNumberedMarkerIcon(pt.order, isSelected)}
+                    icon={createNumberedMarkerIcon(pt.number, isSelected)}
                     eventHandlers={{
                       click: () => setSelectedMapPoint(pt)
                     }}
@@ -1727,7 +1745,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
                       <div className="p-1 space-y-1.5 min-w-[200px] text-slate-800">
                         <div className="flex items-center gap-1.5">
                           <span className="w-5 h-5 rounded-full bg-sky-600 text-white font-extrabold text-[10px] flex items-center justify-center shrink-0">
-                            {pt.order}
+                            {pt.number}
                           </span>
                           <h5 className="font-extrabold text-xs text-slate-900 leading-tight">
                             {pt.cleanName}
@@ -1771,7 +1789,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
                   }`}
                 >
                   <span className="w-4 h-4 rounded-full bg-white/20 text-white text-[10px] font-black flex items-center justify-center">
-                    {pt.order}
+                    {pt.number}
                   </span>
                   <span className="truncate max-w-[140px]">{pt.cleanName}</span>
                 </button>
@@ -1798,14 +1816,20 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
         isOpen={Boolean(addToTripItem)}
         onClose={() => setAddToTripItem(null)}
         item={addToTripItem}
-        itineraries={myItineraries || []}
+        itineraries={(myItineraries || []).filter(
+          (m) =>
+            !m.creatorEmail ||
+            !currentUser?.email ||
+            m.creatorEmail.toLowerCase() === currentUser.email.toLowerCase()
+        )}
         onAddToTrip={async (payload) => {
+          const targetItem = payload.item || addToTripItem;
           await itineraryApi.addItineraryDetail(
             payload.itinerary.id,
             {
-              placeId: payload.item?.id || null,
-              locationName: payload.item?.name || 'Điểm dừng chân',
-              locationAddress: payload.item?.address || '',
+              placeId: targetItem?.id || null,
+              locationName: targetItem?.name || 'Điểm dừng chân',
+              locationAddress: targetItem?.address || '',
               dayNumber: payload.dayNumber || 1,
               startTime: payload.startTime || '09:00:00',
               category: payload.category || 'Tham quan',
@@ -1815,9 +1839,11 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
             currentUser?.email
           );
           await fetchItineraries?.();
-          toast.showSuccess(`Đã thêm "${payload.item?.name}" vào Ngày ${payload.dayNumber} của "${payload.itinerary.title}"!`);
+          toast.showSuccess(`Đã thêm "${targetItem?.name || 'điểm dừng'}" vào Ngày ${payload.dayNumber} của "${payload.itinerary.title}"!`);
         }}
-        onCreateNewTripWithItem={async (itemToCreate) => {
+        onCreateNewTripWithItem={async (maybeItem) => {
+          const itemToCreate = maybeItem && typeof maybeItem === 'object' && maybeItem.name ? maybeItem : addToTripItem;
+          if (!itemToCreate) return;
           const today = new Date();
           today.setDate(today.getDate() + 1);
           const startStr = today.toISOString().split('T')[0];

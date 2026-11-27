@@ -103,36 +103,58 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
 
   // 2. Generate iCalendar (.ics) content
   const icsContent = useMemo(() => {
-    // Generate dates based on current or offset
-    const now = new Date();
     const pad = (n) => String(n).padStart(2, '0');
+    const parseBaseDate = () => {
+      if (itinerary?.startDate) {
+        const parts = String(itinerary.startDate).split('-').map(Number);
+        if (parts.length === 3 && parts[0] > 2000) {
+          return new Date(parts[0], parts[1] - 1, parts[2]);
+        }
+      }
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      return tomorrow;
+    };
+    const baseDate = parseBaseDate();
+    const escapeIcs = (str) =>
+      String(str || '')
+        .replace(/\\/g, '\\\\')
+        .replace(/;/g, '\\;')
+        .replace(/,/g, '\\,')
+        .replace(/\r?\n/g, '\\n');
 
     let events = '';
 
     days.forEach((day, dIdx) => {
-      const eventDate = new Date(now.getTime() + (dIdx + 1) * 86400000);
+      const eventDate = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate() + dIdx);
       const dateStr = `${eventDate.getFullYear()}${pad(eventDate.getMonth() + 1)}${pad(eventDate.getDate())}`;
 
       if (day.activities && day.activities.length > 0) {
         day.activities.forEach((act, aIdx) => {
           let startHour = 8 + aIdx * 2;
-          let endHour = startHour + 2;
-          if (startHour > 21) startHour = 20;
-          if (endHour > 23) endHour = 22;
+          let startMin = 0;
+          const timeMatch = String(act.time || '').match(/^(\d{1,2}):(\d{2})/);
+          if (timeMatch) {
+            startHour = Math.min(22, Math.max(0, Number(timeMatch[1])));
+            startMin = Math.min(59, Math.max(0, Number(timeMatch[2])));
+          } else if (startHour > 21) {
+            startHour = 20;
+          }
+          const endHour = Math.min(23, startHour + 2);
 
-          const dtStart = `${dateStr}T${pad(startHour)}0000`;
-          const dtEnd = `${dateStr}T${pad(endHour)}0000`;
-          const uid = `wayfare-${Date.now()}-${dIdx}-${aIdx}@wayfare.vn`;
-          const desc = `${act.note || ''}\\nĐịa chỉ: ${act.address || ''}\\nMẹo AI: ${act.aiTip || 'Không có'}`;
+          const dtStart = `${dateStr}T${pad(startHour)}${pad(startMin)}00`;
+          const dtEnd = `${dateStr}T${pad(endHour)}${pad(startMin)}00`;
+          const uid = `wayfare-${itinerary?.id || 'trip'}-${dIdx}-${aIdx}@wayfare.vn`;
+          const desc = escapeIcs(`${act.note || ''}\nĐịa chỉ: ${act.address || ''}\nMẹo AI: ${act.aiTip || 'Không có'}`);
 
           events += `BEGIN:VEVENT\r\n`;
           events += `UID:${uid}\r\n`;
           events += `DTSTAMP:${dateStr}T000000Z\r\n`;
           events += `DTSTART:${dtStart}\r\n`;
           events += `DTEND:${dtEnd}\r\n`;
-          events += `SUMMARY:[Wayfare] ${act.title || 'Điểm tham quan'}\r\n`;
+          events += `SUMMARY:${escapeIcs(`[Wayfare] ${act.title || 'Điểm tham quan'}`)}\r\n`;
           events += `DESCRIPTION:${desc}\r\n`;
-          events += `LOCATION:${act.address || act.location || destination}\r\n`;
+          events += `LOCATION:${escapeIcs(act.address || act.location || destination)}\r\n`;
           events += `STATUS:CONFIRMED\r\n`;
           events += `END:VEVENT\r\n`;
         });
