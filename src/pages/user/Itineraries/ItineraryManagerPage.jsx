@@ -90,6 +90,13 @@ export const ItineraryManagerPage = () => {
     }
   }, [searchParams, handleOpenItineraryDetail, selectedItinerary?.id]);
 
+  // Đồng bộ danh sách lịch trình mới nhất từ Backend mỗi khi vào trang kho lịch trình
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchItineraries();
+    }
+  }, [isLoggedIn, fetchItineraries]);
+
   // Tự động mở xem chi tiết lịch trình khi WanderAI vừa khởi tạo xong
   useEffect(() => {
     if (activeViewingItinerary) {

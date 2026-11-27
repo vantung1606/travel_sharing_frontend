@@ -21,6 +21,7 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { itineraryApi, savedPlaceApi } from '../../services/api';
+import { useApp } from '../../context/AppContext';
 
 function FormattedReplyText({ text }) {
   if (!text) return null;
@@ -362,6 +363,7 @@ export const AiRichMessageBubble = ({
   navigate,
   onQuickReply
 }) => {
+  const { fetchItineraries } = useApp();
   const [loadingIdx, setLoadingIdx] = useState(null);
   const [doneMap, setDoneMap] = useState({});
   const [confirmIdx, setConfirmIdx] = useState(null);
@@ -457,10 +459,11 @@ export const AiRichMessageBubble = ({
           },
           effectiveEmail
         );
-        toast.showSuccess(`Đã lưu lịch trình "${created?.title || payload.title}" (#${created?.id})!`);
+        await fetchItineraries(effectiveEmail);
+        toast.showSuccess(`Đã lưu lịch trình "${created?.title || payload.title}"!`);
         setDoneMap(prev => ({
           ...prev,
-          [idx]: { label: `Đã lưu (#${created?.id || 'Mới'}) • Mở xem ngay`, itineraryId: created?.id }
+          [idx]: { label: `Đã lưu • Mở xem ngay`, itineraryId: created?.id }
         }));
       } else if (type === 'UPDATE_ITINERARY') {
         if (!payload.itineraryId) throw new Error('Thiếu mã lịch trình cần cập nhật.');
@@ -477,11 +480,13 @@ export const AiRichMessageBubble = ({
           ...(payload.status ? { status: payload.status } : {})
         };
         await itineraryApi.updateItinerary(payload.itineraryId, merged, effectiveEmail);
+        await fetchItineraries(effectiveEmail);
         toast.showSuccess('Đã cập nhật lịch trình thành công!');
         setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã cập nhật • Mở xem', itineraryId: payload.itineraryId } }));
       } else if (type === 'DELETE_ITINERARY') {
         if (!payload.itineraryId) throw new Error('Thiếu mã lịch trình cần xóa.');
         await itineraryApi.deleteItinerary(payload.itineraryId, effectiveEmail);
+        await fetchItineraries(effectiveEmail);
         toast.showSuccess(`Đã xóa lịch trình "${payload.title || '#' + payload.itineraryId}".`);
         setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã xóa lịch trình' } }));
       } else if (type === 'ADD_ITINERARY_STOP') {
@@ -500,6 +505,7 @@ export const AiRichMessageBubble = ({
           },
           effectiveEmail
         );
+        await fetchItineraries(effectiveEmail);
         toast.showSuccess(`Đã thêm "${payload.locationName}" vào lịch trình!`);
         setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã thêm • Mở lịch trình', itineraryId: payload.itineraryId } }));
       } else if (type === 'UPDATE_ITINERARY_STOP') {
@@ -515,11 +521,13 @@ export const AiRichMessageBubble = ({
           },
           effectiveEmail
         );
+        await fetchItineraries(effectiveEmail);
         toast.showSuccess('Đã cập nhật điểm dừng thành công!');
         setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã sửa điểm dừng' } }));
       } else if (type === 'DELETE_ITINERARY_STOP') {
         if (!payload.detailId) throw new Error('Thiếu mã điểm dừng cần xóa.');
         await itineraryApi.deleteItineraryDetail(payload.detailId, effectiveEmail);
+        await fetchItineraries(effectiveEmail);
         toast.showSuccess(`Đã xóa điểm dừng "${payload.locationName || ''}".`);
         setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã xóa điểm dừng' } }));
       } else if (type === 'SAVE_PLACE') {
