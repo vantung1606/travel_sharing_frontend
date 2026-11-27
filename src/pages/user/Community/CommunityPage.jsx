@@ -1686,7 +1686,9 @@ export const CommunityPage = () => {
                   const locName = story.location;
                   const isSelected = searchQuery.toLowerCase().includes(locName.toLowerCase());
                   const postCount = story.count || null;
-                  const imgSrc = story.image || (story.badge ? null : null);
+                  const rawImg = story.image || null;
+                  const isVideoUrl = typeof rawImg === 'string' && (/\/video\/upload\//i.test(rawImg) || /\.(mp4|webm|mov|mkv)(\?.*)?$/i.test(rawImg));
+                  const imgSrc = rawImg && !isVideoUrl ? rawImg : null;
 
                   return (
                     <div
@@ -1706,12 +1708,19 @@ export const CommunityPage = () => {
                               src={imgSrc}
                               alt={locName}
                               className="w-11 h-11 sm:w-14 sm:h-14 rounded-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                const fallback = e.currentTarget.nextElementSibling;
+                                if (fallback) fallback.style.display = 'flex';
+                              }}
                             />
-                          ) : (
-                            <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-[#F8F4EC] flex items-center justify-center text-clay-700 font-extrabold text-sm sm:text-base">
-                              📍
-                            </div>
-                          )}
+                          ) : null}
+                          <div
+                            style={{ display: imgSrc ? 'none' : 'flex' }}
+                            className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-[#F8F4EC] items-center justify-center text-clay-700 font-extrabold text-sm sm:text-base"
+                          >
+                            📍
+                          </div>
                         </div>
                         {postCount ? (
                           <span className="absolute -bottom-1 -right-1 text-[9px] sm:text-[10px] bg-[#1E1A15] text-[#F8F4EC] px-1.5 py-0.2 rounded-sm font-bold">
