@@ -11,25 +11,36 @@ import {
   ExternalLink,
   Check,
   Loader2,
-  ArrowRight
+  ArrowRight,
+  Calendar,
+  Wallet,
+  Users,
+  MessageCircleQuestion
 } from 'lucide-react';
 import { itineraryApi, savedPlaceApi } from '../../services/api';
 
 /**
  * Render văn bản sạch: loại bỏ markdown ** thô hoặc chuyển thành <strong> gọn gàng,
- * giữ nguyên xuống dòng để dễ đọc.
+ * giữ nguyên xuống dòng và làm nổi bật các tiêu đề ngày (Ngày 1:, Ngày 2:...).
  */
 function FormattedReplyText({ text }) {
   if (!text) return null;
-  const lines = String(text).split('\n');
+  const cleanedText = String(text).replace(/\s*\((?:placeId|itineraryId|detailId|postId)\s*:\s*\d+\)/gi, '');
+  const lines = cleanedText.split('\n');
+
   return (
     <div className="space-y-1.5 text-[12.5px] leading-relaxed text-ink-800">
       {lines.map((line, i) => {
         const trimmed = line.trim();
         if (!trimmed) return <div key={i} className="h-1" />;
+
+        const isDayHeading = /^-?\s*Ngày\s+\d+[:.]/i.test(trimmed);
         const parts = line.split(/(\*\*[^*]+\*\*)/g);
         return (
-          <p key={i} className="break-words">
+          <p
+            key={i}
+            className={`break-words ${isDayHeading ? 'font-bold text-clay-800 pt-1' : ''}`}
+          >
             {parts.map((part, j) => {
               if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
                 return (
@@ -50,11 +61,11 @@ function FormattedReplyText({ text }) {
 const ACTION_STYLE_MAP = {
   CREATE_ITINERARY: {
     icon: Sparkles,
-    cls: 'bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] border-clay-600'
+    cls: 'bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] border-clay-600 shadow-xs'
   },
   ADD_ITINERARY_STOP: {
     icon: Plus,
-    cls: 'bg-emerald-600 hover:bg-emerald-700 text-[#FFFDF8] border-emerald-600'
+    cls: 'bg-emerald-600 hover:bg-emerald-700 text-[#FFFDF8] border-emerald-600 shadow-xs'
   },
   SAVE_PLACE: {
     icon: Heart,
@@ -98,6 +109,12 @@ const ACTION_STYLE_MAP = {
   }
 };
 
+function formatCurrency(val) {
+  const num = Number(val);
+  if (!num || Number.isNaN(num)) return null;
+  return new Intl.NumberFormat('vi-VN').format(num) + 'đ';
+}
+
 export const AiRichMessageBubble = ({
   msg,
   effectiveEmail,
@@ -121,6 +138,13 @@ export const AiRichMessageBubble = ({
   const replyText = parsed?.reply ?? msg?.content ?? '';
   const actions = Array.isArray(parsed?.actions) ? parsed.actions : [];
   const quickReplies = Array.isArray(parsed?.quickReplies) ? parsed.quickReplies : [];
+
+  const createItineraryActions = actions
+    .map((act, idx) => ({ act, idx }))
+    .filter(({ act }) => String(act?.type || '').toUpperCase() === 'CREATE_ITINERARY');
+  const otherActions = actions
+    .map((act, idx) => ({ act, idx }))
+    .filter(({ act }) => String(act?.type || '').toUpperCase() !== 'CREATE_ITINERARY');
 
   const executeAction = async (action, idx) => {
     if (!action || !action.type || loadingIdx !== null) return;
@@ -185,7 +209,7 @@ export const AiRichMessageBubble = ({
           effectiveEmail
         );
         toast.showSuccess(`Đã tạo lịch trình "${created?.title || payload.title}" thành công!`);
-        setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã tạo • Mở xem', itineraryId: created?.id } }));
+        setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã lưu lịch trình • Mở xem ngay', itineraryId: created?.id } }));
       } else if (type === 'UPDATE_ITINERARY') {
         if (!payload.itineraryId) throw new Error('Thiếu mã lịch trình cần cập nhật.');
         const existing = await itineraryApi.getItineraryById(payload.itineraryId, effectiveEmail);
@@ -263,86 +287,184 @@ export const AiRichMessageBubble = ({
   };
 
   return (
-    <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] px-3.5 py-3 shadow-2xs space-y-2.5">
+    <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[8px] px-4 py-3 shadow-2xs space-y-3">
       <FormattedReplyText text={replyText} />
 
-      {/* Các nút thao tác thực thi trực tiếp (Thêm / Sửa / Xóa / Lưu / Mở) */}
-      {actions.length > 0 && (
-        <div className="pt-2 border-t border-ink-200/50 flex flex-wrap gap-1.5">
-          {actions.map((act, idx) => {
+      {/* Thẻ tóm tắt Lịch trình + Nút Tạo 1-Click */}
+      {createItineraryActions.length > 0 && (
+        <div className="space-y-2 pt-1">
+          {createItineraryActions.map(({ act, idx }) => {
+            const p = act.payload || {};
             const doneInfo = doneMap[idx];
-            if (doneInfo) {
-              return (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => {
-                    if (doneInfo.itineraryId) navigate(`/itineraries?id=${doneInfo.itineraryId}`);
-                  }}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[5px] text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-pointer hover:bg-emerald-100 transition-colors"
-                >
-                  <Check className="w-3.5 h-3.5" />
-                  <span>{doneInfo.label}</span>
-                  {doneInfo.itineraryId && <ArrowRight className="w-3 h-3" />}
-                </button>
-              );
-            }
-
-            if (confirmIdx === idx) {
-              return (
-                <div key={idx} className="inline-flex items-center gap-1 bg-rose-50 border border-rose-200 rounded-[5px] px-2 py-1">
-                  <span className="text-[11px] font-bold text-rose-700">Xác nhận xóa?</span>
-                  <button
-                    type="button"
-                    onClick={() => executeAction(act, idx)}
-                    className="px-2 py-0.5 rounded bg-rose-600 hover:bg-rose-700 text-white text-[10.5px] font-bold cursor-pointer"
-                  >
-                    Xóa
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setConfirmIdx(null)}
-                    className="px-2 py-0.5 rounded bg-white hover:bg-ink-50 text-ink-600 border border-ink-200 text-[10.5px] font-semibold cursor-pointer"
-                  >
-                    Hủy
-                  </button>
-                </div>
-              );
-            }
-
-            const styleCfg = ACTION_STYLE_MAP[String(act.type || '').toUpperCase()] || ACTION_STYLE_MAP.NAVIGATE;
-            const IconComp = styleCfg.icon;
             const isLoading = loadingIdx === idx;
+            const budgetStr = formatCurrency(p.budgetTotal);
+            const stopsCount = Array.isArray(p.details) ? p.details.length : 0;
 
             return (
-              <button
+              <div
                 key={idx}
-                type="button"
-                disabled={loadingIdx !== null}
-                onClick={() => executeAction(act, idx)}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[5px] text-[11px] font-bold border transition-colors cursor-pointer disabled:opacity-50 ${styleCfg.cls}`}
+                className="rounded-[7px] border border-clay-200 bg-gradient-to-br from-[#FAF7F0] to-[#FFFDF8] p-3 space-y-2.5"
               >
-                {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <IconComp className="w-3.5 h-3.5 shrink-0" />}
-                <span>{act.label || 'Thực hiện'}</span>
-              </button>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-clay-600 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
+                      <span>Đề xuất lịch trình sẵn sàng lưu</span>
+                    </div>
+                    <h4 className="text-[13px] font-bold text-ink-900 mt-0.5 truncate">
+                      {p.title || `Khám phá ${p.destination || 'Việt Nam'}`}
+                    </h4>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 text-[11px] text-ink-600">
+                  {p.destination && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70">
+                      <MapPin className="w-3 h-3 text-clay-600" />
+                      {p.destination}
+                    </span>
+                  )}
+                  {p.durationDays && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70">
+                      <Calendar className="w-3 h-3 text-clay-600" />
+                      {p.durationDays} ngày
+                    </span>
+                  )}
+                  {p.groupType && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70">
+                      <Users className="w-3 h-3 text-clay-600" />
+                      {p.groupType}
+                    </span>
+                  )}
+                  {budgetStr && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70">
+                      <Wallet className="w-3 h-3 text-emerald-600" />
+                      ~{budgetStr}
+                    </span>
+                  )}
+                  {stopsCount > 0 && (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70">
+                      <Route className="w-3 h-3 text-indigo-600" />
+                      {stopsCount} điểm dừng
+                    </span>
+                  )}
+                </div>
+
+                {doneInfo ? (
+                  <button
+                    type="button"
+                    onClick={() => doneInfo.itineraryId && navigate(`/itineraries?id=${doneInfo.itineraryId}`)}
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-[6px] text-[11.5px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer"
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>{doneInfo.label}</span>
+                    {doneInfo.itineraryId && <ArrowRight className="w-3.5 h-3.5" />}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={loadingIdx !== null}
+                    onClick={() => executeAction(act, idx)}
+                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-[6px] text-[11.5px] font-bold bg-clay-600 hover:bg-clay-700 disabled:opacity-50 text-[#FFFDF8] transition-colors cursor-pointer shadow-xs"
+                  >
+                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                    <span>{act.label || 'Lưu & Tạo lịch trình này'}</span>
+                  </button>
+                )}
+              </div>
             );
           })}
         </div>
       )}
 
-      {/* Gợi ý hỏi tiếp (1-click gửi luôn) */}
+      {/* Các nút thao tác Thêm / Sửa / Xóa / Lưu / Xem chi tiết */}
+      {otherActions.length > 0 && (
+        <div className="pt-2 border-t border-ink-200/50 space-y-1.5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-ink-400">
+            Thao tác nhanh trên dữ liệu
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {otherActions.map(({ act, idx }) => {
+              const doneInfo = doneMap[idx];
+              if (doneInfo) {
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => {
+                      if (doneInfo.itineraryId) navigate(`/itineraries?id=${doneInfo.itineraryId}`);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[6px] text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-pointer hover:bg-emerald-100 transition-colors"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                    <span>{doneInfo.label}</span>
+                    {doneInfo.itineraryId && <ArrowRight className="w-3 h-3" />}
+                  </button>
+                );
+              }
+
+              if (confirmIdx === idx) {
+                return (
+                  <div key={idx} className="inline-flex items-center gap-1 bg-rose-50 border border-rose-200 rounded-[6px] px-2.5 py-1">
+                    <span className="text-[11px] font-bold text-rose-700">Xác nhận xóa?</span>
+                    <button
+                      type="button"
+                      onClick={() => executeAction(act, idx)}
+                      className="px-2 py-0.5 rounded bg-rose-600 hover:bg-rose-700 text-white text-[10.5px] font-bold cursor-pointer"
+                    >
+                      Xóa
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmIdx(null)}
+                      className="px-2 py-0.5 rounded bg-white hover:bg-ink-50 text-ink-600 border border-ink-200 text-[10.5px] font-semibold cursor-pointer"
+                    >
+                      Hủy
+                    </button>
+                  </div>
+                );
+              }
+
+              const styleCfg = ACTION_STYLE_MAP[String(act.type || '').toUpperCase()] || ACTION_STYLE_MAP.NAVIGATE;
+              const IconComp = styleCfg.icon;
+              const isLoading = loadingIdx === idx;
+
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  disabled={loadingIdx !== null}
+                  onClick={() => executeAction(act, idx)}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[6px] text-[11px] font-bold border transition-colors cursor-pointer disabled:opacity-50 ${styleCfg.cls}`}
+                >
+                  {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <IconComp className="w-3.5 h-3.5 shrink-0" />}
+                  <span>{act.label || 'Thực hiện'}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Gợi ý hỏi tiếp theo (1-click gửi luôn) */}
       {quickReplies.length > 0 && onQuickReply && (
-        <div className="pt-1.5 flex flex-wrap gap-1.5">
-          {quickReplies.slice(0, 4).map((qr, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => onQuickReply(qr)}
-              className="text-[10.5px] font-semibold px-2.5 py-1 rounded-full bg-[#F8F4EC] hover:bg-clay-50 text-clay-800 border border-ink-200/70 hover:border-clay-300 transition-colors cursor-pointer"
-            >
-              {qr}
-            </button>
-          ))}
+        <div className="pt-2 border-t border-ink-200/40 space-y-1.5">
+          <div className="text-[10px] font-semibold text-ink-400 flex items-center gap-1">
+            <MessageCircleQuestion className="w-3 h-3" />
+            <span>Gợi ý tiếp theo (bấm để gửi):</span>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {quickReplies.slice(0, 4).map((qr, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => onQuickReply(qr)}
+                className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-[#F8F4EC] hover:bg-clay-50 text-clay-800 border border-ink-200/80 hover:border-clay-300 transition-colors cursor-pointer"
+              >
+                {qr}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>
