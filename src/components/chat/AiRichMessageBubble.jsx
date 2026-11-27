@@ -115,6 +115,34 @@ function formatCurrency(val) {
   return new Intl.NumberFormat('vi-VN').format(num) + 'đ';
 }
 
+function getCoverImageByDestination(dest = '') {
+  const d = String(dest).toLowerCase();
+  if (d.includes('đà lạt') || d.includes('da lat')) return 'https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?auto=format&fit=crop&w=1200&q=80';
+  if (d.includes('hội an') || d.includes('hoi an') || d.includes('đà nẵng')) return 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80';
+  if (d.includes('phú quốc') || d.includes('phu quoc') || d.includes('nha trang')) return 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80';
+  if (d.includes('hà giang') || d.includes('sa pa') || d.includes('sapa')) return 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80';
+  if (d.includes('hạ long') || d.includes('ninh bình')) return 'https://images.unsplash.com/photo-1528127269322-539801943592?auto=format&fit=crop&w=1200&q=80';
+  if (d.includes('nghệ an') || d.includes('nam đàn') || d.includes('hà tĩnh')) return 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80';
+  return 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80';
+}
+
+function normalizeGroupType(val = '') {
+  const v = String(val).toLowerCase();
+  if (v.includes('1 mình') || v.includes('solo') || v.includes('cá nhân')) return 'Cá nhân';
+  if (v.includes('cặp đôi') || v.includes('người yêu')) return 'Cặp đôi';
+  if (v.includes('gia đình')) return 'Gia đình';
+  if (v.includes('bạn')) return 'Bạn bè';
+  return val || 'Cá nhân';
+}
+
+function formatBackendTime(val) {
+  if (!val) return '08:30:00';
+  const clean = String(val).trim();
+  if (/^\d{2}:\d{2}:\d{2}$/.test(clean)) return clean;
+  if (/^\d{2}:\d{2}$/.test(clean)) return `${clean}:00`;
+  return '08:30:00';
+}
+
 function getDefaultDates(durationDays = 2) {
   const start = new Date();
   start.setDate(start.getDate() + 1);
@@ -426,35 +454,44 @@ export const AiRichMessageBubble = ({
     try {
       if (type === 'CREATE_ITINERARY') {
         const defaults = getDefaultDates(payload.durationDays);
+        const destName = payload.destination || 'Việt Nam';
         const details = Array.isArray(payload.details)
-          ? payload.details.map((d, dIdx) => ({
-              dayNumber: Number(d.dayNumber) || 1,
-              dayTitle: d.dayTitle || `Ngày ${Number(d.dayNumber) || 1}`,
-              visitOrder: Number(d.visitOrder) || dIdx + 1,
-              placeId: d.placeId ? Number(d.placeId) : null,
-              locationName: d.locationName || 'Điểm dừng chân',
-              locationAddress: d.locationAddress || '',
-              category: d.category || 'Tham quan',
-              startTime: d.startTime && /^\d{2}:\d{2}/.test(d.startTime) ? d.startTime.slice(0, 5) : '09:00',
-              estimatedCost: d.estimatedCost ? Number(d.estimatedCost) : 0,
-              aiTip: d.aiTip || '',
-              transitInfo: d.transitInfo || '',
-              note: d.note || ''
-            }))
+          ? payload.details.map((d, dIdx) => {
+              const dayNum = Number(d.dayNumber) || 1;
+              const rawDayTitle = (d.dayTitle || '').trim();
+              const normalizedDayTitle = rawDayTitle.startsWith(`Ngày ${dayNum}`)
+                ? rawDayTitle
+                : (rawDayTitle ? `Ngày ${dayNum}: ${rawDayTitle}` : `Ngày ${dayNum}: Khám phá ${destName}`);
+              return {
+                dayNumber: dayNum,
+                dayTitle: normalizedDayTitle,
+                visitOrder: Number(d.visitOrder) || dIdx + 1,
+                placeId: d.placeId ? Number(d.placeId) : null,
+                locationName: d.locationName || 'Điểm dừng chân',
+                locationAddress: d.locationAddress || destName,
+                category: d.category || 'Khám phá',
+                startTime: formatBackendTime(d.startTime),
+                estimatedCost: d.estimatedCost ? Number(d.estimatedCost) : 0,
+                aiTip: d.aiTip || '',
+                transitInfo: d.transitInfo || '',
+                note: d.note || ''
+              };
+            })
           : [];
 
         const created = await itineraryApi.createItinerary(
           {
-            title: payload.title || `Chuyến đi ${payload.destination || 'mới'}`,
-            destination: payload.destination || 'Việt Nam',
+            title: payload.title || `Chuyến đi ${destName}`,
+            destination: destName,
             startDate: payload.startDate || defaults.startDate,
             endDate: payload.endDate || defaults.endDate,
-            budgetTotal: payload.budgetTotal ? Number(payload.budgetTotal) : 0,
-            groupType: payload.groupType || 'Cá nhân',
-            travelStyle: payload.travelStyle || 'Khám phá',
+            budgetTotal: payload.budgetTotal ? Number(payload.budgetTotal) : 3000000,
+            coverImageUrl: payload.coverImageUrl || getCoverImageByDestination(destName),
             isAiGenerated: true,
             isPublic: payload.isPublic !== false,
-            status: 'ACTIVE',
+            status: (payload.status || 'ACTIVE').toUpperCase(),
+            groupType: normalizeGroupType(payload.groupType),
+            travelStyle: payload.travelStyle || 'Nghỉ dưỡng & Khám phá',
             details
           },
           effectiveEmail
@@ -499,7 +536,7 @@ export const AiRichMessageBubble = ({
             locationName: payload.locationName || 'Điểm dừng mới',
             locationAddress: payload.locationAddress || '',
             category: payload.category || 'Tham quan',
-            startTime: dStartTime(payload.startTime),
+            startTime: formatBackendTime(payload.startTime),
             estimatedCost: payload.estimatedCost ? Number(payload.estimatedCost) : 0,
             note: payload.note || ''
           },
