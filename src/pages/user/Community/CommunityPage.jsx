@@ -807,7 +807,7 @@ export const CommunityPage = () => {
   const renderPagination = () => {
     if (totalPages <= 1) return null;
     return (
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-4 pt-4 sm:pt-6 pb-2 border-t border-[#1E1A15]/10 mt-4 sm:mt-6">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-4 pt-4 sm:pt-6 pb-2 border-t border-slate-200 mt-4 sm:mt-6">
         <p className="text-[11px] sm:text-xs text-[#6B6154] font-medium">
           Hiển thị <strong className="text-[#1E1A15] font-bold">{(currentPage - 1) * postsPerPage + 1}</strong> - <strong className="text-[#1E1A15] font-bold">{Math.min(currentPage * postsPerPage, displayPosts.length)}</strong> trong số <strong className="text-[#1E1A15] font-bold">{displayPosts.length}</strong> bài viết
         </p>
@@ -820,7 +820,7 @@ export const CommunityPage = () => {
               setCurrentPage((p) => Math.max(p - 1, 1));
               window.scrollTo({ top: 380, behavior: 'smooth' });
             }}
-            className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-sm border border-[#1E1A15]/10 bg-[#FFFDF8] hover:bg-[#F8F4EC] text-xs font-bold text-[#3B332A] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 transition-all "
+            className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 transition-all"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Trước</span>
@@ -838,7 +838,7 @@ export const CommunityPage = () => {
                 className={`min-w-[28px] sm:min-w-[32px] h-7 sm:h-8 px-1.5 sm:px-2 rounded-sm text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
                   currentPage === p
                     ? 'bg-sky-600 text-white '
-                    : 'bg-[#FFFDF8] hover:bg-[#F3EDE2] text-[#3B332A] border border-[#1E1A15]/10 '
+                    : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300'
                 }`}
               >
                 {p}
@@ -857,7 +857,7 @@ export const CommunityPage = () => {
               setCurrentPage((p) => Math.min(p + 1, totalPages));
               window.scrollTo({ top: 380, behavior: 'smooth' });
             }}
-            className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-sm border border-[#1E1A15]/10 bg-[#FFFDF8] hover:bg-[#F8F4EC] text-xs font-bold text-[#3B332A] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 transition-all "
+            className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 transition-all"
           >
             <span className="hidden sm:inline">Sau</span>
             <ChevronRight className="w-3.5 h-3.5" />
@@ -1551,7 +1551,7 @@ export const CommunityPage = () => {
             
             {/* User Profile Card or Guest Login Prompt */}
             {isLoggedIn ? (
-              <div className="bg-[#FFFDF8] rounded-sm p-5 border border-[#1E1A15]/10  space-y-4">
+              <div className="bg-white rounded-xl p-5 border border-slate-300/90 shadow-sm space-y-4">
                 <div className="flex items-center gap-3.5">
                   <div className="relative">
                     <img
@@ -1579,12 +1579,12 @@ export const CommunityPage = () => {
                 </div>
 
                 {/* User Stats Grid */}
-                <div className="grid grid-cols-4 gap-1.5 p-2.5 bg-[#F8F4EC] rounded-sm text-center border border-[#1E1A15]/10">
-                  <div className="p-1 rounded-sm bg-[#FFFDF8] border border-[#1E1A15]/10">
+                <div className="grid grid-cols-4 gap-1.5 p-2.5 bg-slate-50 rounded-lg text-center border border-slate-200">
+                  <div className="p-1.5 rounded-md bg-white border border-slate-200">
                     <span className="font-extrabold text-sm text-sky-600 block">{itineraries.length}</span>
                     <span className="text-[10px] text-[#6B6154] font-semibold">Chuyến đi</span>
                   </div>
-                  <div className="p-1 rounded-sm bg-[#FFFDF8] border border-[#1E1A15]/10">
+                  <div className="p-1.5 rounded-md bg-white border border-slate-200">
                     <span className="font-extrabold text-sm text-amber-600 block">
                       {posts.filter(p => p.author?.email === currentUser?.email && p.status === 'ACTIVE').length}
                     </span>
@@ -1592,7 +1592,7 @@ export const CommunityPage = () => {
                   </div>
                   <div
                     onClick={() => setFollowListModalState({ isOpen: true, tab: 'following', userId: currentUser?.id, userName: currentUser?.name })}
-                    className="p-1 rounded-sm bg-[#FFFDF8] border border-[#1E1A15]/10 cursor-pointer hover:bg-[#F3EDE2] transition-colors group"
+                    className="p-1.5 rounded-md bg-white border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors group"
                     title="Bấm để xem danh sách đang theo dõi"
                   >
                     <span className="font-extrabold text-sm text-sky-700 block">
@@ -1602,7 +1602,7 @@ export const CommunityPage = () => {
                   </div>
                   <div
                     onClick={() => setFeedScope(feedScope === 'saved' ? 'all' : 'saved')}
-                    className="p-1 rounded-sm bg-[#FFFDF8] border border-[#1E1A15]/10 cursor-pointer hover:bg-[#F3EDE2] transition-colors group"
+                    className="p-1.5 rounded-md bg-white border border-slate-200 cursor-pointer hover:bg-slate-100 transition-colors group"
                     title="Bấm để xem bài viết đã lưu"
                   >
                     <span className="font-extrabold text-sm text-sky-600 block">
@@ -1654,7 +1654,7 @@ export const CommunityPage = () => {
           <main className="col-span-1 lg:col-span-8 xl:col-span-9 2xl:col-span-6 space-y-3 sm:space-y-4">
 
             {/* ─── 24H COMMUNITY MOMENTS & STORIES CAROUSEL ─── */}
-            <div className="bg-[#FFFDF8] rounded-sm p-3 sm:p-4 border border-[#1E1A15]/10">
+            <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-300/90 shadow-sm">
               {/* Horizontal Scroll Story Circles - Dữ liệu địa điểm toàn hệ thống */}
               <div className="flex items-center gap-3 sm:gap-3.5 overflow-x-auto pb-1 scrollbar-none select-none">
                 {/* Reset / All Filter */}
@@ -1666,7 +1666,7 @@ export const CommunityPage = () => {
                   <div className={`relative p-0.5 rounded-full border-2 ${
                     !searchQuery
                       ? 'border-clay-600'
-                      : 'border-[#1E1A15]/10 group-hover:border-clay-600/50'
+                      : 'border-slate-300 group-hover:border-clay-600/70'
                   }`}>
                     <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-full bg-[#F3EDE2] flex items-center justify-center p-0.5">
                       <div className="w-full h-full rounded-full bg-[#FFFDF8] flex items-center justify-center text-clay-700">
@@ -1700,7 +1700,7 @@ export const CommunityPage = () => {
                       <div className={`relative p-0.5 rounded-full border-2 ${
                         isSelected
                           ? 'border-clay-600'
-                          : 'border-[#1E1A15]/10 group-hover:border-clay-600/50'
+                          : 'border-slate-300 group-hover:border-clay-600/70'
                       }`}>
                         <div className="p-0.5 rounded-full bg-[#FFFDF8]">
                           {imgSrc ? (
@@ -1745,15 +1745,15 @@ export const CommunityPage = () => {
             
             {/* Quick Create Post Bar or Guest Invitation */}
             {isLoggedIn ? (
-            <div className="bg-[#FFFDF8] rounded-sm p-3 sm:p-4 border border-[#1E1A15]/10 flex items-center gap-3">
+            <div className="bg-white rounded-xl p-3.5 sm:p-4 border border-slate-300/90 shadow-sm flex items-center gap-3">
               <img
                 src={currentUser?.avatar}
                 alt="Avatar"
-                className="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-[#1E1A15]/10"
+                className="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-slate-300"
               />
               <button
                 onClick={() => setIsCreateModalOpen(true)}
-                className="flex-1 min-w-0 text-left bg-[#F8F4EC] hover:bg-[#F3EDE2] text-[#6B6154] px-3.5 py-2.5 sm:py-3 rounded-sm text-xs sm:text-sm font-medium transition-colors cursor-pointer border border-[#1E1A15]/10 truncate"
+                className="flex-1 min-w-0 text-left bg-slate-50 hover:bg-slate-100 text-slate-600 px-3.5 py-2.5 sm:py-3 rounded-lg text-xs sm:text-sm font-medium transition-colors cursor-pointer border border-slate-300 truncate"
               >
                 Chia sẻ review, ảnh đẹp hoặc đính kèm tour...
               </button>
@@ -1765,7 +1765,7 @@ export const CommunityPage = () => {
               </button>
             </div>
           ) : (
-            <div className="bg-[#FFFDF8] rounded-sm p-4 sm:p-5 border border-[#1E1A15]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-300/90 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3.5">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-sm bg-clay-600/10 text-clay-700 flex items-center justify-center shrink-0">
                   <Compass className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -1795,7 +1795,7 @@ export const CommunityPage = () => {
           {/* ========================================================= */}
           <div className="space-y-2.5">
             {/* TIER 1: FEED SCOPE TABS */}
-            <div className="flex items-center gap-1 border-b border-[#1E1A15]/10 overflow-x-auto no-scrollbar">
+            <div className="flex items-center gap-1 border-b border-slate-200 overflow-x-auto no-scrollbar">
               {FEED_SCOPES.map(scope => {
                 const Icon = scope.icon;
                 const isActive = feedScope === scope.id;
@@ -1832,7 +1832,7 @@ export const CommunityPage = () => {
                   placeholder="Tìm bài viết theo tác giả, địa điểm, nội dung..."
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 sm:py-3 bg-[#FFFDF8] border border-[#1E1A15]/10 rounded-sm text-xs sm:text-sm text-[#2A241D] placeholder-[#8A7F70] focus:outline-none focus:border-clay-600 focus:ring-0 transition-colors font-medium"
+                  className="w-full pl-10 pr-10 py-2.5 sm:py-3 bg-white border border-slate-300 rounded-lg text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-clay-600 focus:ring-0 transition-colors font-medium shadow-2xs"
                 />
                 {searchQuery && (
                   <button
@@ -1852,7 +1852,7 @@ export const CommunityPage = () => {
                   onChange={setActiveSort}
                   icon={SlidersHorizontal}
                   size="sm"
-                  buttonClassName="py-2.5 sm:py-3 font-bold border-[#1E1A15]/10 rounded-sm bg-[#FFFDF8]"
+                  buttonClassName="py-2.5 sm:py-3 font-bold border-slate-300 rounded-lg bg-white shadow-2xs"
                   options={[
                     { value: 'newest', label: 'Mới nhất' },
                     { value: 'popular', label: 'Nhiều like nhất' },
@@ -1869,7 +1869,7 @@ export const CommunityPage = () => {
                 <button
                   type="button"
                   onClick={handleTopicScrollLeft}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-[#FFFDF8] hover:bg-[#F8F4EC] text-[#3B332A] hover:text-clay-700 border border-[#1E1A15]/10 flex items-center justify-center transition-colors cursor-pointer"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white hover:bg-slate-50 text-slate-700 hover:text-clay-700 border border-slate-300 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
                   title="Cuộn sang trái"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -1900,7 +1900,7 @@ export const CommunityPage = () => {
                       className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-sm text-xs transition-colors shrink-0 cursor-pointer ${
                         isActive
                           ? 'bg-clay-600 text-white font-extrabold'
-                          : 'bg-[#FFFDF8] text-[#3B332A] border border-[#1E1A15]/10 hover:border-clay-600/50 hover:text-clay-700 font-semibold'
+                          : 'bg-white text-slate-700 border border-slate-300 hover:border-clay-600/70 hover:text-clay-700 font-semibold'
                       }`}
                     >
                       <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-[#8A7F70]'}`} />
@@ -1915,7 +1915,7 @@ export const CommunityPage = () => {
                 <button
                   type="button"
                   onClick={handleTopicScrollRight}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-[#FFFDF8] hover:bg-[#F8F4EC] text-[#3B332A] hover:text-clay-700 border border-[#1E1A15]/10 flex items-center justify-center transition-colors cursor-pointer"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white hover:bg-slate-50 text-slate-700 hover:text-clay-700 border border-slate-300 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
                   title="Cuộn sang phải"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -1928,7 +1928,7 @@ export const CommunityPage = () => {
           {loading && (
             <div className="space-y-4">
               {[1, 2].map(n => (
-                <div key={n} className="bg-[#FFFDF8] rounded-sm p-6 border border-[#1E1A15]/10  animate-pulse space-y-4">
+                <div key={n} className="bg-white rounded-xl p-6 border border-slate-300/90 shadow-sm animate-pulse space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-[#E8DFD0]" />
                     <div className="space-y-2 flex-1">
@@ -1945,7 +1945,7 @@ export const CommunityPage = () => {
 
           {/* Empty State */}
           {!loading && displayPosts.length === 0 && (
-            <div className="bg-[#FFFDF8] rounded-sm p-10 border border-[#1E1A15]/10  text-center space-y-4">
+            <div className="bg-white rounded-xl p-10 border border-slate-300/90 shadow-sm text-center space-y-4">
               <div className="w-16 h-16 rounded-sm bg-sky-50 text-sky-600 flex items-center justify-center mx-auto ">
                 {feedScope === 'following' ? (
                   <UserCheck className="w-8 h-8 text-sky-600" />
@@ -2396,7 +2396,7 @@ export const CommunityPage = () => {
                       {/* Embedded Shared Post Card */}
                       <div
                         onClick={() => setSelectedPostForDetail(post.sharedPost)}
-                        className="rounded-sm border border-[#1E1A15]/10 bg-[#F8F4EC]/70 p-4 space-y-3 hover:border-slate-300 hover:bg-[#F8F4EC] transition-all cursor-pointer  group"
+                        className="rounded-xl border border-slate-300 bg-slate-50/80 p-4 space-y-3 hover:border-slate-400 hover:bg-slate-50 transition-all cursor-pointer group"
                       >
                         {/* Original Author Header */}
                         <div className="flex items-center gap-3">
@@ -2958,7 +2958,7 @@ export const CommunityPage = () => {
         <aside ref={rightSidebarRef} className="hidden lg:flex lg:col-span-4 xl:col-span-3 flex-col gap-5 sticky top-20 self-start max-h-[calc(100vh-5.5rem)] overflow-y-auto overscroll-contain sidebar-scrollbar pr-1.5 pb-8 select-none z-10">
           
           {/* Top Curated Tours to Clone 1-Click */}
-          <div className="bg-[#FFFDF8] rounded-sm p-4 border border-[#1E1A15]/10 space-y-3">
+          <div className="bg-white rounded-xl p-4 border border-slate-300/90 shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-extrabold text-[#1E1A15] flex items-center gap-1.5">
                 <Route className="w-4 h-4 text-clay-700" />
@@ -3014,7 +3014,7 @@ export const CommunityPage = () => {
           </div>
 
           {/* Top Travel Bloggers of the Month */}
-          <div className="bg-[#FFFDF8] rounded-sm p-4 border border-[#1E1A15]/10 space-y-3">
+          <div className="bg-white rounded-xl p-4 border border-slate-300/90 shadow-sm space-y-3">
             <h4 className="text-xs font-extrabold text-[#1E1A15] flex items-center gap-1.5">
               <Award className="w-4 h-4 text-amber-500" />
               <span>Top Tác Giả Tuần Này</span>
@@ -3091,7 +3091,7 @@ export const CommunityPage = () => {
           </div>
 
           {/* Community Guidelines Card */}
-          <details className="p-4 rounded-sm bg-[#FFFDF8] border border-[#1E1A15]/10 text-xs text-[#6B6154]">
+          <details className="p-4 rounded-xl bg-white border border-slate-300/90 shadow-sm text-xs text-slate-600">
             <summary className="font-extrabold text-[#1E1A15] flex items-center gap-1.5 cursor-pointer list-none">
               <ShieldCheck className="w-4 h-4 text-clay-700" />
               <span>Quy tắc Cộng đồng Wayfare</span>
@@ -3119,7 +3119,7 @@ export const CommunityPage = () => {
       {/* ========================================================= */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/30 backdrop-blur-[2px]">
-          <div className="bg-[#FFFDF8] rounded-sm sm:rounded-sm max-w-xl w-full p-4 sm:p-6  border border-[#1E1A15]/10 max-h-[90vh] overflow-y-auto space-y-4 animate-in fade-in zoom-in-95 duration-200 relative">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-4 sm:p-6 border border-slate-300 shadow-xl max-h-[90vh] overflow-y-auto space-y-4 animate-in fade-in zoom-in-95 duration-200 relative">
             
             {/* AI Moderation & Shield Scanning Overlay */}
             {submittingPost && (
