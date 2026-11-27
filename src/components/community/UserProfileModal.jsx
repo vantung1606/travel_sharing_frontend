@@ -807,6 +807,7 @@ export const UserProfileModal = ({ userId, onClose, onSelectItinerary }) => {
       {selectedItineraryDetail && (
         <ItineraryDetailModal
           itinerary={selectedItineraryDetail}
+          readOnly={String(userId) !== String(currentUser?.id)}
           onClose={() => setSelectedItineraryDetail(null)}
         />
       )}

@@ -313,7 +313,7 @@ const createNumberedMarkerIcon = (num, isHighlighted) => {
   });
 };
 
-export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
+export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = false }) => {
   const toast = useToast();
   const {
     itineraries: myItineraries,
@@ -326,8 +326,9 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
   } = useApp();
   const [addToTripItem, setAddToTripItem] = useState(null);
 
-  // Kiểm tra quyền sở hữu: chỉ chủ sở hữu mới thấy các nút chỉnh sửa / sắp xếp / xóa / đổi quyền riêng tư
+  // Kiểm tra quyền sở hữu: chỉ chủ sở hữu (và không ở chế độ readOnly) mới thấy các nút chỉnh sửa / sắp xếp / xóa / đổi quyền riêng tư
   const isOwner = useMemo(() => {
+    if (readOnly) return false;
     if (!currentUser || !itinerary) return false;
     if (itinerary.creatorId != null && currentUser.id != null) {
       return String(itinerary.creatorId) === String(currentUser.id);
@@ -342,7 +343,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
       return myItineraries.some((m) => String(m.id) === String(itinerary.id));
     }
     return false;
-  }, [currentUser, itinerary, myItineraries]);
+  }, [readOnly, currentUser, itinerary, myItineraries]);
   // 'all' hoặc index 0, 1, 2...
   const [activeTab, setActiveTab] = useState('all');
   // Chế độ xem trên Mobile & Tablet (< 1024px): 'timeline' (Lịch trình) hoặc 'map' (Bản đồ & Lộ trình)

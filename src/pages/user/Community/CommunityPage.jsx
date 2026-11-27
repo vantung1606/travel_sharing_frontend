@@ -289,6 +289,7 @@ export const CommunityPage = () => {
 
   // Itinerary Detail Modal State
   const [selectedItineraryForModal, setSelectedItineraryForModal] = useState(null);
+  const [selectedItineraryReadOnly, setSelectedItineraryReadOnly] = useState(false);
 
   // Comments Drawer / Modal State
   const [activeCommentPost, setActiveCommentPost] = useState(null);
@@ -1179,6 +1180,10 @@ export const CommunityPage = () => {
 
   // Open Full Itinerary Modal from Post
   const handleViewItineraryDetails = (post) => {
+    const isOwnPost =
+      (post?.authorId && currentUser?.id && String(post.authorId) === String(currentUser.id)) ||
+      (post?.authorEmail && currentUser?.email && post.authorEmail.toLowerCase() === currentUser.email.toLowerCase());
+    setSelectedItineraryReadOnly(!isOwnPost);
     // Find matching itinerary in local state or craft representation
     const existing = itineraries.find(i => i.id === post.itineraryId);
     if (existing) {
@@ -2963,7 +2968,10 @@ export const CommunityPage = () => {
                 return (
                   <div
                     key={tour.id || idx}
-                    onClick={() => setSelectedItineraryForModal(tour)}
+                    onClick={() => {
+                      setSelectedItineraryReadOnly(true);
+                      setSelectedItineraryForModal(tour);
+                    }}
                     className="flex items-center gap-2.5 p-2 rounded-sm hover:bg-[#F8F4EC] border border-transparent hover:border-[#1E1A15]/10 transition-colors group cursor-pointer"
                     title="Bấm để xem lịch trình chi tiết và sao chép"
                   >
@@ -3960,7 +3968,11 @@ export const CommunityPage = () => {
       {selectedItineraryForModal && (
         <ItineraryDetailModal
           itinerary={selectedItineraryForModal}
-          onClose={() => setSelectedItineraryForModal(null)}
+          readOnly={selectedItineraryReadOnly}
+          onClose={() => {
+            setSelectedItineraryForModal(null);
+            setSelectedItineraryReadOnly(false);
+          }}
         />
       )}
 
@@ -3972,7 +3984,9 @@ export const CommunityPage = () => {
           userId={selectedUserIdForModal}
           onClose={() => setSelectedUserIdForModal(null)}
           onSelectItinerary={(itin) => {
+            const viewingUserId = selectedUserIdForModal;
             setSelectedUserIdForModal(null);
+            setSelectedItineraryReadOnly(String(viewingUserId) !== String(currentUser?.id));
             setSelectedItineraryForModal(itin);
           }}
         />
@@ -4010,7 +4024,12 @@ export const CommunityPage = () => {
             setSelectedUserIdForModal(authorId);
           }}
           onSelectItinerary={(itin) => {
+            const p = selectedPostForDetail;
+            const isOwnPost =
+              (p?.authorId && currentUser?.id && String(p.authorId) === String(currentUser.id)) ||
+              (p?.authorEmail && currentUser?.email && p.authorEmail.toLowerCase() === currentUser.email.toLowerCase());
             setSelectedPostForDetail(null);
+            setSelectedItineraryReadOnly(!isOwnPost);
             setSelectedItineraryForModal(itin);
           }}
           onReportPost={(post) => {
