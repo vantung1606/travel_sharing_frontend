@@ -15,14 +15,13 @@ import {
   Calendar,
   Wallet,
   Users,
-  MessageCircleQuestion
+  MessageCircleQuestion,
+  Clock,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { itineraryApi, savedPlaceApi } from '../../services/api';
 
-/**
- * Render văn bản sạch: loại bỏ markdown ** thô hoặc chuyển thành <strong> gọn gàng,
- * giữ nguyên xuống dòng và làm nổi bật các tiêu đề ngày (Ngày 1:, Ngày 2:...).
- */
 function FormattedReplyText({ text }) {
   if (!text) return null;
   const cleanedText = String(text).replace(/\s*\((?:placeId|itineraryId|detailId|postId)\s*:\s*\d+\)/gi, '');
@@ -115,6 +114,271 @@ function formatCurrency(val) {
   return new Intl.NumberFormat('vi-VN').format(num) + 'đ';
 }
 
+function getDefaultDates(durationDays = 2) {
+  const start = new Date();
+  start.setDate(start.getDate() + 1);
+  const end = new Date(start);
+  end.setDate(start.getDate() + Math.max(1, Number(durationDays) || 2) - 1);
+  return {
+    startDate: start.toISOString().slice(0, 10),
+    endDate: end.toISOString().slice(0, 10)
+  };
+}
+
+/**
+ * Card đề xuất lịch trình chuyên nghiệp: hiển thị đầy đủ các chặng theo ngày,
+ * cho phép chỉnh sửa nhanh (Tiêu đề, Ngày đi, Ngân sách, Công khai) trước khi lưu vào DB.
+ */
+function ItineraryProposalCard({
+  action,
+  idx,
+  isLoading,
+  doneInfo,
+  onSaveItinerary,
+  onNavigate
+}) {
+  const p = action.payload || {};
+  const defaults = getDefaultDates(p.durationDays);
+
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(p.title || `Khám phá ${p.destination || 'Việt Nam'}`);
+  const [startDate, setStartDate] = useState(p.startDate || defaults.startDate);
+  const [budgetTotal, setBudgetTotal] = useState(p.budgetTotal ? String(p.budgetTotal) : '3000000');
+  const [isPublic, setIsPublic] = useState(p.isPublic !== false);
+
+  const details = Array.isArray(p.details) ? p.details : [];
+  const daysCount = Math.max(1, Number(p.durationDays) || (details.length > 0 ? Math.max(...details.map(d => Number(d.dayNumber) || 1)) : 2));
+
+  // Tính ngày kết thúc từ startDate + daysCount
+  const computedEndDate = (() => {
+    try {
+      const s = new Date(startDate);
+      if (Number.isNaN(s.getTime())) return defaults.endDate;
+      s.setDate(s.getDate() + daysCount - 1);
+      return s.toISOString().slice(0, 10);
+    } catch {
+      return defaults.endDate;
+    }
+  })();
+
+  // Nhóm chặng dừng theo ngày
+  const groupedByDay = details.reduce((acc, item) => {
+    const day = Number(item.dayNumber) || 1;
+    if (!acc[day]) acc[day] = [];
+    acc[day].push(item);
+    return acc;
+  }, {});
+  const dayKeys = Object.keys(groupedByDay).map(Number).sort((a, b) => a - b);
+
+  const handleConfirmSave = () => {
+    onSaveItinerary(
+      {
+        ...action,
+        payload: {
+          ...p,
+          title: title.trim() || `Khám phá ${p.destination || 'Việt Nam'}`,
+          startDate,
+          endDate: computedEndDate,
+          durationDays: daysCount,
+          budgetTotal: Number(budgetTotal) || 0,
+          isPublic
+        }
+      },
+      idx
+    );
+  };
+
+  return (
+    <div className="rounded-[8px] border border-clay-200 bg-gradient-to-br from-[#FAF7F0] to-[#FFFDF8] p-3.5 space-y-3 shadow-2xs">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-clay-600 flex items-center gap-1">
+            <Sparkles className="w-3 h-3" />
+            <span>Kế hoạch chuyến đi đề xuất</span>
+          </div>
+          <h4 className="text-[13.5px] font-bold text-ink-900 mt-0.5 leading-snug">
+            {title}
+          </h4>
+        </div>
+        {!doneInfo && (
+          <button
+            type="button"
+            onClick={() => setIsEditing(v => !v)}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10.5px] font-semibold bg-white hover:bg-clay-50 text-ink-700 border border-ink-200 cursor-pointer shrink-0"
+            title="Chỉnh sửa nhanh trước khi lưu"
+          >
+            <Pencil className="w-3 h-3" />
+            <span>{isEditing ? 'Đóng sửa' : 'Chỉnh sửa'}</span>
+          </button>
+        )}
+      </div>
+
+      {/* Metadata Badges */}
+      <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-ink-700">
+        {p.destination && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70 font-medium">
+            <MapPin className="w-3 h-3 text-clay-600" />
+            {p.destination}
+          </span>
+        )}
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70 font-medium">
+          <Calendar className="w-3 h-3 text-clay-600" />
+          {daysCount} ngày ({startDate} → {computedEndDate})
+        </span>
+        {p.groupType && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70 font-medium">
+            <Users className="w-3 h-3 text-clay-600" />
+            {p.groupType}
+          </span>
+        )}
+        {formatCurrency(budgetTotal) && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70 font-medium">
+            <Wallet className="w-3 h-3 text-emerald-600" />
+            ~{formatCurrency(budgetTotal)}
+          </span>
+        )}
+      </div>
+
+      {/* Form chỉnh nhanh trước khi lưu */}
+      {isEditing && !doneInfo && (
+        <div className="p-2.5 rounded-[6px] bg-white border border-clay-200/80 space-y-2 text-[11px]">
+          <div>
+            <label className="block font-bold text-ink-600 mb-0.5">Tên lịch trình</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="w-full px-2.5 py-1.5 rounded border border-ink-200 text-ink-800 outline-none focus:border-clay-500"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block font-bold text-ink-600 mb-0.5">Ngày khởi hành</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full px-2 py-1.5 rounded border border-ink-200 text-ink-800 outline-none focus:border-clay-500"
+              />
+            </div>
+            <div>
+              <label className="block font-bold text-ink-600 mb-0.5">Ngân sách dự kiến (VNĐ)</label>
+              <input
+                type="number"
+                min="0"
+                step="100000"
+                value={budgetTotal}
+                onChange={(e) => setBudgetTotal(e.target.value)}
+                className="w-full px-2 py-1.5 rounded border border-ink-200 text-ink-800 outline-none focus:border-clay-500"
+              />
+            </div>
+          </div>
+          <label className="inline-flex items-center gap-1.5 cursor-pointer font-medium text-ink-700 pt-0.5">
+            <input
+              type="checkbox"
+              checked={isPublic}
+              onChange={(e) => setIsPublic(e.target.checked)}
+              className="accent-clay-600"
+            />
+            <span>Công khai lịch trình cho cộng đồng tham khảo</span>
+          </label>
+        </div>
+      )}
+
+      {/* Danh sách chi tiết các chặng theo từng ngày */}
+      {dayKeys.length > 0 && (
+        <div className="rounded-[6px] bg-white border border-ink-200/70 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setIsExpanded(v => !v)}
+            className="w-full px-3 py-2 flex items-center justify-between text-[11px] font-bold text-ink-700 bg-[#FAF7F0]/70 hover:bg-[#FAF7F0] border-b border-ink-200/50 cursor-pointer"
+          >
+            <span className="flex items-center gap-1.5">
+              <Route className="w-3.5 h-3.5 text-clay-600" />
+              Chi tiết lịch trình ({details.length} chặng dừng)
+            </span>
+            {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+
+          {isExpanded && (
+            <div className="p-2.5 space-y-2.5 max-h-64 overflow-y-auto">
+              {dayKeys.map((dayNum) => {
+                const stops = groupedByDay[dayNum];
+                const dayTitle = stops[0]?.dayTitle;
+                return (
+                  <div key={dayNum} className="space-y-1.5">
+                    <div className="text-[11px] font-bold text-clay-700 flex items-center gap-1.5">
+                      <span className="px-1.5 py-0.5 rounded bg-clay-100 text-clay-800">Ngày {dayNum}</span>
+                      {dayTitle && <span className="text-ink-600 font-semibold truncate">— {dayTitle}</span>}
+                    </div>
+                    <div className="pl-2 border-l-2 border-clay-200 space-y-1.5">
+                      {stops.map((s, sIdx) => (
+                        <div key={sIdx} className="flex items-start justify-between gap-2 text-[11px] bg-[#FAF7F0]/50 rounded px-2 py-1.5">
+                          <div className="min-w-0 flex-1">
+                            <div className="font-semibold text-ink-900 flex items-center gap-1.5 flex-wrap">
+                              {s.startTime && (
+                                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-clay-700 bg-clay-50 px-1.5 py-0.5 rounded border border-clay-200/60">
+                                  <Clock className="w-2.5 h-2.5" />
+                                  {s.startTime}
+                                </span>
+                              )}
+                              <span>{s.locationName}</span>
+                              {s.category && (
+                                <span className="text-[9.5px] px-1.5 py-0.5 rounded bg-white border border-ink-200 text-ink-500">
+                                  {s.category}
+                                </span>
+                              )}
+                            </div>
+                            {(s.note || s.aiTip) && (
+                              <p className="text-[10.5px] text-ink-500 mt-0.5 leading-snug">
+                                {s.note || s.aiTip}
+                              </p>
+                            )}
+                          </div>
+                          {Number(s.estimatedCost) > 0 && (
+                            <span className="text-[10.5px] font-semibold text-emerald-700 shrink-0">
+                              {formatCurrency(s.estimatedCost)}
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Nút Lưu / Mở trang Lịch trình */}
+      {doneInfo ? (
+        <button
+          type="button"
+          onClick={() => onNavigate(doneInfo.itineraryId ? `/itineraries?id=${doneInfo.itineraryId}` : '/itineraries')}
+          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-[6px] text-[11.5px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer"
+        >
+          <Check className="w-4 h-4" />
+          <span>{doneInfo.label}</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          disabled={isLoading}
+          onClick={handleConfirmSave}
+          className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-[6px] text-[11.5px] font-bold bg-clay-600 hover:bg-clay-700 disabled:opacity-50 text-[#FFFDF8] transition-colors cursor-pointer shadow-xs"
+        >
+          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+          <span>Lưu vào Lịch trình của tôi</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 export const AiRichMessageBubble = ({
   msg,
   effectiveEmail,
@@ -146,22 +410,25 @@ export const AiRichMessageBubble = ({
     .map((act, idx) => ({ act, idx }))
     .filter(({ act }) => String(act?.type || '').toUpperCase() !== 'CREATE_ITINERARY');
 
+  // Lọc trùng: không hiển thị quickReply nếu giống hệt nhãn nút action phía trên
+  const actionLabelsLower = new Set(actions.map(a => (a?.label || '').trim().toLowerCase()));
+  const filteredQuickReplies = quickReplies
+    .filter(qr => qr && !actionLabelsLower.has(qr.trim().toLowerCase()))
+    .slice(0, 4);
+
   const executeAction = async (action, idx) => {
     if (!action || !action.type || loadingIdx !== null) return;
     const type = String(action.type).toUpperCase();
     const payload = action.payload || {};
 
-    // Yêu cầu xác nhận 2 bước cho các thao tác xóa
     if ((type === 'DELETE_ITINERARY' || type === 'DELETE_ITINERARY_STOP') && confirmIdx !== idx) {
       setConfirmIdx(idx);
       return;
     }
     setConfirmIdx(null);
 
-    // Các nút điều hướng thuần túy
     if (type === 'OPEN_PLACE') {
-      if (payload.placeId) navigate(`/places/${payload.placeId}`);
-      else navigate('/explore');
+      navigate(payload.placeId ? `/places/${payload.placeId}` : '/explore');
       return;
     }
     if (type === 'OPEN_ITINERARY') {
@@ -180,15 +447,20 @@ export const AiRichMessageBubble = ({
     setLoadingIdx(idx);
     try {
       if (type === 'CREATE_ITINERARY') {
+        const defaults = getDefaultDates(payload.durationDays);
         const details = Array.isArray(payload.details)
           ? payload.details.map((d, dIdx) => ({
               dayNumber: Number(d.dayNumber) || 1,
+              dayTitle: d.dayTitle || `Ngày ${Number(d.dayNumber) || 1}`,
               visitOrder: Number(d.visitOrder) || dIdx + 1,
               placeId: d.placeId ? Number(d.placeId) : null,
               locationName: d.locationName || 'Điểm dừng chân',
+              locationAddress: d.locationAddress || '',
               category: d.category || 'Tham quan',
               startTime: d.startTime && /^\d{2}:\d{2}/.test(d.startTime) ? d.startTime.slice(0, 5) : '09:00',
               estimatedCost: d.estimatedCost ? Number(d.estimatedCost) : 0,
+              aiTip: d.aiTip || '',
+              transitInfo: d.transitInfo || '',
               note: d.note || ''
             }))
           : [];
@@ -197,7 +469,8 @@ export const AiRichMessageBubble = ({
           {
             title: payload.title || `Chuyến đi ${payload.destination || 'mới'}`,
             destination: payload.destination || 'Việt Nam',
-            durationDays: Number(payload.durationDays) || 2,
+            startDate: payload.startDate || defaults.startDate,
+            endDate: payload.endDate || defaults.endDate,
             budgetTotal: payload.budgetTotal ? Number(payload.budgetTotal) : 0,
             groupType: payload.groupType || 'Cá nhân',
             travelStyle: payload.travelStyle || 'Khám phá',
@@ -208,8 +481,11 @@ export const AiRichMessageBubble = ({
           },
           effectiveEmail
         );
-        toast.showSuccess(`Đã tạo lịch trình "${created?.title || payload.title}" thành công!`);
-        setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã lưu lịch trình • Mở xem ngay', itineraryId: created?.id } }));
+        toast.showSuccess(`Đã lưu lịch trình "${created?.title || payload.title}" (#${created?.id})!`);
+        setDoneMap(prev => ({
+          ...prev,
+          [idx]: { label: `Đã lưu (#${created?.id || 'Mới'}) • Mở xem ngay`, itineraryId: created?.id }
+        }));
       } else if (type === 'UPDATE_ITINERARY') {
         if (!payload.itineraryId) throw new Error('Thiếu mã lịch trình cần cập nhật.');
         const existing = await itineraryApi.getItineraryById(payload.itineraryId, effectiveEmail);
@@ -217,7 +493,8 @@ export const AiRichMessageBubble = ({
           ...existing,
           ...(payload.title ? { title: payload.title } : {}),
           ...(payload.destination ? { destination: payload.destination } : {}),
-          ...(payload.durationDays ? { durationDays: Number(payload.durationDays) } : {}),
+          ...(payload.startDate ? { startDate: payload.startDate } : {}),
+          ...(payload.endDate ? { endDate: payload.endDate } : {}),
           ...(payload.budgetTotal !== undefined ? { budgetTotal: Number(payload.budgetTotal) } : {}),
           ...(payload.groupType ? { groupType: payload.groupType } : {}),
           ...(payload.travelStyle ? { travelStyle: payload.travelStyle } : {}),
@@ -239,8 +516,9 @@ export const AiRichMessageBubble = ({
             dayNumber: Number(payload.dayNumber) || 1,
             placeId: payload.placeId ? Number(payload.placeId) : null,
             locationName: payload.locationName || 'Điểm dừng mới',
+            locationAddress: payload.locationAddress || '',
             category: payload.category || 'Tham quan',
-            startTime: payload.startTime && /^\d{2}:\d{2}/.test(payload.startTime) ? payload.startTime.slice(0, 5) : '09:00',
+            startTime: dStartTime(payload.startTime),
             estimatedCost: payload.estimatedCost ? Number(payload.estimatedCost) : 0,
             note: payload.note || ''
           },
@@ -290,90 +568,20 @@ export const AiRichMessageBubble = ({
     <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[8px] px-4 py-3 shadow-2xs space-y-3">
       <FormattedReplyText text={replyText} />
 
-      {/* Thẻ tóm tắt Lịch trình + Nút Tạo 1-Click */}
+      {/* Card Đề xuất Lịch trình chi tiết + Sửa nhanh + Lưu 1-Click */}
       {createItineraryActions.length > 0 && (
-        <div className="space-y-2 pt-1">
-          {createItineraryActions.map(({ act, idx }) => {
-            const p = act.payload || {};
-            const doneInfo = doneMap[idx];
-            const isLoading = loadingIdx === idx;
-            const budgetStr = formatCurrency(p.budgetTotal);
-            const stopsCount = Array.isArray(p.details) ? p.details.length : 0;
-
-            return (
-              <div
-                key={idx}
-                className="rounded-[7px] border border-clay-200 bg-gradient-to-br from-[#FAF7F0] to-[#FFFDF8] p-3 space-y-2.5"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-clay-600 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      <span>Đề xuất lịch trình sẵn sàng lưu</span>
-                    </div>
-                    <h4 className="text-[13px] font-bold text-ink-900 mt-0.5 truncate">
-                      {p.title || `Khám phá ${p.destination || 'Việt Nam'}`}
-                    </h4>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 text-[11px] text-ink-600">
-                  {p.destination && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70">
-                      <MapPin className="w-3 h-3 text-clay-600" />
-                      {p.destination}
-                    </span>
-                  )}
-                  {p.durationDays && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70">
-                      <Calendar className="w-3 h-3 text-clay-600" />
-                      {p.durationDays} ngày
-                    </span>
-                  )}
-                  {p.groupType && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70">
-                      <Users className="w-3 h-3 text-clay-600" />
-                      {p.groupType}
-                    </span>
-                  )}
-                  {budgetStr && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70">
-                      <Wallet className="w-3 h-3 text-emerald-600" />
-                      ~{budgetStr}
-                    </span>
-                  )}
-                  {stopsCount > 0 && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70">
-                      <Route className="w-3 h-3 text-indigo-600" />
-                      {stopsCount} điểm dừng
-                    </span>
-                  )}
-                </div>
-
-                {doneInfo ? (
-                  <button
-                    type="button"
-                    onClick={() => doneInfo.itineraryId && navigate(`/itineraries?id=${doneInfo.itineraryId}`)}
-                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-[6px] text-[11.5px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer"
-                  >
-                    <Check className="w-4 h-4" />
-                    <span>{doneInfo.label}</span>
-                    {doneInfo.itineraryId && <ArrowRight className="w-3.5 h-3.5" />}
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    disabled={loadingIdx !== null}
-                    onClick={() => executeAction(act, idx)}
-                    className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-[6px] text-[11.5px] font-bold bg-clay-600 hover:bg-clay-700 disabled:opacity-50 text-[#FFFDF8] transition-colors cursor-pointer shadow-xs"
-                  >
-                    {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                    <span>{act.label || 'Lưu & Tạo lịch trình này'}</span>
-                  </button>
-                )}
-              </div>
-            );
-          })}
+        <div className="space-y-2.5 pt-1">
+          {createItineraryActions.map(({ act, idx }) => (
+            <ItineraryProposalCard
+              key={idx}
+              action={act}
+              idx={idx}
+              isLoading={loadingIdx === idx}
+              doneInfo={doneMap[idx]}
+              onSaveItinerary={executeAction}
+              onNavigate={navigate}
+            />
+          ))}
         </div>
       )}
 
@@ -446,15 +654,15 @@ export const AiRichMessageBubble = ({
         </div>
       )}
 
-      {/* Gợi ý hỏi tiếp theo (1-click gửi luôn) */}
-      {quickReplies.length > 0 && onQuickReply && (
+      {/* Gợi ý hỏi tiếp theo (1-click gửi luôn, không trùng nút action) */}
+      {filteredQuickReplies.length > 0 && onQuickReply && (
         <div className="pt-2 border-t border-ink-200/40 space-y-1.5">
           <div className="text-[10px] font-semibold text-ink-400 flex items-center gap-1">
             <MessageCircleQuestion className="w-3 h-3" />
             <span>Gợi ý tiếp theo (bấm để gửi):</span>
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {quickReplies.slice(0, 4).map((qr, idx) => (
+            {filteredQuickReplies.map((qr, idx) => (
               <button
                 key={idx}
                 type="button"
@@ -470,3 +678,7 @@ export const AiRichMessageBubble = ({
     </div>
   );
 };
+
+function dStartTime(val) {
+  return val && /^\d{2}:\d{2}/.test(val) ? val.slice(0, 5) : '09:00';
+}
