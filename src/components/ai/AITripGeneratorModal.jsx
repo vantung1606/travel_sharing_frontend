@@ -679,30 +679,29 @@ QUY TẮC BẮT BUỘC:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 py-8 sm:py-12 bg-black/35 backdrop-blur-[2px] overflow-y-auto animate-fade-in">
-      {/* COMPACT MODAL CARD (Max-w: 620px, thoáng đãng, lề trên rộng rãi) */}
-      <div className="relative w-full max-w-[620px] bg-white text-slate-900 rounded-3xl shadow-2xl overflow-hidden my-auto flex flex-col max-h-[90vh] border border-slate-200">
+      {/* COMPACT MODAL CARD (Hơi vuông, sắc nét đồng nhất với modal tạo thủ công) */}
+      <div className="relative w-full max-w-[620px] bg-white text-slate-900 rounded-lg shadow-2xl overflow-hidden my-auto flex flex-col max-h-[90vh] border border-slate-300">
 
-        {/* MODAL HEADER - THOÁNG ĐÃNG, LỀ TRÊN RỘNG RÃI, KHÔNG SÁT MÉP */}
-        <div className="px-7 sm:px-8 pt-7 sm:pt-8 pb-5 bg-gradient-to-b from-sky-50/50 via-white to-white flex items-start justify-between gap-4 border-b border-slate-100 shrink-0">
-          <div className="flex items-start gap-3.5">
-            <span className="w-11 h-11 rounded-2xl bg-sky-50 border border-sky-100 text-sky-600 flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
+        {/* MODAL HEADER */}
+        <div className="px-6 sm:px-7 pt-6 pb-4 bg-white flex items-start justify-between gap-4 border-b border-slate-200 shrink-0">
+          <div className="flex items-start gap-3">
+            <span className="w-10 h-10 rounded-md bg-sky-50 border border-sky-200 text-sky-600 flex items-center justify-center shrink-0 mt-0.5">
               <Sparkles className="w-5 h-5 text-sky-600" />
             </span>
             <div>
               <h2 className="font-display text-lg sm:text-xl font-extrabold text-slate-900 tracking-tight leading-snug">
                 Lập Lịch Trình AI Thông Minh
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-normal mt-1 leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-500 font-normal mt-0.5 leading-relaxed">
                 AI nghiên cứu thực tế theo điểm đến bạn nhập (toàn quốc & quốc tế).
               </p>
             </div>
           </div>
 
-          {/* Duy nhất 1 nút X thanh lịch để đóng popup */}
           <button
             type="button"
             onClick={() => setIsAIGeneratorOpen(false)}
-            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-400 hover:text-slate-800 flex items-center justify-center transition-all cursor-pointer shrink-0 mt-0.5"
+            className="w-8 h-8 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-900 border border-slate-200 flex items-center justify-center transition-colors cursor-pointer shrink-0 mt-0.5"
             title="Đóng popup"
           >
             <X className="w-4 h-4 stroke-[2.5]" />
@@ -710,7 +709,7 @@ QUY TẮC BẮT BUỘC:
         </div>
 
         {/* MODAL BODY - Form gọn gàng, thoáng đãng, dễ điền */}
-        <div className="px-7 sm:px-8 py-5 overflow-y-auto flex-1 space-y-5">
+        <div className="px-6 sm:px-7 py-5 overflow-y-auto flex-1 space-y-5">
 
           {/* 1. Điểm đến du lịch */}
           <div className="space-y-2">
@@ -730,7 +729,7 @@ QUY TẮC BẮT BUỘC:
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
                 placeholder="Nhập bất kỳ điểm đến nào (ví dụ: Bảo Lộc, Côn Đảo, Phú Yên, Hà Giang, Cà Mau, Sa Pa...)"
-                className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-slate-50 text-slate-900 text-xs font-semibold border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                className="w-full pl-10 pr-9 py-2.5 rounded-md bg-slate-50 text-slate-900 text-xs font-semibold border border-slate-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
               />
               {destination && (
                 <button
@@ -741,19 +740,17 @@ QUY TẮC BẮT BUỘC:
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
-            {/* Input điểm đến */}
             </div>
           </div>
 
-          {/* 2. Thời gian chuyến đi: Ngày bắt đầu, Ngày kết thúc & Ô tính ngày tự động */}
-          <div className="space-y-2.5 pt-2 border-t border-slate-100">
+          {/* 2. Thời gian chuyến đi */}
+          <div className="space-y-2.5 pt-2 border-t border-slate-200/80">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-sky-600" />
                 <span>Thời gian hành trình</span>
               </label>
-              {/* Ô đếm số ngày khi nhập tự động */}
-              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-800 font-extrabold text-xs">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-sky-50 border border-sky-200 text-sky-800 font-extrabold text-xs">
                 <span>{daysCount} Ngày</span>
                 <span className="text-[11px] text-sky-600 font-semibold">
                   {daysCount > 1 ? `(${daysCount}N${daysCount - 1}Đ)` : '(Đi về trong ngày)'}
@@ -761,7 +758,6 @@ QUY TẮC BẮT BUỘC:
               </div>
             </div>
 
-            {/* Start Date & End Date Inputs */}
             <div className="grid grid-cols-2 gap-3 pt-0.5">
               <div>
                 <span className="text-[11px] font-semibold text-slate-500 block mb-1">Ngày bắt đầu</span>
@@ -769,7 +765,7 @@ QUY TẮC BẮT BUỘC:
                   type="date"
                   value={startDate}
                   onChange={(e) => handleStartDateChange(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  className="w-full px-3 py-2 rounded-md bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                 />
               </div>
               <div>
@@ -779,14 +775,14 @@ QUY TẮC BẮT BUỘC:
                   value={endDate}
                   min={startDate}
                   onChange={(e) => handleEndDateChange(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                  className="w-full px-3 py-2 rounded-md bg-slate-50 text-slate-800 text-xs font-semibold border border-slate-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                 />
               </div>
             </div>
           </div>
 
           {/* 3. Đối tượng & Ngân sách */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200/80">
             {/* Companions */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
@@ -807,9 +803,9 @@ QUY TẮC BẮT BUỘC:
                       key={item.id}
                       type="button"
                       onClick={() => setCompanion(item.id)}
-                      className={`py-2 px-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${isSelected
+                      className={`py-2 px-2.5 rounded-md text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${isSelected
                           ? 'bg-sky-50 text-sky-700 border-2 border-sky-500'
-                          : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100'
+                          : 'bg-slate-50 text-slate-700 border border-slate-300 hover:bg-slate-100'
                         }`}
                     >
                       <Icon className="w-3.5 h-3.5" />
@@ -839,9 +835,9 @@ QUY TẮC BẮT BUỘC:
                       key={item.tier}
                       type="button"
                       onClick={() => setBudgetTier(item.tier)}
-                      className={`py-1.5 px-2 rounded-xl text-center transition-all cursor-pointer flex flex-col items-center justify-center ${isSelected
+                      className={`py-1.5 px-2 rounded-md text-center transition-all cursor-pointer flex flex-col items-center justify-center ${isSelected
                           ? 'bg-amber-50 text-amber-900 border-2 border-amber-500'
-                          : 'bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100'
+                          : 'bg-slate-50 text-slate-700 border border-slate-300 hover:bg-slate-100'
                         }`}
                     >
                       <span className="text-xs font-bold">{item.label}</span>
@@ -854,7 +850,7 @@ QUY TẮC BẮT BUỘC:
           </div>
 
           {/* 4. Gu trải nghiệm du lịch (Interests Chips) */}
-          <div className="space-y-2 pt-2 border-t border-slate-100">
+          <div className="space-y-2 pt-2 border-t border-slate-200/80">
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-purple-600" />
@@ -872,9 +868,9 @@ QUY TẮC BẮT BUỘC:
                     key={opt.id}
                     type="button"
                     onClick={() => toggleInterest(opt.id)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${isSelected
-                        ? 'bg-sky-600 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    className={`px-3 py-1.5 rounded-md text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border ${isSelected
+                        ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
+                        : 'bg-slate-50 text-slate-700 border-slate-300 hover:bg-slate-100'
                       }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -886,7 +882,7 @@ QUY TẮC BẮT BUỘC:
           </div>
 
           {/* 5. Ghi chú thêm cho AI */}
-          <div className="space-y-1.5 pt-2 border-t border-slate-100">
+          <div className="space-y-1.5 pt-2 border-t border-slate-200/80">
             <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
               <Info className="w-3.5 h-3.5 text-slate-500" />
               <span>Yêu cầu đặc biệt cho AI (Tùy chọn)</span>
@@ -896,27 +892,27 @@ QUY TẮC BẮT BUỘC:
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
               placeholder="Ví dụ: Không dậy sớm trước 8h, thích ăn hải sản vỉa hè, muốn ghé chùa..."
-              className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 text-slate-900 text-xs font-medium border border-slate-200 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
+              className="w-full px-3.5 py-2.5 rounded-md bg-slate-50 text-slate-900 text-xs font-medium border border-slate-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500"
             />
           </div>
 
         </div>
 
-        {/* MODAL FOOTER - Gọn gàng, nút bấm rõ ràng */}
-        <div className="px-5 sm:px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
+        {/* MODAL FOOTER - Gọn gàng, nút bấm hơi vuông rõ ràng */}
+        <div className="px-6 sm:px-7 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
           <button
             type="button"
             onClick={handleReset}
-            className="text-xs text-slate-500 hover:text-slate-800 font-semibold cursor-pointer transition-colors"
+            className="text-xs text-slate-500 hover:text-slate-900 font-semibold cursor-pointer transition-colors"
           >
             Làm mới
           </button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={() => setIsAIGeneratorOpen(false)}
-              className="px-4 py-2.5 rounded-full text-xs font-bold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
+              className="px-4 py-2 rounded-md border border-slate-300 bg-white text-xs font-bold text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
             >
               Đóng
             </button>
@@ -925,10 +921,10 @@ QUY TẮC BẮT BUỘC:
               type="button"
               disabled={aiGeneratingStatus?.isGenerating}
               onClick={() => handleGenerate(false)}
-              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2 rounded-md bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 hover:from-sky-700 hover:to-indigo-700 text-white font-bold text-xs sm:text-sm shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>{aiGeneratingStatus?.isGenerating ? 'Đang Khởi Tạo...' : 'Khởi Tạo Lịch Trình ✨'}</span>
+              <span>{aiGeneratingStatus?.isGenerating ? 'Đang Khởi Tạo...' : 'Khởi Tạo Lịch Trình'}</span>
             </button>
           </div>
         </div>
