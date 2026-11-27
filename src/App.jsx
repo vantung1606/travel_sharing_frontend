@@ -175,8 +175,10 @@ const AppContent = () => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }, [location.pathname]);
 
-  // Nếu hệ thống đang bật chế độ bảo trì và không phải Admin truy cập admin portal
-  if (!isAdminPath && isMaintenanceActive && !isAdminUser) {
+  const canAdminBypass = isAdminUser && maintenanceConfig?.allowAdminBypass !== false;
+
+  // Nếu hệ thống đang bật chế độ bảo trì và không phải Admin được phép vượt qua
+  if (!isAdminPath && isMaintenanceActive && !canAdminBypass) {
     return (
       <div className="min-h-screen bg-[#F8F4EC] font-sans text-ink-900">
         <PageTitleManager />

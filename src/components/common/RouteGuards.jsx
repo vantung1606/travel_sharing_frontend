@@ -80,23 +80,23 @@ export const AdminRouteGuard = ({ children }) => {
   const requiredPermission = ROUTE_PERMISSION_MAP[location.pathname];
   const isSuperAdminOnlyRoute = location.pathname === '/admin/moderators' 
     || location.pathname === '/admin/broadcast' 
-    || location.pathname === '/admin/maintenance';
+    || location.pathname === '/admin/maintenance'
+    || location.pathname === '/admin/system';
 
   // Dynamic permission verification: SuperAdmin has full bypass; Moderator needs required permission
   const hasAccess = isAdmin || (!isSuperAdminOnlyRoute && isModerator && (!requiredPermission || permissions.includes(requiredPermission)));
   const restrictedForModerator = isModerator && !hasAccess;
 
-  useEffect(() => {
-    if (restrictedForModerator) {
-      // Find the first path the moderator actually has permission to view
-      const allowedPaths = Object.entries(ROUTE_PERMISSION_MAP)
-        .filter(([_, perm]) => permissions.includes(perm))
-        .map(([path]) => path);
+  const allowedModeratorPaths = Object.entries(ROUTE_PERMISSION_MAP)
+    .filter(([path, perm]) => !['/admin/moderators', '/admin/broadcast', '/admin/maintenance', '/admin/system'].includes(path) && permissions.includes(perm))
+    .map(([path]) => path);
+  const moderatorFallbackPath = allowedModeratorPaths.length > 0 ? allowedModeratorPaths[0] : '/';
 
-      const fallbackPath = allowedPaths.length > 0 ? allowedPaths[0] : '/admin/dashboard';
-      navigate(fallbackPath, { replace: true });
+  useEffect(() => {
+    if (restrictedForModerator && location.pathname !== moderatorFallbackPath) {
+      navigate(moderatorFallbackPath, { replace: true });
     }
-  }, [restrictedForModerator, permissions, navigate]);
+  }, [restrictedForModerator, moderatorFallbackPath, location.pathname, navigate]);
 
   // 1. Not Logged In -> Require Admin Login
   if (!isLoggedIn) {
@@ -173,9 +173,9 @@ export const AdminRouteGuard = ({ children }) => {
     );
   }
 
-  // 3. Unauthorized Moderator — Chuyển thẳng về trang kiểm duyệt địa điểm được cấp phép
+  // 3. Unauthorized Moderator — Chuyển về trang đầu tiên được cấp phép (tránh vòng lặp vô hạn)
   if (restrictedForModerator) {
-    return <Navigate to="/admin/places" replace />;
+    return <Navigate to={moderatorFallbackPath} replace />;
   }
 
   // 4. Authorized (Admin full / Moderator moderation-only)

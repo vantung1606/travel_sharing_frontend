@@ -168,7 +168,9 @@ export const AdminReportsPage = () => {
       setMetrics(metricsData);
       setReports(pendingReportsData);
       setArticles(allArticlesData);
-      if (Array.isArray(sysReportsData) && activeTab !== 'system_reports') {
+      if (activeTab === 'system_reports') {
+        await fetchSystemReports(systemReportStatusFilter, systemReportTypeFilter);
+      } else if (Array.isArray(sysReportsData)) {
         setSystemReports(sysReportsData);
       }
 
@@ -407,6 +409,37 @@ export const AdminReportsPage = () => {
       document.body.removeChild(link);
 
       toast.success('Đã xuất toàn bộ nhật ký kiểm duyệt ra file CSV thành công! 📊');
+      return;
+    }
+
+    if (activeTab === 'system_reports') {
+      if (systemReports.length === 0) {
+        toast.info('Không có dữ liệu báo cáo vi phạm để xuất file');
+        return;
+      }
+      const headers = ['ID', 'Loai Doi Tuong', 'Ma Doi Tuong', 'Tieu De', 'Danh Muc', 'Ly Do', 'Nguoi Bao Cao', 'Trang Thai', 'Ngay Tao'];
+      const rows = systemReports.map(r => [
+        r.id,
+        `"${r.targetType || ''}"`,
+        r.targetId || '',
+        `"${(r.targetTitle || '').replace(/"/g, '""')}"`,
+        `"${(r.category || '').replace(/"/g, '""')}"`,
+        `"${(r.reason || '').replace(/"/g, '""')}"`,
+        `"${(r.reporterEmail || r.reporterName || '').replace(/"/g, '""')}"`,
+        r.status || 'PENDING',
+        r.createdAt || ''
+      ]);
+      const csvStr = '\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const blob = new Blob([csvStr], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `wayfare_system_reports_${new Date().toISOString().slice(0, 10)}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success('Đã xuất danh sách báo cáo vi phạm ra file CSV thành công! 📊');
       return;
     }
 

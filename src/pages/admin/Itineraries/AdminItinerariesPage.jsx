@@ -60,12 +60,16 @@ export const AdminItinerariesPage = () => {
     fetchItineraries();
   }, [fetchItineraries]);
 
+  const isAiItinerary = (it) =>
+    Boolean(it?.isAiGenerated) ||
+    Boolean(it?.title && /\b(ai|wanderai)\b/i.test(it.title));
+
   // Statistics KPIs based on real Database Schema
   const stats = useMemo(() => {
     const total = itineraries.length;
     const publicCount = itineraries.filter(it => it.isPublic).length;
     const privateCount = total - publicCount;
-    const aiCount = itineraries.filter(it => it.isAiGenerated || (it.title && it.title.toLowerCase().includes('ai'))).length;
+    const aiCount = itineraries.filter(isAiItinerary).length;
     const hasBudgetCount = itineraries.filter(it => it.budgetTotal && Number(it.budgetTotal) > 0).length;
     const totalBudget = itineraries.reduce((sum, it) => sum + (Number(it.budgetTotal) || 0), 0);
 
@@ -80,7 +84,7 @@ export const AdminItinerariesPage = () => {
       if (visibilityFilter === 'PRIVATE' && it.isPublic) return false;
 
       // Source Filter
-      const isAi = it.isAiGenerated || (it.title && it.title.toLowerCase().includes('ai'));
+      const isAi = isAiItinerary(it);
       if (sourceFilter === 'AI' && !isAi) return false;
       if (sourceFilter === 'MANUAL' && isAi) return false;
 
@@ -201,7 +205,7 @@ export const AdminItinerariesPage = () => {
       region: dto.destination,
       coverImage: dto.coverImageUrl || null,
       coverImageUrl: dto.coverImageUrl || null,
-      duration: `${daysCount}N${Math.max(1, daysCount - 1)}Đ`,
+      duration: daysCount <= 1 ? '1 ngày' : `${daysCount}N${daysCount - 1}Đ`,
       daysCount: daysCount,
       status: (dto.status || 'ACTIVE').toLowerCase(),
       isAiGenerated: Boolean(dto.isAiGenerated),

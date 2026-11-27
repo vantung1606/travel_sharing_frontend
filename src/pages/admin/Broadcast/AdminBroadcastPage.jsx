@@ -185,12 +185,19 @@ export const AdminBroadcastPage = () => {
       return;
     }
 
+    const rawUrl = (form.targetUrl || '/').trim();
+    const isSafeUrl = rawUrl.startsWith('/') || /^https?:\/\//i.test(rawUrl);
+    if (!isSafeUrl) {
+      toast.error('Đường dẫn đích không hợp lệ (chỉ chấp nhận đường dẫn nội bộ /... hoặc https://...).');
+      return;
+    }
+
     try {
       setSending(true);
       const payload = {
         type: form.type,
         message: form.title ? `[${form.title}] ${form.message}` : form.message,
-        targetUrl: form.targetUrl || '/',
+        targetUrl: rawUrl,
         senderEmail: currentUser?.email
       };
 

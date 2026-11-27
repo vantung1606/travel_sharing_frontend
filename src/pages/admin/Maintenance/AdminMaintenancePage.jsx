@@ -127,6 +127,9 @@ export const AdminMaintenancePage = () => {
         : 'ĐÃ TẮT BẢO TRÌ! Hệ thống đã mở cửa công khai trở lại.');
     } catch (err) {
       console.error('Lỗi khi lưu cấu hình bảo trì:', err);
+      if (overrideEnabled !== null) {
+        setForm(prev => ({ ...prev, enabled: !overrideEnabled }));
+      }
       toast.error(err.message || 'Không thể cập nhật chế độ bảo trì');
     } finally {
       setSaving(false);

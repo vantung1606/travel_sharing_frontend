@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { adminUserApi } from '../../../services/api';
 import {
@@ -33,6 +34,7 @@ import { UserAvatar } from '../../../components/common/UserAvatar';
 import { ModeratorPermissionDrawer } from '../../../components/admin/ModeratorPermissionDrawer';
 
 export const AdminUsersPage = () => {
+  const { currentUser } = useApp();
   const toast = useToast();
 
   // State
@@ -211,6 +213,14 @@ export const AdminUsersPage = () => {
 
   // Handlers
   const handleToggleStatus = async (user) => {
+    if (
+      currentUser &&
+      ((currentUser.id != null && String(user.id) === String(currentUser.id)) ||
+        (currentUser.email && user.email && user.email.toLowerCase() === currentUser.email.toLowerCase()))
+    ) {
+      toast.warning('Bạn không thể tự khóa tài khoản Quản trị của chính mình!');
+      return;
+    }
     try {
       const willLock = user.status === 'ACTIVE';
       await adminUserApi.toggleUserStatus(user.id);
@@ -252,6 +262,14 @@ export const AdminUsersPage = () => {
 
   const handleSaveRole = async () => {
     if (!userToChangeRole) return;
+    const isSelf =
+      currentUser &&
+      ((currentUser.id != null && String(userToChangeRole.id) === String(currentUser.id)) ||
+        (currentUser.email && userToChangeRole.email && userToChangeRole.email.toLowerCase() === currentUser.email.toLowerCase()));
+    if (isSelf && newSelectedRole !== 'ROLE_ADMIN') {
+      toast.warning('Bạn không thể tự hạ quyền Quản trị viên của chính mình!');
+      return;
+    }
     try {
       setIsSavingRole(true);
       await adminUserApi.updateUserRole(userToChangeRole.id, newSelectedRole);
@@ -358,35 +376,37 @@ export const AdminUsersPage = () => {
   // Batch lock selected
   const handleBatchLock = async () => {
     if (selectedUserIds.length === 0) return;
+    const safeIds = selectedUserIds.filter((id) => !currentUser?.id || String(id) !== String(currentUser.id));
+    if (safeIds.length === 0) {
+      toast.warning('Không thể tự khóa tài khoản của chính mình!');
+      return;
+    }
+    if (!window.confirm(`Bạn có chắc muốn đổi trạng thái khóa/mở cho ${safeIds.length} tài khoản đã chọn?`)) {
+      return;
+    }
     try {
-      for (const id of selectedUserIds) {
+      for (const id of safeIds) {
         await adminUserApi.toggleUserStatus(id);
       }
-      toast.success(`Đã cập nhật trạng thái cho ${selectedUserIds.length} tài khoản!`);
+      toast.success(`Đã cập nhật trạng thái cho ${safeIds.length} tài khoản!`);
       setSelectedUserIds([]);
       loadData();
     } catch (err) {
       toast.error('Lỗi khi thao tác hàng loạt');
+      loadData();
     }
   };
 
-  // Helper for role badge (Paper-Ink-Clay style)
+  // Helper for role badge (Paper-Ink-Clay style) — check highest privilege first
   const renderRoleBadge = (roles) => {
-    if (!roles || roles.length === 0 || roles.includes('ROLE_USER')) {
-      return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-700 border border-ink-200/80 font-mono text-[10px] font-semibold">
-          Thành viên
-        </span>
-      );
-    }
-    if (roles.includes('ROLE_ADMIN')) {
+    if (Array.isArray(roles) && roles.includes('ROLE_ADMIN')) {
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] bg-amber-50 text-amber-900 border border-amber-300/80 font-serif font-bold text-[10px]">
           <Shield className="w-3 h-3 text-amber-700" /> Quản trị viên
         </span>
       );
     }
-    if (roles.includes('ROLE_MODERATOR')) {
+    if (Array.isArray(roles) && roles.includes('ROLE_MODERATOR')) {
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] bg-clay-50 text-clay-800 border border-clay-300/80 font-serif font-bold text-[10px]">
           <ShieldCheck className="w-3 h-3 text-clay-700" /> Kiểm duyệt
@@ -394,8 +414,8 @@ export const AdminUsersPage = () => {
       );
     }
     return (
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-700 border border-ink-200/80 font-mono text-[10px]">
-        {roles[0]}
+      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-700 border border-ink-200/80 font-mono text-[10px] font-semibold">
+        Thành viên
       </span>
     );
   };

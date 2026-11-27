@@ -355,6 +355,13 @@ export const AdminAppearancePage = () => {
     applyCssTokens(formData);
   }, [formData]);
 
+  // Restore published theme when leaving Appearance page without publishing
+  useEffect(() => {
+    return () => {
+      refreshTheme?.();
+    };
+  }, [refreshTheme]);
+
   // Handle color change
   const handleColorChange = (key, value) => {
     setFormData(prev => ({

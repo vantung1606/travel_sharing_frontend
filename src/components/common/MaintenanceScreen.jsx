@@ -68,7 +68,9 @@ export const MaintenanceScreen = ({ maintenanceData, onAdminBypass }) => {
     try {
       setChecking(true);
       const config = await publicConfigApi.getSiteConfig();
-      if (!config?.maintenance?.enabled) {
+      if (!config) {
+        toast.info('Chưa thể kết nối tới máy chủ. Vui lòng thử lại sau giây lát!');
+      } else if (!config?.maintenance?.enabled) {
         toast.success('Hệ thống bảo trì đã kết thúc! Đang đưa bạn vào trang web... 🎉');
         setTimeout(() => {
           window.location.reload();

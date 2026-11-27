@@ -420,9 +420,9 @@ export const AdminPlacesPage = () => {
       sourceList = pendingPlaces;
     } else if (activeTab === 'Đang hoạt động') {
       sourceList = allPlaces.filter(p => p.status === 'ACTIVE');
-    } else if (activeTab === 'Nổi bật (Featured)') {
+    } else if (activeTab === 'Nổi bật' || activeTab === 'Nổi bật (Featured)') {
       sourceList = allPlaces.filter(p => p.isFeatured);
-    } else if (activeTab === 'Bị báo cáo vi phạm') {
+    } else if (activeTab === 'Bị báo cáo' || activeTab === 'Bị báo cáo vi phạm') {
       const reportedTargetIds = new Set(
         placeReports.map(r => String(r.targetId))
       );
@@ -475,9 +475,10 @@ export const AdminPlacesPage = () => {
 
   // Metric stats calculation
   const totalActive = allPlaces.filter(p => p.status === 'ACTIVE').length;
-  const avgRating = allPlaces.length > 0
-    ? (allPlaces.reduce((sum, p) => sum + (Number(p.averageRating) || 0), 0) / allPlaces.length).toFixed(1)
-    : '4.8';
+  const ratedPlaces = allPlaces.filter(p => Number(p.averageRating) > 0);
+  const avgRating = ratedPlaces.length > 0
+    ? (ratedPlaces.reduce((sum, p) => sum + Number(p.averageRating), 0) / ratedPlaces.length).toFixed(1)
+    : '0.0';
 
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-200">

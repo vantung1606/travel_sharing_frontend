@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Flag, X, Camera, AlertTriangle, Loader2, CheckCircle2 } from 'lucide-react';
 import { reportApi, uploadApi } from '../../services/api';
+import { useApp } from '../../context/AppContext';
 import { useToast } from './Toast';
 
 export const UniversalReportModal = ({
@@ -10,6 +11,7 @@ export const UniversalReportModal = ({
   targetId,
   targetTitle = ''
 }) => {
+  const { isLoggedIn, setIsAuthModalOpen, setAuthMode } = useApp();
   const [category, setCategory] = useState('');
   const [reason, setReason] = useState('');
   const [description, setDescription] = useState('');
@@ -18,6 +20,14 @@ export const UniversalReportModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const toast = useToast();
+
+  // Reset form when target or modal open state changes to avoid stale cross-target submissions
+  useEffect(() => {
+    setCategory('');
+    setReason('');
+    setDescription('');
+    setEvidenceImageUrl('');
+  }, [isOpen, targetType, targetId]);
 
   if (!isOpen) return null;
 
@@ -55,7 +65,22 @@ export const UniversalReportModal = ({
 
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
+    if (!isLoggedIn) {
+      toast.showInfo('Vui lòng đăng nhập để đính kèm ảnh bằng chứng!');
+      setAuthMode?.('login');
+      setIsAuthModalOpen?.(true);
+      return;
+    }
+    if (!file.type?.startsWith('image/')) {
+      toast.showError('Chỉ hỗ trợ định dạng ảnh (JPG, PNG, WebP...).');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.showError('Ảnh bằng chứng vượt quá 10MB. Vui lòng chọn ảnh nhẹ hơn.');
+      return;
+    }
 
     try {
       setIsUploadingImage(true);
@@ -75,6 +100,16 @@ export const UniversalReportModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!isLoggedIn) {
+      toast.showInfo('Vui lòng đăng nhập để gửi báo cáo vi phạm!');
+      setAuthMode?.('login');
+      setIsAuthModalOpen?.(true);
+      return;
+    }
+    if (!targetId) {
+      toast.showError('Không xác định được đối tượng cần báo cáo.');
+      return;
+    }
     if (!category) {
       toast.showError('Vui lòng chọn danh mục vi phạm!');
       return;

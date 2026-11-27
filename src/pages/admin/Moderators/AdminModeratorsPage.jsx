@@ -369,8 +369,7 @@ export const AdminModeratorsPage = () => {
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <UserAvatar 
-                          avatarUrl={mod.avatarUrl} 
-                          fullName={mod.fullName} 
+                          user={mod}
                           size="md"
                           className="shrink-0"
                         />
@@ -416,8 +415,7 @@ export const AdminModeratorsPage = () => {
             <div className="p-4 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <UserAvatar 
-                  avatarUrl={selectedMod.avatarUrl} 
-                  fullName={selectedMod.fullName} 
+                  user={selectedMod}
                   size="lg"
                   className="border border-ink-200"
                 />
