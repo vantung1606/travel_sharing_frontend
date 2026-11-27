@@ -30,6 +30,9 @@ export const PlaceDetailPage = () => {
   const [weatherUnavailable, setWeatherUnavailable] = useState(false);
   const [isAddToTripModalOpen, setIsAddToTripModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportTargetType, setReportTargetType] = useState('PLACE');
+  const [reportTargetId, setReportTargetId] = useState(null);
+  const [reportTargetTitle, setReportTargetTitle] = useState('');
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
   // Review states
@@ -683,8 +686,8 @@ export const PlaceDetailPage = () => {
                           </div>
                         </div>
 
-                        {/* Actions for Author */}
-                        {isAuthor && !isEditingThis && (
+                        {/* Actions for Author or Report for Others */}
+                        {isAuthor && !isEditingThis ? (
                           <div className="flex items-center gap-1.5 text-slate-400">
                             <button
                               type="button"
@@ -703,7 +706,21 @@ export const PlaceDetailPage = () => {
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
-                        )}
+                        ) : !isAuthor && !isEditingThis && r.id ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setReportTargetType('REVIEW');
+                              setReportTargetId(r.id);
+                              setReportTargetTitle(`Đánh giá của ${r.authorName || 'du khách'}`);
+                              setIsReportModalOpen(true);
+                            }}
+                            className="p-1 text-slate-400 hover:text-rose-600 transition cursor-pointer"
+                            title="Báo cáo vi phạm đánh giá này"
+                          >
+                            <Flag className="w-3.5 h-3.5" />
+                          </button>
+                        ) : null}
                       </div>
 
                       {/* Content or Edit Form */}
@@ -814,7 +831,12 @@ export const PlaceDetailPage = () => {
               </button>
             )}
             <button
-              onClick={() => setIsReportModalOpen(true)}
+              onClick={() => {
+                setReportTargetType('PLACE');
+                setReportTargetId(Number(place?.rawId || place?.id || placeId));
+                setReportTargetTitle(place?.name || 'Địa điểm du lịch');
+                setIsReportModalOpen(true);
+              }}
               className="w-full flex items-center justify-center gap-2 bg-rose-50 border border-rose-200 hover:bg-rose-100 text-rose-700 rounded-xl h-11 font-bold text-xs transition cursor-pointer"
             >
               <Flag className="w-4 h-4 text-rose-600" /> Báo cáo vi phạm địa điểm
@@ -949,9 +971,9 @@ export const PlaceDetailPage = () => {
       <UniversalReportModal
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
-        targetType="PLACE"
-        targetId={Number(place?.rawId || place?.id || placeId)}
-        targetTitle={place?.name || 'Địa điểm du lịch'}
+        targetType={reportTargetType}
+        targetId={reportTargetId || Number(place?.rawId || place?.id || placeId)}
+        targetTitle={reportTargetTitle || place?.name || 'Địa điểm du lịch'}
       />
 
       {/* Styled Delete Review Confirmation Modal */}

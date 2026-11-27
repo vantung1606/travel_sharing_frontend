@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useToast } from '../../../components/common/Toast';
-import { adminReviewApi } from '../../../services/api';
+import { adminReviewApi, reportApi } from '../../../services/api';
 import { formatVietnamDateOnly } from '../../../utils/dateUtils';
 import { Star, Eye, EyeOff, Trash2, Search, RefreshCw, ChevronLeft, ChevronRight, MessageSquare, ShieldAlert, ExternalLink, X, ChevronDown } from 'lucide-react';
 import { UserAvatar } from '../../../components/common/UserAvatar';
@@ -33,6 +34,13 @@ export const AdminReviewsPage = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchKeyword, setSearchKeyword] = useState('');
   const [ratingFilter, setRatingFilter] = useState('all');
+  const [pendingReviewReportsCount, setPendingReviewReportsCount] = useState(0);
+
+  useEffect(() => {
+    reportApi.getAdminReports('PENDING', 'REVIEW')
+      .then((list) => setPendingReviewReportsCount(Array.isArray(list) ? list.length : 0))
+      .catch(() => {});
+  }, []);
   const [page, setPage] = useState(0);
   const [detailReview, setDetailReview] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -166,6 +174,23 @@ export const AdminReviewsPage = () => {
           </div>
         ))}
       </div>
+
+      {/* ── Pending Review Reports Shortcut Banner ── */}
+      {pendingReviewReportsCount > 0 && (
+        <Link
+          to="/admin/reports?tab=system_reports&type=REVIEW"
+          className="p-3.5 rounded-[6px] bg-rose-50 border border-rose-200 flex items-center justify-between gap-3 hover:bg-rose-100/70 transition-colors"
+        >
+          <div className="flex items-center gap-2.5 text-xs text-rose-900 font-bold">
+            <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+            <span>Hiện có {pendingReviewReportsCount} báo cáo vi phạm đánh giá địa điểm đang chờ xử lý.</span>
+          </div>
+          <span className="text-xs font-extrabold text-rose-700 inline-flex items-center gap-1 shrink-0">
+            <span>Xem & xử lý</span>
+            <ExternalLink className="w-3.5 h-3.5" />
+          </span>
+        </Link>
+      )}
 
       {/* ── Filters Toolbar ── */}
       <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 flex flex-wrap items-center gap-3">

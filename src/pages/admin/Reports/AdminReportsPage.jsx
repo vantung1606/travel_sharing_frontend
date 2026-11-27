@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useToast } from '../../../components/common/Toast';
 import { adminReportApi, auditLogApi, reportApi } from '../../../services/api';
 import { formatVietnam24h, formatVietnamRelativeTime } from '../../../utils/dateUtils';
@@ -26,7 +26,10 @@ const getSafeImageUrl = (url) => {
 
 export const AdminReportsPage = () => {
   const toast = useToast();
-  const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'all' | 'hidden' | 'audit'
+  const [searchParams] = useSearchParams();
+  const initialTab = searchParams.get('tab') || 'pending';
+  const initialType = searchParams.get('type') || 'ALL';
+  const [activeTab, setActiveTab] = useState(initialTab); // 'pending' | 'all' | 'hidden' | 'audit' | 'system_reports'
   const [pendingSubFilter, setPendingSubFilter] = useState('all'); // 'all' | 'ai_pending' | 'user_reported'
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -60,7 +63,7 @@ export const AdminReportsPage = () => {
   // System Reports (Place, User, Review) States (Batch 1 #74, #75, #76)
   const [systemReports, setSystemReports] = useState([]);
   const [systemReportStatusFilter, setSystemReportStatusFilter] = useState('ALL');
-  const [systemReportTypeFilter, setSystemReportTypeFilter] = useState('ALL');
+  const [systemReportTypeFilter, setSystemReportTypeFilter] = useState(initialType);
   const [systemReportLoading, setSystemReportLoading] = useState(false);
   const [resolvingReportId, setResolvingReportId] = useState(null);
   const [selectedEvidenceImage, setSelectedEvidenceImage] = useState(null);
@@ -152,15 +155,19 @@ export const AdminReportsPage = () => {
 
     try {
       const targetStatus = activeTab === 'pending' ? 'all' : activeTab;
-      const [metricsData, pendingReportsData, allArticlesData] = await Promise.all([
+      const [metricsData, pendingReportsData, allArticlesData, sysReportsData] = await Promise.all([
         adminReportApi.getMetrics(),
         adminReportApi.getPendingReports(searchQuery),
-        adminReportApi.getAllArticles({ keyword: searchQuery, status: targetStatus })
+        adminReportApi.getAllArticles({ keyword: searchQuery, status: targetStatus }),
+        reportApi.getAdminReports('ALL', 'ALL').catch(() => [])
       ]);
 
       setMetrics(metricsData);
       setReports(pendingReportsData);
       setArticles(allArticlesData);
+      if (Array.isArray(sysReportsData) && activeTab !== 'system_reports') {
+        setSystemReports(sysReportsData);
+      }
 
       if (activeTab === 'audit') {
         await fetchAuditLogs(auditPage);
@@ -669,6 +676,11 @@ export const AdminReportsPage = () => {
         >
           <Flag className="w-3.5 h-3.5 text-amber-600" />
           <span>Báo cáo Đa đối tượng (Địa điểm / Du khách / Review)</span>
+          {systemReports.filter(r => r.status === 'PENDING').length > 0 && (
+            <span className="px-1.5 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-black leading-none">
+              {systemReports.filter(r => r.status === 'PENDING').length}
+            </span>
+          )}
         </button>
       </div>
 
