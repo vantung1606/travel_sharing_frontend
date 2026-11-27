@@ -2028,7 +2028,7 @@ export const CommunityPage = () => {
               return (
                 <article
                   key={post.id}
-                  className={`bg-[#FFFDF8] rounded-sm sm:rounded-sm p-3 sm:p-5 border border-[#1E1A15]/10 hover:shadow-none transition-all space-y-3 relative ${
+                  className={`bg-white rounded-xl p-4 sm:p-5 border border-slate-300/90 shadow-sm hover:shadow-md transition-all space-y-3.5 relative ${
                     openMenuPostId === post.id ? 'z-40' : 'z-0'
                   }`}
                 >
@@ -2654,102 +2654,102 @@ export const CommunityPage = () => {
 
                         return (
                           <div
-                            className="rounded-[6px] overflow-hidden border border-[#1E1A15]/10 bg-[#F8F4EC] cursor-pointer select-none"
+                            className="rounded-xl overflow-hidden border border-slate-300 bg-slate-200 cursor-pointer select-none shadow-2xs"
                             title="Bấm vào ảnh để phóng to toàn màn hình"
                           >
                             {/* CASE 1: 1 PHOTO */}
                             {validImages.length === 1 ? (
                               <div
-                                className="w-full max-h-[460px] overflow-hidden bg-black/5 flex items-center justify-center"
+                                className="w-full max-h-[520px] overflow-hidden bg-slate-100 flex items-center justify-center"
                                 onClick={(e) => handleOpenLightbox(post, 0, e, validImages)}
                               >
                                 <img
                                   src={validImages[0]}
                                   alt="Post photo"
                                   onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                  className="w-full max-h-[460px] object-cover hover:scale-[1.01] transition-transform duration-300"
+                                  className="w-full max-h-[520px] object-contain bg-slate-100 transition-transform duration-300"
                                 />
                               </div>
                             ) : validImages.length === 2 ? (
-                              /* CASE 2: 2 PHOTOS (Balanced 50/50 Split) */
-                              <div className="grid grid-cols-2 gap-1.5 h-64 sm:h-80">
+                              /* CASE 2: 2 PHOTOS (Balanced 50/50 Split with crisp divider) */
+                              <div className="grid grid-cols-2 gap-1 bg-slate-200">
                                 {validImages.map((img, i) => (
                                   <div
                                     key={i}
-                                    className="h-full overflow-hidden"
+                                    className="aspect-[4/3] sm:aspect-square overflow-hidden bg-slate-100"
                                     onClick={(e) => handleOpenLightbox(post, i, e, validImages)}
                                   >
                                     <img
                                       src={img}
                                       alt={`Post photo ${i + 1}`}
                                       onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                      className="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-300"
                                     />
                                   </div>
                                 ))}
                               </div>
                             ) : validImages.length === 3 ? (
                               /* CASE 3: 3 PHOTOS (1 Large 8-col + 2 Stacked 4-col) */
-                              <div className="grid grid-cols-12 gap-1.5 h-72 sm:h-84">
+                              <div className="grid grid-cols-12 gap-1 h-72 sm:h-96 bg-slate-200">
                                 <div
-                                  className="col-span-8 h-full overflow-hidden"
+                                  className="col-span-8 h-full overflow-hidden bg-slate-100"
                                   onClick={(e) => handleOpenLightbox(post, 0, e, validImages)}
                                 >
                                   <img
                                     src={validImages[0]}
                                     alt="Post photo 1"
                                     onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                    className="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-300"
                                   />
                                 </div>
-                                <div className="col-span-4 grid grid-rows-2 gap-1.5 h-full">
+                                <div className="col-span-4 grid grid-rows-2 gap-1 h-full bg-slate-200">
                                   <div
-                                    className="h-full overflow-hidden"
+                                    className="h-full overflow-hidden bg-slate-100"
                                     onClick={(e) => handleOpenLightbox(post, 1, e, validImages)}
                                   >
                                     <img
                                       src={validImages[1]}
                                       alt="Post photo 2"
                                       onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                      className="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-300"
                                     />
                                   </div>
                                   <div
-                                    className="h-full overflow-hidden"
+                                    className="h-full overflow-hidden bg-slate-100"
                                     onClick={(e) => handleOpenLightbox(post, 2, e, validImages)}
                                   >
                                     <img
                                       src={validImages[2]}
                                       alt="Post photo 3"
                                       onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                      className="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-300"
                                     />
                                   </div>
                                 </div>
                               </div>
                             ) : (
                               /* CASE 4 & 5+: 4 HOẶC NHIỀU HƠN (Lưới 2x2 cân xứng, ô thứ 4 phủ +N nếu có > 4 ảnh) */
-                              <div className="grid grid-cols-2 grid-rows-2 gap-1.5 h-72 sm:h-88">
+                              <div className="grid grid-cols-2 grid-rows-2 gap-1 h-72 sm:h-96 bg-slate-200">
                                 {validImages.slice(0, 4).map((img, i) => {
                                   const isLast = i === 3 && validImages.length > 4;
                                   return (
                                     <div
                                       key={i}
-                                      className="relative h-full overflow-hidden group/item cursor-pointer"
+                                      className="relative h-full overflow-hidden bg-slate-100 group/item cursor-pointer"
                                       onClick={(e) => handleOpenLightbox(post, i, e, validImages)}
                                     >
                                       <img
                                         src={img}
                                         alt={`Post photo ${i + 1}`}
                                         onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                                        className="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-300"
                                       />
                                       {isLast && (
-                                        <div className="absolute inset-0 bg-[#1E1A15]/65 backdrop-blur-[1px] flex flex-col items-center justify-center text-white font-bold group-hover/item:bg-[#1E1A15]/75 transition-all">
+                                        <div className="absolute inset-0 bg-slate-900/65 flex flex-col items-center justify-center text-white font-bold group-hover/item:bg-slate-900/75 transition-all">
                                           <span className="text-xl sm:text-3xl font-black leading-none drop-shadow-md">
                                             +{validImages.length - 4}
                                           </span>
-                                          <span className="text-xs sm:text-sm font-semibold text-white/90 mt-1">
+                                          <span className="text-xs sm:text-sm font-semibold text-white/95 mt-1">
                                             ảnh
                                           </span>
                                         </div>
@@ -2769,7 +2769,7 @@ export const CommunityPage = () => {
                   {!post.sharedPost && hasItinerary && (
                     <div
                       onClick={() => handleViewItineraryDetails(post)}
-                      className="p-3 sm:p-3.5 rounded-[6px] bg-[#FAF7F0] hover:bg-[#F3ECE0] border border-[#E8DFD1] transition-all cursor-pointer group/itin flex items-center justify-between gap-3 shadow-2xs hover:shadow-xs"
+                      className="p-3 sm:p-3.5 rounded-xl bg-slate-50 hover:bg-sky-50/40 border border-slate-300/90 transition-all cursor-pointer group/itin flex items-center justify-between gap-3 shadow-2xs hover:shadow-xs"
                       title="Bấm để xem chi tiết lộ trình"
                     >
                       <div className="flex items-center gap-3 min-w-0">
@@ -2847,7 +2847,7 @@ export const CommunityPage = () => {
 
 
                   {/* Post Interaction Bar (Facebook Style) */}
-                  <div className="flex items-center justify-between pt-2.5 sm:pt-3 border-t border-[#1E1A15]/10 text-xs sm:text-sm text-[#5A5146] font-sans flex-wrap gap-y-2">
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-200 text-xs sm:text-sm text-[#5A5146] font-sans flex-wrap gap-y-2">
                     <div className="flex items-center gap-1 sm:gap-2">
                       {/* Like Button & Likers Count */}
                       <div className="inline-flex items-center rounded-sm hover:bg-[#F3EDE2] transition-colors">
