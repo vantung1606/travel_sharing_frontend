@@ -539,6 +539,38 @@ export const itineraryApi = {
       throw new Error(err.message || `HTTP ${response.status}`);
     }
     return true;
+  },
+
+  async addMember(id, email, role = 'VIEWER') {
+    const response = await fetch(`${BASE_URL}/itineraries/${id}/members`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ email, role })
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    const res = await response.json();
+    return res.data;
+  },
+
+  async removeMember(id, userId) {
+    const response = await fetch(`${BASE_URL}/itineraries/${id}/members/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      }
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    return true;
   }
 };
 

@@ -81,11 +81,14 @@ export const AdminReportsPage = () => {
     }
   };
 
-  const handleResolveSystemReport = async (id, action, notes = '') => {
+  const handleResolveSystemReport = async (id, action, notes = '', confirmMsg = '') => {
+    if (confirmMsg && !window.confirm(confirmMsg)) {
+      return;
+    }
     try {
       setResolvingReportId(id);
       await reportApi.resolveReport(id, action, notes);
-      toast.success(`Đã cập nhật trạng thái báo cáo #${id} (${action})!`);
+      toast.success(`Đã cập nhật trạng thái báo cáo #${id} (${notes || action})!`);
       await fetchSystemReports();
     } catch (err) {
       toast.error('Lỗi khi cập nhật trạng thái báo cáo: ' + err.message);
@@ -1505,7 +1508,12 @@ export const AdminReportsPage = () => {
                                     {resolvingReportId === rep.id ? 'Đang xử lý...' : 'Ẩn đánh giá'}
                                   </button>
                                   <button
-                                    onClick={() => handleResolveSystemReport(rep.id, 'DELETE_TARGET', 'Đã xóa vĩnh viễn đánh giá vi phạm')}
+                                    onClick={() => handleResolveSystemReport(
+                                      rep.id,
+                                      'DELETE_TARGET',
+                                      'Đã xóa vĩnh viễn đánh giá vi phạm',
+                                      `Xác nhận xóa vĩnh viễn đánh giá trong báo cáo #${rep.id}? Hành động này không thể hoàn tác.`
+                                    )}
                                     disabled={resolvingReportId === rep.id}
                                     className="px-2.5 py-1.5 rounded-[4px] bg-rose-600 hover:bg-rose-700 text-[#FFFDF8] text-[11px] font-bold whitespace-nowrap cursor-pointer transition-colors disabled:opacity-50"
                                   >
@@ -1533,7 +1541,12 @@ export const AdminReportsPage = () => {
                               )}
                               {rep.targetType === 'USER' && (
                                 <button
-                                  onClick={() => handleResolveSystemReport(rep.id, 'HIDE_TARGET', 'Đã khóa tài khoản vi phạm')}
+                                  onClick={() => handleResolveSystemReport(
+                                    rep.id,
+                                    'HIDE_TARGET',
+                                    'Đã khóa tài khoản vi phạm',
+                                    `Xác nhận khóa tài khoản "${rep.targetTitle || '#' + rep.targetId}" do vi phạm?`
+                                  )}
                                   disabled={resolvingReportId === rep.id}
                                   className="px-2.5 py-1.5 rounded-[4px] bg-rose-600 hover:bg-rose-700 text-[#FFFDF8] text-[11px] font-bold whitespace-nowrap cursor-pointer transition-colors disabled:opacity-50"
                                 >

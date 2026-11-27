@@ -6,6 +6,7 @@ import { useApp } from '../../context/AppContext';
 import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2, Globe, Lock, Edit3, ArrowUp, ArrowDown } from 'lucide-react';
 import { ItineraryExportModal } from './ItineraryExportModal';
 import { EditItineraryModal } from './EditItineraryModal';
+import { ItineraryExpensesMembersPanel } from './ItineraryExpensesMembersPanel';
 import { AddToTripModal } from '../../pages/user/Explore/components/AddToTripModal';
 import { itineraryApi } from '../../services/api';
 
@@ -1600,6 +1601,13 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
                 </div>
               </div>
             </div>
+
+            {/* 3.5. CHI TIÊU THỰC TẾ & BẠN ĐỒNG HÀNH (CSDL MySQL) */}
+            <ItineraryExpensesMembersPanel
+              itineraryId={itinerary?.id}
+              budgetTotal={itinerary?.totalBudget || itinerary?.budgetTotal || itinerary?.budget || 0}
+              isOwner={isOwner}
+            />
 
             {/* 4. LƯU Ý & GHI CHÚ CHUYẾN ĐI (nếu có) */}
             {itinerary.aiTipNote ? (
