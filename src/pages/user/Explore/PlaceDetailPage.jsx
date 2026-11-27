@@ -10,7 +10,6 @@ import { useToast } from '../../../components/common/Toast';
 import { RealMapView } from '../../../components/map/RealMapView';
 import { fetchLiveWeather } from '../../../utils/weatherUtils';
 import { mapApiSpot } from '../../../utils/placeMap';
-import { pickFallbackImage, SHARED_PLACEHOLDER_IMAGE } from '../../../utils/placeImages';
 import { AddToTripModal } from './components/AddToTripModal';
 import { UniversalReportModal } from '../../../components/common/UniversalReportModal';
 
@@ -34,6 +33,7 @@ export const PlaceDetailPage = () => {
   const [reportTargetId, setReportTargetId] = useState(null);
   const [reportTargetTitle, setReportTargetTitle] = useState('');
   const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [failedImageUrls, setFailedImageUrls] = useState(() => new Set());
 
   // Review states
   const [isAddingReview, setIsAddingReview] = useState(false);
@@ -194,6 +194,8 @@ export const PlaceDetailPage = () => {
   useEffect(() => {
     let alive = true;
     setLoading(true);
+    setFailedImageUrls(new Set());
+    setLightboxIndex(null);
     placeApi.getPlaceById(placeId).then((p) => {
       if (!alive) return;
       setPlace(p ? mapApiSpot(p) : null);
@@ -244,16 +246,18 @@ export const PlaceDetailPage = () => {
     toast.success(<div><p className="font-bold">Đã sao chép link chia sẻ!</p><p className="text-[11px] text-slate-200 font-normal mt-0.5">{url}</p></div>);
   };
 
-  const handleImageError = (e) => {
-    const img = e.currentTarget;
-    const fallback = pickFallbackImage(place?.rawId ?? 0);
-    if (img.src !== fallback) img.src = fallback;
-    else img.src = SHARED_PLACEHOLDER_IMAGE;
+  const handleImageError = (failedUrl) => {
+    if (!failedUrl) return;
+    setFailedImageUrls((prev) => {
+      if (prev.has(failedUrl)) return prev;
+      const next = new Set(prev);
+      next.add(failedUrl);
+      return next;
+    });
   };
 
-  const galleryImages = (Array.isArray(place?.images) && place.images.length > 0)
-    ? place.images
-    : (place?.image ? [place.image] : []);
+  const galleryImages = (Array.isArray(place?.realImages) ? place.realImages : (Array.isArray(place?.images) ? place.images : []))
+    .filter((url) => Boolean(url) && !failedImageUrls.has(url));
 
   useEffect(() => {
     if (lightboxIndex === null) return;
@@ -324,7 +328,7 @@ export const PlaceDetailPage = () => {
             <img
               src={galleryImages[0]}
               alt={place.name}
-              onError={handleImageError}
+              onError={() => handleImageError(galleryImages[0])}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
@@ -391,7 +395,7 @@ export const PlaceDetailPage = () => {
               <img
                 src={galleryImages[1]}
                 alt={`${place.name} - 2`}
-                onError={handleImageError}
+                onError={() => handleImageError(galleryImages[1])}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors" />
@@ -408,7 +412,7 @@ export const PlaceDetailPage = () => {
               <img
                 src={galleryImages[2]}
                 alt={`${place.name} - 3`}
-                onError={handleImageError}
+                onError={() => handleImageError(galleryImages[2])}
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-black/45 hover:bg-black/55 transition-colors flex flex-col items-center justify-center text-white gap-1 backdrop-blur-[1px]">
@@ -431,7 +435,7 @@ export const PlaceDetailPage = () => {
             <img
               src={galleryImages[0]}
               alt={place.name}
-              onError={handleImageError}
+              onError={() => handleImageError(galleryImages[0])}
               className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
@@ -466,16 +470,16 @@ export const PlaceDetailPage = () => {
             </div>
           </div>
         </div>
-      ) : (
-        /* Single Hero Photo */
+      ) : galleryImages.length === 1 ? (
+        /* Single Real Hero Photo */
         <div
-          onClick={() => galleryImages[0] && setLightboxIndex(0)}
+          onClick={() => setLightboxIndex(0)}
           className="relative h-56 sm:h-80 md:h-[400px] rounded-3xl overflow-hidden border border-slate-200/90 shadow-sm bg-slate-950 cursor-pointer group select-none"
         >
           <img
-            src={galleryImages[0] || place.image}
+            src={galleryImages[0]}
             alt={place.name}
-            onError={handleImageError}
+            onError={() => handleImageError(galleryImages[0])}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent pointer-events-none" />
@@ -511,6 +515,37 @@ export const PlaceDetailPage = () => {
               </span>
             )}
           </div>
+        </div>
+      ) : (
+        /* Không có ảnh thật -> ẩn khung ảnh, chỉ hiển thị tiêu đề gọn gàng */
+        <div className="bg-white rounded-2xl border border-slate-200/90 p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="min-w-0 space-y-1.5">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-[11px] font-bold text-slate-700 border border-slate-200">
+                {place.category}
+              </span>
+              {place.isVerifiedHost && (
+                <span className="px-2 py-0.5 rounded-full bg-sky-50 text-[11px] font-bold text-sky-700 border border-sky-200 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" /> Đã xác thực
+                </span>
+              )}
+              <span className="text-xs font-semibold text-slate-500 flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-sky-600" /> {place.city}
+              </span>
+            </div>
+            <h1 className="font-display text-2xl sm:text-3xl font-black text-slate-900 truncate">{place.name}</h1>
+          </div>
+          {place.rating && place.reviewsCount > 0 ? (
+            <div className="flex items-center gap-1.5 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 shrink-0">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span className="font-black text-amber-700 text-sm">{place.rating}</span>
+              <span className="text-[11px] text-slate-500 font-semibold">({place.reviewsCount} đánh giá)</span>
+            </div>
+          ) : (
+            <span className="text-xs text-slate-500 font-semibold bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+              Mới · chưa có đánh giá
+            </span>
+          )}
         </div>
       )}
 

@@ -1,4 +1,24 @@
-import { resolvePlaceImage } from './placeImages';
+import { fixImageUrl, PLACE_IMAGE_POOL, resolvePlaceImage, SHARED_PLACEHOLDER_IMAGE } from './placeImages';
+
+const FAKE_FALLBACK_SET = new Set([SHARED_PLACEHOLDER_IMAGE, ...(PLACE_IMAGE_POOL || [])]);
+
+function extractRealImages(p) {
+  const seen = new Set();
+  const list = [];
+  const pushIfReal = (raw) => {
+    const fixed = fixImageUrl(raw);
+    if (!fixed) return;
+    if (FAKE_FALLBACK_SET.has(fixed)) return;
+    if (seen.has(fixed)) return;
+    seen.add(fixed);
+    list.push(fixed);
+  };
+  if (Array.isArray(p?.images)) {
+    p.images.forEach(pushIfReal);
+  }
+  pushIfReal(p?.coverImageUrl ?? p?.coverImage);
+  return list;
+}
 
 /**
  * Chuyển 1 địa điểm thô từ API /places sang item thống nhất dùng xuyên suốt
@@ -7,6 +27,7 @@ import { resolvePlaceImage } from './placeImages';
  */
 export function mapApiSpot(p) {
   if (!p || p.id == null) return null;
+  const realImages = extractRealImages(p);
   return {
     id: `spot-${p.id}`,
     rawId: p.id,
@@ -16,7 +37,8 @@ export function mapApiSpot(p) {
     city: p.city || 'Việt Nam',
     address: p.address,
     image: resolvePlaceImage(p),
-    images: Array.isArray(p.images) && p.images.length > 0 ? p.images : (resolvePlaceImage(p) ? [resolvePlaceImage(p)] : []),
+    images: realImages,
+    realImages,
     latitude: p.latitude,
     longitude: p.longitude,
     rating: p.averageRating ? Number(p.averageRating).toFixed(1) : null,
