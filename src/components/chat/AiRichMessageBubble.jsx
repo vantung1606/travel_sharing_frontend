@@ -20,7 +20,7 @@ import {
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
-import { itineraryApi, savedPlaceApi } from '../../services/api';
+import { itineraryApi, savedPlaceApi, postApi } from '../../services/api';
 import { useApp } from '../../context/AppContext';
 
 function FormattedReplyText({ text }) {
@@ -106,6 +106,18 @@ const ACTION_STYLE_MAP = {
   NAVIGATE: {
     icon: ExternalLink,
     cls: 'bg-[#FAF7F0] hover:bg-clay-50 text-ink-800 border-ink-200'
+  },
+  CLONE_ITINERARY: {
+    icon: Plus,
+    cls: 'bg-clay-50 hover:bg-clay-100 text-clay-800 border-clay-200'
+  },
+  TOGGLE_ITINERARY_VISIBILITY: {
+    icon: ExternalLink,
+    cls: 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
+  },
+  CREATE_POST: {
+    icon: FileText,
+    cls: 'bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] border-clay-600 shadow-xs'
   }
 };
 
@@ -571,6 +583,134 @@ function AddStopActionCard({
   );
 }
 
+function AddExpenseActionCard({
+  action,
+  idx,
+  itineraries,
+  isLoading,
+  doneInfo,
+  onAddExpense,
+  onNavigate
+}) {
+  const p = action.payload || {};
+  const list = Array.isArray(itineraries) ? itineraries : [];
+  const initialItinId = p.itineraryId && list.some(it => String(it.id) === String(p.itineraryId))
+    ? String(p.itineraryId)
+    : (list[0]?.id ? String(list[0].id) : (p.itineraryId ? String(p.itineraryId) : ''));
+
+  const [selectedItinId, setSelectedItinId] = useState(initialItinId);
+  const [amount, setAmount] = useState(p.amount ? String(p.amount) : '100000');
+  const [category, setCategory] = useState(p.category || 'Ăn uống');
+  const [description, setDescription] = useState(p.description || action.label || 'Chi tiêu chuyến đi');
+
+  const selectedItin = list.find(it => String(it.id) === String(selectedItinId));
+  const targetTitle = selectedItin?.title || p.itineraryTitle || (selectedItinId ? `Lịch trình #${selectedItinId}` : 'Chưa có lịch trình');
+
+  return (
+    <div className="rounded-[7px] border border-amber-200/90 bg-[#FFFDF5] p-3 space-y-2 text-[11.5px]">
+      <div className="flex items-center justify-between gap-2">
+        <div className="font-bold text-ink-900 flex items-center gap-1.5">
+          <Wallet className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+          <span>Ghi nhận chi tiêu chuyến đi</span>
+        </div>
+        {Number(amount) > 0 && (
+          <span className="text-[11.5px] font-bold text-amber-700">{formatCurrency(amount)}</span>
+        )}
+      </div>
+
+      {!doneInfo && (
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-1.5">
+          <div className="sm:col-span-6">
+            <label className="block text-[10px] font-bold text-ink-500 mb-0.5">Lịch trình</label>
+            {list.length > 0 ? (
+              <select
+                value={selectedItinId}
+                onChange={(e) => setSelectedItinId(e.target.value)}
+                className="w-full px-2 py-1.5 rounded border border-ink-200 bg-white text-[11px] font-medium text-ink-800 outline-none focus:border-amber-500"
+              >
+                {list.map(it => (
+                  <option key={it.id} value={String(it.id)}>{it.title}</option>
+                ))}
+              </select>
+            ) : (
+              <div className="px-2 py-1.5 rounded border border-amber-200 bg-amber-50 text-[11px] text-amber-800">{targetTitle}</div>
+            )}
+          </div>
+          <div className="sm:col-span-3">
+            <label className="block text-[10px] font-bold text-ink-500 mb-0.5">Hạng mục</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="w-full px-2 py-1.5 rounded border border-ink-200 bg-white text-[11px] font-medium text-ink-800 outline-none focus:border-amber-500"
+            >
+              {['Ăn uống', 'Di chuyển', 'Lưu trú', 'Tham quan', 'Mua sắm', 'Khác'].map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+          <div className="sm:col-span-3">
+            <label className="block text-[10px] font-bold text-ink-500 mb-0.5">Số tiền (đ)</label>
+            <input
+              type="number"
+              min="0"
+              step="10000"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full px-2 py-1.5 rounded border border-ink-200 bg-white text-[11px] font-medium text-ink-800 outline-none focus:border-amber-500"
+            />
+          </div>
+          <div className="sm:col-span-12">
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Mô tả khoản chi..."
+              className="w-full px-2 py-1.5 rounded border border-ink-200 bg-white text-[11px] text-ink-800 outline-none focus:border-amber-500"
+            />
+          </div>
+        </div>
+      )}
+
+      {doneInfo ? (
+        <button
+          type="button"
+          onClick={() => doneInfo.itineraryId && onNavigate(`/itineraries?id=${doneInfo.itineraryId}`)}
+          className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-[6px] text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer"
+        >
+          <Check className="w-3.5 h-3.5" />
+          <span>{doneInfo.label}</span>
+          <ArrowRight className="w-3 h-3" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          disabled={isLoading || !selectedItinId || Number(amount) <= 0}
+          onClick={() =>
+            onAddExpense(
+              {
+                ...action,
+                payload: {
+                  ...p,
+                  itineraryId: Number(selectedItinId),
+                  itineraryTitle: targetTitle,
+                  amount: Number(amount),
+                  category,
+                  description: description.trim() || category
+                }
+              },
+              idx
+            )
+          }
+          className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-[6px] text-[11px] font-bold bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white transition-colors cursor-pointer"
+        >
+          {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+          <span>{selectedItinId ? `Ghi ${formatCurrency(amount) || ''} vào ${targetTitle}` : 'Chưa có lịch trình'}</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 export const AiRichMessageBubble = ({
   msg,
   effectiveEmail,
@@ -602,11 +742,14 @@ export const AiRichMessageBubble = ({
   const addStopActions = actions
     .map((act, idx) => ({ act, idx }))
     .filter(({ act }) => String(act?.type || '').toUpperCase() === 'ADD_ITINERARY_STOP');
+  const addExpenseActions = actions
+    .map((act, idx) => ({ act, idx }))
+    .filter(({ act }) => String(act?.type || '').toUpperCase() === 'ADD_EXPENSE');
   const otherActions = actions
     .map((act, idx) => ({ act, idx }))
     .filter(({ act }) => {
       const t = String(act?.type || '').toUpperCase();
-      return t !== 'CREATE_ITINERARY' && t !== 'ADD_ITINERARY_STOP';
+      return t !== 'CREATE_ITINERARY' && t !== 'ADD_ITINERARY_STOP' && t !== 'ADD_EXPENSE';
     });
 
   // Lọc trùng: không hiển thị quickReply nếu giống hệt nhãn nút action phía trên
@@ -770,6 +913,45 @@ export const AiRichMessageBubble = ({
         await savedPlaceApi.removeSavedPlace(payload.placeId);
         toast.showSuccess(`Đã bỏ lưu "${payload.placeName || 'địa điểm'}".`);
         setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã bỏ lưu' } }));
+      } else if (type === 'ADD_EXPENSE') {
+        if (!payload.itineraryId) throw new Error('Thiếu mã lịch trình.');
+        await itineraryApi.addExpense(
+          payload.itineraryId,
+          {
+            amount: Number(payload.amount) || 0,
+            category: payload.category || 'Khác',
+            description: payload.description || 'Chi tiêu chuyến đi'
+          },
+          effectiveEmail
+        );
+        await fetchItineraries(effectiveEmail);
+        toast.showSuccess(`Đã ghi khoản chi ${formatCurrency(payload.amount) || ''} vào "${payload.itineraryTitle || 'lịch trình'}"!`);
+        setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã ghi chi tiêu • Mở lịch trình', itineraryId: payload.itineraryId } }));
+      } else if (type === 'CLONE_ITINERARY') {
+        if (!payload.itineraryId) throw new Error('Thiếu mã lịch trình.');
+        const cloned = await itineraryApi.cloneItinerary(payload.itineraryId, effectiveEmail);
+        await fetchItineraries(effectiveEmail);
+        toast.showSuccess(`Đã sao chép lịch trình "${cloned?.title || payload.title || ''}" về kho!`);
+        setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã sao chép • Mở xem', itineraryId: cloned?.id } }));
+      } else if (type === 'TOGGLE_ITINERARY_VISIBILITY') {
+        if (!payload.itineraryId) throw new Error('Thiếu mã lịch trình.');
+        const updated = await itineraryApi.toggleVisibility(payload.itineraryId, payload.isPublic);
+        await fetchItineraries(effectiveEmail);
+        toast.showSuccess(updated?.isPublic ? 'Đã chuyển lịch trình sang Công khai!' : 'Đã chuyển lịch trình sang Riêng tư!');
+        setDoneMap(prev => ({ ...prev, [idx]: { label: updated?.isPublic ? 'Đã công khai' : 'Đã đặt riêng tư', itineraryId: payload.itineraryId } }));
+      } else if (type === 'CREATE_POST') {
+        const createdPost = await postApi.createPost(
+          {
+            title: payload.title || 'Chia sẻ trải nghiệm du lịch',
+            content: payload.content || '',
+            locationTag: payload.locationTag || '',
+            itineraryId: payload.itineraryId ? Number(payload.itineraryId) : null,
+            visibility: 'PUBLIC'
+          },
+          effectiveEmail
+        );
+        toast.showSuccess('Đã đăng bài viết lên Cộng đồng!');
+        setDoneMap(prev => ({ ...prev, [idx]: { label: 'Đã đăng bài • Mở Cộng đồng', postId: createdPost?.id } }));
       }
     } catch (err) {
       toast.showError(err?.message || 'Không thể thực hiện thao tác. Vui lòng thử lại!');
@@ -817,6 +999,24 @@ export const AiRichMessageBubble = ({
         </div>
       )}
 
+      {/* Card Ghi nhận Chi tiêu chuyến đi */}
+      {addExpenseActions.length > 0 && (
+        <div className="space-y-2 pt-1">
+          {addExpenseActions.map(({ act, idx }) => (
+            <AddExpenseActionCard
+              key={idx}
+              action={act}
+              idx={idx}
+              itineraries={itineraries}
+              isLoading={loadingIdx === idx}
+              doneInfo={doneMap[idx]}
+              onAddExpense={executeAction}
+              onNavigate={navigate}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Các nút thao tác Thêm / Sửa / Xóa / Lưu / Xem chi tiết */}
       {otherActions.length > 0 && (
         <div className="pt-2 border-t border-ink-200/50 space-y-1.5">
@@ -833,12 +1033,13 @@ export const AiRichMessageBubble = ({
                     type="button"
                     onClick={() => {
                       if (doneInfo.itineraryId) navigate(`/itineraries?id=${doneInfo.itineraryId}`);
+                      else if (doneInfo.postId) navigate(`/community?postId=${doneInfo.postId}`);
                     }}
                     className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[6px] text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-pointer hover:bg-emerald-100 transition-colors"
                   >
                     <Check className="w-3.5 h-3.5" />
                     <span>{doneInfo.label}</span>
-                    {doneInfo.itineraryId && <ArrowRight className="w-3 h-3" />}
+                    {(doneInfo.itineraryId || doneInfo.postId) && <ArrowRight className="w-3 h-3" />}
                   </button>
                 );
               }
