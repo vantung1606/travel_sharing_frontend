@@ -44,12 +44,12 @@ export const ExploreSpotCard = ({
     <div
       id={`explore-card-${item.id}`}
       onClick={() => onOpenDetail(item)}
-      className={`bg-[#FFFDF8] rounded-[6px] overflow-hidden border transition-colors duration-200 cursor-pointer flex flex-col group relative ${
-        isActive ? 'border-clay-500' : 'border-ink-200/80 hover:border-clay-400'
+      className={`bg-white rounded-xl overflow-hidden border shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col group relative ${
+        isActive ? 'border-clay-500 ring-1 ring-clay-500/30' : 'border-slate-300/90 hover:border-slate-400'
       }`}
     >
       {/* 1. Image cover */}
-      <div className="relative h-40 sm:h-44 w-full overflow-hidden bg-ink-100 shrink-0">
+      <div className="relative h-44 w-full overflow-hidden bg-slate-100 border-b border-slate-200 shrink-0">
         <img
           src={item.image}
           alt={item.name}
@@ -140,7 +140,7 @@ export const ExploreSpotCard = ({
           {item.description || item.tagline}
         </p>
 
-        <div className="mt-auto pt-2.5 border-t border-ink-200/70 flex items-center justify-between gap-2">
+        <div className="mt-auto pt-2.5 border-t border-slate-200 flex items-center justify-between gap-2">
           <div className="min-w-0">
             {priceInfo.isFree ? (
               <span className="text-xs font-bold text-clay-700 whitespace-nowrap">Miễn phí vé</span>

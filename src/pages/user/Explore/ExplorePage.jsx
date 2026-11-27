@@ -853,10 +853,11 @@ export const ExplorePage = () => {
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (selectedRegion !== 'Tất cả') count++;
+    if (selectedCity !== 'Tất cả') count++;
     if (selectedBudget !== 'all') count++;
     if (sortBy !== 'popular') count++;
     return count;
-  }, [selectedRegion, selectedBudget, sortBy]);
+  }, [selectedRegion, selectedCity, selectedBudget, sortBy]);
 
   // Reset all filters
   const handleResetFilters = () => {
@@ -931,7 +932,7 @@ export const ExplorePage = () => {
 
       {/* 3.1 SERVER SEARCH / LOAD-MORE STATUS */}
       {exploreLayer === 'spots' && remotePool !== null && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-[5px] border border-ink-200 bg-[#FFFDF8] px-4 py-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-slate-300/90 bg-white shadow-sm px-4 py-3">
           <span className="text-[11px] sm:text-xs text-ink-400 text-center sm:text-left">
             {isRemoteSearching && !remotePool.length ? 'Đang tìm trên server...' : (
               <>
@@ -949,7 +950,7 @@ export const ExplorePage = () => {
         </div>
       )}
       {exploreLayer === 'spots' && remotePool === null && hasMorePlaces && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-[5px] border border-ink-200 bg-[#FFFDF8] px-4 py-3">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-xl border border-slate-300/90 bg-white shadow-sm px-4 py-3">
           <span className="text-[11px] sm:text-xs text-ink-400 text-center sm:text-left">
             Đang hiển thị <strong className="text-ink-800 font-bold">{places.length}</strong> / {placesTotal} địa điểm.
           </span>
@@ -1029,7 +1030,7 @@ export const ExplorePage = () => {
             </div>
 
             {/* Right Column: Interactive Real Map */}
-            <div className="lg:col-span-6 sticky top-24 h-[550px] sm:h-[650px] lg:h-[760px] rounded-[6px] overflow-hidden border border-ink-200 bg-[#FFFDF8]">
+            <div className="lg:col-span-6 sticky top-24 h-[550px] sm:h-[650px] lg:h-[760px] rounded-xl overflow-hidden border border-slate-300/90 shadow-sm bg-white">
               <RealMapView
                 items={filteredItems}
                 activeItem={activeItem}
@@ -1101,7 +1102,7 @@ export const ExplorePage = () => {
 
       {/* ─── C. FULL MAP VIEW ─── */}
       {viewMode === 'map' && (
-        <div className="w-full h-[750px] rounded-[6px] overflow-hidden border border-ink-200 bg-[#FFFDF8]">
+        <div className="w-full h-[750px] rounded-xl overflow-hidden border border-slate-300/90 shadow-sm bg-white">
           <RealMapView
             items={filteredItems}
             activeItem={activeItem}
