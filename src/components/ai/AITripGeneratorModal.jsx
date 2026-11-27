@@ -542,7 +542,7 @@ ${customPrompt ? `- Yêu cầu thêm: ${customPrompt}` : ''}
 
 QUY TẮC BẮT BUỘC:
 1. Nghiên cứu chính xác các địa điểm, quán ăn có thật 100% tại "${destination}". Tuyệt đối không dùng văn mẫu chung chung.
-2. Mỗi ngày có 3-4 hoạt động sắp xếp từ sáng đến tối.
+2. Mỗi ngày có 3-4 hoạt động sắp xếp từ sáng đến tối. Nếu chuyến đi dài (>= 5 ngày), viết "note" thật ngắn gọn (tối đa 10 từ) để đảm bảo xuất đủ toàn bộ ${daysCount} ngày trong 1 lần trả lời.
 3. BẮT BUỘC VỀ ĐỊA CHỈ & TỌA ĐỘ: Cung cấp "location" (tên ngắn gọn của địa danh/quán ăn), "address" (ĐỊA CHỈ CỤ THỂ CHI TIẾT CÓ THẬT gồm số nhà/tên đường, xã/phường, quận/huyện tại ${destination}. Tuyệt đối KHÔNG chỉ ghi tên tỉnh thành chung chung), và "lat", "lng" (TỌA ĐỘ GPS THỰC TẾ CHÍNH XÁC CỦA ĐỊA ĐIỂM ĐÓ TẠI ${destination}, VIỆT NAM dạng số thập phân float, ví dụ Đà Nẵng: lat ~16.0xx, lng ~108.2xx; Hà Nội: lat ~21.0xx, lng ~105.8xx) để đồng bộ trực quan trên bản đồ số.
 4. Trả về DUY NHẤT một chuỗi JSON hợp lệ theo định dạng:
 {
@@ -570,11 +570,11 @@ QUY TẮC BẮT BUỘC:
   ]
 }`;
 
-      // 4. GỌI GEMINI FLASH QUA BACKEND PROXY (TỐI ƯU TOKENS 3072 ĐỂ PHẢN HỒI SIÊU TỐC)
+      // 4. GỌI GEMINI FLASH QUA BACKEND PROXY (CẤP ĐỦ 8192 TOKENS CHO LỊCH TRÌNH DÀI 7-14 NGÀY)
       const aiResponse = await aiService.generateText({
         prompt,
         model: 'gemini-2.5-flash',
-        maxTokens: 3072,
+        maxTokens: 8192,
         temperature: 0.3
       });
 

@@ -364,12 +364,13 @@ function ItineraryProposalCard({
             <div className="p-2.5 space-y-2.5 max-h-64 overflow-y-auto">
               {dayKeys.map((dayNum) => {
                 const stops = groupedByDay[dayNum];
-                const dayTitle = stops[0]?.dayTitle;
+                const rawDayTitle = stops[0]?.dayTitle || '';
+                const cleanDayTitle = rawDayTitle.replace(new RegExp(`^Ngày\\s*${dayNum}\\s*[:\\-—.]*\\s*`, 'i'), '').trim();
                 return (
                   <div key={dayNum} className="space-y-1.5">
                     <div className="text-[11px] font-bold text-clay-700 flex items-center gap-1.5">
                       <span className="px-1.5 py-0.5 rounded bg-clay-100 text-clay-800">Ngày {dayNum}</span>
-                      {dayTitle && <span className="text-ink-600 font-semibold truncate">— {dayTitle}</span>}
+                      {cleanDayTitle && <span className="text-ink-600 font-semibold truncate">— {cleanDayTitle}</span>}
                     </div>
                     <div className="pl-2 border-l-2 border-clay-200 space-y-1.5">
                       {stops.map((s, sIdx) => (
