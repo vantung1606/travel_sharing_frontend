@@ -787,11 +787,9 @@ export const FloatingChatWidget = () => {
                 </>
               ) : (
                 <div className="flex items-center gap-2.5">
-                  <img
-                    src="/chaticon.png"
-                    alt=""
-                    className="w-9 h-9 object-contain drop-shadow-sm shrink-0"
-                  />
+                  <div className="w-8 h-8 rounded-full bg-clay-600 text-white flex items-center justify-center shadow-xs shrink-0">
+                    <MessageCircle className="w-4 h-4 stroke-[2.2]" />
+                  </div>
                   <div>
                     <h4 className="font-bold text-xs text-white leading-tight">Hỏi đáp chuyến đi</h4>
                     <span className="text-[11px] text-slate-300 mt-0.5 flex items-center gap-1">
@@ -1165,20 +1163,16 @@ export const FloatingChatWidget = () => {
         >
           {/* Smooth Icon Morphing Animation between Crystal Orb and Close X */}
           <div className="relative w-full h-full flex items-center justify-center">
-            {/* Crystal Glass Chat Orb */}
+            {/* Clean Practical Chat Button */}
             <div
-              className={`transition-all duration-300 ease-out transform flex items-center justify-center w-full h-full ${
+              className={`transition-all duration-300 ease-out transform flex items-center justify-center w-full h-full rounded-full bg-clay-600 hover:bg-clay-700 text-white shadow-lg ring-2 ring-white/90 ${
                 isOpen
                   ? 'rotate-90 scale-0 opacity-0 pointer-events-none'
                   : 'rotate-0 scale-100 opacity-100'
               }`}
             >
-              <img
-                src="/chaticon.png"
-                alt="Wayfare Chat"
-                className="w-full h-full object-contain drop-shadow-md"
-              />
-              <span className="absolute bottom-0 right-0 sm:bottom-0.5 sm:right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-400 ring-2 ring-white shadow-xs" />
+              <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
+              <span className="absolute bottom-0 right-0 sm:bottom-0.5 sm:right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-white shadow-xs" />
             </div>
 
             {/* Close X Icon */}
