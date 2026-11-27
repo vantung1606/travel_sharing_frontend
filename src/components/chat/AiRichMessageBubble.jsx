@@ -416,6 +416,161 @@ function ItineraryProposalCard({
   );
 }
 
+/**
+ * Thẻ Thêm điểm dừng thông minh: hiển thị rõ tên địa điểm, chi phí, ghi chú,
+ * và cho phép chọn chính xác Lịch trình đích, Ngày thứ mấy, Giờ nào trước khi thêm.
+ */
+function AddStopActionCard({
+  action,
+  idx,
+  itineraries,
+  isLoading,
+  doneInfo,
+  onAddStop,
+  onNavigate
+}) {
+  const p = action.payload || {};
+  const list = Array.isArray(itineraries) ? itineraries : [];
+
+  const initialItinId = (() => {
+    if (p.itineraryId && list.some(it => String(it.id) === String(p.itineraryId))) {
+      return String(p.itineraryId);
+    }
+    return list[0]?.id ? String(list[0].id) : (p.itineraryId ? String(p.itineraryId) : '');
+  })();
+
+  const [selectedItinId, setSelectedItinId] = useState(initialItinId);
+  const [dayNumber, setDayNumber] = useState(Number(p.dayNumber) || 1);
+  const [startTime, setStartTime] = useState(
+    p.startTime && /^\d{2}:\d{2}/.test(p.startTime) ? p.startTime.slice(0, 5) : '12:00'
+  );
+
+  const selectedItin = list.find(it => String(it.id) === String(selectedItinId));
+  const maxDays = Math.max(
+    3,
+    Number(selectedItin?.daysCount) || (Array.isArray(selectedItin?.days) ? selectedItin.days.length : 1),
+    dayNumber
+  );
+  const targetTitle = selectedItin?.title || p.itineraryTitle || (selectedItinId ? `Lịch trình #${selectedItinId}` : 'Chưa có lịch trình');
+
+  return (
+    <div className="rounded-[7px] border border-emerald-200/90 bg-[#F4FBF7] p-3 space-y-2 text-[11.5px]">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="font-bold text-ink-900 flex items-center gap-1.5 flex-wrap">
+            <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <span>{p.locationName || action.label || 'Điểm dừng mới'}</span>
+            {p.category && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-white border border-emerald-200 text-emerald-700">
+                {p.category}
+              </span>
+            )}
+          </div>
+          {(p.locationAddress || p.note) && (
+            <p className="text-[11px] text-ink-600 mt-0.5 leading-snug">
+              {[p.locationAddress, p.note].filter(Boolean).join(' · ')}
+            </p>
+          )}
+        </div>
+        {Number(p.estimatedCost) > 0 && (
+          <span className="text-[11px] font-bold text-emerald-700 shrink-0">
+            ~{formatCurrency(p.estimatedCost)}
+          </span>
+        )}
+      </div>
+
+      {/* Chọn Lịch trình đích + Ngày + Giờ rõ ràng */}
+      {!doneInfo && (
+        <div className="grid grid-cols-1 sm:grid-cols-12 gap-1.5 pt-1">
+          <div className="sm:col-span-6">
+            <label className="block text-[10px] font-bold text-ink-500 mb-0.5">Thêm vào lịch trình</label>
+            {list.length > 0 ? (
+              <select
+                value={selectedItinId}
+                onChange={(e) => setSelectedItinId(e.target.value)}
+                className="w-full px-2 py-1.5 rounded border border-ink-200 bg-white text-[11px] font-medium text-ink-800 outline-none focus:border-emerald-500"
+              >
+                {list.map(it => (
+                  <option key={it.id} value={String(it.id)}>
+                    {it.title} ({it.destination})
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <div className="px-2 py-1.5 rounded border border-amber-200 bg-amber-50 text-[11px] text-amber-800">
+                {targetTitle}
+              </div>
+            )}
+          </div>
+
+          <div className="sm:col-span-3">
+            <label className="block text-[10px] font-bold text-ink-500 mb-0.5">Ngày</label>
+            <select
+              value={dayNumber}
+              onChange={(e) => setDayNumber(Number(e.target.value))}
+              className="w-full px-2 py-1.5 rounded border border-ink-200 bg-white text-[11px] font-medium text-ink-800 outline-none focus:border-emerald-500"
+            >
+              {Array.from({ length: maxDays }, (_, i) => i + 1).map(d => (
+                <option key={d} value={d}>Ngày {d}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="sm:col-span-3">
+            <label className="block text-[10px] font-bold text-ink-500 mb-0.5">Giờ</label>
+            <input
+              type="time"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              className="w-full px-2 py-1.5 rounded border border-ink-200 bg-white text-[11px] font-medium text-ink-800 outline-none focus:border-emerald-500"
+            />
+          </div>
+        </div>
+      )}
+
+      {doneInfo ? (
+        <button
+          type="button"
+          onClick={() => doneInfo.itineraryId && onNavigate(`/itineraries?id=${doneInfo.itineraryId}`)}
+          className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-[6px] text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors cursor-pointer"
+        >
+          <Check className="w-3.5 h-3.5" />
+          <span>{doneInfo.label}</span>
+          <ArrowRight className="w-3 h-3" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          disabled={isLoading || !selectedItinId}
+          onClick={() =>
+            onAddStop(
+              {
+                ...action,
+                payload: {
+                  ...p,
+                  itineraryId: Number(selectedItinId),
+                  itineraryTitle: targetTitle,
+                  dayNumber,
+                  startTime
+                }
+              },
+              idx
+            )
+          }
+          className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-[6px] text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white transition-colors cursor-pointer"
+        >
+          {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
+          <span>
+            {selectedItinId
+              ? `Thêm vào Ngày ${dayNumber} (${startTime}) · ${targetTitle}`
+              : 'Vui lòng tạo lịch trình trước khi thêm điểm dừng'}
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 export const AiRichMessageBubble = ({
   msg,
   effectiveEmail,
@@ -423,7 +578,7 @@ export const AiRichMessageBubble = ({
   navigate,
   onQuickReply
 }) => {
-  const { fetchItineraries } = useApp();
+  const { fetchItineraries, itineraries } = useApp();
   const [loadingIdx, setLoadingIdx] = useState(null);
   const [doneMap, setDoneMap] = useState({});
   const [confirmIdx, setConfirmIdx] = useState(null);
@@ -444,9 +599,15 @@ export const AiRichMessageBubble = ({
   const createItineraryActions = actions
     .map((act, idx) => ({ act, idx }))
     .filter(({ act }) => String(act?.type || '').toUpperCase() === 'CREATE_ITINERARY');
+  const addStopActions = actions
+    .map((act, idx) => ({ act, idx }))
+    .filter(({ act }) => String(act?.type || '').toUpperCase() === 'ADD_ITINERARY_STOP');
   const otherActions = actions
     .map((act, idx) => ({ act, idx }))
-    .filter(({ act }) => String(act?.type || '').toUpperCase() !== 'CREATE_ITINERARY');
+    .filter(({ act }) => {
+      const t = String(act?.type || '').toUpperCase();
+      return t !== 'CREATE_ITINERARY' && t !== 'ADD_ITINERARY_STOP';
+    });
 
   // Lọc trùng: không hiển thị quickReply nếu giống hệt nhãn nút action phía trên
   const actionLabelsLower = new Set(actions.map(a => (a?.label || '').trim().toLowerCase()));
@@ -632,6 +793,24 @@ export const AiRichMessageBubble = ({
               isLoading={loadingIdx === idx}
               doneInfo={doneMap[idx]}
               onSaveItinerary={executeAction}
+              onNavigate={navigate}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Card Thêm điểm dừng rõ ràng: chọn Lịch trình đích, Ngày, Giờ */}
+      {addStopActions.length > 0 && (
+        <div className="space-y-2 pt-1">
+          {addStopActions.map(({ act, idx }) => (
+            <AddStopActionCard
+              key={idx}
+              action={act}
+              idx={idx}
+              itineraries={itineraries}
+              isLoading={loadingIdx === idx}
+              doneInfo={doneMap[idx]}
+              onAddStop={executeAction}
               onNavigate={navigate}
             />
           ))}
