@@ -2,9 +2,11 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { useToast } from '../common/Toast';
+import { useApp } from '../../context/AppContext';
 import { X, Calendar, MapPin, Clock, Car, Navigation, DollarSign, Share2, Download, Users, ExternalLink, Compass, Info, ListFilter, Map as MapIcon, Maximize2, Minimize2, Layers, Plus, Trash2, Globe, Lock, Edit3, ArrowUp, ArrowDown } from 'lucide-react';
 import { ItineraryExportModal } from './ItineraryExportModal';
 import { EditItineraryModal } from './EditItineraryModal';
+import { AddToTripModal } from '../../pages/user/Explore/components/AddToTripModal';
 import { itineraryApi } from '../../services/api';
 
 // Tọa độ trung tâm các tỉnh/thành phố du lịch chính tại Việt Nam
@@ -313,6 +315,16 @@ const createNumberedMarkerIcon = (num, isHighlighted) => {
 
 export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
   const toast = useToast();
+  const {
+    itineraries: myItineraries,
+    isLoggedIn,
+    currentUser,
+    setIsAuthModalOpen,
+    setAuthMode,
+    fetchItineraries,
+    createManualItinerary
+  } = useApp();
+  const [addToTripItem, setAddToTripItem] = useState(null);
   // 'all' hoặc index 0, 1, 2...
   const [activeTab, setActiveTab] = useState('all');
   // Chế độ xem trên Mobile & Tablet (< 1024px): 'timeline' (Lịch trình) hoặc 'map' (Bản đồ & Lộ trình)
@@ -1080,6 +1092,33 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                             <div className="flex items-center gap-1">
                               <button
                                 type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (!isLoggedIn) {
+                                    toast.showInfo('Vui lòng đăng nhập để thêm địa điểm vào lịch trình của bạn!');
+                                    setAuthMode('login');
+                                    setIsAuthModalOpen(true);
+                                    return;
+                                  }
+                                  fetchItineraries?.();
+                                  setAddToTripItem({
+                                    id: act.placeId || null,
+                                    name: cleanPlaceName || act.title,
+                                    address: act.address || (act.location && act.location !== act.title ? act.location : null) || matchedPt?.address || `${destinationName}, Việt Nam`,
+                                    category: act.category || 'Tham quan',
+                                    ticketPrice: parseInt(String(act.cost || '').replace(/\D/g, ''), 10) || 0,
+                                    city: destinationName
+                                  });
+                                }}
+                                className="px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200/80 text-[11px] font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
+                                title="Thêm riêng địa điểm này vào lịch trình của bạn"
+                              >
+                                <Plus className="w-3 h-3" />
+                                <span>Thêm vào lịch</span>
+                              </button>
+
+                              <button
+                                type="button"
                                 disabled={actIdx === 0}
                                 onClick={() => handleMoveActivity(dayItem.dayNumber || dayIdx + 1, actIdx, -1)}
                                 className={`p-1.5 rounded-lg transition-colors ${
@@ -1796,6 +1835,69 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
           if (updated) {
             onUpdate?.(updated);
           }
+        }}
+      />
+
+      {/* MODAL THÊM RIÊNG 1 ĐỊA ĐIỂM VÀO LỊCH TRÌNH CÁ NHÂN */}
+      <AddToTripModal
+        isOpen={Boolean(addToTripItem)}
+        onClose={() => setAddToTripItem(null)}
+        item={addToTripItem}
+        itineraries={myItineraries || []}
+        onAddToTrip={async (payload) => {
+          await itineraryApi.addItineraryDetail(
+            payload.itinerary.id,
+            {
+              placeId: payload.item?.id || null,
+              locationName: payload.item?.name || 'Điểm dừng chân',
+              locationAddress: payload.item?.address || '',
+              dayNumber: payload.dayNumber || 1,
+              startTime: payload.startTime || '09:00:00',
+              category: payload.category || 'Tham quan',
+              estimatedCost: Number(payload.estimatedCost) || 0,
+              note: payload.note || ''
+            },
+            currentUser?.email
+          );
+          await fetchItineraries?.();
+          toast.showSuccess(`Đã thêm "${payload.item?.name}" vào Ngày ${payload.dayNumber} của "${payload.itinerary.title}"!`);
+        }}
+        onCreateNewTripWithItem={async (itemToCreate) => {
+          const today = new Date();
+          today.setDate(today.getDate() + 1);
+          const startStr = today.toISOString().split('T')[0];
+          const created = await createManualItinerary(
+            {
+              title: `Khám phá ${itemToCreate.name}`,
+              destination: itemToCreate.city || destinationName || 'Việt Nam',
+              startDate: startStr,
+              endDate: startStr,
+              budgetTotal: 2000000,
+              isPublic: true,
+              status: 'ACTIVE',
+              days: [
+                {
+                  dayNumber: 1,
+                  title: `Ngày 1: ${itemToCreate.name}`,
+                  activities: [
+                    {
+                      time: '08:30',
+                      title: itemToCreate.name,
+                      location: itemToCreate.name,
+                      address: itemToCreate.address || '',
+                      category: itemToCreate.category || 'Tham quan',
+                      cost: Number(itemToCreate.ticketPrice) || 0,
+                      note: `Thêm từ lịch trình tham khảo`
+                    }
+                  ]
+                }
+              ]
+            },
+            currentUser?.email
+          );
+          await fetchItineraries?.();
+          setAddToTripItem(null);
+          toast.showSuccess(`Đã tạo lịch trình mới "${created?.title || itemToCreate.name}"!`);
         }}
       />
     </div>
