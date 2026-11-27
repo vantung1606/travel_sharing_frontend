@@ -2295,7 +2295,9 @@ export const MessagesPage = () => {
                     <span className="w-1.5 h-1.5 rounded-full bg-clay-500 animate-bounce [animation-delay:-0.15s]"></span>
                     <span className="w-1.5 h-1.5 rounded-full bg-clay-500 animate-bounce"></span>
                     <span className="ml-1 text-[11px] font-medium text-ink-600 italic">
-                      {Object.values(typingUsers).map(u => u.userName).join(', ')} đang soạn tin...
+                      {Object.keys(typingUsers).includes('assistant@wayfare.com')
+                        ? 'Trợ lý Wayfare đang đọc dữ liệu và phân tích...'
+                        : `${Object.values(typingUsers).map(u => u.userName).join(', ')} đang soạn tin...`}
                     </span>
                   </div>
                 </div>

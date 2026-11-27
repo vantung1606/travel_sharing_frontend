@@ -174,9 +174,12 @@ function ItineraryProposalCard({
   const [title, setTitle] = useState(p.title || `Khám phá ${p.destination || 'Việt Nam'}`);
   const [startDate, setStartDate] = useState(p.startDate || defaults.startDate);
   const [budgetTotal, setBudgetTotal] = useState(p.budgetTotal ? String(p.budgetTotal) : '3000000');
+  const [status, setStatus] = useState((p.status || 'ACTIVE').toUpperCase());
   const [isPublic, setIsPublic] = useState(p.isPublic !== false);
+  const [editableDetails, setEditableDetails] = useState(Array.isArray(p.details) ? p.details : []);
 
-  const details = Array.isArray(p.details) ? p.details : [];
+  const details = editableDetails;
+  const estimatedStopsSum = details.reduce((sum, d) => sum + (Number(d.estimatedCost) || 0), 0);
   const daysCount = Math.max(1, Number(p.durationDays) || (details.length > 0 ? Math.max(...details.map(d => Number(d.dayNumber) || 1)) : 2));
 
   // Tính ngày kết thúc từ startDate + daysCount
@@ -200,6 +203,10 @@ function ItineraryProposalCard({
   }, {});
   const dayKeys = Object.keys(groupedByDay).map(Number).sort((a, b) => a - b);
 
+  const handleRemoveStop = (targetItem) => {
+    setEditableDetails(prev => prev.filter(item => item !== targetItem));
+  };
+
   const handleConfirmSave = () => {
     onSaveItinerary(
       {
@@ -211,7 +218,9 @@ function ItineraryProposalCard({
           endDate: computedEndDate,
           durationDays: daysCount,
           budgetTotal: Number(budgetTotal) || 0,
-          isPublic
+          status,
+          isPublic,
+          details: editableDetails
         }
       },
       idx
@@ -264,14 +273,14 @@ function ItineraryProposalCard({
               className="w-full px-2.5 py-1.5 rounded border border-ink-200 text-ink-800 outline-none focus:border-clay-500"
             />
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <div>
               <label className="block font-bold text-ink-600 mb-0.5">Ngày khởi hành</label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-2 py-1.5 rounded border border-ink-200 text-ink-800 outline-none focus:border-clay-500"
+                className="w-full px-2.5 py-1.5 rounded border border-ink-200 text-ink-800 outline-none focus:border-clay-500"
               />
             </div>
             <div>
@@ -282,8 +291,19 @@ function ItineraryProposalCard({
                 step="100000"
                 value={budgetTotal}
                 onChange={(e) => setBudgetTotal(e.target.value)}
-                className="w-full px-2 py-1.5 rounded border border-ink-200 text-ink-800 outline-none focus:border-clay-500"
+                className="w-full px-2.5 py-1.5 rounded border border-ink-200 text-ink-800 outline-none focus:border-clay-500"
               />
+            </div>
+            <div>
+              <label className="block font-bold text-ink-600 mb-0.5">Trạng thái lưu</label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full px-2.5 py-1.5 rounded border border-ink-200 text-ink-800 bg-white outline-none focus:border-clay-500"
+              >
+                <option value="ACTIVE">Sắp tới (Kích hoạt)</option>
+                <option value="DRAFT">Bản nháp</option>
+              </select>
             </div>
           </div>
           <label className="inline-flex items-center gap-1.5 cursor-pointer font-medium text-ink-700 pt-0.5">
@@ -308,7 +328,7 @@ function ItineraryProposalCard({
           >
             <span className="flex items-center gap-1.5">
               <Route className="w-3.5 h-3.5 text-clay-600" />
-              Chi tiết lịch trình ({details.length} chặng dừng)
+              Chi tiết lịch trình ({details.length} chặng{estimatedStopsSum > 0 ? ` · Dự kiến ${formatCurrency(estimatedStopsSum)}` : ''})
             </span>
             {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
@@ -342,11 +362,23 @@ function ItineraryProposalCard({
                               </p>
                             )}
                           </div>
-                          {Number(s.estimatedCost) > 0 && (
-                            <span className="text-[10.5px] font-semibold text-emerald-700 shrink-0">
-                              {formatCurrency(s.estimatedCost)}
-                            </span>
-                          )}
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {Number(s.estimatedCost) > 0 && (
+                              <span className="text-[10.5px] font-semibold text-emerald-700">
+                                {formatCurrency(s.estimatedCost)}
+                              </span>
+                            )}
+                            {isEditing && !doneInfo && (
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveStop(s)}
+                                className="p-0.5 rounded text-ink-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+                                title="Bỏ chặng này"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
