@@ -325,6 +325,24 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
     createManualItinerary
   } = useApp();
   const [addToTripItem, setAddToTripItem] = useState(null);
+
+  // Kiểm tra quyền sở hữu: chỉ chủ sở hữu mới thấy các nút chỉnh sửa / sắp xếp / xóa / đổi quyền riêng tư
+  const isOwner = useMemo(() => {
+    if (!currentUser || !itinerary) return false;
+    if (itinerary.creatorId != null && currentUser.id != null) {
+      return String(itinerary.creatorId) === String(currentUser.id);
+    }
+    if (itinerary.userId != null && currentUser.id != null) {
+      return String(itinerary.userId) === String(currentUser.id);
+    }
+    if (itinerary.creatorEmail && currentUser.email) {
+      return itinerary.creatorEmail.toLowerCase() === currentUser.email.toLowerCase();
+    }
+    if (Array.isArray(myItineraries) && itinerary.id != null) {
+      return myItineraries.some((m) => String(m.id) === String(itinerary.id));
+    }
+    return false;
+  }, [currentUser, itinerary, myItineraries]);
   // 'all' hoặc index 0, 1, 2...
   const [activeTab, setActiveTab] = useState('all');
   // Chế độ xem trên Mobile & Tablet (< 1024px): 'timeline' (Lịch trình) hoặc 'map' (Bản đồ & Lộ trình)
@@ -798,30 +816,52 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                   <span>{itinerary.groupType}</span>
                 </span>
               )}
-              {/* Nút Toggle Quyền riêng tư */}
-              <button
-                type="button"
-                disabled={isTogglingVisibility}
-                onClick={handleToggleVisibility}
-                className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold inline-flex items-center gap-1 transition-all cursor-pointer border ${
-                  itinerary?.isPublic !== false
-                    ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
-                    : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
-                }`}
-                title={itinerary?.isPublic !== false ? 'Lịch trình đang Công khai. Bấm để chuyển sang Riêng tư.' : 'Lịch trình đang Riêng tư. Bấm để chia sẻ Công khai.'}
-              >
-                {itinerary?.isPublic !== false ? (
-                  <>
-                    <Globe className="w-3 h-3 text-emerald-600" />
-                    <span>Công khai</span>
-                  </>
-                ) : (
-                  <>
-                    <Lock className="w-3 h-3 text-amber-600" />
-                    <span>Riêng tư</span>
-                  </>
-                )}
-              </button>
+              {/* Quyền riêng tư: chủ sở hữu có thể bấm để chuyển đổi, người xem chỉ đọc */}
+              {isOwner ? (
+                <button
+                  type="button"
+                  disabled={isTogglingVisibility}
+                  onClick={handleToggleVisibility}
+                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold inline-flex items-center gap-1 transition-all cursor-pointer border ${
+                    itinerary?.isPublic !== false
+                      ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                      : 'bg-amber-50 hover:bg-amber-100 text-amber-800 border-amber-200'
+                  }`}
+                  title={itinerary?.isPublic !== false ? 'Lịch trình đang Công khai. Bấm để chuyển sang Riêng tư.' : 'Lịch trình đang Riêng tư. Bấm để chia sẻ Công khai.'}
+                >
+                  {itinerary?.isPublic !== false ? (
+                    <>
+                      <Globe className="w-3 h-3 text-emerald-600" />
+                      <span>Công khai</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-3 h-3 text-amber-600" />
+                      <span>Riêng tư</span>
+                    </>
+                  )}
+                </button>
+              ) : (
+                <span
+                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold inline-flex items-center gap-1 border ${
+                    itinerary?.isPublic !== false
+                      ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      : 'bg-amber-50 text-amber-800 border-amber-200'
+                  }`}
+                >
+                  {itinerary?.isPublic !== false ? (
+                    <>
+                      <Globe className="w-3 h-3 text-emerald-600" />
+                      <span>Công khai</span>
+                    </>
+                  ) : (
+                    <>
+                      <Lock className="w-3 h-3 text-amber-600" />
+                      <span>Riêng tư</span>
+                    </>
+                  )}
+                </span>
+              )}
             </div>
 
             {/* Title */}
@@ -853,15 +893,17 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
 
           {/* Action Header Buttons & Close Button */}
           <div className="flex items-center gap-2 shrink-0 self-start md:self-center">
-            <button
-              type="button"
-              onClick={() => setIsEditModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer border border-sky-200/80"
-              title="Chỉnh sửa toàn bộ chuyến đi"
-            >
-              <Edit3 className="w-3.5 h-3.5 text-sky-600" />
-              <span>Sửa</span>
-            </button>
+            {isOwner && (
+              <button
+                type="button"
+                onClick={() => setIsEditModalOpen(true)}
+                className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer border border-sky-200/80"
+                title="Chỉnh sửa toàn bộ chuyến đi"
+              >
+                <Edit3 className="w-3.5 h-3.5 text-sky-600" />
+                <span>Sửa</span>
+              </button>
+            )}
 
             <button
               type="button"
@@ -988,23 +1030,27 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                         <Calendar className="w-5 h-5" />
                       </div>
                       <p className="text-xs font-bold text-slate-700">Chưa có mốc giờ / hoạt động nào trong Ngày {dayItem.dayNumber || dayIdx + 1}</p>
-                      <p className="text-[11px] text-slate-400">Bạn có thể tự tay thêm hoạt động và điểm dừng chân bất kỳ lúc nào.</p>
-                      {addingDayNumber !== (dayItem.dayNumber || dayIdx + 1) && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAddingDayNumber(dayItem.dayNumber || dayIdx + 1);
-                            setNewActTime('');
-                            setNewActTitle('');
-                            setNewActLocation('');
-                            setNewActCost('');
-                            setNewActNote('');
-                          }}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-xs transition-all cursor-pointer"
-                        >
-                          <Plus className="w-3.5 h-3.5" />
-                          <span>Thêm hoạt động đầu tiên</span>
-                        </button>
+                      {isOwner && (
+                        <>
+                          <p className="text-[11px] text-slate-400">Bạn có thể tự tay thêm hoạt động và điểm dừng chân bất kỳ lúc nào.</p>
+                          {addingDayNumber !== (dayItem.dayNumber || dayIdx + 1) && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAddingDayNumber(dayItem.dayNumber || dayIdx + 1);
+                                setNewActTime('');
+                                setNewActTitle('');
+                                setNewActLocation('');
+                                setNewActCost('');
+                                setNewActNote('');
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-xs transition-all cursor-pointer"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              <span>Thêm hoạt động đầu tiên</span>
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   ) : (
@@ -1067,51 +1113,55 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                                 <span>Thêm vào lịch</span>
                               </button>
 
-                              <button
-                                type="button"
-                                disabled={actIdx === 0}
-                                onClick={() => handleMoveActivity(dayItem.dayNumber || dayIdx + 1, actIdx, -1)}
-                                className={`p-1.5 rounded-lg transition-colors ${
-                                  actIdx === 0
-                                    ? 'text-slate-200 cursor-not-allowed'
-                                    : 'text-slate-400 hover:text-sky-600 hover:bg-sky-50 cursor-pointer'
-                                }`}
-                                title={actIdx === 0 ? 'Điểm đầu tiên trong ngày' : 'Di chuyển lên trên'}
-                              >
-                                <ArrowUp className="w-3.5 h-3.5" />
-                              </button>
+                              {isOwner && (
+                                <>
+                                  <button
+                                    type="button"
+                                    disabled={actIdx === 0}
+                                    onClick={() => handleMoveActivity(dayItem.dayNumber || dayIdx + 1, actIdx, -1)}
+                                    className={`p-1.5 rounded-lg transition-colors ${
+                                      actIdx === 0
+                                        ? 'text-slate-200 cursor-not-allowed'
+                                        : 'text-slate-400 hover:text-sky-600 hover:bg-sky-50 cursor-pointer'
+                                    }`}
+                                    title={actIdx === 0 ? 'Điểm đầu tiên trong ngày' : 'Di chuyển lên trên'}
+                                  >
+                                    <ArrowUp className="w-3.5 h-3.5" />
+                                  </button>
 
-                              <button
-                                type="button"
-                                disabled={actIdx === dayItem.activities.length - 1}
-                                onClick={() => handleMoveActivity(dayItem.dayNumber || dayIdx + 1, actIdx, 1)}
-                                className={`p-1.5 rounded-lg transition-colors ${
-                                  actIdx === dayItem.activities.length - 1
-                                    ? 'text-slate-200 cursor-not-allowed'
-                                    : 'text-slate-400 hover:text-sky-600 hover:bg-sky-50 cursor-pointer'
-                                }`}
-                                title={actIdx === dayItem.activities.length - 1 ? 'Điểm cuối cùng trong ngày' : 'Di chuyển xuống dưới'}
-                              >
-                                <ArrowDown className="w-3.5 h-3.5" />
-                              </button>
+                                  <button
+                                    type="button"
+                                    disabled={actIdx === dayItem.activities.length - 1}
+                                    onClick={() => handleMoveActivity(dayItem.dayNumber || dayIdx + 1, actIdx, 1)}
+                                    className={`p-1.5 rounded-lg transition-colors ${
+                                      actIdx === dayItem.activities.length - 1
+                                        ? 'text-slate-200 cursor-not-allowed'
+                                        : 'text-slate-400 hover:text-sky-600 hover:bg-sky-50 cursor-pointer'
+                                    }`}
+                                    title={actIdx === dayItem.activities.length - 1 ? 'Điểm cuối cùng trong ngày' : 'Di chuyển xuống dưới'}
+                                  >
+                                    <ArrowDown className="w-3.5 h-3.5" />
+                                  </button>
 
-                              <button
-                                type="button"
-                                onClick={() => handleStartEditActivity(dayItem.dayNumber || dayIdx + 1, act)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-colors cursor-pointer"
-                                title="Chỉnh sửa hoạt động này"
-                              >
-                                <Edit3 className="w-3.5 h-3.5" />
-                              </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleStartEditActivity(dayItem.dayNumber || dayIdx + 1, act)}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-colors cursor-pointer"
+                                    title="Chỉnh sửa hoạt động này"
+                                  >
+                                    <Edit3 className="w-3.5 h-3.5" />
+                                  </button>
 
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteActivity(dayItem.dayNumber || dayIdx + 1, actIdx, act)}
-                                className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                                title="Xóa hoạt động này"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteActivity(dayItem.dayNumber || dayIdx + 1, actIdx, act)}
+                                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                                    title="Xóa hoạt động này"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </>
+                              )}
                             </div>
                           </div>
 
@@ -1170,8 +1220,8 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                     })
                   )}
 
-                  {/* Form thêm / sửa hoạt động inline */}
-                  {addingDayNumber === (dayItem.dayNumber || dayIdx + 1) ? (
+                  {/* Form thêm / sửa hoạt động inline (chỉ chủ sở hữu) */}
+                  {isOwner && (addingDayNumber === (dayItem.dayNumber || dayIdx + 1) ? (
                     <div className="p-4 rounded-2xl bg-sky-50/70 border border-sky-200 space-y-3 animate-in fade-in duration-150">
                       <div className="flex items-center justify-between">
                         <span className="font-extrabold text-xs text-sky-900 flex items-center gap-1.5">
@@ -1294,7 +1344,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                       <Plus className="w-4 h-4 text-sky-600" />
                       <span>Thêm hoạt động vào Ngày {dayItem.dayNumber || dayIdx + 1}</span>
                     </button>
-                  )}
+                  ))}
                 </div>
 
               </div>
