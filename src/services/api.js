@@ -1227,6 +1227,22 @@ export const auditLogApi = {
 
 // ─── Community Posts & Social Interaction API ────────────────────────────────
 export const postApi = {
+  async getTopLocations(limit = 10) {
+    try {
+      const res = await fetch(`${BASE_URL}/posts/top-locations?limit=${limit}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader()
+        }
+      });
+      if (!res.ok) return [];
+      const json = await res.json();
+      return Array.isArray(json.data) ? json.data : [];
+    } catch {
+      return [];
+    }
+  },
+
   async getPosts({ category = '', keyword = '', placeId = null, email = '' } = {}) {
     try {
       const user = JSON.parse(localStorage.getItem('wayfare_user') || '{}');

@@ -1490,13 +1490,28 @@ export const CommunityPage = () => {
     }
   }, [searchParams, setSearchParams]);
 
-  // Real Location Stories extracted dynamically from loaded posts
+  // System-wide all-time top locations fetched from backend
+  const [systemTopLocations, setSystemTopLocations] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    postApi.getTopLocations(10).then((items) => {
+      if (!cancelled && Array.isArray(items) && items.length > 0) {
+        setSystemTopLocations(items);
+      }
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [posts?.length]);
+
+  // Real Location Stories: ưu tiên thống kê toàn hệ thống & toàn thời gian từ Backend
   const realLocationStories = useMemo(() => {
+    if (Array.isArray(systemTopLocations) && systemTopLocations.length > 0) {
+      return systemTopLocations;
+    }
     if (!Array.isArray(posts) || posts.length === 0) return [];
     const map = new Map();
     posts.forEach(p => {
       const loc = p.location?.trim();
-      if (loc) {
+      if (loc && loc.toLowerCase() !== 'việt nam') {
         const existing = map.get(loc);
         const img = (Array.isArray(p.mediaUrls) && p.mediaUrls.length > 0 ? p.mediaUrls[0] : null) || p.imageUrl || null;
         if (!existing) {
@@ -1513,7 +1528,7 @@ export const CommunityPage = () => {
       }
     });
     return Array.from(map.values()).sort((a, b) => b.count - a.count).slice(0, 10);
-  }, [posts]);
+  }, [systemTopLocations, posts]);
 
   const readerAuthorId = readingPost?.author?.id || readingPost?.authorId || null;
 
@@ -1634,13 +1649,8 @@ export const CommunityPage = () => {
           <main className="col-span-1 lg:col-span-8 xl:col-span-9 2xl:col-span-6 space-y-3 sm:space-y-4">
 
             {/* ─── 24H COMMUNITY MOMENTS & STORIES CAROUSEL ─── */}
-            <div className="bg-[#FFFDF8] rounded-sm p-3 sm:p-4 border border-[#1E1A15]/10 space-y-2.5">
-              <div className="flex items-center gap-2 px-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-clay-600"></div>
-                <h3 className="font-extrabold text-xs sm:text-sm text-[#1E1A15] tracking-tight">Khoảnh Khắc 24h • Trải Nghiệm Thực Tế</h3>
-              </div>
-
-              {/* Horizontal Scroll Story Circles - Dữ liệu địa điểm thực tế từ bài viết */}
+            <div className="bg-[#FFFDF8] rounded-sm p-3 sm:p-4 border border-[#1E1A15]/10">
+              {/* Horizontal Scroll Story Circles - Dữ liệu địa điểm toàn hệ thống */}
               <div className="flex items-center gap-3 sm:gap-3.5 overflow-x-auto pb-1 scrollbar-none select-none">
                 {/* Reset / All Filter */}
                 <div
