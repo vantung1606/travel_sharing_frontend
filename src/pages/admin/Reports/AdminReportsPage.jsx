@@ -1494,24 +1494,64 @@ export const AdminReportsPage = () => {
                         </td>
                         <td className="py-3.5 px-4 text-right">
                           {rep.status === 'PENDING' ? (
-                            <div className="flex items-center justify-end gap-1.5">
-                              <button
-                                onClick={() => handleResolveSystemReport(rep.id, 'RESOLVE', 'Đã xử lý xác minh vi phạm')}
-                                disabled={resolvingReportId === rep.id}
-                                className="px-2.5 py-1 rounded-[4px] bg-emerald-600 hover:bg-emerald-700 text-[#FFFDF8] text-[11px] font-bold cursor-pointer transition-colors disabled:opacity-50"
-                              >
-                                {resolvingReportId === rep.id ? 'Đang lưu...' : 'Xử lý xong'}
-                              </button>
+                            <div className="flex items-center justify-end gap-1.5 flex-wrap">
+                              {rep.targetType === 'REVIEW' && (
+                                <>
+                                  <button
+                                    onClick={() => handleResolveSystemReport(rep.id, 'HIDE_TARGET', 'Đã ẩn đánh giá vi phạm')}
+                                    disabled={resolvingReportId === rep.id}
+                                    className="px-2.5 py-1.5 rounded-[4px] bg-amber-600 hover:bg-amber-700 text-[#FFFDF8] text-[11px] font-bold whitespace-nowrap cursor-pointer transition-colors disabled:opacity-50"
+                                  >
+                                    {resolvingReportId === rep.id ? 'Đang xử lý...' : 'Ẩn đánh giá'}
+                                  </button>
+                                  <button
+                                    onClick={() => handleResolveSystemReport(rep.id, 'DELETE_TARGET', 'Đã xóa vĩnh viễn đánh giá vi phạm')}
+                                    disabled={resolvingReportId === rep.id}
+                                    className="px-2.5 py-1.5 rounded-[4px] bg-rose-600 hover:bg-rose-700 text-[#FFFDF8] text-[11px] font-bold whitespace-nowrap cursor-pointer transition-colors disabled:opacity-50"
+                                  >
+                                    Xóa đánh giá
+                                  </button>
+                                </>
+                              )}
+                              {rep.targetType === 'PLACE' && (
+                                <button
+                                  onClick={() => handleResolveSystemReport(rep.id, 'HIDE_TARGET', 'Đã ẩn địa điểm vi phạm')}
+                                  disabled={resolvingReportId === rep.id}
+                                  className="px-2.5 py-1.5 rounded-[4px] bg-amber-600 hover:bg-amber-700 text-[#FFFDF8] text-[11px] font-bold whitespace-nowrap cursor-pointer transition-colors disabled:opacity-50"
+                                >
+                                  {resolvingReportId === rep.id ? 'Đang xử lý...' : 'Ẩn địa điểm'}
+                                </button>
+                              )}
+                              {rep.targetType === 'POST' && (
+                                <button
+                                  onClick={() => handleResolveSystemReport(rep.id, 'HIDE_TARGET', 'Đã ẩn bài viết vi phạm')}
+                                  disabled={resolvingReportId === rep.id}
+                                  className="px-2.5 py-1.5 rounded-[4px] bg-amber-600 hover:bg-amber-700 text-[#FFFDF8] text-[11px] font-bold whitespace-nowrap cursor-pointer transition-colors disabled:opacity-50"
+                                >
+                                  {resolvingReportId === rep.id ? 'Đang xử lý...' : 'Ẩn bài viết'}
+                                </button>
+                              )}
+                              {rep.targetType === 'USER' && (
+                                <button
+                                  onClick={() => handleResolveSystemReport(rep.id, 'HIDE_TARGET', 'Đã khóa tài khoản vi phạm')}
+                                  disabled={resolvingReportId === rep.id}
+                                  className="px-2.5 py-1.5 rounded-[4px] bg-rose-600 hover:bg-rose-700 text-[#FFFDF8] text-[11px] font-bold whitespace-nowrap cursor-pointer transition-colors disabled:opacity-50"
+                                >
+                                  {resolvingReportId === rep.id ? 'Đang xử lý...' : 'Khóa tài khoản'}
+                                </button>
+                              )}
                               <button
                                 onClick={() => handleResolveSystemReport(rep.id, 'DISMISS', 'Báo cáo không có căn cứ')}
                                 disabled={resolvingReportId === rep.id}
-                                className="px-2.5 py-1 rounded-[4px] bg-[#F8F4EC] hover:bg-ink-200 text-ink-700 text-[11px] font-bold border border-ink-200 cursor-pointer transition-colors disabled:opacity-50"
+                                className="px-2.5 py-1.5 rounded-[4px] bg-[#F8F4EC] hover:bg-ink-200 text-ink-700 text-[11px] font-bold whitespace-nowrap border border-ink-200 cursor-pointer transition-colors disabled:opacity-50"
                               >
                                 Bác bỏ
                               </button>
                             </div>
                           ) : (
-                            <span className="text-[11px] text-ink-400 font-mono">Đã đóng</span>
+                            <span className="text-[11px] text-ink-500 font-medium whitespace-nowrap">
+                              {rep.moderatorNotes || (rep.status === 'DISMISSED' ? 'Đã bác bỏ' : 'Đã xử lý')}
+                            </span>
                           )}
                         </td>
                       </tr>
