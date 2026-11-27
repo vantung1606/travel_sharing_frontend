@@ -524,8 +524,21 @@ export const AITripGeneratorModal = () => {
     }, 700);
 
     try {
+      const INTEREST_GUIDE_MAP = {
+        checkin: 'Check-in sống ảo (ưu tiên điểm cảnh đẹp, góc chụp ảnh biểu tượng, quán cafe view đẹp)',
+        food: 'Ẩm thực bản địa (ưu tiên quán đặc sản nổi tiếng, chợ ẩm thực, món ngon đặc trưng cho từng bữa)',
+        beach: 'Nghỉ dưỡng & Biển (ưu tiên bãi biển, vịnh/đảo, hoạt động thư giãn ven biển)',
+        culture: 'Văn hóa & Di sản (ưu tiên di tích lịch sử, bảo tàng, đền chùa, làng nghề truyền thống)',
+        trekking: 'Trekking & Phượt (ưu tiên núi đồi, thác nước, rừng quốc gia, cung đường đèo khám phá)',
+        nightlife: 'Phố đêm & Vui chơi (ưu tiên phố đi bộ, chợ đêm, quảng trường, giải trí buổi tối)',
+        healing: 'Chữa lành & Thư giãn (ưu tiên thiên nhiên yên tĩnh, suối khoáng, spa, cafe vườn)',
+        shopping: 'Mua sắm & Chợ (ưu tiên chợ truyền thống, đặc sản địa phương làm quà)'
+      };
+      const selectedInterestDetails = selectedInterests
+        .map(id => INTEREST_GUIDE_MAP[id] || INTEREST_OPTIONS.find(o => o.id === id)?.label)
+        .filter(Boolean);
+
       // 3. BUILD PROMPT CÔ ĐỌNG, YÊU CẦU AI NGHIÊN CỨU TRỰC TIẾP ĐỊA ĐIỂM NGƯỜI DÙNG NHẬP
-      // Tối ưu để không bao giờ vượt quá token limit
       const prompt = `Bạn là chuyên gia cố vấn du lịch bản địa hàng đầu tại Việt Nam.
 Hãy nghiên cứu và phân tích điểm đến: "${destination}".
 Lập lịch trình du lịch ${daysCount} ngày với các danh lam thắng cảnh, di tích lịch sử và quán ăn đặc sản có thật 100% tại "${destination}".
@@ -535,14 +548,16 @@ Thông tin chuyến đi:
 - Đối tượng: ${getCompanionLabel()}
 - Phương tiện: ${getTransitLabel()}
 - Ngân sách: ${getBudgetLabel()}
-- Gu trải nghiệm: ${selectedInterests.join(', ')}
+- Gu du lịch & Trải nghiệm đã chọn (YẾU TỐ CỐT LÕI ĐỂ CHỌN ĐỊA ĐIỂM):
+  ${selectedInterestDetails.length > 0 ? selectedInterestDetails.map(g => `* ${g}`).join('\n  ') : '* Trải nghiệm cân bằng mọi loại hình'}
 - Lưu trú: ${accommodation}
 - Ẩm thực: ${diningStyle}
 ${customPrompt ? `- Yêu cầu thêm: ${customPrompt}` : ''}
 
 QUY TẮC BẮT BUỘC:
-1. Nghiên cứu chính xác các địa điểm, quán ăn có thật 100% tại "${destination}". Tuyệt đối không dùng văn mẫu chung chung.
-2. Mỗi ngày có 3-4 hoạt động sắp xếp từ sáng đến tối. Nếu chuyến đi dài (>= 5 ngày), viết "note" thật ngắn gọn (tối đa 10 từ) để đảm bảo xuất đủ toàn bộ ${daysCount} ngày trong 1 lần trả lời.
+1. TÍNH ĐỊA ĐIỂM THEO GU ĐÃ CHỌN: Mọi địa điểm trong lịch trình PHẢI bám sát đúng các Gu du lịch & Trải nghiệm đã chọn ở trên (tuyệt đối không đưa các hoạt động lạc gu không được chọn).
+2. NHIỀU ĐIỂM & KHÔNG TRÙNG LẶP: Mỗi ngày PHẢI có ĐỦ 4-5 hoạt động phong phú (Sáng, Trưa, Chiều, Tối), tổng cộng ít nhất ${daysCount * 4} địa điểm khác nhau. Tuyệt đối KHÔNG lặp lại địa điểm giữa các ngày.
+3. HỢP LÝ VỀ TUYẾN ĐƯỜNG & THỜI GIAN: Các địa điểm trong cùng một buổi/ngày phải nằm cùng cụm khu vực địa lý gần nhau để di chuyển thuận tiện, không chạy ngược đường. Nếu chuyến đi dài (>= 5 ngày), viết "note" ngắn gọn (tối đa 10 từ) để xuất đủ toàn bộ ${daysCount} ngày.
 3. BẮT BUỘC VỀ ĐỊA CHỈ & TỌA ĐỘ: Cung cấp "location" (tên ngắn gọn của địa danh/quán ăn), "address" (ĐỊA CHỈ CỤ THỂ CHI TIẾT CÓ THẬT gồm số nhà/tên đường, xã/phường, quận/huyện tại ${destination}. Tuyệt đối KHÔNG chỉ ghi tên tỉnh thành chung chung), và "lat", "lng" (TỌA ĐỘ GPS THỰC TẾ CHÍNH XÁC CỦA ĐỊA ĐIỂM ĐÓ TẠI ${destination}, VIỆT NAM dạng số thập phân float, ví dụ Đà Nẵng: lat ~16.0xx, lng ~108.2xx; Hà Nội: lat ~21.0xx, lng ~105.8xx) để đồng bộ trực quan trên bản đồ số.
 4. Trả về DUY NHẤT một chuỗi JSON hợp lệ theo định dạng:
 {
@@ -722,24 +737,7 @@ QUY TẮC BẮT BUỘC:
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
-            </div>
-
-            {/* Quick destination tags */}
-            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-              <span className="text-[11px] font-bold text-slate-400">Gợi ý nhanh:</span>
-              {HOT_DESTINATIONS.map(tag => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => setDestination(tag)}
-                  className={`px-2.5 py-1 rounded-full text-[11px] font-bold transition-all cursor-pointer ${destination === tag
-                      ? 'bg-sky-600 text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-700'
-                    }`}
-                >
-                  {tag}
-                </button>
-              ))}
+            {/* Input điểm đến */}
             </div>
           </div>
 
