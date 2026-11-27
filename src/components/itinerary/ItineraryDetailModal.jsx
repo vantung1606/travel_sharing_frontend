@@ -199,12 +199,23 @@ const getDestinationCoordinates = (destName) => {
   return { lat: 16.0544, lng: 108.2022, zoom: 12 };
 };
 
+// Kiểm tra tọa độ có nằm trong bán kính hợp lý quanh điểm đến chính hay không (tránh khớp nhầm sang tỉnh khác như Hà Tĩnh)
+const isReasonableNearDestination = (lat, lng, baseCoords, destinationName = '') => {
+  if (!baseCoords || typeof baseCoords.lat !== 'number' || typeof baseCoords.lng !== 'number') return true;
+  const maxDelta = /[-,&]/.test(String(destinationName).replace(/,\s*Việt Nam/i, '')) ? 2.5 : 1.5;
+  return Math.abs(lat - baseCoords.lat) <= maxDelta && Math.abs(lng - baseCoords.lng) <= maxDelta;
+};
+
 // Xác định tọa độ thực tế có thật 100% của từng hoạt động
 const resolvePlaceCoordinates = (act, destinationName, baseCoords) => {
-  // 1. Nếu đã có tọa độ GPS hợp lệ (trong lãnh thổ Việt Nam: lat 8 -> 24, lng 102 -> 110)
+  // 1. Nếu đã có tọa độ GPS hợp lệ (trong lãnh thổ Việt Nam và hợp lý với điểm đến)
   const actLat = parseFloat(act.lat || act.latitude);
   const actLng = parseFloat(act.lng || act.longitude);
-  if (!isNaN(actLat) && !isNaN(actLng) && actLat >= 8.0 && actLat <= 24.0 && actLng >= 102.0 && actLng <= 110.0) {
+  if (
+    !isNaN(actLat) && !isNaN(actLng) &&
+    actLat >= 8.0 && actLat <= 24.0 && actLng >= 102.0 && actLng <= 110.0 &&
+    isReasonableNearDestination(actLat, actLng, baseCoords, destinationName)
+  ) {
     return { lat: actLat, lng: actLng, isExact: true };
   }
 
@@ -214,27 +225,31 @@ const resolvePlaceCoordinates = (act, destinationName, baseCoords) => {
   const rawAddress = (act.address || '').toLowerCase().trim();
   const rawLoc = (act.location || '').toLowerCase().trim();
 
-  // Bắt buộc chuỗi tìm kiếm phải có độ dài tối thiểu >= 3 ký tự
-  // Tuyệt đối không cho phép chuỗi rỗng "" lọt vào key.includes("") gây khớp sai với "biển thạch hải"
+  // Bắt buộc chuỗi tìm kiếm phải đủ dài để không khớp nhầm chuỗi ngắn (vd: "biển" khớp "biển thạch hải")
   for (const [key, coords] of Object.entries(VIETNAM_LANDMARKS)) {
     const k = key.toLowerCase().trim();
-    if (k.length < 3) continue;
+    if (k.length < 4) continue;
+    if (!isReasonableNearDestination(coords.lat, coords.lng, baseCoords, destinationName)) continue;
 
     const isMatch =
-      (cleanName.length >= 3 && (cleanName.includes(k) || (cleanName.length >= 4 && k.includes(cleanName)))) ||
-      (rawLoc.length >= 3 && (rawLoc.includes(k) || (rawLoc.length >= 4 && k.includes(rawLoc)))) ||
-      (rawTitle.length >= 3 && rawTitle.includes(k)) ||
-      (rawAddress.length >= 3 && rawAddress.includes(k));
+      (cleanName.length >= 4 && (cleanName.includes(k) || (cleanName.length >= 8 && k.includes(cleanName)))) ||
+      (rawLoc.length >= 4 && (rawLoc.includes(k) || (rawLoc.length >= 8 && k.includes(rawLoc)))) ||
+      (rawTitle.length >= 4 && rawTitle.includes(k)) ||
+      (rawAddress.length >= 4 && rawAddress.includes(k));
 
     if (isMatch) {
       return { lat: coords.lat, lng: coords.lng, isExact: true, matchedAddress: coords.address };
     }
   }
 
-  // 3. Tra cứu theo quận / huyện / thị xã
+  // 3. Tra cứu theo quận / huyện / thị xã (chỉ nhận nếu nằm trong vùng điểm đến)
   for (const [distKey, distCoords] of Object.entries(VIETNAM_DISTRICTS)) {
     const dk = distKey.toLowerCase().trim();
-    if (dk.length >= 3 && (rawAddress.includes(dk) || rawTitle.includes(dk) || rawLoc.includes(dk))) {
+    if (
+      dk.length >= 4 &&
+      isReasonableNearDestination(distCoords.lat, distCoords.lng, baseCoords, destinationName) &&
+      (rawAddress.includes(dk) || rawTitle.includes(dk) || rawLoc.includes(dk))
+    ) {
       return { lat: distCoords.lat, lng: distCoords.lng, isExact: false };
     }
   }
