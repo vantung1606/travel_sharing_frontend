@@ -436,7 +436,7 @@ export const AITripGeneratorModal = () => {
 
     return {
       id: `itin-${Date.now()}`,
-      title: `Hành Trình ${destination} (${daysCount}N${Math.max(1, daysCount - 1)}Đ): Tối Ưu Thực Địa WanderAI`,
+      title: `Khám phá ${String(destination || '').replace(/,\s*Việt Nam$/i, '').trim() || destination} (${daysCount}N${Math.max(1, daysCount - 1)}Đ)`,
       destination: destination,
       region: 'Điểm đến du lịch Việt Nam',
       coverImage: getDestinationCover(destination),
