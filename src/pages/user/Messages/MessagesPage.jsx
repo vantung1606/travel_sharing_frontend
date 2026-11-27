@@ -39,6 +39,7 @@ import {
 } from 'lucide-react';
 import { ItineraryMessageBubble } from '../../../components/chat/ItineraryMessageBubble';
 import { ItineraryPickerModal } from '../../../components/chat/ItineraryPickerModal';
+import { AiRichMessageBubble } from '../../../components/chat/AiRichMessageBubble';
 
 // Hàm chuẩn hóa tiếng Việt loại bỏ dấu để tìm kiếm tức thì theo chuỗi con (VD: 'tu' -> khớp 'tùng', 'tg' -> không khớp)
 export const normalizeVietnamese = (str) => {
@@ -733,6 +734,39 @@ export const MessagesPage = () => {
           isTyping: false
         });
       }, 2000);
+    }
+  };
+
+  // 6.1 Gửi nhanh tin nhắn từ nút gợi ý (Quick Prompt / Quick Reply)
+  const sendQuickPromptText = async (promptContent) => {
+    const contentToSend = (promptContent || '').trim();
+    if (!activeThreadId || !contentToSend) return;
+
+    const tempId = 'temp-text-' + Date.now();
+    const tempMsg = {
+      id: tempId,
+      roomId: activeThreadId,
+      senderId: currentUser?.id,
+      senderEmail: effectiveEmail,
+      senderName: currentUser?.name || 'Bạn',
+      senderAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+      content: contentToSend,
+      messageType: 'TEXT',
+      time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }),
+      isMe: true,
+      isPending: true
+    };
+    setMessages(prev => [...prev, tempMsg]);
+
+    try {
+      const savedMsg = await chatApi.sendMessage(activeThreadId, { content: contentToSend, messageType: 'TEXT' }, effectiveEmail);
+      if (savedMsg) {
+        setMessages(prev => prev.map(m => m.id === tempId ? { ...savedMsg, isMe: true } : m));
+      }
+      loadRooms();
+    } catch (err) {
+      toast.showError('Không thể gửi tin nhắn. Vui lòng thử lại!');
+      setMessages(prev => prev.filter(m => m.id !== tempId));
     }
   };
 
@@ -2191,6 +2225,14 @@ export const MessagesPage = () => {
                                 navigate(`/itinerary?id=${itinData.id || ''}`);
                               }}
                             />
+                          ) : msg.messageType === 'AI_RICH' || (!isMe && (currentThreadObj?.type === 'AI' || msg.senderEmail === 'assistant@wayfare.com') && msg.messageType === 'TEXT') ? (
+                            <AiRichMessageBubble
+                              msg={msg}
+                              effectiveEmail={effectiveEmail}
+                              toast={toast}
+                              navigate={navigate}
+                              onQuickReply={sendQuickPromptText}
+                            />
                           ) : (
                             <div
                               className={`px-3.5 py-2.5 rounded-[6px] text-[12px] leading-relaxed break-words border ${
@@ -2290,25 +2332,23 @@ export const MessagesPage = () => {
                 </div>
               ) : (
                 <div className="border-t border-ink-200/70 bg-[#FFFDF8] shrink-0">
-                  {/* Thanh gợi ý câu hỏi nhanh (Quick Prompts) cho Trợ lý Wayfare */}
+                  {/* Thanh gợi ý thao tác & câu hỏi nhanh (Quick Prompts) cho Trợ lý Wayfare VIP */}
                   {(currentThreadObj?.type === 'AI' || currentThreadObj?.isPinned) && (
-                    <div className="px-3 pt-2.5 pb-1 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-ink-200/40">
+                    <div className="px-3 pt-2.5 pb-1.5 flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b border-ink-200/40">
                       {[
-                        '🌤️ Thời tiết & săn mây Đà Lạt',
-                        '🍲 Top 5 món ngon Sa Pa',
-                        '🏖️ Lịch trình 3N2Đ Phú Quốc tiết kiệm',
-                        '🛵 Cung đường phượt Hà Giang',
-                        '🏮 Check-in phố cổ Hội An'
-                      ].map((promptText, idx) => (
+                        { label: '✨ Tạo lịch trình mới', text: 'Gợi ý và tạo giúp mình một lịch trình du lịch nổi bật 3 ngày 2 đêm' },
+                        { label: '📋 Lịch trình của tôi', text: 'Xem danh sách lịch trình hiện tại của tôi để sửa hoặc xóa' },
+                        { label: '❤️ Địa điểm đã lưu', text: 'Xem các địa điểm tôi đã lưu trong danh sách yêu thích' },
+                        { label: '🗺️ Điểm đến hot trong CSDL', text: 'Gợi ý các địa điểm du lịch được đánh giá cao nhất hiện có' },
+                        { label: '✏️ Sửa / thêm điểm dừng', text: 'Giúp tôi thêm điểm dừng mới vào lịch trình gần nhất' }
+                      ].map((item, idx) => (
                         <button
                           key={idx}
                           type="button"
-                          onClick={() => {
-                            setInputText(promptText);
-                          }}
+                          onClick={() => sendQuickPromptText(item.text)}
                           className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-clay-50 hover:bg-clay-100 text-clay-800 border border-clay-200 whitespace-nowrap transition-colors cursor-pointer shrink-0 shadow-2xs"
                         >
-                          {promptText}
+                          {item.label}
                         </button>
                       ))}
                     </div>
