@@ -10,9 +10,13 @@ export const ToastProvider = ({ children }) => {
     setToasts(prev => prev.filter(t => t.id !== id));
   }, []);
 
-  const addToast = useCallback((message, type = 'success', duration = 4000) => {
+  const addToast = useCallback((message, type = 'success', duration = 3500) => {
     const id = Date.now() + Math.random();
-    setToasts(prev => [...prev, { id, message, type }]);
+    setToasts(prev => {
+      // Tránh hiển thị trùng cùng một nội dung liên tiếp và giữ tối đa 3 toast
+      if (prev.some(t => t.message === message)) return prev;
+      return [...prev.slice(-2), { id, message, type }];
+    });
 
     if (duration > 0) {
       setTimeout(() => {
@@ -35,45 +39,45 @@ export const ToastProvider = ({ children }) => {
   return (
     <ToastContext.Provider value={toast}>
       {children}
-      {/* Global Toast Floating Notification Container */}
-      <div className="fixed top-5 right-5 z-[9999] flex flex-col gap-3 max-w-sm w-full pointer-events-none px-4 sm:px-0">
+      {/* Global Toast Notification Container - Clean, Basic & Professional */}
+      <div className="fixed top-4 right-4 z-[9999] flex flex-col gap-2 max-w-xs sm:max-w-sm w-full pointer-events-none px-3 sm:px-0">
         {toasts.map(t => {
-          let bgClass = 'bg-slate-900 border-slate-700 text-white';
+          let styleClass = 'bg-[#FFFDF8] border-emerald-200 text-ink-800';
           let Icon = CheckCircle2;
-          let iconColor = 'text-sky-400';
+          let iconColor = 'text-emerald-600';
 
           if (t.type === 'success') {
-            bgClass = 'bg-slate-900/95 border-sky-500/30 text-white shadow-sky-500/10';
+            styleClass = 'bg-[#FFFDF8] border-emerald-200 text-ink-800';
             Icon = CheckCircle2;
-            iconColor = 'text-sky-400';
+            iconColor = 'text-emerald-600';
           } else if (t.type === 'error') {
-            bgClass = 'bg-rose-950/95 border-rose-500/30 text-white shadow-rose-500/10';
+            styleClass = 'bg-[#FFFDF8] border-rose-200 text-ink-800';
             Icon = AlertCircle;
-            iconColor = 'text-rose-400';
+            iconColor = 'text-rose-600';
           } else if (t.type === 'info') {
-            bgClass = 'bg-slate-900/95 border-sky-500/30 text-white shadow-sky-500/10';
+            styleClass = 'bg-[#FFFDF8] border-clay-200 text-ink-800';
             Icon = Info;
-            iconColor = 'text-sky-400';
+            iconColor = 'text-clay-600';
           } else if (t.type === 'warning') {
-            bgClass = 'bg-slate-900/95 border-amber-500/30 text-white shadow-amber-500/10';
+            styleClass = 'bg-[#FFFDF8] border-amber-200 text-ink-800';
             Icon = AlertTriangle;
-            iconColor = 'text-amber-400';
+            iconColor = 'text-amber-600';
           }
 
           return (
             <div
               key={t.id}
-              className={`pointer-events-auto flex items-start gap-3 p-4 rounded-2xl border backdrop-blur-xl shadow-2xl transition-all transform animate-in slide-in-from-top-3 duration-300 ${bgClass}`}
+              className={`pointer-events-auto flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg border shadow-md transition-all animate-in slide-in-from-top-2 duration-200 ${styleClass}`}
             >
-              <Icon className={`w-5 h-5 shrink-0 mt-0.5 ${iconColor}`} />
-              <div className="flex-1 text-xs font-semibold leading-relaxed">
+              <Icon className={`w-4 h-4 shrink-0 ${iconColor}`} />
+              <div className="flex-1 text-[12px] font-medium leading-snug">
                 {t.message}
               </div>
               <button
                 onClick={() => removeToast(t.id)}
-                className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors shrink-0"
+                className="p-0.5 text-ink-400 hover:text-ink-700 rounded transition-colors shrink-0 cursor-pointer"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
           );
@@ -90,4 +94,3 @@ export const useToast = () => {
   }
   return context;
 };
-

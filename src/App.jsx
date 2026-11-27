@@ -121,16 +121,19 @@ const AppContent = () => {
           return;
         }
 
-        // 4. Nếu đang ở trang Khám phá (/explore) và nhận thông báo về địa điểm vừa gửi -> tránh đè Toast đôi
-        const isOnExplore = window.location.pathname.startsWith('/explore');
-        if (isOnExplore && (notification.type === 'PLACE_MODERATION' || notification.type === 'PLACE_PENDING')) {
+        // 4. Không bắn Toast đè nếu đang thao tác tạo/cập nhật ở /explore, /messages, /itineraries
+        const path = window.location.pathname;
+        if (path.startsWith('/explore') && (notification.type === 'PLACE_MODERATION' || notification.type === 'PLACE_PENDING')) {
+          return;
+        }
+        if ((path.startsWith('/messages') || path.startsWith('/itineraries')) && (notification.type === 'AI_READY' || notification.type === 'SYSTEM')) {
           return;
         }
 
         // Hiển thị Toast nổi thông báo tức thời
         const title = notification.title || 'Thông báo';
         const msg = notification.message || 'Bạn có thông báo mới';
-        toast.showInfo(`🔔 ${title}: ${msg}`, 4000);
+        toast.showInfo(`${title}: ${msg}`, 3500);
       }
     );
 

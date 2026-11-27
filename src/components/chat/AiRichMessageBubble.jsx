@@ -215,30 +215,12 @@ function ItineraryProposalCard({
         )}
       </div>
 
-      {/* Metadata Badges */}
-      <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-ink-700">
-        {p.destination && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70 font-medium">
-            <MapPin className="w-3 h-3 text-clay-600" />
-            {p.destination}
-          </span>
-        )}
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70 font-medium">
-          <Calendar className="w-3 h-3 text-clay-600" />
-          {daysCount} ngày ({startDate} → {computedEndDate})
-        </span>
-        {p.groupType && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70 font-medium">
-            <Users className="w-3 h-3 text-clay-600" />
-            {p.groupType}
-          </span>
-        )}
-        {formatCurrency(budgetTotal) && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white border border-ink-200/70 font-medium">
-            <Wallet className="w-3 h-3 text-emerald-600" />
-            ~{formatCurrency(budgetTotal)}
-          </span>
-        )}
+      {/* Metadata tóm tắt 1 dòng gọn gàng */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-ink-500">
+        {p.destination && <span className="font-medium text-ink-700">{p.destination}</span>}
+        <span>· {daysCount} ngày ({startDate} → {computedEndDate})</span>
+        {p.groupType && <span>· {p.groupType}</span>}
+        {formatCurrency(budgetTotal) && <span className="font-semibold text-emerald-700">· ~{formatCurrency(budgetTotal)}</span>}
       </div>
 
       {/* Form chỉnh nhanh trước khi lưu */}
@@ -319,17 +301,11 @@ function ItineraryProposalCard({
                           <div className="min-w-0 flex-1">
                             <div className="font-semibold text-ink-900 flex items-center gap-1.5 flex-wrap">
                               {s.startTime && (
-                                <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-clay-700 bg-clay-50 px-1.5 py-0.5 rounded border border-clay-200/60">
-                                  <Clock className="w-2.5 h-2.5" />
+                                <span className="text-[10.5px] font-bold text-clay-700 tabular-nums">
                                   {s.startTime}
                                 </span>
                               )}
                               <span>{s.locationName}</span>
-                              {s.category && (
-                                <span className="text-[9.5px] px-1.5 py-0.5 rounded bg-white border border-ink-200 text-ink-500">
-                                  {s.category}
-                                </span>
-                              )}
                             </div>
                             {(s.note || s.aiTip) && (
                               <p className="text-[10.5px] text-ink-500 mt-0.5 leading-snug">
