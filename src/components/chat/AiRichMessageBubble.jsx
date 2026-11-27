@@ -25,7 +25,22 @@ import { useApp } from '../../context/AppContext';
 
 function FormattedReplyText({ text }) {
   if (!text) return null;
-  const cleanedText = String(text).replace(/\s*\((?:placeId|itineraryId|detailId|postId)\s*:\s*\d+\)/gi, '');
+  let safeText = String(text);
+  // Bảo vệ cho cả các tin nhắn cũ lỡ chứa JSON thô bị cắt ngang
+  if (safeText.includes('"reply"') && safeText.includes('{')) {
+    const match = safeText.match(/"reply"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+    if (match && match[1]) {
+      try {
+        safeText = JSON.parse(`"${match[1]}"`);
+      } catch {
+        safeText = match[1];
+      }
+    } else {
+      const idx = safeText.indexOf('{');
+      if (idx > 15) safeText = safeText.slice(0, idx).trim();
+    }
+  }
+  const cleanedText = safeText.replace(/\s*\((?:placeId|itineraryId|detailId|postId)\s*:\s*\d+\)/gi, '');
   const lines = cleanedText.split('\n');
 
   return (
