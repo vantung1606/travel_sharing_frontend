@@ -6,7 +6,14 @@ import { useToast } from '../common/Toast';
 
 const EXPENSE_CATEGORIES = ['Ăn uống', 'Di chuyển', 'Khách sạn', 'Vé tham quan', 'Mua sắm', 'Khác'];
 
-export const ItineraryExpensesMembersPanel = ({ itineraryId, budgetTotal = 0, isOwner = false }) => {
+export const ItineraryExpensesMembersPanel = ({
+  itineraryId,
+  budgetTotal = 0,
+  isOwner = false,
+  creatorName = '',
+  creatorEmail = '',
+  mode = 'expenses' // 'expenses' | 'members'
+}) => {
   const { currentUser } = useApp();
   const toast = useToast();
   const numericId = Number(itineraryId);
@@ -16,13 +23,11 @@ export const ItineraryExpensesMembersPanel = ({ itineraryId, budgetTotal = 0, is
   const [expenses, setExpenses] = useState([]);
   const [members, setMembers] = useState([]);
 
-  // Expense form
   const [expAmount, setExpAmount] = useState('');
   const [expCategory, setExpCategory] = useState('Ăn uống');
   const [expDesc, setExpDesc] = useState('');
   const [submittingExp, setSubmittingExp] = useState(false);
 
-  // Member form
   const [memberEmail, setMemberEmail] = useState('');
   const [submittingMember, setSubmittingMember] = useState(false);
 
@@ -44,21 +49,29 @@ export const ItineraryExpensesMembersPanel = ({ itineraryId, budgetTotal = 0, is
     loadData();
   }, [loadData]);
 
-  if (!isValidId) return null;
+  if (!isValidId) {
+    return (
+      <div className="p-8 text-center text-xs text-slate-400">
+        Lịch trình chưa được lưu vào cơ sở dữ liệu.
+      </div>
+    );
+  }
 
   const actualTotal = expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
   const totalPeople = 1 + members.length;
   const perPerson = Math.round(actualTotal / Math.max(1, totalPeople));
   const budgetNum = Number(budgetTotal) || 0;
+  const remaining = budgetNum - actualTotal;
   const pct = budgetNum > 0 ? Math.min(100, Math.round((actualTotal / budgetNum) * 100)) : 0;
   const isOver = budgetNum > 0 && actualTotal > budgetNum;
+
   const isMember = Boolean(
     currentUser &&
-    members.some(
-      (m) =>
-        (m.email && currentUser.email && m.email.toLowerCase() === currentUser.email.toLowerCase()) ||
-        (m.userId != null && currentUser.id != null && String(m.userId) === String(currentUser.id))
-    )
+      members.some(
+        (m) =>
+          (m.email && currentUser.email && m.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+          (m.userId != null && currentUser.id != null && String(m.userId) === String(currentUser.id))
+      )
   );
   const canLogExpense = isOwner || isMember;
 
@@ -127,172 +140,226 @@ export const ItineraryExpensesMembersPanel = ({ itineraryId, budgetTotal = 0, is
     }
   };
 
+  if (mode === 'members') {
+    return (
+      <div className="max-w-2xl mx-auto space-y-5">
+        {/* Mời bạn đồng hành */}
+        {isOwner && (
+          <form onSubmit={handleAddMember} className="bg-white p-4 rounded-xl border border-slate-200 space-y-2.5">
+            <label className="block text-xs font-bold text-slate-700">
+              Mời bạn đồng hành qua email
+            </label>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="email"
+                placeholder="Nhập email tài khoản Wayfare (VD: banbe@gmail.com)..."
+                value={memberEmail}
+                onChange={(e) => setMemberEmail(e.target.value)}
+                className="flex-1 px-3 py-2 rounded-lg border border-slate-200 text-xs outline-none focus:border-sky-500"
+              />
+              <button
+                type="submit"
+                disabled={submittingMember}
+                className="px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold inline-flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>{submittingMember ? 'Đang mời...' : 'Mời tham gia'}</span>
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* Danh sách thành viên */}
+        <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
+          <div className="px-4 py-3 flex items-center justify-between">
+            <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <Users className="w-4 h-4 text-slate-500" />
+              <span>Thành viên chuyến đi ({totalPeople})</span>
+            </h4>
+            {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" />}
+          </div>
+
+          {/* Chủ chuyến đi */}
+          <div className="px-4 py-3 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-sm font-bold text-slate-900 truncate">
+                {creatorName || 'Chủ chuyến đi'}
+              </div>
+              {creatorEmail && (
+                <div className="text-xs text-slate-400 truncate">{creatorEmail}</div>
+              )}
+            </div>
+            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[11px] font-bold shrink-0">
+              Chủ chuyến đi
+            </span>
+          </div>
+
+          {/* Bạn đồng hành */}
+          {members.length === 0 ? (
+            <div className="px-4 py-6 text-center text-xs text-slate-400">
+              Chưa có bạn đồng hành nào. {isOwner ? 'Nhập email phía trên để mời bạn bè cùng theo dõi và ghi chi tiêu.' : ''}
+            </div>
+          ) : (
+            members.map((m) => (
+              <div key={m.id || m.userId} className="px-4 py-3 flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-slate-800 truncate">{m.fullName || m.email}</div>
+                  <div className="text-xs text-slate-400 truncate">{m.email}</div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold">
+                    Thành viên
+                  </span>
+                  {isOwner && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveMember(m.userId)}
+                      className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+                      title="Xóa thành viên"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // mode === 'expenses'
   return (
-    <div className="bg-white p-4 rounded-2xl border border-slate-200 space-y-4">
-      {/* 1. Chi tiêu thực tế & Chia tiền nhóm */}
-      <div className="space-y-2.5">
-        <div className="flex items-center justify-between gap-2">
-          <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
-            <Wallet className="w-3.5 h-3.5 text-sky-600" />
-            <span>Chi tiêu thực tế & Chia tiền ({totalPeople} người)</span>
-          </h4>
-          {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" />}
+    <div className="max-w-3xl mx-auto space-y-5">
+      {/* 1. 3 chỉ số cơ bản rõ ràng */}
+      <div className="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+        <div className="grid grid-cols-3 gap-3 text-center sm:text-left">
+          <div>
+            <div className="text-[11px] text-slate-400 font-medium">Ngân sách dự kiến</div>
+            <div className="text-sm sm:text-base font-bold text-slate-900 mt-0.5">
+              {budgetNum.toLocaleString('vi-VN')}đ
+            </div>
+          </div>
+          <div>
+            <div className="text-[11px] text-slate-400 font-medium">Đã chi thực tế</div>
+            <div className={`text-sm sm:text-base font-bold mt-0.5 ${isOver ? 'text-rose-600' : 'text-emerald-700'}`}>
+              {actualTotal.toLocaleString('vi-VN')}đ
+            </div>
+          </div>
+          <div>
+            <div className="text-[11px] text-slate-400 font-medium">Chia đều ({totalPeople} người)</div>
+            <div className="text-sm sm:text-base font-bold text-sky-700 mt-0.5">
+              {perPerson.toLocaleString('vi-VN')}đ/người
+            </div>
+          </div>
         </div>
 
-        <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100 space-y-1.5 text-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-slate-500">Đã chi thực tế:</span>
-            <strong className={isOver ? 'text-rose-600' : 'text-slate-900'}>
-              {actualTotal.toLocaleString('vi-VN')}đ
-            </strong>
-          </div>
-          {budgetNum > 0 && (
-            <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+        {budgetNum > 0 && (
+          <div className="space-y-1">
+            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${isOver ? 'bg-rose-500' : 'bg-emerald-500'}`}
                 style={{ width: `${pct}%` }}
               />
             </div>
-          )}
-          <div className="flex items-center justify-between text-[11px] text-slate-500">
-            <span>Bình quân / người:</span>
-            <strong className="text-sky-700">{perPerson.toLocaleString('vi-VN')}đ</strong>
-          </div>
-        </div>
-
-        {expenses.length > 0 && (
-          <div className="space-y-1.5 max-h-40 overflow-y-auto pr-0.5">
-            {expenses.map((exp) => (
-              <div
-                key={exp.id}
-                className="flex items-center justify-between gap-2 text-xs py-1.5 px-2.5 rounded-lg bg-slate-50/70 border border-slate-100"
-              >
-                <div className="min-w-0">
-                  <div className="font-semibold text-slate-800 truncate">
-                    {exp.description || exp.category}
-                  </div>
-                  <div className="text-[10px] text-slate-400">
-                    {exp.category} · {exp.payerName || 'Thành viên'}
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="font-bold text-slate-900">
-                    {Number(exp.amount || 0).toLocaleString('vi-VN')}đ
-                  </span>
-                  {(isOwner || (currentUser?.id != null && String(exp.payerId) === String(currentUser.id))) && (
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteExpense(exp.id)}
-                      className="p-1 text-slate-400 hover:text-rose-600 cursor-pointer"
-                      title="Xóa khoản chi"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {canLogExpense && (
-          <form onSubmit={handleAddExpense} className="space-y-1.5 pt-1">
-            <div className="grid grid-cols-2 gap-1.5">
-              <input
-                type="number"
-                min="1000"
-                placeholder="Số tiền (VNĐ)"
-                value={expAmount}
-                onChange={(e) => setExpAmount(e.target.value)}
-                className="px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs outline-none focus:border-sky-500"
-              />
-              <select
-                value={expCategory}
-                onChange={(e) => setExpCategory(e.target.value)}
-                className="px-2 py-1.5 rounded-lg border border-slate-200 text-xs outline-none focus:border-sky-500 bg-white"
-              >
-                {EXPENSE_CATEGORIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
-                ))}
-              </select>
+            <div className="flex items-center justify-between text-[11px] text-slate-500">
+              <span>Đã dùng {pct}% ngân sách</span>
+              <span className={isOver ? 'text-rose-600 font-semibold' : ''}>
+                {isOver
+                  ? `Vượt ${Math.abs(remaining).toLocaleString('vi-VN')}đ`
+                  : `Còn lại ${remaining.toLocaleString('vi-VN')}đ`}
+              </span>
             </div>
-            <div className="flex gap-1.5">
-              <input
-                type="text"
-                placeholder="Mô tả khoản chi (VD: Ăn hải sản tối)"
-                value={expDesc}
-                onChange={(e) => setExpDesc(e.target.value)}
-                className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs outline-none focus:border-sky-500"
-              />
-              <button
-                type="submit"
-                disabled={submittingExp}
-                className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Ghi</span>
-              </button>
-            </div>
-          </form>
+          </div>
         )}
       </div>
 
-      {/* 2. Bạn đồng hành */}
-      <div className="pt-3 border-t border-slate-100 space-y-2.5">
-        <h4 className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
-          <Users className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Bạn đồng hành ({members.length})</span>
-        </h4>
-
-        {members.length > 0 ? (
-          <div className="space-y-1.5">
-            {members.map((m) => (
-              <div
-                key={m.id || m.userId}
-                className="flex items-center justify-between gap-2 text-xs py-1.5 px-2.5 rounded-lg bg-slate-50/70 border border-slate-100"
-              >
-                <div className="min-w-0">
-                  <div className="font-semibold text-slate-800 truncate">{m.fullName || m.email}</div>
-                  <div className="text-[10px] text-slate-400 truncate">{m.email}</div>
-                </div>
-                {isOwner && (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveMember(m.userId)}
-                    className="p-1 text-slate-400 hover:text-rose-600 cursor-pointer"
-                    title="Xóa thành viên"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-[11px] text-slate-400">Chưa có bạn đồng hành nào được mời.</p>
-        )}
-
-        {isOwner && (
-          <form onSubmit={handleAddMember} className="flex gap-1.5">
+      {/* 2. Form ghi khoản chi mới (chủ chuyến đi hoặc bạn đồng hành) */}
+      {canLogExpense && (
+        <form onSubmit={handleAddExpense} className="bg-white p-4 rounded-xl border border-slate-200 space-y-3">
+          <div className="text-xs font-bold text-slate-800">Ghi khoản chi mới</div>
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
             <input
-              type="email"
-              placeholder="Email bạn đồng hành..."
-              value={memberEmail}
-              onChange={(e) => setMemberEmail(e.target.value)}
-              className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 text-xs outline-none focus:border-emerald-500"
+              type="number"
+              min="1000"
+              placeholder="Số tiền (VNĐ)"
+              value={expAmount}
+              onChange={(e) => setExpAmount(e.target.value)}
+              className="sm:col-span-3 px-3 py-2 rounded-lg border border-slate-200 text-xs outline-none focus:border-sky-500"
+            />
+            <select
+              value={expCategory}
+              onChange={(e) => setExpCategory(e.target.value)}
+              className="sm:col-span-3 px-3 py-2 rounded-lg border border-slate-200 text-xs outline-none focus:border-sky-500 bg-white"
+            >
+              {EXPENSE_CATEGORIES.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            <input
+              type="text"
+              placeholder="Mô tả (VD: Ăn tối hải sản)"
+              value={expDesc}
+              onChange={(e) => setExpDesc(e.target.value)}
+              className="sm:col-span-4 px-3 py-2 rounded-lg border border-slate-200 text-xs outline-none focus:border-sky-500"
             />
             <button
               type="submit"
-              disabled={submittingMember}
-              className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
+              disabled={submittingExp}
+              className="sm:col-span-2 px-3 py-2 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold inline-flex items-center justify-center gap-1 cursor-pointer disabled:opacity-50"
             >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>Mời</span>
+              <Plus className="w-3.5 h-3.5" />
+              <span>{submittingExp ? '...' : 'Ghi'}</span>
             </button>
-          </form>
+          </div>
+        </form>
+      )}
+
+      {/* 3. Danh sách các khoản đã chi */}
+      <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
+        <div className="px-4 py-3 flex items-center justify-between">
+          <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <Wallet className="w-4 h-4 text-slate-500" />
+            <span>Danh sách khoản chi ({expenses.length})</span>
+          </h4>
+          {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" />}
+        </div>
+
+        {expenses.length === 0 ? (
+          <div className="px-4 py-8 text-center text-xs text-slate-400">
+            Chưa có khoản chi tiêu thực tế nào được ghi nhận.
+          </div>
+        ) : (
+          expenses.map((exp) => (
+            <div key={exp.id} className="px-4 py-3 flex items-center justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-slate-900 truncate">
+                  {exp.description || exp.category}
+                </div>
+                <div className="text-xs text-slate-400 mt-0.5">
+                  {exp.category} · Người chi: {exp.payerName || 'Thành viên'}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-sm font-bold text-slate-900">
+                  {Number(exp.amount || 0).toLocaleString('vi-VN')}đ
+                </span>
+                {(isOwner || (currentUser?.id != null && String(exp.payerId) === String(currentUser.id))) && (
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteExpense(exp.id)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
+                    title="Xóa khoản chi"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
         )}
       </div>
     </div>
   );
 };
-

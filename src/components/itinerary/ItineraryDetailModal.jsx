@@ -345,6 +345,8 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
     }
     return false;
   }, [readOnly, currentUser, itinerary, myItineraries]);
+  // Tab chính của modal: 'schedule' (Lịch trình) | 'expenses' (Chi tiêu) | 'members' (Bạn đồng hành)
+  const [sectionTab, setSectionTab] = useState('schedule');
   // 'all' hoặc index 0, 1, 2...
   const [activeTab, setActiveTab] = useState('all');
   // Chế độ xem trên Mobile & Tablet (< 1024px): 'timeline' (Lịch trình) hoặc 'map' (Bản đồ & Lộ trình)
@@ -928,7 +930,30 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
           </div>
         </div>
 
-        {/* ─── 3. THANH TAB CHỌN NGÀY (SEGMENTED DAY PILLS) ─────────────────────── */}
+        {/* ─── 2.5. THANH TAB CHÍNH (LỊCH TRÌNH | CHI TIÊU | BẠN ĐỒNG HÀNH) ────── */}
+        <div className="px-5 sm:px-7 bg-white border-b border-slate-200 flex items-center gap-5 shrink-0">
+          {[
+            { id: 'schedule', label: 'Lịch trình' },
+            { id: 'expenses', label: 'Chi tiêu' },
+            { id: 'members', label: 'Bạn đồng hành' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setSectionTab(tab.id)}
+              className={`py-2.5 text-xs sm:text-sm font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
+                sectionTab === tab.id
+                  ? 'border-sky-600 text-sky-700'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ─── 3. THANH TAB CHỌN NGÀY (CHỈ HIỆN KHI XEM LỊCH TRÌNH) ────────────── */}
+        {sectionTab === 'schedule' && (
         <div className="px-5 sm:px-7 py-2.5 bg-white border-b border-slate-200 flex items-center gap-2 overflow-x-auto shrink-0 scrollbar-none">
           <button
             type="button"
@@ -974,8 +999,10 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
             );
           })}
         </div>
+        )}
 
         {/* ─── 4. MOBILE / TABLET SEGMENTED SWITCHER (< 1024px) ───────────────── */}
+        {sectionTab === 'schedule' && (
         <div className="lg:hidden px-4 sm:px-6 py-2 bg-slate-100/80 border-b border-slate-200 flex items-center gap-2 shrink-0">
           <button
             type="button"
@@ -1003,8 +1030,21 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
             <span>Bản Đồ & Lộ Trình ({mapPoints.length})</span>
           </button>
         </div>
+        )}
 
-        {/* ─── 5. NỘI DUNG CHÍNH (RESPONSIVE WORKSPACE) ────────────────────────── */}
+        {/* ─── 5. NỘI DUNG TAB CHI TIÊU HOẶC BẠN ĐỒNG HÀNH ─────────────────────── */}
+        {sectionTab !== 'schedule' ? (
+          <div className="flex-1 overflow-y-auto p-5 sm:p-7 bg-slate-50/60">
+            <ItineraryExpensesMembersPanel
+              itineraryId={itinerary?.id}
+              budgetTotal={itinerary?.totalBudget || itinerary?.budgetTotal || itinerary?.budget || 0}
+              isOwner={isOwner}
+              creatorName={itinerary?.creatorName || itinerary?.authorName || ''}
+              creatorEmail={itinerary?.creatorEmail || ''}
+              mode={sectionTab}
+            />
+          </div>
+        ) : (
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 bg-slate-50/40">
           
           {/* CỘT TRÁI (7 CỘT): LỊCH TRÌNH CHI TIẾT TỪNG HOẠT ĐỘNG */}
@@ -1519,111 +1559,20 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
               </div>
             </div>
 
-            {/* 2. LỘ TRÌNH TRẠM DỪNG TUYẾN ĐƯỜNG (DANH SÁCH BẤM ĐỂ BAY ĐẾN TRÊN BẢN ĐỒ) */}
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                  <Compass className="w-4 h-4 text-sky-600" />
-                  <span>Trình tự các trạm dừng</span>
-                </h4>
-                <span className="text-[11px] font-semibold text-slate-400">
-                  {mapPoints.length} điểm
-                </span>
-              </div>
-
-              <div className="space-y-1.5 max-h-48 sm:max-h-56 overflow-y-auto pr-1">
-                {mapPoints.map((pt) => {
-                  const isSelected = selectedMapPoint?.id === pt.id;
-                  return (
-                    <button
-                      key={pt.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedMapPoint(pt);
-                        if (window.innerWidth < 1024) {
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }
-                      }}
-                      className={`w-full flex items-center justify-between text-left text-xs p-2 rounded-xl transition-colors cursor-pointer ${
-                        isSelected
-                          ? 'bg-sky-50 text-sky-900 border border-sky-200'
-                          : 'hover:bg-slate-50 text-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 min-w-0 pr-2">
-                        <span className={`w-5 h-5 rounded-full text-[10px] font-extrabold flex items-center justify-center shrink-0 ${
-                          isSelected ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-700'
-                        }`}>
-                          {pt.number}
-                        </span>
-                        <div className="truncate">
-                          <span className="font-bold block truncate">{pt.location}</span>
-                          <span className="text-[10px] text-slate-400 block truncate">{pt.address}</span>
-                        </div>
-                      </div>
-                      <span className="text-[11px] text-slate-400 shrink-0 font-mono">
-                        {pt.time?.split('–')[0]?.trim()}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 3. DỰ TOÁN NGÂN SÁCH RÕ RÀNG */}
-            <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-              <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                <DollarSign className="w-4 h-4 text-sky-600" />
-                <span>Dự trù kinh phí cơ bản</span>
-              </h4>
-
-              <div className="space-y-2 text-xs">
-                <div className="flex items-center justify-between text-slate-600">
-                  <span>Lưu trú ({days.length - 1} đêm)</span>
-                  <span className="font-bold text-slate-800">40% (~{(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) * 0.4).toLocaleString('vi-VN')}đ)</span>
-                </div>
-                <div className="flex items-center justify-between text-slate-600">
-                  <span>Ẩm thực & Đặc sản</span>
-                  <span className="font-bold text-slate-800">30% (~{(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) * 0.3).toLocaleString('vi-VN')}đ)</span>
-                </div>
-                <div className="flex items-center justify-between text-slate-600">
-                  <span>Vé tham quan & Trải nghiệm</span>
-                  <span className="font-bold text-slate-800">20% (~{(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) * 0.2).toLocaleString('vi-VN')}đ)</span>
-                </div>
-                <div className="flex items-center justify-between text-slate-600">
-                  <span>Di chuyển & Chi phí dự phòng</span>
-                  <span className="font-bold text-slate-800">10% (~{(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) * 0.1).toLocaleString('vi-VN')}đ)</span>
-                </div>
-
-                <div className="pt-2 border-t border-slate-200 flex items-center justify-between text-xs sm:text-sm font-extrabold text-slate-900">
-                  <span>Tổng cộng dự kiến:</span>
-                  <span className="text-sky-700">{Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0).toLocaleString('vi-VN')}đ</span>
-                </div>
-              </div>
-            </div>
-
-            {/* 3.5. CHI TIÊU THỰC TẾ & BẠN ĐỒNG HÀNH (CSDL MySQL) */}
-            <ItineraryExpensesMembersPanel
-              itineraryId={itinerary?.id}
-              budgetTotal={itinerary?.totalBudget || itinerary?.budgetTotal || itinerary?.budget || 0}
-              isOwner={isOwner}
-            />
-
-            {/* 4. LƯU Ý & GHI CHÚ CHUYẾN ĐI (nếu có) */}
+            {/* Ghi chú chuyến đi gọn (nếu có) */}
             {itinerary.aiTipNote ? (
-              <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-3">
-                <div className="p-2.5 sm:p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-start gap-2">
-                  <Info className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
-                  <p className="leading-relaxed">
-                    <strong>Ghi chú chuyến đi:</strong> {itinerary.aiTipNote}
-                  </p>
-                </div>
+              <div className="p-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-600 flex items-start gap-2">
+                <Info className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+                <p className="leading-relaxed">
+                  <strong>Ghi chú:</strong> {itinerary.aiTipNote}
+                </p>
               </div>
             ) : null}
 
           </div>
 
         </div>
+        )}
 
         {/* ─── 6. FOOTER RÕ RÀNG, TINH GỌN, CHUYÊN NGHIỆP ─────────────────────── */}
         <div className="px-5 sm:px-7 py-3 sm:py-3.5 bg-white border-t border-slate-200 flex items-center justify-between gap-3 shrink-0">
