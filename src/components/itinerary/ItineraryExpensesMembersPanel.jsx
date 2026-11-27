@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Wallet, Users, Plus, Trash2, UserPlus, Loader2 } from 'lucide-react';
 import { itineraryApi } from '../../services/api';
+import { useApp } from '../../context/AppContext';
 import { useToast } from '../common/Toast';
 
 const EXPENSE_CATEGORIES = ['Ăn uống', 'Di chuyển', 'Khách sạn', 'Vé tham quan', 'Mua sắm', 'Khác'];
 
 export const ItineraryExpensesMembersPanel = ({ itineraryId, budgetTotal = 0, isOwner = false }) => {
+  const { currentUser } = useApp();
   const toast = useToast();
   const numericId = Number(itineraryId);
   const isValidId = Number.isFinite(numericId) && numericId > 0;
@@ -50,6 +52,15 @@ export const ItineraryExpensesMembersPanel = ({ itineraryId, budgetTotal = 0, is
   const budgetNum = Number(budgetTotal) || 0;
   const pct = budgetNum > 0 ? Math.min(100, Math.round((actualTotal / budgetNum) * 100)) : 0;
   const isOver = budgetNum > 0 && actualTotal > budgetNum;
+  const isMember = Boolean(
+    currentUser &&
+    members.some(
+      (m) =>
+        (m.email && currentUser.email && m.email.toLowerCase() === currentUser.email.toLowerCase()) ||
+        (m.userId != null && currentUser.id != null && String(m.userId) === String(currentUser.id))
+    )
+  );
+  const canLogExpense = isOwner || isMember;
 
   const handleAddExpense = async (e) => {
     e.preventDefault();
@@ -168,7 +179,7 @@ export const ItineraryExpensesMembersPanel = ({ itineraryId, budgetTotal = 0, is
                   <span className="font-bold text-slate-900">
                     {Number(exp.amount || 0).toLocaleString('vi-VN')}đ
                   </span>
-                  {isOwner && (
+                  {(isOwner || (currentUser?.id != null && String(exp.payerId) === String(currentUser.id))) && (
                     <button
                       type="button"
                       onClick={() => handleDeleteExpense(exp.id)}
@@ -184,7 +195,7 @@ export const ItineraryExpensesMembersPanel = ({ itineraryId, budgetTotal = 0, is
           </div>
         )}
 
-        {isOwner && (
+        {canLogExpense && (
           <form onSubmit={handleAddExpense} className="space-y-1.5 pt-1">
             <div className="grid grid-cols-2 gap-1.5">
               <input
@@ -284,3 +295,4 @@ export const ItineraryExpensesMembersPanel = ({ itineraryId, budgetTotal = 0, is
     </div>
   );
 };
+
