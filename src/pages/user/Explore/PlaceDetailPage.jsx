@@ -924,14 +924,27 @@ export const PlaceDetailPage = () => {
                 onClick={() => navigate('/community')}
                 className="group p-3.5 rounded-2xl border border-slate-200/80 hover:border-emerald-300 bg-slate-50/50 hover:bg-white transition-all cursor-pointer flex gap-3 shadow-2xs hover:shadow-xs"
               >
-                {/* Image */}
-                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden shrink-0 bg-slate-100">
-                  <img
-                    src={p.imageUrl || (p.images && p.images[0]) || pickFallbackImage(p.id)}
-                    alt={p.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
+                {/* Image (chỉ hiển thị nếu bài viết có ảnh thật, không dùng ảnh giả) */}
+                {(() => {
+                  const rawPostThumb = p.imageUrl || (Array.isArray(p.images) && p.images[0]) || null;
+                  const isVideoThumb = typeof rawPostThumb === 'string' && (/\/video\/upload\//i.test(rawPostThumb) || /\.(mp4|webm|mov|mkv)(\?.*)?$/i.test(rawPostThumb));
+                  const postThumb = rawPostThumb && !isVideoThumb ? rawPostThumb : null;
+                  if (!postThumb) return null;
+                  return (
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden shrink-0 bg-slate-100">
+                      <img
+                        src={postThumb}
+                        alt={p.title}
+                        onError={(e) => {
+                          if (e.currentTarget.parentElement) {
+                            e.currentTarget.parentElement.style.display = 'none';
+                          }
+                        }}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  );
+                })()}
 
                 {/* Content */}
                 <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
