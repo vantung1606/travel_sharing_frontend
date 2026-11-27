@@ -722,6 +722,7 @@ export const AiRichMessageBubble = ({
   const [loadingIdx, setLoadingIdx] = useState(null);
   const [doneMap, setDoneMap] = useState({});
   const [confirmIdx, setConfirmIdx] = useState(null);
+  const [editingAction, setEditingAction] = useState(null); // { idx, itineraryId, title, budgetTotal, status, isPublic }
 
   let parsed = null;
   if (msg?.messageType === 'AI_RICH' && typeof msg.content === 'string') {
@@ -752,6 +753,47 @@ export const AiRichMessageBubble = ({
       return t !== 'CREATE_ITINERARY' && t !== 'ADD_ITINERARY_STOP' && t !== 'ADD_EXPENSE';
     });
 
+  // Gom nhóm các nút theo từng Lịch trình và từng Địa điểm để hiển thị gọn, không bị rải nút lộn xộn
+  const ITINERARY_ROW_TYPES = new Set(['OPEN_ITINERARY', 'UPDATE_ITINERARY', 'DELETE_ITINERARY', 'TOGGLE_ITINERARY_VISIBILITY', 'CLONE_ITINERARY']);
+  const PLACE_ROW_TYPES = new Set(['OPEN_PLACE', 'SAVE_PLACE', 'UNSAVE_PLACE']);
+
+  const itineraryGroupsMap = new Map();
+  const placeGroupsMap = new Map();
+  const standaloneActions = [];
+
+  otherActions.forEach((item) => {
+    const t = String(item.act?.type || '').toUpperCase();
+    const p = item.act?.payload || {};
+    if (ITINERARY_ROW_TYPES.has(t) && p.itineraryId) {
+      const key = String(p.itineraryId);
+      if (!itineraryGroupsMap.has(key)) {
+        const matched = (itineraries || []).find(it => String(it.id) === key);
+        itineraryGroupsMap.set(key, {
+          itineraryId: p.itineraryId,
+          title: matched?.title || p.title || p.itineraryTitle || `Lịch trình #${key}`,
+          destination: matched?.destination || p.destination || '',
+          items: []
+        });
+      }
+      itineraryGroupsMap.get(key).items.push(item);
+    } else if (PLACE_ROW_TYPES.has(t) && p.placeId) {
+      const key = String(p.placeId);
+      if (!placeGroupsMap.has(key)) {
+        placeGroupsMap.set(key, {
+          placeId: p.placeId,
+          placeName: p.placeName || item.act?.label?.replace(/^[^\p{L}\p{N}]+/u, '').trim() || `Địa điểm #${key}`,
+          items: []
+        });
+      }
+      placeGroupsMap.get(key).items.push(item);
+    } else {
+      standaloneActions.push(item);
+    }
+  });
+
+  const itineraryGroups = Array.from(itineraryGroupsMap.values());
+  const placeGroups = Array.from(placeGroupsMap.values());
+
   // Lọc trùng: không hiển thị quickReply nếu giống hệt nhãn nút action phía trên
   const actionLabelsLower = new Set(actions.map(a => (a?.label || '').trim().toLowerCase()));
   const filteredQuickReplies = quickReplies
@@ -768,6 +810,21 @@ export const AiRichMessageBubble = ({
       return;
     }
     setConfirmIdx(null);
+
+    // Nếu là UPDATE_ITINERARY từ nút bấm và chưa mở form chỉnh sửa -> mở form inline cho người dùng xác nhận/sửa trước
+    if (type === 'UPDATE_ITINERARY' && !action._confirmedEdit) {
+      const matched = (itineraries || []).find(it => String(it.id) === String(payload.itineraryId));
+      setEditingAction({
+        idx,
+        action,
+        itineraryId: payload.itineraryId,
+        title: payload.title || matched?.title || '',
+        budgetTotal: payload.budgetTotal !== undefined ? String(payload.budgetTotal) : String(matched?.totalBudget || matched?.budgetTotal || 3000000),
+        status: (payload.status || matched?.status || 'ACTIVE').toUpperCase(),
+        isPublic: payload.isPublic !== undefined ? payload.isPublic : (matched?.isPublic !== false)
+      });
+      return;
+    }
 
     if (type === 'OPEN_PLACE') {
       navigate(payload.placeId ? `/places/${payload.placeId}` : '/explore');
@@ -1017,14 +1074,197 @@ export const AiRichMessageBubble = ({
         </div>
       )}
 
-      {/* Các nút thao tác Thêm / Sửa / Xóa / Lưu / Xem chi tiết */}
-      {otherActions.length > 0 && (
+      {/* Nhóm thẻ Lịch trình (Xem / Sửa / Xóa gọn theo từng lịch trình) */}
+      {itineraryGroups.length > 0 && (
+        <div className="pt-2 border-t border-ink-200/50 space-y-1.5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-ink-400">
+            Quản lý lịch trình
+          </div>
+          <div className="space-y-1.5">
+            {itineraryGroups.map((grp) => (
+              <div key={grp.itineraryId} className="rounded-[6px] border border-ink-200/80 bg-[#FAF7F0]/70 px-3 py-2 flex flex-wrap items-center justify-between gap-2">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[12px] font-bold text-ink-900 truncate flex items-center gap-1.5">
+                    <Route className="w-3.5 h-3.5 text-clay-600 shrink-0" />
+                    <span className="truncate">{grp.title}</span>
+                  </div>
+                  {grp.destination && <div className="text-[10.5px] text-ink-500 pl-5">{grp.destination}</div>}
+                </div>
+                <div className="flex flex-wrap items-center gap-1">
+                  {grp.items.map(({ act, idx }) => {
+                    const t = String(act.type || '').toUpperCase();
+                    const doneInfo = doneMap[idx];
+                    if (doneInfo) {
+                      return (
+                        <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <Check className="w-3 h-3" /> {doneInfo.label}
+                        </span>
+                      );
+                    }
+                    if (confirmIdx === idx) {
+                      return (
+                        <div key={idx} className="inline-flex items-center gap-1 bg-rose-50 border border-rose-200 rounded px-2 py-0.5">
+                          <span className="text-[10.5px] font-bold text-rose-700">Xóa?</span>
+                          <button type="button" onClick={() => executeAction(act, idx)} className="px-1.5 py-0.5 rounded bg-rose-600 text-white text-[10px] font-bold cursor-pointer">Xóa</button>
+                          <button type="button" onClick={() => setConfirmIdx(null)} className="px-1.5 py-0.5 rounded bg-white text-ink-600 border border-ink-200 text-[10px] cursor-pointer">Hủy</button>
+                        </div>
+                      );
+                    }
+                    const styleCfg = ACTION_STYLE_MAP[t] || ACTION_STYLE_MAP.NAVIGATE;
+                    const IconComp = styleCfg.icon;
+                    const shortLabel = t === 'OPEN_ITINERARY' ? 'Xem' : t === 'UPDATE_ITINERARY' ? 'Sửa' : t === 'DELETE_ITINERARY' ? 'Xóa' : (act.label || 'Thao tác');
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        disabled={loadingIdx !== null}
+                        onClick={() => executeAction(act, idx)}
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[10.5px] font-bold border transition-colors cursor-pointer disabled:opacity-50 ${styleCfg.cls}`}
+                      >
+                        {loadingIdx === idx ? <Loader2 className="w-3 h-3 animate-spin" /> : <IconComp className="w-3 h-3" />}
+                        <span>{shortLabel}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Form sửa nhanh inline khi bấm Sửa lịch trình */}
+      {editingAction && (
+        <div className="rounded-[7px] border border-amber-200 bg-[#FFFDF5] p-3 space-y-2 text-[11px]">
+          <div className="flex items-center justify-between">
+            <span className="font-bold text-amber-800 flex items-center gap-1.5">
+              <Pencil className="w-3.5 h-3.5" /> Chỉnh sửa lịch trình #{editingAction.itineraryId}
+            </span>
+            <button type="button" onClick={() => setEditingAction(null)} className="text-ink-400 hover:text-ink-700 cursor-pointer">Đóng</button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <div className="sm:col-span-3">
+              <label className="block font-bold text-ink-600 mb-0.5">Tên lịch trình</label>
+              <input
+                type="text"
+                value={editingAction.title}
+                onChange={(e) => setEditingAction(prev => ({ ...prev, title: e.target.value }))}
+                className="w-full px-2 py-1.5 rounded border border-ink-200 bg-white text-ink-800 outline-none focus:border-amber-500"
+              />
+            </div>
+            <div>
+              <label className="block font-bold text-ink-600 mb-0.5">Ngân sách (VNĐ)</label>
+              <input
+                type="number"
+                value={editingAction.budgetTotal}
+                onChange={(e) => setEditingAction(prev => ({ ...prev, budgetTotal: e.target.value }))}
+                className="w-full px-2 py-1.5 rounded border border-ink-200 bg-white text-ink-800 outline-none focus:border-amber-500"
+              />
+            </div>
+            <div>
+              <label className="block font-bold text-ink-600 mb-0.5">Trạng thái</label>
+              <select
+                value={editingAction.status}
+                onChange={(e) => setEditingAction(prev => ({ ...prev, status: e.target.value }))}
+                className="w-full px-2 py-1.5 rounded border border-ink-200 bg-white text-ink-800 outline-none focus:border-amber-500"
+              >
+                <option value="ACTIVE">Sắp tới</option>
+                <option value="DRAFT">Bản nháp</option>
+                <option value="COMPLETED">Đã xong</option>
+              </select>
+            </div>
+            <div className="flex items-end pb-1">
+              <label className="inline-flex items-center gap-1.5 cursor-pointer font-medium text-ink-700">
+                <input
+                  type="checkbox"
+                  checked={editingAction.isPublic}
+                  onChange={(e) => setEditingAction(prev => ({ ...prev, isPublic: e.target.checked }))}
+                  className="accent-amber-600"
+                />
+                <span>Công khai</span>
+              </label>
+            </div>
+          </div>
+          <button
+            type="button"
+            disabled={loadingIdx !== null}
+            onClick={() => {
+              const { idx, action, title, budgetTotal, status, isPublic } = editingAction;
+              setEditingAction(null);
+              executeAction({
+                ...action,
+                _confirmedEdit: true,
+                payload: {
+                  ...action.payload,
+                  title,
+                  budgetTotal: Number(budgetTotal) || 0,
+                  status,
+                  isPublic
+                }
+              }, idx);
+            }}
+            className="w-full py-1.5 rounded bg-amber-600 hover:bg-amber-700 text-white font-bold cursor-pointer"
+          >
+            Lưu thay đổi
+          </button>
+        </div>
+      )}
+
+      {/* Nhóm thẻ Địa điểm (Chi tiết / Lưu yêu thích gọn theo từng địa điểm) */}
+      {placeGroups.length > 0 && (
+        <div className="pt-2 border-t border-ink-200/50 space-y-1.5">
+          <div className="text-[10px] font-bold uppercase tracking-wider text-ink-400">
+            Địa điểm liên quan
+          </div>
+          <div className="space-y-1.5">
+            {placeGroups.map((grp) => (
+              <div key={grp.placeId} className="rounded-[6px] border border-ink-200/80 bg-[#FAF7F0]/70 px-3 py-1.5 flex flex-wrap items-center justify-between gap-2">
+                <div className="text-[11.5px] font-bold text-ink-900 flex items-center gap-1.5 min-w-0 flex-1">
+                  <MapPin className="w-3.5 h-3.5 text-clay-600 shrink-0" />
+                  <span className="truncate">{grp.placeName}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {grp.items.map(({ act, idx }) => {
+                    const t = String(act.type || '').toUpperCase();
+                    const doneInfo = doneMap[idx];
+                    if (doneInfo) {
+                      return (
+                        <span key={idx} className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10.5px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <Check className="w-3 h-3" /> {doneInfo.label}
+                        </span>
+                      );
+                    }
+                    const styleCfg = ACTION_STYLE_MAP[t] || ACTION_STYLE_MAP.NAVIGATE;
+                    const IconComp = styleCfg.icon;
+                    const shortLabel = t === 'OPEN_PLACE' ? 'Chi tiết' : t === 'SAVE_PLACE' ? 'Lưu' : t === 'UNSAVE_PLACE' ? 'Bỏ lưu' : (act.label || 'Xem');
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        disabled={loadingIdx !== null}
+                        onClick={() => executeAction(act, idx)}
+                        className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[10.5px] font-bold border transition-colors cursor-pointer disabled:opacity-50 ${styleCfg.cls}`}
+                      >
+                        {loadingIdx === idx ? <Loader2 className="w-3 h-3 animate-spin" /> : <IconComp className="w-3 h-3" />}
+                        <span>{shortLabel}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Các nút thao tác độc lập khác (nếu có) */}
+      {standaloneActions.length > 0 && (
         <div className="pt-2 border-t border-ink-200/50 space-y-1.5">
           <div className="text-[10px] font-bold uppercase tracking-wider text-ink-400">
             Thao tác nhanh trên dữ liệu
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {otherActions.map(({ act, idx }) => {
+            {standaloneActions.map(({ act, idx }) => {
               const doneInfo = doneMap[idx];
               if (doneInfo) {
                 return (
