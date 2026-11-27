@@ -426,608 +426,335 @@ export const ItineraryManagerPage = () => {
   };
 
   return (
-    <div className="itinerary-page w-full min-h-screen bg-[#F8F4EC] text-[#1E1A15] pb-24">
-      {/* ─── 1. PAGE HEADER GỌN: TIÊU ĐỀ + HÀNH ĐỘNG ─── */}
-      <section className="relative w-full overflow-hidden bg-[#F8F4EC] text-[#1E1A15] border-b border-[#1E1A15]/10">
-        <div className="relative z-10 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6 pb-6 sm:pt-7 sm:pb-7 lg:pt-8 lg:pb-8">
-          {/* Breadcrumb */}
-          <div className="flex flex-wrap items-center gap-2.5 text-xs">
-            <span className="flex items-center gap-1.5 text-clay-700 font-semibold">
-              <Compass className="w-3.5 h-3.5 text-clay-600" />
-              <span>Wayfare</span>
-            </span>
-            <ChevronRight className="w-3 h-3 text-[#1E1A15]/30" />
-            <span className="text-[#1E1A15] font-bold">Kế Hoạch & Lịch Trình</span>
+    <div className="itinerary-page w-full min-h-screen bg-[#F8F4EC] text-slate-900 pb-20">
+      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6 space-y-5">
+
+        {/* ─── 1. HEADER GỌN GÀNG: TIÊU ĐỀ + 2 NÚT TẠO ─── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+              Lịch trình của tôi
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
+              {(itineraries || []).length} chuyến đi
+              {nextUpcomingTrip ? ` · Sắp khởi hành: ${nextUpcomingTrip.destination}` : ''}
+            </p>
           </div>
 
-          <div className="mt-4 flex flex-col 2xl:flex-row 2xl:items-center justify-between gap-5 2xl:gap-8">
-            {/* Main Headline */}
-            <h1 className="font-display text-3xl sm:text-4xl lg:text-[2.75rem] 2xl:text-5xl font-extrabold tracking-tight text-[#1E1A15] leading-[1.08]">
-              Lịch Trình Du Lịch{' '}
-              <span className="text-clay-700">Của Bạn</span>
-            </h1>
-
-            {/* Action CTA Cluster */}
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
-              {/* AI CTA Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (!requireAuth('lập lịch trình bằng AI')) return;
-                  setIsAIGeneratorOpen(true);
-                }}
-                className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-sm font-extrabold transition-colors duration-200 cursor-pointer"
-              >
-                <span>Lập Tour Bằng AI (30s)</span>
-                <span className="px-2 py-0.5 rounded-sm bg-[#17130F]/25 text-[10px] font-black uppercase tracking-wider">
-                  Miễn phí
-                </span>
-              </button>
-
-              {/* Manual Trip CTA */}
-              <button
-                type="button"
-                onClick={() => {
-                  if (!requireAuth('tạo chuyến đi mới')) return;
-                  setIsManualCreateOpen(true);
-                }}
-                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-sm bg-transparent hover:bg-[#1E1A15]/5 text-[#1E1A15] font-bold text-sm transition-colors border border-[#1E1A15]/25 hover:border-clay-600/70 cursor-pointer"
-              >
-                <span>+ Tạo Thủ Công</span>
-              </button>
-            </div>
+          <div className="flex items-center gap-2.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                if (!requireAuth('lập lịch trình bằng AI')) return;
+                setIsAIGeneratorOpen(true);
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-clay-600 hover:bg-clay-700 text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer shadow-xs"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Tạo bằng AI</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!requireAuth('tạo chuyến đi mới')) return;
+                setIsManualCreateOpen(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm transition-colors border border-slate-300 cursor-pointer shadow-2xs"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Tạo thủ công</span>
+            </button>
           </div>
         </div>
-      </section>
 
-      {/* ─── 2. DASHBOARD LAYER ─── */}
-      <div className="relative mt-6 sm:mt-8 z-20 w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 space-y-5">
-        {/* Guest Restriction Banner (Nếu chưa đăng nhập) */}
+        {/* Guest Banner */}
         {!isLoggedIn && (
-          <div className="bg-[#FFFDF8] border border-clay-600/30 rounded-sm p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-start sm:items-center gap-4">
-              <div className="w-12 h-12 rounded-sm bg-clay-600 text-white flex items-center justify-center shrink-0">
-                <Calendar className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="font-extrabold text-base text-[#1E1A15]">
-                  Chế độ khách: Xem lịch trình mẫu
-                </h3>
-                <p className="text-xs sm:text-sm text-[#6B6154] leading-relaxed mt-0.5">
-                  Đăng nhập tài khoản để tự do chỉnh sửa lịch trình, liên kết điểm tham quan và đồng bộ kế hoạch du lịch trên mọi thiết bị.
-                </p>
-              </div>
-            </div>
+          <div className="bg-white border border-slate-300 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+            <p className="text-xs sm:text-sm text-slate-600">
+              Đăng nhập để tạo, chỉnh sửa và đồng bộ lịch trình của bạn trên mọi thiết bị.
+            </p>
             <button
               type="button"
               onClick={() => {
                 setAuthMode('login');
                 setIsAuthModalOpen(true);
               }}
-              className="shrink-0 px-6 py-2.5 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-xs sm:text-sm font-extrabold transition-colors cursor-pointer whitespace-nowrap"
+              className="shrink-0 px-4 py-2 rounded-lg bg-clay-600 hover:bg-clay-700 text-white text-xs font-bold transition-colors cursor-pointer"
             >
-              Đăng nhập ngay
+              Đăng nhập
             </button>
           </div>
         )}
 
-        {/* STATS KPI DASHBOARD (4 METRIC CARDS) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-          {/* Card 1: Tổng số chuyến */}
-          <div className="bg-[#FFFDF8] rounded-sm p-5 sm:p-6 border border-[#1E1A15]/12 hover:border-clay-600/50 transition-colors flex items-center gap-4">
-            <div className="w-12 h-12 rounded-sm border border-clay-600/30 bg-clay-50 text-clay-700 flex items-center justify-center shrink-0">
-              <Compass className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-[#8A7E6E] uppercase tracking-[0.1em] whitespace-nowrap">Tổng Chuyến Đi</p>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="font-display text-2xl sm:text-3xl font-extrabold text-[#1E1A15]">
-                  {(itineraries || []).length}
-                </span>
-                <span className="text-xs text-[#7A6F60] font-medium">chuyến đã tạo</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 2: Điểm đến đã lên kế hoạch */}
-          <div className="bg-[#FFFDF8] rounded-sm p-5 sm:p-6 border border-[#1E1A15]/12 hover:border-clay-600/50 transition-colors flex items-center gap-4">
-            <div className="w-12 h-12 rounded-sm border border-clay-600/30 bg-clay-50 text-clay-700 flex items-center justify-center shrink-0">
-              <MapPin className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-[#8A7E6E] uppercase tracking-[0.1em] whitespace-nowrap">Điểm Dừng Chân</p>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="font-display text-2xl sm:text-3xl font-extrabold text-[#1E1A15]">
-                  {(itineraries || []).reduce((acc, curr) => acc + (curr.placesCount || (curr.placesList ? curr.placesList.length : 3)), 0)}
-                </span>
-                <span className="text-xs text-[#7A6F60] font-medium">địa danh kết nối</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 3: Ngân sách ước tính */}
-          <div className="bg-[#FFFDF8] rounded-sm p-5 sm:p-6 border border-[#1E1A15]/12 hover:border-clay-600/50 transition-colors flex items-center gap-4">
-            <div className="w-12 h-12 rounded-sm border border-clay-600/30 bg-clay-50 text-clay-700 flex items-center justify-center shrink-0">
-              <DollarSign className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold text-[#8A7E6E] uppercase tracking-[0.1em] whitespace-nowrap">Tổng Dự Toán Chi Phí</p>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="font-display text-xl sm:text-2xl font-extrabold text-clay-700">
-                  {((itineraries || []).reduce((acc, curr) => acc + (curr.totalBudget || (curr.budgetPerPerson ? curr.budgetPerPerson * 2 : 4000000)), 0) / 1000000).toFixed(1)}M
-                </span>
-                <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-sm bg-clay-50 text-clay-700 border border-clay-200 whitespace-nowrap">
-                  Ước tính
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 4: Hành trình gần nhất */}
-          <div className="bg-[#1E1A15] rounded-sm p-5 sm:p-6 border border-[#1E1A15] flex items-center gap-4">
-            <div className="w-12 h-12 rounded-sm bg-clay-600 text-white flex items-center justify-center shrink-0">
-              <Clock className="w-6 h-6" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold text-clay-200 uppercase tracking-[0.1em] whitespace-nowrap">Kế Hoạch Sắp Tới</p>
-              <p className="font-display text-base sm:text-lg font-extrabold text-white truncate mt-0.5">
-                {nextUpcomingTrip ? nextUpcomingTrip.destination : 'Chưa có lịch sắp tới'}
-              </p>
-              <p className="text-xs text-[#B8AD9C] truncate">
-                {nextUpcomingTrip ? (nextUpcomingTrip.duration || `${nextUpcomingTrip.daysCount || 1} ngày`) : 'Tạo chuyến đi ngay'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ─── 4. FILTER WORKSPACE & TABS TOOLBAR ─────────────────────────────────── */}
-      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6">
-        <div className="bg-[#FFFDF8] rounded-sm p-5 sm:p-6 border border-[#1E1A15]/12 space-y-4">
-          
-          {/* Row 1: Tabs & Layout Mode Switcher */}
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#1E1A15]/10">
-            <div className="flex items-center gap-5 sm:gap-7 overflow-x-auto scrollbar-none">
-              {[
-                { id: 'upcoming', label: 'Chuyến đi sắp tới', count: tabCounts.upcoming },
-                { id: 'completed', label: 'Đã hoàn thành', count: tabCounts.completed },
-                { id: 'drafts', label: 'Bản nháp & Đề xuất AI', count: tabCounts.drafts, isAi: true },
-                { id: 'cancelled', label: 'Đã hủy', count: tabCounts.cancelled }
-              ].map(tab => {
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`px-0 pb-3 text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-2 cursor-pointer border-b-2 -mb-px ${
-                      isActive
-                        ? 'border-clay-600 text-[#1E1A15]'
-                        : 'border-transparent text-[#8A7E6E] hover:text-[#1E1A15]'
-                    }`}
-                  >
-                    <span>{tab.label}</span>
-                    <span
-                      className={`px-2 py-0.5 rounded-sm text-[10px] font-extrabold ${
-                        isActive ? 'bg-clay-600 text-white' : 'bg-[#1E1A15]/5 text-[#6B6154]'
-                      }`}
-                    >
-                      {tab.count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Layout Mode Switcher */}
-            <div className="flex items-center gap-1 bg-[#F8F4EC] p-1 rounded-sm border border-[#1E1A15]/10 self-end sm:self-auto shrink-0 mb-2">
-              <button
-                type="button"
-                onClick={() => setLayoutMode('grid')}
-                className={`p-2 rounded-sm transition-colors cursor-pointer ${
-                  layoutMode === 'grid' ? 'bg-[#1E1A15] text-white' : 'text-[#8A7E6E] hover:text-[#1E1A15]'
-                }`}
-                title="Dạng lưới thẻ"
-              >
-                <Layers className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setLayoutMode('list')}
-                className={`p-2 rounded-sm transition-colors cursor-pointer ${
-                  layoutMode === 'list' ? 'bg-[#1E1A15] text-white' : 'text-[#8A7E6E] hover:text-[#1E1A15]'
-                }`}
-                title="Dạng danh sách"
-              >
-                <SlidersHorizontal className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Row 2: Search Input & Sorting */}
-          <div className="grid grid-cols-1 md:grid-cols-8 gap-3.5 items-center">
-            {/* Search Box */}
-            <div className="md:col-span-5 relative">
-              <Search className="w-4 h-4 text-[#9A8F7F] absolute left-4 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Tìm chuyến đi theo tên, thành phố, điểm check-in..."
-                className="w-full pl-11 pr-4 py-2.5 rounded-sm bg-[#F8F4EC] border border-[#1E1A15]/15 text-xs sm:text-sm text-[#1E1A15] outline-none focus:border-clay-600 focus:bg-[#FFFDF8] transition-colors font-medium"
-              />
-            </div>
-
-            {/* Sort Select */}
-            <div className="md:col-span-3">
-              <select
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-sm bg-[#F8F4EC] border border-[#1E1A15]/15 text-xs sm:text-sm font-semibold text-[#3A332B] outline-none focus:border-clay-600 focus:bg-[#FFFDF8] cursor-pointer"
-              >
-                <option value="nearest">Sắp xếp: Khởi hành gần nhất</option>
-                <option value="newest">Sắp xếp: Mới tạo gần đây</option>
-                <option value="budget_low">Sắp xếp: Ngân sách tiết kiệm</option>
-                <option value="duration">Sắp xếp: Số ngày dài nhất</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Filter Tags */}
-          <div className="flex flex-wrap items-center gap-1.5">
+        {/* ─── 2. THANH LỌC & TÌM KIẾM 1 HÀNG GỌN ─── */}
+        <div className="bg-white rounded-xl p-3 sm:p-4 border border-slate-300/90 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          {/* Status Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
             {[
-              { id: 'all', label: 'Tất cả' },
-              { id: 'ai', label: 'Tạo bởi AI', isAi: true },
-              { id: 'group', label: 'Chuyến đi nhóm' },
-              { id: 'family', label: 'Gia đình' }
-            ].map(tag => {
-              const isSelected = activeFilterTag === tag.id;
+              { id: 'upcoming', label: 'Sắp tới', count: tabCounts.upcoming },
+              { id: 'completed', label: 'Hoàn thành', count: tabCounts.completed },
+              { id: 'drafts', label: 'Bản nháp', count: tabCounts.drafts },
+              { id: 'cancelled', label: 'Đã hủy', count: tabCounts.cancelled }
+            ].map(tab => {
+              const isActive = activeTab === tab.id;
               return (
                 <button
-                  key={tag.id}
+                  key={tab.id}
                   type="button"
-                  onClick={() => setActiveFilterTag(tag.id)}
-                  className={`px-3 py-1.5 rounded-sm text-xs font-bold whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1 border ${
-                    isSelected
-                      ? 'bg-[#1E1A15] text-white border-[#1E1A15]'
-                      : 'bg-transparent text-[#6B6154] border-[#1E1A15]/15 hover:border-clay-600/60 hover:text-[#1E1A15]'
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer border ${
+                    isActive
+                      ? 'bg-slate-900 text-white border-slate-900'
+                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 hover:text-slate-900'
                   }`}
                 >
-                  <span>{tag.label}</span>
+                  <span>{tab.label}</span>
+                  <span className={`text-[11px] font-bold ${isActive ? 'text-slate-300' : 'text-slate-400'}`}>
+                    {tab.count}
+                  </span>
                 </button>
               );
             })}
           </div>
-        </div>
-      </div>
 
-      {/* ─── 5. ITINERARIES GRID / LIST CONTAINER ──────────────────────────────── */}
-      <div className="w-full max-w-[1700px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 pt-6">
-        {filteredItineraries.length === 0 ? (
-          /* Empty State */
-          <div className="bg-[#FFFDF8] rounded-sm p-12 sm:p-16 text-center border border-[#1E1A15]/12 space-y-5">
-            <div className="w-16 h-16 rounded-sm border border-clay-600/30 bg-clay-50 text-clay-700 flex items-center justify-center mx-auto">
-              <Compass className="w-8 h-8" />
+          {/* Search + Sort */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 lg:w-[460px] shrink-0">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Tìm theo tên, điểm đến..."
+                className="w-full pl-9 pr-3 py-2 rounded-lg bg-slate-50 border border-slate-300 text-xs sm:text-sm text-slate-900 placeholder-slate-400 outline-none focus:border-clay-600 focus:bg-white transition-colors"
+              />
             </div>
-            <div className="space-y-1.5 max-w-md mx-auto">
-              <h3 className="font-display text-xl font-bold text-[#1E1A15]">
-                Chưa có chuyến đi nào phù hợp
+            <select
+              value={sortOption}
+              onChange={(e) => setSortOption(e.target.value)}
+              className="px-3 py-2 rounded-lg bg-slate-50 border border-slate-300 text-xs sm:text-sm font-semibold text-slate-700 outline-none focus:border-clay-600 focus:bg-white cursor-pointer"
+            >
+              <option value="nearest">Khởi hành gần nhất</option>
+              <option value="newest">Mới tạo gần đây</option>
+              <option value="budget_low">Ngân sách thấp nhất</option>
+              <option value="duration">Nhiều ngày nhất</option>
+            </select>
+          </div>
+        </div>
+
+        {/* ─── 3. DANH SÁCH LỊCH TRÌNH (TRỌNG TÂM) ─── */}
+        {filteredItineraries.length === 0 ? (
+          <div className="bg-white rounded-xl p-10 sm:p-14 text-center border border-slate-300/90 shadow-sm space-y-4">
+            <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center mx-auto">
+              <Compass className="w-6 h-6" />
+            </div>
+            <div className="space-y-1 max-w-sm mx-auto">
+              <h3 className="font-display text-lg font-bold text-slate-900">
+                Chưa có chuyến đi nào
               </h3>
-              <p className="text-xs sm:text-sm text-[#7A6F60] leading-relaxed">
-                Bạn chưa có lịch trình nào trong mục này. Hãy thử thay đổi bộ lọc hoặc để WanderAI tự động lập kế hoạch hoàn hảo chỉ trong 30 giây!
+              <p className="text-xs sm:text-sm text-slate-500">
+                Tạo chuyến đi đầu tiên bằng AI hoặc tự lên lịch trình thủ công.
               </p>
             </div>
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
               <button
                 type="button"
                 onClick={() => {
                   if (!requireAuth('tạo lịch trình bằng AI')) return;
                   setIsAIGeneratorOpen(true);
                 }}
-                className="px-6 py-3 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer flex items-center gap-2"
+                className="px-4 py-2 rounded-lg bg-clay-600 hover:bg-clay-700 text-white text-xs sm:text-sm font-bold transition-colors cursor-pointer"
               >
-                <span>Khởi Tạo Bằng AI</span>
+                Tạo bằng AI
               </button>
-
               <button
                 type="button"
                 onClick={() => {
                   if (!requireAuth('tạo chuyến đi thủ công')) return;
                   setIsManualCreateOpen(true);
                 }}
-                className="px-5 py-3 rounded-sm bg-transparent border border-[#1E1A15]/20 hover:bg-[#1E1A15]/5 text-[#3A332B] text-xs sm:text-sm font-bold transition-colors cursor-pointer"
+                className="px-4 py-2 rounded-lg bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold transition-colors cursor-pointer"
               >
-                + Tự Lập Lịch Trình
+                + Tạo thủ công
               </button>
             </div>
           </div>
         ) : (
-          /* Grid / List Cards */
-          <div className={`grid gap-6 sm:gap-7 ${layoutMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+          <div className="grid gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {filteredItineraries.map((itin) => {
               const statusInfo = computeItineraryStatus(itin);
+              const isCardOwner = Boolean(
+                !currentUser ||
+                (!itin.creatorEmail && itin.creatorId == null) ||
+                (itin.creatorEmail && currentUser.email && itin.creatorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
+                (itin.creatorId != null && currentUser.id != null && String(itin.creatorId) === String(currentUser.id))
+              );
+              const displayBudget = Number(itin.totalBudget || 0) > 0
+                ? `${Number(itin.totalBudget).toLocaleString('vi-VN')}đ`
+                : (itin.budgetPerPerson ? `${Number(itin.budgetPerPerson).toLocaleString('vi-VN')}đ/người` : 'Chưa đặt ngân sách');
+
               return (
                 <div
                   key={itin.id}
                   onClick={() => setSelectedItinerary(itin)}
-                  className="group bg-[#FFFDF8] rounded-sm overflow-hidden border border-[#1E1A15]/12 hover:border-clay-600/60 transition-colors duration-200 flex flex-col cursor-pointer relative"
+                  className="group bg-white rounded-xl overflow-hidden border border-slate-300/90 shadow-sm hover:shadow-md hover:border-slate-400 transition-all duration-200 flex flex-col cursor-pointer"
                 >
-                  {/* Photo Cover Header */}
-                  <div className="relative h-60 w-full overflow-hidden bg-[#F2ECE1] border-b border-[#1E1A15]/10">
+                  {/* Ảnh bìa gọn gàng */}
+                  <div className="relative h-48 w-full overflow-hidden bg-slate-100 border-b border-slate-200">
                     <img
                       src={itin.coverImage || 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1200&q=80'}
                       alt={itin.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#17130F]/90 via-[#17130F]/25 to-transparent"></div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-transparent" />
 
-                    {/* Top Badges */}
-                    <div className="absolute top-4 left-4 right-4 flex items-center justify-between gap-2 flex-wrap">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {/* Status Badge */}
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-[11px] font-bold border backdrop-blur-xs ${
-                          statusInfo.statusKey === 'ongoing'
-                            ? 'bg-blue-600/90 text-white border-blue-400/40'
-                            : statusInfo.statusKey === 'completed'
-                            ? 'bg-slate-700/90 text-slate-200 border-slate-500/40'
-                            : statusInfo.statusKey === 'cancelled'
-                            ? 'bg-rose-700/90 text-white border-rose-400/40'
-                            : 'bg-emerald-700/90 text-white border-emerald-400/40'
-                        }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.statusKey === 'ongoing' ? 'bg-white animate-pulse' : 'bg-white'}`}></span>
-                          <span>{statusInfo.label}</span>
-                        </span>
-
-                        {itin.countdown && (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-[#17130F]/85 text-white text-[11px] font-bold border border-white/15">
-                            <span className="w-1.5 h-1.5 rounded-sm bg-clay-300 "></span>
-                            {itin.countdown}
-                          </span>
-                        )}
-
-                        {itin.isAiGenerated && (
-                          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-clay-600 text-white text-[11px] font-bold border border-clay-400/40">
-                            <span>WanderAI</span>
-                          </span>
-                        )}
-                      </div>
-
-                      <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-sm text-[11px] font-bold border backdrop-blur-xs ${
-                        itin.isPublic !== false
-                          ? 'bg-emerald-700/90 text-white border-emerald-400/40'
-                          : 'bg-[#17130F]/90 text-amber-300 border-amber-400/40'
+                    {/* 2 nhãn tối giản góc trên */}
+                    <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold ${
+                        statusInfo.statusKey === 'ongoing'
+                          ? 'bg-blue-600 text-white'
+                          : statusInfo.statusKey === 'completed'
+                          ? 'bg-slate-800 text-slate-100'
+                          : statusInfo.statusKey === 'cancelled'
+                          ? 'bg-rose-600 text-white'
+                          : 'bg-emerald-600 text-white'
                       }`}>
-                        {itin.isPublic !== false ? <Globe className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                        {statusInfo.label}
+                      </span>
+
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold ${
+                        itin.isPublic !== false
+                          ? 'bg-white/95 text-slate-800'
+                          : 'bg-slate-900/85 text-amber-300'
+                      }`}>
+                        {itin.isPublic !== false ? <Globe className="w-3 h-3 text-emerald-600" /> : <Lock className="w-3 h-3" />}
                         <span>{itin.isPublic !== false ? 'Công khai' : 'Riêng tư'}</span>
                       </span>
                     </div>
 
-                    {/* Destination & Days Floating on Image Bottom */}
-                    <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between text-white">
-                      <div className="min-w-0 pr-2">
-                        <p className="text-[10px] font-extrabold text-clay-200 uppercase tracking-[0.12em]">
-                          {itin.region || 'Điểm Đến Việt Nam'}
-                        </p>
-                        <div className="flex items-center gap-1.5 font-extrabold text-sm sm:text-base truncate">
-                          <MapPin className="w-4 h-4 text-clay-300 shrink-0" />
-                          <span className="truncate">{itin.destination}</span>
-                        </div>
+                    {/* Điểm đến & Thời lượng */}
+                    <div className="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-2 text-white">
+                      <div className="flex items-center gap-1.5 font-bold text-sm truncate">
+                        <MapPin className="w-3.5 h-3.5 text-clay-300 shrink-0" />
+                        <span className="truncate">{itin.destination}</span>
                       </div>
-                      
-                      <div className="shrink-0 px-3 py-1 rounded-sm bg-[#F8F4EC] text-[#1E1A15] text-xs font-extrabold">
-                        {itin.duration || `${itin.daysCount || 3}N${Math.max(1, (itin.daysCount || 3) - 1)}Đ`}
-                      </div>
+                      <span className="shrink-0 px-2.5 py-0.5 rounded-md bg-white/95 text-slate-900 text-xs font-extrabold">
+                        {itin.duration || `${itin.daysCount || 1} ngày`}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Card Content Body */}
-                  <div className="p-5 sm:p-6 flex flex-col flex-1 space-y-4">
-                    {/* Title */}
-                    <h3 className="font-display font-extrabold text-base sm:text-lg text-[#1E1A15] group-hover:text-clay-700 transition-colors line-clamp-2 leading-snug">
-                      {itin.title}
-                    </h3>
-
-                    {/* Schedule Metadata */}
-                    <div className="space-y-2 text-xs text-[#7A6F60]">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-clay-600 shrink-0" />
-                        <span className="font-semibold text-[#3A332B]">{itin.departureDate || 'Ngày khởi hành linh hoạt'}</span>
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Users className="w-4 h-4 text-[#9A8F7F] shrink-0" />
-                          <span>{itin.groupType || 'Cặp đôi / Bạn bè'}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-clay-700 font-bold text-xs">
-                          <MapPin className="w-3.5 h-3.5" />
-                          <span>{itin.placesCount || (itin.placesList ? itin.placesList.length : 3)} điểm dừng chân</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Places Chips Preview */}
-                    {itin.placesList && itin.placesList.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {itin.placesList.slice(0, 3).map((place, idx) => (
-                          <span key={idx} className="px-2.5 py-1 rounded-sm bg-[#F8F4EC] text-[11px] font-semibold text-[#6B6154] border border-[#1E1A15]/10">
-                            {place}
-                          </span>
-                        ))}
-                        {itin.placesList.length > 3 && (
-                          <span className="px-2 py-1 rounded-sm bg-clay-50 text-[11px] font-extrabold text-clay-700 border border-clay-200">
-                            +{itin.placesList.length - 3} điểm nữa
+                  {/* Nội dung thẻ */}
+                  <div className="p-4 sm:p-5 flex flex-col flex-1 gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between gap-2">
+                        <h3 className="font-display font-bold text-base text-slate-900 group-hover:text-clay-700 transition-colors line-clamp-1">
+                          {itin.title}
+                        </h3>
+                        {!isCardOwner && (
+                          <span className="px-2 py-0.5 rounded-full bg-sky-50 text-sky-700 border border-sky-200 text-[10px] font-bold shrink-0">
+                            Được mời
                           </span>
                         )}
                       </div>
-                    )}
-
-                    {/* Simplified Budget Estimate */}
-                    <div className="mt-auto pt-3.5 border-t border-[#1E1A15]/10 flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1.5 text-[#7A6F60]">
-                        <DollarSign className="w-4 h-4 text-clay-600" />
-                        <span className="font-semibold text-[#6B6154]">Dự toán chi phí:</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="font-extrabold text-clay-700 text-sm">
-                          {itin.budgetPerPerson ? `${itin.budgetPerPerson.toLocaleString('vi-VN')}đ` : (itin.totalBudget ? `${itin.totalBudget.toLocaleString('vi-VN')}đ` : '3.500.000đ')}
+                      <div className="flex items-center gap-3 text-xs text-slate-500 flex-wrap">
+                        <span className="inline-flex items-center gap-1">
+                          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                          {itin.departureDate || 'Linh hoạt'}
                         </span>
-                        <span className="font-normal text-[11px] text-[#9A8F7F] ml-1">/người</span>
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                          {itin.placesCount || (itin.placesList ? itin.placesList.length : 0)} điểm dừng
+                        </span>
                       </div>
                     </div>
 
-                    {/* Action Buttons */}
-                    {(() => {
-                      const isCardOwner = Boolean(
-                        !currentUser ||
-                        (!itin.creatorEmail && itin.creatorId == null) ||
-                        (itin.creatorEmail && currentUser.email && itin.creatorEmail.toLowerCase() === currentUser.email.toLowerCase()) ||
-                        (itin.creatorId != null && currentUser.id != null && String(itin.creatorId) === String(currentUser.id))
-                      );
-                      return (
-                        <div className="flex items-center gap-2 pt-2">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedItinerary(itin)}
-                            className="flex-1 py-2.5 px-3 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-xs font-extrabold transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer"
-                          >
-                            <span>Mở Lịch Trình</span>
-                            <ArrowRight className="w-3.5 h-3.5" />
-                          </button>
+                    <div className="mt-auto pt-3 border-t border-slate-200 flex items-center justify-between text-xs">
+                      <span className="text-slate-500 font-medium">Ngân sách dự kiến</span>
+                      <span className="font-bold text-slate-900">{displayBudget}</span>
+                    </div>
 
-                          {isCardOwner && (
-                            <button
-                              type="button"
-                              onClick={async (e) => {
-                                e.stopPropagation();
-                                try {
-                                  const nextPublic = !(itin.isPublic !== false);
-                                  await toggleItineraryVisibility(itin.id, nextPublic);
-                                  toast.showSuccess(nextPublic ? 'Đã bật chế độ CÔNG KHAI!' : 'Đã chuyển sang RIÊNG TƯ!');
-                                } catch (err) {
-                                  toast.showError('Lỗi cập nhật hiển thị: ' + (err.message || 'Thất bại'));
-                                }
-                              }}
-                              className={`w-9 h-9 rounded-sm border flex items-center justify-center transition-colors cursor-pointer ${
-                                itin.isPublic !== false
-                                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
-                                  : 'border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100'
-                              }`}
-                              title={itin.isPublic !== false ? 'Lịch trình đang Công khai. Bấm để chuyển sang Riêng tư.' : 'Lịch trình đang Riêng tư. Bấm để Công khai.'}
-                            >
-                              {itin.isPublic !== false ? <Globe className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
-                            </button>
-                          )}
+                    {/* Hành động */}
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedItinerary(itin)}
+                        className="flex-1 py-2 px-3 rounded-lg bg-clay-600 hover:bg-clay-700 text-white text-xs font-bold transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap cursor-pointer"
+                      >
+                        <span>Mở lịch trình</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
 
-                          {isCardOwner && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingItinerary(itin);
-                              }}
-                              className="w-9 h-9 rounded-sm border border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 flex items-center justify-center transition-colors cursor-pointer"
-                              title="Chỉnh sửa thông tin chuyến đi"
-                            >
-                              <Edit3 className="w-4 h-4" />
-                            </button>
-                          )}
+                      {isCardOwner && (
+                        <button
+                          type="button"
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              const nextPublic = !(itin.isPublic !== false);
+                              await toggleItineraryVisibility(itin.id, nextPublic);
+                              toast.showSuccess(nextPublic ? 'Đã bật chế độ CÔNG KHAI!' : 'Đã chuyển sang RIÊNG TƯ!');
+                            } catch (err) {
+                              toast.showError('Lỗi cập nhật hiển thị: ' + (err.message || 'Thất bại'));
+                            }
+                          }}
+                          className="w-8 h-8 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+                          title={itin.isPublic !== false ? 'Đang Công khai — bấm để chuyển Riêng tư' : 'Đang Riêng tư — bấm để Công khai'}
+                        >
+                          {itin.isPublic !== false ? <Globe className="w-3.5 h-3.5 text-emerald-600" /> : <Lock className="w-3.5 h-3.5 text-amber-600" />}
+                        </button>
+                      )}
 
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setExportModalItinerary(itin);
-                            }}
-                            className="w-9 h-9 rounded-sm border border-[#1E1A15]/12 bg-transparent hover:bg-clay-50 text-[#6B6154] hover:text-clay-700 flex items-center justify-center transition-colors cursor-pointer"
-                            title="Tải lịch trình (PDF, Lịch Google, In ấn)"
-                          >
-                            <Download className="w-4 h-4" />
-                          </button>
+                      {isCardOwner && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingItinerary(itin);
+                          }}
+                          className="w-8 h-8 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+                          title="Chỉnh sửa thông tin chuyến đi"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
 
-                          <button
-                            type="button"
-                            onClick={(e) => handleShareItinerary(itin, e)}
-                            className="w-9 h-9 rounded-sm border border-[#1E1A15]/12 bg-transparent hover:bg-[#1E1A15]/5 text-[#6B6154] flex items-center justify-center transition-colors cursor-pointer"
-                            title="Chia sẻ chuyến đi"
-                          >
-                            <Share2 className="w-4 h-4" />
-                          </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExportModalItinerary(itin);
+                        }}
+                        className="w-8 h-8 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+                        title="Tải lịch trình (PDF, Lịch, In ấn)"
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                      </button>
 
-                          {isCardOwner && (
-                            <button
-                              type="button"
-                              onClick={(e) => handleDeleteItinerary(itin.id, itin.title, e)}
-                              className="w-9 h-9 rounded-sm border border-[#1E1A15]/12 bg-transparent hover:bg-rose-50 text-[#9A8F7F] hover:text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
-                              title="Xóa lịch trình"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      );
-                    })()}
+                      <button
+                        type="button"
+                        onClick={(e) => handleShareItinerary(itin, e)}
+                        className="w-8 h-8 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
+                        title="Chia sẻ chuyến đi"
+                      >
+                        <Share2 className="w-3.5 h-3.5" />
+                      </button>
+
+                      {isCardOwner && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteItinerary(itin.id, itin.title, e)}
+                          className="w-8 h-8 rounded-lg border border-slate-300 bg-white hover:bg-rose-50 hover:border-rose-300 text-slate-500 hover:text-rose-600 flex items-center justify-center transition-colors cursor-pointer"
+                          title="Xóa lịch trình"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
             })}
-
-            {/* AI Prompter Inspiration Card */}
-            <div className="bg-[#1E1A15] text-white rounded-sm p-6 sm:p-8 border border-[#1E1A15] md:col-span-2 lg:col-span-3 grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
-              <div className="lg:col-span-7 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="inline-block px-3 py-1 rounded-sm bg-clay-600/15 text-clay-200 border border-clay-500/40 text-[11px] font-bold">
-                    Khám phá AI 1 chạm
-                  </div>
-                </div>
-
-                <h3 className="font-display font-extrabold text-lg text-white leading-snug">
-                  Chưa biết đi đâu? Hãy để WanderAI lên lịch giúp bạn!
-                </h3>
-
-                <p className="text-xs text-[#B8AD9C] leading-relaxed">
-                  Trí tuệ nhân tạo tra cứu thực tế các địa danh, quán ăn bản địa của 63 tỉnh thành để tạo hành trình từng giờ tối ưu ngân sách.
-                </p>
-              </div>
-
-              <div className="lg:col-span-5 space-y-2">
-                {/* Quick Suggestion Pills */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!requireAuth('lập lịch trình bằng AI')) return;
-                    setIsAIGeneratorOpen(true);
-                  }}
-                  className="w-full text-left px-4 py-3 rounded-sm bg-[#FFFDF8]/5 hover:bg-[#FFFDF8]/10 border border-white/10 text-xs font-semibold text-[#E6DED2] flex items-center justify-between transition-colors cursor-pointer"
-                >
-                  <span>🏖️ Đà Nẵng - Hội An 3N2Đ &lt; 4.5M</span>
-                  <ChevronRight className="w-4 h-4 text-clay-300" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!requireAuth('lập lịch trình bằng AI')) return;
-                    setIsAIGeneratorOpen(true);
-                  }}
-                  className="w-full text-left px-4 py-3 rounded-sm bg-[#FFFDF8]/5 hover:bg-[#FFFDF8]/10 border border-white/10 text-xs font-semibold text-[#E6DED2] flex items-center justify-between transition-colors cursor-pointer"
-                >
-                  <span>🏔️ Phượt Hà Giang Mùa Tam Giác Mạch</span>
-                  <ChevronRight className="w-4 h-4 text-clay-300" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!requireAuth('lập lịch trình bằng AI')) return;
-                    setIsAIGeneratorOpen(true);
-                  }}
-                  className="mt-2 w-full py-3 px-4 rounded-sm bg-clay-600 hover:bg-clay-700 text-white text-xs font-extrabold transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>Khởi Tạo Lịch Trình Ngay</span>
-                </button>
-              </div>
-            </div>
           </div>
         )}
       </div>
