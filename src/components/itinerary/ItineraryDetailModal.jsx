@@ -824,18 +824,31 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
               </button>
             </div>
 
-            {/* Title - Rõ ràng, nổi bật, không bị ép co rúm */}
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
+            {/* Title */}
+            <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight leading-snug">
               {itinerary.title || `Hành Trình Khám Phá ${destinationName}`}
             </h1>
 
-            {/* Departure date */}
-            {itinerary.departureDate && (
-              <p className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                <span>Khởi hành: <strong className="text-slate-700">{itinerary.departureDate}</strong></span>
-              </p>
-            )}
+            {/* Concise 1-line summary metadata (replaces bulky 4-KPI strip) */}
+            <p className="text-xs text-slate-500 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+              <span className="font-semibold text-slate-700">
+                {Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0).toLocaleString('vi-VN')}đ
+              </span>
+              <span>·</span>
+              <span>{totalPlaces} điểm dừng</span>
+              {totalRouteDistanceKm > 0 && (
+                <>
+                  <span>·</span>
+                  <span>~{totalRouteDistanceKm} km</span>
+                </>
+              )}
+              {itinerary.departureDate && (
+                <>
+                  <span>·</span>
+                  <span>Khởi hành {itinerary.departureDate}</span>
+                </>
+              )}
+            </p>
           </div>
 
           {/* Action Header Buttons & Close Button */}
@@ -843,17 +856,17 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
             <button
               type="button"
               onClick={() => setIsEditModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer border border-sky-200/80 shadow-2xs"
+              className="px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer border border-sky-200/80"
               title="Chỉnh sửa toàn bộ chuyến đi"
             >
               <Edit3 className="w-3.5 h-3.5 text-sky-600" />
-              <span>Sửa Chuyến Đi</span>
+              <span>Sửa</span>
             </button>
 
             <button
               type="button"
               onClick={handleShare}
-              className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200/80 shadow-2xs"
+              className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold inline-flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200/80"
               title="Sao chép liên kết chia sẻ"
             >
               <Share2 className="w-3.5 h-3.5 text-slate-600" />
@@ -863,74 +876,11 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer ml-1"
+              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer"
               title="Đóng cửa sổ"
             >
               <X className="w-4 h-4 stroke-[2.5]" />
             </button>
-          </div>
-        </div>
-
-        {/* ─── 2. DẢI 4 CHỈ SỐ VÀNG (KEY METRICS STRIP) ─────────────────────────── */}
-        <div className="px-5 sm:px-7 py-3 bg-slate-50/90 border-b border-slate-200 grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 shrink-0">
-          <div className="flex items-center gap-2.5 bg-white p-2.5 rounded-xl border border-slate-200/70 shadow-2xs">
-            <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-              <DollarSign className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Ngân sách dự kiến</span>
-              <span className="font-black text-slate-900 text-xs sm:text-sm truncate block">
-                {Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0).toLocaleString('vi-VN')}đ
-              </span>
-              <span className="text-[10px] text-sky-700 font-semibold block truncate">
-                ~{Number(itinerary.budgetPerPerson || Math.round(Number(itinerary.totalBudget || itinerary.budgetTotal || itinerary.budget || 0) / 2)).toLocaleString('vi-VN')}đ/người
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 bg-white p-2.5 rounded-xl border border-slate-200/70 shadow-2xs">
-            <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
-              <MapPin className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Tổng điểm dừng</span>
-              <span className="font-black text-slate-900 text-xs sm:text-sm block">
-                {totalPlaces} địa điểm
-              </span>
-              <span className="text-[10px] text-slate-500 font-semibold block truncate">
-                ~{Math.round(totalPlaces / Math.max(1, days.length))} trạm/ngày
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 bg-white p-2.5 rounded-xl border border-slate-200/70 shadow-2xs">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-              <Calendar className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Thời lượng</span>
-              <span className="font-black text-slate-900 text-xs sm:text-sm block">
-                {days.length} Ngày {days.length > 1 ? `(${days.length - 1} Đêm)` : ''}
-              </span>
-              <span className="text-[10px] text-slate-500 font-semibold block truncate">
-                {itinerary.departureDate || 'Theo kế hoạch'}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 bg-white p-2.5 rounded-xl border border-slate-200/70 shadow-2xs">
-            <div className="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-              <Navigation className="w-4 h-4" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Lộ trình tối ưu</span>
-              <span className="font-black text-slate-900 text-xs sm:text-sm truncate block">
-                {totalRouteDistanceKm > 0 ? `~${totalRouteDistanceKm} km` : 'Tuyến liên tục'}
-              </span>
-              <span className="text-[10px] text-indigo-600 font-semibold block truncate">
-                {estimatedTravelMinutes > 0 ? `~${estimatedTravelMinutes} phút di chuyển` : 'Tối ưu thời gian'}
-              </span>
-            </div>
           </div>
         </div>
 
@@ -1166,14 +1116,12 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                           </div>
 
                           {/* Hàng 2: Tên hoạt động / địa danh */}
-                          <div>
-                            <h4 className="font-black text-base text-slate-900 leading-snug">
-                              {act.title}
-                            </h4>
-                          </div>
+                          <h4 className="font-bold text-sm sm:text-base text-slate-900 leading-snug">
+                            {act.title}
+                          </h4>
 
-                          {/* Hàng 3: Địa chỉ & Link Google Maps tinh tế (không còn lồng ô xám đôi) */}
-                          <div className="flex items-center justify-between gap-2 text-xs text-slate-600 bg-slate-50/70 px-3 py-2 rounded-xl border border-slate-100">
+                          {/* Hàng 3: Địa chỉ & Link Google Maps gọn gàng */}
+                          <div className="flex items-center justify-between gap-2 text-xs text-slate-600">
                             <div className="flex items-center gap-1.5 min-w-0">
                               <MapPin className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                               <span className="truncate">
@@ -1185,7 +1133,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                               href={mapQueryUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="shrink-0 text-sky-600 hover:text-sky-700 font-bold inline-flex items-center gap-1 hover:underline text-[11px]"
+                              className="shrink-0 text-sky-600 hover:text-sky-700 font-semibold inline-flex items-center gap-1 hover:underline text-[11px]"
                               title="Xem vị trí trên Google Maps"
                             >
                               <span>Chỉ đường</span>
@@ -1193,24 +1141,24 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
                             </a>
                           </div>
 
-                          {/* Hàng 4: Mô tả chi tiết & Gợi ý */}
+                          {/* Hàng 4: Ghi chú ngắn */}
                           {act.note && (
-                            <p className="text-xs text-slate-700 leading-relaxed bg-amber-50/50 p-2.5 rounded-xl border border-amber-100/60">
-                              💡 <strong>Gợi ý:</strong> {act.note}
+                            <p className="text-xs text-slate-500 leading-relaxed">
+                              {act.note}
                             </p>
                           )}
 
                           {/* Hàng 5: Chi phí & Di chuyển */}
                           {(act.cost || act.transit) && (
-                            <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
+                            <div className="pt-1.5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
                               {act.cost && (
                                 <span>
-                                  Chi phí: <strong className="text-slate-800 font-bold">{act.cost}</strong>
+                                  Chi phí: <strong className="text-slate-800 font-semibold">{act.cost}</strong>
                                 </span>
                               )}
 
                               {act.transit && (
-                                <span className="flex items-center gap-1 text-slate-500 font-medium">
+                                <span className="flex items-center gap-1 text-slate-500">
                                   <Car className="w-3.5 h-3.5 text-slate-400" />
                                   <span>{act.transit}</span>
                                 </span>
@@ -1635,8 +1583,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate }) => {
               className="px-4 sm:px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95"
             >
               <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">In & Tải Toàn Bộ Lịch Trình (PDF)</span>
-              <span className="sm:hidden">Tải PDF</span>
+              <span>Xuất PDF</span>
             </button>
           </div>
         </div>
