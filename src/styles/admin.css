@@ -5,6 +5,18 @@
   --admin-panel-shadow: 0 2px 3px rgb(30 26 21 / 2%), 0 8px 24px -16px rgb(30 26 21 / 18%);
 }
 
+.admin-sidebar .sidebar-scrollbar {
+  scrollbar-color: rgb(255 255 255 / 18%) transparent;
+}
+
+.admin-sidebar .sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgb(255 255 255 / 18%);
+}
+
+.admin-sidebar .sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgb(255 255 255 / 30%);
+}
+
 .admin-workspace .admin-page {
   width: 100%;
   max-width: 1700px;
