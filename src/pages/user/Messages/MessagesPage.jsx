@@ -40,6 +40,7 @@ import {
 import { ItineraryMessageBubble } from '../../../components/chat/ItineraryMessageBubble';
 import { ItineraryPickerModal } from '../../../components/chat/ItineraryPickerModal';
 import { AiRichMessageBubble } from '../../../components/chat/AiRichMessageBubble';
+import { readSharedLink } from '../../../utils/inAppShare';
 
 // Hàm chuẩn hóa tiếng Việt loại bỏ dấu để tìm kiếm tức thì theo chuỗi con (VD: 'tu' -> khớp 'tùng', 'tg' -> không khớp)
 export const normalizeVietnamese = (str) => {
@@ -2201,6 +2202,7 @@ export const MessagesPage = ({
                 ) : (
                   messages.map(msg => {
                     const isMe = isMessageFromMe(msg);
+                    const sharedLink = msg.messageType === 'TEXT' ? readSharedLink(msg.content) : null;
                     if (msg.messageType === 'SYSTEM') {
                       return (
                         <div key={msg.id} className="flex justify-center my-1">
@@ -2275,6 +2277,16 @@ export const MessagesPage = ({
                                 navigate(`/itineraries?id=${itinData.id || ''}`);
                               }}
                             />
+                          ) : sharedLink ? (
+                            <button
+                              type="button"
+                              onClick={() => navigate(sharedLink.path)}
+                              className={`flex min-h-11 max-w-full items-center gap-3 rounded-[6px] border px-3.5 py-3 text-left text-xs font-semibold [overflow-wrap:anywhere] transition-colors ${isMe ? 'border-clay-600 bg-clay-600 text-white hover:bg-clay-700' : 'border-ink-200 bg-white text-ink-800 hover:bg-ink-50'}`}
+                              aria-label={`Mở ${sharedLink.title}`}
+                            >
+                              <FileText className="h-5 w-5 shrink-0" />
+                              <span className="min-w-0">{sharedLink.title}</span>
+                            </button>
                           ) : msg.messageType === 'AI_RICH' || (!isMe && (currentThreadObj?.type === 'AI' || msg.senderEmail === 'assistant@wayfare.com') && msg.messageType === 'TEXT') ? (
                             <AiRichMessageBubble
                               msg={msg}

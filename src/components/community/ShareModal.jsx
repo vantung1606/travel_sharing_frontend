@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { X, Globe, Lock, Users, Smile, Send, Copy, Check, ExternalLink, ChevronDown, Loader2 } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { X, Globe, Lock, Users, Smile, Send, Check, ChevronDown, Loader2 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useToast } from '../common/Toast';
-import { postApi } from '../../services/api';
+import { chatApi, postApi } from '../../services/api';
 
 export const ShareModal = ({ post, onClose, onPostShared }) => {
   const { currentUser } = useApp();
@@ -13,12 +13,14 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
   const [isAudienceDropdownOpen, setIsAudienceDropdownOpen] = useState(false);
   const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const [isSharingToFeed, setIsSharingToFeed] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [rooms, setRooms] = useState(null);
+  const [loadingRooms, setLoadingRooms] = useState(false);
+  const [sendingRoomId, setSendingRoomId] = useState(null);
+  const submitting = useRef(false);
 
   if (!post) return null;
 
-  const postUrl = window.location.origin + `/community?post=${post.id}`;
-  const userName = currentUser?.name || currentUser?.fullName || 'Nguyễn Tùng';
+  const userName = currentUser?.name || currentUser?.fullName || 'Thành viên Wayfare';
   const userAvatar =
     currentUser?.avatar ||
     'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80';
@@ -31,42 +33,34 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
 
   const CurrentAudienceIcon = audienceConfig[audience].icon;
 
-  // Handle Copy Link
-  const handleCopyLink = async () => {
+  const loadRecipients = async () => {
+    if (!currentUser?.email) { toast.showError('Vui lòng đăng nhập để chia sẻ.'); return; }
+    setLoadingRooms(true);
     try {
-      if (navigator.clipboard) {
-        await navigator.clipboard.writeText(postUrl);
-        setCopied(true);
-        if (toast?.showSuccess) toast.showSuccess('Đã sao chép liên kết vào bộ nhớ tạm! 📋');
-        else if (toast?.success) toast.success('Đã sao chép liên kết vào bộ nhớ tạm! 📋');
-        setTimeout(() => setCopied(false), 2500);
-      }
-    } catch (err) {
-      if (toast?.showError) toast.showError('Không thể sao chép liên kết');
-    }
+      const data = await chatApi.getRooms(currentUser.email);
+      setRooms(data.filter(room => room.type !== 'AI'));
+    } catch {
+      toast.showError('Không tải được cuộc trò chuyện. Vui lòng thử lại.');
+    } finally { setLoadingRooms(false); }
   };
 
-  // Handle Share to Messenger
-  const handleShareMessenger = () => {
-    // Facebook Messenger web send link
-    const messengerUrl = `https://www.facebook.com/dialog/send?link=${encodeURIComponent(postUrl)}&app_id=291494419107518&redirect_uri=${encodeURIComponent(postUrl)}`;
-    window.open(messengerUrl, '_blank', 'width=600,height=500');
+  const sendToRoom = async (room) => {
+    if (submitting.current) return;
+    submitting.current = true;
+    setSendingRoomId(room.id);
+    try {
+      const content = `${post.title || 'Bài viết của ' + (post.authorName || 'thành viên')}\nwayfare://community?postId=${post.id}`;
+      await chatApi.sendMessage(room.id, { content, messageType: 'TEXT' }, currentUser.email);
+      toast.showSuccess('Đã gửi bài viết trong Wayfare.');
+      onClose();
+    } catch {
+      toast.showError('Chưa gửi được bài viết. Vui lòng thử lại.');
+    } finally { submitting.current = false; setSendingRoomId(null); }
   };
-
-  // Handle Share to Facebook
-  const handleShareFacebook = () => {
-    const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
-    window.open(fbUrl, '_blank', 'width=600,height=500');
-  };
-
-  // Handle Share to Zalo
-  const handleShareZalo = () => {
-    const zaloUrl = `https://zalo.me/share?url=${encodeURIComponent(postUrl)}`;
-    window.open(zaloUrl, '_blank', 'width=600,height=500');
-  };
-
   // Handle Share to User's Feed
   const handleShareToFeed = async () => {
+    if (submitting.current) return;
+    submitting.current = true;
     try {
       setIsSharingToFeed(true);
 
@@ -97,6 +91,7 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
     } catch (err) {
       if (toast?.showError) toast.showError('Chia sẻ thất bại: ' + (err.message || 'Lỗi'));
     } finally {
+      submitting.current = false;
       setIsSharingToFeed(false);
     }
   };
@@ -239,7 +234,7 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
               <button
                 type="button"
                 onClick={handleShareToFeed}
-                disabled={isSharingToFeed}
+                disabled={isSharingToFeed || sendingRoomId != null}
                 className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm shadow-md hover:shadow-blue-500/25 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-60"
               >
                 {isSharingToFeed ? (
@@ -279,111 +274,25 @@ export const ShareModal = ({ post, onClose, onPostShared }) => {
             </div>
           </div>
 
-          {/* Social Channels Section Divider */}
-          <div className="border-t border-slate-200 pt-3 space-y-2">
-            <h5 className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-              Hoặc chia sẻ qua
-            </h5>
-
-            {/* Messenger option (Exactly matching screenshot) */}
-            <button
-              type="button"
-              onClick={handleShareMessenger}
-              className="w-full p-3 rounded-2xl hover:bg-slate-50 border border-slate-100 flex items-center justify-between group transition-all cursor-pointer shadow-2xs"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-[#00B2FF] to-[#006AFF] text-white flex items-center justify-center shadow-xs">
-                  <Send className="w-5 h-5 -rotate-45" />
-                </div>
-                <div className="text-left">
-                  <div className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-blue-600 transition-colors">
-                    Gửi bằng Messenger
-                  </div>
-                  <div className="text-[11px] text-slate-400 font-medium">
-                    Gửi trực tiếp cho bạn bè hoặc nhóm chat
-                  </div>
-                </div>
-              </div>
-              <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
+          <div className="border-t border-slate-200 pt-3 space-y-3">
+            <button type="button" onClick={loadRecipients} disabled={loadingRooms || isSharingToFeed || sendingRoomId != null}
+              className="flex min-h-11 w-full items-center gap-3 rounded-xl border border-slate-200 p-3 text-left transition-colors hover:bg-slate-50 disabled:opacity-60">
+              {loadingRooms ? <Loader2 className="h-5 w-5 shrink-0 animate-spin" /> : <Send className="h-5 w-5 shrink-0 text-clay-600" />}
+              <span className="min-w-0 text-sm font-semibold">Gửi trong tin nhắn Wayfare</span>
             </button>
-
-            {/* Facebook Post option */}
-            <button
-              type="button"
-              onClick={handleShareFacebook}
-              className="w-full p-3 rounded-2xl hover:bg-slate-50 border border-slate-100 flex items-center justify-between group transition-all cursor-pointer shadow-2xs"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#1877F2] text-white flex items-center justify-center font-black text-lg shadow-xs">
-                  f
-                </div>
-                <div className="text-left">
-                  <div className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-[#1877F2] transition-colors">
-                    Chia sẻ lên Facebook
-                  </div>
-                  <div className="text-[11px] text-slate-400 font-medium">
-                    Đăng lên trang cá nhân hoặc dòng thời gian
-                  </div>
-                </div>
-              </div>
-              <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-[#1877F2] transition-colors" />
-            </button>
-
-            {/* Zalo option */}
-            <button
-              type="button"
-              onClick={handleShareZalo}
-              className="w-full p-3 rounded-2xl hover:bg-slate-50 border border-slate-100 flex items-center justify-between group transition-all cursor-pointer shadow-2xs"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#0068FF] text-white flex items-center justify-center font-black text-xs shadow-xs">
-                  Zalo
-                </div>
-                <div className="text-left">
-                  <div className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-[#0068FF] transition-colors">
-                    Chia sẻ qua Zalo
-                  </div>
-                  <div className="text-[11px] text-slate-400 font-medium">
-                    Gửi nhật ký hoặc tin nhắn Zalo
-                  </div>
-                </div>
-              </div>
-              <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-[#0068FF] transition-colors" />
-            </button>
-
-            {/* Copy Link option */}
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className="w-full p-3 rounded-2xl hover:bg-slate-50 border border-slate-100 flex items-center justify-between group transition-all cursor-pointer shadow-2xs"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-slate-100 text-slate-700 flex items-center justify-center shadow-xs">
-                  {copied ? (
-                    <Check className="w-5 h-5 text-sky-600" />
-                  ) : (
-                    <Copy className="w-5 h-5" />
-                  )}
-                </div>
-                <div className="text-left">
-                  <div className="font-bold text-xs sm:text-sm text-slate-900 group-hover:text-sky-600 transition-colors">
-                    {copied ? 'Đã sao chép liên kết!' : 'Sao chép liên kết'}
-                  </div>
-                  <div className="text-[11px] text-slate-400 font-medium truncate max-w-[240px] sm:max-w-[320px]">
-                    {postUrl}
-                  </div>
-                </div>
-              </div>
-              <span className="text-xs font-bold text-sky-600 group-hover:underline">
-                {copied ? 'Đã chép' : 'Sao chép'}
-              </span>
-            </button>
+            {rooms !== null && <div className="max-h-56 space-y-1 overflow-y-auto">
+              {rooms.length === 0 && <p className="px-3 py-4 text-xs text-slate-500">Chưa có cuộc trò chuyện. Hãy bắt đầu trò chuyện với bạn bè trước khi chia sẻ.</p>}
+              {rooms.map(room => <button key={room.id} type="button" onClick={() => sendToRoom(room)} disabled={sendingRoomId != null || isSharingToFeed}
+                aria-label={`Gửi cho ${room.name}`}
+                className="flex min-h-11 w-full items-center gap-3 rounded-lg px-3 py-2 text-left hover:bg-slate-50 disabled:opacity-60">
+                <Users className="h-5 w-5 shrink-0 text-slate-500" /><span className="min-w-0 flex-1 truncate text-xs font-semibold">{room.name}</span>
+                {sendingRoomId === room.id ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Send className="h-4 w-4 shrink-0 text-clay-600" />}
+              </button>)}
+            </div>}
           </div>
 
         </div>
-
       </div>
     </div>
   );
 };
-
