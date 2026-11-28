@@ -1,14 +1,111 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useId } from 'react';
 import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { adminApi, adminReportApi, auditLogApi, adminUserApi } from '../../../services/api';
 import { formatVietnamDateOnly } from '../../../utils/dateUtils';
 import { 
-  Users, MapPin, Sparkles, TrendingUp, CheckCircle2, Calendar, 
-  ChevronRight, Search, Filter, Flag, Eye, Download, ArrowRight, RefreshCw, 
-  FileText, Compass, ShieldAlert, Clock, History, UserCheck, ChevronLeft, 
-  X, Star, ExternalLink, BarChart3, AlertTriangle
+  Users, MapPin, Sparkles, CheckCircle2, Calendar,
+  ChevronRight, Search, Flag, Eye, Download, ArrowRight, RefreshCw,
+  FileText, Compass, ShieldAlert, Clock, History, ChevronLeft,
+  X, Star, ExternalLink, BarChart3
 } from 'lucide-react';
+
+const PANEL_CLASS = 'min-w-0 rounded-2xl border border-ink-200/70 bg-white shadow-[0_2px_3px_rgba(30,26,21,0.02),0_8px_24px_-16px_rgba(30,26,21,0.18)]';
+
+const METRIC_TONES = {
+  clay: { surface: 'from-clay-50/70 to-white', icon: 'bg-clay-100/70 text-clay-700 ring-clay-200/70', badge: 'bg-clay-50 text-clay-700' },
+  ink: { surface: 'from-ink-50 to-white', icon: 'bg-ink-100 text-ink-700 ring-ink-200/70', badge: 'bg-ink-50 text-ink-600' },
+  green: { surface: 'from-emerald-50/70 to-white', icon: 'bg-emerald-100/70 text-emerald-700 ring-emerald-200/70', badge: 'bg-emerald-50 text-emerald-700' },
+  rose: { surface: 'from-rose-50/70 to-white', icon: 'bg-rose-100/70 text-rose-700 ring-rose-200/70', badge: 'bg-rose-50 text-rose-700' }
+};
+
+const DashboardMetric = ({ icon: Icon, label, value, badge, detail, tone = 'clay', onClick }) => {
+  const colors = METRIC_TONES[tone];
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`${PANEL_CLASS} dashboard-metric group flex w-full flex-col gap-4 bg-gradient-to-br ${colors.surface} p-4 text-left transition duration-200 hover:-translate-y-0.5 hover:border-clay-300 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-600 motion-reduce:transform-none sm:p-5`}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[13px] font-semibold text-ink-500">{label}</span>
+        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ${colors.icon}`}>
+          <Icon className="h-4 w-4" />
+        </span>
+      </div>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <span className="font-display text-[30px] font-bold leading-none tracking-tight text-ink-900 tabular-nums sm:text-[32px]">{value}</span>
+        <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${colors.badge}`}>{badge}</span>
+      </div>
+      <div className="mt-auto flex items-center justify-between gap-2 border-t border-ink-200/60 pt-3 text-[12px] leading-relaxed text-ink-500">
+        <span>{detail}</span>
+        <ArrowRight className="h-3.5 w-3.5 shrink-0 text-ink-400 transition-transform group-hover:translate-x-0.5" />
+      </div>
+    </button>
+  );
+};
+
+const GrowthChart = ({ data, metric }) => {
+  const gradientId = useId().replace(/:/g, '');
+  if (!data.length) {
+    return (
+      <div className="flex min-h-52 flex-col items-center justify-center gap-2 text-center text-[13px] text-ink-500">
+        <BarChart3 className="h-6 w-6 text-ink-300" />
+        <p>Chưa có dữ liệu tăng trưởng.</p>
+      </div>
+    );
+  }
+  const width = 640;
+  const height = 190;
+  const floor = 164;
+  const ceiling = Math.ceil(Math.max(...data.map(item => Number(item.count) || 0), 1) / 4) * 4;
+  const points = data.map((item, index) => ({
+    ...item,
+    x: data.length === 1 ? width / 2 : 40 + (index / (data.length - 1)) * 580,
+    y: floor - ((Number(item.count) || 0) / ceiling) * 140
+  }));
+  const line = points.map((point, index) => `${index ? 'L' : 'M'} ${point.x} ${point.y}`).join(' ');
+  const area = `${line} L ${points[points.length - 1].x} ${floor} L ${points[0].x} ${floor} Z`;
+  const unit = metric === 'users' ? 'thành viên' : 'bài viết';
+  return (
+    <div className="min-w-0">
+      <svg viewBox={`0 0 ${width} ${height}`} className="block w-full" role="img" aria-label={`Tăng trưởng ${unit}: ${data.map(item => `${item.label}, ${item.count}`).join('; ')}`}>
+        <defs>
+          <linearGradient id={gradientId} x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="var(--wf-primary, #B0522F)" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="var(--wf-primary, #B0522F)" stopOpacity="0.015" />
+          </linearGradient>
+        </defs>
+        {[0, 1, 2, 3, 4].map(tick => {
+          const y = floor - tick * 35;
+          return (
+            <g key={tick}>
+              <line x1="40" x2="620" y1={y} y2={y} className="stroke-ink-200/70" strokeDasharray={tick ? '3 5' : undefined} />
+              <text x="30" y={y + 4} textAnchor="end" className="hidden fill-ink-400 text-[11px] sm:block">
+                {Intl.NumberFormat('vi-VN', { notation: 'compact' }).format(ceiling * tick / 4)}
+              </text>
+            </g>
+          );
+        })}
+        <path d={area} fill={`url(#${gradientId})`} />
+        <path d={line} fill="none" stroke="var(--wf-primary, #B0522F)" strokeWidth="3" strokeLinejoin="round" strokeLinecap="round" />
+        {points.map((point, index) => (
+          <g key={index}>
+            <title>{point.label}: {Number(point.count || 0).toLocaleString('vi-VN')} {unit}</title>
+            <circle cx={point.x} cy={point.y} r={index === points.length - 1 ? 5 : 3.5} className="fill-white stroke-clay-600" strokeWidth="2" />
+          </g>
+        ))}
+      </svg>
+      <div className="flex justify-between gap-1 pl-[6.25%] pr-[3.125%] text-[11px] text-ink-500 sm:text-[12px]">
+        {data.map((item, index) => (
+          <span key={index} title={item.label} className="min-w-0 flex-1 truncate text-center first:text-left last:text-right">
+            {item.label?.replace(/^Th/, 'T')}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export const AdminDashboardPage = () => {
   const toast = useToast();
@@ -347,23 +444,8 @@ export const AdminDashboardPage = () => {
   // Growth Chart Data calculation
   const growthData = useMemo(() => {
     const rawList = chartMetric === 'users' ? (stats.userGrowth || []) : (stats.postGrowth || []);
-    if (!rawList || rawList.length === 0) {
-      return [
-        { label: 'Th5/26', count: 0 },
-        { label: 'Th6/26', count: 0 },
-        { label: 'Th7/26', count: 0 },
-        { label: 'Th8/26', count: 0 },
-        { label: 'Th9/26', count: 0 },
-        { label: 'Th10/26', count: 0 }
-      ];
-    }
-    return rawList;
+    return Array.isArray(rawList) ? rawList : [];
   }, [stats.userGrowth, stats.postGrowth, chartMetric]);
-
-  const maxChartValue = useMemo(() => {
-    const max = Math.max(...growthData.map(d => Number(d.count) || 0), 1);
-    return Math.ceil(max * 1.25);
-  }, [growthData]);
 
   // Comprehensive Full Dashboard CSV Exporter (Exports all metrics, charts, trends, moderation, itineraries, and users)
   const handleExportCsv = () => {
@@ -591,191 +673,89 @@ export const AdminDashboardPage = () => {
   };
 
   return (
-    <div className="space-y-6 pb-12">
-      
-      {/* ─── PAGE HEADER & ACTION TOOLBAR ────────────────────────────────────── */}
-      <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-        <div className="space-y-1.5">
-          <nav className="flex items-center gap-2 text-[11px] font-semibold text-ink-400">
-            <Compass className="w-3.5 h-3.5 text-clay-600 shrink-0" />
-            <span>Quản trị hệ thống</span>
-            <span className="text-ink-300">/</span>
-            <span className="text-clay-700 font-bold">Tổng quan</span>
-          </nav>
-          <h1 className="font-display text-2xl sm:text-3xl font-black text-ink-800 tracking-tight flex items-center gap-2">
-            Chào mừng trở lại, {currentUser?.name || 'Quản trị viên'}! <span>👋</span>
-          </h1>
-          <p className="text-xs text-ink-400 flex items-center gap-2 flex-wrap font-medium">
-            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-            <span>Hệ thống hoạt động ổn định • Dữ liệu thời gian thực</span>
-          </p>
-        </div>
+    <div className="admin-dashboard-depth min-w-0 space-y-5 pb-8 sm:space-y-6">
+      <nav className="flex flex-wrap items-center gap-2 text-[12px] font-medium text-ink-400" aria-label="Đường dẫn">
+        <Compass className="h-3.5 w-3.5" />
+        <span>Quản trị hệ thống</span>
+        <ChevronRight className="h-3 w-3 text-ink-300" />
+        <span className="text-ink-700">Dashboard</span>
+      </nav>
 
-        {/* Action Toolbar */}
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 pt-2 xl:pt-0 w-full sm:w-auto">
-          <button 
-            onClick={() => loadDashboardData(true)}
-            disabled={refreshing}
-            className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer disabled:opacity-50"
-            title="Đồng bộ dữ liệu mới nhất"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-clay-600 ${refreshing ? 'animate-spin' : ''}`} />
-            <span>{refreshing ? 'Đang đồng bộ...' : 'Làm mới'}</span>
-          </button>
-
-          <button 
-            onClick={handleExportCsv}
-            className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer"
-            title="Xuất báo cáo tổng quan ra file CSV"
-          >
-            <Download className="w-3.5 h-3.5 text-clay-600" />
-            <span>Xuất CSV</span>
-          </button>
-        </div>
-      </div>
-
-      {/* ─── ROW 1: 4 KEY METRIC KPI CARDS ─────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        
-        {/* KPI 1: Users Metric */}
-        <div className="bg-ink-50 p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
-          <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-[5px] bg-clay-50 text-clay-700 border border-clay-200 flex items-center justify-center shrink-0">
-              <Users className="w-5 h-5" />
+      <section className="relative isolate overflow-hidden rounded-2xl border border-ink-700 bg-gradient-to-br from-ink-800 via-ink-700 to-ink-800 p-5 text-white shadow-[0_12px_32px_-18px_rgba(30,26,21,0.5)] sm:p-6">
+        <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-24 h-72 w-72 rounded-full border border-white/10 bg-clay-500/10" />
+        <div aria-hidden="true" className="pointer-events-none absolute -right-2 -top-12 h-48 w-48 rounded-full border border-white/10" />
+        <div className="relative flex flex-col justify-between gap-5 xl:flex-row xl:items-center">
+          <div className="min-w-0 space-y-2">
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium text-white/65">
+              <span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 tracking-wide">WAYFARE · ADMIN</span>
+              <span>{new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' })}</span>
             </div>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[10px] font-bold border border-clay-200">
-              <TrendingUp className="w-3 h-3 text-clay-600" />
-              +{stats.newUsersThisMonth} tháng này
-            </span>
-          </div>
-          <div>
-            <span className="text-xs text-ink-400 font-medium block">Thành viên</span>
-            <div className="mt-1">
-              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalUsers.toLocaleString('vi-VN')}</h2>
-            </div>
-            <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
-              <UserCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Tài khoản trên hệ thống</span>
+            <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">Tổng quan hệ thống</h1>
+            <p className="max-w-xl text-[13px] leading-relaxed text-white/70">
+              Chào {currentUser?.name || 'Quản trị viên'}, cùng nhìn lại hoạt động cộng đồng và những việc cần chú ý.
             </p>
           </div>
-        </div>
-
-        {/* KPI 2: Community Posts & Engagement Metric */}
-        <div className="bg-clay-50/70 p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
-          <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-[5px] bg-clay-50 text-clay-700 border border-clay-200 flex items-center justify-center shrink-0">
-              <FileText className="w-5 h-5" />
-            </div>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[10px] font-bold border border-clay-200">
-              <TrendingUp className="w-3 h-3 text-clay-600" />
-              +{stats.newPostsThisMonth} tháng này
-            </span>
-          </div>
-          <div>
-            <span className="text-xs text-ink-400 font-medium block">Bài viết cộng đồng</span>
-            <div className="mt-1">
-              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalPosts.toLocaleString('vi-VN')}</h2>
-            </div>
-            <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
-              <span className="font-bold text-clay-700">{(stats.totalLikes || 0).toLocaleString('vi-VN')}</span> thích
-              <span className="text-ink-300">•</span>
-              <span className="font-bold text-clay-700">{(stats.totalComments || 0).toLocaleString('vi-VN')}</span> bình luận
-            </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <button type="button" onClick={() => loadDashboardData(true)} disabled={refreshing} title="Đồng bộ dữ liệu mới nhất"
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 text-[13px] font-semibold text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white disabled:opacity-50 sm:flex-none">
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              {refreshing ? 'Đang đồng bộ...' : 'Làm mới'}
+            </button>
+            <button type="button" onClick={handleExportCsv} title="Xuất báo cáo tổng quan ra file CSV"
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-clay-500 bg-clay-600 px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-clay-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white sm:flex-none">
+              <Download className="h-3.5 w-3.5" />Xuất báo cáo
+            </button>
           </div>
         </div>
+      </section>
 
-        {/* KPI 3: Itineraries & Places Metric */}
-        <div className="bg-emerald-50/60 p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
-          <div className="flex items-start justify-between">
-            <div className="w-10 h-10 rounded-[5px] bg-clay-50 text-clay-700 border border-clay-200 flex items-center justify-center shrink-0">
-              <Compass className="w-5 h-5" />
-            </div>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[10px] font-bold border border-clay-200">
-              <Compass className="w-3 h-3 text-clay-600" />
-              {stats.activeItineraries} đang chạy
-            </span>
-          </div>
-          <div>
-            <span className="text-xs text-ink-400 font-medium block">Lịch trình du lịch</span>
-            <div className="mt-1">
-              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalItineraries.toLocaleString('vi-VN')}</h2>
-            </div>
-            <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
-              <MapPin className="w-3.5 h-3.5 text-clay-600 shrink-0" />
-              <span>{stats.totalPlaces} địa điểm tham quan</span>
-            </p>
-          </div>
-        </div>
-
-        {/* KPI 4: Moderation & Quality Rating */}
-        {(() => {
-          const pendingCount = stats.pendingReports ?? pendingReports.length;
-          const totalCount = stats.totalReports ?? Math.max(pendingCount, 0);
-          return (
-            <div className="bg-rose-50/60 p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
-              <div className="flex items-start justify-between">
-                <div className={`w-10 h-10 rounded-[5px] flex items-center justify-center shrink-0 border ${
-                  pendingCount > 0 ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
-                }`}>
-                  <ShieldAlert className="w-5 h-5" />
-                </div>
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
-                  pendingCount > 0 
-                    ? 'bg-rose-50 text-rose-700 border-rose-200 animate-pulse' 
-                    : 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                }`}>
-                  {pendingCount > 0 ? `${pendingCount} chờ xử lý` : 'An toàn'}
-                </span>
-              </div>
-              <div>
-                <span className="text-xs text-ink-400 font-medium block">Kiểm duyệt nội dung</span>
-                <div className="flex items-baseline gap-2 mt-1">
-                  <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight flex items-baseline gap-1.5">
-                    <span className={pendingCount > 0 ? 'text-rose-600' : 'text-ink-800'}>{pendingCount}</span>
-                    <span className="text-sm font-semibold text-ink-400">/ {totalCount}</span>
-                  </h2>
-                </div>
-                <p className="text-[11px] text-ink-400 mt-2 flex items-center justify-between pt-2 border-t border-ink-200/50">
-                  <span>{totalCount > 0 ? `${totalCount} báo cáo tổng số` : 'Không có vi phạm'}</span>
-                  <button 
-                    onClick={() => setAdminTab('reports')}
-                    className="text-clay-700 hover:text-clay-800 font-bold hover:underline cursor-pointer"
-                  >
-                    Xem báo cáo →
-                  </button>
-                </p>
-              </div>
-            </div>
-          );
-        })()}
-
+      <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 sm:gap-4" aria-label="Chỉ số tổng quan">
+        <DashboardMetric icon={Users} label="Thành viên" tone="ink"
+          value={loading ? '—' : Number(stats.totalUsers || 0).toLocaleString('vi-VN')}
+          badge={`+${stats.newUsersThisMonth || 0} tháng này`}
+          detail="Xem cộng đồng thành viên" onClick={() => setAdminTab('users')} />
+        <DashboardMetric icon={FileText} label="Bài viết cộng đồng" tone="clay"
+          value={loading ? '—' : Number(stats.totalPosts || 0).toLocaleString('vi-VN')}
+          badge={`+${stats.newPostsThisMonth || 0} tháng này`}
+          detail={`${Number(stats.totalLikes || 0).toLocaleString('vi-VN')} lượt thích · ${Number(stats.totalComments || 0).toLocaleString('vi-VN')} bình luận`}
+          onClick={() => setAdminTab('reports')} />
+        <DashboardMetric icon={Compass} label="Lịch trình du lịch" tone="green"
+          value={loading ? '—' : Number(stats.totalItineraries || 0).toLocaleString('vi-VN')}
+          badge={`${stats.activeItineraries || 0} hoạt động`}
+          detail={`${Number(stats.totalPlaces || 0).toLocaleString('vi-VN')} địa điểm khám phá`}
+          onClick={() => setAdminTab('itineraries')} />
+        <DashboardMetric icon={ShieldAlert} label="Báo cáo chờ xử lý" tone={(stats.pendingReports ?? pendingReports.length) > 0 ? 'rose' : 'green'}
+          value={loading ? '—' : Number(stats.pendingReports ?? pendingReports.length).toLocaleString('vi-VN')}
+          badge={(stats.pendingReports ?? pendingReports.length) > 0 ? 'Cần chú ý' : 'Đã xử lý hết'}
+          detail={`Trong tổng số ${Number(stats.totalReports || 0).toLocaleString('vi-VN')} báo cáo`}
+          onClick={() => setAdminTab('reports')} />
       </div>
 
       {/* ─── ROW 2: REAL CHARTS & INTELLIGENCE WIDGETS ────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid min-w-0 grid-cols-1 items-start gap-5 xl:grid-cols-12">
         
         {/* LEFT COLUMN: REAL DATA CHARTS & TOP TRENDS (8 Cols) */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="min-w-0 space-y-5 xl:col-span-8">
           
           {/* Dynamic Growth Chart */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <section className={`${PANEL_CLASS} space-y-4 p-4 sm:p-5`} aria-label="Biểu đồ tăng trưởng">
+            <div className="flex flex-col justify-between gap-3 border-b border-ink-100 pb-4 sm:flex-row sm:flex-wrap sm:items-center">
               <div>
-                <h3 className="font-display font-black text-lg text-ink-800 flex items-center gap-2">
+                <h3 className="font-display font-bold text-[18px] text-ink-800 flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-clay-600" />
-                  Tăng trưởng 6 tháng gần nhất
+                  Nhịp tăng trưởng
                 </h3>
-                <p className="text-xs text-ink-400 mt-0.5">Số lượng người dùng và bài viết mới theo từng tháng</p>
+                <p className="text-[12px] text-ink-400 mt-1">Hoạt động cộng đồng trong 6 tháng gần nhất</p>
               </div>
 
               {/* Metric Toggle Tabs */}
-              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80 shrink-0 text-xs">
+              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-ink-50 rounded-xl shrink-0 text-[12px]">
                 <button
                   type="button"
                   onClick={() => setChartMetric('users')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 min-h-10 px-3 py-2 rounded-lg font-semibold text-[12px] whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     chartMetric === 'users'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
+                      ? 'bg-white text-clay-700 border border-ink-200/60 shadow-sm'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
                   }`}
                 >
@@ -785,9 +765,9 @@ export const AdminDashboardPage = () => {
                 <button
                   type="button"
                   onClick={() => setChartMetric('posts')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 min-h-10 px-3 py-2 rounded-lg font-semibold text-[12px] whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     chartMetric === 'posts'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
+                      ? 'bg-white text-clay-700 border border-ink-200/60 shadow-sm'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
                   }`}
                 >
@@ -797,92 +777,52 @@ export const AdminDashboardPage = () => {
               </div>
             </div>
 
-            {/* Dynamic Interactive Bar & Gradient Chart Container */}
-            <div className="pt-2">
-              <div className="h-52 w-full flex items-end justify-between gap-2 sm:gap-6 px-2 sm:px-4 border-b border-ink-200/60 pb-2">
-                {growthData.map((item, idx) => {
-                  const count = Number(item.count) || 0;
-                  const percent = Math.min(100, Math.max(12, Math.round((count / maxChartValue) * 100)));
-                  const isLatest = idx === growthData.length - 1;
-
-                  return (
-                    <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group relative">
-                      {/* Floating Tooltip */}
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-ink-900 text-[#FFFDF8] px-2.5 py-1 rounded-[4px] text-[10px] font-bold whitespace-nowrap pointer-events-none z-10 border border-ink-800">
-                        {count.toLocaleString('vi-VN')} {chartMetric === 'users' ? 'thành viên' : 'bài viết'}
-                      </div>
-
-                      {/* Bar Value Header */}
-                      <span className={`text-[11px] font-bold mb-1 transition-colors ${
-                        isLatest ? 'text-clay-700 font-black' : 'text-ink-400 group-hover:text-ink-800'
-                      }`}>
-                        {count}
-                      </span>
-
-                      {/* Bar Column Graphic */}
-                      <div className="w-full max-w-[48px] bg-[#F8F4EC] rounded-t-[3px] border-t border-x border-ink-200/60 overflow-hidden flex flex-col justify-end h-full">
-                        <div 
-                          className={`w-full rounded-t-[3px] transition-all duration-500 ease-out ${
-                            isLatest 
-                              ? 'bg-gradient-to-t from-clay-700 to-clay-500 group-hover:brightness-110'
-                              : 'bg-gradient-to-t from-ink-300 to-ink-200 group-hover:from-clay-400 group-hover:to-clay-300'
-                          }`}
-                          style={{ height: `${percent}%` }}
-                        ></div>
-                      </div>
-
-                      {/* Month Label */}
-                      <span className="text-[11px] text-ink-500 font-semibold mt-2.5 block text-center truncate w-full">
-                        {item.label}
-                      </span>
-                    </div>
-                  );
-                })}
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <div className="flex items-baseline gap-2">
+                  <span className="font-display text-[30px] font-bold leading-tight tracking-tight text-ink-900 tabular-nums">{Number(growthData[growthData.length - 1]?.count || 0).toLocaleString('vi-VN')}</span>
+                  <span className="text-[12px] text-ink-500">{chartMetric === 'users' ? 'thành viên mới' : 'bài viết mới'}</span>
+                </div>
+                <p className="mt-1 text-[12px] text-ink-400">Tháng gần nhất trong kỳ</p>
               </div>
-
-              {/* Chart Footer Summary Cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-4 pt-2">
-                <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Tổng 6 tháng</span>
-                  <span className="text-base font-display font-black text-ink-800 mt-0.5 block">
-                    {growthData.reduce((acc, cur) => acc + (Number(cur.count) || 0), 0).toLocaleString('vi-VN')}
-                  </span>
-                </div>
-                <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Cao điểm nhất</span>
-                  <span className="text-base font-display font-black text-clay-700 mt-0.5 block">
-                    {Math.max(...growthData.map(d => Number(d.count) || 0)).toLocaleString('vi-VN')}
-                  </span>
-                </div>
-                <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Tháng này</span>
-                  <span className="text-base font-display font-black text-emerald-700 mt-0.5 block">
-                    +{growthData[growthData.length - 1]?.count || 0} mới
-                  </span>
-                </div>
+              <span className="inline-flex items-center gap-1.5 text-[12px] text-ink-500"><span className="h-2 w-2 rounded-full bg-clay-600" />{chartMetric === 'users' ? 'Thành viên' : 'Bài viết'}</span>
+            </div>
+            <GrowthChart data={growthData} metric={chartMetric} />
+            <div className="grid grid-cols-1 gap-3 border-t border-ink-100 pt-4 sm:grid-cols-3">
+              <div className="min-w-0 rounded-xl bg-ink-50/70 px-3 py-2.5">
+                <span className="block text-[11px] text-ink-500">Tổng trong kỳ</span>
+                <span className="mt-1 block text-[18px] font-bold text-ink-800 tabular-nums">{growthData.reduce((acc, cur) => acc + (Number(cur.count) || 0), 0).toLocaleString('vi-VN')}</span>
+              </div>
+              <div className="min-w-0 rounded-xl bg-clay-50/70 px-3 py-2.5">
+                <span className="block text-[11px] text-ink-500">Tháng cao nhất</span>
+                <span className="mt-1 block text-[18px] font-bold text-clay-700 tabular-nums">{Math.max(0, ...growthData.map(item => Number(item.count) || 0)).toLocaleString('vi-VN')}</span>
+              </div>
+              <div className="min-w-0 rounded-xl bg-emerald-50/60 px-3 py-2.5">
+                <span className="block text-[11px] text-ink-500">Tháng gần nhất</span>
+                <span className="mt-1 block text-[18px] font-bold text-emerald-700 tabular-nums">+{growthData[growthData.length - 1]?.count || 0} mới</span>
               </div>
             </div>
-          </div>
+          </section>
 
           {/* Top Trends & Places */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className={`${PANEL_CLASS} space-y-4 p-4 sm:p-5`}>
+            <div className="flex flex-col justify-between gap-3 border-b border-ink-100 pb-4 sm:flex-row sm:flex-wrap sm:items-center">
               <div>
-                <h3 className="font-display font-black text-lg text-ink-800 flex items-center gap-2">
+                <h3 className="font-display font-bold text-[18px] text-ink-800 flex items-center gap-2">
                   <Compass className="w-4 h-4 text-clay-600" />
                   Điểm đến & Địa danh nổi bật
                 </h3>
-                <p className="text-xs text-ink-400 mt-0.5">Xếp hạng theo lượt tạo lịch trình và đánh giá thực tế</p>
+                <p className="text-[12px] text-ink-400 mt-1">Xếp hạng theo lượt tạo lịch trình và đánh giá thực tế</p>
               </div>
 
               {/* Subtabs for Trends */}
-              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80 shrink-0 text-xs">
+              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-ink-50 rounded-xl shrink-0 text-[12px]">
                 <button
                   type="button"
                   onClick={() => setTopTab('destinations')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 min-h-10 px-3 py-2 rounded-lg font-semibold text-[12px] whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     topTab === 'destinations'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
+                      ? 'bg-white text-clay-700 border border-ink-200/60 shadow-sm'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
                   }`}
                 >
@@ -892,9 +832,9 @@ export const AdminDashboardPage = () => {
                 <button
                   type="button"
                   onClick={() => setTopTab('places')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 min-h-10 px-3 py-2 rounded-lg font-semibold text-[12px] whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     topTab === 'places'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
+                      ? 'bg-white text-clay-700 border border-ink-200/60 shadow-sm'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
                   }`}
                 >
@@ -916,23 +856,23 @@ export const AdminDashboardPage = () => {
                     const highestCount = Number(stats.topDestinations[0]?.count) || 1;
                     const percent = Math.min(100, Math.round((Number(dest.count) / highestCount) * 100));
                     return (
-                      <div key={idx} className="p-3.5 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200/60 hover:bg-[#F8F4EC] transition-colors">
-                        <div className="flex items-center justify-between font-bold text-xs text-ink-800 mb-1.5">
-                          <span className="flex items-center gap-2">
-                            <span className={`w-5 h-5 rounded-[4px] flex items-center justify-center text-[10px] font-extrabold border ${
+                      <div key={idx} className="min-w-0 p-3.5 rounded-xl bg-ink-50/50 border border-ink-200/50 hover:bg-[#F8F4EC] transition-colors">
+                        <div className="flex flex-wrap items-center justify-between gap-2 font-semibold text-[13px] text-ink-800 mb-2.5">
+                          <span className="flex min-w-0 flex-1 items-center gap-2">
+                            <span className={`w-6 h-6 shrink-0 rounded-lg flex items-center justify-center text-[11px] font-semibold border ${
                               idx === 0 ? 'bg-amber-100 text-amber-800 border-amber-300' :
                               idx === 1 ? 'bg-ink-100 text-ink-700 border-ink-300' :
                               idx === 2 ? 'bg-clay-100 text-clay-800 border-clay-300' : 'bg-[#FFFDF8] text-ink-600 border-ink-200'
                             }`}>
                               #{idx + 1}
                             </span>
-                            <span className="font-display font-bold text-ink-800">{dest.destination || 'Không xác định'}</span>
+                            <span className="min-w-0 break-words font-display font-bold text-ink-800">{dest.destination || 'Không xác định'}</span>
                           </span>
-                          <span className="text-clay-700 font-extrabold">{dest.count} chuyến đi</span>
+                          <span className="shrink-0 text-clay-700 font-semibold tabular-nums">{dest.count} chuyến đi</span>
                         </div>
-                        <div className="w-full bg-ink-200/60 rounded-full h-1.5">
+                        <div className="w-full bg-ink-200/60 rounded-full h-1">
                           <div 
-                            className="bg-clay-600 h-1.5 rounded-full transition-all duration-500" 
+                            className="bg-clay-500 h-1 rounded-full transition-all duration-500"
                             style={{ width: `${percent}%` }}
                           ></div>
                         </div>
@@ -944,12 +884,12 @@ export const AdminDashboardPage = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {(!stats.topPlaces || stats.topPlaces.length === 0) ? (
-                  <div className="col-span-2 p-8 text-center text-ink-400 text-xs">
+                  <div className="sm:col-span-2 p-8 text-center text-ink-400 text-xs">
                     Chưa có đánh giá địa danh.
                   </div>
                 ) : (
                   stats.topPlaces.map((place, idx) => (
-                    <div key={idx} className="p-3.5 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200/60 flex items-center justify-between gap-3 hover:bg-[#F8F4EC] transition-colors">
+                    <div key={idx} className="min-w-0 p-3.5 rounded-xl bg-ink-50/50 border border-ink-200/50 flex items-center justify-between gap-3 hover:bg-[#F8F4EC] transition-colors">
                       <div className="min-w-0">
                         <div className="font-display font-bold text-xs text-ink-800 truncate">{place.name}</div>
                         <div className="text-[11px] text-ink-400 flex items-center gap-1 mt-0.5">
@@ -974,12 +914,12 @@ export const AdminDashboardPage = () => {
         </div>
 
         {/* RIGHT COLUMN: ACTION REQUIRED & RECENT AUDIT LOGS (4 Cols) */}
-        <div className="lg:col-span-4 space-y-6">
+        <div className="min-w-0 space-y-5 xl:col-span-4">
           
           {/* Action Required: Pending Moderation Reports */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-ink-200/60">
-              <div className="flex items-center gap-2 font-display font-black text-base text-ink-800">
+          <div className={`${PANEL_CLASS} space-y-4 p-4 sm:p-5`}>
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-ink-100">
+              <div className="flex items-center gap-2 font-display font-bold text-[17px] text-ink-800">
                 <span className={`w-2 h-2 rounded-full ${(stats.pendingReports > 0 || pendingReports.length > 0) ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`}></span>
                 <span>Cần kiểm duyệt</span>
               </div>
@@ -990,31 +930,31 @@ export const AdminDashboardPage = () => {
               </span>
             </div>
 
-            <div className="space-y-3 text-xs">
+            <div className="space-y-3 text-[13px]">
               {pendingReports.length === 0 ? (
-                <div className="p-5 rounded-[5px] bg-emerald-50/60 border border-emerald-200 text-emerald-800 text-center font-semibold space-y-1">
+                <div className="p-5 rounded-xl bg-emerald-50/60 border border-emerald-200 text-emerald-800 text-center font-semibold space-y-1">
                   <CheckCircle2 className="w-5 h-5 mx-auto text-emerald-600 mb-1" />
                   <div className="font-bold">Hệ thống an toàn</div>
                   <p className="text-[11px] text-emerald-700 font-normal">Không có báo cáo vi phạm chờ duyệt.</p>
                 </div>
               ) : (
                 pendingReports.slice(0, 3).map((r) => (
-                  <div key={r.id} className="p-3 rounded-[5px] bg-rose-50/70 border border-rose-200/80 space-y-1.5">
-                    <div className="flex items-center justify-between text-rose-800 font-bold">
+                  <div key={r.id} className="p-3.5 rounded-xl bg-rose-50/60 border border-rose-100 space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-1.5 text-rose-800 font-semibold">
                       <span className="flex items-center gap-1">
                         <Flag className="w-3.5 h-3.5 text-rose-600" /> {r.category || 'Vi phạm'}
                       </span>
                       <span className="text-[10px] text-ink-400 font-normal">{r.timeAgo || 'Gần đây'}</span>
                     </div>
-                    <h4 className="font-display font-bold text-ink-800 line-clamp-1">{r.title || 'Bài viết báo cáo'}</h4>
-                    <p className="text-[11px] text-ink-600 line-clamp-1">
+                    <h4 className="font-display font-bold text-ink-800 line-clamp-2">{r.title || 'Bài viết báo cáo'}</h4>
+                    <p className="text-[12px] leading-relaxed text-ink-500 line-clamp-2">
                       {r.aiFlagReason || r.reportReason || r.snippet || 'Dấu hiệu vi phạm tiêu chuẩn cộng đồng.'}
                     </p>
                     <div className="flex items-center justify-between pt-1">
                       <span className="text-[10px] text-ink-500 truncate max-w-[130px]">{r.authorName || 'Ẩn danh'}</span>
                       <button
                         onClick={() => setAdminTab('reports')}
-                        className="px-2.5 py-0.5 rounded-[4px] bg-rose-700 hover:bg-rose-800 text-white font-bold text-[10px] transition-colors cursor-pointer"
+                        className="min-h-9 px-3 py-1 rounded-lg bg-rose-700 hover:bg-rose-800 text-white font-semibold text-[12px] transition-colors cursor-pointer"
                       >
                         Kiểm duyệt
                       </button>
@@ -1026,7 +966,7 @@ export const AdminDashboardPage = () => {
 
             <button
               onClick={() => setAdminTab('reports')}
-              className="w-full pt-1 text-center text-clay-700 hover:text-clay-800 font-bold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
+              className="w-full min-h-10 rounded-xl border border-clay-200/60 bg-clay-50/50 text-center text-clay-700 hover:bg-clay-50 font-semibold text-[12px] flex items-center justify-center gap-1 cursor-pointer transition-colors"
             >
               <span>Xem tất cả báo cáo</span>
               <ArrowRight className="w-4 h-4" />
@@ -1034,9 +974,9 @@ export const AdminDashboardPage = () => {
           </div>
 
           {/* Recent Audit Logs Feed */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-ink-200/60">
-              <div className="flex items-center gap-2 font-display font-black text-base text-ink-800">
+          <div className={`${PANEL_CLASS} space-y-4 p-4 sm:p-5`}>
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-ink-100">
+              <div className="flex items-center gap-2 font-display font-bold text-[17px] text-ink-800">
                 <History className="w-4 h-4 text-clay-600" />
                 <span>Nhật ký hoạt động</span>
               </div>
@@ -1057,9 +997,9 @@ export const AdminDashboardPage = () => {
                 recentLogs.map((logItem) => {
                   const badge = formatActionBadge(logItem.action);
                   return (
-                    <div key={logItem.id} className="p-2.5 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200/60 text-xs space-y-1 hover:bg-[#F8F4EC] transition-colors">
+                    <div key={logItem.id} className="relative ml-1 border-l border-ink-200 py-1 pl-4 text-[12px] space-y-1.5 before:absolute before:-left-[4px] before:top-3 before:h-[7px] before:w-[7px] before:rounded-full before:bg-clay-400 before:ring-4 before:ring-white">
                       <div className="flex items-center justify-between">
-                        <span className={`px-1.5 py-0.5 rounded-[3px] font-mono text-[9px] font-bold border ${badge.bg}`}>
+                        <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold border ${badge.bg}`}>
                           {badge.label}
                         </span>
                         <span className="text-[10px] text-ink-400 flex items-center gap-1">
@@ -1067,10 +1007,10 @@ export const AdminDashboardPage = () => {
                           {logItem.createdAt ? new Date(logItem.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Vừa xong'}
                         </span>
                       </div>
-                      <div className="font-bold text-ink-800 line-clamp-1 text-[11px]">
+                      <div className="font-semibold text-ink-700 line-clamp-1 text-[13px]">
                         {logItem.actorName || logItem.actorEmail || 'Hệ thống'}
                       </div>
-                      <p className="text-[10px] text-ink-500 line-clamp-1">
+                      <p className="text-[12px] leading-relaxed text-ink-400 line-clamp-2">
                         {logItem.details || logItem.targetResource || 'Thực hiện thao tác trong hệ thống'}
                       </p>
                     </div>
@@ -1081,7 +1021,7 @@ export const AdminDashboardPage = () => {
 
             <button
               onClick={() => setAdminTab('audit-logs')}
-              className="w-full pt-1 text-center text-ink-500 hover:text-ink-800 font-bold text-xs flex items-center justify-center gap-1 cursor-pointer transition-colors"
+              className="w-full min-h-10 rounded-xl bg-ink-50/70 text-center text-ink-500 hover:bg-ink-100 hover:text-ink-800 font-semibold text-[12px] flex items-center justify-center gap-1 cursor-pointer transition-colors"
             >
               <span>Xem tất cả nhật ký</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -1093,14 +1033,14 @@ export const AdminDashboardPage = () => {
       </div>
 
       {/* ─── ROW 3: CENTRAL DATA TABLE ────────────────────────────────────── */}
-      <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-5">
+      <div className={`${PANEL_CLASS} space-y-5 p-4 sm:p-5`}>
         
         {/* Table Header & Functional Bar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-ink-200/60">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col justify-between gap-4 border-b border-ink-100 pb-4 xl:flex-row xl:flex-wrap xl:items-center">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => setActiveTableTab('itineraries')}
-              className={`font-display font-black text-base transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
+              className={`font-display font-bold text-[17px] transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
                 activeTableTab === 'itineraries' 
                   ? 'text-clay-700 border-clay-600' 
                   : 'text-ink-400 border-transparent hover:text-ink-700'
@@ -1111,7 +1051,7 @@ export const AdminDashboardPage = () => {
             <span className="text-ink-200">|</span>
             <button
               onClick={() => setActiveTableTab('users')}
-              className={`font-display font-black text-base transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
+              className={`font-display font-bold text-[17px] transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
                 activeTableTab === 'users' 
                   ? 'text-clay-700 border-clay-600' 
                   : 'text-ink-400 border-transparent hover:text-ink-700'
@@ -1121,16 +1061,16 @@ export const AdminDashboardPage = () => {
             </button>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full md:w-auto">
+          <div className="flex min-w-0 w-full flex-col gap-2.5 sm:flex-row sm:items-center xl:w-auto">
             {/* Search Input */}
-            <div className="relative w-full sm:w-64">
+            <div className="relative min-w-0 w-full sm:flex-1 xl:w-64">
               <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
               <input
                 type="text"
                 placeholder={activeTableTab === 'itineraries' ? "Tìm theo tên, điểm đến, tác giả..." : "Tìm tên, email thành viên..."}
                 value={tableSearch}
                 onChange={(e) => setTableSearch(e.target.value)}
-                className="pl-8 pr-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs text-ink-800 placeholder:text-ink-300 outline-none focus:border-clay-600 w-full transition-all"
+                className="min-h-11 pl-8 pr-3 py-2 bg-ink-50/50 border border-ink-200/80 rounded-xl text-[13px] text-ink-800 placeholder:text-ink-300 outline-none focus:border-clay-600 w-full transition-all"
               />
             </div>
 
@@ -1139,7 +1079,7 @@ export const AdminDashboardPage = () => {
               <select
                 value={tableStatusFilter}
                 onChange={(e) => setTableStatusFilter(e.target.value)}
-                className="flex-1 sm:flex-none px-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs font-bold text-ink-700 outline-none cursor-pointer hover:bg-[#F8F4EC]/80 transition-colors"
+                className="flex-1 sm:flex-none min-h-11 px-3 py-2 bg-ink-50/50 border border-ink-200/80 rounded-xl text-[13px] font-bold text-ink-700 outline-none cursor-pointer hover:bg-[#F8F4EC]/80 transition-colors"
               >
                 {activeTableTab === 'itineraries' ? (
                   <>
@@ -1171,11 +1111,11 @@ export const AdminDashboardPage = () => {
         </div>
 
         {/* Data Table Container */}
-        <div className="overflow-x-auto rounded-[5px] border border-ink-200/80">
+        <div className="overflow-x-auto rounded-xl border border-ink-200/70">
           {activeTableTab === 'itineraries' ? (
             /* ITINERARIES TABLE */
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F4EC] text-ink-600 font-bold border-b border-ink-200/80 uppercase text-[11px] tracking-wider">
+            <table className="w-full min-w-[760px] text-left text-[13px]">
+              <thead className="bg-ink-50 text-ink-500 font-semibold border-b border-ink-200/70 text-[12px]">
                 <tr>
                   <th className="py-3 px-4">Mã</th>
                   <th className="py-3 px-4">Lịch trình</th>
@@ -1186,7 +1126,7 @@ export const AdminDashboardPage = () => {
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ink-200/60 bg-[#FFFDF8]">
+              <tbody className="divide-y divide-ink-100 bg-white">
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-ink-400">
@@ -1202,7 +1142,7 @@ export const AdminDashboardPage = () => {
                   </tr>
                 ) : (
                   paginatedRecords.map((row) => (
-                    <tr key={row.id} className="hover:bg-[#F8F4EC]/50 transition-colors">
+                    <tr key={row.id} className="even:bg-ink-50/30 hover:bg-clay-50/50 transition-colors">
                       <td className="py-3 px-4 font-mono font-bold text-clay-700">#{row.id}</td>
 
                       <td className="py-3 px-4 max-w-xs">
@@ -1289,8 +1229,8 @@ export const AdminDashboardPage = () => {
             </table>
           ) : (
             /* USERS TABLE */
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F4EC] text-ink-600 font-bold border-b border-ink-200/80 uppercase text-[11px] tracking-wider">
+            <table className="w-full min-w-[760px] text-left text-[13px]">
+              <thead className="bg-ink-50 text-ink-500 font-semibold border-b border-ink-200/70 text-[12px]">
                 <tr>
                   <th className="py-3 px-4">Mã</th>
                   <th className="py-3 px-4">Thành viên</th>
@@ -1301,7 +1241,7 @@ export const AdminDashboardPage = () => {
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ink-200/60 bg-[#FFFDF8]">
+              <tbody className="divide-y divide-ink-100 bg-white">
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="py-12 text-center text-ink-400">
@@ -1317,7 +1257,7 @@ export const AdminDashboardPage = () => {
                   </tr>
                 ) : (
                   paginatedRecords.map((user) => (
-                    <tr key={user.id} className="hover:bg-[#F8F4EC]/50 transition-colors">
+                    <tr key={user.id} className="even:bg-ink-50/30 hover:bg-clay-50/50 transition-colors">
                       <td className="py-3 px-4 font-mono font-bold text-clay-700">#{user.id}</td>
 
                       <td className="py-3 px-4">
