@@ -477,23 +477,23 @@ export const AdminUsersPage = () => {
       </div>
 
       {/* 2. 4 METRICS KPI CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="admin-stat-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
         {/* KPI 1: Tổng người dùng */}
-        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs text-ink-400 font-medium block">Tổng thành viên</span>
-              <div className="font-display font-black text-2xl lg:text-3xl text-ink-800 mt-1">
+              <span className="admin-stat-label text-xs text-ink-400 font-medium block">Tổng thành viên</span>
+              <div className="admin-stat-value font-display font-black text-2xl lg:text-3xl text-ink-800 mt-1">
                 {metrics.totalUsers}
               </div>
             </div>
-            <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center">
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center">
               <Users className="w-4 h-4" />
             </div>
           </div>
           <div className="space-y-1.5 pt-1 border-t border-ink-100">
-            <div className="flex items-center justify-between text-[11px]">
+            <div className="admin-stat-detail flex items-center justify-between text-[11px]">
               <span className="text-clay-600 font-bold">
                 +{metrics.newUsersToday} mới hôm nay
               </span>
@@ -509,38 +509,38 @@ export const AdminUsersPage = () => {
         </div>
 
         {/* KPI 2: Quản trị & Điều hành */}
-        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs text-ink-400 font-medium block">Ban quản trị</span>
-              <div className="font-display font-black text-2xl lg:text-3xl text-ink-800 mt-1">
+              <span className="admin-stat-label text-xs text-ink-400 font-medium block">Ban quản trị</span>
+              <div className="admin-stat-value font-display font-black text-2xl lg:text-3xl text-ink-800 mt-1">
                 {metrics.adminCount}
               </div>
             </div>
-            <div className="w-9 h-9 rounded-[5px] bg-amber-50 border border-amber-200/80 text-amber-700 flex items-center justify-center">
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-amber-50 border border-amber-200/80 text-amber-700 flex items-center justify-center">
               <Shield className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex flex-wrap items-center gap-1.5 pt-1 border-t border-ink-100 text-[10px] font-mono">
+          <div className="admin-stat-detail flex flex-wrap items-center gap-1.5 pt-1 border-t border-ink-100 text-[10px] font-mono">
             <span className="px-2 py-0.5 rounded-[4px] bg-amber-100/70 text-amber-900 border border-amber-200">Admin: {metrics.adminCount}</span>
             <span className="px-2 py-0.5 rounded-[4px] bg-clay-100/70 text-clay-900 border border-clay-200">Mod: {metrics.moderatorCount || 0}</span>
           </div>
         </div>
 
         {/* KPI 3: Tài khoản bị khóa / Ban */}
-        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs text-rose-600 font-medium block">Tài khoản bị khóa</span>
-              <div className="font-display font-black text-2xl lg:text-3xl text-rose-700 mt-1">
+              <span className="admin-stat-label text-xs text-rose-600 font-medium block">Tài khoản bị khóa</span>
+              <div className="admin-stat-value font-display font-black text-2xl lg:text-3xl text-rose-700 mt-1">
                 {metrics.lockedUsers}
               </div>
             </div>
-            <div className="w-9 h-9 rounded-[5px] bg-rose-50 border border-rose-200/80 text-rose-600 flex items-center justify-center">
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-rose-50 border border-rose-200/80 text-rose-600 flex items-center justify-center">
               <Ban className="w-4 h-4" />
             </div>
           </div>
-          <div className="pt-1 border-t border-ink-100 text-[11px] text-ink-500 flex items-center justify-between">
+          <div className="admin-stat-detail pt-1 border-t border-ink-100 text-[11px] text-ink-500 flex items-center justify-between">
             <span>Tỷ lệ khóa:</span>
             <span className="font-bold text-ink-700">
               {metrics.totalUsers > 0 ? ((metrics.lockedUsers / metrics.totalUsers) * 100).toFixed(1) : 0}%
@@ -549,19 +549,19 @@ export const AdminUsersPage = () => {
         </div>
 
         {/* KPI 4: Tăng trưởng hôm nay */}
-        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex flex-col justify-between space-y-3">
           <div className="flex items-start justify-between">
             <div>
-              <span className="text-xs text-ink-400 font-medium block">Mới trong ngày</span>
-              <div className="font-display font-black text-2xl lg:text-3xl text-clay-700 mt-1">
+              <span className="admin-stat-label text-xs text-ink-400 font-medium block">Mới trong ngày</span>
+              <div className="admin-stat-value font-display font-black text-2xl lg:text-3xl text-clay-700 mt-1">
                 +{metrics.newUsersToday}
               </div>
             </div>
-            <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center">
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center">
               <Award className="w-4 h-4" />
             </div>
           </div>
-          <div className="pt-1 border-t border-ink-100 text-[11px] text-ink-600 flex items-center justify-between">
+          <div className="admin-stat-detail pt-1 border-t border-ink-100 text-[11px] text-ink-600 flex items-center justify-between">
             <span>Giám sát viên:</span>
             <span className="text-clay-700 font-bold">{metrics.moderatorCount || 0}</span>
           </div>

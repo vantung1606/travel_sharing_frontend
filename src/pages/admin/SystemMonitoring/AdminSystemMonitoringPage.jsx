@@ -232,42 +232,42 @@ export const AdminSystemMonitoringPage = () => {
       </div>
 
       {/* ─── 2. TOP METRIC SUMMARY CARDS ─────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="admin-stat-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Database Stats */}
-        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="admin-stat-card admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Cơ sở dữ liệu</span>
-            <div className="w-8 h-8 rounded-[5px] bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
+            <span className="admin-stat-label font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Cơ sở dữ liệu</span>
+            <div className="admin-stat-icon w-8 h-8 rounded-[5px] bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
               <Database className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-bold font-serif text-ink-900">{databaseInfo?.totalTables || 0}</span>
-              <span className="text-xs font-serif font-medium text-ink-500">bảng lưu trữ</span>
+              <span className="admin-stat-value text-2xl font-bold font-serif text-ink-900">{databaseInfo?.totalTables || 0}</span>
+              <span className="admin-stat-detail text-xs font-serif font-medium text-ink-500">bảng lưu trữ</span>
             </div>
-            <p className="text-[11px] font-mono text-ink-600 mt-1">
+            <p className="admin-stat-detail text-[11px] font-mono text-ink-600 mt-1">
               {databaseInfo?.totalRows?.toLocaleString() || 0} dòng • {databaseInfo?.totalSizeFormatted || '0 B'}
             </p>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-ink-100 flex items-center justify-between text-[11px]">
+          <div className="admin-stat-detail mt-3 pt-2.5 border-t border-ink-100 flex items-center justify-between text-[11px]">
             <span className="text-ink-500 font-sans">Động cơ:</span>
             <span className="font-mono font-bold text-emerald-800">{databaseInfo?.productName} {databaseInfo?.productVersion?.split('-')[0]}</span>
           </div>
         </div>
 
         {/* Card 2: JVM Memory Heap */}
-        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="admin-stat-card admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Bộ nhớ JVM Heap</span>
-            <div className="w-8 h-8 rounded-[5px] bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
+            <span className="admin-stat-label font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Bộ nhớ JVM Heap</span>
+            <div className="admin-stat-icon w-8 h-8 rounded-[5px] bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
               <Cpu className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
             <div className="flex items-baseline justify-between">
-              <span className="text-xl font-bold font-serif text-ink-900">{memoryInfo?.usedMemoryFormatted || '0 B'}</span>
-              <span className="text-xs font-mono font-bold text-clay-700">{memoryInfo?.usagePercent || 0}%</span>
+              <span className="admin-stat-value text-xl font-bold font-serif text-ink-900">{memoryInfo?.usedMemoryFormatted || '0 B'}</span>
+              <span className="admin-stat-detail text-xs font-mono font-bold text-clay-700">{memoryInfo?.usagePercent || 0}%</span>
             </div>
             {/* Memory Bar */}
             <div className="w-full bg-ink-100 h-2 rounded-full overflow-hidden mt-1.5">
@@ -279,26 +279,26 @@ export const AdminSystemMonitoringPage = () => {
                 style={{ width: `${Math.min(100, Math.max(2, memoryInfo?.usagePercent || 0))}%` }}
               />
             </div>
-            <p className="text-[11px] font-mono text-ink-500 mt-1">
+            <p className="admin-stat-detail text-[11px] font-mono text-ink-500 mt-1">
               Tối đa: {memoryInfo?.maxMemoryFormatted || '0 B'} • Còn trống: {memoryInfo?.freeMemoryFormatted || '0 B'}
             </p>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-ink-100 flex items-center justify-between text-[11px]">
+          <div className="admin-stat-detail mt-3 pt-2.5 border-t border-ink-100 flex items-center justify-between text-[11px]">
             <span className="text-ink-500 font-sans">Trạng thái:</span>
             <span className="font-serif font-bold text-emerald-800">Hoạt động ổn định</span>
           </div>
         </div>
 
         {/* Card 3: Uptime */}
-        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="admin-stat-card admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Thời gian hoạt động</span>
-            <div className="w-8 h-8 rounded-[5px] bg-blue-50 text-blue-700 flex items-center justify-center border border-blue-200">
+            <span className="admin-stat-label font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Thời gian hoạt động</span>
+            <div className="admin-stat-icon w-8 h-8 rounded-[5px] bg-blue-50 text-blue-700 flex items-center justify-center border border-blue-200">
               <Clock className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
-            <span className="text-lg font-bold font-serif text-ink-900 leading-snug line-clamp-1">
+            <span className="admin-stat-value admin-stat-value--text text-lg font-bold font-serif text-ink-900 leading-snug line-clamp-1">
               {serverInfo?.formattedUptime || 'Đang cập nhật...'}
             </span>
             <p className="text-[11px] font-sans text-ink-500 mt-1 line-clamp-1">
@@ -312,23 +312,23 @@ export const AdminSystemMonitoringPage = () => {
         </div>
 
         {/* Card 4: Runtime Environment */}
-        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="admin-stat-card admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
-            <span className="font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Môi trường máy chủ</span>
-            <div className="w-8 h-8 rounded-[5px] bg-clay-50 text-clay-700 flex items-center justify-center border border-clay-200">
+            <span className="admin-stat-label font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Môi trường máy chủ</span>
+            <div className="admin-stat-icon w-8 h-8 rounded-[5px] bg-clay-50 text-clay-700 flex items-center justify-center border border-clay-200">
               <Server className="w-4 h-4" />
             </div>
           </div>
           <div className="mt-2">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-xl font-bold font-serif text-clay-900">Java {serverInfo?.javaVersion?.split('.')[0] || '21'}</span>
-              <span className="text-xs font-mono font-medium text-ink-500">v{serverInfo?.javaVersion}</span>
+              <span className="admin-stat-value text-xl font-bold font-serif text-clay-900">Java {serverInfo?.javaVersion?.split('.')[0] || '21'}</span>
+              <span className="admin-stat-detail text-xs font-mono font-medium text-ink-500">v{serverInfo?.javaVersion}</span>
             </div>
-            <p className="text-[11px] font-sans text-ink-600 mt-1">
+            <p className="admin-stat-detail text-[11px] font-sans text-ink-600 mt-1">
               Spring Boot <span className="font-mono font-bold">{serverInfo?.springBootVersion}</span>
             </p>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-ink-100 flex items-center justify-between text-[11px]">
+          <div className="admin-stat-detail mt-3 pt-2.5 border-t border-ink-100 flex items-center justify-between text-[11px]">
             <span className="text-ink-500 font-sans">Hệ điều hành:</span>
             <span className="font-mono font-bold text-ink-800">{serverInfo?.osName} ({serverInfo?.availableProcessors} CPU)</span>
           </div>

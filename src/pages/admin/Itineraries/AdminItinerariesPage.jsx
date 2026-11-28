@@ -493,53 +493,53 @@ export const AdminItinerariesPage = () => {
       </div>
 
       {/* ─── 2. STATISTIC KPI CARDS (MATCHING CSDL) ────────────────────────── */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
-          <span className="text-[11px] font-bold text-ink-400 uppercase tracking-wider block">Tổng Lịch Trình</span>
-          <p className="text-xl sm:text-2xl font-black text-ink-900 font-display">{stats.total}</p>
-          <span className="text-[10px] text-ink-500 font-sans">Bản ghi trong CSDL</span>
+      <div className="admin-stat-grid grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+        <div className="admin-stat-card admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+          <span className="admin-stat-label text-[11px] font-bold text-ink-400 uppercase tracking-wider block">Tổng Lịch Trình</span>
+          <p className="admin-stat-value text-xl sm:text-2xl font-black text-ink-900 font-display">{stats.total}</p>
+          <span className="admin-stat-detail text-[10px] text-ink-500 font-sans">Bản ghi trong CSDL</span>
         </div>
 
-        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
-          <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider block flex items-center gap-1">
+        <div className="admin-stat-card admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+          <span className="admin-stat-label text-[11px] font-bold text-emerald-700 uppercase tracking-wider block flex items-center gap-1">
             <Globe className="w-3 h-3" /> Công Khai
           </span>
-          <p className="text-xl sm:text-2xl font-black text-emerald-800 font-display">{stats.publicCount}</p>
-          <span className="text-[10px] text-emerald-600 font-sans">Hiển thị cộng đồng</span>
+          <p className="admin-stat-value text-xl sm:text-2xl font-black text-emerald-800 font-display">{stats.publicCount}</p>
+          <span className="admin-stat-detail text-[10px] text-emerald-600 font-sans">Hiển thị cộng đồng</span>
         </div>
 
-        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
-          <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block flex items-center gap-1">
+        <div className="admin-stat-card admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+          <span className="admin-stat-label text-[11px] font-bold text-slate-600 uppercase tracking-wider block flex items-center gap-1">
             <Lock className="w-3 h-3" /> Riêng Tư
           </span>
-          <p className="text-xl sm:text-2xl font-black text-slate-800 font-display">{stats.privateCount}</p>
-          <span className="text-[10px] text-slate-500 font-sans">Chỉ tác giả & đoàn</span>
+          <p className="admin-stat-value text-xl sm:text-2xl font-black text-slate-800 font-display">{stats.privateCount}</p>
+          <span className="admin-stat-detail text-[10px] text-slate-500 font-sans">Chỉ tác giả & đoàn</span>
         </div>
 
-        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
-          <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider block flex items-center gap-1">
+        <div className="admin-stat-card admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+          <span className="admin-stat-label text-[11px] font-bold text-amber-700 uppercase tracking-wider block flex items-center gap-1">
             <Compass className="w-3 h-3" /> Hệ thống tạo
           </span>
-          <p className="text-xl sm:text-2xl font-black text-amber-800 font-display">{stats.aiCount}</p>
-          <span className="text-[10px] text-amber-600 font-sans">Tạo từ gợi ý lịch trình</span>
+          <p className="admin-stat-value text-xl sm:text-2xl font-black text-amber-800 font-display">{stats.aiCount}</p>
+          <span className="admin-stat-detail text-[10px] text-amber-600 font-sans">Tạo từ gợi ý lịch trình</span>
         </div>
 
-        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
-          <span className="text-[11px] font-bold text-clay-700 uppercase tracking-wider block flex items-center gap-1">
+        <div className="admin-stat-card admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+          <span className="admin-stat-label text-[11px] font-bold text-clay-700 uppercase tracking-wider block flex items-center gap-1">
             <DollarSign className="w-3 h-3" /> Có Dự Toán
           </span>
-          <p className="text-xl sm:text-2xl font-black text-clay-800 font-display">{stats.hasBudgetCount}</p>
-          <span className="text-[10px] text-clay-600 font-sans">Đã nhập ngân sách</span>
+          <p className="admin-stat-value text-xl sm:text-2xl font-black text-clay-800 font-display">{stats.hasBudgetCount}</p>
+          <span className="admin-stat-detail text-[10px] text-clay-600 font-sans">Đã nhập ngân sách</span>
         </div>
 
-        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
-          <span className="text-[11px] font-bold text-ink-400 uppercase tracking-wider block flex items-center gap-1">
+        <div className="admin-stat-card admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+          <span className="admin-stat-label text-[11px] font-bold text-ink-400 uppercase tracking-wider block flex items-center gap-1">
             <DollarSign className="w-3 h-3" /> Tổng Ngân Sách
           </span>
-          <p className="text-sm sm:text-base font-black text-ink-900 font-display truncate" title={formatVND(stats.totalBudget) || '0 ₫'}>
+          <p className="admin-stat-value admin-stat-value--money text-sm sm:text-base font-black text-ink-900 font-display truncate" title={formatVND(stats.totalBudget) || '0 ₫'}>
             {formatVND(stats.totalBudget) || '0 ₫'}
           </p>
-          <span className="text-[10px] text-ink-500 font-sans">Tổng giá trị dự toán</span>
+          <span className="admin-stat-detail text-[10px] text-ink-500 font-sans">Tổng giá trị dự toán</span>
         </div>
       </div>
 

@@ -363,57 +363,57 @@ export const AdminAuditLogsPage = () => {
       </div>
 
       {/* 2. Top Metric Cards (Paper-Ink-Clay) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="admin-stat-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1 */}
-        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center shrink-0">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+          <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center shrink-0">
             <Layers className="w-4 h-4" />
           </div>
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-wider text-ink-500">Tổng bản ghi nhật ký</p>
-            <p className="font-display font-black text-2xl lg:text-3xl text-ink-800 mt-0.5">
+            <p className="admin-stat-label font-mono text-[10px] uppercase tracking-wider text-ink-500">Tổng bản ghi nhật ký</p>
+            <p className="admin-stat-value font-display font-black text-2xl lg:text-3xl text-ink-800 mt-0.5">
               {stats.totalLogs?.toLocaleString() || 0}
             </p>
-            <span className="font-mono text-[10px] text-emerald-700 font-bold">Lưu trữ Rolling File</span>
+            <span className="admin-stat-detail font-mono text-[10px] text-emerald-700 font-bold">Lưu trữ Rolling File</span>
           </div>
         </div>
 
         {/* Metric 2 */}
-        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center shrink-0">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+          <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center shrink-0">
             <Calendar className="w-4 h-4" />
           </div>
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-wider text-ink-500">Hoạt động hôm nay</p>
-            <p className="font-display font-black text-2xl lg:text-3xl text-clay-700 mt-0.5">
+            <p className="admin-stat-label font-mono text-[10px] uppercase tracking-wider text-ink-500">Hoạt động hôm nay</p>
+            <p className="admin-stat-value font-display font-black text-2xl lg:text-3xl text-clay-700 mt-0.5">
               {stats.logsToday?.toLocaleString() || 0}
             </p>
-            <span className="font-mono text-[10px] text-ink-500">Theo thời gian thực</span>
+            <span className="admin-stat-detail font-mono text-[10px] text-ink-500">Theo thời gian thực</span>
           </div>
         </div>
 
         {/* Metric 3 */}
-        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-9 h-9 rounded-[5px] bg-amber-50 border border-amber-200/80 text-amber-700 flex items-center justify-center shrink-0">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+          <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-amber-50 border border-amber-200/80 text-amber-700 flex items-center justify-center shrink-0">
             <Shield className="w-4 h-4" />
           </div>
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-wider text-ink-500">Phân loại hành động</p>
-            <p className="font-display font-black text-2xl lg:text-3xl text-ink-800 mt-0.5">
-              {stats.distinctActionsCount || actionsList.length || 0} <span className="text-xs font-serif font-normal text-ink-400">loại</span>
+            <p className="admin-stat-label font-mono text-[10px] uppercase tracking-wider text-ink-500">Phân loại hành động</p>
+            <p className="admin-stat-value font-display font-black text-2xl lg:text-3xl text-ink-800 mt-0.5">
+              {stats.distinctActionsCount || actionsList.length || 0} <span className="admin-stat-detail text-xs font-serif font-normal text-ink-400">loại</span>
             </p>
-            <span className="font-mono text-[10px] text-amber-800 font-bold">4 file phân loại độc lập</span>
+            <span className="admin-stat-detail font-mono text-[10px] text-amber-800 font-bold">4 file phân loại độc lập</span>
           </div>
         </div>
 
         {/* Metric 4 */}
-        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
-          <div className="w-9 h-9 rounded-[5px] bg-clay-50 border border-clay-200/80 text-clay-700 flex items-center justify-center shrink-0">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+          <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-clay-50 border border-clay-200/80 text-clay-700 flex items-center justify-center shrink-0">
             <History className="w-4 h-4" />
           </div>
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-wider text-ink-500">Cơ chế File Rolling</p>
-            <p className="font-serif font-bold text-sm text-ink-800 mt-0.5 flex items-center gap-1.5">
+            <p className="admin-stat-label font-mono text-[10px] uppercase tracking-wider text-ink-500">Cơ chế File Rolling</p>
+            <p className="admin-stat-value admin-stat-value--text font-serif font-bold text-sm text-ink-800 mt-0.5 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping"></span>
               Xoay vòng 30 ngày
             </p>

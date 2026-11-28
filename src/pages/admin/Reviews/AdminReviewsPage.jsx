@@ -163,16 +163,16 @@ export const AdminReviewsPage = () => {
       </div>
 
       {/* ── KPI Row ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+      <div className="admin-stat-grid grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         {kpis.map(({ label, value, icon: Icon, sub }) => (
-          <div key={label} className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 flex items-center gap-4 transition-colors hover:border-ink-300">
-            <div className="w-10 h-10 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center shrink-0">
+          <div key={label} className="admin-stat-card admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 flex items-center gap-4 transition-colors hover:border-ink-300">
+            <div className="admin-stat-icon w-10 h-10 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center shrink-0">
               <Icon className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[11px] text-ink-400 font-bold uppercase tracking-wider block">{label}</span>
-              <div className="font-display font-black text-3xl text-ink-800 mt-0.5 leading-none">{value}</div>
-              <span className="text-[10px] text-ink-400 font-medium block mt-1">{sub}</span>
+              <span className="admin-stat-label text-[11px] text-ink-400 font-bold uppercase tracking-wider block">{label}</span>
+              <div className="admin-stat-value font-display font-black text-3xl text-ink-800 mt-0.5 leading-none">{value}</div>
+              <span className="admin-stat-detail text-[10px] text-ink-400 font-medium block mt-1">{sub}</span>
             </div>
           </div>
         ))}

@@ -566,20 +566,20 @@ export const AdminReportsPage = () => {
       </div>
 
       {/* 2. KPI Cards (4 Thẻ Thống Kê Nhanh từ DB) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+      <div className="admin-stat-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
         {/* Card 1 */}
-        <div className="admin-panel bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 flex flex-col justify-between hover:border-ink-300 transition-colors">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 flex flex-col justify-between hover:border-ink-300 transition-colors">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-ink-400">Tổng bài viết hôm nay</span>
-            <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] text-clay-700 border border-ink-200/80 flex items-center justify-center font-bold">
+            <span className="admin-stat-label text-xs font-bold text-ink-400">Tổng bài viết hôm nay</span>
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-[#F8F4EC] text-clay-700 border border-ink-200/80 flex items-center justify-center font-bold">
               <FileText className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="font-display font-black text-3xl text-ink-800 leading-none mb-1.5">
+            <div className="admin-stat-value font-display font-black text-3xl text-ink-800 leading-none mb-1.5">
               {metrics.totalPostsToday}
             </div>
-            <div className="flex items-center gap-1 text-xs font-semibold text-clay-700">
+            <div className="admin-stat-detail flex items-center gap-1 text-xs font-semibold text-clay-700">
               <TrendingUp className="w-3.5 h-3.5" />
               <span>+{metrics.growthPercent}%</span>
               <span className="text-ink-400 font-normal">so với hôm qua</span>
@@ -588,18 +588,18 @@ export const AdminReportsPage = () => {
         </div>
 
         {/* Card 2 */}
-        <div className="admin-panel bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 flex flex-col justify-between hover:border-ink-300 transition-colors">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 flex flex-col justify-between hover:border-ink-300 transition-colors">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-ink-400">Báo cáo chờ xử lý</span>
-            <div className="w-9 h-9 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center font-bold">
+            <span className="admin-stat-label text-xs font-bold text-ink-400">Báo cáo chờ xử lý</span>
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center font-bold">
               <AlertTriangle className={`w-4 h-4 ${metrics.pendingReportsCount > 0 ? 'animate-pulse' : ''}`} />
             </div>
           </div>
           <div>
-            <div className="font-display font-black text-3xl text-rose-700 leading-none mb-1.5">
+            <div className="admin-stat-value font-display font-black text-3xl text-rose-700 leading-none mb-1.5">
               {metrics.pendingReportsCount}
             </div>
-            <div className="flex items-center gap-1 text-xs font-bold text-rose-700">
+            <div className="admin-stat-detail flex items-center gap-1 text-xs font-bold text-rose-700">
               <ShieldAlert className="w-3.5 h-3.5" />
               <span>Cần duyệt</span>
               <span className="text-ink-400 font-normal">({metrics.pendingReportsCount} trọng điểm)</span>
@@ -608,18 +608,18 @@ export const AdminReportsPage = () => {
         </div>
 
         {/* Card 3 */}
-        <div className="admin-panel bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 flex flex-col justify-between hover:border-ink-300 transition-colors">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 flex flex-col justify-between hover:border-ink-300 transition-colors">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-ink-400">Đã gỡ / Tạm ẩn</span>
-            <div className="w-9 h-9 rounded-[5px] bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center font-bold">
+            <span className="admin-stat-label text-xs font-bold text-ink-400">Đã gỡ / Tạm ẩn</span>
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center font-bold">
               <EyeOff className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="font-display font-black text-3xl text-ink-800 leading-none mb-1.5">
+            <div className="admin-stat-value font-display font-black text-3xl text-ink-800 leading-none mb-1.5">
               {metrics.hiddenPostsCount}
             </div>
-            <div className="flex items-center gap-1 text-xs font-semibold text-amber-800">
+            <div className="admin-stat-detail flex items-center gap-1 text-xs font-semibold text-amber-800">
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Vi phạm quy chuẩn</span>
             </div>
@@ -627,18 +627,18 @@ export const AdminReportsPage = () => {
         </div>
 
         {/* Card 4 */}
-        <div className="admin-panel bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 flex flex-col justify-between hover:border-ink-300 transition-colors">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 flex flex-col justify-between hover:border-ink-300 transition-colors">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-ink-400">Tỷ lệ nội dung an toàn</span>
-            <div className="w-9 h-9 rounded-[5px] bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-bold">
+            <span className="admin-stat-label text-xs font-bold text-ink-400">Tỷ lệ nội dung an toàn</span>
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-bold">
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="font-display font-black text-3xl text-emerald-700 leading-none mb-1.5">
+            <div className="admin-stat-value font-display font-black text-3xl text-emerald-700 leading-none mb-1.5">
               {metrics.safeRate}%
             </div>
-            <div className="flex items-center gap-1 text-xs font-semibold text-emerald-700">
+            <div className="admin-stat-detail flex items-center gap-1 text-xs font-semibold text-emerald-700">
               <CheckCircle2 className="w-3.5 h-3.5" />
               <span>Kết quả kiểm tra nội dung</span>
             </div>
@@ -1139,33 +1139,33 @@ export const AdminReportsPage = () => {
           </div>
 
           {/* Quick Metrics Bar */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="admin-panel bg-[#FFFDF8] p-4 rounded-[6px] border border-ink-200/80 flex items-center justify-between">
+          <div className="admin-stat-grid grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="admin-stat-card admin-panel bg-[#FFFDF8] p-4 rounded-[6px] border border-ink-200/80 flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-bold text-ink-400 uppercase tracking-wider">Tổng bản ghi kiểm duyệt</span>
-                <div className="font-display font-black text-2xl text-ink-800 mt-0.5">{auditTotalElements}</div>
+                <span className="admin-stat-label text-[11px] font-bold text-ink-400 uppercase tracking-wider">Tổng bản ghi kiểm duyệt</span>
+                <div className="admin-stat-value font-display font-black text-2xl text-ink-800 mt-0.5">{auditTotalElements}</div>
               </div>
-              <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] text-clay-700 border border-ink-200/80 flex items-center justify-center">
+              <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-[#F8F4EC] text-clay-700 border border-ink-200/80 flex items-center justify-center">
                 <FileText className="w-4 h-4" />
               </div>
             </div>
 
-            <div className="admin-panel bg-[#FFFDF8] p-4 rounded-[6px] border border-ink-200/80 flex items-center justify-between">
+            <div className="admin-stat-card admin-panel bg-[#FFFDF8] p-4 rounded-[6px] border border-ink-200/80 flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-bold text-ink-400 uppercase tracking-wider">Hoạt động hôm nay</span>
-                <div className="font-display font-black text-2xl text-emerald-700 mt-0.5">{auditStats.logsToday}</div>
+                <span className="admin-stat-label text-[11px] font-bold text-ink-400 uppercase tracking-wider">Hoạt động hôm nay</span>
+                <div className="admin-stat-value font-display font-black text-2xl text-emerald-700 mt-0.5">{auditStats.logsToday}</div>
               </div>
-              <div className="w-9 h-9 rounded-[5px] bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
+              <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
                 <Clock className="w-4 h-4" />
               </div>
             </div>
 
-            <div className="admin-panel bg-[#FFFDF8] p-4 rounded-[6px] border border-ink-200/80 flex items-center justify-between">
+            <div className="admin-stat-card admin-panel bg-[#FFFDF8] p-4 rounded-[6px] border border-ink-200/80 flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-bold text-ink-400 uppercase tracking-wider">Sự kiện An toàn & Bảo mật</span>
-                <div className="font-display font-black text-2xl text-rose-700 mt-0.5">{auditStats.securityCount || auditTotalElements}</div>
+                <span className="admin-stat-label text-[11px] font-bold text-ink-400 uppercase tracking-wider">Sự kiện An toàn & Bảo mật</span>
+                <div className="admin-stat-value font-display font-black text-2xl text-rose-700 mt-0.5">{auditStats.securityCount || auditTotalElements}</div>
               </div>
-              <div className="w-9 h-9 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center">
+              <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center">
                 <Shield className="w-4 h-4" />
               </div>
             </div>

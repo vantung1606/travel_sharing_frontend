@@ -543,12 +543,12 @@ export const AdminPlacesPage = () => {
       </div>
 
       {/* ─── 2. 4 METRIC CARDS GRID ───────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="admin-stat-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         
         {/* Metric 1: Pending Moderation */}
-        <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
+        <div className="admin-stat-card admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
               <Clock className="w-4 h-4" />
             </div>
             {pendingPlaces.length > 0 ? (
@@ -562,18 +562,18 @@ export const AdminPlacesPage = () => {
             )}
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Chờ phê duyệt</span>
+            <span className="admin-stat-label text-xs text-ink-400 font-medium block">Chờ phê duyệt</span>
             <div className="mt-1">
-              <span className="font-display text-3xl font-black text-clay-700">{pendingPlaces.length}</span>
+              <span className="admin-stat-value font-display text-3xl font-black text-clay-700">{pendingPlaces.length}</span>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2">Yêu cầu từ cộng đồng</p>
+            <p className="admin-stat-detail text-[11px] text-ink-400 mt-2">Yêu cầu từ cộng đồng</p>
           </div>
         </div>
 
         {/* Metric 2: Active Places */}
-        <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
+        <div className="admin-stat-card admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-emerald-700 flex items-center justify-center">
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-emerald-700 flex items-center justify-center">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
@@ -581,18 +581,18 @@ export const AdminPlacesPage = () => {
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Đang hoạt động</span>
+            <span className="admin-stat-label text-xs text-ink-400 font-medium block">Đang hoạt động</span>
             <div className="mt-1">
-              <span className="font-display text-3xl font-black text-ink-800">{totalActive}</span>
+              <span className="admin-stat-value font-display text-3xl font-black text-ink-800">{totalActive}</span>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2">Hiển thị trên bản đồ</p>
+            <p className="admin-stat-detail text-[11px] text-ink-400 mt-2">Hiển thị trên bản đồ</p>
           </div>
         </div>
 
         {/* Metric 3: City Coverage */}
-        <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
+        <div className="admin-stat-card admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
               <Compass className="w-4 h-4" />
             </div>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-700 text-[10px] font-bold border border-ink-200/80">
@@ -600,18 +600,18 @@ export const AdminPlacesPage = () => {
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Tỉnh thành phủ sóng</span>
+            <span className="admin-stat-label text-xs text-ink-400 font-medium block">Tỉnh thành phủ sóng</span>
             <div className="mt-1">
-              <span className="font-display text-3xl font-black text-ink-800">{dynamicCities.length}</span>
+              <span className="admin-stat-value font-display text-3xl font-black text-ink-800">{dynamicCities.length}</span>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2">Phủ sóng trên toàn quốc</p>
+            <p className="admin-stat-detail text-[11px] text-ink-400 mt-2">Phủ sóng trên toàn quốc</p>
           </div>
         </div>
 
         {/* Metric 4: Average Rating */}
-        <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
+        <div className="admin-stat-card admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
-            <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-amber-600 flex items-center justify-center">
+            <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-amber-600 flex items-center justify-center">
               <Star className="w-4 h-4 fill-amber-300" />
             </div>
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-amber-50 text-amber-800 text-[10px] font-bold border border-amber-200">
@@ -619,14 +619,14 @@ export const AdminPlacesPage = () => {
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Đánh giá trung bình</span>
+            <span className="admin-stat-label text-xs text-ink-400 font-medium block">Đánh giá trung bình</span>
             <div className="flex items-baseline gap-2 mt-1">
-              <span className="font-display text-3xl font-black text-ink-800 flex items-center gap-1">
+              <span className="admin-stat-value font-display text-3xl font-black text-ink-800 flex items-center gap-1">
                 {avgRating} <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
               </span>
-              <span className="text-xs text-ink-400 font-medium">/ 5.0</span>
+              <span className="admin-stat-detail text-xs text-ink-400 font-medium">/ 5.0</span>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2">Đánh giá từ du khách</p>
+            <p className="admin-stat-detail text-[11px] text-ink-400 mt-2">Đánh giá từ du khách</p>
           </div>
         </div>
 

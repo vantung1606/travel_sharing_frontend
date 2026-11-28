@@ -28,19 +28,19 @@ const DashboardMetric = ({ icon: Icon, label, value, badge, detail, tone = 'clay
     <MetricElement
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`${PANEL_CLASS} dashboard-metric group flex w-full flex-col gap-4 bg-gradient-to-br ${colors.surface} p-4 text-left transition duration-200 ${onClick ? 'hover:-translate-y-0.5 hover:border-clay-300 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-600' : ''} motion-reduce:transform-none sm:p-5`}
+      className={`${PANEL_CLASS} admin-stat-card dashboard-metric group flex w-full flex-col gap-4 bg-gradient-to-br ${colors.surface} p-4 text-left transition duration-200 ${onClick ? 'hover:-translate-y-0.5 hover:border-clay-300 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-600' : ''} motion-reduce:transform-none sm:p-5`}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[13px] font-semibold text-ink-500">{label}</span>
-        <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ${colors.icon}`}>
+        <span className="admin-stat-label text-[13px] font-semibold text-ink-500">{label}</span>
+        <span className={`admin-stat-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ring-inset ${colors.icon}`}>
           <Icon className="h-4 w-4" />
         </span>
       </div>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="font-display text-[30px] font-bold leading-none tracking-tight text-ink-900 tabular-nums sm:text-[32px]">{value}</span>
-        <span className={`rounded-full px-2 py-1 text-[11px] font-semibold ${colors.badge}`}>{badge}</span>
+        <span className="admin-stat-value font-display text-[30px] font-bold leading-none tracking-tight text-ink-900 tabular-nums sm:text-[32px]">{value}</span>
+        <span className={`admin-stat-badge rounded-full px-2 py-1 text-[11px] font-semibold ${colors.badge}`}>{badge}</span>
       </div>
-      <div className="mt-auto flex items-center justify-between gap-2 border-t border-ink-200/60 pt-3 text-[12px] leading-relaxed text-ink-500">
+      <div className="admin-stat-detail mt-auto flex items-center justify-between gap-2 border-t border-ink-200/60 pt-3 text-[12px] leading-relaxed text-ink-500">
         <span>{detail}</span>
         {onClick && <ArrowRight className="h-3.5 w-3.5 shrink-0 text-ink-400 transition-transform group-hover:translate-x-0.5" />}
       </div>
@@ -723,7 +723,7 @@ export const AdminDashboardPage = () => {
           </div>
       </section>
 
-      <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 sm:gap-4" aria-label="Chỉ số tổng quan">
+      <div className="admin-stat-grid grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 sm:gap-4" aria-label="Chỉ số tổng quan">
         <DashboardMetric icon={Users} label="Thành viên" tone="ink"
           value={loading ? '—' : Number(stats.totalUsers || 0).toLocaleString('vi-VN')}
           badge={`+${stats.newUsersThisMonth || 0} tháng này`}

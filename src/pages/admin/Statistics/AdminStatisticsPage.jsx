@@ -76,10 +76,10 @@ const BarChart = ({ data, color = '#B0522F', label, metricType = 'items' }) => {
 
 // ─── KPI Card (Paper - Ink - Clay) ───────────────────────────────────────────
 const KpiCard = ({ icon: Icon, label, value, sub, trend, loading }) => (
-  <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex flex-col justify-between gap-3 relative transition-colors hover:border-ink-300">
+  <div className="admin-stat-card admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex flex-col justify-between gap-3 relative transition-colors hover:border-ink-300">
     <div className="flex items-center justify-between">
-      <span className="text-xs font-bold text-ink-400">{label}</span>
-      <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
+      <span className="admin-stat-label text-xs font-bold text-ink-400">{label}</span>
+      <div className="admin-stat-icon w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
         <Icon className="w-4 h-4" />
       </div>
     </div>
@@ -87,12 +87,12 @@ const KpiCard = ({ icon: Icon, label, value, sub, trend, loading }) => (
       {loading ? (
         <div className="h-8 w-24 bg-[#F8F4EC] animate-pulse rounded-[4px] mb-1.5" />
       ) : (
-        <div className="font-display font-black text-3xl text-ink-800 leading-none mb-1.5">
+        <div className="admin-stat-value font-display font-black text-3xl text-ink-800 leading-none mb-1.5">
           {value}
         </div>
       )}
       {sub && (
-        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-ink-500">
+        <div className="admin-stat-detail flex items-center gap-1.5 text-[11px] font-semibold text-ink-500">
           {trend === 'up' && <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />}
           {trend === 'down' && <TrendingDown className="w-3.5 h-3.5 text-rose-600" />}
           <span>{sub}</span>
@@ -212,7 +212,7 @@ export const AdminStatisticsPage = () => {
       </div>
 
       {/* ── KPI Overview Row ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
+      <div className="admin-stat-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6">
         <KpiCard
           icon={Users}
           label="Tổng người dùng"
@@ -247,45 +247,45 @@ export const AdminStatisticsPage = () => {
       </div>
 
       {/* ── Engagement Row ── */}
-      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
-        <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
-          <div className="w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-rose-600 flex items-center justify-center shrink-0">
+      <div className="admin-stat-grid grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
+          <div className="admin-stat-icon w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-rose-600 flex items-center justify-center shrink-0">
             <Heart className="w-5 h-5 fill-rose-100" />
           </div>
           <div>
-            <p className="text-xs font-bold text-ink-400">Tổng lượt thích (Likes)</p>
+            <p className="admin-stat-label text-xs font-bold text-ink-400">Tổng lượt thích</p>
             {loading ? (
               <div className="h-7 w-16 bg-[#F8F4EC] animate-pulse rounded-[4px] mt-1" />
             ) : (
-              <p className="font-display font-black text-2xl text-ink-800 mt-0.5">{fmt(stats?.totalLikes)}</p>
+              <p className="admin-stat-value font-display font-black text-2xl text-ink-800 mt-0.5">{fmt(stats?.totalLikes)}</p>
             )}
           </div>
         </div>
 
-        <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
-          <div className="w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center shrink-0">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
+          <div className="admin-stat-icon w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center shrink-0">
             <MessageCircle className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs font-bold text-ink-400">Tổng bình luận (Comments)</p>
+            <p className="admin-stat-label text-xs font-bold text-ink-400">Tổng bình luận</p>
             {loading ? (
               <div className="h-7 w-16 bg-[#F8F4EC] animate-pulse rounded-[4px] mt-1" />
             ) : (
-              <p className="font-display font-black text-2xl text-ink-800 mt-0.5">{fmt(stats?.totalComments)}</p>
+              <p className="admin-stat-value font-display font-black text-2xl text-ink-800 mt-0.5">{fmt(stats?.totalComments)}</p>
             )}
           </div>
         </div>
 
-        <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
-          <div className="w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-amber-600 flex items-center justify-center shrink-0">
+        <div className="admin-stat-card admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
+          <div className="admin-stat-icon w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-amber-600 flex items-center justify-center shrink-0">
             <Star className="w-5 h-5 fill-amber-300 text-amber-500" />
           </div>
           <div>
-            <p className="text-xs font-bold text-ink-400">Rating trung bình địa điểm</p>
+            <p className="admin-stat-label text-xs font-bold text-ink-400">Đánh giá trung bình</p>
             {loading ? (
               <div className="h-7 w-16 bg-[#F8F4EC] animate-pulse rounded-[4px] mt-1" />
             ) : (
-              <p className="font-display font-black text-2xl text-ink-800 mt-0.5">
+              <p className="admin-stat-value font-display font-black text-2xl text-ink-800 mt-0.5">
                 {fmtRating(stats?.averagePlaceRating)} <span className="text-base text-amber-500">★</span>
               </p>
             )}
@@ -436,19 +436,19 @@ export const AdminStatisticsPage = () => {
             <p className="text-[11px] text-ink-400">Trạng thái toàn bộ hành trình và chu kỳ phát triển hệ thống</p>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="admin-stat-grid grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
             { label: 'Tổng hành trình', value: stats?.totalItineraries, color: 'text-ink-800' },
             { label: 'Đang hoạt động', value: stats?.activeItineraries, color: 'text-emerald-700' },
             { label: 'Mới tháng này', value: stats?.newItinerariesThisMonth, color: 'text-clay-700' },
             { label: 'Người dùng mới', value: stats?.newUsersThisMonth, color: 'text-ink-800' },
           ].map((item, i) => (
-            <div key={i} className="bg-[#F8F4EC] rounded-[6px] p-4 text-center border border-ink-200/60">
-              <p className="text-[11px] font-bold text-ink-400 mb-1">{item.label}</p>
+            <div key={i} className="admin-stat-card bg-[#F8F4EC] rounded-[6px] p-4 text-center border border-ink-200/60">
+              <p className="admin-stat-label text-[11px] font-bold text-ink-400 mb-1">{item.label}</p>
               {loading ? (
                 <div className="h-7 w-14 bg-ink-200/60 animate-pulse rounded-[4px] mx-auto" />
               ) : (
-                <p className={`font-display font-black text-2xl ${item.color}`}>{fmt(item.value)}</p>
+                <p className={`admin-stat-value font-display font-black text-2xl ${item.color}`}>{fmt(item.value)}</p>
               )}
             </div>
           ))}
