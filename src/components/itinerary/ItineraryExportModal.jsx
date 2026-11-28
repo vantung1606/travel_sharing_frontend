@@ -2,8 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { useToast } from '../common/Toast';
 import { X, Download, Printer, Calendar, FileText, Copy, Check, FileCode } from 'lucide-react';
 
-export const ItineraryExportModal = ({ itinerary, onClose }) => {
+export const ItineraryExportModal = ({ itinerary, onClose, adminView = false }) => {
   const toast = useToast();
+  const tipLabel = adminView ? 'Gợi ý chuyến đi' : 'Mẹo AI';
+  const exportBrand = adminView ? 'Wayfare Travel Sharing' : 'Wayfare Travel Sharing & AI Planner';
 
   // Export Format Tabs: 'pdf' | 'calendar' | 'text' | 'json'
   const [activeTab, setActiveTab] = useState('pdf');
@@ -71,7 +73,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
           out += `  • ${act.time || 'Thời gian tự do'}: ${act.title}\n`;
           out += `    📍 Địa điểm: ${act.location || ''} (${act.address || ''})\n`;
           if (act.note) out += `    📝 Ghi chú: ${act.note}\n`;
-          if (includeTips && act.aiTip) out += `    💡 Mẹo AI: ${act.aiTip}\n`;
+          if (includeTips && act.aiTip) out += `    💡 ${tipLabel}: ${act.aiTip}\n`;
           if (includeBudget && act.cost) out += `    💵 Chi phí: ${act.cost}\n`;
           out += `\n`;
         });
@@ -97,9 +99,9 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
       out += `====================================================\n`;
     }
 
-    out += `\nĐược tạo bởi Wayfare Travel Sharing & AI Planner. Chúc bạn có một hành trình đáng nhớ! 🌍✨`;
+    out += `\nĐược tạo bởi ${exportBrand}. Chúc bạn có một hành trình đáng nhớ! ${adminView ? '🌍' : '🌍✨'}`;
     return out;
-  }, [title, destination, duration, days, includeBudget, includeTips, includeChecklist, includeEmergency, totalBudget, budgetPerPerson]);
+  }, [title, destination, duration, days, includeBudget, includeTips, includeChecklist, includeEmergency, totalBudget, budgetPerPerson, tipLabel, exportBrand, adminView]);
 
   // 2. Generate iCalendar (.ics) content
   const icsContent = useMemo(() => {
@@ -145,7 +147,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
           const dtStart = `${dateStr}T${pad(startHour)}${pad(startMin)}00`;
           const dtEnd = `${dateStr}T${pad(endHour)}${pad(startMin)}00`;
           const uid = `wayfare-${itinerary?.id || 'trip'}-${dIdx}-${aIdx}@wayfare.vn`;
-          const desc = escapeIcs(`${act.note || ''}\nĐịa chỉ: ${act.address || ''}\nMẹo AI: ${act.aiTip || 'Không có'}`);
+          const desc = escapeIcs(`${act.note || ''}\nĐịa chỉ: ${act.address || ''}\n${tipLabel}: ${act.aiTip || 'Không có'}`);
 
           events += `BEGIN:VEVENT\r\n`;
           events += `UID:${uid}\r\n`;
@@ -161,8 +163,8 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
       }
     });
 
-    return `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Wayfare//Travel Sharing AI Planner//VI\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nX-WR-CALNAME:${title}\r\nX-WR-TIMEZONE:Asia/Ho_Chi_Minh\r\n${events}END:VCALENDAR\r\n`;
-  }, [title, destination, days]);
+    return `BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Wayfare//${adminView ? 'Travel Sharing' : 'Travel Sharing AI Planner'}//VI\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nX-WR-CALNAME:${title}\r\nX-WR-TIMEZONE:Asia/Ho_Chi_Minh\r\n${events}END:VCALENDAR\r\n`;
+  }, [title, destination, days, tipLabel, adminView]);
 
   // Action: Copy Text to Clipboard
   const handleCopyText = async () => {
@@ -209,7 +211,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
   // Action: Download .json Data file
   const handleDownloadJSON = () => {
     const exportData = {
-      app: 'Wayfare Travel Sharing & AI Planner',
+      app: exportBrand,
       version: '2.5.0',
       exportedAt: new Date().toISOString(),
       itinerary: {
@@ -415,7 +417,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
         <div class="header-banner">
           <div>
             <div class="brand-logo">Wayfare</div>
-            <div class="brand-sub">Hành Trình Du Lịch Thông Minh & Lịch Trình AI</div>
+            <div class="brand-sub">${adminView ? 'Lịch trình du lịch & Kế hoạch chuyến đi' : 'Hành Trình Du Lịch Thông Minh & Lịch Trình AI'}</div>
           </div>
           <div class="qr-box">
             <div>Ngày xuất: ${new Date().toLocaleDateString('vi-VN')}</div>
@@ -429,7 +431,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
             <div class="meta-item">📍 Điểm đến: <strong>${safeDestination}</strong></div>
             <div class="meta-item">⏱️ Thời lượng: <strong>${safeDuration}</strong></div>
             ${includeBudget ? `<div class="meta-item">💰 Ngân sách: <strong>~${Number(budgetPerPerson).toLocaleString('vi-VN')} đ/người</strong> (Tổng: ${Number(totalBudget).toLocaleString('vi-VN')} đ)</div>` : ''}
-            <div class="meta-item">✨ Phân loại: <strong>Lộ trình WanderAI Tối Ưu</strong></div>
+            <div class="meta-item">${adminView ? 'Phân loại: <strong>Lịch trình du lịch</strong>' : '✨ Phân loại: <strong>Lộ trình WanderAI Tối Ưu</strong>'}</div>
           </div>
         </div>
 
@@ -445,7 +447,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
                   ${includeBudget && act.cost ? `| 💵 ${escapeHtml(act.cost)}` : ''}
                 </div>
                 ${act.note ? `<div class="act-note">${escapeHtml(act.note)}</div>` : ''}
-                ${includeTips && act.aiTip ? `<div class="act-tip">💡 <strong>Mẹo WanderAI:</strong> ${escapeHtml(act.aiTip)}</div>` : ''}
+                ${includeTips && act.aiTip ? `<div class="act-tip">💡 <strong>${adminView ? tipLabel : 'Mẹo WanderAI'}:</strong> ${escapeHtml(act.aiTip)}</div>` : ''}
               </div>
             `).join('')}
           </div>
@@ -603,7 +605,7 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
                   onChange={(e) => setIncludeTips(e.target.checked)}
                   className="rounded text-sky-600 focus:ring-sky-500"
                 />
-                <span>Đính kèm Mẹo thông minh WanderAI</span>
+                <span>{adminView ? 'Đính kèm gợi ý chuyến đi' : 'Đính kèm Mẹo thông minh WanderAI'}</span>
               </label>
 
               <label className="flex items-center gap-2 cursor-pointer select-none">
@@ -734,7 +736,9 @@ export const ItineraryExportModal = ({ itinerary, onClose }) => {
                     Xuất dữ liệu cấu trúc Wayfare (.json)
                   </h4>
                   <p className="text-xs text-slate-600 mt-0.5">
-                    Lưu trữ trọn vẹn dữ liệu JSON các ngày, trạm dừng chân, chi phí và cấu hình AI để lưu trữ cá nhân hoặc tích hợp vào hệ thống khác.
+                    {adminView
+                      ? 'Lưu trữ dữ liệu các ngày, điểm dừng, chi phí và thông tin bổ sung để lưu trữ hoặc tích hợp vào hệ thống khác.'
+                      : 'Lưu trữ trọn vẹn dữ liệu JSON các ngày, trạm dừng chân, chi phí và cấu hình AI để lưu trữ cá nhân hoặc tích hợp vào hệ thống khác.'}
                   </p>
                 </div>
               </div>

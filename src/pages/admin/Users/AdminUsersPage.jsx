@@ -15,7 +15,6 @@ import {
   Eye,
   BadgeCheck,
   RefreshCw,
-  Sparkles,
   ChevronLeft,
   Lock,
   Unlock,
@@ -946,7 +945,7 @@ export const AdminUsersPage = () => {
                 <div className="p-3.5 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-serif font-bold text-xs text-ink-800 flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-clay-600" /> Thống kê hoạt động
+                      <Layers className="w-3.5 h-3.5 text-clay-600" /> Thống kê hoạt động
                     </span>
                     <span className="font-mono text-[10px] text-clay-700 font-bold">
                       {activitySummary ? 'Thời gian thực' : 'Đang tải…'}

@@ -21,7 +21,7 @@ import {
   Flag
 } from 'lucide-react';
 
-export const NotificationDropdown = ({ isOpen, onClose }) => {
+export const NotificationDropdown = ({ isOpen, onClose, adminView = false }) => {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const {
@@ -53,7 +53,9 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'AI_READY':
-        return <Sparkles className="w-3.5 h-3.5 text-amber-700" />;
+        return adminView
+          ? <CheckCircle2 className="w-3.5 h-3.5 text-amber-700" />
+          : <Sparkles className="w-3.5 h-3.5 text-amber-700" />;
       case 'LIKE':
         return <Heart className="w-3.5 h-3.5 text-rose-600 fill-rose-600" />;
       case 'COMMENT':
@@ -305,6 +307,9 @@ export const NotificationDropdown = ({ isOpen, onClose }) => {
               <div className="flex-1 min-w-0 pr-2">
                 <p className="text-xs text-ink-700 leading-snug font-sans line-clamp-2">
                   {(() => {
+                    if (adminView && item.type === 'AI_READY') {
+                      return 'Lịch trình của bạn đã sẵn sàng.';
+                    }
                     if (item.type === 'SYSTEM' || !item.actorId || !item.actorName) {
                       return item.message;
                     }

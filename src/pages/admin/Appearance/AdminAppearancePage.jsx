@@ -23,7 +23,6 @@ import {
   History, 
   AlertCircle, 
   ExternalLink, 
-  Sparkles, 
   Check, 
   ArrowRight, 
   ShieldCheck,
@@ -246,7 +245,7 @@ export const AdminAppearancePage = () => {
       announcement: {
         enabled: false,
         badge: 'SỰ KIỆN',
-        text: 'Chào mừng mùa du lịch 2026 - Khám phá 500+ điểm đến đặc sắc & Lên lịch trình thông minh cùng AI!',
+        text: 'Chào mừng mùa du lịch 2026 - Khám phá 500+ điểm đến đặc sắc & Lên kế hoạch cho chuyến đi của bạn!',
         linkText: 'Khám phá ngay',
         linkUrl: '/explore',
         bgColor: '#B0522F',
@@ -320,7 +319,7 @@ export const AdminAppearancePage = () => {
         sanitizedBranding.announcement = {
           enabled: false,
           badge: 'SỰ KIỆN',
-          text: 'Chào mừng mùa du lịch 2026 - Khám phá 500+ điểm đến đặc sắc & Lên lịch trình thông minh cùng AI!',
+          text: 'Chào mừng mùa du lịch 2026 - Khám phá 500+ điểm đến đặc sắc & Lên kế hoạch cho chuyến đi của bạn!',
           linkText: 'Khám phá ngay',
           linkUrl: '/explore',
           bgColor: '#B0522F',
@@ -1061,7 +1060,7 @@ export const AdminAppearancePage = () => {
                 <div className="flex items-center justify-between border-b border-ink-100 pb-2">
                   <div>
                     <h3 className="font-serif font-bold text-sm text-ink-900 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-amber-600" />
+                      <Palette className="w-4 h-4 text-amber-600" />
                       <span>Bộ Phối Màu Tuyển Chọn Cho Du Lịch (Theme Presets 1-Chạm)</span>
                     </h3>
                     <p className="text-[11px] text-ink-500 font-sans mt-0.5">
@@ -1154,7 +1153,7 @@ export const AdminAppearancePage = () => {
                             </>
                           ) : (
                             <>
-                              <Sparkles className="w-3.5 h-3.5" />
+                              <Palette className="w-3.5 h-3.5" />
                               <span>Áp dụng bảng màu này ➔</span>
                             </>
                           )}
@@ -1500,7 +1499,7 @@ export const AdminAppearancePage = () => {
                   </h3>
                 </div>
                 <p className="text-xs text-ink-500 font-sans mt-1">
-                  Quản lý dải thông báo mảnh chạy trên cùng của website (nằm trên thanh Navbar). Thường dùng cho các chiến dịch phát động mùa du lịch, ưu đãi đặc biệt hoặc thông báo tính năng AI mới.
+                  Quản lý dải thông báo mảnh chạy trên cùng của website (nằm trên thanh Navbar). Thường dùng cho các chiến dịch phát động mùa du lịch, ưu đãi đặc biệt hoặc thông báo tính năng mới.
                 </p>
               </div>
 
@@ -1593,7 +1592,7 @@ export const AdminAppearancePage = () => {
                     rows={2}
                     value={formData.branding?.announcement?.text || ''}
                     onChange={(e) => handleAnnouncementChange('text', e.target.value)}
-                    placeholder="Chào mừng mùa du lịch 2026 - Khám phá 500+ điểm đến đặc sắc & Lên lịch trình thông minh cùng AI!"
+                    placeholder="Chào mừng mùa du lịch 2026 - Khám phá 500+ điểm đến đặc sắc & Lên kế hoạch cho chuyến đi của bạn!"
                     className="w-full px-3 py-2 bg-[#F8F4EC] border border-ink-200 rounded-[5px] text-xs font-serif text-ink-900 outline-none focus:border-clay-600 focus:bg-white resize-none"
                   />
                 </div>

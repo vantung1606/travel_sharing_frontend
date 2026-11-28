@@ -19,7 +19,6 @@ import {
   CheckCircle2, 
   ChevronDown, 
   ChevronRight, 
-  Sparkles,
   Lock,
   UserCheck
 } from 'lucide-react';

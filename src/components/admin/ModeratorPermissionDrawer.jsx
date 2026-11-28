@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { 
   X, Shield, ShieldCheck, Check, Ban, RotateCcw, 
-  Search, Lock, Info, CheckCircle2, AlertTriangle, Sparkles 
+  Search, Lock, Info, CheckCircle2, AlertTriangle
 } from 'lucide-react';
 import { adminPermissionApi } from '../../services/api';
 import { useToast } from '../common/Toast';

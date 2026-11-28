@@ -23,7 +23,7 @@ const TRAVEL_STYLES = [
 
 const GROUP_TYPES = ['Cá nhân', 'Cặp đôi', 'Bạn bè', 'Gia đình'];
 
-export const EditItineraryModal = ({ itinerary, isOpen, onClose, onSuccess }) => {
+export const EditItineraryModal = ({ itinerary, isOpen, onClose, onSuccess, adminView = false }) => {
   const toast = useToast();
   const { updateItineraryInBackend } = useApp();
 
@@ -249,7 +249,7 @@ export const EditItineraryModal = ({ itinerary, isOpen, onClose, onSuccess }) =>
           {/* Phong cách du lịch (Travel Style) */}
           <div className="space-y-1.5">
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              {adminView ? <Compass className="w-3.5 h-3.5 text-amber-500" /> : <Sparkles className="w-3.5 h-3.5 text-amber-500" />}
               <span>Phong Cách Du Lịch</span>
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

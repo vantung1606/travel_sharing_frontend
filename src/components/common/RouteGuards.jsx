@@ -17,7 +17,7 @@ export const PAGE_TITLES = {
   '/admin': 'Wayfare Admin - Bảng điều khiển Quản trị',
   '/admin/dashboard': 'Wayfare Admin - Bảng điều khiển Tổng quan',
   '/admin/places': 'Wayfare Admin - Quản lý Điểm đến & Kiểm duyệt Check-in',
-  '/admin/itineraries': 'Wayfare Admin - Quản lý Lịch trình Du khách & AI Planner',
+  '/admin/itineraries': 'Wayfare Admin - Quản lý Lịch trình Du khách',
   '/admin/users': 'Wayfare Admin - Quản lý Người dùng & Phân quyền RBAC',
   '/admin/reports': 'Wayfare Admin - Kiểm duyệt Vi phạm & Báo cáo Spam',
   '/admin/reviews': 'Wayfare Admin - Kiểm duyệt Đánh giá Du khách',

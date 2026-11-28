@@ -21,12 +21,14 @@ import { useApp } from '../../context/AppContext';
 import { publicConfigApi } from '../../services/api';
 import { useToast } from './Toast';
 
-export const MaintenanceScreen = ({ maintenanceData, onAdminBypass }) => {
+export const MaintenanceScreen = ({ maintenanceData, onAdminBypass, adminView = false }) => {
   const { setIsAuthModalOpen, setAuthMode, currentUser, isLoggedIn } = useApp();
   const toast = useToast();
 
   const title = maintenanceData?.title || 'Hệ thống đang bảo trì & nâng cấp trải nghiệm';
-  const message = maintenanceData?.message || 'Wayfare đang thực hiện đợt bảo dưỡng máy chủ định kỳ nhằm mang đến tốc độ duyệt web mượt mà và khả năng lên lịch trình AI chính xác nhất cho bạn. Chúng tôi sẽ sớm mở cửa trở lại!';
+  const message = maintenanceData?.message || (adminView
+    ? 'Wayfare đang bảo trì và nâng cấp để cải thiện trải nghiệm lập lịch trình. Chúng tôi sẽ sớm mở cửa trở lại!'
+    : 'Wayfare đang thực hiện đợt bảo dưỡng máy chủ định kỳ nhằm mang đến tốc độ duyệt web mượt mà và khả năng lên lịch trình AI chính xác nhất cho bạn. Chúng tôi sẽ sớm mở cửa trở lại!');
   const estimatedEndTime = maintenanceData?.estimatedEndTime;
   const allowAdminBypass = maintenanceData?.allowAdminBypass ?? true;
 
@@ -248,7 +250,7 @@ export const MaintenanceScreen = ({ maintenanceData, onAdminBypass }) => {
             <div className="p-3 rounded-[6px] bg-[#F8F4EC]/60 border border-ink-200/60 flex items-start gap-2.5">
               <Cpu className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
               <div>
-                <span className="font-serif font-bold text-xs text-ink-900 block">Nâng cấp Lịch trình AI</span>
+                <span className="font-serif font-bold text-xs text-ink-900 block">{adminView ? 'Nâng cấp công cụ lập lịch trình' : 'Nâng cấp Lịch trình AI'}</span>
                 <span className="text-[10px] text-ink-500 font-sans leading-tight block mt-0.5">
                   Gợi ý điểm dừng thông minh & thực tế hơn
                 </span>

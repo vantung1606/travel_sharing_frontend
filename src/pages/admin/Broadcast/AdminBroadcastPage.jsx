@@ -5,7 +5,6 @@ import {
   History, 
   Bell, 
   AlertTriangle, 
-  Sparkles, 
   Info, 
   Compass, 
   ExternalLink, 
@@ -33,7 +32,7 @@ export const PRESET_SYSTEM_ROUTES = [
   { id: 'home', label: 'Trang chủ', path: '/', icon: Globe, desc: 'Trang chính Wayfare' },
   { id: 'explore', label: 'Khám phá điểm đến', path: '/explore', icon: Compass, desc: 'Bản đồ & 500+ địa điểm du lịch' },
   { id: 'community', label: 'Cộng đồng du lịch', path: '/community', icon: Users, desc: 'Bảng tin chia sẻ bài viết, trải nghiệm' },
-  { id: 'itineraries', label: 'Lịch trình du lịch AI', path: '/itineraries', icon: Calendar, desc: 'Kế hoạch hành trình thông minh' },
+  { id: 'itineraries', label: 'Lịch trình du lịch', path: '/itineraries', icon: Calendar, desc: 'Kế hoạch cho chuyến đi' },
   { id: 'notifications', label: 'Trung tâm thông báo', path: '/notifications', icon: Bell, desc: 'Hộp thư thông báo của du khách' },
   { id: 'messages', label: 'Hộp thư tin nhắn', path: '/messages', icon: MessageSquare, desc: 'Tin nhắn cá nhân và nhóm phượt' },
   { id: 'profile', label: 'Trang cá nhân', path: '/profile', icon: User, desc: 'Hồ sơ người dùng cá nhân' }
@@ -61,7 +60,7 @@ const NOTIFICATION_TYPES = [
     label: 'Cập nhật tính năng & Phiên bản',
     badgeText: 'Cập nhật',
     color: 'emerald',
-    icon: Sparkles,
+    icon: RefreshCw,
     accentBg: 'bg-emerald-50 text-emerald-700 border-emerald-200'
   },
   {

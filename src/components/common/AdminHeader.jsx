@@ -114,6 +114,7 @@ export const AdminHeader = () => {
               )}
             </button>
             <NotificationDropdown
+              adminView
               isOpen={isNotificationOpen}
               onClose={() => setIsNotificationOpen(false)}
             />

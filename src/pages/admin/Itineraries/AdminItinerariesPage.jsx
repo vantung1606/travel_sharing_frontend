@@ -6,7 +6,7 @@ import { UserAvatar } from '../../../components/common/UserAvatar';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
 import { 
   Route, Search, Calendar, MapPin, Eye, Trash2, RefreshCw, 
-  Download, Globe, Lock, Sparkles, Compass, DollarSign, 
+  Download, Globe, Lock, Compass, DollarSign,
   ChevronLeft, ChevronRight, Check, X, Users, Tag, Loader2
 } from 'lucide-react';
 
@@ -379,7 +379,7 @@ export const AdminItinerariesPage = () => {
       `"${(it.travelStyle || 'Khám phá').replace(/"/g, '""')}"`,
       `"${it.budgetTotal ? Number(it.budgetTotal) : 'Chưa thiết lập'}"`,
       `"${it.isPublic ? 'Công khai' : 'Riêng tư'}"`,
-      `"${it.isAiGenerated || (it.title && it.title.toLowerCase().includes('ai')) ? 'AI Khởi tạo' : 'Du khách tự tạo'}"`,
+      `"${it.isAiGenerated || (it.title && it.title.toLowerCase().includes('ai')) ? 'Hệ thống tạo' : 'Du khách tự tạo'}"`,
       `"${it.createdAt ? new Date(it.createdAt).toLocaleString('vi-VN') : ''}"`
     ]);
 
@@ -517,10 +517,10 @@ export const AdminItinerariesPage = () => {
 
         <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider block flex items-center gap-1">
-            <Sparkles className="w-3 h-3" /> AI Khởi Tạo
+            <Compass className="w-3 h-3" /> Hệ thống tạo
           </span>
           <p className="text-xl sm:text-2xl font-black text-amber-800 font-display">{stats.aiCount}</p>
-          <span className="text-[10px] text-amber-600 font-sans">Sinh tự động qua AI</span>
+          <span className="text-[10px] text-amber-600 font-sans">Tạo từ gợi ý lịch trình</span>
         </div>
 
         <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
@@ -584,7 +584,7 @@ export const AdminItinerariesPage = () => {
             className="px-3 py-2 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs font-sans font-bold text-ink-700 outline-none cursor-pointer focus:border-clay-500 focus:bg-white"
           >
             <option value="ALL">Nguồn: Tất cả</option>
-            <option value="AI">✨ AI Khởi tạo</option>
+            <option value="AI">Hệ thống tạo</option>
             <option value="MANUAL">🧭 Du khách tự tạo</option>
           </select>
 
@@ -826,8 +826,8 @@ export const AdminItinerariesPage = () => {
                       <td className="p-3.5 text-center">
                         {isAi ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-amber-50 text-amber-800 border border-amber-300 font-bold text-[10px]">
-                            <Sparkles className="w-3 h-3 text-amber-600" />
-                            <span>AI Sinh</span>
+                            <Compass className="w-3 h-3 text-amber-600" />
+                            <span>Hệ thống tạo</span>
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-600 border border-ink-200/80 font-bold text-[10px]">
@@ -911,6 +911,7 @@ export const AdminItinerariesPage = () => {
       {/* ─── 5. ITINERARY DETAIL MODAL (CON MẮT THAO TÁC XEM) ──────────────── */}
       {selectedItineraryModal && (
         <ItineraryDetailModal
+          adminView
           itinerary={selectedItineraryModal}
           onClose={() => setSelectedItineraryModal(null)}
           onUpdate={(updatedItin) => {

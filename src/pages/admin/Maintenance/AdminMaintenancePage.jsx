@@ -10,7 +10,6 @@ import {
   RotateCcw, 
   Lock, 
   ShieldCheck, 
-  Sparkles, 
   Calendar,
   X,
   Compass,
@@ -41,11 +40,11 @@ export const MAINTENANCE_TEMPLATES = [
   },
   {
     id: 'feature',
-    label: 'Nâng cấp tính năng & AI Planner',
+    label: 'Nâng cấp tính năng',
     badge: '1 giờ',
-    icon: Sparkles,
-    title: 'Wayfare đang nâng cấp tính năng mới & Trí tuệ Nhân tạo AI',
-    message: 'Đội ngũ kỹ thuật đang cập nhật thuật toán lập lịch trình thông minh AI và bổ sung tính năng mới. Hãy quay lại sau ít phút để trải nghiệm nhé!',
+    icon: Wrench,
+    title: 'Wayfare đang nâng cấp các tính năng mới',
+    message: 'Đội ngũ kỹ thuật đang nâng cấp công cụ lập lịch trình và bổ sung các tính năng mới. Hãy quay lại sau ít phút để trải nghiệm nhé!',
     durationMins: 60
   },
   {
@@ -519,7 +518,7 @@ export const AdminMaintenancePage = () => {
               {/* Upgrades Mini */}
               <div className="grid grid-cols-3 gap-1 pt-1 text-[9px] font-mono text-ink-500 text-center">
                 <div className="p-1 rounded bg-[#FFFDF8] border border-ink-100">🚀 Máy chủ</div>
-                <div className="p-1 rounded bg-[#FFFDF8] border border-ink-100">🤖 AI Planner</div>
+                <div className="p-1 rounded bg-[#FFFDF8] border border-ink-100">Lịch trình du lịch</div>
                 <div className="p-1 rounded bg-[#FFFDF8] border border-ink-100">🛡️ Bảo mật</div>
               </div>
 
@@ -564,7 +563,7 @@ export const AdminMaintenancePage = () => {
             </button>
           </div>
           <div className="flex-1">
-            <MaintenanceScreen maintenanceData={form} />
+            <MaintenanceScreen adminView maintenanceData={form} />
           </div>
         </div>
       )}

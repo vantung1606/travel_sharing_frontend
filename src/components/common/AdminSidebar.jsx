@@ -72,7 +72,7 @@ export const AdminSidebar = ({ onNavigate }) => {
           id: 'itineraries', 
           label: 'Quản lý Lịch trình', 
           icon: Route,
-          description: 'Lộ trình du khách & AI tạo',
+          description: 'Lộ trình và kế hoạch chuyến đi',
           permission: 'PLACES_VIEW'
         },
         { 

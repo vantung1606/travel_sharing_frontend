@@ -15,7 +15,6 @@ import {
   Activity,
   ArrowUpRight,
   Loader2,
-  Sparkles,
   Compass
 } from 'lucide-react';
 import { adminApi } from '../../../services/api';

@@ -21,7 +21,8 @@ export const AddToTripModal = ({
   item,
   itineraries = [],
   onAddToTrip = () => {},
-  onCreateNewTripWithItem = () => {}
+  onCreateNewTripWithItem = () => {},
+  adminView = false
 }) => {
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [selectedDayNumber, setSelectedDayNumber] = useState(1);
@@ -202,7 +203,7 @@ export const AddToTripModal = ({
                     onClick={onCreateNewTripWithItem}
                     className="px-4 py-2.5 rounded-[5px] bg-clay-600 text-white text-xs font-bold hover:shadow-none transition-all cursor-pointer flex items-center gap-1.5 mx-auto"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    {adminView ? <Plus className="w-3.5 h-3.5 text-amber-300" /> : <Sparkles className="w-3.5 h-3.5 text-amber-300" />}
                     <span>Tạo lịch trình mới với điểm này</span>
                   </button>
                 </div>
@@ -250,7 +251,7 @@ export const AddToTripModal = ({
                 onClick={onCreateNewTripWithItem}
                 className="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1 cursor-pointer"
               >
-                <Sparkles className="w-3.5 h-3.5" />
+                {adminView ? <Plus className="w-3.5 h-3.5" /> : <Sparkles className="w-3.5 h-3.5" />}
                 <span>+ Tạo lịch trình mới</span>
               </button>
               <button

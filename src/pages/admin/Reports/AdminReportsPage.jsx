@@ -6,7 +6,7 @@ import { formatVietnam24h, formatVietnamRelativeTime } from '../../../utils/date
 import { 
   AlertTriangle, Flame, ShieldAlert, Search, Filter, Download, CheckCircle2, 
   Eye, EyeOff, UserX, Trash2, RefreshCw, TrendingUp, FileText, ShieldCheck, 
-  Bot, History, X, MapPin, Sparkles, ExternalLink, ChevronLeft, ChevronRight,
+  History, X, MapPin, ExternalLink, ChevronLeft, ChevronRight,
   Shield, Globe, Laptop, Clock, ArrowRight, Flag, Image as ImageIcon
 } from 'lucide-react';
 import { getUserTier } from '../../../utils/tierSystem';
@@ -354,8 +354,8 @@ export const AdminReportsPage = () => {
       return {
         bg: 'bg-clay-50 text-clay-800 border-clay-200',
         badge: 'bg-clay-600',
-        icon: Bot,
-        label: 'AI gắn cờ'
+        icon: ShieldCheck,
+        label: 'Hệ thống gắn cờ'
       };
     }
     return {
@@ -449,7 +449,7 @@ export const AdminReportsPage = () => {
       return;
     }
 
-    const headers = ['ID', 'Tieu De', 'Tac Gia', 'Chuyen Muc', 'AI Safety Score', 'Luot Bao Cao', 'Trang Thai', 'Ngay Tao'];
+    const headers = ['ID', 'Tieu De', 'Tac Gia', 'Chuyen Muc', 'Điểm an toàn', 'Luot Bao Cao', 'Trang Thai', 'Ngay Tao'];
     const rows = listToExport.map(p => [
       p.id,
       `"${(p.title || '').replace(/"/g, '""')}"`,
@@ -518,7 +518,7 @@ export const AdminReportsPage = () => {
             Kiểm duyệt Bài viết & Xử lý Báo cáo
           </h1>
           <p className="text-xs text-ink-400 mt-1">
-            Giám sát nội dung cộng đồng, kiểm duyệt các bài viết check-in và xử lý khiếu nại báo cáo vi phạm với WanderAI Moderation Engine.
+            Giám sát nội dung cộng đồng, kiểm duyệt bài viết và xử lý báo cáo vi phạm.
           </p>
         </div>
 
@@ -628,7 +628,7 @@ export const AdminReportsPage = () => {
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-ink-400">Tỷ lệ nội dung an toàn</span>
             <div className="w-9 h-9 rounded-[5px] bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center font-bold">
-              <Bot className="w-4 h-4" />
+              <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
           <div>
@@ -637,7 +637,7 @@ export const AdminReportsPage = () => {
             </div>
             <div className="flex items-center gap-1 text-xs font-semibold text-emerald-700">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>WanderAI lọc tự động</span>
+              <span>Kết quả kiểm tra nội dung</span>
             </div>
           </div>
         </div>
@@ -731,7 +731,7 @@ export const AdminReportsPage = () => {
                   Hàng đợi kiểm duyệt bài viết & Xử lý khiếu nại
                 </h2>
                 <p className="text-xs text-ink-400">
-                  Xem xét bài viết người dùng mới đăng bị AI giữ lại chờ duyệt hoặc khiếu nại từ cộng đồng
+                  Xem xét bài viết đang chờ duyệt và báo cáo từ cộng đồng
                 </p>
               </div>
             </div>
@@ -754,7 +754,7 @@ export const AdminReportsPage = () => {
                   pendingSubFilter === 'ai_pending' ? 'bg-[#FFFDF8] text-amber-800 border border-ink-200/80' : 'text-ink-500 hover:text-ink-800'
                 }`}
               >
-                Chờ AI duyệt ({reports.filter(r => r.flagSource ? (r.flagSource === 'AI') : (r.isAiPending != null ? r.isAiPending : (r.status === 'PENDING_REVIEW'))).length})
+                Chờ xét duyệt ({reports.filter(r => r.flagSource ? (r.flagSource === 'AI') : (r.isAiPending != null ? r.isAiPending : (r.status === 'PENDING_REVIEW'))).length})
               </button>
               <button
                 type="button"
@@ -805,8 +805,8 @@ export const AdminReportsPage = () => {
                       />
                       {isAiPending ? (
                         <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-[4px] bg-amber-600 text-white font-bold text-[10px] flex items-center gap-1 shadow-sm z-10">
-                          <Sparkles className="w-3 h-3" />
-                          <span>AI Gắn Cờ - Chờ Duyệt</span>
+                          <ShieldCheck className="w-3 h-3" />
+                          <span>Chờ xét duyệt</span>
                         </span>
                       ) : (
                         <span className="absolute top-2 left-2 px-2.5 py-0.5 rounded-[4px] bg-rose-700 text-white font-bold text-[10px] flex items-center gap-1 shadow-sm z-10">
@@ -866,13 +866,13 @@ export const AdminReportsPage = () => {
                       <div className="p-3.5 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 mb-3 space-y-1">
                         <div className="flex items-start gap-2 text-xs">
                           {isAiPending ? (
-                            <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                            <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                           ) : (
                             <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                           )}
                           <div>
                             <strong className="font-bold text-ink-800">
-                              {isAiPending ? 'Đánh giá AI & Lý do giữ bài: ' : 'Lý do báo cáo từ cộng đồng: '}
+                              {isAiPending ? 'Kết quả kiểm tra & Lý do giữ bài: ' : 'Lý do báo cáo từ cộng đồng: '}
                             </strong>
                             <span className="text-ink-700">{isAiPending ? (report.aiFlagReason || report.reportReason) : (report.reportReason || report.aiFlagReason)}</span>
                             {!isAiPending && report.reporterName && (
@@ -971,7 +971,7 @@ export const AdminReportsPage = () => {
               <h3 className="font-display font-black text-base text-ink-800">
                 {activeTab === 'hidden' ? 'Danh sách bài viết đã ẩn / Vi phạm' : 'Toàn bộ bài viết cộng đồng gần đây'}
               </h3>
-              <p className="text-xs text-ink-400">Kiểm toán tự động theo thời gian thực kết hợp WanderAI Moderation</p>
+              <p className="text-xs text-ink-400">Theo dõi nội dung và trạng thái kiểm duyệt</p>
             </div>
             <button
               onClick={() => loadData(true)}
@@ -990,7 +990,7 @@ export const AdminReportsPage = () => {
                   <th className="py-3 px-4">Tiêu đề bài viết</th>
                   <th className="py-3 px-4">Tác giả</th>
                   <th className="py-3 px-4">{activeTab === 'hidden' ? 'Thời gian ẩn' : 'Thời gian'}</th>
-                  <th className="py-3 px-4">Trạng thái AI</th>
+                  <th className="py-3 px-4">Kiểm duyệt</th>
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
@@ -1208,7 +1208,7 @@ export const AdminReportsPage = () => {
                 { id: 'MODERATION_REMOVE_BAN', label: 'Gỡ bài & Khóa TK' },
                 { id: 'MODERATION_DELETE', label: 'Xóa vĩnh viễn' },
                 { id: 'USER_REPORT_POST', label: 'Báo cáo từ du khách' },
-                { id: 'AI_FLAG_POST', label: 'AI gắn cờ' }
+                { id: 'AI_FLAG_POST', label: 'Hệ thống gắn cờ' }
               ].map(tab => (
                 <button
                   key={tab.id}
@@ -1693,7 +1693,7 @@ export const AdminReportsPage = () => {
             <div className="p-3 bg-amber-50 rounded-[5px] border border-amber-200 text-xs text-amber-900 space-y-1">
               <div className="flex items-center justify-between font-bold">
                 <span className="flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-600" /> WanderAI Security Analysis
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600" /> Kết quả kiểm tra nội dung
                 </span>
                 <span>Điểm an toàn: {selectedPostModal.aiSafetyScore || 98}/100</span>
               </div>

@@ -7,7 +7,7 @@ import {
   MapPin, Check, X, Search, Star, Clock, ChevronRight, Eye, Trash2, 
   RefreshCw, ShieldCheck, Phone, AlertCircle, Plus, ExternalLink, 
   Filter, ChevronLeft, Building2, Tag, Compass, DollarSign, Image, 
-  Navigation, CheckCircle2, AlertTriangle, EyeOff, Sparkles, Flag, Edit3
+  Navigation, CheckCircle2, AlertTriangle, EyeOff, Flag, Edit3
 } from 'lucide-react';
 
 export const AdminPlacesPage = () => {
@@ -816,7 +816,7 @@ export const AdminPlacesPage = () => {
                                 )}
                                 {p.isFeatured && (
                                   <span className="px-1.5 py-0.5 rounded-[4px] bg-amber-50 text-amber-900 text-[9px] font-bold border border-amber-300 flex items-center gap-1 shadow-2xs">
-                                    <Sparkles className="w-2.5 h-2.5 fill-amber-500 text-amber-600" />
+                                    <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-600" />
                                     {p.featuredBadge || 'Nổi bật'}
                                   </span>
                                 )}
@@ -832,7 +832,7 @@ export const AdminPlacesPage = () => {
                                 )}
                                 {p.aiModerationStatus === 'APPROVED_BY_AI' && (
                                   <span className="px-1.5 py-0.5 rounded-[4px] bg-emerald-50 text-emerald-800 text-[9px] font-bold border border-emerald-200 flex items-center gap-1">
-                                    <Sparkles className="w-2.5 h-2.5" /> AI duyệt
+                                    <ShieldCheck className="w-2.5 h-2.5" /> Đã thẩm định
                                   </span>
                                 )}
                                 {(() => {
@@ -929,7 +929,7 @@ export const AdminPlacesPage = () => {
                               }`}
                               title={p.isFeatured ? `Đang ghim: ${p.featuredBadge || 'Nổi bật'}` : 'Ghim nổi bật'}
                             >
-                              <Sparkles className="w-3.5 h-3.5" />
+                              <Star className="w-3.5 h-3.5" />
                             </button>
                             <button
                               type="button"
@@ -1054,7 +1054,7 @@ export const AdminPlacesPage = () => {
                   <p className="text-[11px] text-ink-400 mt-1">Chưa cập nhật tọa độ GPS</p>
                 )}
 
-                {/* WanderAI Shield Verification Details */}
+                {/* Kết quả thẩm định địa điểm */}
                 <div className={`mt-3 p-3 rounded-[5px] border text-xs space-y-1.5 ${
                   selectedPlace.aiModerationStatus === 'DUPLICATE_FLAGGED'
                     ? 'bg-rose-50 border-rose-200 text-rose-900'
@@ -1064,8 +1064,8 @@ export const AdminPlacesPage = () => {
                 }`}>
                   <div className="flex items-center justify-between">
                     <span className="font-bold flex items-center gap-1.5 text-[11px] uppercase tracking-wide">
-                      <Sparkles className="w-3.5 h-3.5" />
-                      Thẩm định WanderAI
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      Kết quả thẩm định
                     </span>
                     <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${
                       selectedPlace.aiModerationStatus === 'DUPLICATE_FLAGGED'
@@ -1900,7 +1900,7 @@ export const AdminPlacesPage = () => {
             <div className="flex items-center justify-between pb-3 border-b border-ink-100">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-[4px] bg-amber-100 text-amber-800 flex items-center justify-center border border-amber-200">
-                  <Sparkles className="w-4 h-4 fill-amber-400" />
+                  <Star className="w-4 h-4 fill-amber-400" />
                 </div>
                 <div>
                   <h3 className="font-serif font-bold text-sm text-ink-900">

@@ -314,7 +314,7 @@ const createNumberedMarkerIcon = (num, isHighlighted) => {
   });
 };
 
-export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = false }) => {
+export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = false, adminView = false }) => {
   const toast = useToast();
   const {
     itineraries: myItineraries,
@@ -1619,6 +1619,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
       {/* Modal xuất PDF khi cần */}
       {isExportModalOpen && (
         <ItineraryExportModal
+          adminView={adminView}
           itinerary={itinerary}
           onClose={() => setIsExportModalOpen(false)}
         />
@@ -1801,6 +1802,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
 
       {/* MODAL CHỈNH SỬA TOÀN BỘ CHUYẾN ĐI */}
       <EditItineraryModal
+        adminView={adminView}
         itinerary={itinerary}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
@@ -1813,6 +1815,7 @@ export const ItineraryDetailModal = ({ itinerary, onClose, onUpdate, readOnly = 
 
       {/* MODAL THÊM RIÊNG 1 ĐỊA ĐIỂM VÀO LỊCH TRÌNH CÁ NHÂN */}
       <AddToTripModal
+        adminView={adminView}
         isOpen={Boolean(addToTripItem)}
         onClose={() => setAddToTripItem(null)}
         item={addToTripItem}

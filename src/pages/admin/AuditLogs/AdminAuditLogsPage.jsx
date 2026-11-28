@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { auditLogApi, adminUserApi } from '../../../services/api';
 import { formatVietnam24h, formatVietnamRelativeTime } from '../../../utils/dateUtils';
+import { formatAdminActionLabel } from '../../../utils/adminPresentation';
 import {
   History,
   Search,
@@ -24,7 +25,6 @@ import {
   ShieldCheck,
   Cpu,
   Layers,
-  Sparkles,
   Download,
   Info
 } from 'lucide-react';
@@ -214,7 +214,7 @@ export const AdminAuditLogsPage = () => {
       return {
         bg: 'bg-clay-50 text-clay-800 border-clay-300/80',
         icon: Cpu,
-        label: 'Trợ lý AI'
+        label: 'Xử lý hệ thống'
       };
     }
     return {
@@ -409,7 +409,7 @@ export const AdminAuditLogsPage = () => {
         {/* Metric 4 */}
         <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
           <div className="w-9 h-9 rounded-[5px] bg-clay-50 border border-clay-200/80 text-clay-700 flex items-center justify-center shrink-0">
-            <Sparkles className="w-4 h-4" />
+            <History className="w-4 h-4" />
           </div>
           <div>
             <p className="font-mono text-[10px] uppercase tracking-wider text-ink-500">Cơ chế File Rolling</p>
@@ -503,7 +503,7 @@ export const AdminAuditLogsPage = () => {
               <option value="ALL">Tất cả loại hành động</option>
               {actionsList.map((act) => (
                 <option key={act} value={act}>
-                  {act}
+                  {formatAdminActionLabel(act)}
                 </option>
               ))}
             </select>
@@ -543,7 +543,7 @@ export const AdminAuditLogsPage = () => {
 
             {selectedAction !== 'ALL' && (
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] bg-[#F8F4EC] text-ink-800 border border-ink-200/80 font-mono text-xs">
-                <span>Hành động: {selectedAction}</span>
+                <span>Hành động: {formatAdminActionLabel(selectedAction)}</span>
                 <button
                   onClick={() => setSelectedAction('ALL')}
                   className="hover:text-rose-600 transition-colors cursor-pointer"
@@ -700,7 +700,7 @@ export const AdminAuditLogsPage = () => {
                           className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] font-serif text-[10px] font-bold border ${badge.bg}`}
                         >
                           <Icon className="w-3 h-3" />
-                          <span>{logItem.action}</span>
+                          <span>{formatAdminActionLabel(logItem.action)}</span>
                         </span>
                       </td>
 
@@ -853,7 +853,7 @@ export const AdminAuditLogsPage = () => {
                     Hành động
                   </label>
                   <div className="p-2 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 font-mono font-bold text-clay-700 text-xs truncate">
-                    {selectedLog.action}
+                    {formatAdminActionLabel(selectedLog.action)}
                   </div>
                 </div>
               </div>

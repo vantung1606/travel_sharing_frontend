@@ -3,8 +3,9 @@ import { useApp } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { adminApi, adminReportApi, auditLogApi, adminUserApi } from '../../../services/api';
 import { formatVietnamDateOnly } from '../../../utils/dateUtils';
+import { formatAdminActionLabel } from '../../../utils/adminPresentation';
 import { 
-  Users, MapPin, Sparkles, CheckCircle2, Calendar,
+  Users, MapPin, CheckCircle2, Calendar,
   ChevronRight, Search, Flag, Eye, Download, ArrowRight, RefreshCw,
   FileText, Compass, ShieldAlert, Clock, History, ChevronLeft,
   X, Star, ExternalLink, BarChart3
@@ -542,7 +543,7 @@ export const AdminDashboardPage = () => {
         lines.push('N/A,"Chưa có lịch trình",N/A,N/A,0,0,N/A,N/A');
       } else {
         itinerariesList.forEach(item => {
-          lines.push(`${item.id},${escape(item.title || 'Không tiêu đề')},${escape(item.creatorName || item.userFullName || 'Thành viên')},${escape(item.destination || 'Việt Nam')},${getItineraryDuration(item).days},${Number(item.budgetTotal || 0).toLocaleString('vi-VN')},${item.isAiGenerated ? '"Trợ lý AI thiết kế"' : '"Thành viên tự tạo"'},${escape(item.status || 'ACTIVE')}`);
+          lines.push(`${item.id},${escape(item.title || 'Không tiêu đề')},${escape(item.creatorName || item.userFullName || 'Thành viên')},${escape(item.destination || 'Việt Nam')},${getItineraryDuration(item).days},${Number(item.budgetTotal || 0).toLocaleString('vi-VN')},${item.isAiGenerated ? '"Hệ thống tạo"' : '"Thành viên tự tạo"'},${escape(item.status || 'ACTIVE')}`);
         });
       }
       lines.push('');
@@ -618,7 +619,7 @@ export const AdminDashboardPage = () => {
       lines.push(`"Trạng thái hệ thống CSDL (status)",${escape(statusInfo.dbStatus)}`);
       lines.push(`"Tiến độ hành trình thực tế (Timeline)",${escape(statusInfo.label)}`);
       lines.push(`"Tổng dự toán ngân sách",${escape(itin.budgetTotal ? Number(itin.budgetTotal).toLocaleString('vi-VN') + ' VNĐ' : 'Chưa nhập')}`);
-      lines.push(`"Phương thức thiết lập",${escape(itin.isAiGenerated ? 'Trợ lý AI Gemini thiết kế' : 'Người dùng tự tạo')}`);
+      lines.push(`"Phương thức thiết lập",${escape(itin.isAiGenerated ? 'Hệ thống tạo' : 'Người dùng tự tạo')}`);
       lines.push(`"Chế độ hiển thị",${escape(itin.isPublic === false ? 'Riêng tư (Chỉ tác giả / nhóm xem)' : 'Công khai toàn hệ thống')}`);
       lines.push(`"Phong cách du lịch",${escape(itin.travelStyle || 'Khám phá & Nghỉ dưỡng')}`);
       lines.push(`"Nhóm đối tượng",${escape(itin.groupType || 'Cá nhân')}`);
@@ -661,15 +662,15 @@ export const AdminDashboardPage = () => {
   const formatActionBadge = (action) => {
     const act = (action || '').toUpperCase();
     if (act.includes('DELETE') || act.includes('BAN') || act.includes('BLOCK')) {
-      return { bg: 'bg-rose-50 text-rose-700 border-rose-200', label: action };
+      return { bg: 'bg-rose-50 text-rose-700 border-rose-200', label: formatAdminActionLabel(action) };
     }
     if (act.includes('UPDATE') || act.includes('ROLE')) {
-      return { bg: 'bg-amber-50 text-amber-700 border-amber-200', label: action };
+      return { bg: 'bg-amber-50 text-amber-700 border-amber-200', label: formatAdminActionLabel(action) };
     }
     if (act.includes('CREATE') || act.includes('APPROVE') || act.includes('LOGIN')) {
-      return { bg: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: action };
+      return { bg: 'bg-emerald-50 text-emerald-700 border-emerald-200', label: formatAdminActionLabel(action) };
     }
-    return { bg: 'bg-sky-50 text-sky-700 border-sky-200', label: action || 'ACTION' };
+    return { bg: 'bg-sky-50 text-sky-700 border-sky-200', label: formatAdminActionLabel(action) };
   };
 
   return (
@@ -1150,7 +1151,7 @@ export const AdminDashboardPage = () => {
                         <span className="text-ink-400 text-[11px] flex items-center gap-1">
                           {row.isAiGenerated ? (
                             <span className="text-clay-600 font-bold flex items-center gap-0.5">
-                              <Sparkles className="w-2.5 h-2.5" /> WanderAI
+                              <Compass className="w-2.5 h-2.5" /> Hệ thống tạo
                             </span>
                           ) : (
                             'Tự tạo'
@@ -1423,7 +1424,7 @@ export const AdminDashboardPage = () => {
                 <span className={`px-2 py-0.5 rounded-[4px] font-bold text-[10px] border ${
                   selectedItinerary.isAiGenerated ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-ink-100 text-ink-700 border-ink-200'
                 }`}>
-                  {selectedItinerary.isAiGenerated ? 'WanderAI' : 'Tự tạo'}
+                  {selectedItinerary.isAiGenerated ? 'Hệ thống tạo' : 'Tự tạo'}
                 </span>
               </div>
               <div className="flex justify-between py-1">
