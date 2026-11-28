@@ -164,10 +164,10 @@ export const AdminMaintenancePage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pb-12">
+    <div className="admin-page max-w-7xl mx-auto space-y-6 pb-12">
       
       {/* ─── 1. HEADER BANNER ────────────────────────────────────────────── */}
-      <div className="p-6 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="admin-panel admin-page-header p-6 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-[6px] bg-clay-700 text-white flex items-center justify-center shadow-xs">
             <Wrench className="w-5 h-5" />
@@ -228,7 +228,7 @@ export const AdminMaintenancePage = () => {
           ? 'bg-amber-50/80 border-amber-300 ring-2 ring-amber-200/70 shadow-sm'
           : 'bg-[#FFFDF8] border-ink-200/80 shadow-2xs'
       }`}>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex min-w-0 flex-col justify-between gap-4 xl:flex-row xl:flex-wrap xl:items-center">
           <div className="flex items-start gap-3.5">
             <div className={`w-12 h-12 rounded-[6px] flex items-center justify-center shrink-0 border ${
               form.enabled
@@ -276,7 +276,7 @@ export const AdminMaintenancePage = () => {
         
         {/* Left Column: Form Configuration (7 cols) */}
         <div className="lg:col-span-7 space-y-5">
-          <div className="bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 p-6 shadow-2xs space-y-5">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 p-6 shadow-2xs space-y-5">
             
             <div className="flex items-center justify-between pb-3 border-b border-ink-100">
               <span className="font-serif font-bold text-sm text-ink-900">
@@ -447,7 +447,7 @@ export const AdminMaintenancePage = () => {
 
         {/* Right Column: Live Mockup Preview (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
-          <div className="bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 p-5 shadow-2xs space-y-4">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 p-5 shadow-2xs space-y-4">
             <div className="flex items-center justify-between pb-2 border-b border-ink-100">
               <span className="font-serif font-bold text-xs text-ink-900">
                 Mô Phỏng Trực Quan Màn Hình Khách (Live Preview)

@@ -11,7 +11,7 @@ import {
   X, Star, ExternalLink, BarChart3
 } from 'lucide-react';
 
-const PANEL_CLASS = 'min-w-0 rounded-2xl border border-ink-200/70 bg-white shadow-[0_2px_3px_rgba(30,26,21,0.02),0_8px_24px_-16px_rgba(30,26,21,0.18)]';
+const PANEL_CLASS = 'admin-panel min-w-0 rounded-[6px] border border-ink-200/70 bg-white shadow-[0_2px_3px_rgba(30,26,21,0.02),0_8px_24px_-16px_rgba(30,26,21,0.18)]';
 
 const METRIC_TONES = {
   clay: { surface: 'from-clay-50/70 to-white', icon: 'bg-clay-100/70 text-clay-700 ring-clay-200/70', badge: 'bg-clay-50 text-clay-700' },
@@ -674,7 +674,7 @@ export const AdminDashboardPage = () => {
   };
 
   return (
-    <div className="admin-dashboard-depth min-w-0 space-y-5 pb-8 sm:space-y-6">
+    <div className="admin-page admin-dashboard-depth min-w-0 space-y-5 pb-8 sm:space-y-6">
       <nav className="flex flex-wrap items-center gap-2 text-[12px] font-medium text-ink-400" aria-label="Đường dẫn">
         <Compass className="h-3.5 w-3.5" />
         <span>Quản trị hệ thống</span>
@@ -682,32 +682,24 @@ export const AdminDashboardPage = () => {
         <span className="text-ink-700">Dashboard</span>
       </nav>
 
-      <section className="relative isolate overflow-hidden rounded-2xl border border-ink-700 bg-gradient-to-br from-ink-800 via-ink-700 to-ink-800 p-5 text-white shadow-[0_12px_32px_-18px_rgba(30,26,21,0.5)] sm:p-6">
-        <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-24 h-72 w-72 rounded-full border border-white/10 bg-clay-500/10" />
-        <div aria-hidden="true" className="pointer-events-none absolute -right-2 -top-12 h-48 w-48 rounded-full border border-white/10" />
-        <div className="relative flex flex-col justify-between gap-5 xl:flex-row xl:items-center">
+      <section className="admin-page-header flex flex-col justify-between gap-4 xl:flex-row xl:items-center">
           <div className="min-w-0 space-y-2">
-            <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium text-white/65">
-              <span className="rounded-full border border-white/15 bg-white/5 px-2.5 py-1 tracking-wide">WAYFARE · ADMIN</span>
-              <span>{new Date().toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Asia/Ho_Chi_Minh' })}</span>
-            </div>
-            <h1 className="font-display text-2xl font-bold tracking-tight sm:text-3xl">Tổng quan hệ thống</h1>
-            <p className="max-w-xl text-[13px] leading-relaxed text-white/70">
-              Chào {currentUser?.name || 'Quản trị viên'}, cùng nhìn lại hoạt động cộng đồng và những việc cần chú ý.
+            <h1 className="font-display text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl">Tổng quan hệ thống</h1>
+            <p className="max-w-xl text-[13px] leading-relaxed text-ink-500">
+              Theo dõi hoạt động cộng đồng, tăng trưởng và nội dung cần xử lý.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button type="button" onClick={() => loadDashboardData(true)} disabled={refreshing} title="Đồng bộ dữ liệu mới nhất"
-              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-4 text-[13px] font-semibold text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white disabled:opacity-50 sm:flex-none">
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[4px] border border-ink-200 bg-white px-4 text-[13px] font-semibold text-ink-700 transition hover:border-clay-300 hover:bg-clay-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-clay-600 disabled:opacity-50 sm:flex-none">
               <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
               {refreshing ? 'Đang đồng bộ...' : 'Làm mới'}
             </button>
             <button type="button" onClick={handleExportCsv} title="Xuất báo cáo tổng quan ra file CSV"
-              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border border-clay-500 bg-clay-600 px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-clay-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white sm:flex-none">
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-[4px] border border-clay-600 bg-clay-600 px-4 text-[13px] font-semibold text-white shadow-sm transition hover:bg-clay-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-clay-600 sm:flex-none">
               <Download className="h-3.5 w-3.5" />Xuất báo cáo
             </button>
           </div>
-        </div>
       </section>
 
       <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4 sm:gap-4" aria-label="Chỉ số tổng quan">
@@ -1372,7 +1364,7 @@ export const AdminDashboardPage = () => {
       {/* ─── QUICK VIEW ITINERARY MODAL ────────────────────────────────────── */}
       {selectedItinerary && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
-          <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 border border-ink-200 shadow-xl space-y-4">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 border border-ink-200 shadow-xl space-y-4">
             <div className="flex items-start justify-between">
               <div>
                 <span className="text-[11px] font-bold text-clay-700 uppercase tracking-wider block">

@@ -449,10 +449,10 @@ export const AdminItinerariesPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="admin-page space-y-6">
       
       {/* ─── 1. HEADER SECTION ────────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-ink-200/80">
+      <div className="admin-page-header flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-ink-200/80">
         <div>
           <div className="flex items-center gap-2 text-xs font-serif text-clay-700 font-bold uppercase tracking-wider mb-1">
             <span>Hệ Thống Quản Trị</span>
@@ -493,13 +493,13 @@ export const AdminItinerariesPage = () => {
 
       {/* ─── 2. STATISTIC KPI CARDS (MATCHING CSDL) ────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-ink-400 uppercase tracking-wider block">Tổng Lịch Trình</span>
           <p className="text-xl sm:text-2xl font-black text-ink-900 font-display">{stats.total}</p>
           <span className="text-[10px] text-ink-500 font-sans">Bản ghi trong CSDL</span>
         </div>
 
-        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-emerald-700 uppercase tracking-wider block flex items-center gap-1">
             <Globe className="w-3 h-3" /> Công Khai
           </span>
@@ -507,7 +507,7 @@ export const AdminItinerariesPage = () => {
           <span className="text-[10px] text-emerald-600 font-sans">Hiển thị cộng đồng</span>
         </div>
 
-        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider block flex items-center gap-1">
             <Lock className="w-3 h-3" /> Riêng Tư
           </span>
@@ -515,7 +515,7 @@ export const AdminItinerariesPage = () => {
           <span className="text-[10px] text-slate-500 font-sans">Chỉ tác giả & đoàn</span>
         </div>
 
-        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-amber-700 uppercase tracking-wider block flex items-center gap-1">
             <Compass className="w-3 h-3" /> Hệ thống tạo
           </span>
@@ -523,7 +523,7 @@ export const AdminItinerariesPage = () => {
           <span className="text-[10px] text-amber-600 font-sans">Tạo từ gợi ý lịch trình</span>
         </div>
 
-        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-clay-700 uppercase tracking-wider block flex items-center gap-1">
             <DollarSign className="w-3 h-3" /> Có Dự Toán
           </span>
@@ -531,7 +531,7 @@ export const AdminItinerariesPage = () => {
           <span className="text-[10px] text-clay-600 font-sans">Đã nhập ngân sách</span>
         </div>
 
-        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
+        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-1">
           <span className="text-[11px] font-bold text-ink-400 uppercase tracking-wider block flex items-center gap-1">
             <DollarSign className="w-3 h-3" /> Tổng Ngân Sách
           </span>
@@ -543,7 +543,7 @@ export const AdminItinerariesPage = () => {
       </div>
 
       {/* ─── 3. FILTER & SEARCH CONTROLS ───────────────────────────────────── */}
-      <div className="p-4 sm:p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-3">
+      <div className="admin-panel p-4 sm:p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
           
           {/* Search Bar */}
@@ -924,7 +924,7 @@ export const AdminItinerariesPage = () => {
       {/* ─── 6. DELETE CONFIRMATION MODAL (SOFT TRANSLUCENT BLUR) ─────────── */}
       {deleteConfirmItinerary && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
-          <div className="bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4 animate-in zoom-in-95 duration-200">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4 animate-in zoom-in-95 duration-200">
             <div className="flex items-start gap-3.5">
               <div className="w-10 h-10 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center shrink-0">
                 <Trash2 className="w-5 h-5" />

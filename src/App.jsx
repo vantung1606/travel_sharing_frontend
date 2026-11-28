@@ -282,7 +282,7 @@ const AppContent = () => {
       ) : (
         /* ADMIN PORTAL SECURED LAYOUT */
         <AdminRouteGuard>
-          <div className="min-h-screen bg-[#F7F5EE]">
+          <div className="admin-workspace min-h-screen bg-[#F7F5EE]">
             {/* Fixed Sidebar */}
             <div className="hidden md:block">
               <AdminSidebar />

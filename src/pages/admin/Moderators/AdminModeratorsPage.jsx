@@ -269,10 +269,10 @@ export const AdminModeratorsPage = () => {
   const isSuperAdmin = selectedMod?.roles?.includes('ROLE_ADMIN');
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pb-12">
+    <div className="admin-page max-w-7xl mx-auto space-y-6 pb-12">
       
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xs">
+      <div className="admin-panel admin-page-header flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xs">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="w-10 h-10 rounded-[6px] bg-clay-700 text-white flex items-center justify-center shadow-xs">
@@ -411,7 +411,7 @@ export const AdminModeratorsPage = () => {
           
           {/* Selected Moderator Info Banner */}
           {selectedMod ? (
-            <div className="p-4 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="admin-panel p-4 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
                 <UserAvatar 
                   user={selectedMod}
@@ -586,7 +586,7 @@ export const AdminModeratorsPage = () => {
           </div>
 
           {/* Bottom Save Bar */}
-          <div className="p-4 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xs flex items-center justify-between gap-4">
+          <div className="admin-panel min-w-0 p-4 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xs flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2 text-xs text-ink-500 font-sans">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>

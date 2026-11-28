@@ -481,10 +481,10 @@ export const AdminPlacesPage = () => {
     : '0.0';
 
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in duration-200">
+    <div className="admin-page space-y-6 pb-12 animate-in fade-in duration-200">
       
       {/* ─── 1. BREADCRUMB & HEADER ACTION TOOLBAR ─────────────────────────────── */}
-      <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      <div className="admin-panel admin-page-header bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div className="space-y-1">
           <nav className="flex items-center gap-2 text-xs font-semibold text-ink-400">
             <span>Quản trị hệ thống</span>
@@ -545,7 +545,7 @@ export const AdminPlacesPage = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         
         {/* Metric 1: Pending Moderation */}
-        <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
+        <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
             <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
               <Clock className="w-4 h-4" />
@@ -570,7 +570,7 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Metric 2: Active Places */}
-        <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
+        <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
             <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-emerald-700 flex items-center justify-center">
               <ShieldCheck className="w-4 h-4" />
@@ -589,7 +589,7 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Metric 3: City Coverage */}
-        <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
+        <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
             <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
               <Compass className="w-4 h-4" />
@@ -608,7 +608,7 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Metric 4: Average Rating */}
-        <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
+        <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 space-y-3 transition-colors hover:border-ink-300">
           <div className="flex items-start justify-between">
             <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-amber-600 flex items-center justify-center">
               <Star className="w-4 h-4 fill-amber-300" />
@@ -667,7 +667,7 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Search & Filter Toolbar */}
-        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 flex flex-col md:flex-row items-center gap-3">
+        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 flex flex-col md:flex-row items-center gap-3">
           {/* Keyword Search */}
           <div className="relative flex-1 w-full">
             <Search className="w-3.5 h-3.5 absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-400" />
@@ -714,7 +714,7 @@ export const AdminPlacesPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Table Column (7 Cols) */}
-        <div className="lg:col-span-7 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 overflow-hidden flex flex-col space-y-4 p-5">
+        <div className="admin-panel lg:col-span-7 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 overflow-hidden flex flex-col space-y-4 p-5">
           <div className="flex items-center justify-between pb-2 border-b border-ink-200/60">
             <span className="font-display font-black text-base text-ink-800">
               Danh sách địa điểm ({filteredPlaces.length})
@@ -991,7 +991,7 @@ export const AdminPlacesPage = () => {
         </div>
 
         {/* Right Preview Drawer (5 Cols - Sticky) */}
-        <div className="lg:col-span-5 bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4 sticky top-20">
+        <div className="admin-panel lg:col-span-5 bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4 sticky top-20">
           <div className="flex items-center justify-between border-b border-ink-200/60 pb-3">
             <span className="font-display font-black text-base text-ink-800 flex items-center gap-2">
               <Eye className="w-4 h-4 text-clay-600" />
@@ -1302,7 +1302,7 @@ export const AdminPlacesPage = () => {
       {/* ─── 5. MODAL: CREATE NEW PLACE ───────────────────────────────────────── */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
-          <div className="bg-[#FFFDF8] rounded-[6px] max-w-2xl w-full p-6 border border-ink-200 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] max-w-2xl w-full p-6 border border-ink-200 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-start justify-between border-b border-ink-200/60 pb-3">
               <div>
                 <span className="text-[11px] font-bold text-clay-700 uppercase tracking-wider block">
@@ -1762,7 +1762,7 @@ export const AdminPlacesPage = () => {
       {/* ─── 6. MODAL: REJECT CONFIRMATION ───────────────────────────────────── */}
       {rejectModalData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
-          <div className="bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-[5px] bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0">
                 <AlertTriangle className="w-5 h-5" />
@@ -1822,7 +1822,7 @@ export const AdminPlacesPage = () => {
       {/* ─── 7. MODAL: DELETE CONFIRMATION ───────────────────────────────────── */}
       {deleteModalData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
-          <div className="bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center shrink-0">
                 <Trash2 className="w-5 h-5" />
@@ -1859,7 +1859,7 @@ export const AdminPlacesPage = () => {
       {/* ─── 8. MODAL: EVIDENCE IMAGE PREVIEW ─────────────────────────────────── */}
       {selectedEvidenceModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-150">
-          <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-4 border border-ink-200 shadow-2xl space-y-3">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-4 border border-ink-200 shadow-2xl space-y-3">
             <div className="flex items-center justify-between border-b border-ink-200/60 pb-2">
               <span className="font-display font-black text-sm text-ink-800 flex items-center gap-1.5">
                 <Flag className="w-4 h-4 text-rose-600" />
@@ -1896,7 +1896,7 @@ export const AdminPlacesPage = () => {
       {/* ─── 8. MODAL: CẤU HÌNH GHIM NỔI BẬT & CHIẾN DỊCH MÙA ─── */}
       {featuredModalPlace && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-150">
-          <div className="bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-150">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xl max-w-md w-full p-6 space-y-5 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-3 border-b border-ink-100">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-[4px] bg-amber-100 text-amber-800 flex items-center justify-center border border-amber-200">

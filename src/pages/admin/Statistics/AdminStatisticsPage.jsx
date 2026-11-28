@@ -74,7 +74,7 @@ const BarChart = ({ data, color = '#B0522F', label, metricType = 'items' }) => {
 
 // ─── KPI Card (Paper - Ink - Clay) ───────────────────────────────────────────
 const KpiCard = ({ icon: Icon, label, value, sub, trend, loading }) => (
-  <div className="bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex flex-col justify-between gap-3 relative transition-colors hover:border-ink-300">
+  <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex flex-col justify-between gap-3 relative transition-colors hover:border-ink-300">
     <div className="flex items-center justify-between">
       <span className="text-xs font-bold text-ink-400">{label}</span>
       <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
@@ -167,10 +167,10 @@ export const AdminStatisticsPage = () => {
   const maxPlace = stats?.topPlaces?.[0]?.reviewCount || 1;
 
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in duration-200">
+    <div className="admin-page space-y-6 pb-12 animate-in fade-in duration-200">
 
       {/* ── Page Header ── */}
-      <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      <div className="admin-panel admin-page-header bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="px-2.5 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 font-bold text-[10px] uppercase tracking-wider border border-clay-200/60">
@@ -244,8 +244,8 @@ export const AdminStatisticsPage = () => {
       </div>
 
       {/* ── Engagement Row ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
-        <div className="bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
+      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+        <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
           <div className="w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-rose-600 flex items-center justify-center shrink-0">
             <Heart className="w-5 h-5 fill-rose-100" />
           </div>
@@ -259,7 +259,7 @@ export const AdminStatisticsPage = () => {
           </div>
         </div>
 
-        <div className="bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
+        <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
           <div className="w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center shrink-0">
             <MessageCircle className="w-5 h-5" />
           </div>
@@ -273,7 +273,7 @@ export const AdminStatisticsPage = () => {
           </div>
         </div>
 
-        <div className="bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
+        <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 border border-ink-200/80 flex items-center gap-4">
           <div className="w-11 h-11 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-amber-600 flex items-center justify-center shrink-0">
             <Star className="w-5 h-5 fill-amber-300 text-amber-500" />
           </div>
@@ -293,7 +293,7 @@ export const AdminStatisticsPage = () => {
       {/* ── Charts Row ── */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* User Growth Chart */}
-        <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
+        <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-ink-200/60">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
@@ -317,7 +317,7 @@ export const AdminStatisticsPage = () => {
         </div>
 
         {/* Post Growth Chart */}
-        <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
+        <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-ink-200/60">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
@@ -344,7 +344,7 @@ export const AdminStatisticsPage = () => {
       {/* ── Top Lists Row ── */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Top Destinations */}
-        <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
+        <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
           <div className="flex items-center gap-2.5 pb-2 border-b border-ink-200/60">
             <div className="w-8 h-8 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
               <Compass className="w-4 h-4" />
@@ -383,7 +383,7 @@ export const AdminStatisticsPage = () => {
         </div>
 
         {/* Top Places by Rating */}
-        <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
+        <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
           <div className="flex items-center gap-2.5 pb-2 border-b border-ink-200/60">
             <div className="w-8 h-8 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-amber-600 flex items-center justify-center">
               <Star className="w-4 h-4 fill-amber-300" />
@@ -423,7 +423,7 @@ export const AdminStatisticsPage = () => {
       </div>
 
       {/* ── Itinerary Distribution Row ── */}
-      <div className="bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
+      <div className="admin-panel bg-[#FFFDF8] rounded-[6px] p-5 sm:p-6 border border-ink-200/80 space-y-4">
         <div className="flex items-center gap-2.5 pb-2 border-b border-ink-200/60">
           <div className="w-8 h-8 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center">
             <TrendingUp className="w-4 h-4" />

@@ -607,7 +607,7 @@ export const AdminAppearancePage = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12">
+    <div className="admin-page space-y-6 max-w-7xl mx-auto pb-12">
       
       {/* Hidden file input for Cloudinary upload */}
       <input
@@ -619,7 +619,7 @@ export const AdminAppearancePage = () => {
       />
 
       {/* ─── 1. HEADER BANNER ────────────────────────────────────────────── */}
-      <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="admin-panel admin-page-header bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-[5px] bg-clay-100 text-clay-700 border border-clay-300 flex items-center justify-center shrink-0">
             <Palette className="w-6 h-6" />
@@ -787,7 +787,7 @@ export const AdminAppearancePage = () => {
 
           {/* ═══════════════ TAB 1: BRANDING & ASSETS ═══════════════ */}
           {activeTab === 'branding' && (
-            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
+            <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
               
               {/* Group 1: General Brand Info */}
               <div className="space-y-4">
@@ -1053,7 +1053,7 @@ export const AdminAppearancePage = () => {
 
           {/* ═══════════════ TAB 2: SYSTEM COLORS & THEMES ═══════════════ */}
           {activeTab === 'colors' && (
-            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
+            <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
               
               {/* Group 0: Curated Color Presets */}
               <div className="space-y-3">
@@ -1260,7 +1260,7 @@ export const AdminAppearancePage = () => {
 
                     {/* ═══════════════ TAB: SOCIAL MEDIA & CONTACT CHANNELS ═══════════════ */}
           {activeTab === 'social' && (
-            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
+            <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
               
               <div className="border-b border-ink-200/80 pb-4">
                 <div className="flex items-center gap-2">
@@ -1489,7 +1489,7 @@ export const AdminAppearancePage = () => {
 
           {/* ═══════════════ TAB: TOP ANNOUNCEMENT RIBBON ═══════════════ */}
           {activeTab === 'announcement' && (
-            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
+            <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
               
               <div className="border-b border-ink-200/80 pb-4">
                 <div className="flex items-center gap-2">
@@ -1696,7 +1696,7 @@ export const AdminAppearancePage = () => {
 
           {/* ═══════════════ TAB 3: TOKENS & COMPONENTS ═══════════════ */}
           {activeTab === 'components' && (
-            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
+            <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-6">
               
               <div className="border-b border-ink-100 pb-2">
                 <h3 className="font-serif font-bold text-sm text-ink-900 flex items-center gap-2">
@@ -1819,7 +1819,7 @@ export const AdminAppearancePage = () => {
 
           {/* ═══════════════ TAB 4: VERSION HISTORY & ROLLBACK ═══════════════ */}
           {activeTab === 'history' && (
-            <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-4">
+            <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-6 shadow-xs space-y-4">
               
               <div className="flex items-center justify-between border-b border-ink-100 pb-2">
                 <div>

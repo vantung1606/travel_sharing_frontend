@@ -129,10 +129,10 @@ export const AdminReviewsPage = () => {
   ]), [metrics]);
 
   return (
-    <div className="space-y-6 pb-12 animate-in fade-in duration-200">
+    <div className="admin-page space-y-6 pb-12 animate-in fade-in duration-200">
       
       {/* ── Page Header ── */}
-      <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="admin-panel admin-page-header bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 font-bold text-[10px] uppercase tracking-wider border border-clay-200/60">
@@ -162,7 +162,7 @@ export const AdminReviewsPage = () => {
       {/* ── KPI Row ── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         {kpis.map(({ label, value, icon: Icon, sub }) => (
-          <div key={label} className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 flex items-center gap-4 transition-colors hover:border-ink-300">
+          <div key={label} className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 flex items-center gap-4 transition-colors hover:border-ink-300">
             <div className="w-10 h-10 rounded-[5px] bg-[#F8F4EC] border border-ink-200/80 text-clay-700 flex items-center justify-center shrink-0">
               <Icon className="w-5 h-5" />
             </div>
@@ -193,7 +193,7 @@ export const AdminReviewsPage = () => {
       )}
 
       {/* ── Filters Toolbar ── */}
-      <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 flex flex-wrap items-center gap-3">
+      <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 flex flex-wrap items-center gap-3">
         {/* Status Tabs */}
         <div className="inline-flex rounded-[5px] bg-[#F8F4EC] p-1 border border-ink-200/80">
           {TABS.map(tab => (
@@ -395,7 +395,7 @@ export const AdminReviewsPage = () => {
       {/* ── Review Detail Modal ── */}
       {detailReview && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200" onClick={() => setDetailReview(null)}>
-          <div className="bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 border border-ink-200 shadow-xl space-y-4" onClick={(e) => e.stopPropagation()}>
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] max-w-lg w-full p-6 border border-ink-200 shadow-xl space-y-4" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-3 border-b border-ink-200/60 pb-3">
               <div className="flex items-center gap-3">
                 <UserAvatar 
@@ -473,7 +473,7 @@ export const AdminReviewsPage = () => {
       {/* ── Confirm Delete Modal ── */}
       {confirmDelete && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-200">
-          <div className="bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] max-w-md w-full p-6 border border-ink-200 shadow-xl space-y-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-[5px] bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center shrink-0">
                 <Trash2 className="w-5 h-5" />

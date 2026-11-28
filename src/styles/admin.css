@@ -1,0 +1,101 @@
+/* Shared admin surfaces. Traveler pages keep their own component styles. */
+.admin-workspace {
+  --admin-panel-radius: 6px;
+  --admin-control-radius: 4px;
+  --admin-panel-shadow: 0 2px 3px rgb(30 26 21 / 2%), 0 8px 24px -16px rgb(30 26 21 / 18%);
+}
+
+.admin-workspace .admin-page {
+  width: 100%;
+  max-width: 1700px;
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.admin-workspace .admin-page .grid > :is(div, section, article) {
+  min-width: 0;
+}
+
+.admin-workspace :is(.rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl, [class~="rounded-[8px]"], [class~="rounded-[12px]"], [class~="rounded-[16px]"], [class~="rounded-[24px]"]) {
+  border-radius: var(--admin-panel-radius);
+}
+
+.admin-workspace [class*="rounded-t-"] {
+  border-top-left-radius: var(--admin-panel-radius);
+  border-top-right-radius: var(--admin-panel-radius);
+}
+
+.admin-workspace [class*="rounded-b-"] {
+  border-bottom-left-radius: var(--admin-panel-radius);
+  border-bottom-right-radius: var(--admin-panel-radius);
+}
+
+.admin-workspace :is(button, input, select, textarea, [role="tab"]),
+.admin-workspace span.rounded-full:not([class*="w-"]):not([class*="h-"]) {
+  border-radius: var(--admin-control-radius);
+}
+
+.admin-workspace .admin-panel,
+.admin-workspace .admin-page-header {
+  @apply border border-ink-200/70;
+  border-radius: var(--admin-panel-radius);
+  background-color: white;
+  box-shadow: var(--admin-panel-shadow);
+}
+
+.admin-workspace .admin-panel {
+  transition-property: transform, border-color, background-color, box-shadow;
+  transition-duration: 180ms;
+}
+
+@media (hover: hover) {
+  .admin-workspace .admin-panel:hover {
+    @apply border-ink-300/80;
+    box-shadow: 0 2px 4px rgb(30 26 21 / 3%), 0 12px 28px -18px rgb(30 26 21 / 28%);
+  }
+
+  .admin-workspace .dashboard-metric:hover {
+    @apply border-clay-300;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%), 0 2px 4px -2px rgb(0 0 0 / 10%);
+  }
+}
+
+.admin-workspace .admin-page-header {
+  min-width: 0;
+  padding: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.admin-workspace .admin-page-header :is(h1, .flex),
+.admin-workspace .admin-page-header .flex > div {
+  min-width: 0;
+}
+
+.admin-workspace .admin-page-header > :is(div, button) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.admin-workspace .admin-page-header > .flex {
+  flex-wrap: wrap;
+}
+
+.admin-workspace .admin-page-header h1 {
+  flex-wrap: wrap;
+  font-size: clamp(1.375rem, 2vw, 1.75rem);
+  font-weight: 700;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 640px) {
+  .admin-workspace .admin-page-header {
+    padding: 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-workspace .admin-panel {
+    transition: none;
+  }
+}

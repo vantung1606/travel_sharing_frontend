@@ -218,10 +218,10 @@ export const AdminBroadcastPage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 pb-12">
+    <div className="admin-page max-w-7xl mx-auto space-y-6 pb-12">
       
       {/* ─── 1. HEADER BANNER ────────────────────────────────────────────── */}
-      <div className="p-6 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="admin-panel admin-page-header p-6 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-[6px] bg-clay-700 text-white flex items-center justify-center shadow-xs">
             <Megaphone className="w-5 h-5" />
@@ -254,7 +254,7 @@ export const AdminBroadcastPage = () => {
         
         {/* Left Column: Composer Form (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 p-6 shadow-2xs space-y-5">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 p-6 shadow-2xs space-y-5">
             
             <div className="flex items-center justify-between pb-3 border-b border-ink-100">
               <span className="font-serif font-bold text-sm text-ink-900">
@@ -498,7 +498,7 @@ export const AdminBroadcastPage = () => {
         {/* Right Column: Live Notification Mockup Preview (5 cols) */}
         <div className="lg:col-span-5 space-y-4">
           
-          <div className="bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 p-5 shadow-2xs space-y-4">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 p-5 shadow-2xs space-y-4">
             <span className="font-serif font-bold text-xs text-ink-900 block pb-2 border-b border-ink-100">
               Mô Phỏng Trực Quan Thông Báo (Live Preview)
             </span>
@@ -648,7 +648,7 @@ export const AdminBroadcastPage = () => {
       {/* ─── 4. CONFIRMATION DIALOG MODAL ─────────────────────────────────── */}
       {confirmModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-150">
-          <div className="bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-150">
+          <div className="admin-panel bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-2xl max-w-md w-full p-6 space-y-4 animate-in zoom-in-95 duration-150">
             <div className="flex items-center gap-3 text-clay-700">
               <div className="w-10 h-10 rounded-full bg-clay-100 flex items-center justify-center shrink-0">
                 <Megaphone className="w-5 h-5 text-clay-700" />

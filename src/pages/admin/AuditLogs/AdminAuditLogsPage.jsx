@@ -310,9 +310,9 @@ export const AdminAuditLogsPage = () => {
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="admin-page space-y-6 pb-12">
       {/* 1. Header & Title (Paper-Ink-Clay) */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-ink-200/80">
+      <div className="admin-page-header flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-ink-200/80">
         <div>
           <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-ink-500 mb-1">
             <History className="w-3.5 h-3.5 text-clay-600" />
@@ -365,7 +365,7 @@ export const AdminAuditLogsPage = () => {
       {/* 2. Top Metric Cards (Paper-Ink-Clay) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1 */}
-        <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
           <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center shrink-0">
             <Layers className="w-4 h-4" />
           </div>
@@ -379,7 +379,7 @@ export const AdminAuditLogsPage = () => {
         </div>
 
         {/* Metric 2 */}
-        <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
           <div className="w-9 h-9 rounded-[5px] bg-[#F8F4EC] border border-ink-200/60 text-clay-600 flex items-center justify-center shrink-0">
             <Calendar className="w-4 h-4" />
           </div>
@@ -393,7 +393,7 @@ export const AdminAuditLogsPage = () => {
         </div>
 
         {/* Metric 3 */}
-        <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
           <div className="w-9 h-9 rounded-[5px] bg-amber-50 border border-amber-200/80 text-amber-700 flex items-center justify-center shrink-0">
             <Shield className="w-4 h-4" />
           </div>
@@ -407,7 +407,7 @@ export const AdminAuditLogsPage = () => {
         </div>
 
         {/* Metric 4 */}
-        <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
+        <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs flex items-center gap-3.5">
           <div className="w-9 h-9 rounded-[5px] bg-clay-50 border border-clay-200/80 text-clay-700 flex items-center justify-center shrink-0">
             <History className="w-4 h-4" />
           </div>
@@ -423,7 +423,7 @@ export const AdminAuditLogsPage = () => {
       </div>
 
       {/* 3. Search & Filter Bar */}
-      <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs space-y-3.5">
+      <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] p-4 shadow-xs space-y-3.5">
         {/* Category Filter Tabs */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-ink-200/80">
           {[
@@ -783,7 +783,7 @@ export const AdminAuditLogsPage = () => {
       {/* 6. Log Detail Modal (Paper-Ink-Clay) */}
       {selectedLog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-[2px] animate-in fade-in duration-150">
-          <div className="bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] max-w-lg w-full p-6 shadow-xl space-y-4 animate-in zoom-in-95 duration-150">
+          <div className="admin-panel bg-[#FFFDF8] border border-ink-200/80 rounded-[6px] max-w-lg w-full p-6 shadow-xl space-y-4 animate-in zoom-in-95 duration-150">
             <div className="flex items-center justify-between pb-3 border-b border-ink-200/80">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-[4px] bg-clay-100 text-clay-700 flex items-center justify-center font-bold">

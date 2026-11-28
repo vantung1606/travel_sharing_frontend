@@ -163,9 +163,9 @@ export const AdminSystemMonitoringPage = () => {
   const { serverInfo, memoryInfo, threadInfo, databaseInfo, garbageCollectors } = systemData || {};
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="admin-page space-y-6 pb-12">
       {/* ─── 1. TOP HEADER & ACTIONS ────────────────────────────────────────── */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-ink-200/80">
+      <div className="admin-page-header flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-ink-200/80">
         <div>
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-[6px] bg-clay-700 text-white flex items-center justify-center shadow-xs">
@@ -234,7 +234,7 @@ export const AdminSystemMonitoringPage = () => {
       {/* ─── 2. TOP METRIC SUMMARY CARDS ─────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Database Stats */}
-        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Cơ sở dữ liệu</span>
             <div className="w-8 h-8 rounded-[5px] bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-200">
@@ -257,7 +257,7 @@ export const AdminSystemMonitoringPage = () => {
         </div>
 
         {/* Card 2: JVM Memory Heap */}
-        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Bộ nhớ JVM Heap</span>
             <div className="w-8 h-8 rounded-[5px] bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-200">
@@ -290,7 +290,7 @@ export const AdminSystemMonitoringPage = () => {
         </div>
 
         {/* Card 3: Uptime */}
-        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Thời gian hoạt động</span>
             <div className="w-8 h-8 rounded-[5px] bg-blue-50 text-blue-700 flex items-center justify-center border border-blue-200">
@@ -312,7 +312,7 @@ export const AdminSystemMonitoringPage = () => {
         </div>
 
         {/* Card 4: Runtime Environment */}
-        <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
+        <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col justify-between">
           <div className="flex items-center justify-between">
             <span className="font-mono text-[10px] font-bold text-ink-400 uppercase tracking-wider">Môi trường máy chủ</span>
             <div className="w-8 h-8 rounded-[5px] bg-clay-50 text-clay-700 flex items-center justify-center border border-clay-200">
@@ -336,7 +336,7 @@ export const AdminSystemMonitoringPage = () => {
       </div>
 
       {/* ─── 3. SUB-TABS NAVIGATION ──────────────────────────────────────── */}
-      <div className="flex border-b border-ink-200">
+      <div className="flex min-w-0 flex-wrap border-b border-ink-200">
         <button
           type="button"
           onClick={() => setActiveTab('database')}
@@ -402,7 +402,7 @@ export const AdminSystemMonitoringPage = () => {
           )}
 
           {/* Search, Filter & Controls */}
-          <div className="p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div className="admin-panel p-4 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-3">
             {/* Search Input */}
             <div className="relative flex-1 max-w-md">
               <Search className="w-4 h-4 text-ink-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -579,7 +579,7 @@ export const AdminSystemMonitoringPage = () => {
       {activeTab === 'versions' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Software Stack Versions */}
-          <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-4">
+          <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-ink-200">
               <Boxes className="w-5 h-5 text-clay-700" />
               <h2 className="text-base font-bold font-serif text-ink-900">
@@ -634,7 +634,7 @@ export const AdminSystemMonitoringPage = () => {
           </div>
 
           {/* Operating System & Server Environment */}
-          <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-4">
+          <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-4">
             <div className="flex items-center gap-2 pb-3 border-b border-ink-200">
               <Server className="w-5 h-5 text-clay-700" />
               <h2 className="text-base font-bold font-serif text-ink-900">
@@ -693,7 +693,7 @@ export const AdminSystemMonitoringPage = () => {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Memory Heap Breakdown */}
-            <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-4">
+            <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-4">
               <div className="flex items-center justify-between pb-3 border-b border-ink-200">
                 <div className="flex items-center gap-2">
                   <Cpu className="w-5 h-5 text-amber-700" />
@@ -748,7 +748,7 @@ export const AdminSystemMonitoringPage = () => {
             </div>
 
             {/* JVM Threads Breakdown */}
-            <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-4">
+            <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-4">
               <div className="flex items-center gap-2 pb-3 border-b border-ink-200">
                 <Activity className="w-5 h-5 text-blue-700" />
                 <h2 className="text-base font-bold font-serif text-ink-900">Luồng Xử Lý (JVM Threads)</h2>
@@ -781,7 +781,7 @@ export const AdminSystemMonitoringPage = () => {
 
           {/* Garbage Collector Metrics */}
           {garbageCollectors && garbageCollectors.length > 0 && (
-            <div className="p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-3">
+            <div className="admin-panel p-5 rounded-[6px] bg-[#FFFDF8] border border-ink-200/80 shadow-2xs space-y-3">
               <div className="flex items-center gap-2 pb-2 border-b border-ink-200">
                 <Zap className="w-5 h-5 text-amber-600" />
                 <h2 className="text-base font-bold font-serif text-ink-900">Bộ Thu Gom Rác (Garbage Collectors)</h2>
