@@ -189,7 +189,13 @@ const FileAttachmentBubble = ({ src, isMe }) => {
   );
 };
 
-export const MessagesPage = () => {
+export const MessagesPage = ({
+  embedded = false,
+  initialThreadId = null,
+  initialDraft = '',
+  onActiveThreadChange,
+  onDraftChange
+} = {}) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { currentUser } = useApp();
@@ -197,11 +203,11 @@ export const MessagesPage = () => {
 
   const [threads, setThreads] = useState([]);
   const [messages, setMessages] = useState([]);
-  const [activeThreadId, setActiveThreadId] = useState(null);
-  const [showMobileChat, setShowMobileChat] = useState(false);
+  const [activeThreadId, setActiveThreadId] = useState(initialThreadId);
+  const [showMobileChat, setShowMobileChat] = useState(Boolean(initialThreadId));
   const [filterTab, setFilterTab] = useState('all'); // 'all' | 'direct' | 'group'
   const [searchTerm, setSearchTerm] = useState('');
-  const [inputText, setInputText] = useState('');
+  const [inputText, setInputText] = useState(initialDraft);
   const [typingUsers, setTypingUsers] = useState({});
   const typingTimeoutRef = useRef(null);
   const isTypingRef = useRef(false);
@@ -244,8 +250,33 @@ export const MessagesPage = () => {
   const audioChunksRef = useRef([]);
   const recordingTimerRef = useRef(null);
   const recordingStreamRef = useRef(null);
+  const isMountedRef = useRef(false);
 
   const effectiveEmail = currentUser?.email || '';
+
+  useEffect(() => {
+    onActiveThreadChange?.(activeThreadId);
+  }, [activeThreadId, onActiveThreadChange]);
+
+  useEffect(() => {
+    onDraftChange?.(inputText);
+  }, [inputText, onDraftChange]);
+
+  // The floating chat unmounts on minimize; release the microphone and timers.
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      clearInterval(recordingTimerRef.current);
+      clearTimeout(typingTimeoutRef.current);
+      const recorder = mediaRecorderRef.current;
+      if (recorder && recorder.state !== 'inactive') {
+        recorder.onstop = null;
+        recorder.stop();
+      }
+      recordingStreamRef.current?.getTracks().forEach(track => track.stop());
+    };
+  }, []);
 
   // Tải danh sách người dùng khả dụng để thêm vào nhóm (hỗ trợ silent update để không giật màn hình khi gõ phím)
   const loadAvailableUsers = useCallback(async (keyword = '', silent = false) => {
@@ -286,7 +317,7 @@ export const MessagesPage = () => {
       if (Array.isArray(data)) {
         setThreads(data);
         if (data.length > 0) {
-          setActiveThreadId(prev => (prev && data.some(r => r.id === prev)) ? prev : data[0].id);
+          setActiveThreadId(prev => (prev && data.some(r => r.id === prev)) ? prev : (embedded ? null : data[0].id));
         } else {
           setActiveThreadId(null);
           setMessages([]);
@@ -297,7 +328,7 @@ export const MessagesPage = () => {
     } finally {
       setIsLoadingRooms(false);
     }
-  }, [effectiveEmail]);
+  }, [effectiveEmail, embedded]);
 
   useEffect(() => {
     loadRooms();
@@ -649,6 +680,7 @@ export const MessagesPage = () => {
   }, [currentUser?.id, effectiveEmail, loadRooms, loadMessages]);
 
   useEffect(() => {
+    if (embedded) return;
     const targetRoomId = searchParams.get('roomId');
     if (targetRoomId) {
       const parsedId = Number(targetRoomId) || targetRoomId;
@@ -688,7 +720,7 @@ export const MessagesPage = () => {
         })();
       }
     }
-  }, [searchParams, currentUser?.id, effectiveEmail, loadRooms, loadMessages, setSearchParams, toast]);
+  }, [embedded, searchParams, currentUser?.id, effectiveEmail, loadRooms, loadMessages, setSearchParams, toast]);
 
   // Xóa vĩnh viễn một cuộc trò chuyện
   const handleDeleteRoom = async (roomId) => {
@@ -922,6 +954,10 @@ export const MessagesPage = () => {
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!isMountedRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       recordingStreamRef.current = stream;
       audioChunksRef.current = [];
 
@@ -1280,7 +1316,9 @@ export const MessagesPage = () => {
   }, [isMembersModalOpen, membersModalTab, addMemberSearchKeyword, loadAvailableUsers]);
 
   return (
-    <div className="messages-page w-full h-[calc(100vh-64px)] sm:h-[calc(100dvh-64px)] bg-[#F8F4EC] text-ink-800 flex flex-col py-3 sm:py-4 px-4 sm:px-6 lg:px-8 xl:px-12 overflow-hidden">
+    <div className={embedded
+      ? 'messages-page w-full min-h-0 flex-1 bg-[#F8F4EC] text-ink-800 flex flex-col overflow-hidden'
+      : 'messages-page w-full h-[calc(100vh-64px)] sm:h-[calc(100dvh-64px)] bg-[#F8F4EC] text-ink-800 flex flex-col py-3 sm:py-4 px-4 sm:px-6 lg:px-8 xl:px-12 overflow-hidden'}>
       <div className="w-full max-w-[1700px] mx-auto flex-1 min-h-0 flex flex-col">
       
       {/* Lightbox Xem Ảnh Chi Tiết */}
@@ -1883,10 +1921,12 @@ export const MessagesPage = () => {
       )}
 
       {/* Khung chat chính - Đồng bộ lề 2 bên mép px-4 sm:px-6 lg:px-8 xl:px-12 và bo viền chuẩn */}
-      <div className="flex-1 w-full min-h-0 overflow-hidden grid grid-cols-1 md:grid-cols-12 bg-[#FFFDF8] rounded-[6px] border border-ink-200/80 shadow-xs">
+      <div className={`flex-1 w-full min-h-0 overflow-hidden grid grid-cols-1 bg-[#FFFDF8] ${embedded ? '' : 'md:grid-cols-12 rounded-[6px] border border-ink-200/80 shadow-xs'}`}>
 
         {/* CỘT TRÁI: Hộp thư */}
-        <div className={`md:col-span-5 lg:col-span-4 xl:col-span-3 border-r border-ink-200/70 flex flex-col min-h-0 h-full bg-[#FFFDF8] ${showMobileChat ? 'hidden md:flex' : 'flex'}`}>
+        <div className={`border-ink-200/70 flex-col min-h-0 min-w-0 h-full bg-[#FFFDF8] ${embedded
+          ? (showMobileChat && activeThreadId ? 'hidden' : 'flex')
+          : `md:col-span-5 lg:col-span-4 xl:col-span-3 border-r ${showMobileChat ? 'hidden md:flex' : 'flex'}`}`}>
           <div className="p-3.5 sm:p-4 border-b border-ink-200/70 shrink-0 bg-[#FFFDF8]">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 min-w-0">
@@ -2055,16 +2095,26 @@ export const MessagesPage = () => {
         </div>
 
         {/* CỘT PHẢI: Nội dung hội thoại */}
-        <div className={`md:col-span-7 lg:col-span-8 xl:col-span-9 flex flex-col min-h-0 h-full bg-[#FFFDF8] ${!showMobileChat ? 'hidden md:flex' : 'flex'}`}>
+        <div className={`flex-col min-h-0 min-w-0 h-full bg-[#FFFDF8] ${embedded
+          ? (showMobileChat && activeThreadId ? 'flex' : 'hidden')
+          : `md:col-span-7 lg:col-span-8 xl:col-span-9 ${!showMobileChat ? 'hidden md:flex' : 'flex'}`}`}>
           {currentThreadObj ? (
             <>
               {/* Header phòng chat */}
-              <div className="px-4 sm:px-5 py-3 border-b border-ink-200/70 flex items-center justify-between gap-2 shrink-0 bg-[#FFFDF8]">
-                <div className="flex items-center gap-2.5 min-w-0">
+              <div className={`${embedded ? 'px-3 py-2' : 'px-4 sm:px-5 py-3'} border-b border-ink-200/70 flex items-center justify-between gap-2 shrink-0 bg-[#FFFDF8]`}>
+                <div className="flex flex-1 items-center gap-2.5 min-w-0">
                   <button
                     type="button"
-                    onClick={() => setShowMobileChat(false)}
-                    className="md:hidden w-8 h-8 rounded-[5px] border border-ink-200 bg-[#F8F4EC] text-ink-500 hover:text-clay-700 flex items-center justify-center cursor-pointer shrink-0"
+                    onClick={() => {
+                      setShowMobileChat(false);
+                      if (embedded) {
+                        setActiveThreadId(null);
+                        setMessages([]);
+                      }
+                    }}
+                    aria-label="Quay lại danh sách trò chuyện"
+                    title="Quay lại danh sách trò chuyện"
+                    className={`${embedded ? 'w-11 h-11' : 'md:hidden w-8 h-8'} rounded-[5px] border border-ink-200 bg-[#F8F4EC] text-ink-500 hover:text-clay-700 flex items-center justify-center cursor-pointer shrink-0`}
                   >
                     <ArrowLeft className="w-4 h-4" />
                   </button>
@@ -2081,9 +2131,9 @@ export const MessagesPage = () => {
                     </h3>
                     <div className="text-[10px] text-ink-400 flex items-center gap-1.5 mt-0.5 min-w-0">
                       {currentThreadObj?.type === 'AI' || currentThreadObj?.isPinned ? (
-                        <span className="text-indigo-700 font-bold flex items-center gap-1">
+                        <span className="text-indigo-700 font-bold flex items-center gap-1 min-w-0">
                           <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse" />
-                          <span>Trợ lý du lịch AI • Luôn trực tuyến</span>
+                          <span className="truncate">Trợ lý du lịch AI • Luôn trực tuyến</span>
                         </span>
                       ) : currentThreadObj?.type === 'DIRECT' ? (
                         currentThreadObj?.isOnline ? (
@@ -2118,7 +2168,7 @@ export const MessagesPage = () => {
                       type="button"
                       onClick={handleOpenMembersModal}
                       title="Xem danh sách & quản lý thành viên nhóm"
-                      className="h-8 px-2.5 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-ink-600 hover:text-clay-700 text-[10px] font-bold transition-colors cursor-pointer flex items-center gap-1.5 border border-ink-200"
+                      className={`${embedded ? 'h-11 min-w-11 px-2' : 'h-8 px-2.5'} rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-ink-600 hover:text-clay-700 text-[10px] font-bold transition-colors cursor-pointer flex items-center justify-center gap-1.5 border border-ink-200`}
                     >
                       <Users className="w-3.5 h-3.5 text-clay-600" />
                       <span>{currentThreadObj?.membersCount || 1}</span>
@@ -2129,7 +2179,7 @@ export const MessagesPage = () => {
                     type="button"
                     onClick={() => handleDeleteRoom(currentThreadObj.id)}
                     title="Xóa cuộc trò chuyện này"
-                    className="w-8 h-8 rounded-[5px] text-ink-300 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer flex items-center justify-center"
+                    className={`${embedded ? 'w-11 h-11' : 'w-8 h-8'} rounded-[5px] text-ink-300 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer flex items-center justify-center`}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -2137,7 +2187,7 @@ export const MessagesPage = () => {
               </div>
 
               {/* Lịch sử tin nhắn */}
-              <div ref={chatScrollContainerRef} className="flex-1 min-h-0 overflow-y-auto px-4 sm:px-6 py-4 space-y-3 bg-[#F8F4EC] custom-dropdown-scroll">
+              <div ref={chatScrollContainerRef} className={`flex-1 min-h-0 min-w-0 overflow-y-auto ${embedded ? 'px-3' : 'px-4 sm:px-6'} py-4 space-y-3 bg-[#F8F4EC] custom-dropdown-scroll`}>
                 {isLoadingMessages ? (
                   <div className="py-20 text-center text-ink-300 text-xs space-y-2">
                     <Loader2 className="w-5 h-5 animate-spin mx-auto text-clay-600" />
@@ -2176,7 +2226,7 @@ export const MessagesPage = () => {
                           />
                         )}
 
-                        <div className={`max-w-[82%] sm:max-w-[70%] flex flex-col gap-1 ${isMe ? 'items-end' : 'items-start'}`}>
+                        <div className={`min-w-0 ${embedded ? 'max-w-[85%] [overflow-wrap:anywhere] [&_img]:max-w-full [&_video]:max-w-full' : 'max-w-[82%] sm:max-w-[70%]'} flex flex-col gap-1 ${isMe ? 'items-end' : 'items-start'}`}>
                           {!isMe && (
                             <span className="text-[9px] font-bold text-ink-400 px-0.5">
                               {msg.senderName}
@@ -2235,7 +2285,7 @@ export const MessagesPage = () => {
                             />
                           ) : (
                             <div
-                              className={`px-3.5 py-2.5 rounded-[6px] text-[12px] leading-relaxed break-words border ${
+                              className={`max-w-full min-w-0 px-3.5 py-2.5 rounded-[6px] text-[12px] leading-relaxed break-words border ${
                                 isMe
                                   ? 'bg-clay-600 text-[#FFFDF8] border-clay-600'
                                   : 'bg-[#FFFDF8] text-ink-800 border-ink-200/70'
@@ -2358,14 +2408,14 @@ export const MessagesPage = () => {
 
                   <form
                     onSubmit={handleSendMessage}
-                    className="p-3 flex items-center gap-1.5"
+                    className={`p-3 flex items-center gap-1.5 ${embedded ? 'flex-wrap' : ''}`}
                   >
                     <button
                       type="button"
                       disabled={isUploading}
                       onClick={() => fileInputRef.current?.click()}
                       title="Đính kèm ảnh, video hoặc tệp tài liệu"
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-ink-400 hover:text-clay-700 hover:bg-[#F8F4EC] transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
+                      className={`${embedded ? 'w-11 h-11' : 'w-8 h-8 sm:w-9 sm:h-9'} rounded-[5px] text-ink-400 hover:text-clay-700 hover:bg-[#F8F4EC] transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center`}
                     >
                       <Paperclip className="w-4 h-4" />
                     </button>
@@ -2375,7 +2425,7 @@ export const MessagesPage = () => {
                       disabled={isUploading}
                       onClick={handleStartRecording}
                       title="Ghi âm tin nhắn thoại"
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-ink-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
+                      className={`${embedded ? 'w-11 h-11' : 'w-8 h-8 sm:w-9 sm:h-9'} rounded-[5px] text-ink-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center`}
                     >
                       <Mic className="w-4 h-4" />
                     </button>
@@ -2385,7 +2435,7 @@ export const MessagesPage = () => {
                       disabled={isUploading}
                       onClick={() => setIsItineraryPickerOpen(true)}
                       title="Gửi lịch trình vào cuộc trò chuyện"
-                      className="w-8 h-8 sm:w-9 sm:h-9 rounded-[5px] text-clay-600 hover:bg-clay-50 transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center"
+                      className={`${embedded ? 'w-11 h-11' : 'w-8 h-8 sm:w-9 sm:h-9'} rounded-[5px] text-clay-600 hover:bg-clay-50 transition-colors cursor-pointer disabled:opacity-40 shrink-0 flex items-center justify-center`}
                     >
                       <Route className="w-4 h-4" />
                     </button>
@@ -2402,16 +2452,17 @@ export const MessagesPage = () => {
                       value={inputText}
                       onChange={handleInputChange}
                       disabled={isUploading}
-                      className="flex-1 min-w-0 h-10 px-3 rounded-[5px] border border-ink-200 text-xs text-ink-800 outline-none focus:border-clay-500 focus:bg-[#FFFDF8] bg-[#F8F4EC] transition-colors font-medium placeholder:text-ink-300 disabled:opacity-60"
+                      className={`${embedded ? 'order-first w-full h-11' : 'flex-1 h-10'} min-w-0 px-3 rounded-[5px] border border-ink-200 text-xs text-ink-800 outline-none focus:border-clay-500 focus:bg-[#FFFDF8] bg-[#F8F4EC] transition-colors font-medium placeholder:text-ink-300 disabled:opacity-60`}
                     />
 
                     <button
                       type="submit"
+                      aria-label="Gửi tin nhắn"
                       disabled={!inputText.trim() || isUploading}
-                      className="h-10 px-3 sm:px-4 rounded-[5px] bg-clay-600 hover:bg-clay-700 disabled:opacity-40 disabled:cursor-not-allowed text-[#FFFDF8] text-xs font-bold shrink-0 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                      className={`${embedded ? 'ml-auto w-11 h-11' : 'h-10 px-3 sm:px-4'} rounded-[5px] bg-clay-600 hover:bg-clay-700 disabled:opacity-40 disabled:cursor-not-allowed text-[#FFFDF8] text-xs font-bold shrink-0 transition-colors flex items-center justify-center gap-1.5 cursor-pointer`}
                     >
                       <Send className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Gửi</span>
+                      {!embedded && <span className="hidden sm:inline">Gửi</span>}
                     </button>
                   </form>
                 </div>
