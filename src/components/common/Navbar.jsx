@@ -109,7 +109,7 @@ export const Navbar = () => {
         }`}
       >
         <TopAnnouncementRibbon />
-        <div className="w-full max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12">
+        <div className={`w-full ${isHomePage ? 'max-w-[1700px]' : 'max-w-[1560px]'} mx-auto px-4 sm:px-6 lg:px-8 xl:px-12`}>
           <div className="flex items-center justify-between h-16 gap-2 sm:gap-3">
             
             {/* 1. Brand Logo */}

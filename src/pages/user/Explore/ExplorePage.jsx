@@ -82,7 +82,7 @@ export const ExplorePage = () => {
   const [mapStyle, setMapStyle] = useState('osm');
 
   // 3. Filter States
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(() => new URLSearchParams(window.location.search).get('keyword') || '');
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
   const [selectedRegion, setSelectedRegion] = useState('Tất cả');
   const [selectedCity, setSelectedCity] = useState('Tất cả');
