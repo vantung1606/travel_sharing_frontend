@@ -6,6 +6,8 @@ import { formatVietnamDateOnly } from '../../../utils/dateUtils';
 import { Star, Eye, EyeOff, Trash2, Search, RefreshCw, ChevronLeft, ChevronRight, MessageSquare, ShieldAlert, ExternalLink, X, ChevronDown } from 'lucide-react';
 import { UserAvatar } from '../../../components/common/UserAvatar';
 import { getUserTier } from '../../../utils/tierSystem';
+import { useApp } from '../../../context/AppContext';
+import { getStaffPresentation } from '../../../utils/staffPresentation';
 
 const TABS = [
   { id: 'all', label: 'Tất cả' },
@@ -23,6 +25,7 @@ const RatingStars = ({ rating }) => (
 
 export const AdminReviewsPage = () => {
   const toast = useToast();
+  const { currentUser } = useApp();
 
   const [reviews, setReviews] = useState([]);
   const [pageData, setPageData] = useState({ totalElements: 0, totalPages: 1, number: 0 });
@@ -136,7 +139,7 @@ export const AdminReviewsPage = () => {
         <div className="space-y-1">
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 font-bold text-[10px] uppercase tracking-wider border border-clay-200/60">
-              Ban Quản Trị
+              {getStaffPresentation(currentUser).workspaceLabel}
             </span>
             <span className="text-ink-200">/</span>
             <span className="font-bold text-xs text-clay-700">Kiểm duyệt đánh giá</span>

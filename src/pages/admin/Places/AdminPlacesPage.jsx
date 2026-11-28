@@ -3,6 +3,7 @@ import { useToast } from '../../../components/common/Toast';
 import { useApp } from '../../../context/AppContext';
 import { placeApi, reportApi } from '../../../services/api';
 import { formatVietnamDateOnly } from '../../../utils/dateUtils';
+import { getStaffPresentation } from '../../../utils/staffPresentation';
 import { 
   MapPin, Check, X, Search, Star, Clock, ChevronRight, Eye, Trash2, 
   RefreshCw, ShieldCheck, Phone, AlertCircle, Plus, ExternalLink, 
@@ -487,7 +488,7 @@ export const AdminPlacesPage = () => {
       <div className="admin-panel admin-page-header bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div className="space-y-1">
           <nav className="flex items-center gap-2 text-xs font-semibold text-ink-400">
-            <span>Quản trị hệ thống</span>
+            <span>{getStaffPresentation(currentUser).workspaceLabel}</span>
             <ChevronRight className="w-3.5 h-3.5 text-ink-300" />
             <span className="text-clay-700 font-bold">Địa điểm</span>
           </nav>

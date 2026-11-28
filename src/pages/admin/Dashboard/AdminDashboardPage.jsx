@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo, useId } from 'react';
-import { useApp } from '../../../context/AppContext';
+import { useApp, DEFAULT_MODERATOR_PERMISSIONS } from '../../../context/AppContext';
 import { useToast } from '../../../components/common/Toast';
 import { adminApi, adminReportApi, auditLogApi, adminUserApi } from '../../../services/api';
 import { formatVietnamDateOnly } from '../../../utils/dateUtils';
 import { formatAdminActionLabel } from '../../../utils/adminPresentation';
+import { getStaffPresentation } from '../../../utils/staffPresentation';
 import { 
   Users, MapPin, CheckCircle2, Calendar,
   ChevronRight, Search, Flag, Eye, Download, ArrowRight, RefreshCw,
@@ -22,11 +23,12 @@ const METRIC_TONES = {
 
 const DashboardMetric = ({ icon: Icon, label, value, badge, detail, tone = 'clay', onClick }) => {
   const colors = METRIC_TONES[tone];
+  const MetricElement = onClick ? 'button' : 'div';
   return (
-    <button
-      type="button"
+    <MetricElement
+      type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`${PANEL_CLASS} dashboard-metric group flex w-full flex-col gap-4 bg-gradient-to-br ${colors.surface} p-4 text-left transition duration-200 hover:-translate-y-0.5 hover:border-clay-300 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-600 motion-reduce:transform-none sm:p-5`}
+      className={`${PANEL_CLASS} dashboard-metric group flex w-full flex-col gap-4 bg-gradient-to-br ${colors.surface} p-4 text-left transition duration-200 ${onClick ? 'hover:-translate-y-0.5 hover:border-clay-300 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-clay-600' : ''} motion-reduce:transform-none sm:p-5`}
     >
       <div className="flex items-center justify-between gap-2">
         <span className="text-[13px] font-semibold text-ink-500">{label}</span>
@@ -40,9 +42,9 @@ const DashboardMetric = ({ icon: Icon, label, value, badge, detail, tone = 'clay
       </div>
       <div className="mt-auto flex items-center justify-between gap-2 border-t border-ink-200/60 pt-3 text-[12px] leading-relaxed text-ink-500">
         <span>{detail}</span>
-        <ArrowRight className="h-3.5 w-3.5 shrink-0 text-ink-400 transition-transform group-hover:translate-x-0.5" />
+        {onClick && <ArrowRight className="h-3.5 w-3.5 shrink-0 text-ink-400 transition-transform group-hover:translate-x-0.5" />}
       </div>
-    </button>
+    </MetricElement>
   );
 };
 
@@ -111,6 +113,16 @@ const GrowthChart = ({ data, metric }) => {
 export const AdminDashboardPage = () => {
   const toast = useToast();
   const { currentUser, setAdminTab } = useApp();
+  const presentation = getStaffPresentation(currentUser);
+  const assignedPermissions = Array.isArray(currentUser?.permissions) ? currentUser.permissions : [];
+  const permissions = assignedPermissions.length ? assignedPermissions : DEFAULT_MODERATOR_PERMISSIONS;
+  const canView = permission => presentation.role === 'admin'
+    || (presentation.role === 'moderator' && permissions.includes(permission));
+  const canViewUsers = canView('USERS_VIEW');
+  const canViewItineraries = canView('PLACES_VIEW');
+  const canViewReports = canView('REPORTS_VIEW');
+  const canViewAudit = canView('AUDIT_VIEW');
+  const hasSidePanels = canViewReports || canViewAudit;
 
   // Core Data States with SWR Instant Hydration
   const initialStatsObj = {
@@ -145,6 +157,7 @@ export const AdminDashboardPage = () => {
   });
 
   const [itinerariesList, setItinerariesList] = useState(() => {
+    if (!canViewItineraries) return [];
     try {
       const cached = sessionStorage.getItem('wayfare_admin_itineraries');
       return cached ? JSON.parse(cached) : [];
@@ -154,6 +167,7 @@ export const AdminDashboardPage = () => {
   });
   const [usersList, setUsersList] = useState([]);
   const [pendingReports, setPendingReports] = useState(() => {
+    if (!canViewReports) return [];
     try {
       const cached = sessionStorage.getItem('wayfare_admin_reports');
       return cached ? JSON.parse(cached) : [];
@@ -168,7 +182,7 @@ export const AdminDashboardPage = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [chartMetric, setChartMetric] = useState('users'); // 'users' | 'posts'
   const [topTab, setTopTab] = useState('destinations'); // 'destinations' | 'places'
-  const [activeTableTab, setActiveTableTab] = useState('itineraries'); // 'itineraries' | 'users'
+  const [activeTableTab, setActiveTableTab] = useState(canViewItineraries ? 'itineraries' : 'users');
   const [tableSearch, setTableSearch] = useState('');
   const [tableStatusFilter, setTableStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
@@ -185,10 +199,10 @@ export const AdminDashboardPage = () => {
     try {
       const [fetchedStats, fetchedItins, fetchedReports, fetchedLogs, fetchedUsers] = await Promise.all([
         adminApi.getStats().catch(() => null),
-        adminApi.getAllItineraries().catch(() => []),
-        adminReportApi.getPendingReports().catch(() => []),
-        auditLogApi.getLogs({ page: 0, size: 5 }).catch(() => ({ content: [] })),
-        adminUserApi.getUsers().catch(() => [])
+        canViewItineraries ? adminApi.getAllItineraries().catch(() => []) : [],
+        canViewReports ? adminReportApi.getPendingReports().catch(() => []) : [],
+        canViewAudit ? auditLogApi.getLogs({ page: 0, size: 5 }).catch(() => ({ content: [] })) : { content: [] },
+        canViewUsers ? adminUserApi.getUsers().catch(() => []) : []
       ]);
 
       if (fetchedStats) {
@@ -239,12 +253,17 @@ export const AdminDashboardPage = () => {
 
   useEffect(() => {
     loadDashboardData();
-  }, []);
+  }, [canViewUsers, canViewItineraries, canViewReports, canViewAudit]);
 
   // Reset page when switching table tab or filters
   useEffect(() => {
     setCurrentPage(1);
   }, [activeTableTab, tableSearch, tableStatusFilter]);
+
+  useEffect(() => {
+    if (!canViewUsers && canViewItineraries) setActiveTableTab('itineraries');
+    if (!canViewItineraries && canViewUsers) setActiveTableTab('users');
+  }, [canViewUsers, canViewItineraries]);
 
   // Helper tính toán trạng thái Lịch trình (kết hợp CSDL `status` và Dòng thời gian `startDate`/`endDate`)
   const getItineraryTimelineStatus = (item) => {
@@ -464,7 +483,7 @@ export const AdminDashboardPage = () => {
       // 1. REPORT HEADER
       lines.push('BÁO CÁO TỔNG QUAN HỆ THỐNG WAYFARE (WAYFARE SYSTEM FULL DASHBOARD REPORT)');
       lines.push(`Thời gian xuất dữ liệu:,${escape(exportTimestamp)}`);
-      lines.push(`Người lập báo cáo:,${escape(`${currentUser?.name || 'Quản trị viên'} (${currentUser?.email || 'admin@wayfare.com'})`)}`);
+      lines.push(`Người lập báo cáo:,${escape(`${currentUser?.name || presentation.roleLabel} (${currentUser?.email || ''})`)}`);
       lines.push(`Trạng thái máy chủ CSDL:,${escape('Online - Đã đồng bộ trực tiếp từ MySQL')}`);
       lines.push('');
 
@@ -601,7 +620,7 @@ export const AdminDashboardPage = () => {
       // Tiêu đề & Thông tin kết xuất
       lines.push('BÁO CÁO HỒ SƠ CHI TIẾT LỊCH TRÌNH DU LỊCH WAYFARE');
       lines.push(`Thời gian trích xuất dữ liệu:,${escape(now.toLocaleString('vi-VN'))}`);
-      lines.push(`Cán bộ kiểm tra / Quản trị viên:,${escape(`${currentUser?.name || 'Quản trị viên'} (${currentUser?.email || 'admin@wayfare.com'})`)}`);
+      lines.push(`Người lập báo cáo:,${escape(`${currentUser?.name || presentation.roleLabel} (${currentUser?.email || ''})`)}`);
       lines.push(`Nguồn cơ sở dữ liệu:,${escape('Hệ quản trị CSDL Wayfare MySQL (Single Source of Truth)')}`);
       lines.push('');
 
@@ -677,16 +696,18 @@ export const AdminDashboardPage = () => {
     <div className="admin-page admin-dashboard-depth min-w-0 space-y-5 pb-8 sm:space-y-6">
       <nav className="flex flex-wrap items-center gap-2 text-[12px] font-medium text-ink-400" aria-label="Đường dẫn">
         <Compass className="h-3.5 w-3.5" />
-        <span>Quản trị hệ thống</span>
+        <span>{presentation.workspaceLabel}</span>
         <ChevronRight className="h-3 w-3 text-ink-300" />
-        <span className="text-ink-700">Dashboard</span>
+        <span className="text-ink-700">Tổng quan</span>
       </nav>
 
       <section className="admin-page-header flex flex-col justify-between gap-4 xl:flex-row xl:items-center">
           <div className="min-w-0 space-y-2">
-            <h1 className="font-display text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl">Tổng quan hệ thống</h1>
+            <h1 className="font-display text-2xl font-bold tracking-tight text-ink-900 sm:text-3xl">{presentation.dashboardLabel}</h1>
             <p className="max-w-xl text-[13px] leading-relaxed text-ink-500">
-              Theo dõi hoạt động cộng đồng, tăng trưởng và nội dung cần xử lý.
+              {presentation.role === 'moderator'
+                ? 'Theo dõi nội dung được phân công, hàng đợi kiểm duyệt và báo cáo cần xử lý.'
+                : 'Theo dõi hoạt động cộng đồng, tăng trưởng và nội dung cần xử lý.'}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -706,29 +727,29 @@ export const AdminDashboardPage = () => {
         <DashboardMetric icon={Users} label="Thành viên" tone="ink"
           value={loading ? '—' : Number(stats.totalUsers || 0).toLocaleString('vi-VN')}
           badge={`+${stats.newUsersThisMonth || 0} tháng này`}
-          detail="Xem cộng đồng thành viên" onClick={() => setAdminTab('users')} />
+          detail={canViewUsers ? 'Xem cộng đồng thành viên' : 'Tài khoản trên hệ thống'} onClick={canViewUsers ? () => setAdminTab('users') : undefined} />
         <DashboardMetric icon={FileText} label="Bài viết cộng đồng" tone="clay"
           value={loading ? '—' : Number(stats.totalPosts || 0).toLocaleString('vi-VN')}
           badge={`+${stats.newPostsThisMonth || 0} tháng này`}
           detail={`${Number(stats.totalLikes || 0).toLocaleString('vi-VN')} lượt thích · ${Number(stats.totalComments || 0).toLocaleString('vi-VN')} bình luận`}
-          onClick={() => setAdminTab('reports')} />
+          onClick={canViewReports ? () => setAdminTab('reports') : undefined} />
         <DashboardMetric icon={Compass} label="Lịch trình du lịch" tone="green"
           value={loading ? '—' : Number(stats.totalItineraries || 0).toLocaleString('vi-VN')}
           badge={`${stats.activeItineraries || 0} hoạt động`}
           detail={`${Number(stats.totalPlaces || 0).toLocaleString('vi-VN')} địa điểm khám phá`}
-          onClick={() => setAdminTab('itineraries')} />
+          onClick={canViewItineraries ? () => setAdminTab('itineraries') : undefined} />
         <DashboardMetric icon={ShieldAlert} label="Báo cáo chờ xử lý" tone={(stats.pendingReports ?? pendingReports.length) > 0 ? 'rose' : 'green'}
           value={loading ? '—' : Number(stats.pendingReports ?? pendingReports.length).toLocaleString('vi-VN')}
           badge={(stats.pendingReports ?? pendingReports.length) > 0 ? 'Cần chú ý' : 'Đã xử lý hết'}
           detail={`Trong tổng số ${Number(stats.totalReports || 0).toLocaleString('vi-VN')} báo cáo`}
-          onClick={() => setAdminTab('reports')} />
+          onClick={canViewReports ? () => setAdminTab('reports') : undefined} />
       </div>
 
       {/* ─── ROW 2: REAL CHARTS & INTELLIGENCE WIDGETS ────────────────────── */}
       <div className="grid min-w-0 grid-cols-1 items-start gap-5 xl:grid-cols-12">
         
         {/* LEFT COLUMN: REAL DATA CHARTS & TOP TRENDS (8 Cols) */}
-        <div className="min-w-0 space-y-5 xl:col-span-8">
+        <div className={`min-w-0 space-y-5 ${hasSidePanels ? 'xl:col-span-8' : 'xl:col-span-12'}`}>
           
           {/* Dynamic Growth Chart */}
           <section className={`${PANEL_CLASS} space-y-4 p-4 sm:p-5`} aria-label="Biểu đồ tăng trưởng">
@@ -907,10 +928,10 @@ export const AdminDashboardPage = () => {
         </div>
 
         {/* RIGHT COLUMN: ACTION REQUIRED & RECENT AUDIT LOGS (4 Cols) */}
-        <div className="min-w-0 space-y-5 xl:col-span-4">
+        {hasSidePanels && <div className="min-w-0 space-y-5 xl:col-span-4">
           
           {/* Action Required: Pending Moderation Reports */}
-          <div className={`${PANEL_CLASS} space-y-4 p-4 sm:p-5`}>
+          {canViewReports && <div className={`${PANEL_CLASS} space-y-4 p-4 sm:p-5`}>
             <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-ink-100">
               <div className="flex items-center gap-2 font-display font-bold text-[17px] text-ink-800">
                 <span className={`w-2 h-2 rounded-full ${(stats.pendingReports > 0 || pendingReports.length > 0) ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`}></span>
@@ -964,10 +985,10 @@ export const AdminDashboardPage = () => {
               <span>Xem tất cả báo cáo</span>
               <ArrowRight className="w-4 h-4" />
             </button>
-          </div>
+          </div>}
 
           {/* Recent Audit Logs Feed */}
-          <div className={`${PANEL_CLASS} space-y-4 p-4 sm:p-5`}>
+          {canViewAudit && <div className={`${PANEL_CLASS} space-y-4 p-4 sm:p-5`}>
             <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-ink-100">
               <div className="flex items-center gap-2 font-display font-bold text-[17px] text-ink-800">
                 <History className="w-4 h-4 text-clay-600" />
@@ -1019,19 +1040,19 @@ export const AdminDashboardPage = () => {
               <span>Xem tất cả nhật ký</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
-          </div>
+          </div>}
 
-        </div>
+        </div>}
 
       </div>
 
       {/* ─── ROW 3: CENTRAL DATA TABLE ────────────────────────────────────── */}
-      <div className={`${PANEL_CLASS} space-y-5 p-4 sm:p-5`}>
+      {(canViewItineraries || canViewUsers) && <div className={`${PANEL_CLASS} space-y-5 p-4 sm:p-5`}>
         
         {/* Table Header & Functional Bar */}
         <div className="flex flex-col justify-between gap-4 border-b border-ink-100 pb-4 xl:flex-row xl:flex-wrap xl:items-center">
           <div className="flex flex-wrap items-center gap-3">
-            <button
+            {canViewItineraries && <button
               onClick={() => setActiveTableTab('itineraries')}
               className={`font-display font-bold text-[17px] transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
                 activeTableTab === 'itineraries' 
@@ -1040,9 +1061,9 @@ export const AdminDashboardPage = () => {
               }`}
             >
               Lịch trình ({filteredItineraries.length})
-            </button>
-            <span className="text-ink-200">|</span>
-            <button
+            </button>}
+            {canViewItineraries && canViewUsers && <span className="text-ink-200">|</span>}
+            {canViewUsers && <button
               onClick={() => setActiveTableTab('users')}
               className={`font-display font-bold text-[17px] transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
                 activeTableTab === 'users' 
@@ -1051,7 +1072,7 @@ export const AdminDashboardPage = () => {
               }`}
             >
               Thành viên ({filteredUsers.length})
-            </button>
+            </button>}
           </div>
 
           <div className="flex min-w-0 w-full flex-col gap-2.5 sm:flex-row sm:items-center xl:w-auto">
@@ -1359,7 +1380,7 @@ export const AdminDashboardPage = () => {
           </div>
         )}
 
-      </div>
+      </div>}
 
       {/* ─── QUICK VIEW ITINERARY MODAL ────────────────────────────────────── */}
       {selectedItinerary && (

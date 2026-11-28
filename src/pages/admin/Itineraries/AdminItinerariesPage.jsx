@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useToast } from '../../../components/common/Toast';
 import { useApp } from '../../../context/AppContext';
+import { getStaffPresentation } from '../../../utils/staffPresentation';
 import { itineraryApi } from '../../../services/api';
 import { UserAvatar } from '../../../components/common/UserAvatar';
 import { ItineraryDetailModal } from '../../../components/itinerary/ItineraryDetailModal';
@@ -455,7 +456,7 @@ export const AdminItinerariesPage = () => {
       <div className="admin-page-header flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-ink-200/80">
         <div>
           <div className="flex items-center gap-2 text-xs font-serif text-clay-700 font-bold uppercase tracking-wider mb-1">
-            <span>Hệ Thống Quản Trị</span>
+            <span>{getStaffPresentation(currentUser).workspaceLabel}</span>
             <span>•</span>
             <span>Quản Lý Nội Dung</span>
           </div>

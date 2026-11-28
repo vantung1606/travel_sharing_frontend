@@ -10,6 +10,8 @@ import {
   Shield, Globe, Laptop, Clock, ArrowRight, Flag, Image as ImageIcon
 } from 'lucide-react';
 import { getUserTier } from '../../../utils/tierSystem';
+import { useApp } from '../../../context/AppContext';
+import { getStaffPresentation } from '../../../utils/staffPresentation';
 
 // Helper to sanitize media image URLs and prevent Mixed Content on production HTTPS
 const getSafeImageUrl = (url) => {
@@ -26,6 +28,7 @@ const getSafeImageUrl = (url) => {
 
 export const AdminReportsPage = () => {
   const toast = useToast();
+  const { currentUser } = useApp();
   const [searchParams] = useSearchParams();
   const initialTab = searchParams.get('tab') || 'pending';
   const initialType = searchParams.get('type') || 'ALL';
@@ -509,7 +512,7 @@ export const AdminReportsPage = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 font-bold text-[10px] uppercase tracking-wider border border-clay-200/60">
-              Ban Quản Trị Cộng Đồng
+              {getStaffPresentation(currentUser).workspaceLabel}
             </span>
             <span className="text-ink-200">/</span>
             <span className="font-bold text-xs text-clay-700">Khối kiểm duyệt & xử lý vi phạm</span>
@@ -1242,7 +1245,7 @@ export const AdminReportsPage = () => {
                 </div>
                 <div>
                   <h4 className="font-display font-bold text-ink-800 text-sm">Chưa có bản ghi nhật ký phù hợp</h4>
-                  <p className="text-xs text-ink-400 mt-1">Các thao tác kiểm duyệt mới của Quản trị viên sẽ lập tức được lưu vết tại đây.</p>
+                  <p className="text-xs text-ink-400 mt-1">Các thao tác kiểm duyệt mới của người phụ trách sẽ được lưu vết tại đây.</p>
                 </div>
                 <button
                   onClick={() => {
@@ -1308,7 +1311,7 @@ export const AdminReportsPage = () => {
                               )}
                               <div className="min-w-0">
                                 <div className="flex items-center gap-1.5">
-                                  <p className="font-bold text-ink-800 truncate text-xs">{log.userName || 'Quản Trị Viên'}</p>
+                                  <p className="font-bold text-ink-800 truncate text-xs">{log.userName || 'Người phụ trách'}</p>
                                   {isActorAdmin && (
                                     <span className="px-1.5 py-0.2 rounded-[4px] bg-clay-50 text-clay-800 font-bold text-[9px] uppercase border border-clay-200">
                                       Admin

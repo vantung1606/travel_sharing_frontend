@@ -2,6 +2,7 @@ import React from 'react';
 import { useApp } from '../../context/AppContext';
 import { useTheme } from '../../context/ThemeContext';
 import { DEFAULT_MODERATOR_PERMISSIONS } from './RouteGuards';
+import { getStaffPageTitle, getStaffPresentation } from '../../utils/staffPresentation';
 import { 
   LayoutDashboard, 
   MapPin, 
@@ -25,9 +26,9 @@ export const AdminSidebar = ({ onNavigate }) => {
   const { branding } = useTheme();
   const { adminTab, setAdminTab, setPortalMode, stats = {}, currentUser } = useApp();
 
-  const roles = Array.isArray(currentUser?.roles) ? currentUser.roles : [];
-  const isAdminUser = roles.includes('ROLE_ADMIN') || (currentUser?.email && currentUser.email.toLowerCase().includes('admin'));
-  const isModeratorUser = !isAdminUser && (roles.includes('ROLE_MODERATOR') || (currentUser?.email && (currentUser.email.toLowerCase().includes('mod') || currentUser.email.toLowerCase().includes('manager'))));
+  const presentation = getStaffPresentation(currentUser);
+  const isAdminUser = presentation.role === 'admin';
+  const isModeratorUser = presentation.role === 'moderator';
   const rawPerms = Array.isArray(currentUser?.permissions) ? currentUser.permissions : [];
   const userPerms = rawPerms.length > 0 ? rawPerms : (isModeratorUser ? DEFAULT_MODERATOR_PERMISSIONS : []);
 
@@ -42,7 +43,7 @@ export const AdminSidebar = ({ onNavigate }) => {
       items: [
         { 
           id: 'dashboard', 
-          label: 'Dashboard tổng quan', 
+          label: presentation.dashboardLabel,
           icon: LayoutDashboard,
           description: 'Chỉ số & hoạt động chính',
           permission: 'DASHBOARD_VIEW'
@@ -57,11 +58,11 @@ export const AdminSidebar = ({ onNavigate }) => {
       ]
     },
     {
-      title: 'QUẢN LÝ NỘI DUNG',
+      title: isModeratorUser ? 'GIÁM SÁT NỘI DUNG' : 'QUẢN LÝ NỘI DUNG',
       items: [
         { 
           id: 'places', 
-          label: 'Quản lý Địa điểm', 
+          label: getStaffPageTitle('places', currentUser),
           icon: MapPin, 
           badge: pendingPlacesCount,
           badgeColor: 'clay',
@@ -70,7 +71,7 @@ export const AdminSidebar = ({ onNavigate }) => {
         },
         { 
           id: 'itineraries', 
-          label: 'Quản lý Lịch trình', 
+          label: getStaffPageTitle('itineraries', currentUser),
           icon: Route,
           description: 'Lộ trình và kế hoạch chuyến đi',
           permission: 'PLACES_VIEW'
@@ -96,7 +97,7 @@ export const AdminSidebar = ({ onNavigate }) => {
       ]
     },
     {
-      title: 'HỆ THỐNG & AN TOÀN',
+      title: isModeratorUser ? 'CÔNG CỤ GIÁM SÁT' : 'HỆ THỐNG & AN TOÀN',
       items: [
         { 
           id: 'users', 
@@ -107,7 +108,7 @@ export const AdminSidebar = ({ onNavigate }) => {
         },
         { 
           id: 'moderators', 
-          label: 'Phân quyền Giám sát', 
+          label: 'Phân quyền giám sát viên',
           icon: ShieldCheck,
           description: 'Bật/tắt quyền cho Moderator',
           permission: 'USERS_VIEW',
@@ -161,9 +162,11 @@ export const AdminSidebar = ({ onNavigate }) => {
     items: sec.items.filter(item => {
       if (item.adminOnly && !isAdminUser) return false;
       if (isAdminUser) return true;
-      return item.permission ? userPerms.includes(item.permission) : true;
+      return isModeratorUser && (!item.permission || userPerms.includes(item.permission));
     })
   })).filter(sec => sec.items.length > 0);
+  const visibleItems = filteredSections.flatMap(section => section.items);
+  const homeItem = visibleItems.find(item => item.id === 'dashboard') || visibleItems[0];
 
   return (
     <aside className="admin-sidebar fixed left-0 top-0 z-50 flex h-dvh w-[260px] max-w-[calc(100vw-4rem)] flex-col border-r border-ink-200 bg-ink-50 text-ink-800 select-none md:max-w-none">
@@ -173,9 +176,10 @@ export const AdminSidebar = ({ onNavigate }) => {
         {/* Brand Header */}
         <button
           type="button"
-          onClick={() => { setAdminTab('dashboard'); onNavigate?.(); }}
+          onClick={() => { if (homeItem) setAdminTab(homeItem.id); onNavigate?.(); }}
+          disabled={!homeItem}
           className="group flex h-16 w-full shrink-0 items-center gap-3 border-b border-ink-200 bg-ink-50 px-4 text-left transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-clay-600"
-          aria-label="Về dashboard quản trị"
+          aria-label={homeItem ? `Về ${homeItem.label.toLowerCase()}` : presentation.workspaceName}
         >
           <div className="flex h-9 w-[66px] shrink-0 items-center justify-center rounded-[4px] border border-ink-200/70 bg-white px-1.5">
             <img
@@ -187,7 +191,7 @@ export const AdminSidebar = ({ onNavigate }) => {
           </div>
           <div className="flex min-w-0 flex-col gap-0.5">
             <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-400">
-              Không gian quản trị
+              {presentation.workspaceName}
             </span>
             <span className="truncate font-display text-[16px] font-bold leading-tight text-ink-800">
               {branding?.siteTitle || 'Wayfare'}
@@ -196,7 +200,7 @@ export const AdminSidebar = ({ onNavigate }) => {
         </button>
 
         {/* Navigation Sections */}
-        <nav aria-label="Các mục quản trị" className="min-h-0 flex-1 space-y-5 overflow-y-auto overflow-x-hidden px-3 py-4 sidebar-scrollbar">
+        <nav aria-label={presentation.navigationLabel} className="min-h-0 flex-1 space-y-5 overflow-y-auto overflow-x-hidden px-3 py-4 sidebar-scrollbar">
           {filteredSections.map((section, idx) => (
             <div key={idx} className="space-y-1">
               {/* Section Header */}
@@ -294,7 +298,7 @@ export const AdminSidebar = ({ onNavigate }) => {
               <div className="flex items-center gap-1 mt-0.5">
                 <ShieldCheck className="w-3 h-3 text-clay-600 shrink-0" />
                 <span className="font-mono text-[9px] text-ink-500 font-semibold truncate">
-                  {isAdminUser ? 'Quản trị viên' : 'Kiểm duyệt viên'}
+                  {presentation.roleLabel}
                 </span>
               </div>
             </div>

@@ -18,6 +18,8 @@ import {
   Compass
 } from 'lucide-react';
 import { adminApi } from '../../../services/api';
+import { useApp } from '../../../context/AppContext';
+import { getStaffPresentation } from '../../../utils/staffPresentation';
 
 // ─── Mini Bar Chart Component (Paper - Ink - Clay) ───────────────────────────
 const BarChart = ({ data, color = '#B0522F', label, metricType = 'items' }) => {
@@ -130,6 +132,7 @@ const TopListItem = ({ rank, name, value, suffix = '', bar, maxBar }) => (
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export const AdminStatisticsPage = () => {
+  const { currentUser } = useApp();
   const toast = useToast();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -174,7 +177,7 @@ export const AdminStatisticsPage = () => {
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="px-2.5 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 font-bold text-[10px] uppercase tracking-wider border border-clay-200/60">
-              Ban Quản Trị
+              {getStaffPresentation(currentUser).workspaceLabel}
             </span>
             <span className="text-ink-200">/</span>
             <span className="font-bold text-xs text-clay-700">Báo cáo & Thống kê hệ thống</span>

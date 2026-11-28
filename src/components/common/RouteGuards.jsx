@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { useApp, DEFAULT_MODERATOR_PERMISSIONS } from '../../context/AppContext';
 import { ShieldAlert, Lock, ArrowLeft, LogIn } from 'lucide-react';
+import { getStaffPageTitle, getStaffPresentation } from '../../utils/staffPresentation';
 
 // Title dictionary mapping routes to descriptive page titles
 export const PAGE_TITLES = {
@@ -32,12 +33,18 @@ export const PAGE_TITLES = {
 // Component that dynamically syncs document.title on every URL change
 export const PageTitleManager = () => {
   const location = useLocation();
+  const { currentUser } = useApp();
 
   useEffect(() => {
     const currentTitle = PAGE_TITLES[location.pathname]
       || (location.pathname.startsWith('/places/') ? 'Wayfare - Địa điểm du lịch chi tiết & Chia sẻ Check-in' : null)
       || 'Wayfare - Authentic Travel Stories';
-    document.title = currentTitle;
+    document.title = location.pathname.startsWith('/admin')
+      ? `Wayfare · ${getStaffPresentation(currentUser).roleLabel} · ${getStaffPageTitle(location.pathname.split('/')[2] || 'dashboard', currentUser)}`
+      : currentTitle;
+  }, [location.pathname, currentUser]);
+
+  useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [location.pathname]);
 
@@ -107,9 +114,9 @@ export const AdminRouteGuard = ({ children }) => {
             <Lock className="w-7 h-7" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-ink-800 font-display">Khu vực Quản Trị Viên (Admin Portal)</h2>
+            <h2 className="text-xl font-bold text-ink-800 font-display">Khu vực quản trị & giám sát</h2>
             <p className="text-xs text-ink-400 mt-2 leading-relaxed">
-              Bạn đang truy cập phân hệ Quản trị hệ thống. Vui lòng đăng nhập bằng tài khoản Quản Trị Viên được cấp quyền.
+              Vui lòng đăng nhập bằng tài khoản quản trị viên hoặc giám sát viên được cấp quyền.
             </p>
           </div>
           <div className="pt-2 flex flex-col gap-2.5">
@@ -120,7 +127,7 @@ export const AdminRouteGuard = ({ children }) => {
               }}
               className="w-full h-10 rounded-[5px] bg-clay-600 hover:bg-clay-700 text-[#FFFDF8] font-bold text-xs border border-clay-600 transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
-              <LogIn className="w-4 h-4" /> Đăng nhập tài khoản Quản trị
+              <LogIn className="w-4 h-4" /> Đăng nhập tài khoản được cấp quyền
             </button>
             <button
               onClick={() => navigate('/')}
@@ -148,7 +155,7 @@ export const AdminRouteGuard = ({ children }) => {
             </div>
             <h2 className="text-xl font-bold text-slate-900 font-display">Tài khoản không đủ thẩm quyền</h2>
             <p className="text-xs text-slate-500 mt-2 leading-relaxed">
-              Tài khoản hiện tại <strong className="text-slate-800">{currentUser?.email}</strong> thuộc nhóm thành viên thông thường. Bạn không có quyền truy cập cơ sở dữ liệu và cấu hình hệ thống Wayfare Admin.
+              Tài khoản <strong className="text-slate-800">{currentUser?.email}</strong> chưa được cấp vai trò quản trị viên hoặc giám sát viên để truy cập khu vực này.
             </p>
           </div>
           <div className="pt-2 flex flex-col gap-2.5">
@@ -159,7 +166,7 @@ export const AdminRouteGuard = ({ children }) => {
               }}
               className="w-full py-3 rounded-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-xs shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
             >
-              ⚡ Đăng nhập bằng Tài khoản Quản Trị Viên
+              Đăng nhập bằng tài khoản được cấp quyền
             </button>
             <button
               onClick={() => navigate('/')}
