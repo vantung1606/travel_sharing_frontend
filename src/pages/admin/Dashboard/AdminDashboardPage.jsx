@@ -10,6 +10,9 @@ import {
   X, Star, ExternalLink, BarChart3, AlertTriangle
 } from 'lucide-react';
 
+const DASHBOARD_PANEL = 'min-w-0 rounded-lg border border-ink-300 bg-white shadow-sm';
+const DASHBOARD_METRIC = `${DASHBOARD_PANEL} dashboard-metric-card flex flex-col justify-between gap-4 border-t-[3px] p-4 sm:p-5`;
+
 export const AdminDashboardPage = () => {
   const toast = useToast();
   const { currentUser, setAdminTab } = useApp();
@@ -591,12 +594,12 @@ export const AdminDashboardPage = () => {
   };
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="admin-dashboard min-w-0 space-y-5 pb-8 sm:space-y-6">
       
       {/* ─── PAGE HEADER & ACTION TOOLBAR ────────────────────────────────────── */}
-      <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      <div className={`${DASHBOARD_PANEL} flex flex-col justify-between gap-4 p-4 sm:p-6 xl:flex-row xl:items-center`}>
         <div className="space-y-1.5">
-          <nav className="flex items-center gap-2 text-[11px] font-semibold text-ink-400">
+          <nav className="flex items-center gap-2 text-[13px] font-semibold text-ink-500">
             <Compass className="w-3.5 h-3.5 text-clay-600 shrink-0" />
             <span>Quản trị hệ thống</span>
             <span className="text-ink-300">/</span>
@@ -605,7 +608,7 @@ export const AdminDashboardPage = () => {
           <h1 className="font-display text-2xl sm:text-3xl font-black text-ink-800 tracking-tight flex items-center gap-2">
             Chào mừng trở lại, {currentUser?.name || 'Quản trị viên'}! <span>👋</span>
           </h1>
-          <p className="text-xs text-ink-400 flex items-center gap-2 flex-wrap font-medium">
+          <p className="text-xs text-ink-500 flex items-center gap-2 flex-wrap font-medium">
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span>Hệ thống hoạt động ổn định • Dữ liệu thời gian thực</span>
           </p>
@@ -616,7 +619,7 @@ export const AdminDashboardPage = () => {
           <button 
             onClick={() => loadDashboardData(true)}
             disabled={refreshing}
-            className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer disabled:opacity-50"
+            className="flex-1 sm:flex-none min-h-11 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-white hover:bg-clay-50 text-ink-800 font-bold text-[14px] border border-ink-300 hover:border-clay-400 transition-colors cursor-pointer disabled:opacity-50"
             title="Đồng bộ dữ liệu mới nhất"
           >
             <RefreshCw className={`w-3.5 h-3.5 text-clay-600 ${refreshing ? 'animate-spin' : ''}`} />
@@ -625,7 +628,7 @@ export const AdminDashboardPage = () => {
 
           <button 
             onClick={handleExportCsv}
-            className="flex-1 sm:flex-none h-9 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-[#FFFDF8] hover:bg-clay-50 text-ink-700 font-bold text-xs border border-ink-200 hover:border-clay-400 transition-colors cursor-pointer"
+            className="flex-1 sm:flex-none min-h-11 flex items-center justify-center gap-1.5 px-3.5 rounded-[5px] bg-white hover:bg-clay-50 text-ink-800 font-bold text-[14px] border border-ink-300 hover:border-clay-400 transition-colors cursor-pointer"
             title="Xuất báo cáo tổng quan ra file CSV"
           >
             <Download className="w-3.5 h-3.5 text-clay-600" />
@@ -635,25 +638,25 @@ export const AdminDashboardPage = () => {
       </div>
 
       {/* ─── ROW 1: 4 KEY METRIC KPI CARDS ─────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Chỉ số tổng quan">
         
         {/* KPI 1: Users Metric */}
-        <div className="bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
-          <div className="flex items-start justify-between">
+        <div className={`${DASHBOARD_METRIC} border-t-ink-700`}>
+          <div className="flex flex-wrap items-start justify-between gap-2">
             <div className="w-10 h-10 rounded-[5px] bg-clay-50 text-clay-700 border border-clay-200 flex items-center justify-center shrink-0">
               <Users className="w-5 h-5" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[10px] font-bold border border-clay-200">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[12px] font-bold border border-clay-200">
               <TrendingUp className="w-3 h-3 text-clay-600" />
               +{stats.newUsersThisMonth} tháng này
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Thành viên</span>
+            <span className="text-[15px] font-semibold text-ink-600 block">Thành viên</span>
             <div className="mt-1">
-              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalUsers.toLocaleString('vi-VN')}</h2>
+              <h2 className="font-display text-[36px] leading-tight font-bold tracking-tight text-ink-900 tabular-nums sm:text-[40px]">{stats.totalUsers.toLocaleString('vi-VN')}</h2>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
+            <p className="text-[13px] leading-relaxed text-ink-600 mt-3 flex flex-wrap items-center gap-1.5 pt-3 border-t border-ink-200">
               <UserCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
               <span>Tài khoản trên hệ thống</span>
             </p>
@@ -661,22 +664,22 @@ export const AdminDashboardPage = () => {
         </div>
 
         {/* KPI 2: Community Posts & Engagement Metric */}
-        <div className="bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
-          <div className="flex items-start justify-between">
+        <div className={`${DASHBOARD_METRIC} border-t-clay-600`}>
+          <div className="flex flex-wrap items-start justify-between gap-2">
             <div className="w-10 h-10 rounded-[5px] bg-clay-50 text-clay-700 border border-clay-200 flex items-center justify-center shrink-0">
               <FileText className="w-5 h-5" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[10px] font-bold border border-clay-200">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[12px] font-bold border border-clay-200">
               <TrendingUp className="w-3 h-3 text-clay-600" />
               +{stats.newPostsThisMonth} tháng này
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Bài viết cộng đồng</span>
+            <span className="text-[15px] font-semibold text-ink-600 block">Bài viết cộng đồng</span>
             <div className="mt-1">
-              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalPosts.toLocaleString('vi-VN')}</h2>
+              <h2 className="font-display text-[36px] leading-tight font-bold tracking-tight text-ink-900 tabular-nums sm:text-[40px]">{stats.totalPosts.toLocaleString('vi-VN')}</h2>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
+            <p className="text-[13px] leading-relaxed text-ink-600 mt-3 flex flex-wrap items-center gap-1.5 pt-3 border-t border-ink-200">
               <span className="font-bold text-clay-700">{(stats.totalLikes || 0).toLocaleString('vi-VN')}</span> thích
               <span className="text-ink-300">•</span>
               <span className="font-bold text-clay-700">{(stats.totalComments || 0).toLocaleString('vi-VN')}</span> bình luận
@@ -685,22 +688,22 @@ export const AdminDashboardPage = () => {
         </div>
 
         {/* KPI 3: Itineraries & Places Metric */}
-        <div className="bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
-          <div className="flex items-start justify-between">
+        <div className={`${DASHBOARD_METRIC} border-t-emerald-600`}>
+          <div className="flex flex-wrap items-start justify-between gap-2">
             <div className="w-10 h-10 rounded-[5px] bg-clay-50 text-clay-700 border border-clay-200 flex items-center justify-center shrink-0">
               <Compass className="w-5 h-5" />
             </div>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[10px] font-bold border border-clay-200">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-clay-50 text-clay-700 text-[12px] font-bold border border-clay-200">
               <Compass className="w-3 h-3 text-clay-600" />
               {stats.activeItineraries} đang chạy
             </span>
           </div>
           <div>
-            <span className="text-xs text-ink-400 font-medium block">Lịch trình du lịch</span>
+            <span className="text-[15px] font-semibold text-ink-600 block">Lịch trình du lịch</span>
             <div className="mt-1">
-              <h2 className="font-display font-black text-2xl sm:text-3xl text-ink-800 tracking-tight">{stats.totalItineraries.toLocaleString('vi-VN')}</h2>
+              <h2 className="font-display text-[36px] leading-tight font-bold tracking-tight text-ink-900 tabular-nums sm:text-[40px]">{stats.totalItineraries.toLocaleString('vi-VN')}</h2>
             </div>
-            <p className="text-[11px] text-ink-400 mt-2 flex items-center gap-1.5 pt-2 border-t border-ink-200/50">
+            <p className="text-[13px] leading-relaxed text-ink-600 mt-3 flex flex-wrap items-center gap-1.5 pt-3 border-t border-ink-200">
               <MapPin className="w-3.5 h-3.5 text-clay-600 shrink-0" />
               <span>{stats.totalPlaces} địa điểm tham quan</span>
             </p>
@@ -712,14 +715,14 @@ export const AdminDashboardPage = () => {
           const pendingCount = stats.pendingReports ?? pendingReports.length;
           const totalCount = stats.totalReports ?? Math.max(pendingCount, 0);
           return (
-            <div className="bg-[#FFFDF8] p-5 rounded-[6px] border border-ink-200/80 shadow-xs hover:border-clay-300 transition-colors flex flex-col justify-between space-y-3">
-              <div className="flex items-start justify-between">
+            <div className={`${DASHBOARD_METRIC} ${pendingCount > 0 ? 'border-t-rose-600' : 'border-t-emerald-600'}`}>
+              <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className={`w-10 h-10 rounded-[5px] flex items-center justify-center shrink-0 border ${
                   pendingCount > 0 ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
                 }`}>
                   <ShieldAlert className="w-5 h-5" />
                 </div>
-                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[12px] font-bold border ${
                   pendingCount > 0 
                     ? 'bg-rose-50 text-rose-700 border-rose-200 animate-pulse' 
                     : 'bg-emerald-50 text-emerald-700 border-emerald-200'
@@ -728,14 +731,14 @@ export const AdminDashboardPage = () => {
                 </span>
               </div>
               <div>
-                <span className="text-xs text-ink-400 font-medium block">Kiểm duyệt nội dung</span>
+                <span className="text-[15px] font-semibold text-ink-600 block">Kiểm duyệt nội dung</span>
                 <div className="flex items-baseline gap-2 mt-1">
-                  <h2 className="font-display font-black text-2xl sm:text-3xl tracking-tight flex items-baseline gap-1.5">
+                  <h2 className="font-display text-[36px] leading-tight font-bold tracking-tight tabular-nums sm:text-[40px] flex items-baseline gap-1.5">
                     <span className={pendingCount > 0 ? 'text-rose-600' : 'text-ink-800'}>{pendingCount}</span>
-                    <span className="text-sm font-semibold text-ink-400">/ {totalCount}</span>
+                    <span className="text-sm font-semibold text-ink-500">/ {totalCount}</span>
                   </h2>
                 </div>
-                <p className="text-[11px] text-ink-400 mt-2 flex items-center justify-between pt-2 border-t border-ink-200/50">
+                <p className="text-[13px] leading-relaxed text-ink-600 mt-3 flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-ink-200">
                   <span>{totalCount > 0 ? `${totalCount} báo cáo tổng số` : 'Không có vi phạm'}</span>
                   <button 
                     onClick={() => setAdminTab('reports')}
@@ -752,30 +755,30 @@ export const AdminDashboardPage = () => {
       </div>
 
       {/* ─── ROW 2: REAL CHARTS & INTELLIGENCE WIDGETS ────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid min-w-0 grid-cols-1 gap-5 sm:gap-6 xl:grid-cols-12">
         
         {/* LEFT COLUMN: REAL DATA CHARTS & TOP TRENDS (8 Cols) */}
-        <div className="lg:col-span-8 space-y-6">
+        <div className="min-w-0 space-y-5 sm:space-y-6 xl:col-span-8">
           
           {/* Dynamic Growth Chart */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-5">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className={`${DASHBOARD_PANEL} space-y-5 p-4 sm:p-5`}>
+            <div className="flex flex-col justify-between gap-3 border-b border-ink-200 pb-4 sm:flex-row sm:flex-wrap sm:items-center">
               <div>
                 <h3 className="font-display font-black text-lg text-ink-800 flex items-center gap-2">
                   <BarChart3 className="w-4 h-4 text-clay-600" />
                   Tăng trưởng 6 tháng gần nhất
                 </h3>
-                <p className="text-xs text-ink-400 mt-0.5">Số lượng người dùng và bài viết mới theo từng tháng</p>
+                <p className="text-xs text-ink-500 mt-0.5">Số lượng người dùng và bài viết mới theo từng tháng</p>
               </div>
 
               {/* Metric Toggle Tabs */}
-              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80 shrink-0 text-xs">
+              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200 shrink-0 text-xs">
                 <button
                   type="button"
                   onClick={() => setChartMetric('users')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 min-h-10 px-3 py-2 rounded-[5px] font-bold text-[13px] whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     chartMetric === 'users'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
+                      ? 'bg-clay-600 text-white border border-clay-600 shadow-sm'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
                   }`}
                 >
@@ -785,9 +788,9 @@ export const AdminDashboardPage = () => {
                 <button
                   type="button"
                   onClick={() => setChartMetric('posts')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 min-h-10 px-3 py-2 rounded-[5px] font-bold text-[13px] whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     chartMetric === 'posts'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
+                      ? 'bg-clay-600 text-white border border-clay-600 shadow-sm'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
                   }`}
                 >
@@ -799,41 +802,40 @@ export const AdminDashboardPage = () => {
 
             {/* Dynamic Interactive Bar & Gradient Chart Container */}
             <div className="pt-2">
-              <div className="h-52 w-full flex items-end justify-between gap-2 sm:gap-6 px-2 sm:px-4 border-b border-ink-200/60 pb-2">
+              <div className="h-52 w-full flex items-end justify-between gap-2 sm:gap-6 px-2 sm:px-4 border-b border-ink-200 pb-2">
                 {growthData.map((item, idx) => {
                   const count = Number(item.count) || 0;
                   const percent = Math.min(100, Math.max(12, Math.round((count / maxChartValue) * 100)));
                   const isLatest = idx === growthData.length - 1;
 
                   return (
-                    <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group relative">
-                      {/* Floating Tooltip */}
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute -top-8 bg-ink-900 text-[#FFFDF8] px-2.5 py-1 rounded-[4px] text-[10px] font-bold whitespace-nowrap pointer-events-none z-10 border border-ink-800">
-                        {count.toLocaleString('vi-VN')} {chartMetric === 'users' ? 'thành viên' : 'bài viết'}
-                      </div>
-
+                    <div
+                      key={idx}
+                      title={`${item.label}: ${count.toLocaleString('vi-VN')} ${chartMetric === 'users' ? 'thành viên' : 'bài viết'}`}
+                      className="relative flex h-full min-w-0 flex-1 flex-col items-center justify-end group"
+                    >
                       {/* Bar Value Header */}
-                      <span className={`text-[11px] font-bold mb-1 transition-colors ${
-                        isLatest ? 'text-clay-700 font-black' : 'text-ink-400 group-hover:text-ink-800'
+                      <span className={`text-[13px] font-bold mb-1 transition-colors ${
+                        isLatest ? 'text-clay-700 font-black' : 'text-ink-500 group-hover:text-ink-800'
                       }`}>
                         {count}
                       </span>
 
                       {/* Bar Column Graphic */}
-                      <div className="w-full max-w-[48px] bg-[#F8F4EC] rounded-t-[3px] border-t border-x border-ink-200/60 overflow-hidden flex flex-col justify-end h-full">
+                      <div className="w-full max-w-[48px] bg-[#F8F4EC] rounded-t-[3px] border-t border-x border-ink-200 overflow-hidden flex flex-col justify-end h-full">
                         <div 
                           className={`w-full rounded-t-[3px] transition-all duration-500 ease-out ${
                             isLatest 
-                              ? 'bg-gradient-to-t from-clay-700 to-clay-500 group-hover:brightness-110' 
-                              : 'bg-gradient-to-t from-ink-300 to-ink-200 group-hover:from-clay-400 group-hover:to-clay-300'
+                              ? 'bg-clay-600 group-hover:bg-clay-700'
+                              : 'bg-ink-400 group-hover:bg-ink-600'
                           }`}
                           style={{ height: `${percent}%` }}
                         ></div>
                       </div>
 
                       {/* Month Label */}
-                      <span className="text-[11px] text-ink-500 font-semibold mt-2.5 block text-center truncate w-full">
-                        {item.label}
+                      <span className="text-[11px] sm:text-[13px] text-ink-500 font-semibold mt-2.5 block text-center truncate w-full">
+                        {item.label?.replace(/^Th/, 'T')}
                       </span>
                     </div>
                   );
@@ -842,21 +844,21 @@ export const AdminDashboardPage = () => {
 
               {/* Chart Footer Summary Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 mt-4 pt-2">
-                <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Tổng 6 tháng</span>
-                  <span className="text-base font-display font-black text-ink-800 mt-0.5 block">
+                <div className="min-w-0 p-3.5 bg-ink-50 rounded-md border border-ink-200 text-left">
+                  <span className="text-[13px] text-ink-600 block font-semibold">Tổng 6 tháng</span>
+                  <span className="text-xl font-display font-bold tabular-nums text-ink-800 mt-0.5 block">
                     {growthData.reduce((acc, cur) => acc + (Number(cur.count) || 0), 0).toLocaleString('vi-VN')}
                   </span>
                 </div>
-                <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Cao điểm nhất</span>
-                  <span className="text-base font-display font-black text-clay-700 mt-0.5 block">
+                <div className="min-w-0 p-3.5 bg-ink-50 rounded-md border border-ink-200 text-left">
+                  <span className="text-[13px] text-ink-600 block font-semibold">Cao điểm nhất</span>
+                  <span className="text-xl font-display font-bold tabular-nums text-clay-700 mt-0.5 block">
                     {Math.max(...growthData.map(d => Number(d.count) || 0)).toLocaleString('vi-VN')}
                   </span>
                 </div>
-                <div className="p-3 bg-[#F8F4EC] rounded-[6px] border border-ink-200/60 text-center">
-                  <span className="text-[11px] text-ink-400 block font-medium">Tháng này</span>
-                  <span className="text-base font-display font-black text-emerald-700 mt-0.5 block">
+                <div className="min-w-0 p-3.5 bg-ink-50 rounded-md border border-ink-200 text-left">
+                  <span className="text-[13px] text-ink-600 block font-semibold">Tháng này</span>
+                  <span className="text-xl font-display font-bold tabular-nums text-emerald-700 mt-0.5 block">
                     +{growthData[growthData.length - 1]?.count || 0} mới
                   </span>
                 </div>
@@ -865,24 +867,24 @@ export const AdminDashboardPage = () => {
           </div>
 
           {/* Top Trends & Places */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className={`${DASHBOARD_PANEL} space-y-4 p-4 sm:p-5`}>
+            <div className="flex flex-col justify-between gap-3 border-b border-ink-200 pb-4 sm:flex-row sm:flex-wrap sm:items-center">
               <div>
                 <h3 className="font-display font-black text-lg text-ink-800 flex items-center gap-2">
                   <Compass className="w-4 h-4 text-clay-600" />
                   Điểm đến & Địa danh nổi bật
                 </h3>
-                <p className="text-xs text-ink-400 mt-0.5">Xếp hạng theo lượt tạo lịch trình và đánh giá thực tế</p>
+                <p className="text-xs text-ink-500 mt-0.5">Xếp hạng theo lượt tạo lịch trình và đánh giá thực tế</p>
               </div>
 
               {/* Subtabs for Trends */}
-              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200/80 shrink-0 text-xs">
+              <div className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start p-1 bg-[#F8F4EC] rounded-[5px] border border-ink-200 shrink-0 text-xs">
                 <button
                   type="button"
                   onClick={() => setTopTab('destinations')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 min-h-10 px-3 py-2 rounded-[5px] font-bold text-[13px] whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     topTab === 'destinations'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
+                      ? 'bg-clay-600 text-white border border-clay-600 shadow-sm'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
                   }`}
                 >
@@ -892,9 +894,9 @@ export const AdminDashboardPage = () => {
                 <button
                   type="button"
                   onClick={() => setTopTab('places')}
-                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] font-bold text-xs whitespace-nowrap transition-all duration-150 cursor-pointer ${
+                  className={`flex-1 sm:flex-none justify-center inline-flex items-center gap-1.5 min-h-10 px-3 py-2 rounded-[5px] font-bold text-[13px] whitespace-nowrap transition-all duration-150 cursor-pointer ${
                     topTab === 'places'
-                      ? 'bg-[#FFFDF8] text-clay-700 border border-ink-200/80 shadow-none'
+                      ? 'bg-clay-600 text-white border border-clay-600 shadow-sm'
                       : 'text-ink-500 hover:text-ink-800 hover:bg-[#FFFDF8]/60 border border-transparent'
                   }`}
                 >
@@ -908,7 +910,7 @@ export const AdminDashboardPage = () => {
             {topTab === 'destinations' ? (
               <div className="space-y-3">
                 {(!stats.topDestinations || stats.topDestinations.length === 0) ? (
-                  <div className="p-8 text-center text-ink-400 text-xs">
+                  <div className="p-8 text-center text-ink-500 text-xs">
                     Chưa có dữ liệu điểm đến.
                   </div>
                 ) : (
@@ -916,19 +918,19 @@ export const AdminDashboardPage = () => {
                     const highestCount = Number(stats.topDestinations[0]?.count) || 1;
                     const percent = Math.min(100, Math.round((Number(dest.count) / highestCount) * 100));
                     return (
-                      <div key={idx} className="p-3.5 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200/60 hover:bg-[#F8F4EC] transition-colors">
-                        <div className="flex items-center justify-between font-bold text-xs text-ink-800 mb-1.5">
-                          <span className="flex items-center gap-2">
-                            <span className={`w-5 h-5 rounded-[4px] flex items-center justify-center text-[10px] font-extrabold border ${
+                      <div key={idx} className="min-w-0 p-3.5 rounded-md bg-ink-50 border border-ink-200 hover:bg-[#F8F4EC] transition-colors">
+                        <div className="flex flex-wrap items-center justify-between gap-2 font-bold text-[14px] text-ink-800 mb-2">
+                          <span className="flex min-w-0 flex-1 items-center gap-2">
+                            <span className={`w-6 h-6 shrink-0 rounded-[4px] flex items-center justify-center text-[12px] font-extrabold border ${
                               idx === 0 ? 'bg-amber-100 text-amber-800 border-amber-300' :
                               idx === 1 ? 'bg-ink-100 text-ink-700 border-ink-300' :
                               idx === 2 ? 'bg-clay-100 text-clay-800 border-clay-300' : 'bg-[#FFFDF8] text-ink-600 border-ink-200'
                             }`}>
                               #{idx + 1}
                             </span>
-                            <span className="font-display font-bold text-ink-800">{dest.destination || 'Không xác định'}</span>
+                            <span className="min-w-0 break-words font-display font-bold text-ink-800">{dest.destination || 'Không xác định'}</span>
                           </span>
-                          <span className="text-clay-700 font-extrabold">{dest.count} chuyến đi</span>
+                          <span className="shrink-0 text-clay-700 font-extrabold tabular-nums">{dest.count} chuyến đi</span>
                         </div>
                         <div className="w-full bg-ink-200/60 rounded-full h-1.5">
                           <div 
@@ -944,25 +946,25 @@ export const AdminDashboardPage = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {(!stats.topPlaces || stats.topPlaces.length === 0) ? (
-                  <div className="col-span-2 p-8 text-center text-ink-400 text-xs">
+                  <div className="sm:col-span-2 p-8 text-center text-ink-500 text-xs">
                     Chưa có đánh giá địa danh.
                   </div>
                 ) : (
                   stats.topPlaces.map((place, idx) => (
-                    <div key={idx} className="p-3.5 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200/60 flex items-center justify-between gap-3 hover:bg-[#F8F4EC] transition-colors">
+                    <div key={idx} className="min-w-0 p-3.5 rounded-md bg-ink-50 border border-ink-200 flex items-center justify-between gap-3 hover:bg-[#F8F4EC] transition-colors">
                       <div className="min-w-0">
                         <div className="font-display font-bold text-xs text-ink-800 truncate">{place.name}</div>
-                        <div className="text-[11px] text-ink-400 flex items-center gap-1 mt-0.5">
+                        <div className="text-[13px] text-ink-500 flex items-center gap-1 mt-0.5">
                           <MapPin className="w-3 h-3 text-clay-600 shrink-0" />
                           <span className="truncate">{place.city || 'Việt Nam'}</span>
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-[#FFFDF8] text-ink-800 font-bold text-xs border border-ink-200/80">
+                        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] bg-[#FFFDF8] text-ink-800 font-bold text-xs border border-ink-200">
                           <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                           <span>{Number(place.rating || 0).toFixed(1)}</span>
                         </div>
-                        <span className="block text-[10px] text-ink-400 mt-0.5">{place.reviewCount || 0} đánh giá</span>
+                        <span className="block text-[12px] text-ink-500 mt-0.5">{place.reviewCount || 0} đánh giá</span>
                       </div>
                     </div>
                   ))
@@ -974,11 +976,11 @@ export const AdminDashboardPage = () => {
         </div>
 
         {/* RIGHT COLUMN: ACTION REQUIRED & RECENT AUDIT LOGS (4 Cols) */}
-        <div className="lg:col-span-4 space-y-6">
+        <div className="min-w-0 space-y-5 sm:space-y-6 xl:col-span-4">
           
           {/* Action Required: Pending Moderation Reports */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-ink-200/60">
+          <div className={`${DASHBOARD_PANEL} space-y-4 p-4 sm:p-5`}>
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-ink-200">
               <div className="flex items-center gap-2 font-display font-black text-base text-ink-800">
                 <span className={`w-2 h-2 rounded-full ${(stats.pendingReports > 0 || pendingReports.length > 0) ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`}></span>
                 <span>Cần kiểm duyệt</span>
@@ -995,7 +997,7 @@ export const AdminDashboardPage = () => {
                 <div className="p-5 rounded-[5px] bg-emerald-50/60 border border-emerald-200 text-emerald-800 text-center font-semibold space-y-1">
                   <CheckCircle2 className="w-5 h-5 mx-auto text-emerald-600 mb-1" />
                   <div className="font-bold">Hệ thống an toàn</div>
-                  <p className="text-[11px] text-emerald-700 font-normal">Không có báo cáo vi phạm chờ duyệt.</p>
+                  <p className="text-[13px] text-emerald-700 font-normal">Không có báo cáo vi phạm chờ duyệt.</p>
                 </div>
               ) : (
                 pendingReports.slice(0, 3).map((r) => (
@@ -1004,17 +1006,17 @@ export const AdminDashboardPage = () => {
                       <span className="flex items-center gap-1">
                         <Flag className="w-3.5 h-3.5 text-rose-600" /> {r.category || 'Vi phạm'}
                       </span>
-                      <span className="text-[10px] text-ink-400 font-normal">{r.timeAgo || 'Gần đây'}</span>
+                      <span className="text-[12px] text-ink-500 font-normal">{r.timeAgo || 'Gần đây'}</span>
                     </div>
                     <h4 className="font-display font-bold text-ink-800 line-clamp-1">{r.title || 'Bài viết báo cáo'}</h4>
-                    <p className="text-[11px] text-ink-600 line-clamp-1">
+                    <p className="text-[13px] text-ink-600 line-clamp-1">
                       {r.aiFlagReason || r.reportReason || r.snippet || 'Dấu hiệu vi phạm tiêu chuẩn cộng đồng.'}
                     </p>
                     <div className="flex items-center justify-between pt-1">
-                      <span className="text-[10px] text-ink-500 truncate max-w-[130px]">{r.authorName || 'Ẩn danh'}</span>
+                      <span className="text-[12px] text-ink-500 truncate max-w-[130px]">{r.authorName || 'Ẩn danh'}</span>
                       <button
                         onClick={() => setAdminTab('reports')}
-                        className="px-2.5 py-0.5 rounded-[4px] bg-rose-700 hover:bg-rose-800 text-white font-bold text-[10px] transition-colors cursor-pointer"
+                        className="px-2.5 py-0.5 rounded-[4px] bg-rose-700 hover:bg-rose-800 text-white font-bold text-[12px] transition-colors cursor-pointer"
                       >
                         Kiểm duyệt
                       </button>
@@ -1034,15 +1036,15 @@ export const AdminDashboardPage = () => {
           </div>
 
           {/* Recent Audit Logs Feed */}
-          <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-ink-200/60">
+          <div className={`${DASHBOARD_PANEL} space-y-4 p-4 sm:p-5`}>
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-ink-200">
               <div className="flex items-center gap-2 font-display font-black text-base text-ink-800">
                 <History className="w-4 h-4 text-clay-600" />
                 <span>Nhật ký hoạt động</span>
               </div>
               <button 
                 onClick={() => setAdminTab('audit-logs')}
-                className="text-[11px] text-clay-700 hover:text-clay-800 font-bold hover:underline cursor-pointer"
+                className="text-[13px] text-clay-700 hover:text-clay-800 font-bold hover:underline cursor-pointer"
               >
                 Tất cả →
               </button>
@@ -1050,27 +1052,27 @@ export const AdminDashboardPage = () => {
 
             <div className="space-y-2.5">
               {recentLogs.length === 0 ? (
-                <div className="p-4 text-center text-ink-400 text-xs">
+                <div className="p-4 text-center text-ink-500 text-xs">
                   Chưa có hoạt động gần đây.
                 </div>
               ) : (
                 recentLogs.map((logItem) => {
                   const badge = formatActionBadge(logItem.action);
                   return (
-                    <div key={logItem.id} className="p-2.5 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200/60 text-xs space-y-1 hover:bg-[#F8F4EC] transition-colors">
+                    <div key={logItem.id} className="p-2.5 rounded-[5px] bg-[#F8F4EC]/60 border border-ink-200 text-xs space-y-1 hover:bg-[#F8F4EC] transition-colors">
                       <div className="flex items-center justify-between">
-                        <span className={`px-1.5 py-0.5 rounded-[3px] font-mono text-[9px] font-bold border ${badge.bg}`}>
+                        <span className={`px-1.5 py-0.5 rounded-[3px] font-mono text-[11px] font-bold border ${badge.bg}`}>
                           {badge.label}
                         </span>
-                        <span className="text-[10px] text-ink-400 flex items-center gap-1">
+                        <span className="text-[12px] text-ink-500 flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {logItem.createdAt ? new Date(logItem.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : 'Vừa xong'}
                         </span>
                       </div>
-                      <div className="font-bold text-ink-800 line-clamp-1 text-[11px]">
+                      <div className="font-bold text-ink-800 line-clamp-1 text-[13px]">
                         {logItem.actorName || logItem.actorEmail || 'Hệ thống'}
                       </div>
-                      <p className="text-[10px] text-ink-500 line-clamp-1">
+                      <p className="text-[12px] text-ink-500 line-clamp-1">
                         {logItem.details || logItem.targetResource || 'Thực hiện thao tác trong hệ thống'}
                       </p>
                     </div>
@@ -1093,17 +1095,17 @@ export const AdminDashboardPage = () => {
       </div>
 
       {/* ─── ROW 3: CENTRAL DATA TABLE ────────────────────────────────────── */}
-      <div className="bg-[#FFFDF8] p-5 sm:p-6 rounded-[6px] border border-ink-200/80 space-y-5">
+      <div className={`${DASHBOARD_PANEL} space-y-5 p-4 sm:p-5`}>
         
         {/* Table Header & Functional Bar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-ink-200/60">
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col justify-between gap-4 border-b border-ink-200 pb-4 xl:flex-row xl:flex-wrap xl:items-center">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={() => setActiveTableTab('itineraries')}
               className={`font-display font-black text-base transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
                 activeTableTab === 'itineraries' 
                   ? 'text-clay-700 border-clay-600' 
-                  : 'text-ink-400 border-transparent hover:text-ink-700'
+                  : 'text-ink-500 border-transparent hover:text-ink-700'
               }`}
             >
               Lịch trình ({filteredItineraries.length})
@@ -1114,23 +1116,23 @@ export const AdminDashboardPage = () => {
               className={`font-display font-black text-base transition-colors cursor-pointer pb-2 -mb-2 border-b-2 ${
                 activeTableTab === 'users' 
                   ? 'text-clay-700 border-clay-600' 
-                  : 'text-ink-400 border-transparent hover:text-ink-700'
+                  : 'text-ink-500 border-transparent hover:text-ink-700'
               }`}
             >
               Thành viên ({filteredUsers.length})
             </button>
           </div>
 
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2.5 w-full md:w-auto">
+          <div className="flex min-w-0 w-full flex-col gap-2.5 sm:flex-row sm:items-center xl:w-auto">
             {/* Search Input */}
-            <div className="relative w-full sm:w-64">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-ink-400" />
+            <div className="relative min-w-0 w-full sm:flex-1 xl:w-64">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-ink-500" />
               <input
                 type="text"
                 placeholder={activeTableTab === 'itineraries' ? "Tìm theo tên, điểm đến, tác giả..." : "Tìm tên, email thành viên..."}
                 value={tableSearch}
                 onChange={(e) => setTableSearch(e.target.value)}
-                className="pl-8 pr-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs text-ink-800 placeholder:text-ink-300 outline-none focus:border-clay-600 w-full transition-all"
+                className="pl-8 pr-3 min-h-11 py-2 bg-white border border-ink-300 rounded-[5px] text-xs text-ink-800 placeholder:text-ink-400 outline-none focus:border-clay-600 w-full transition-all"
               />
             </div>
 
@@ -1139,7 +1141,7 @@ export const AdminDashboardPage = () => {
               <select
                 value={tableStatusFilter}
                 onChange={(e) => setTableStatusFilter(e.target.value)}
-                className="flex-1 sm:flex-none px-3 py-1.5 bg-[#F8F4EC] border border-ink-200/80 rounded-[5px] text-xs font-bold text-ink-700 outline-none cursor-pointer hover:bg-[#F8F4EC]/80 transition-colors"
+                className="flex-1 sm:flex-none px-3 min-h-11 py-2 bg-white border border-ink-300 rounded-[5px] text-xs font-bold text-ink-700 outline-none cursor-pointer hover:bg-[#F8F4EC]/80 transition-colors"
               >
                 {activeTableTab === 'itineraries' ? (
                   <>
@@ -1161,7 +1163,7 @@ export const AdminDashboardPage = () => {
               <button 
                 onClick={() => loadDashboardData(true)}
                 disabled={refreshing}
-                className="p-2 rounded-[5px] bg-[#FFFDF8] border border-ink-200/80 text-ink-600 hover:text-clay-700 hover:bg-[#F8F4EC] transition-colors cursor-pointer disabled:opacity-50 shrink-0" 
+                className="p-2 rounded-[5px] bg-[#FFFDF8] border border-ink-200 text-ink-600 hover:text-clay-700 hover:bg-[#F8F4EC] transition-colors cursor-pointer disabled:opacity-50 shrink-0"
                 title="Làm mới bảng"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-clay-600' : ''}`} />
@@ -1171,11 +1173,11 @@ export const AdminDashboardPage = () => {
         </div>
 
         {/* Data Table Container */}
-        <div className="overflow-x-auto rounded-[5px] border border-ink-200/80">
+        <div className="overflow-x-auto rounded-md border border-ink-300">
           {activeTableTab === 'itineraries' ? (
             /* ITINERARIES TABLE */
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F4EC] text-ink-600 font-bold border-b border-ink-200/80 uppercase text-[11px] tracking-wider">
+            <table className="w-full min-w-[760px] text-left text-[14px]">
+              <thead className="bg-ink-100 text-ink-800 font-bold border-b border-ink-300 text-[13px]">
                 <tr>
                   <th className="py-3 px-4">Mã</th>
                   <th className="py-3 px-4">Lịch trình</th>
@@ -1186,28 +1188,28 @@ export const AdminDashboardPage = () => {
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ink-200/60 bg-[#FFFDF8]">
+              <tbody className="divide-y divide-ink-200 bg-white">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-ink-400">
+                    <td colSpan={7} className="py-12 text-center text-ink-500">
                       <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-clay-600" />
                       Đang đồng bộ dữ liệu lịch trình...
                     </td>
                   </tr>
                 ) : paginatedRecords.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-ink-400">
+                    <td colSpan={7} className="py-12 text-center text-ink-500">
                       Không tìm thấy lịch trình nào khớp với bộ lọc.
                     </td>
                   </tr>
                 ) : (
                   paginatedRecords.map((row) => (
-                    <tr key={row.id} className="hover:bg-[#F8F4EC]/50 transition-colors">
+                    <tr key={row.id} className="even:bg-ink-50/60 hover:bg-clay-50 transition-colors">
                       <td className="py-3 px-4 font-mono font-bold text-clay-700">#{row.id}</td>
 
                       <td className="py-3 px-4 max-w-xs">
                         <div className="font-display font-bold text-ink-800 truncate">{row.title}</div>
-                        <span className="text-ink-400 text-[11px] flex items-center gap-1">
+                        <span className="text-ink-500 text-[13px] flex items-center gap-1">
                           {row.isAiGenerated ? (
                             <span className="text-clay-600 font-bold flex items-center gap-0.5">
                               <Sparkles className="w-2.5 h-2.5" /> WanderAI
@@ -1227,10 +1229,10 @@ export const AdminDashboardPage = () => {
                               alt="" 
                               crossOrigin="anonymous" 
                               referrerPolicy="no-referrer" 
-                              className="w-6 h-6 rounded-full object-cover shrink-0 border border-ink-200/80" 
+                              className="w-6 h-6 rounded-full object-cover shrink-0 border border-ink-200"
                             />
                           ) : (
-                            <div className="w-6 h-6 rounded-full bg-clay-700 text-[#FFFDF8] font-bold text-[10px] flex items-center justify-center shrink-0">
+                            <div className="w-6 h-6 rounded-full bg-clay-700 text-[#FFFDF8] font-bold text-[12px] flex items-center justify-center shrink-0">
                               {row.creatorName ? row.creatorName.charAt(0) : 'U'}
                             </div>
                           )}
@@ -1255,14 +1257,14 @@ export const AdminDashboardPage = () => {
                           return (
                             <div className="space-y-0.5">
                               <span 
-                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[10px] font-bold border ${st.badgeClass}`} 
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[12px] font-bold border ${st.badgeClass}`}
                               >
                                 <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                                 {st.label}
                               </span>
                               {row.startDate && (
-                                <div className="text-[10px] text-ink-400 font-mono flex items-center gap-1">
-                                  <Calendar className="w-2.5 h-2.5 text-ink-400 shrink-0" />
+                                <div className="text-[12px] text-ink-500 font-mono flex items-center gap-1">
+                                  <Calendar className="w-2.5 h-2.5 text-ink-500 shrink-0" />
                                   <span>{row.startDate}</span>
                                 </div>
                               )}
@@ -1272,7 +1274,7 @@ export const AdminDashboardPage = () => {
                       </td>
 
                       <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end gap-1 text-ink-400">
+                        <div className="flex items-center justify-end gap-1 text-ink-500">
                           <button 
                             onClick={() => setSelectedItinerary(row)}
                             className="p-1.5 hover:text-clay-700 hover:bg-clay-50 rounded-[4px] transition-colors cursor-pointer" 
@@ -1289,8 +1291,8 @@ export const AdminDashboardPage = () => {
             </table>
           ) : (
             /* USERS TABLE */
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#F8F4EC] text-ink-600 font-bold border-b border-ink-200/80 uppercase text-[11px] tracking-wider">
+            <table className="w-full min-w-[760px] text-left text-[14px]">
+              <thead className="bg-ink-100 text-ink-800 font-bold border-b border-ink-300 text-[13px]">
                 <tr>
                   <th className="py-3 px-4">Mã</th>
                   <th className="py-3 px-4">Thành viên</th>
@@ -1301,23 +1303,23 @@ export const AdminDashboardPage = () => {
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-ink-200/60 bg-[#FFFDF8]">
+              <tbody className="divide-y divide-ink-200 bg-white">
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-ink-400">
+                    <td colSpan={7} className="py-12 text-center text-ink-500">
                       <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-clay-600" />
                       Đang đồng bộ danh sách thành viên...
                     </td>
                   </tr>
                 ) : paginatedRecords.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-12 text-center text-ink-400">
+                    <td colSpan={7} className="py-12 text-center text-ink-500">
                       Không tìm thấy thành viên nào khớp với bộ lọc.
                     </td>
                   </tr>
                 ) : (
                   paginatedRecords.map((user) => (
-                    <tr key={user.id} className="hover:bg-[#F8F4EC]/50 transition-colors">
+                    <tr key={user.id} className="even:bg-ink-50/60 hover:bg-clay-50 transition-colors">
                       <td className="py-3 px-4 font-mono font-bold text-clay-700">#{user.id}</td>
 
                       <td className="py-3 px-4">
@@ -1328,10 +1330,10 @@ export const AdminDashboardPage = () => {
                               alt="" 
                               crossOrigin="anonymous" 
                               referrerPolicy="no-referrer" 
-                              className="w-7 h-7 rounded-full object-cover shrink-0 border border-ink-200/80" 
+                              className="w-7 h-7 rounded-full object-cover shrink-0 border border-ink-200"
                             />
                           ) : (
-                            <div className="w-7 h-7 rounded-full bg-ink-800 text-[#FFFDF8] font-bold text-[10px] flex items-center justify-center shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-ink-800 text-[#FFFDF8] font-bold text-[12px] flex items-center justify-center shrink-0">
                               {(user.name || user.fullName || 'U').charAt(0).toUpperCase()}
                             </div>
                           )}
@@ -1339,7 +1341,7 @@ export const AdminDashboardPage = () => {
                         </div>
                       </td>
 
-                      <td className="py-3 px-4 text-ink-600 font-mono text-[11px]">{user.email}</td>
+                      <td className="py-3 px-4 text-ink-600 font-mono text-[13px]">{user.email}</td>
 
                       <td className="py-3 px-4">
                         {(() => {
@@ -1347,20 +1349,20 @@ export const AdminDashboardPage = () => {
                           const isMod = (user.roles && user.roles.includes('ROLE_MODERATOR')) || user.role === 'ROLE_MODERATOR';
                           if (isAdmin) {
                             return (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-bold border bg-amber-50 text-amber-900 border-amber-300">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[12px] font-bold border bg-amber-50 text-amber-900 border-amber-300">
                                 ADMIN
                               </span>
                             );
                           }
                           if (isMod) {
                             return (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-bold border bg-clay-50 text-clay-800 border-clay-300">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[12px] font-bold border bg-clay-50 text-clay-800 border-clay-300">
                                 MODERATOR
                               </span>
                             );
                           }
                           return (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[10px] font-bold border bg-[#F8F4EC] text-ink-700 border-ink-200">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[12px] font-bold border bg-[#F8F4EC] text-ink-700 border-ink-200">
                               USER
                             </span>
                           );
@@ -1368,7 +1370,7 @@ export const AdminDashboardPage = () => {
                       </td>
 
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] text-[10px] font-bold border ${
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[4px] text-[12px] font-bold border ${
                           user.isBlocked
                             ? 'bg-rose-50 text-rose-800 border-rose-200'
                             : 'bg-emerald-50 text-emerald-800 border-emerald-200'
@@ -1378,14 +1380,14 @@ export const AdminDashboardPage = () => {
                         </span>
                       </td>
 
-                      <td className="py-3 px-4 text-ink-500 text-[11px]">
+                      <td className="py-3 px-4 text-ink-500 text-[13px]">
                         {user.createdAt ? formatVietnamDateOnly(user.createdAt, 'Mới tham gia') : 'Mới tham gia'}
                       </td>
 
                       <td className="py-3 px-4 text-right">
                         <button
                           onClick={() => setAdminTab('users')}
-                          className="px-2.5 py-1 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-ink-700 hover:text-clay-700 font-bold text-[11px] border border-ink-200/80 transition-colors cursor-pointer"
+                          className="px-2.5 py-1 rounded-[5px] bg-[#F8F4EC] hover:bg-clay-50 text-ink-700 hover:text-clay-700 font-bold text-[13px] border border-ink-200 transition-colors cursor-pointer"
                         >
                           Quản lý
                         </button>
@@ -1408,7 +1410,7 @@ export const AdminDashboardPage = () => {
               <button
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="p-1.5 rounded-[5px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-[#F8F4EC] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-ink-700"
+                className="p-1.5 rounded-[5px] border border-ink-200 bg-[#FFFDF8] hover:bg-[#F8F4EC] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-ink-700"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -1418,7 +1420,7 @@ export const AdminDashboardPage = () => {
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
-                className="p-1.5 rounded-[5px] border border-ink-200/80 bg-[#FFFDF8] hover:bg-[#F8F4EC] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-ink-700"
+                className="p-1.5 rounded-[5px] border border-ink-200 bg-[#FFFDF8] hover:bg-[#F8F4EC] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer text-ink-700"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
